@@ -28,7 +28,6 @@ using AlastairLundy.CliInvoke.Exceptions;
 
 using AlastairLundy.Extensions.Processes;
 using AlastairLundy.Extensions.Processes.Abstractions;
-
 using AlastairLundy.Extensions.Processes.Piping.Abstractions;
 
 #if NET5_0_OR_GREATER
