@@ -21,7 +21,9 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
-using AlastairLundy.Extensions.Processes;
+using ProcessResourcePolicy = AlastairLundy.Extensions.Processes.Abstractions.ProcessResourcePolicy;
+using ProcessResultValidation = AlastairLundy.Extensions.Processes.Abstractions.ProcessResultValidation;
+using UserCredential = AlastairLundy.Extensions.Processes.Abstractions.UserCredential;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
