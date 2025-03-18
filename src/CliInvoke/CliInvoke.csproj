@@ -35,8 +35,8 @@
     
     <ItemGroup>
         <PackageReference Include="AlastairLundy.Extensions.System" Version="[6.1.0, 7.0.0)"/>
-        <PackageReference Include="AlastairLundy.Extensions.Processes" Version="[1.4.1, 2.0.0)"/>
-        <PackageReference Include="AlastairLundy.Extensions.Processes.Abstractions" Version="[1.4.1, 2.0.0)"/>
+        <PackageReference Include="AlastairLundy.Extensions.Processes" Version="[1.4.2. 2.0.0)" />
+        <PackageReference Include="AlastairLundy.Extensions.Processes.Abstractions" Version="[1.4.2, 2.0.0)"/>
     </ItemGroup>
     
     <ItemGroup >
