@@ -8,7 +8,9 @@
    */
 
 
+using System;
 using System.Diagnostics;
+using AlastairLundy.CliInvoke.Internal;
 
 namespace AlastairLundy.CliInvoke.Abstractions;
 
@@ -22,6 +24,7 @@ public interface ICommandProcessFactory
     /// </summary>
     /// <param name="processStartInfo">The process start information to be used to configure the process to be created.</param>
     /// <returns>The newly created Process with the specified start information.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process CreateProcess(ProcessStartInfo processStartInfo);
 
     /// <summary>
