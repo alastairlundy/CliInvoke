@@ -20,9 +20,8 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.0.0</Version>
-        <PackageReleaseNotes>* Updated to support CliInvoke 1.0.0 changes.
-* Created ``ISpecializedCliCommandInvoker`` from ``SpecializedCliCommandInvoker``. </PackageReleaseNotes>
+        <Version>1.1.0</Version>
+        <PackageReleaseNotes>* Updated to support CliInvoke 1.1.0 changes.</PackageReleaseNotes>
         <RootNamespace>AlastairLundy.CliInvoke.Extensibility</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Extensibility</AssemblyName>
     </PropertyGroup>

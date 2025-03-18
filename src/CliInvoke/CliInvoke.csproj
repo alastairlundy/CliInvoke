@@ -13,17 +13,17 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes># Changes since 1.0.0 RC 2
+        <PackageReleaseNotes>## Changes
+
+- Deprecate CommandProcessFactory ``CreateProcess`` method @alastairlundy (#19)
+
 ## 🚀 Features
 
-- Add DocFx documentation @alastairlundy (#17)
-
-## Other changes
-* Corrected xml doc comment issues</PackageReleaseNotes>
+- Update dependencies @alastairlundy (#18)</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.0.0</PackageVersion>
+        <PackageVersion>1.1.0</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
