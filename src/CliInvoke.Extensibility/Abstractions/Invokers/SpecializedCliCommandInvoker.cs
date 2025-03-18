@@ -15,7 +15,6 @@ using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
 
-using AlastairLundy.Extensions.Processes;
 using AlastairLundy.Extensions.Processes.Abstractions;
 
 
