@@ -26,9 +26,8 @@ using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Exceptions;
 
-using AlastairLundy.Extensions.Processes;
 using AlastairLundy.Extensions.Processes.Abstractions;
-using AlastairLundy.Extensions.Processes.Piping.Abstractions;
+using AlastairLundy.Extensions.Processes.Abstractions.Piping;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
