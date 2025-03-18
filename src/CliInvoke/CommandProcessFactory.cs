@@ -22,6 +22,7 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Abstractions;
+using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using AlastairLundy.Extensions.Processes;
@@ -51,6 +52,7 @@ public class CommandProcessFactory : ICommandProcessFactory
         [UnsupportedOSPlatform("watchos")]
         [UnsupportedOSPlatform("browser")]
 #endif
+        [Obsolete(DeprecationMessages.ClassDeprecationV2)]
         public Process CreateProcess(ProcessStartInfo processStartInfo)
         {
             if (string.IsNullOrEmpty(processStartInfo.FileName))
