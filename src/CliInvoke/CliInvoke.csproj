@@ -78,7 +78,7 @@
     <ItemGroup>
       <None Include="..\..\.assets\icon.png">
         <Pack>True</Pack>
-        <PackagePath></PackagePath>
+        <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
