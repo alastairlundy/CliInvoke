@@ -23,14 +23,14 @@ CliInvoke is a library for interacting with Command Line Interfaces and wrapping
 ## Features
 * Promotes the single responsibility principle and separation of concerns
 * For .NET 8 and newer TFMs CliRunner has few dependencies.
-* Compatible with .NET Standard 2.0 and 2.1 ^1
+* Compatible with .NET Standard 2.0 and 2.1 <sup>1</sup>
 * Dependency Injection extensions to make using it easier.
-* Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows ^2
+* Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows <sup>2</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
-^1 - [Polyfill](https://github.com/SimonCropp/Polyfill) is a dependency only required for .NET Standard 2.0 and 2.1 users. [Microsoft.Bcl.HashCode](https://www.nuget.org/packages/Microsoft.Bcl.HashCode) is a dependency only required for .NET Standard 2.0 users.
+<sup>1</sup> - [Polyfill](https://github.com/SimonCropp/Polyfill) is a dependency only required for .NET Standard 2.0 and 2.1 users. [Microsoft.Bcl.HashCode](https://www.nuget.org/packages/Microsoft.Bcl.HashCode) is a dependency only required for .NET Standard 2.0 users.
 
-^2 - The Specialization library is distributed separately.
+<sup>2</sup> - The Specialization library is distributed separately.
 
 ## Why use CliInvoke over [CliWrap](https://github.com/Tyrrrz/CliWrap/)?
 * Greater separation of concerns with the Command class - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
@@ -83,7 +83,7 @@ The following table details which target platforms are supported for executing c
 ^4 - Lack of watchOS support is implied by lack of IOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 
 
-**Note:** This library has not been tested on Android or Tizen!
+**Note:** This library has not been tested on Android or Tizen.
 
 ## Using CliInvoke / Examples
 One of the main use cases for CliInvoke is intended to be executing programs programatically, but other valid use cases also exist such as [safer Process Running](#safer-process-running).
