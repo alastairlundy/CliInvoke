@@ -30,7 +30,7 @@ CliInvoke is a library for interacting with Command Line Interfaces and wrapping
 
 <sup>1</sup> - [Polyfill](https://github.com/SimonCropp/Polyfill) is a dependency only required for .NET Standard 2.0 and 2.1 users. [Microsoft.Bcl.HashCode](https://www.nuget.org/packages/Microsoft.Bcl.HashCode) is a dependency only required for .NET Standard 2.0 users.
 
-<sup>2</sup> - The Specialization library is distributed separately.
+<sup>2</sup> - The Specialization library is distributed separately [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations).
 
 ## Why use CliInvoke over [CliWrap](https://github.com/Tyrrrz/CliWrap/)?
 * Greater separation of concerns with the Command class - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
@@ -61,7 +61,7 @@ CliInvoke's packages can be installed via the .NET SDK CLI, Nuget via your IDE o
 
 
 ### Supported Platforms
-CliInvoke can be added to any .NET Standard 2.0, .NET Standard 2.1, .NET 8, or .NET 9 supported project.
+CliInvoke can be added to .NET Standard 2.0, .NET Standard 2.1, .NET 8, or .NET 9 supported projects.
 
 The following table details which target platforms are supported for executing commands via CliInvoke. 
 
@@ -73,14 +73,14 @@ The following table details which target platforms are supported for executing c
 | Linux            | Fully Supported :white_check_mark: |                                                                                             |
 | FreeBSD          | Fully Supported :white_check_mark: |                                                                                             |
 | Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                |
-| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. ^3                             | 
-| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS ^3                             |
-| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^4                          |
+| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. <sup>3</sup>                             | 
+| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS <sup>3</sup>                             |
+| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                          |
 | Browser          | Not Supported and Not Planned :x:  | Not supported due to not being a valid target Platform for executing programs or processes. |
 
-^3 - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
+<sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
-^4 - Lack of watchOS support is implied by lack of IOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
+<sup>4</sup> - Lack of watchOS support is implied by lack of IOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 
 
 **Note:** This library has not been tested on Android or Tizen.
