@@ -19,6 +19,7 @@ using AlastairLundy.CliInvoke.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Extensibility.Abstractions;
 
 using AlastairLundy.Extensions.Processes;
+using AlastairLundy.Extensions.Processes.Abstractions;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;

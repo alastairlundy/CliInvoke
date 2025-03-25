@@ -6,13 +6,13 @@ This readme covers the **CliInvoke Specializations** library. Looking for the [C
 
 ## Usage
 CliInvoke.Specializations comes with 3 specializations as of 0.8.0: 
-- [CmdCommand](#cmdcommand) - An easier way to execute processes and commands through cmd.exe (Only supported on Windows)
-- [ClassicPowershellCommand](#classicpowershellcommand) - An easier way to execute processes and commands through Windows Powershell (Only supported on Windows)
-- [PowershellCommand](#powershellcommand) - An easier way to execute processes and commands through the modern Cross-Platform open source Powershell (Powershell is not installed by CliInvoke and is expected to be installed if you plan to use it.)
+- [CmdCommandConfiguration](#cmdcommandconfiguration) - An easier way to execute processes and commands through cmd.exe (Only supported on Windows)
+- [ClassicPowershellCommandConfiguration](#classicpowershellcommandconfiguration) - An easier way to execute processes and commands through Windows Powershell (Only supported on Windows)
+- [PowershellCommandConfiguration](#powershellcommandconfiguration) - An easier way to execute processes and commands through the modern Cross-Platform open source Powershell (Powershell is not installed by CliInvoke and is expected to be installed if you plan to use it.)
 
 All Command specialization classes come with an already configured TargetFilePath that points to the relevant executable.
 
-### CmdCommand
+### CmdCommandConfiguration
 The CmdCommand's TargetFilePath points to Windows' copy of cmd.exe .
 
 ```csharp
@@ -25,9 +25,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
 
-
-  ServiceProvider sp = services.Build();
-  ICommandInvoker _commandInvoker = sp.GetService<ICommandInvoker>();
+  ICliCommandInvoker _commandInvoker = sp.GetRequiredService<ICliCommandInvoker>();
 
   //Build your command fluently
   ICliCommandConfigurationBuilder builder = new CliCommandConfigurationBuilder(
@@ -51,7 +49,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
 
-  ICommandInvoker _commandInvoker = serviceProvider.GetRequiredService<ICommandInvoker>();
+  ICliCommandInvoker _commandInvoker = serviceProvider.GetRequiredService<ICliCommandInvoker>();
 
   //Build your command fluently
   ICliCommandConfigurationBuilder builder = new CliCommandConfigurationBuilder(
@@ -63,7 +61,7 @@ using AlastairLundy.CliInvoke.Specializations;
   var result = await _commandInvoker.ExecuteAsync(commandConfig);
 ```
 
-### ClassicPowershellCommand
+### ClassicPowershellCommandConfiguration
 The ClassicPowershellCommand is a specialized Command class with an already configured TargetFilePath that points to Windows' copy of powershell.exe .
 
 ```csharp
@@ -75,7 +73,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
 
-  ICommandInvoker _commandInvoker = serviceProvider.GetRequiredService<ICommandInvoker>();
+  ICliCommandInvoker _commandInvoker = serviceProvider.GetRequiredService<ICliCommandInvoker>();
 
    //Build your command fluently
   ICliCommandConfigurationBuilder builder = new CliCommandConfigurationBuilder(
@@ -87,7 +85,7 @@ using AlastairLundy.CliInvoke.Specializations;
  var result = await _commandInvoker.ExecuteBufferedAsync(commandConfig);
 ```
 
-### PowershellCommand
+### PowershellCommandConfiguration
 The PowershellCommand's TargetFilePath points to the installed copy of cross-platform Powershell if it is installed.
 
 ```csharp
@@ -99,7 +97,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
 
-  ICommandInvoker _commandInvoker = serviceProvider.GetRequiredService<ICommandInvoker>();
+  ICliCommandInvoker _commandInvoker = serviceProvider.GetRequiredService<ICliCommandInvoker>();
 
    //Build your command fluently
   ICliCommandConfigurationBuilder builder = new CliCommandConfigurationBuilder(

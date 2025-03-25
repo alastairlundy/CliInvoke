@@ -12,8 +12,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using AlastairLundy.Extensions.Processes;
-using AlastairLundy.Extensions.Processes.Builders.Abstractions;
+using AlastairLundy.Extensions.Processes.Abstractions;
+using AlastairLundy.Extensions.Processes.Abstractions.Builders;
 
 namespace AlastairLundy.CliInvoke.Builders.Abstractions;
 

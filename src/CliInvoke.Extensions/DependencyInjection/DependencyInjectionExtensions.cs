@@ -15,10 +15,11 @@ using AlastairLundy.Extensions.IO.Files.Abstractions;
 
 using AlastairLundy.Extensions.Processes;
 using AlastairLundy.Extensions.Processes.Abstractions;
+using AlastairLundy.Extensions.Processes.Abstractions.Piping;
+using AlastairLundy.Extensions.Processes.Abstractions.Utilities;
+    
 using AlastairLundy.Extensions.Processes.Piping;
-using AlastairLundy.Extensions.Processes.Piping.Abstractions;
 using AlastairLundy.Extensions.Processes.Utilities;
-using AlastairLundy.Extensions.Processes.Utilities.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
