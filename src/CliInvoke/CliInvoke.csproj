@@ -34,21 +34,16 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.Extensions.System" Version="[6.1.0, 7.0.0)"/>
-        <PackageReference Include="AlastairLundy.Extensions.Processes" Version="[1.4.3, 2.0.0)" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="[6.3.0, 7.0.0)"/>
+        <PackageReference Include="AlastairLundy.Extensions.Processes" Version="[1.4.4, 2.0.0)" />
         <PackageReference Include="AlastairLundy.Extensions.Processes.Abstractions" Version="[1.4.2, 2.0.0)"/>
     </ItemGroup>
     
     <ItemGroup >
-        <PackageReference Include="PolyFill" Version="[7.21.0, 8.0.0)" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"/>
+        <PackageReference Include="PolyFill" Version="[7.24.0, 8.0.0)" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"/>
     </ItemGroup>
     
     <ItemGroup>
-      <Content Include="..\..\LICENSE.txt">
-        <Link>LICENSE.txt</Link>
-          <PackagePath>LICENSE.txt</PackagePath>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
       <Content Include="..\..\README.md">
         <Link>README.md</Link>
           <PackagePath>README.md</PackagePath>
@@ -78,7 +73,7 @@
     <ItemGroup>
       <None Include="..\..\.assets\icon.png">
         <Pack>True</Pack>
-        <PackagePath></PackagePath>
+        <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
