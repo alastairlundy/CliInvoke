@@ -22,8 +22,8 @@ public interface ISpecializedCliCommandInvoker : ICliCommandInvoker
     CliCommandConfiguration CreateRunnerCommand(CliCommandConfiguration inputCommand);
 
     /// <summary>
-    /// 
+    /// Determines whether the Specialized CLI Command Invoker is installed on the current system.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>True if the specialized CLI Command Invoker is installed on this system; false otherwise.</returns>
     Task<bool> IsInvokerInstalledAsync();
 }
