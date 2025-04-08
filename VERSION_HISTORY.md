@@ -3,6 +3,11 @@
 
 ## As CliInvoke
 
+### 1.2
+| Version | Release Date | Changelog |
+|-|-|-|
+| 1.2.0 | April 8th 2025 |  https://github.com/alastairlundy/CliInvoke/releases/1.2.0|
+
 ### 1.1
 | Version | Release Date | Changelog |
 |-|-|-|
