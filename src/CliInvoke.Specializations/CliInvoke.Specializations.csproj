@@ -37,7 +37,6 @@
     <ItemGroup>
         <Content Include="..\..\LICENSE.txt">
             <Link>LICENSE.txt</Link>
-            <PackagePath>LICENSE.txt</PackagePath>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
         <Content Include="..\..\SPECIALIZATIONS_README.md">
