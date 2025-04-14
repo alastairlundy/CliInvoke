@@ -159,8 +159,7 @@ namespace AlastairLundy.CliInvoke
             Encoding standardErrorEncoding = null,
             ProcessResourcePolicy processResourcePolicy = null,
             bool windowCreation = false,
-            bool useShellExecution = false
-        )
+            bool useShellExecution = false)
         {
             TargetFilePath = targetFilePath;
             RequiresAdministrator = requiresAdministrator;
