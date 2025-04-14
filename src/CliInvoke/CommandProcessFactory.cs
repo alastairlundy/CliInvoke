@@ -27,7 +27,19 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 using System.Runtime.Versioning;
 #endif
 
-namespace CliInvoke;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+
+using AlastairLundy.CliInvoke.Abstractions;
+using AlastairLundy.CliInvoke.Internal;
+using AlastairLundy.CliInvoke.Internal.Localizations;
+
+using AlastairLundy.Extensions.Processes;
+
+namespace AlastairLundy.CliInvoke;
 
 /// <summary>
 /// A class to enable easy Process Creation with Command Configuration information.

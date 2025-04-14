@@ -18,6 +18,9 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 
+using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Internal.Localizations;
+
 using AlastairLundy.Extensions.Processes.Abstractions;
 using AlastairLundy.Extensions.Processes.Abstractions.Builders;
 using AlastairLundy.Extensions.Processes.Builders;
@@ -29,7 +32,7 @@ using CliInvoke.Internal.Localizations;
 using System.Runtime.Versioning;
 #endif
 
-namespace CliInvoke.Builders;
+namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
 /// A class to build Command Configurations with a Fluent configuration interface. 

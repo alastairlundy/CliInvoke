@@ -16,6 +16,10 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+
+using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Internal.Localizations;
+
 using AlastairLundy.DotExtensions.Globalization;
 using CliInvoke.Abstractions.Builders;
 using CliInvoke.Internal.Localizations;
@@ -32,7 +36,7 @@ using CliInvoke.Internal.Localizations;
 
 #nullable enable
 
-namespace CliInvoke.Builders;
+namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
 /// A class that provides a fluent interface style builder for constructing Arguments to provide to a program.
