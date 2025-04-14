@@ -7,12 +7,15 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
-using CliInvoke.Specializations.Configurations;
+using AlastairLundy.CliInvoke.Specializations.Configurations;
 
-namespace CliInvoke.Specializations.Invokers;
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
+
+namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 
 /// <summary>
 /// Run commands through cross-platform modern Powershell with ease.

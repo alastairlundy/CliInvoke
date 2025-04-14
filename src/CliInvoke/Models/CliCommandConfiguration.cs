@@ -18,7 +18,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
-using CliInvoke.Internal.Localizations;
+
+using AlastairLundy.CliInvoke.Internal.Localizations;
+
 using ProcessResourcePolicy = AlastairLundy.Extensions.Processes.Abstractions.ProcessResourcePolicy;
 using ProcessResultValidation = AlastairLundy.Extensions.Processes.Abstractions.ProcessResultValidation;
 using UserCredential = AlastairLundy.Extensions.Processes.Abstractions.UserCredential;
@@ -29,7 +31,7 @@ using UserCredential = AlastairLundy.Extensions.Processes.Abstractions.UserCrede
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 
-namespace CliInvoke
+namespace AlastairLundy.CliInvoke
 {
     /// <summary>
     /// A class to represent the configuration of a Command to be run.

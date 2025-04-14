@@ -24,6 +24,7 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
+        <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
         <PackageId>AlastairLundy.CliInvoke</PackageId>
         <Product>CliInvoke</Product>
     </PropertyGroup>

@@ -8,23 +8,26 @@
 */
 
 using System;
-using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
+
 using AlastairLundy.Extensions.IO.Files;
 using AlastairLundy.Extensions.IO.Files.Abstractions;
+
 using AlastairLundy.Extensions.Processes;
 using AlastairLundy.Extensions.Processes.Abstractions;
 using AlastairLundy.Extensions.Processes.Abstractions.Piping;
 using AlastairLundy.Extensions.Processes.Abstractions.Utilities;
+    
 using AlastairLundy.Extensions.Processes.Piping;
 using AlastairLundy.Extensions.Processes.Utilities;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 // ReSharper disable RedundantAssignment
 // ReSharper disable UnusedMember.Global
 
-namespace CliInvoke.Extensions;
+namespace AlastairLundy.CliInvoke.Extensions;
 
 public static class DependencyInjectionExtensions
 {

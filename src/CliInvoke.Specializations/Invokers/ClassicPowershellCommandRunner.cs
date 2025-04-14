@@ -7,14 +7,18 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
-using CliInvoke.Specializations.Configurations;
 
+using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
+
+using AlastairLundy.CliInvoke.Specializations.Configurations;
+
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 // ReSharper disable RedundantExtendsListEntry
 
-namespace CliInvoke.Specializations.Invokers;
+namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 
 /// <summary>
 /// Run commands through Windows Powershell with ease.
