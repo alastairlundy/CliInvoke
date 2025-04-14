@@ -22,7 +22,6 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>1.2.0</Version>
         <PackageReleaseNotes>* Updated to support CliInvoke 1.2.0 changes.</PackageReleaseNotes>
-        <RootNamespace>AlastairLundy.CliInvoke.Extensibility</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Extensibility</AssemblyName>
     </PropertyGroup>
     
@@ -33,10 +32,6 @@
     </ItemGroup>
     
     <ItemGroup>
-        <Content Include="..\..\LICENSE.txt">
-            <Link>LICENSE.txt</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
         <Content Include="README.md">
             <Link>README.md</Link>
             <PackagePath>README.md</PackagePath>

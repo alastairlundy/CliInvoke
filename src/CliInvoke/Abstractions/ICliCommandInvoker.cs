@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.Extensions.Processes.Abstractions;
+using CliInvoke;
 
 // ReSharper disable once CheckNamespace
 namespace AlastairLundy.CliInvoke.Abstractions;

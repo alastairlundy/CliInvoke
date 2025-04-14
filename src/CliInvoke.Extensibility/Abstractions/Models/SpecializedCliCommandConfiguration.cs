@@ -7,22 +7,20 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// ReSharper disable UnusedType.Global
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
-
+using AlastairLundy.CliInvoke;
 using AlastairLundy.Extensions.Processes.Abstractions;
-
-// ReSharper disable UnusedType.Global
-
 #if NET5_0_OR_GREATER
-using System.Runtime.Versioning;
+
 #nullable enable
 #endif
 
-namespace AlastairLundy.CliInvoke.Extensibility.Abstractions;
+namespace CliInvoke.Extensibility.Abstractions;
 
 /// <summary>
 /// An abstract class that implements ICommandConfiguration and adds a default constructor.

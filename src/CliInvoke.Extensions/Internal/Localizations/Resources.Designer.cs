@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AlastairLundy.CliInvoke.Extensions.Internal.Localizations {
+namespace CliInvoke.Extensions.Internal.Localizations {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>

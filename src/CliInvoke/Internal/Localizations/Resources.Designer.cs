@@ -7,10 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AlastairLundy.CliInvoke.Internal.Localizations {
-    using System;
-    
-    
+namespace CliInvoke.Internal.Localizations {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>

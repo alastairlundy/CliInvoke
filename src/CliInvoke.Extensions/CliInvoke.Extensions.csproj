@@ -23,7 +23,6 @@
         <PackageTags>shell, cli, process, wrapping, commandline,</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
-        <RootNamespace>AlastairLundy.CliInvoke.Extensions</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Extensions</AssemblyName>
     </PropertyGroup>
 

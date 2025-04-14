@@ -11,11 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
 using AlastairLundy.Extensions.Processes.Abstractions;
 using AlastairLundy.Extensions.Processes.Abstractions.Builders;
 
-namespace AlastairLundy.CliInvoke.Builders.Abstractions;
+namespace CliInvoke.Builders.Abstractions;
 
 /// <summary>
 /// An interface that defines the fluent builder methods all CommandBuilder classes must implement. 

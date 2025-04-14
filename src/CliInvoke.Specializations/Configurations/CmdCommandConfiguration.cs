@@ -7,26 +7,23 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-using AlastairLundy.CliInvoke.Extensibility.Abstractions;
-using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-
-using AlastairLundy.Extensions.Processes;
-using AlastairLundy.Extensions.Processes.Abstractions;
-
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else
 using System.Runtime.Versioning;
 #endif
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using AlastairLundy.CliInvoke.Extensibility.Abstractions;
+using AlastairLundy.Extensions.Processes.Abstractions;
+using CliInvoke.Specializations.Internal.Localizations;
+
 // ReSharper disable UnusedMember.Global
 
 
-namespace AlastairLundy.CliInvoke.Specializations.Configurations
+namespace CliInvoke.Specializations.Configurations
 {
     /// <summary>
     /// A Command configuration to make running commands through Windows CMD easier.

@@ -13,19 +13,15 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else
 using System.Runtime.Versioning;
 #endif
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
 using AlastairLundy.CliInvoke.Extensibility.Abstractions;
-
-using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-
 using AlastairLundy.Extensions.Processes.Abstractions;
+using CliInvoke.Specializations.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke.Specializations.Configurations
+namespace CliInvoke.Specializations.Configurations
 {
     /// <summary>
     /// A Command configuration to make running commands through Windows Powershell easier.

@@ -12,12 +12,12 @@
 #endif
 
 using System;
+using CliInvoke.Internal.Localizations;
 
-using AlastairLundy.CliInvoke.Internal.Localizations;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Exceptions
+namespace CliInvoke.Exceptions
 {
     /// <summary>
     /// Represents errors that occur if a Command being executed by CliInvoke is unsuccessful.

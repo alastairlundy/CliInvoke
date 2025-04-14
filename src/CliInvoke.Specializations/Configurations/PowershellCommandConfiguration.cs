@@ -7,29 +7,26 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-
-using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Extensibility.Abstractions;
-
-using AlastairLundy.Extensions.Processes;
-using AlastairLundy.Extensions.Processes.Abstractions;
-
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else
 using System.Runtime.Versioning;
 #endif
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using AlastairLundy.CliInvoke;
+using AlastairLundy.CliInvoke.Abstractions;
+using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Extensibility.Abstractions;
+using AlastairLundy.Extensions.Processes.Abstractions;
 
 // ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Specializations.Configurations
+namespace CliInvoke.Specializations.Configurations
 {
     /// <summary>
     /// A Command configuration to make running commands through cross-platform Powershell easier.
