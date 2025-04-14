@@ -21,12 +21,11 @@
 * Updated CliInvoke dependency to 1.2.0</PackageReleaseNotes>
         <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
         <PackageIcon>icon.png</PackageIcon>
-        <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="[7.24.0, 8.0.0)" />
+        <PackageReference Include="Polyfill" Version="[7.26.0, 8.0.0)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,10 +34,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\LICENSE.txt">
-            <Link>LICENSE.txt</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
         <Content Include="..\..\SPECIALIZATIONS_README.md">
             <Link>README.md</Link>
             <PackagePath>README.md</PackagePath>

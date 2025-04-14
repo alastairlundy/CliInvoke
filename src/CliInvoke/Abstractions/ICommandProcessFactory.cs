@@ -10,10 +10,9 @@
 
 using System;
 using System.Diagnostics;
+using CliInvoke.Internal;
 
-using AlastairLundy.CliInvoke.Internal;
-
-namespace AlastairLundy.CliInvoke.Abstractions;
+namespace CliInvoke.Abstractions;
 
 /// <summary>
 /// An interface to enable Creating Processes from Command Configuration inputs.

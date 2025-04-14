@@ -10,17 +10,16 @@
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
-
 using AlastairLundy.Extensions.Processes.Abstractions;
 
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
+namespace CliInvoke.Extensibility.Abstractions.Invokers;
 
 /// <summary>
 /// An abstract class to allow creating Specialized Command runners that run Commands through other Commands.

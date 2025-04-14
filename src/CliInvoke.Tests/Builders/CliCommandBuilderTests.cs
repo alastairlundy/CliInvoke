@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-using AlastairLundy.Extensions.Processes.Abstractions;
 
-using Xunit;
+using CliInvoke.Builders;
+using CliInvoke.Builders.Abstractions;
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Builders;
 
 public class CliCommandConfigurationBuilderTests
 {

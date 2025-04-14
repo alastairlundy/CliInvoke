@@ -7,9 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 
-namespace AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
+namespace CliInvoke.Extensibility.Abstractions.Invokers;
 
 public interface ISpecializedCliCommandInvoker : ICliCommandInvoker
 {
