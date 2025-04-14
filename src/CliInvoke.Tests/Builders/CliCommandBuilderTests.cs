@@ -6,7 +6,6 @@ using System.Security;
 using System.Text;
 
 using CliInvoke.Builders;
-using CliInvoke.Builders.Abstractions;
 
 namespace CliInvoke.Tests.Builders;
 

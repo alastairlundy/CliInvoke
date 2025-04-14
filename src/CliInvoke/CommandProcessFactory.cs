@@ -16,9 +16,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using AlastairLundy.Extensions.Processes;
+
 using CliInvoke.Abstractions;
 using CliInvoke.Internal;
 using CliInvoke.Internal.Localizations;
+
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else

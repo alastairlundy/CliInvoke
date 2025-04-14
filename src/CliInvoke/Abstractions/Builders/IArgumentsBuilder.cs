@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace CliInvoke.Builders.Abstractions;
+namespace CliInvoke.Abstractions.Builders;
 
 /// <summary>
 /// An interface that defines the fluent builder methods all ArgumentsBuilder classes must implement.

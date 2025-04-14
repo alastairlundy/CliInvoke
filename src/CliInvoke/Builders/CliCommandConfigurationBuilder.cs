@@ -17,11 +17,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
+
 using AlastairLundy.Extensions.Processes.Abstractions;
 using AlastairLundy.Extensions.Processes.Abstractions.Builders;
 using AlastairLundy.Extensions.Processes.Builders;
-using CliInvoke.Builders.Abstractions;
+
+using CliInvoke.Abstractions.Builders;
 using CliInvoke.Internal.Localizations;
+
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif

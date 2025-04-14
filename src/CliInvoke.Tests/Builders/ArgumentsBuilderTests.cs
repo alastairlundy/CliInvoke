@@ -1,5 +1,4 @@
 ﻿using CliInvoke.Builders;
-using CliInvoke.Builders.Abstractions;
 
 namespace CliInvoke.Tests.Builders;
 

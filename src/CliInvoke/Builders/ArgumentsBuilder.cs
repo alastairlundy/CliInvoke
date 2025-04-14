@@ -17,7 +17,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using AlastairLundy.DotExtensions.Globalization;
-using CliInvoke.Builders.Abstractions;
+using CliInvoke.Abstractions.Builders;
 using CliInvoke.Internal.Localizations;
 
 // ReSharper disable RedundantIfElseBlock

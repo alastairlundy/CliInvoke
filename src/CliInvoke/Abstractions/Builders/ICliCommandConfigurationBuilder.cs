@@ -14,7 +14,7 @@ using System.Text;
 using AlastairLundy.Extensions.Processes.Abstractions;
 using AlastairLundy.Extensions.Processes.Abstractions.Builders;
 
-namespace CliInvoke.Builders.Abstractions;
+namespace CliInvoke.Abstractions.Builders;
 
 /// <summary>
 /// An interface that defines the fluent builder methods all CommandBuilder classes must implement. 
