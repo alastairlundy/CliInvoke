@@ -5,7 +5,7 @@ This readme covers the **CliInvoke Specializations** library. Looking for the [C
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Specializations.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Specializations/)
 
 ## Usage
-CliInvoke.Specializations comes with 3 specializations as of 0.8.0: 
+CliInvoke.Specializations comes with 3 specializations as of 1.0.0: 
 - [CmdCommandConfiguration](#cmdcommandconfiguration) - An easier way to execute processes and commands through cmd.exe (Only supported on Windows)
 - [ClassicPowershellCommandConfiguration](#classicpowershellcommandconfiguration) - An easier way to execute processes and commands through Windows Powershell (Only supported on Windows)
 - [PowershellCommandConfiguration](#powershellcommandconfiguration) - An easier way to execute processes and commands through the modern Cross-Platform open source Powershell (Powershell is not installed by CliInvoke and is expected to be installed if you plan to use it.)

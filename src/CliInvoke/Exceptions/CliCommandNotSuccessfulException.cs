@@ -15,6 +15,7 @@ using System;
 
 using AlastairLundy.CliInvoke.Internal.Localizations;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace AlastairLundy.CliInvoke.Exceptions
 {
