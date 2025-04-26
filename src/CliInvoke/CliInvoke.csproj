@@ -30,13 +30,11 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="[6.3.1, 7.0.0)"/>
-        <PackageReference Include="AlastairLundy.Extensions.Processes" Version="[1.4.4, 2.0.0)" />
-        <PackageReference Include="AlastairLundy.Extensions.Processes.Abstractions" Version="[1.4.2, 2.0.0)"/>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="6.6.0"/>
     </ItemGroup>
     
     <ItemGroup >
-        <PackageReference Include="PolyFill" Version="[7.24.0, 8.0.0)" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"/>
+        <PackageReference Include="PolyFill" Version="7.27.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"/>
     </ItemGroup>
     
     <ItemGroup>

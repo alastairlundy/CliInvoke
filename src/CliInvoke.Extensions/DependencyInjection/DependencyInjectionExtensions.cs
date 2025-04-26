@@ -44,8 +44,6 @@ public static class DependencyInjectionExtensions
         {
             case ServiceLifetime.Singleton:
                 services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
-                services.TryAddSingleton<IProcessRunnerUtility, ProcessRunnerUtility>();
-                services.TryAddSingleton<IPipedProcessRunner, PipedProcessRunner>();
                 services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.AddSingleton<ICommandProcessFactory, CommandProcessFactory>();
@@ -53,8 +51,6 @@ public static class DependencyInjectionExtensions
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
-                services.TryAddScoped<IProcessRunnerUtility, ProcessRunnerUtility>();
-                services.TryAddScoped<IPipedProcessRunner, PipedProcessRunner>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.AddScoped<ICommandProcessFactory, CommandProcessFactory>();
@@ -62,8 +58,6 @@ public static class DependencyInjectionExtensions
                 break;
             case ServiceLifetime.Transient:
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
-                services.TryAddTransient<IProcessRunnerUtility, ProcessRunnerUtility>();
-                services.TryAddTransient<IPipedProcessRunner, PipedProcessRunner>();
                 services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.AddTransient<ICommandProcessFactory, CommandProcessFactory>();
