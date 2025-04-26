@@ -13,7 +13,11 @@
 
 using System;
 using System.Diagnostics;
+
 using AlastairLundy.CliInvoke.Core.Internal;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace AlastairLundy.CliInvoke.Core.Primitives.Exceptions
 {
@@ -48,7 +52,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Exceptions
         }
 
         /// <summary>
-        /// Thrown when a Process that was executed exited with a non-zero exit code.
+        /// Thrown when an executed Process exited with a non-zero exit code.
         /// </summary>
         /// <param name="exitCode">The exit code of the Process that was executed.</param>
         /// <param name="process">The Process that was executed.</param>
@@ -57,7 +61,11 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Exceptions
         {
 #if NET5_0_OR_GREATER
         ExecutedProcess = process;
-        Source = ExecutedProcess!.StartInfo.FileName;
+
+        if (ExecutedProcess is not null)
+        {
+            Source = ExecutedProcess.StartInfo.FileName;
+        }
 #endif
             
             ExitCode = exitCode;

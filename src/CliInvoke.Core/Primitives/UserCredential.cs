@@ -19,8 +19,8 @@
 // ReSharper disable MemberCanBePrivate.Global
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Security;
+
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
@@ -30,7 +30,6 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
     /// <summary>
     /// A class to represent a User Credential to be used with Processes.
     /// </summary>
-    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public class UserCredential : IEquatable<UserCredential>, IDisposable
     {
         /// <summary>
@@ -38,10 +37,12 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// </summary>
         public UserCredential()
         {
+#pragma warning disable CA1416
             Domain = null;
             UserName = null;
             Password = null;
             LoadUserProfile = false;
+#pragma warning restore CA1416
         }
 
         /// <summary>
@@ -53,10 +54,12 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// <param name="loadUserProfile">Whether to load the user profile during Process creation.</param>
         public UserCredential(string? domain, string? username, SecureString? password, bool? loadUserProfile)
         {
+#pragma warning disable CA1416
             Domain = domain;
             UserName = username;
             Password = password;
             LoadUserProfile = loadUserProfile;
+#pragma warning restore CA1416
         }
         
         /// <summary>
@@ -98,10 +101,12 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// </summary>
         public void Dispose()
         {
+#pragma warning disable CA1416
             Domain = string.Empty;
             UserName = string.Empty;
             LoadUserProfile = false;
             Password?.Dispose();
+#pragma warning restore CA1416
         }
 
         /// <summary>
@@ -111,6 +116,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// <returns>True if the specified user credential is equal to the current user credential; false otherwise.</returns>
         public bool Equals(UserCredential? other)
         {
+#pragma warning disable CA1416
             if (other is null)
             {
                 return false;
@@ -128,6 +134,8 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
                Password.Equals(other.Password)
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
                && LoadUserProfile == other.LoadUserProfile;
+#pragma warning restore CA1416
+
         }
 
         /// <summary>
@@ -174,7 +182,12 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// <returns>The hash code for the current user credential.</returns>
         public override int GetHashCode()
         {
-            return HashCode.Combine(Domain, UserName, Password, LoadUserProfile);
+#pragma warning disable CA1416
+            return HashCode.Combine(Domain,
+                UserName,
+                Password,
+                LoadUserProfile);
+#pragma warning restore CA1416
         }
 
         /// <summary>
