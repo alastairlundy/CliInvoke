@@ -60,6 +60,15 @@ namespace AlastairLundy.CliInvoke.Core.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Command&apos;s Target File Path cannot be null or empty..
+        /// </summary>
+        internal static string Command_TargetFilePath_Empty {
+            get {
+                return ResourceManager.GetString("Command.TargetFilePath.Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (Requires Administrator).
         /// </summary>
         internal static string Command_ToString_RequiresAdmin {

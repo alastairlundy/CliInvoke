@@ -36,4 +36,7 @@
     <data name="Command.ToString.ShellExecution" xml:space="preserve">
         <value>(Uses Shell Execution)</value>
     </data>
+    <data name="Command.TargetFilePath.Empty" xml:space="preserve">
+        <value>The Command's Target File Path cannot be null or empty.</value>
+    </data>
 </root>
