@@ -1,22 +1,29 @@
-﻿
+﻿/*
+    CliInvoke.Core 
+    Copyright (C) 2024-2025  Alastair Lundy
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+   */
 
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
-#if NETSTANDARD2_0 || NETSTANDARD2_1
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
-
 using AlastairLundy.DotExtensions.Processes;
 
+#if NETSTANDARD2_0 || NETSTANDARD2_1
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+using System.Runtime.InteropServices;
+#endif
 
-namespace AlastairLundy.CliInvoke.Core.Extensions
+
+namespace AlastairLundy.CliInvoke.Core.Extensions.Processes
 {
-    public static class ProcessSetResourcePolicyExtensions
+    public static class ProcessSetPolicyExtensions
     {
         /// <summary>
         /// Applies a ProcessResourcePolicy to a Process.
