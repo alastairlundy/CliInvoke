@@ -9,32 +9,30 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 // ReSharper disable once CheckNamespace
-namespace AlastairLundy.CliInvoke.Abstractions
+namespace AlastairLundy.CliInvoke.Abstractions;
+
+/// <summary>
+/// An interface to specify required Command Running functionality.
+/// </summary>
+public interface ICliCommandInvoker
 {
     /// <summary>
-    /// An interface to specify the required Command Running functionality.
+    /// Executes a command asynchronously and returns Command execution information as a ProcessResult.
     /// </summary>
-    public interface ICliCommandInvoker
-    {
-        /// <summary>
-        /// Executes a command asynchronously and returns Command execution information as a ProcessResult.
-        /// </summary>
-        /// <param name="processConfiguration">The command process configuration to be executed.</param>
-        /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-        /// <returns>A ProcessResult object containing the execution information of the command.</returns>
-        Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);
+    /// <param name="commandConfiguration">The command to be executed.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>A ProcessResult object containing the execution information of the command.</returns>
+    Task<ProcessResult> ExecuteAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default);
         
-        /// <summary>
-        ///Executes a command asynchronously and returns Command execution information and Command output as a BufferedProcessResult.
-        /// </summary>
-        /// <param name="processConfiguration">The command to be executed.</param>
-        /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-        /// <returns>A BufferedProcessResult object containing the output of the command.</returns>
-        Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);
-    }
+    /// <summary>
+    ///Executes a command asynchronously and returns Command execution information and Command output as a BufferedProcessResult.
+    /// </summary>
+    /// <param name="commandConfiguration">The command to be executed.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>A BufferedProcessResult object containing the output of the command.</returns>
+    Task<BufferedProcessResult> ExecuteBufferedAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default);
 }

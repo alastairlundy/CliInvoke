@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke.Core 
+    AlastairLundy.ProcessInvoke.Abstractions 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,21 +9,11 @@
 
 using System;
 using System.Security;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders
 {
-    /// <summary>
-    /// Defines the contract for a class that builds user credential configurations fluently with builder methods.
-    /// </summary>
-    /// <remarks>
-    ///  This interface inherits the IDisposable interface.
-    /// <para>Any resources created by implementations of this interface must be properly released
-    /// when no longer needed. </para>
-    /// </remarks>
     public interface IUserCredentialBuilder : IDisposable
-
     {
         /// <summary>
         /// Sets the domain for the credential to be created.

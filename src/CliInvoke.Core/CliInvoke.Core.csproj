@@ -21,7 +21,7 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.1</Version>
+        <Version>1.2.0</Version>
         <PackageReleaseNotes>Moved abstractions code to this library and merged with ProcessInvoke Primitives and ProcessInvoke Abstractions</PackageReleaseNotes>
     </PropertyGroup>
 

@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke.Core  
+    AlastairLundy.ProcessInvoke.Abstractions  
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,7 +8,6 @@
    */
 
 using System.Diagnostics;
-
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 #if NET5_0_OR_GREATER
