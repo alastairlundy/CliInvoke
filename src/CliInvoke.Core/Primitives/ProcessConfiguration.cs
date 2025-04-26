@@ -11,9 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
-using AlastairLundy.CliInvoke.Core.Extensions;
+
+using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
+
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
@@ -54,6 +55,68 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
             ResourcePolicy = processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default;
             WindowCreation = processConfiguration.WindowCreation;
             UseShellExecution = processConfiguration.UseShellExecution;
+
+            StartInfo = this.ToProcessStartInfo();
+        }
+
+        /// <summary>
+        /// Configures the Command configuration to be wrapped and executed.
+        /// </summary>
+        /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+        /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+        /// <param name="workingDirectoryPath">The working directory to be used.</param>
+        /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
+        /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
+        /// <param name="credential">The credential to be used (if specified).</param>
+        /// <param name="commandResultValidation">Whether to perform Result Validation and exception throwing if the Command exits with an exit code other than 0.</param>
+        /// <param name="standardInput">The standard input source to be used (if specified).</param>
+        /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
+        /// <param name="standardError">The standard error destination to be used (if specified).</param>
+        /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
+        /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
+        /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
+        /// <param name="standardInputEncoding">The Standard Input Encoding to be used (if specified).</param>
+        /// <param name="standardOutputEncoding">The Standard Output Encoding to be used (if specified).</param>
+        /// <param name="standardErrorEncoding">The Standard Error Encoding to be used (if specified).</param>
+        public ProcessConfiguration(string targetFilePath,
+            string? arguments = null, string? workingDirectoryPath = null,
+            bool requiresAdministrator = false,
+            IReadOnlyDictionary<string, string>? environmentVariables = null,
+            UserCredential? credential = null,
+            ProcessResultValidation commandResultValidation = ProcessResultValidation.ExitCodeZero,
+            StreamWriter? standardInput = null,
+            StreamReader? standardOutput = null,
+            StreamReader? standardError = null,
+            Encoding? standardInputEncoding = null,
+            Encoding? standardOutputEncoding = null,
+            Encoding? standardErrorEncoding = null,
+            ProcessResourcePolicy? processResourcePolicy = null,
+            bool windowCreation = false,
+            bool useShellExecution = false)
+        {
+            TargetFilePath = targetFilePath;
+            RequiresAdministrator = requiresAdministrator;
+            Arguments = arguments ?? string.Empty;
+            WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
+            EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+            Credential = credential ?? UserCredential.Null;
+            
+            ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+
+            ResultValidation = commandResultValidation;
+
+            StandardInput = standardInput ?? StreamWriter.Null;
+            StandardOutput = standardOutput ?? StreamReader.Null;
+            StandardError = standardError ?? StreamReader.Null;
+            
+            UseShellExecution = useShellExecution;
+            WindowCreation = windowCreation;
+            
+            StandardInputEncoding = standardInputEncoding ?? Encoding.Default;
+            StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
+            StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
+
+            StartInfo = this.ToProcessStartInfo();
         }
         
         /// <summary>
@@ -63,7 +126,6 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
         /// <param name="credential">The credential to be used (if specified).</param>
         /// <param name="resultValidation">Whether to perform Result Validation and exception throwing if the Command exits with an exit code other than 0.</param>
-        /// <param name="timeOutThreshold"></param>
         /// <param name="standardInput">The standard input source to be used (if specified).</param>
         /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
         /// <param name="standardError">The standard error destination to be used (if specified).</param>
@@ -72,7 +134,6 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
             IReadOnlyDictionary<string, string>? environmentVariables = null,
             UserCredential? credential = null,
             ProcessResultValidation resultValidation = ProcessResultValidation.ExitCodeZero,
-            ProcessTimeoutPolicy policy = default,
             StreamWriter? standardInput = null,
             StreamReader? standardOutput = null,
             StreamReader? standardError = null,
@@ -91,16 +152,15 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
             StandardOutput = standardOutput ?? StreamReader.Null;
             StandardError = standardError ?? StreamReader.Null;
 
-            StartInfo.TryAddUserCredential(Credential);
+            StartInfo = this.ToProcessStartInfo();
 
             StandardInputEncoding = Encoding.Default;
             StandardOutputEncoding = Encoding.Default;
             StandardErrorEncoding = Encoding.Default;
             
-                        
-            ResourcePolicy = commandConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default;
-            WindowCreation = commandConfiguration.WindowCreation;
-            UseShellExecution = commandConfiguration.UseShellExecution;
+            TargetFilePath = processStartInfo.FileName;
+            Arguments = processStartInfo.Arguments;
+            WorkingDirectoryPath = processStartInfo.WorkingDirectory;
         }
                 
         /// <summary>
@@ -134,7 +194,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         public IReadOnlyDictionary<string, string> EnvironmentVariables { get; }
         
         /// <summary>
-        /// The Process start information to be used.
+        /// The ProcessStartInfo to be used for the Process.
         /// </summary>
         public ProcessStartInfo StartInfo { get; }
         
