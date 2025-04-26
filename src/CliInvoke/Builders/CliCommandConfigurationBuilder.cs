@@ -19,12 +19,14 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
-using AlastairLundy.Extensions.Processes.Abstractions;
-using AlastairLundy.Extensions.Processes.Abstractions.Builders;
-using AlastairLundy.Extensions.Processes.Builders;
-
+using UserCredential = AlastairLundy.CliInvoke.Core.Primitives.UserCredential;
+using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;

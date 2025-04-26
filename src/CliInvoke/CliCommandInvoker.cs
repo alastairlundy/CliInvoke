@@ -24,10 +24,12 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Exceptions;
 
-using AlastairLundy.Extensions.Processes.Abstractions;
-using AlastairLundy.Extensions.Processes.Abstractions.Piping;
+using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
+using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
+
+using AlastairLundy.CliInvoke.Exceptions;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;

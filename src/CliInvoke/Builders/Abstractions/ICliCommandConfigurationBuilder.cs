@@ -12,8 +12,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using AlastairLundy.Extensions.Processes.Abstractions;
-using AlastairLundy.Extensions.Processes.Abstractions.Builders;
+using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
+
+using UserCredential = AlastairLundy.CliInvoke.Core.Primitives.UserCredential;
+using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
 
 namespace AlastairLundy.CliInvoke.Builders.Abstractions;
 

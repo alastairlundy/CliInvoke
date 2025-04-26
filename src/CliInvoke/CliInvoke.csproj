@@ -31,8 +31,7 @@
     
     <ItemGroup>
         <PackageReference Include="AlastairLundy.DotExtensions" Version="6.6.0"/>
-        <PackageReference Include="AlastairLundy.Extensions.Processes" Version="1.4.4" />
-        <PackageReference Include="AlastairLundy.Extensions.Processes.Abstractions" Version="1.4.2"/>
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.3.0"/>
     </ItemGroup>
     
     <ItemGroup >

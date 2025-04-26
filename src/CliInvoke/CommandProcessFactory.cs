@@ -22,10 +22,9 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Abstractions;
+using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
 using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
-
-using AlastairLundy.Extensions.Processes;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -151,7 +150,7 @@ public class CommandProcessFactory : ICommandProcessFactory
             {
                 if (OperatingSystem.IsWindows())
                 {
-                   output.AddUserCredential(commandConfiguration.Credential);
+                   output.ApplyUserCredential(commandConfiguration.Credential);
                 }
             }
 
