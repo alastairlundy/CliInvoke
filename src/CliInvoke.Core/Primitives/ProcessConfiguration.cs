@@ -180,11 +180,6 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         public ProcessResourcePolicy? ResourcePolicy { get; }
         
         /// <summary>
-        /// 
-        /// </summary>
-        public ProcessTimeoutPolicy? TimeoutPolicy { get; }
-        
-        /// <summary>
         /// The encoding to use for the Standard Input.
         /// </summary>
         /// <remarks>This is ignored on .NET Standard 2.0 as it is unsupported on that Target Framework's Process class.</remarks>
