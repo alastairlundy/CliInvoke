@@ -41,9 +41,10 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions
         /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Process Results from the running the process.</returns>
-         Task<ProcessResult> ExecuteProcessAsync(Process process, ProcessResultValidation processResultValidation,
-            ProcessResourcePolicy? processResourcePolicy = null,
-            CancellationToken cancellationToken = default);
+         Task<ProcessResult> ExecuteProcessAsync(Process process,
+             ProcessResultValidation processResultValidation,
+             ProcessResourcePolicy? processResourcePolicy = null,
+             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
