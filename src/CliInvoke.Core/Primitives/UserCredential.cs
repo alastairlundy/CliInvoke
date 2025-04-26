@@ -182,7 +182,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// </summary>
         /// <param name="left">A UserCredential to be compared.</param>
         /// <param name="right">The other UserCredential to be compared.</param>
-        /// <returns>True if both UserCredentials are equal to each other; false otherwise.</returns>
+        /// <returns>True if both UserCredentials are equal to each other, false otherwise.</returns>
         public static bool operator ==(UserCredential? left, UserCredential? right)
         {
             return Equals(left, right);

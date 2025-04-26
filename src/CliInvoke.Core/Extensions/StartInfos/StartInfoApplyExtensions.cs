@@ -21,6 +21,8 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+// ReSharper disable UnusedMethodReturnValue.Global
 
 namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos
 {
@@ -96,10 +98,10 @@ namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos
 
         
         /// <summary>
-        /// 
+        /// Applies a specific ProcessConfiguration to a specified ProcessStartInfo object.
         /// </summary>
-        /// <param name="processStartInfo"></param>
-        /// <param name="processConfiguration"></param>
+        /// <param name="processStartInfo">The ProcessStartInfo object to apply the ProcessConfiguration to.</param>
+        /// <param name="processConfiguration">A ProcessConfiguration object that defines the environment variables to be applied.</param>
         public static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
             ProcessConfiguration processConfiguration)
         {
@@ -110,10 +112,10 @@ namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos
         }
 
         /// <summary>
-        /// 
+        /// Applies environment variables to a specified ProcessStartInfo object.
         /// </summary>
-        /// <param name="processStartInfo"></param>
-        /// <param name="environmentVariables"></param>
+        /// <param name="processStartInfo">The ProcessStartInfo object to apply environment variables to.</param>
+        /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
         public static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
@@ -121,7 +123,7 @@ namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos
             {
                 foreach (KeyValuePair<string, string> variable in environmentVariables)
                 {
-                    if (variable.Value != null)
+                    if (variable.Value is not null)
                     {
                         processStartInfo.Environment[variable.Key] = variable.Value;
                     }

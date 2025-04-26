@@ -51,7 +51,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Results
         /// <summary>
         /// Determines whether this PipedProcessResult is equal to another PipedProcessResult object.
         /// </summary>
-        /// <remarks>This method intentionally does not consider Start and Exit times of Command Results for the purposes of equality comparison.</remarks>
+        /// <remarks>This method intentionally does not consider Start and Exit times of Command Results for equality comparison.</remarks>
         /// <param name="other">The other PipedProcessResult to compare.</param>
         /// <returns>True if this PipedProcessResult is equal to the other PipedProcessResult; false otherwise.</returns>
         public bool Equals(PipedProcessResult? other)

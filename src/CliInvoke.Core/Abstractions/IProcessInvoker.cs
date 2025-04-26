@@ -18,7 +18,7 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 namespace AlastairLundy.CliInvoke.Core.Abstractions
 {
     /// <summary>
-    /// 
+    /// Defines the contract for a class that executes processes.
     /// </summary>
     public interface IProcessInvoker
     {

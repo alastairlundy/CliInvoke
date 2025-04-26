@@ -17,6 +17,7 @@ using System;
 
 // ReSharper disable MemberCanBePrivate.Global
 
+
 namespace AlastairLundy.CliInvoke.Core.Primitives.Results
 {
     /// <summary>
@@ -59,7 +60,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Results
         /// <summary>
         /// Determines whether this BufferedProcessResult is equal to another BufferedProcessResult object.
         /// </summary>
-        /// <remarks>This method intentionally does not consider Start and Exit times of Command Results for the purposes of equality comparison.</remarks>
+        /// <remarks>This method intentionally does not consider Start and Exit times of Command Results for equality comparison.</remarks>
         /// <param name="other">The other BufferedProcessResult to compare.</param>
         /// <returns>True if this BufferedProcessResult is equal to the other BufferedProcessResult; false otherwise.</returns>
         public bool Equals(BufferedProcessResult? other)

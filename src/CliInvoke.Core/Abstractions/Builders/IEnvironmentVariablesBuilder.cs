@@ -12,6 +12,10 @@ using System.Collections.Generic;
 
 namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders
 {
+
+    /// <summary>
+    /// Defines the contract for a class that builds environment variable configurations using fluent builder methods.
+    /// </summary>
     public interface IEnvironmentVariablesBuilder
     {
         /// <summary>

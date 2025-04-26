@@ -24,7 +24,7 @@ namespace AlastairLundy.CliInvoke.Abstractions
         /// <summary>
         /// Executes a command asynchronously and returns Command execution information as a ProcessResult.
         /// </summary>
-        /// <param name="commandConfiguration">The command to be executed.</param>
+        /// <param name="processConfiguration">The command process configuration to be executed.</param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>A ProcessResult object containing the execution information of the command.</returns>
         Task<ProcessResult> ExecuteAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default);

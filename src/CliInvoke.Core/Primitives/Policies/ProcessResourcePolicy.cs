@@ -13,6 +13,7 @@ using System.Runtime.Versioning;
 #else
 using System.Runtime.InteropServices;
 #endif
+
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -92,7 +93,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Policies
         /// <summary>
         /// The Minimum Working Set size to be used for the Process.
         /// </summary>
-        /// <remarks>Not supported on Linux based operating systems.</remarks>
+        /// <remarks>This property is not supported on Linux-based operating systems.</remarks>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -106,7 +107,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Policies
         /// <summary>
         /// Maximum Working Set size to be used for the Process.
         /// </summary>
-        /// <remarks>Not supported on Linux based operating systems.</remarks>
+        /// <remarks>This property is not supported on Linux-based operating systems.</remarks>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -127,7 +128,6 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Policies
         /// </summary>
         /// <param name="other">The ProcessResourcePolicy to compare against.</param>
         /// <returns>True if the both Process Resource Policies are equal; false otherwise.</returns>
-        [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
         public bool Equals(ProcessResourcePolicy? other)
         {
             if (other is null)
@@ -135,16 +135,19 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Policies
                 return false;
             }
             
+#pragma warning disable CA1416
             return ProcessorAffinity == other.ProcessorAffinity && PriorityClass == other.PriorityClass &&
                    EnablePriorityBoost == other.EnablePriorityBoost && MinWorkingSet == other.MinWorkingSet &&
                    MaxWorkingSet == other.MaxWorkingSet;
+#pragma warning restore CA1416
         }
 
         /// <summary>
         /// Determines whether this ProcessResourcePolicy is equal to another object.
         /// </summary>
         /// <param name="obj">The object to compare against.</param>
-        /// <returns>True if the other object is a ProcessResourcePolicy and is equal to this ProcessResourcePolicy; false otherwise.</returns>
+        /// <returns>True if the other object is a ProcessResourcePolicy and is equal to this ProcessResourcePolicy,
+        /// false otherwise.</returns>
         public override bool Equals(object? obj)
         {
             if (obj is null)

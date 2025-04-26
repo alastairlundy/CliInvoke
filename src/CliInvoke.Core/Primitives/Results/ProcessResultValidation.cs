@@ -10,7 +10,7 @@ using System;
 namespace AlastairLundy.CliInvoke.Core.Primitives.Results
 {
     /// <summary>
-    /// An enum to represent Result Validation states and whether Result Validation should be performed. 
+    /// An enum to represent Result Validation states, and whether Result Validation should be performed. 
     /// </summary>
     [Flags]
     public enum ProcessResultValidation
