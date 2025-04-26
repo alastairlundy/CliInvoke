@@ -37,6 +37,7 @@
       <ProjectReference Include="..\CliInvoke.Extensibility\CliInvoke.Extensibility.csproj" />
       <ProjectReference Include="..\CliInvoke.Specializations\CliInvoke.Specializations.csproj" />
       <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
+        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" /> 
     </ItemGroup>
 
 </Project>

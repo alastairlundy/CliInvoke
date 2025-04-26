@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="Exceptions.ResourcePolicy.CannotSetToNonStartedProcess" xml:space="preserve">
+        <value>Cannot set Resource Policy to a Process that has not already been started.</value>
+    </data>
+    <data name="Exceptions.ProcessNotSuccessful.Specific" xml:space="preserve">
+        <value>The executed process, with executable name of {x}, was not succesful and returned an exit code of {y}.</value>
+    </data>
+    <data name="Exceptions.ProcessNotSuccessful.Generic" xml:space="preserve">
+        <value>The executed process was not succesful and returned an exit code of {x}.</value>
+    </data>
+    <data name="Command.ToString.WorkingDirectory" xml:space="preserve">
+        <value>Working Directory</value>
+    </data>
+    <data name="Command.ToString.RequiresAdmin" xml:space="preserve">
+        <value>(Requires Administrator)</value>
+    </data>
+    <data name="Command.ToString.ShellExecution" xml:space="preserve">
+        <value>(Uses Shell Execution)</value>
+    </data>
+</root>

@@ -18,8 +18,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
-
-using AlastairLundy.CliInvoke.Internal.Localizations;
+using AlastairLundy.CliInvoke.Core.Internal;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -27,7 +28,7 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 
-namespace AlastairLundy.CliInvoke
+namespace AlastairLundy.CliInvoke.Core.Primitives
 {
     /// <summary>
     /// A class to represent the configuration of a Command to be run.
@@ -207,7 +208,7 @@ namespace AlastairLundy.CliInvoke
         }
 
         /// <summary>
-        /// Returns a string representation of the configuration of the Command.
+        /// Returns a string representation of the Command configuration.
         /// </summary>
         /// <returns>A string representation of the configuration of the Command</returns>
         public override string ToString()
@@ -225,7 +226,7 @@ namespace AlastairLundy.CliInvoke
         /// </summary>
         /// <param name="other">The other Command configuration object to be compared.</param>
         /// <returns>true if both Command configuration objects are the same; false otherwise.</returns>
-        public bool Equals(CliCommandConfiguration other)
+        public bool Equals(CliCommandConfiguration? other)
         {
             if (other is null)
             {
@@ -252,7 +253,7 @@ namespace AlastairLundy.CliInvoke
         /// </summary>
         /// <param name="obj">The other object to be compared.</param>
         /// <returns>true if both objects are Command objects and the same; false otherwise.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null)
             {
@@ -298,7 +299,7 @@ namespace AlastairLundy.CliInvoke
         /// <param name="left">A command configuration to be compared.</param>
         /// <param name="right">The other command configuration to be compared.</param>
         /// <returns>True if both Command configurations are equal to each other; false otherwise.</returns>
-        public static bool Equals(CliCommandConfiguration left, CliCommandConfiguration right)
+        public static bool Equals(CliCommandConfiguration left, CliCommandConfiguration? right)
         {
             return left.Equals(right);
         }
@@ -309,7 +310,7 @@ namespace AlastairLundy.CliInvoke
         /// <param name="left">A command configuration to be compared.</param>
         /// <param name="right">The other command configuration to be compared.</param>
         /// <returns>True if both Command configurations are equal to each other; false otherwise.</returns>
-        public static bool operator ==(CliCommandConfiguration left, CliCommandConfiguration right)
+        public static bool operator ==(CliCommandConfiguration left, CliCommandConfiguration? right)
         {
             return Equals(left, right);
         }
@@ -320,7 +321,7 @@ namespace AlastairLundy.CliInvoke
         /// <param name="left">A command configuration to be compared.</param>
         /// <param name="right">The other command configuration to be compared.</param>
         /// <returns>True if both Command configurations are not equal to each other; false otherwise.</returns>
-        public static bool operator !=(CliCommandConfiguration left, CliCommandConfiguration right)
+        public static bool operator !=(CliCommandConfiguration left, CliCommandConfiguration? right)
         {
             return Equals(left, right) == false;
         }

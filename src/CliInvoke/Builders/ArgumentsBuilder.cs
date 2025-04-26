@@ -17,11 +17,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Internal.Localizations;
-
-using AlastairLundy.DotExtensions.Globalization;
-
 // ReSharper disable RedundantIfElseBlock
 
 // ReSharper disable UseIndexFromEndExpression
