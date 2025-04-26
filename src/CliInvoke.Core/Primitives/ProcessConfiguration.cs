@@ -11,11 +11,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
+
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 
 using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
 
 using AlastairLundy.CliInvoke.Core.Internal;
+
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
@@ -35,28 +41,40 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// Configures this Command configuration with the specified Command configuration.
         /// </summary>
         /// <param name="processConfiguration">The command configuration to be used to configure the Command to be run.</param>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [UnsupportedOSPlatform("ios")]
+        [SupportedOSPlatform("android")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("watchos")]
+        [UnsupportedOSPlatform("browser")]
+#endif
         public ProcessConfiguration(ProcessConfiguration processConfiguration)
         {
             TargetFilePath = processConfiguration.TargetFilePath;
             Arguments = processConfiguration.Arguments; 
-            WorkingDirectoryPath = processConfiguration.WorkingDirectoryPath ?? Directory.GetCurrentDirectory();
+            WorkingDirectoryPath = processConfiguration.WorkingDirectoryPath;
             RequiresAdministrator = processConfiguration.RequiresAdministrator;
-            EnvironmentVariables = processConfiguration.EnvironmentVariables  ?? new Dictionary<string, string>();
+            EnvironmentVariables = processConfiguration.EnvironmentVariables;
             Credential = processConfiguration.Credential ?? UserCredential.Null;
             ResultValidation = processConfiguration.ResultValidation;
             StandardInput = processConfiguration.StandardInput ?? StreamWriter.Null;
             StandardOutput = processConfiguration.StandardOutput ?? StreamReader.Null;
             StandardError = processConfiguration.StandardError ?? StreamReader.Null;
             
-            StandardInputEncoding = processConfiguration.StandardInputEncoding ?? Encoding.Default;
-            StandardOutputEncoding = processConfiguration.StandardOutputEncoding ?? Encoding.Default;
-            StandardErrorEncoding = processConfiguration.StandardErrorEncoding ?? Encoding.Default;
+            StandardInputEncoding = processConfiguration.StandardInputEncoding;
+            StandardOutputEncoding = processConfiguration.StandardOutputEncoding;
+            StandardErrorEncoding = processConfiguration.StandardErrorEncoding;
             
             ResourcePolicy = processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default;
             WindowCreation = processConfiguration.WindowCreation;
             UseShellExecution = processConfiguration.UseShellExecution;
 
-            StartInfo = this.ToProcessStartInfo();
+            StartInfo = ToProcessStartInfo();
         }
 
         /// <summary>
@@ -78,6 +96,18 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// <param name="standardInputEncoding">The Standard Input Encoding to be used (if specified).</param>
         /// <param name="standardOutputEncoding">The Standard Output Encoding to be used (if specified).</param>
         /// <param name="standardErrorEncoding">The Standard Error Encoding to be used (if specified).</param>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [UnsupportedOSPlatform("ios")]
+        [SupportedOSPlatform("android")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("watchos")]
+        [UnsupportedOSPlatform("browser")]
+#endif
         public ProcessConfiguration(string targetFilePath,
             string? arguments = null, string? workingDirectoryPath = null,
             bool requiresAdministrator = false,
@@ -116,7 +146,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
             StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
             StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
 
-            StartInfo = this.ToProcessStartInfo();
+            StartInfo = ToProcessStartInfo();
         }
         
         /// <summary>
@@ -130,6 +160,18 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
         /// <param name="standardError">The standard error destination to be used (if specified).</param>
         /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [UnsupportedOSPlatform("ios")]
+        [SupportedOSPlatform("android")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("watchos")]
+        [UnsupportedOSPlatform("browser")]
+#endif
         public ProcessConfiguration(ProcessStartInfo processStartInfo,
             IReadOnlyDictionary<string, string>? environmentVariables = null,
             UserCredential? credential = null,
@@ -152,7 +194,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
             StandardOutput = standardOutput ?? StreamReader.Null;
             StandardError = standardError ?? StreamReader.Null;
 
-            StartInfo = this.ToProcessStartInfo();
+            StartInfo = ToProcessStartInfo();
 
             StandardInputEncoding = Encoding.Default;
             StandardOutputEncoding = Encoding.Default;
@@ -166,27 +208,27 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// <summary>
         /// Whether administrator privileges should be used when executing the Command.
         /// </summary>
-        public bool RequiresAdministrator { get; protected set; }
+        public bool RequiresAdministrator { get; }
 
         /// <summary>
         /// The file path of the executable to be run and wrapped.
         /// </summary>
-        public string TargetFilePath { get; protected set; }
+        public string TargetFilePath { get; }
 
         /// <summary>
         /// The working directory path to be used when executing the Command.
         /// </summary>
-        public string WorkingDirectoryPath { get; protected set; }
+        public string WorkingDirectoryPath { get; }
 
         /// <summary>
         /// The arguments to be provided to the executable to be run.
         /// </summary>
-        public string Arguments { get; protected set; }
+        public string Arguments { get; }
 
         /// <summary>
         /// Whether to enable window creation or not when the Command's Process is run.
         /// </summary>
-        public bool WindowCreation { get; protected set; }
+        public bool WindowCreation { get; }
         
         /// <summary>
         /// The environment variables to be set.
@@ -341,9 +383,15 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         {
             HashCode hashCode = new HashCode();
             
+            hashCode.Add(TargetFilePath);
             hashCode.Add(EnvironmentVariables);
             hashCode.Add(StartInfo);
-            hashCode.Add(Credential);
+
+            if (Credential is not null)
+            {
+                hashCode.Add(Credential);
+            }
+            
             hashCode.Add((int)ResultValidation);
             hashCode.Add(StandardInput);
             hashCode.Add(StandardOutput);
@@ -352,6 +400,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
             hashCode.Add(StandardInputEncoding);
             hashCode.Add(StandardOutputEncoding);
             hashCode.Add(StandardErrorEncoding);
+            
             return hashCode.ToHashCode();
         }
 
@@ -442,6 +491,101 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
             string shellExecution = UseShellExecution ? $"{Environment.NewLine} {Resources.Command_ToString_ShellExecution}" : "";
 
             return $"{commandString}{workingDirectory}{adminPrivileges}{shellExecution}";
+        }
+        
+        /// <summary>
+        /// Creates Process Start Information based on this Process configuration's values.
+        /// </summary>
+        /// <returns>A new ProcessStartInfo object configured with the specified Process object values.</returns>
+        /// <exception cref="ArgumentException">Thrown if the Target File Path is null or empty.</exception>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [UnsupportedOSPlatform("ios")]
+        [SupportedOSPlatform("android")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("watchos")]
+        [UnsupportedOSPlatform("browser")]
+#endif
+        public ProcessStartInfo ToProcessStartInfo()
+        {
+            bool redirectStandardError = StandardError is not null;
+            bool redirectStandardOutput = StandardOutput is not null;
+                
+            return ToProcessStartInfo(redirectStandardOutput, redirectStandardError);
+        }
+        
+        /// <summary>
+        /// Creates Process Start Information based on specified parameters and Process configuration object values.
+        /// </summary>
+        /// <param name="redirectStandardOutput">Whether to redirect the Standard Output.</param>
+        /// <param name="redirectStandardError">Whether to redirect the Standard Error.</param>
+        /// <returns>A new ProcessStartInfo object configured with the specified parameters and Process object values.</returns>
+        /// <exception cref="ArgumentException">Thrown if the process configuration's Target File Path is null or empty.</exception>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [UnsupportedOSPlatform("ios")]
+        [SupportedOSPlatform("android")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("watchos")]
+        [UnsupportedOSPlatform("browser")]
+#endif
+        public ProcessStartInfo ToProcessStartInfo(bool redirectStandardOutput, bool redirectStandardError)
+        {
+            if (string.IsNullOrEmpty(TargetFilePath))
+            {
+                throw new ArgumentException(Resources.Command_TargetFilePath_Empty);
+            }
+            
+            ProcessStartInfo output = new ProcessStartInfo()
+            {
+                FileName = TargetFilePath,
+                WorkingDirectory = WorkingDirectoryPath,
+                UseShellExecute = UseShellExecution,
+                CreateNoWindow = WindowCreation,
+                RedirectStandardInput = StandardInput != StreamWriter.Null && StandardInput != StreamWriter.Null,
+                RedirectStandardOutput = redirectStandardOutput || StandardOutput != StreamReader.Null,
+                RedirectStandardError = redirectStandardError || StandardError != StreamReader.Null,
+            };
+
+            if (string.IsNullOrEmpty(Arguments) == false)
+            {
+                output.Arguments = Arguments;
+            }
+            
+            if (RequiresAdministrator)
+            {
+                output.RunAsAdministrator();
+            }
+
+            if (Credential is not null)
+            {
+                output.TryApplyUserCredential(Credential);
+            }
+
+            if (EnvironmentVariables.Any())
+            {
+               output.ApplyEnvironmentVariables(EnvironmentVariables);
+            }
+            
+            if (output.RedirectStandardInput)
+            {
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
+                output.StandardInputEncoding = StandardInputEncoding;
+#endif
+            }
+
+            output.StandardOutputEncoding = StandardOutputEncoding;
+            output.StandardErrorEncoding = StandardErrorEncoding;
+            
+            return output;
         }
     }
 }

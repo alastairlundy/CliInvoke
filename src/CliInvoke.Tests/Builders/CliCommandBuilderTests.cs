@@ -21,7 +21,7 @@ public class CliCommandConfigurationBuilderTests
         [Fact]
         public void TestDefaultConfiguration()
         {
-                ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
+                IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
 
                 var builtCommand = commandBuilder.Build();
                 Assert.Equal("foo", builtCommand.TargetFilePath);
@@ -52,7 +52,7 @@ public class CliCommandConfigurationBuilderTests
         [Fact]
         public void TestIncompatiblePipingOptionsThrowsException()
         {
-                ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
+                IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
 
                 //Assert
                 Assert.Throws<ArgumentException>(() =>
@@ -78,7 +78,7 @@ public class CliCommandConfigurationBuilderTests
         public void TestTargetFileReconfigured()
         { 
                 //Arrange
-              ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
+              IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
               
               //Act
               commandBuilder = commandBuilder.WithTargetFile("bar");
@@ -92,7 +92,7 @@ public class CliCommandConfigurationBuilderTests
         public void TestArgumentsReplaced()
         {
              //Arrange
-             ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+             IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
                      .WithArguments("--arg-value=value");
              
              //Act
@@ -107,7 +107,7 @@ public class CliCommandConfigurationBuilderTests
         public void TestValidationReconfigured()
         {
                 //Arrange
-                ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
                         .WithValidation(ProcessResultValidation.None);
                 
                 //Act
@@ -131,7 +131,7 @@ public class CliCommandConfigurationBuilderTests
                 password.AppendChar('3');
                 password.AppendChar('4');
                 
-                ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
                         .WithUserCredential(new UserCredential("", "admin", password, false));
                 
                 //Act
@@ -160,7 +160,7 @@ public class CliCommandConfigurationBuilderTests
         public void TestReconfiguredResourcePolicy()
         {
                 //Arrange
-                ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
                         .WithProcessResourcePolicy(ProcessResourcePolicy.Default);
                 
                 
@@ -181,7 +181,7 @@ public class CliCommandConfigurationBuilderTests
         public void TestReconfiguredAdminPrivileges()
         {
              //Act
-             ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+             IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
                      .WithAdministratorPrivileges(false);
              
              //Arrange
@@ -196,7 +196,7 @@ public class CliCommandConfigurationBuilderTests
         public void TestReconfiguredWorkingDirectory()
         {
                 //Act
-                ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                IProcessConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
                         .WithWorkingDirectory("dir");
                 
                 //Arrange
