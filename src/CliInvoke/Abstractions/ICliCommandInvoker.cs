@@ -9,8 +9,8 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-using AlastairLundy.Extensions.Processes.Abstractions;
 
 // ReSharper disable once CheckNamespace
 namespace AlastairLundy.CliInvoke.Abstractions;
