@@ -14,8 +14,7 @@ using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
-
-using AlastairLundy.Extensions.Processes.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 
 // ReSharper disable MemberCanBePrivate.Global
