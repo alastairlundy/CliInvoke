@@ -21,14 +21,13 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders
     /// <summary>
     /// An interface that defines the fluent builder methods all CommandBuilder classes must implement. 
     /// </summary>
-    public interface ICliCommandConfigurationBuilder
+    public interface IProcessConfigurationBuilder
     {
         /// <summary>
         /// Sets the arguments to pass to the executable.
         /// </summary>
         /// <param name="arguments">The arguments to pass to the Command.</param>
         /// <returns>The updated ICommandBuilder object with the specified arguments.</returns>
-        ICliCommandConfigurationBuilder WithArguments(IEnumerable<string> arguments);
     
         /// <summary>
         /// Sets the arguments to pass to the executable.
