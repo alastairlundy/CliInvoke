@@ -18,11 +18,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
-
-using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using AlastairLundy.CliInvoke.Internal.Localizations;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -30,7 +28,7 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 
-namespace AlastairLundy.CliInvoke
+namespace AlastairLundy.CliInvoke.Core.Primitives
 {
     /// <summary>
     /// A class to represent the configuration of a Command to be run.
@@ -145,18 +143,18 @@ namespace AlastairLundy.CliInvoke
         /// <param name="standardOutputEncoding">The Standard Output Encoding to be used (if specified).</param>
         /// <param name="standardErrorEncoding">The Standard Error Encoding to be used (if specified).</param>
         public CliCommandConfiguration(string targetFilePath,
-            string arguments = null, string workingDirectoryPath = null,
+            string? arguments = null, string? workingDirectoryPath = null,
             bool requiresAdministrator = false,
-            IReadOnlyDictionary<string, string> environmentVariables = null,
-            UserCredential credential = null,
+            IReadOnlyDictionary<string, string>? environmentVariables = null,
+            UserCredential? credential = null,
             ProcessResultValidation commandResultValidation = ProcessResultValidation.ExitCodeZero,
-            StreamWriter standardInput = null,
-            StreamReader standardOutput = null,
-            StreamReader standardError = null,
-            Encoding standardInputEncoding = null,
-            Encoding standardOutputEncoding = null,
-            Encoding standardErrorEncoding = null,
-            ProcessResourcePolicy processResourcePolicy = null,
+            StreamWriter? standardInput = null,
+            StreamReader? standardOutput = null,
+            StreamReader? standardError = null,
+            Encoding? standardInputEncoding = null,
+            Encoding? standardOutputEncoding = null,
+            Encoding? standardErrorEncoding = null,
+            ProcessResourcePolicy? processResourcePolicy = null,
             bool windowCreation = false,
             bool useShellExecution = false)
         {

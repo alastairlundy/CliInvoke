@@ -82,12 +82,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -----------------------------------------------------------------------------
 
- CliInvoke uses AlastairLundy.Extensions.Processes to enable safer and easier running of Processes.
+ CliInvoke uses CliInvoke.Core to enable safer and easier running of Processes.
  
- AlastairLundy.Extensions.Processes is licensed under the Mozilla Public License 2.0 .
+ CliInvoke.Core is licensed under the Mozilla Public License 2.0 .
 -----------------------------------------------------
 
-AlastairLundy.Extensions.Processes 
+CliInvoke.Core 
 
 Copyright (c) Alastair Lundy 2024-2025
 
