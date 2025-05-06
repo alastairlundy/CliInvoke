@@ -32,7 +32,7 @@ using System.Runtime.Versioning;
 namespace AlastairLundy.CliInvoke.Specializations.Configurations
 {
     /// <summary>
-    /// A Command configuration to make running commands through cross-platform Powershell easier.
+    /// A Command configuration to make running commands through cross-platform PowerShell easier.
     /// </summary>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
@@ -86,7 +86,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
         }
         
         /// <summary>
-        /// The target file path of cross-platform Powershell.
+        /// The target file path of cross-platform PowerShell.
         /// </summary>
         /// <exception cref="PlatformNotSupportedException">Thrown if run on an operating system besides Windows, macOS, Linux, and FreeBSD.</exception>
 #if NET5_0_OR_GREATER

@@ -28,7 +28,7 @@ using AlastairLundy.Extensions.Processes.Abstractions;
 namespace AlastairLundy.CliInvoke.Specializations.Configurations
 {
     /// <summary>
-    /// A Command configuration to make running commands through Windows Powershell easier.
+    /// A Command configuration to make running commands through Windows PowerShell easier.
     /// </summary>
 #if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
@@ -76,9 +76,9 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
         }
         
         /// <summary>
-        /// The target file path of Windows Powershell.
+        /// The target file path of Windows PowerShell.
         /// </summary>
-        /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Windows based operating system.</exception>
+        /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Windows-based operating system.</exception>
 #if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
         [UnsupportedOSPlatform("macos")]

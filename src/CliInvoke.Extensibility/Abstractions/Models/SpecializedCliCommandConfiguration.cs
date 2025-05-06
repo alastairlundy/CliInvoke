@@ -27,8 +27,8 @@ namespace AlastairLundy.CliInvoke.Extensibility.Abstractions;
 /// <summary>
 /// An abstract class that implements ICommandConfiguration and adds a default constructor.
 /// </summary>
-/// /// <remarks>Do not use this class directly unless you are creating a specialized Command,
-/// such as one that will be run through an intermediary process like Powershell or Cmd.</remarks>
+/// /// <remarks>Do not use this class directly unless you are creating a specialised Command,
+/// such as one that will be run through an intermediary process like PowerShell or Cmd.</remarks>
 public abstract class SpecializedCliCommandConfiguration : CliCommandConfiguration
 {
     /// <summary>
@@ -50,7 +50,7 @@ public abstract class SpecializedCliCommandConfiguration : CliCommandConfigurati
     /// <param name="processResourcePolicy">The Process Resource Policy to be used for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
-    /// <remarks>Do not use directly unless you are creating a specialized Command, such as one that will be run through an intermediary like Powershell or Cmd.</remarks>
+    /// <remarks>Do not use directly unless you are creating a specialised Command, such as one that will be run through an intermediary like PowerShell or Cmd.</remarks>
     [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public SpecializedCliCommandConfiguration(string targetFilePath, string? arguments = null,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
