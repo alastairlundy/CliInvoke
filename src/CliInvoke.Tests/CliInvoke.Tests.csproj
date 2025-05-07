@@ -29,6 +29,8 @@
     <ItemGroup>
       <Folder Include="Extensibility\" />
       <Folder Include="Extensions\" />
+      <Folder Include="Main\Factories\" />
+      <Folder Include="Main\Invokers\" />
       <Folder Include="Specializations\" />
       <Folder Include="TestData\" />
     </ItemGroup>
