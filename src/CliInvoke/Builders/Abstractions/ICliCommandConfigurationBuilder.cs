@@ -17,7 +17,7 @@ using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
+using AlastairLundy.CliInvoke.Internal;
 using UserCredential = AlastairLundy.CliInvoke.Core.Primitives.UserCredential;
 using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
 
@@ -69,7 +69,7 @@ public interface ICliCommandConfigurationBuilder
     /// </summary>
     /// <param name="configure">The environment variables to be configured</param>
     /// <returns>The new CommandBuilder with the specified environment variables.</returns>
-    [Obsolete("This method is deprecated and will be removed in a future version.")]
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     ICliCommandConfigurationBuilder WithEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configure);
     
     /// <summary>
