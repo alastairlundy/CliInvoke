@@ -159,16 +159,14 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<string> values, bool escapeSpecialChars)
     {
-        string[] enumerable = values as string[] ?? values.ToArray();
-
         if (escapeSpecialChars)
         {
-            enumerable = enumerable.Select(x => EscapeSpecialCharacters(x)).ToArray();
+            values = values.Select(x => EscapeSpecialCharacters(x));
         }
         
-        enumerable = enumerable.Where(x => IsValidArgument(x)).ToArray();
+        values = values.Where(x => IsValidArgument(x));
         
-        string joinedValues = string.Join(" ", enumerable);
+        string joinedValues = string.Join(" ", values);
         
         return Add(joinedValues, escapeSpecialChars);
     }
@@ -283,11 +281,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<IFormattable> values, IFormatProvider formatProvider, bool escapeSpecialChars = true)
     {
-        IFormattable[] formattable = values as IFormattable[] ?? values.ToArray();
-        
         List<string> strings = new List<string>();
         
-        foreach (IFormattable val in formattable)
+        foreach (IFormattable val in values)
         {
             string? newVal = (string?)formatProvider.GetFormat(val.GetType());
            
