@@ -2,7 +2,7 @@
 using AlastairLundy.CliInvoke.Builders.Abstractions;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Main.Builders;
+namespace AlastairLundy.CliInvoke.Tests.Builders;
 
 public class ArgumentsBuilderTests
 {

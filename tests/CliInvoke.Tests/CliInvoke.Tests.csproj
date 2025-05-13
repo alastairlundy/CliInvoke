@@ -14,32 +14,27 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Bogus" Version="35.6.2" />
-        <PackageReference Include="xunit.v3" Version="2.0.1" />
+        <PackageReference Include="Bogus" Version="35.6.3" />
+        <PackageReference Include="xunit.v3" Version="2.0.2" />
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="PolyFill" Version="7.27.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"/>
+        <PackageReference Include="PolyFill" Version="7.31.0" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Extensibility\" />
-      <Folder Include="Extensions\" />
-      <Folder Include="Main\Factories\" />
-      <Folder Include="Main\Invokers\" />
-      <Folder Include="Specializations\" />
+      <Folder Include="Factories\" />
+      <Folder Include="Invokers\" />
       <Folder Include="TestData\" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Extensibility\CliInvoke.Extensibility.csproj" />
-      <ProjectReference Include="..\CliInvoke.Extensions\CliInvoke.Extensions.csproj" />
-      <ProjectReference Include="..\CliInvoke.Specializations\CliInvoke.Specializations.csproj" />
-      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 
 </Project>

@@ -10,12 +10,11 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using Xunit;
-
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
-namespace AlastairLundy.CliInvoke.Tests.Main.Builders;
+namespace AlastairLundy.CliInvoke.Tests.Builders;
 
 public class CliCommandConfigurationBuilderTests
 {
