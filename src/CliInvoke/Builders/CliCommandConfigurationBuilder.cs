@@ -199,6 +199,7 @@ public class CliCommandConfigurationBuilder : ICliCommandConfigurationBuilder
     /// <param name="configure">The environment variables to be configured</param>
     /// <returns>The new CommandBuilder with the specified environment variables.</returns>
     [Pure]
+    [Obsolete("This method is deprecated and will be removed in a future version.")]
     public ICliCommandConfigurationBuilder WithEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configure)
     {
         IEnvironmentVariablesBuilder environmentVariablesBuilder = new EnvironmentVariablesBuilder()

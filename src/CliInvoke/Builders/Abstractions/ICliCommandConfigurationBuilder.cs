@@ -69,6 +69,7 @@ public interface ICliCommandConfigurationBuilder
     /// </summary>
     /// <param name="configure">The environment variables to be configured</param>
     /// <returns>The new CommandBuilder with the specified environment variables.</returns>
+    [Obsolete("This method is deprecated and will be removed in a future version.")]
     ICliCommandConfigurationBuilder WithEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configure);
     
     /// <summary>
