@@ -1,9 +1,8 @@
 ﻿using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
-
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace AlastairLundy.CliInvoke.Tests.Main.Builders;
 
 public class ArgumentsBuilderTests
 {
@@ -19,5 +18,5 @@ public class ArgumentsBuilderTests
         Assert.Equal(expected, argumentsBuilder.ToString());
     }
     
-     
+    
 }
