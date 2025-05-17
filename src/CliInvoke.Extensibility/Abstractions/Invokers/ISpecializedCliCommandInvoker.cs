@@ -9,14 +9,15 @@
 
 using AlastairLundy.CliInvoke.Abstractions;
 
-namespace AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
-
-public interface ISpecializedCliCommandInvoker : ICliCommandInvoker
+namespace AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers
 {
-    /// <summary>
-    /// Create the command to be run from the Command runner configuration and an input command.
-    /// </summary>
-    /// <param name="inputCommand">The command to be run by the Command Runner command.</param>
-    /// <returns>The built Command that will run the input command.</returns>
-    CliCommandConfiguration CreateRunnerCommand(CliCommandConfiguration inputCommand);
+    public interface ISpecializedCliCommandInvoker : ICliCommandInvoker
+    {
+        /// <summary>
+        /// Create the command to be run from the Command runner configuration and an input command.
+        /// </summary>
+        /// <param name="inputCommand">The command to be run by the Command Runner command.</param>
+        /// <returns>The built Command that will run the input command.</returns>
+        CliCommandConfiguration CreateRunnerCommand(CliCommandConfiguration inputCommand);
+    }
 }

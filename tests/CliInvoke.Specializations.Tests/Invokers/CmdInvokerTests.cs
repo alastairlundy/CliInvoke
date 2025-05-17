@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke;
@@ -9,6 +11,7 @@ using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
 using AlastairLundy.CliInvoke.Specializations.Invokers;
 using AlastairLundy.Extensions.Processes.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Testing.Platform.Services;
 
 namespace CliInvoke.Specializations.Tests.Invokers;
 
