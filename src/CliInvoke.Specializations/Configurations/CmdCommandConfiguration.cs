@@ -76,7 +76,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
             standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
             useShellExecution, windowCreation)
         {
-            
+            base.TargetFilePath = this.TargetFilePath;
         }
 
         

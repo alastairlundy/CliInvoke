@@ -56,6 +56,9 @@ namespace AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers
                 .WithEncoding(inputCommand.StandardInputEncoding,
                     inputCommand.StandardOutputEncoding,
                     inputCommand.StandardErrorEncoding)
+                .WithStandardInputPipe(inputCommand.StandardInput)
+                .WithStandardOutputPipe(inputCommand.StandardOutput)
+                .WithStandardErrorPipe(inputCommand.StandardError)
                 .WithUserCredential(inputCommand.Credential)
                 .WithValidation(inputCommand.ResultValidation)
                 .WithAdministratorPrivileges(inputCommand.RequiresAdministrator)
