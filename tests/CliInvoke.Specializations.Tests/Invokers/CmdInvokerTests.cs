@@ -7,11 +7,14 @@ using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
+
 using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
+
 using AlastairLundy.CliInvoke.Specializations.Invokers;
+
 using AlastairLundy.Extensions.Processes.Abstractions;
+
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Testing.Platform.Services;
 
 namespace CliInvoke.Specializations.Tests.Invokers;
 
@@ -25,7 +28,8 @@ public class CmdInvokerTests : IClassFixture<TestFixture>
     
     public CmdInvokerTests(TestFixture testFixture)
     {
-        ICliCommandInvoker cliInvoker = testFixture.ServiceProvider.GetRequiredService<ICliCommandInvoker>();
+        ICliCommandInvoker cliInvoker = testFixture.ServiceProvider
+            .GetRequiredService<ICliCommandInvoker>();
         
         _specializedCliCommandInvoker = new CmdCliCommandInvoker(cliInvoker);
     }

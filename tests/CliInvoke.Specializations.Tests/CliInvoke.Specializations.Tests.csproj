@@ -10,10 +10,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.4">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
         <PackageReference Include="xunit.v3" Version="1.1.0"/>
@@ -37,6 +33,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\CliInvoke.Extensibility\CliInvoke.Extensibility.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke.Extensions\CliInvoke.Extensions.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke.Specializations\CliInvoke.Specializations.csproj" />
     </ItemGroup>
 
 </Project>
