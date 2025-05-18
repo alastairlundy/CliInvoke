@@ -1,8 +1,10 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
 using AlastairLundy.CliInvoke.Abstractions;
+
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
+
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Tests.Helpers;

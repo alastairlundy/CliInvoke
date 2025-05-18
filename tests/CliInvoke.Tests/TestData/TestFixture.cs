@@ -19,6 +19,6 @@ public class TestFixture
             })
             .Build();
             
-        ServiceProvider = hostBuilder.Services;
+        ServiceProvider = hostBuilder.Services; 
     }
 }
