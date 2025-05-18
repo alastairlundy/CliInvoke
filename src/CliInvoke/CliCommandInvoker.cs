@@ -55,7 +55,9 @@ public class CliCommandInvoker : ICliCommandInvoker
         /// <param name="pipedProcessRunner">The piped process runner to be used.</param>
         /// <param name="processPipeHandler">The process pipe handler to be used.</param>
         /// <param name="commandProcessFactory">The command process factory to be used.</param>
-        public CliCommandInvoker(IPipedProcessRunner pipedProcessRunner, IProcessPipeHandler processPipeHandler, ICommandProcessFactory commandProcessFactory)
+        public CliCommandInvoker(IPipedProcessRunner pipedProcessRunner,
+            IProcessPipeHandler processPipeHandler,
+            ICommandProcessFactory commandProcessFactory)
         {
             _pipedProcessRunner = pipedProcessRunner;
             _processPipeHandler = processPipeHandler;

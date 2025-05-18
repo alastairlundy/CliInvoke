@@ -10,7 +10,8 @@
 using System;
 using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Abstractions;
-
+using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;
@@ -23,6 +24,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 /// </summary>
 public class CmdCliCommandInvoker : SpecializedCliCommandInvoker, ISpecializedCliCommandInvoker
 {
+    
     /// <summary>
     /// Instantiates the Cmd Cli command invoker
     /// </summary>
@@ -37,6 +39,29 @@ public class CmdCliCommandInvoker : SpecializedCliCommandInvoker, ISpecializedCl
     #endif
     public CmdCliCommandInvoker(ICliCommandInvoker commandInvoker) : base(commandInvoker, new CmdCommandConfiguration())
     {
+        
+    }
+
+    public override CliCommandConfiguration CreateRunnerCommand(CliCommandConfiguration inputCommand)
+    {
+        ICliCommandConfigurationBuilder configurationBuilder =
+            new CliCommandConfigurationBuilder(new CmdCommandConfiguration())
+                .WithArguments($"{inputCommand.TargetFilePath} {inputCommand.Arguments}")
+                .WithWorkingDirectory(inputCommand.WorkingDirectoryPath)
+                .WithValidation(inputCommand.ResultValidation)
+                .WithStandardInputPipe(inputCommand.StandardInput)
+                .WithStandardOutputPipe(inputCommand.StandardOutput)
+                .WithStandardErrorPipe(inputCommand.StandardError)
+                .WithUserCredential(inputCommand.Credential)
+                .WithWindowCreation(inputCommand.WindowCreation)
+                .WithAdministratorPrivileges(inputCommand.RequiresAdministrator)
+                .WithEncoding(inputCommand.StandardInputEncoding, inputCommand.StandardOutputEncoding,
+                    inputCommand.StandardErrorEncoding)
+                .WithEnvironmentVariables(inputCommand.EnvironmentVariables)
+                .WithProcessResourcePolicy(inputCommand.ResourcePolicy);
+        
+        CliCommandConfiguration runnerCommand = configurationBuilder.Build();
+        return runnerCommand;
 
     }
 }
