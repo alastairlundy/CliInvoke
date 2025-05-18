@@ -1,4 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Abstractions;
 
@@ -13,6 +17,12 @@ using AlastairLundy.CliInvoke.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
+
+#if NET48_OR_GREATER
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#elif NET472
+using System.Runtime.InteropServices;
+#endif
 
 namespace AlastairLundy.CliInvoke.Tests.Invokers
 {
@@ -43,6 +53,28 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
             Assert.Equal(0, bufferedProcess.ExitCode);
             Assert.Equal("test", bufferedProcess.StandardOutput);
         }*/
+        
+        [Fact]
+        public async Task Invoke_Open_Windows_Calc_Test()
+        {
+#if NET48_OR_GREATER || NET5_0_OR_GREATER
+            if (OperatingSystem.IsWindows())
+#else
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+#endif
+            {
+                ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder
+                        (WindowsTestExecutables.WinCalcExePath)
+                    .WithValidation(ProcessResultValidation.ExitCodeZero);
+            
+                CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
+                
+                ProcessResult result = await _cliCommandInvoker.ExecuteAsync(commandConfiguration, CancellationToken.None);
+                
+                Assert.True(Process.GetProcessesByName("Calculator").Any() &&
+                            result.WasSuccessful);
+            }
+        }
 
         [Fact]
         public async Task Invoke_Dotnet_List_Sdk()

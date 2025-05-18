@@ -35,8 +35,7 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
             _specializedCliCommandInvoker = new CmdCliCommandInvoker(cliInvoker);
         }
     
-        [Fact]
-        public async Task Invoke_Calc_Open_With_CMD_Test()
+        /*public async Task Invoke_Calc_Open_With_CMD_Test()
         {
 #if NET48_OR_GREATER || NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
@@ -57,6 +56,6 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
                 Assert.True(Process.GetProcessesByName("Calculator").Any() &&
                             result.WasSuccessful);
             }
-        }
+        }*/
     }
 }
