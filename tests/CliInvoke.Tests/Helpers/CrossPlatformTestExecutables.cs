@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -27,11 +28,9 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
     {
         private static ICliCommandInvoker _cliInvoker;
 
-        private static string dotnetExePath;
-        private static string cmdExePath;
-
-        private static CmdCommandConfiguration _cmdCommandConfiguration;
-
+        private static readonly string dotnetExePath;
+        private static readonly string cmdExePath;
+        
         static CrossPlatformTestExecutables()
         {
                 IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
