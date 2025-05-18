@@ -8,18 +8,19 @@
 */
 
 using System;
+
 using AlastairLundy.CliInvoke.Abstractions;
+
+using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
+using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
+using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
+
+using AlastairLundy.CliInvoke.Legacy;
+using AlastairLundy.CliInvoke.Legacy.Piping;
+using AlastairLundy.CliInvoke.Legacy.Utilities;
 
 using AlastairLundy.Extensions.IO.Files;
 using AlastairLundy.Extensions.IO.Files.Abstractions;
-
-using AlastairLundy.Extensions.Processes;
-using AlastairLundy.Extensions.Processes.Abstractions;
-using AlastairLundy.Extensions.Processes.Abstractions.Piping;
-using AlastairLundy.Extensions.Processes.Abstractions.Utilities;
-    
-using AlastairLundy.Extensions.Processes.Piping;
-using AlastairLundy.Extensions.Processes.Utilities;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -38,33 +39,33 @@ public static class DependencyInjectionExtensions
     /// <param name="lifetime">The service lifetime to use if specified; Singleton otherwise.</param>
     /// <returns>The updated service collection with the added CliInvoke services set up.</returns>
     public static IServiceCollection AddCliInvoke(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         switch (lifetime)
         {
             case ServiceLifetime.Singleton:
                 services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
+                services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
                 services.TryAddSingleton<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddSingleton<IPipedProcessRunner, PipedProcessRunner>();
-                services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.AddSingleton<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddSingleton<ICliCommandInvoker, CliCommandInvoker>();
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
+                services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 services.TryAddScoped<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddScoped<IPipedProcessRunner, PipedProcessRunner>();
-                services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.AddScoped<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddScoped<ICliCommandInvoker, CliCommandInvoker>();
                 break;
             case ServiceLifetime.Transient:
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
+                services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
                 services.TryAddTransient<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddTransient<IPipedProcessRunner, PipedProcessRunner>();
-                services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.AddTransient<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddTransient<ICliCommandInvoker, CliCommandInvoker>();

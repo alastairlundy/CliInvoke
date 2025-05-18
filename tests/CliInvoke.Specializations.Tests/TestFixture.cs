@@ -1,6 +1,6 @@
 ﻿using System;
-using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Extensions;
+
 using Microsoft.Extensions.Hosting;
 
 namespace CliInvoke.Specializations.Tests

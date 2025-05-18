@@ -36,6 +36,7 @@
     </ItemGroup>
     
     <ItemGroup >
+        <PackageReference Include="AlastairLundy.Extensions.IO" Version="2.2.0" />
         <PackageReference Include="PolyFill" Version="7.27.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"/>
     </ItemGroup>
     
@@ -72,6 +73,14 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Legacy\" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
 
 </Project>
