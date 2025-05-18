@@ -38,7 +38,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
         [UnsupportedOSPlatform("freebsd")]
         [UnsupportedOSPlatform("android")]
 #endif
-    public class ClassicPowershellCommandConfiguration : SpecializedCliCommandConfiguration
+    public class ClassicPowershellCommandConfiguration : CliCommandConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the ClassicPowershellCommandConfiguration class.
@@ -72,7 +72,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
             standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
             useShellExecution, windowCreation)
         {
-            
+            base.TargetFilePath = TargetFilePath;
         }
         
         /// <summary>

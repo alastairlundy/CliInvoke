@@ -11,10 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using AlastairLundy.CliInvoke.Extensibility.Abstractions;
+
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1
@@ -41,7 +42,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
 #endif
-    public class CmdCommandConfiguration : SpecializedCliCommandConfiguration
+    public class CmdCommandConfiguration : CliCommandConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the CmdCommandConfiguration class.
@@ -95,7 +96,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
                     throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
                 }
 
-                return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe"; ;
+                return Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe"; ;
             }
         }
     }

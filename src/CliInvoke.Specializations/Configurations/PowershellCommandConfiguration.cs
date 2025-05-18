@@ -46,7 +46,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
 #endif
-    public class PowershellCommandConfiguration : SpecializedCliCommandConfiguration
+    public class PowershellCommandConfiguration : CliCommandConfiguration
     {
         private readonly ICliCommandInvoker _commandInvoker;
 
@@ -83,6 +83,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
             useShellExecution, windowCreation)
         {
             _commandInvoker = commandInvoker;
+            base.TargetFilePath = TargetFilePath;
         }
         
         /// <summary>
