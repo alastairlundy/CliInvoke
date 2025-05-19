@@ -83,6 +83,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
             useShellExecution, windowCreation)
         {
             _commandInvoker = commandInvoker;
+            base.TargetFilePath = TargetFilePath;
         }
         
         /// <summary>
