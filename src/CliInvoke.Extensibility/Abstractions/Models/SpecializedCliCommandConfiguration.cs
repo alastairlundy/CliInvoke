@@ -33,7 +33,6 @@ namespace AlastairLundy.CliInvoke.Extensibility.Abstractions;
     [Obsolete]
     public abstract class SpecializedCliCommandConfiguration : CliCommandConfiguration
     {
-        
         /// <summary>
         /// Initializes a new instance of the Specialized Command Configuration class.
         /// </summary>
