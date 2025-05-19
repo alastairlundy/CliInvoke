@@ -16,9 +16,8 @@ using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Legacy;
 using AlastairLundy.CliInvoke.Legacy.Piping;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
-
+using AlastairLundy.Extensions.IO.Abstractions.Files;
 using AlastairLundy.Extensions.IO.Files;
-using AlastairLundy.Extensions.IO.Files.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

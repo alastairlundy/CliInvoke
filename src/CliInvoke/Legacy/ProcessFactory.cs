@@ -22,7 +22,8 @@ using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Internal.Localizations;
-using AlastairLundy.Extensions.IO.Files.Abstractions;
+
+using AlastairLundy.Extensions.IO.Abstractions.Files;
 
 // ReSharper disable UnusedType.Global
 
