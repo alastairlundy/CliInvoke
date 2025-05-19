@@ -16,10 +16,10 @@ using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Extensibility.Abstractions;
-
-using AlastairLundy.Extensions.Processes;
-using AlastairLundy.Extensions.Processes.Abstractions;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -46,7 +46,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
 #endif
-    public class PowershellCommandConfiguration : SpecializedCliCommandConfiguration
+    public class PowershellCommandConfiguration : CliCommandConfiguration
     {
         private readonly ICliCommandInvoker _commandInvoker;
 
@@ -83,6 +83,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
             useShellExecution, windowCreation)
         {
             _commandInvoker = commandInvoker;
+            base.TargetFilePath = TargetFilePath;
         }
         
         /// <summary>

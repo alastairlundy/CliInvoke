@@ -55,7 +55,9 @@ public class CliCommandInvoker : ICliCommandInvoker
         /// <param name="pipedProcessRunner">The piped process runner to be used.</param>
         /// <param name="processPipeHandler">The process pipe handler to be used.</param>
         /// <param name="commandProcessFactory">The command process factory to be used.</param>
-        public CliCommandInvoker(IPipedProcessRunner pipedProcessRunner, IProcessPipeHandler processPipeHandler, ICommandProcessFactory commandProcessFactory)
+        public CliCommandInvoker(IPipedProcessRunner pipedProcessRunner,
+            IProcessPipeHandler processPipeHandler,
+            ICommandProcessFactory commandProcessFactory)
         {
             _pipedProcessRunner = pipedProcessRunner;
             _processPipeHandler = processPipeHandler;
@@ -85,9 +87,10 @@ public class CliCommandInvoker : ICliCommandInvoker
         {
             Process process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration));
             
-            if (commandConfiguration.StandardInput != null)
+            if (process.StartInfo.RedirectStandardInput &&
+                commandConfiguration.StandardInput is not null
+                && commandConfiguration.StandardInput != StreamWriter.Null)
             {
-                process.StartInfo.RedirectStandardInput = true;
                 await _processPipeHandler.PipeStandardInputAsync(commandConfiguration.StandardInput.BaseStream, process);
             }
             
@@ -101,12 +104,14 @@ public class CliCommandInvoker : ICliCommandInvoker
                 throw new CliCommandNotSuccessfulException(result.processResult.ExitCode, commandConfiguration);
             }
             
-            if (commandConfiguration.StandardOutput != null)
+            if (process.StartInfo.RedirectStandardOutput && 
+                commandConfiguration.StandardOutput is not null)
             {
                 await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
                     cancellationToken);
             }
-            if (commandConfiguration.StandardError != null)
+            if (process.StartInfo.RedirectStandardError &&
+                commandConfiguration.StandardError is not null)
             {
                 await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
             }
@@ -138,9 +143,10 @@ public class CliCommandInvoker : ICliCommandInvoker
             Process process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration,
                 true, true));
 
-            if (commandConfiguration.StandardInput != null && commandConfiguration.StandardInput != StreamWriter.Null)
+            if (process.StartInfo.RedirectStandardInput &&
+                commandConfiguration.StandardInput is not null
+                && commandConfiguration.StandardInput != StreamWriter.Null)
             {
-                process.StartInfo.RedirectStandardInput = true;
                 await _processPipeHandler.PipeStandardInputAsync(commandConfiguration.StandardInput.BaseStream, process);
             }
             
@@ -155,12 +161,14 @@ public class CliCommandInvoker : ICliCommandInvoker
                 throw new CliCommandNotSuccessfulException(result.processResult.ExitCode, commandConfiguration);
             }
             
-            if (commandConfiguration.StandardOutput != null)
+            if (process.StartInfo.RedirectStandardOutput &&
+                commandConfiguration.StandardOutput is not null)
             {
                 await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
                     cancellationToken);
             }
-            if (commandConfiguration.StandardError != null)
+            if (process.StartInfo.RedirectStandardError &&
+                commandConfiguration.StandardError is not null)
             {
                 await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
             }

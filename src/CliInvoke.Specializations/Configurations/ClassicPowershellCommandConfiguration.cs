@@ -18,12 +18,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Extensibility.Abstractions;
 
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-
-using AlastairLundy.Extensions.Processes.Abstractions;
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations
 {
@@ -38,7 +38,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
         [UnsupportedOSPlatform("freebsd")]
         [UnsupportedOSPlatform("android")]
 #endif
-    public class ClassicPowershellCommandConfiguration : SpecializedCliCommandConfiguration
+    public class ClassicPowershellCommandConfiguration : CliCommandConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the ClassicPowershellCommandConfiguration class.
@@ -72,7 +72,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
             standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
             useShellExecution, windowCreation)
         {
-            
+            base.TargetFilePath = TargetFilePath;
         }
         
         /// <summary>

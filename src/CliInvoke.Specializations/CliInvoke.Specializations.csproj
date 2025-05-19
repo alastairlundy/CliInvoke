@@ -26,12 +26,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="7.27.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="1.2.0" />
-        <PackageReference Include="AlastairLundy.CliInvoke.Extensibility" Version="1.2.0" />
+        <PackageReference Include="Polyfill" Version="7.31.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -63,6 +58,12 @@
         <PackagePath></PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+      <ProjectReference Include="..\CliInvoke.Extensibility\CliInvoke.Extensibility.csproj" />
+      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 
 </Project>

@@ -26,10 +26,6 @@
         <AssemblyName>AlastairLundy.CliInvoke.Extensibility</AssemblyName>
     </PropertyGroup>
     
-    <ItemGroup>
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.3.0"/>
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="1.2.0" />
-    </ItemGroup>
     
     <ItemGroup>
         <Content Include="README.md">
@@ -45,5 +41,10 @@
         <PackagePath></PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 </Project>
