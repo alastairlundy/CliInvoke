@@ -13,6 +13,7 @@ using System.IO;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Extensions;
 using AlastairLundy.CliInvoke.Core.Extensions.Processes;
@@ -238,15 +239,15 @@ public class ProcessFactory : IProcessFactory
     {
         Process process = From(configuration);
 
-        if (configuration.StandardInput is not null)
+        if (configuration.StandardInput is not null &&
+            process.StartInfo.RedirectStandardInput)
         {
-            process.StartInfo.RedirectStandardInput = true;
             configuration.StandardInput.BaseStream.CopyTo(process.StandardInput.BaseStream);
         }
         
         process.Start();
         
-        if (configuration.ResourcePolicy != null)
+        if (configuration.ResourcePolicy is not null)
         {
             process.SetResourcePolicy(configuration.ResourcePolicy);
         }
@@ -370,7 +371,8 @@ public class ProcessFactory : IProcessFactory
         
         BufferedProcessResult processResult = new BufferedProcessResult(
             process.StartInfo.FileName, process.ExitCode,
-            await process.StandardOutput.ReadToEndAsync(cancellationToken),  await process.StandardError.ReadToEndAsync(),
+            await process.StandardOutput.ReadToEndAsync(cancellationToken),
+            await process.StandardError.ReadToEndAsync(cancellationToken),
             process.StartTime, process.ExitTime);
         
         process.Dispose();
