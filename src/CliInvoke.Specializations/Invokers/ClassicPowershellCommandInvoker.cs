@@ -21,15 +21,15 @@ using System.Runtime.Versioning;
 namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 
 /// <summary>
-/// Run commands through Windows Powershell with ease.
+/// Run commands through Windows PowerShell with ease.
 /// </summary>
 public class ClassicPowershellCommandInvoker : SpecializedCliCommandInvoker, ISpecializedCliCommandInvoker
 {
     
     /// <summary>
-    /// Instantiates the Classic Powershell Cli command invoker.
+    /// Instantiates the Classic PowerShell Cli command invoker.
     /// </summary>
-    /// <remarks>Only supported on Windows based operating systems.</remarks>
+    /// <remarks>Only supported on Windows-based operating systems.</remarks>
     /// <param name="commandInvoker">The cli command invoker service to be used to run commands.</param>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
