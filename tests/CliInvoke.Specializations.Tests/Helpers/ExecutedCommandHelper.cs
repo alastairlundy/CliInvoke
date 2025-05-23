@@ -50,9 +50,7 @@ namespace CliInvoke.Specializations.Tests.Helpers
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    return Environment.SystemDirectory + Path.DirectorySeparatorChar
-                                                       + "System32" + Path.DirectorySeparatorChar
-                                                       + "calc.exe";
+                    return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}calc.exe";
                 }
                 
                 throw new PlatformNotSupportedException();
