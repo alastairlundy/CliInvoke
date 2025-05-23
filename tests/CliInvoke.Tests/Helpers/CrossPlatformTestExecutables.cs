@@ -19,8 +19,8 @@ using AlastairLundy.CliInvoke.Legacy.Utilities;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
+using AlastairLundy.Extensions.IO.Abstractions.Files;
 using AlastairLundy.Extensions.IO.Files;
-using AlastairLundy.Extensions.IO.Files.Abstractions;
 
 namespace AlastairLundy.CliInvoke.Tests.Helpers
 {
