@@ -357,7 +357,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// 
     /// </summary>
     /// <param name="useShellExecution"></param>
-    /// <returns></returns>
+    /// <returns>The updated Process Configuration builder with the updated configuration info.</returns>
     public IProcessConfigurationBuilder WithShellExecution(bool useShellExecution)
     {
         return new ProcessConfigurationBuilder(
@@ -377,10 +377,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures the process builder to enable or disable window creation.
     /// </summary>
-    /// <param name="enableWindowCreation"></param>
-    /// <returns></returns>
+    /// <param name="enableWindowCreation">A boolean indicating whether to enable or disable window creation.</param>
+    /// <returns>The updated Process Configuration builder with the updated window creation configuration.</returns>
     public IProcessConfigurationBuilder WithWindowCreation(bool enableWindowCreation)
     {
         return new ProcessConfigurationBuilder(
@@ -400,12 +400,15 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures the process builder to use specific encoding schemes for standard input, output, and error streams.
     /// </summary>
-    /// <param name="standardInputEncoding"></param>
-    /// <param name="standardOutputEncoding"></param>
-    /// <param name="standardErrorEncoding"></param>
-    /// <returns></returns>
+    /// <param name="standardInputEncoding">The encoding scheme to use for standard input.
+    /// Uses the Default Encoding if null.</param>
+    /// <param name="standardOutputEncoding">The encoding scheme to use for standard output.
+    /// Uses the Default Encoding if null.</param>
+    /// <param name="standardErrorEncoding">The encoding scheme to use for standard error.
+    /// Uses the Default Encoding if null.</param>
+    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
     public IProcessConfigurationBuilder WithEncoding(Encoding standardInputEncoding = null,
         Encoding standardOutputEncoding = null, Encoding standardErrorEncoding = null)
     {
@@ -426,9 +429,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Builds and returns a ProcessConfiguration object with the specified properties.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The configured ProcessConfiguration object.</returns>
     public ProcessConfiguration Build()
     {
         return _configuration;
