@@ -13,14 +13,20 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 1.2.0
+        <PackageReleaseNotes>## Changes
 
-- Update Polyfill dependency and DotExtensions dependency
-- Switch to using CliInvoke.Core for primitives and abstractions instead of Process Extensions</PackageReleaseNotes>
+## 🚀 Features
+
+- Update CliInvoke to use IO Extensions Abstractions 3.0 instead of direct implementation @alastairlundy (#36)
+
+## 🐛 Bug Fixes
+
+- Update Extensions.IO to 3.0.1 to fix File Path Resolving issues @alastairlundy (#37)
+- Fixed an issue where ProcessFactory unintentionally tries to redirect Standard Input after Process has started @alastairlundy (#35)</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.3.0</PackageVersion>
+        <PackageVersion>1.3.1</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -78,5 +84,4 @@
     <ItemGroup>
       <Folder Include="Legacy\" />
     </ItemGroup>
-
 </Project>

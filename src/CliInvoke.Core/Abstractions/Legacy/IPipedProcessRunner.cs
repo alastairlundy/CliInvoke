@@ -19,7 +19,7 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy
 {
     /// <summary>
-    /// A Process Runner-esque interface for Piping output after Executing processes.
+    /// A Process Runner like interface for Piping output after Executing processes.
     /// </summary>
     [Obsolete]
     public interface IPipedProcessRunner
