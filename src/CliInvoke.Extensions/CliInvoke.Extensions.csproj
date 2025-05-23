@@ -65,10 +65,5 @@
         <DependentUpon>Resources.resx</DependentUpon>
       </Compile>
     </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
-    </ItemGroup>
-    
     
 </Project>
