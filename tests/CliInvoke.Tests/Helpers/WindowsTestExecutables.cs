@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace AlastairLundy.CliInvoke.Tests.Helpers;
 
-public class WindowsTestExecutables
+public static class WindowsTestExecutables
 {
     public static string WinCalcExePath
     {
@@ -12,9 +12,7 @@ public class WindowsTestExecutables
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return Environment.SystemDirectory + Path.DirectorySeparatorChar
-                                                   + "System32" + Path.DirectorySeparatorChar
-                                                   + "calc.exe";
+                return string.Format("{0}{1}calc.exe", Environment.SystemDirectory, Path.DirectorySeparatorChar);
             }
                 
             throw new PlatformNotSupportedException();

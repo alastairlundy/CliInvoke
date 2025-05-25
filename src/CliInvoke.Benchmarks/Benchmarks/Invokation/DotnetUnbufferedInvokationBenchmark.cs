@@ -32,7 +32,7 @@ using CliCommandConfiguration = AlastairLundy.CliInvoke.CliCommandConfiguration;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
-[MemoryDiagnoser(true), Orderer(SummaryOrderPolicy.FastestToSlowest)]
+[MemoryDiagnoser(true)]
 [SimpleJob(RuntimeMoniker.Net80)]
 [SimpleJob(RuntimeMoniker.Net90)]
 public class DotnetUnbufferedInvokationBenchmark
@@ -78,12 +78,13 @@ public class DotnetUnbufferedInvokationBenchmark
       return result.ExitCode;
     }
     
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     [DisplayName("CliInvoke_CliCommandInvoker")]
     public async Task<int> CliInvoke_CliCommandInvoker_Benchmark()
     {
         ICliCommandConfigurationBuilder commandConfigurationBuilder = new
                 CliCommandConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
+            .WithTargetFile(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
             .WithArguments("--list-sdks")
             .WithValidation(ProcessResultValidation.ExitCodeZero);
         
