@@ -1,30 +1,19 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 
-using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
 
 using AlastairLundy.CliInvoke.Core.Abstractions;
-using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
-using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Piping;
-using AlastairLundy.CliInvoke.Legacy.Utilities;
-
-using AlastairLundy.Extensions.IO.Abstractions.Files;
-using AlastairLundy.Extensions.IO.Files;
-
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
+
 using CliInvoke.Benchmarking.Data;
+using CliInvoke.Benchmarking.Helpers;
 
 using CliWrap;
 
@@ -32,9 +21,8 @@ using CliCommandConfiguration = AlastairLundy.CliInvoke.CliCommandConfiguration;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
-[MemoryDiagnoser(true)]
-[SimpleJob(RuntimeMoniker.Net80)]
-[SimpleJob(RuntimeMoniker.Net90)]
+[MemoryDiagnoser(true), 
+ Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class DotnetUnbufferedInvokationBenchmark
 {
     private readonly IProcessFactory _processFactory;
@@ -44,15 +32,8 @@ public class DotnetUnbufferedInvokationBenchmark
     
     public DotnetUnbufferedInvokationBenchmark()
     {
-        IFilePathResolver filePathResolver = new FilePathResolver();
-
-        IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
-        IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility,processPipeHandler);
-        ICommandProcessFactory commandProcessFactory = new CommandProcessFactory();
-        
-        _processFactory = new ProcessFactory(filePathResolver);
-        _cliCommandInvoker = new CliCommandInvoker(pipedProcessRunner, processPipeHandler, commandProcessFactory);
+        _processFactory = CliInvokeHelpers.CreateProcessFactory();
+        _cliCommandInvoker = CliInvokeHelpers.CreateCliCommandInvoker();
     }
     
     [GlobalSetup]
@@ -78,7 +59,7 @@ public class DotnetUnbufferedInvokationBenchmark
       return result.ExitCode;
     }
     
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     [DisplayName("CliInvoke_CliCommandInvoker")]
     public async Task<int> CliInvoke_CliCommandInvoker_Benchmark()
     {
@@ -97,11 +78,11 @@ public class DotnetUnbufferedInvokationBenchmark
 
     [Benchmark]
     [DisplayName("CliWrap")]
-    public async Task<int> CliWrap_Benchmark()
+    public async Task<int> CliWrap()
     {
       CliWrap.CommandResult result = await Cli.Wrap(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
             .WithArguments("--list-sdks")
-            .WithValidation(CliWrap.CommandResultValidation.ZeroExitCode)
+            .WithValidation(global::CliWrap.CommandResultValidation.ZeroExitCode)
             .ExecuteAsync();
       
       return result.ExitCode;
@@ -109,7 +90,7 @@ public class DotnetUnbufferedInvokationBenchmark
 
     [Benchmark]
     [DisplayName("MedallionShell")]
-    public async Task<int> MedallionShell_Benchmark()
+    public async Task<int> MedallionShell()
     {
         Medallion.Shell.CommandResult result = await Medallion.Shell.Command
             .Run(_dotnetCommandHelper.DotnetExecutableTargetFilePath, "--list-sdks").Task;
