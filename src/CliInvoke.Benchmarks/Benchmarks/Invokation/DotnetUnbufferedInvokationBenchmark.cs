@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
@@ -43,8 +42,7 @@ public class DotnetUnbufferedInvokationBenchmark
     }
 
     [Benchmark]
-    [DisplayName("CliInvoke_ProcessFactory")]
-    public async Task<int> CliInvoke_ProcessFactory_Benchmark()
+    public async Task<int> CliInvoke_ProcessFactory()
     {
         ProcessConfiguration processConfiguration =
 #pragma warning disable CA1416
@@ -60,8 +58,7 @@ public class DotnetUnbufferedInvokationBenchmark
     }
     
     [Benchmark]
-    [DisplayName("CliInvoke_CliCommandInvoker")]
-    public async Task<int> CliInvoke_CliCommandInvoker_Benchmark()
+    public async Task<int> CliInvoke_CliCommandInvoker()
     {
         ICliCommandConfigurationBuilder commandConfigurationBuilder = new
                 CliCommandConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
@@ -77,7 +74,6 @@ public class DotnetUnbufferedInvokationBenchmark
     }
 
     [Benchmark]
-    [DisplayName("CliWrap")]
     public async Task<int> CliWrap()
     {
       CliWrap.CommandResult result = await Cli.Wrap(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
@@ -89,7 +85,6 @@ public class DotnetUnbufferedInvokationBenchmark
     }
 
     [Benchmark]
-    [DisplayName("MedallionShell")]
     public async Task<int> MedallionShell()
     {
         Medallion.Shell.CommandResult result = await Medallion.Shell.Command

@@ -1,31 +1,20 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
 
 using AlastairLundy.CliInvoke.Core.Abstractions;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
-using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Piping;
-using AlastairLundy.CliInvoke.Legacy.Utilities;
-
-using AlastairLundy.Extensions.IO.Abstractions.Files;
-using AlastairLundy.Extensions.IO.Files;
-
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
+
 using CliInvoke.Benchmarking.Data;
 using CliInvoke.Benchmarking.Helpers;
+
 using CliWrap;
 using CliWrap.Buffered;
 
@@ -55,7 +44,6 @@ public class DotnetBufferedInvokationBenchmark
     }
     
     [Benchmark]
-    [DisplayName("CliInvoke_ProcessFactory")]
     public async Task<(string standardOutput, string standardError)> CliInvoke_ProcessFactory()
     {
         ProcessConfiguration processConfiguration =
@@ -79,7 +67,6 @@ public class DotnetBufferedInvokationBenchmark
     }
     
     [Benchmark(Baseline = true)]
-    [DisplayName("CliInvoke_CliCommandInvoker")]
     public async Task<(string standardOutput, string standardError)> CliInvoke_CliCommandInvoker()
     {
         ICliCommandConfigurationBuilder commandConfigurationBuilder = new
@@ -96,7 +83,6 @@ public class DotnetBufferedInvokationBenchmark
     }
     
     [Benchmark]
-    [DisplayName("CliWrap")]
     public async Task<(string standardOutput, string standardError)> CliWrap()
     {
         BufferedCommandResult result = await Cli.Wrap(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
@@ -108,7 +94,6 @@ public class DotnetBufferedInvokationBenchmark
     }
     
     [Benchmark]
-    [DisplayName("MedallionShell")]
     public async Task<(string standardOutput, string standardError)> MedallionShell()
     {
         Medallion.Shell.CommandResult result = await Medallion.Shell.Command.Run(_dotnetCommandHelper.DotnetExecutableTargetFilePath, "--list-sdks").Task;
