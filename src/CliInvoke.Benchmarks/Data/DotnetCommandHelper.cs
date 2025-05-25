@@ -29,4 +29,6 @@ public class DotnetCommandHelper
     }
     
     public string DotnetExecutableTargetFilePath => _dotnetFilePath;
+
+    public string Arguments => "--list-sdks";
 }

@@ -57,8 +57,7 @@ public class DotnetUnbufferedInvokationBenchmark
     {
         ICliCommandConfigurationBuilder commandConfigurationBuilder = new
                 CliCommandConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithTargetFile(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithArguments("--list-sdks")
+            .WithArguments(_dotnetCommandHelper.Arguments)
             .WithValidation(ProcessResultValidation.ExitCodeZero);
         
         CliCommandConfiguration configuration = commandConfigurationBuilder.Build();
@@ -72,7 +71,7 @@ public class DotnetUnbufferedInvokationBenchmark
     public async Task<int> CliWrap()
     {
       CliWrap.CommandResult result = await Cli.Wrap(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithArguments("--list-sdks")
+            .WithArguments(_dotnetCommandHelper.Arguments)
             .WithValidation(global::CliWrap.CommandResultValidation.ZeroExitCode)
             .ExecuteAsync();
       
@@ -83,7 +82,7 @@ public class DotnetUnbufferedInvokationBenchmark
     public async Task<int> MedallionShell()
     {
         Medallion.Shell.CommandResult result = await Medallion.Shell.Command
-            .Run(_dotnetCommandHelper.DotnetExecutableTargetFilePath, "--list-sdks").Task;
+            .Run(_dotnetCommandHelper.DotnetExecutableTargetFilePath, _dotnetCommandHelper.Arguments).Task;
         
         return result.ExitCode;
     }
