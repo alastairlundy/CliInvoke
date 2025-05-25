@@ -29,11 +29,11 @@ public class DotnetBufferedInvokationBenchmark
     private readonly IProcessFactory _processFactory;
     private readonly ICliCommandInvoker _cliCommandInvoker;
     
-    private DotnetCommandHelper _dotnetCommandHelper;
+    private BufferedTestHelper _bufferedTestHelper;
 
     public DotnetBufferedInvokationBenchmark()
     {
-        _dotnetCommandHelper = new DotnetCommandHelper();
+        _bufferedTestHelper = new BufferedTestHelper();
         _processFactory = CliInvokeHelpers.CreateProcessFactory();
         _cliCommandInvoker = CliInvokeHelpers.CreateCliCommandInvoker();
     }
@@ -43,7 +43,7 @@ public class DotnetBufferedInvokationBenchmark
     {
         ProcessConfiguration processConfiguration =
 #pragma warning disable CA1416
-            new ProcessConfiguration(_dotnetCommandHelper.DotnetExecutableTargetFilePath, "--list-sdks", 
+            new ProcessConfiguration(_bufferedTestHelper.TargetFilePath, _bufferedTestHelper.Arguments, 
                 commandResultValidation: ProcessResultValidation.ExitCodeZero);
 #pragma warning restore CA1416
 
@@ -65,9 +65,8 @@ public class DotnetBufferedInvokationBenchmark
     public async Task<(string standardOutput, string standardError)> CliInvoke_CliCommandInvoker()
     {
         ICliCommandConfigurationBuilder commandConfigurationBuilder = new
-                CliCommandConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithTargetFile(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithArguments("--list-sdks")
+                CliCommandConfigurationBuilder(_bufferedTestHelper.TargetFilePath)
+            .WithArguments(_bufferedTestHelper.Arguments)
             .WithValidation(ProcessResultValidation.ExitCodeZero);
         
         CliCommandConfiguration configuration = commandConfigurationBuilder.Build();
@@ -80,8 +79,8 @@ public class DotnetBufferedInvokationBenchmark
     [Benchmark]
     public async Task<(string standardOutput, string standardError)> CliWrap()
     {
-        BufferedCommandResult result = await Cli.Wrap(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithArguments("--list-sdks")
+        BufferedCommandResult result = await Cli.Wrap(_bufferedTestHelper.TargetFilePath)
+            .WithArguments(_bufferedTestHelper.Arguments)
             .WithValidation(global::CliWrap.CommandResultValidation.ZeroExitCode)
             .ExecuteBufferedAsync();
       
@@ -91,7 +90,7 @@ public class DotnetBufferedInvokationBenchmark
     [Benchmark]
     public async Task<(string standardOutput, string standardError)> MedallionShell()
     {
-        Medallion.Shell.CommandResult result = await Medallion.Shell.Command.Run(_dotnetCommandHelper.DotnetExecutableTargetFilePath, "--list-sdks").Task;
+        Medallion.Shell.CommandResult result = await Medallion.Shell.Command.Run(_bufferedTestHelper.TargetFilePath, _bufferedTestHelper.Arguments).Task;
         
         return (result.StandardOutput, result.StandardError);
     }
