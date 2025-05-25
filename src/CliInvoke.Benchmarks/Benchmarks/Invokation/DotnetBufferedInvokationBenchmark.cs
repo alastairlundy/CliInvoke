@@ -33,14 +33,9 @@ public class DotnetBufferedInvokationBenchmark
 
     public DotnetBufferedInvokationBenchmark()
     {
+        _dotnetCommandHelper = new DotnetCommandHelper();
         _processFactory = CliInvokeHelpers.CreateProcessFactory();
         _cliCommandInvoker = CliInvokeHelpers.CreateCliCommandInvoker();
-    }
-    
-    [GlobalSetup]
-    public void Setup()
-    {
-        _dotnetCommandHelper = new DotnetCommandHelper();
     }
     
     [Benchmark]

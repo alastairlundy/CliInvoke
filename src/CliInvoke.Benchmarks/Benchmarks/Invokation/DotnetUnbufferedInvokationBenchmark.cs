@@ -31,14 +31,9 @@ public class DotnetUnbufferedInvokationBenchmark
     
     public DotnetUnbufferedInvokationBenchmark()
     {
+        _dotnetCommandHelper = new DotnetCommandHelper();
         _processFactory = CliInvokeHelpers.CreateProcessFactory();
         _cliCommandInvoker = CliInvokeHelpers.CreateCliCommandInvoker();
-    }
-    
-    [GlobalSetup]
-    public void Setup()
-    {
-        _dotnetCommandHelper = new DotnetCommandHelper();
     }
 
     [Benchmark]
