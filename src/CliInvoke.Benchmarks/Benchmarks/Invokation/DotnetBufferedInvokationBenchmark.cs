@@ -94,4 +94,23 @@ public class DotnetBufferedInvokationBenchmark
         
         return (result.StandardOutput, result.StandardError);
     }
+    
+    [Benchmark]
+    public async Task<(string standardOut, string standardError)> ProcessX()
+    {
+        (Process process,
+            ProcessAsyncEnumerable stdOut,
+            ProcessAsyncEnumerable stdError) result =
+            Cysharp.Diagnostics.ProcessX.GetDualAsyncEnumerable($"{_bufferedTestHelper.TargetFilePath} {_bufferedTestHelper.Arguments}");
+
+        Task<string[]> standardOutTask = result.stdOut.ToTask();
+        Task<string[]> standardErrorTask = result.stdError.ToTask();
+
+        await Task.WhenAll([standardOutTask, standardErrorTask]);
+        
+        string standardOut = string.Join(Environment.NewLine, standardOutTask.Result);
+        string standardError = string.Join(Environment.NewLine, standardErrorTask.Result);
+        
+        return (standardOut, standardError);
+    }
 }
