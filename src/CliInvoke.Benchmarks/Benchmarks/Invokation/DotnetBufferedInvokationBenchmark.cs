@@ -17,7 +17,7 @@ using CliInvoke.Benchmarking.Helpers;
 
 using CliWrap;
 using CliWrap.Buffered;
-
+using Cysharp.Diagnostics;
 using CliCommandConfiguration = AlastairLundy.CliInvoke.CliCommandConfiguration;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
