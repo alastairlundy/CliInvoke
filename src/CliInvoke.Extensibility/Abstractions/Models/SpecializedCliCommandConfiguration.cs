@@ -13,7 +13,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
-using AlastairLundy.Extensions.Processes.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 // ReSharper disable UnusedType.Global
 
@@ -22,13 +24,13 @@ using System.Runtime.Versioning;
 #nullable enable
 #endif
 
-namespace AlastairLundy.CliInvoke.Extensibility.Abstractions
-{
+namespace AlastairLundy.CliInvoke.Extensibility.Abstractions;
     /// <summary>
     /// An abstract class that implements ICommandConfiguration and adds a default constructor.
     /// </summary>
     /// /// <remarks>Do not use this class directly unless you are creating a specialized Command,
     /// such as one that will be run through an intermediary process like Powershell or Cmd.</remarks>
+    [Obsolete]
     public abstract class SpecializedCliCommandConfiguration : CliCommandConfiguration
     {
         /// <summary>
@@ -52,6 +54,7 @@ namespace AlastairLundy.CliInvoke.Extensibility.Abstractions
         /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
         /// <remarks>Do not use directly unless you are creating a specialized Command, such as one that will be run through an intermediary like Powershell or Cmd.</remarks>
         [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
+        [Obsolete]
         public SpecializedCliCommandConfiguration(string targetFilePath, string? arguments = null,
             string? workingDirectoryPath = null, bool requiresAdministrator = false,
             IReadOnlyDictionary<string, string>? environmentVariables = null, UserCredential? credential = null,
@@ -59,7 +62,8 @@ namespace AlastairLundy.CliInvoke.Extensibility.Abstractions
             StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
             Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
             Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-            bool useShellExecution = false, bool windowCreation = false) : base(targetFilePath, arguments,
+            bool useShellExecution = false, bool windowCreation = false) :
+            base(targetFilePath, arguments,
             workingDirectoryPath, requiresAdministrator, environmentVariables, credential, commandResultValidation,
             standardInput, standardOutput, standardError, standardInputEncoding, standardOutputEncoding,
             standardErrorEncoding, processResourcePolicy, windowCreation, useShellExecution)
@@ -93,5 +97,4 @@ namespace AlastairLundy.CliInvoke.Extensibility.Abstractions
                 ResourcePolicy = processResourcePolicy;
             }
         }
-    }
 }

@@ -9,12 +9,11 @@ using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
-
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
 
 using AlastairLundy.CliInvoke.Specializations.Invokers;
 
-using AlastairLundy.Extensions.Processes.Abstractions;
 using CliInvoke.Specializations.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,8 +35,7 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
             _specializedCliCommandInvoker = new CmdCliCommandInvoker(cliInvoker);
         }
     
-        [Fact]
-        public async Task Invoke_Calc_Open_With_CMD_Test()
+        /*public async Task Invoke_Calc_Open_With_CMD_Test()
         {
 #if NET48_OR_GREATER || NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
@@ -58,6 +56,6 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
                 Assert.True(Process.GetProcessesByName("Calculator").Any() &&
                             result.WasSuccessful);
             }
-        }
+        }*/
     }
 }

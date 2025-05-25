@@ -2,21 +2,22 @@
 using AlastairLundy.CliInvoke.Builders.Abstractions;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
-
-public class ArgumentsBuilderTests
+namespace AlastairLundy.CliInvoke.Tests.Builders
 {
-    [Fact]
-    public void BuilderChainingTest()
+    public class ArgumentsBuilderTests
     {
-        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
-            .Add("new")
-            .Add(["list", "--help"]);
+        [Fact]
+        public void BuilderChainingTest()
+        {
+            IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
+                .Add("new")
+                .Add(["list", "--help"]);
 
-        string expected = "new list --help";
+            string expected = "new list --help";
         
-        Assert.Equal(expected, argumentsBuilder.ToString());
+            Assert.Equal(expected, argumentsBuilder.ToString());
+        }
+    
+    
     }
-    
-    
 }

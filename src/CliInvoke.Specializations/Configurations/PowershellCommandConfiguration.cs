@@ -16,10 +16,12 @@ using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Extensibility.Abstractions;
 
-using AlastairLundy.Extensions.Processes;
-using AlastairLundy.Extensions.Processes.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
+
+using AlastairLundy.CliInvoke.Extensibility.Abstractions;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -32,7 +34,7 @@ using System.Runtime.Versioning;
 namespace AlastairLundy.CliInvoke.Specializations.Configurations
 {
     /// <summary>
-    /// A Command configuration to make running commands through cross-platform Powershell easier.
+    /// A Command configuration to make running commands through cross-platform PowerShell easier.
     /// </summary>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
@@ -46,7 +48,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
 #endif
-    public class PowershellCommandConfiguration : SpecializedCliCommandConfiguration
+    public class PowershellCommandConfiguration : CliCommandConfiguration
     {
         private readonly ICliCommandInvoker _commandInvoker;
 
@@ -83,10 +85,11 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
             useShellExecution, windowCreation)
         {
             _commandInvoker = commandInvoker;
+            base.TargetFilePath = TargetFilePath;
         }
         
         /// <summary>
-        /// The target file path of cross-platform Powershell.
+        /// The target file path of cross-platform PowerShell.
         /// </summary>
         /// <exception cref="PlatformNotSupportedException">Thrown if run on an operating system besides Windows, macOS, Linux, and FreeBSD.</exception>
 #if NET5_0_OR_GREATER

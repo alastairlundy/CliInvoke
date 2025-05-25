@@ -18,12 +18,12 @@ using System.Runtime.Versioning;
 namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 
 /// <summary>
-/// Run commands through cross-platform modern Powershell with ease.
+/// Run commands through cross-platform modern PowerShell with ease.
 /// </summary>
 public class PowershellCliCommandInvoker : SpecializedCliCommandInvoker, ISpecializedCliCommandInvoker
 {
     /// <summary>
-    /// Instantiates the cross-platform Powershell Cli Command Invoker
+    /// Instantiates the cross-platform PowerShell Cli Command Invoker
     /// </summary>
     /// <param name="commandInvoker">The cli command invoker service to be used to run commands.</param>
 #if NET5_0_OR_GREATER
