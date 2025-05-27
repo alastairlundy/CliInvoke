@@ -23,6 +23,7 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
+using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
@@ -146,7 +147,7 @@ public class CommandProcessFactory : ICommandProcessFactory
                 }
             }
 
-            if (commandConfiguration.Credential != null)
+            if (commandConfiguration.Credential is not null)
             {
                 if (OperatingSystem.IsWindows())
                 {
@@ -154,7 +155,7 @@ public class CommandProcessFactory : ICommandProcessFactory
                 }
             }
 
-            if (commandConfiguration.EnvironmentVariables != null)
+            if (commandConfiguration.EnvironmentVariables is not null)
             {
                 foreach (KeyValuePair<string, string> variable in commandConfiguration.EnvironmentVariables)
                 {

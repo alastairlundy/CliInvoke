@@ -9,6 +9,8 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 
@@ -16,7 +18,7 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 namespace AlastairLundy.CliInvoke.Abstractions;
 
 /// <summary>
-/// An interface to specify required Command Running functionality.
+/// An interface to specify the required Command Running functionality.
 /// </summary>
 public interface ICliCommandInvoker
 {

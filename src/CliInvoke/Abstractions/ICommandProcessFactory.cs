@@ -10,7 +10,7 @@
 
 using System;
 using System.Diagnostics;
-
+using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Internal;
 
 namespace AlastairLundy.CliInvoke.Abstractions;

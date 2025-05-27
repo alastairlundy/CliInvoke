@@ -28,8 +28,6 @@ using CliInvoke.Benchmarking.Data;
 
 using CliWrap;
 
-using CliCommandConfiguration = AlastairLundy.CliInvoke.CliCommandConfiguration;
-
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 [MemoryDiagnoser(true), Orderer(SummaryOrderPolicy.FastestToSlowest)]

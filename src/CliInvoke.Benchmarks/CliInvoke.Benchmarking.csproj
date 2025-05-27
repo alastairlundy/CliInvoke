@@ -9,15 +9,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AlastairLundy.Extensions.IO" Version="3.1.0" />
       <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
       <PackageReference Include="CliWrap" Version="3.8.2" />
       <PackageReference Include="MedallionShell" Version="1.6.2" />
-      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-      <ProjectReference Include="..\CliInvoke.Extensions\CliInvoke.Extensions.csproj" />
       <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 
