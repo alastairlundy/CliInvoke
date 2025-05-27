@@ -11,5 +11,5 @@ public class BufferedTestHelper
 
     public string TargetFilePath => _filePath;
 
-    public string Arguments => "";
+    public string Arguments => "gen-fake-text";
 }
