@@ -49,7 +49,8 @@ public class CliCommandConfigurationBuilder : ICliCommandConfigurationBuilder
     /// <param name="targetFilePath">The target file path of a Command to be executed.</param>
     public CliCommandConfigurationBuilder(string targetFilePath)
     {
-        _commandConfiguration = new CliCommandConfiguration(targetFilePath, processResourcePolicy: ProcessResourcePolicy.Default);
+        _commandConfiguration = new CliCommandConfiguration(targetFilePath,
+            processResourcePolicy: ProcessResourcePolicy.Default);
     }
 
     /// <summary>

@@ -162,7 +162,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
             process.Start();
         }
 
-        if (processResourcePolicy != null)
+        if (processResourcePolicy is not null)
         {
             process.SetResourcePolicy(processResourcePolicy);
         }

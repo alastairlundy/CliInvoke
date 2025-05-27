@@ -9,6 +9,7 @@
 
 using System;
 using AlastairLundy.CliInvoke.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
@@ -46,6 +47,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddSingleton<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddSingleton<IPipedProcessRunner, PipedProcessRunner>();
                 
+                services.AddSingleton<IProcessFactory, ProcessFactory>();
                 services.AddSingleton<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddSingleton<ICliCommandInvoker, CliCommandInvoker>();
                 break;
@@ -55,6 +57,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddScoped<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddScoped<IPipedProcessRunner, PipedProcessRunner>();
                 
+                services.AddScoped<IProcessFactory, ProcessFactory>();
                 services.AddScoped<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddScoped<ICliCommandInvoker, CliCommandInvoker>();
                 break;
@@ -64,6 +67,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddTransient<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddTransient<IPipedProcessRunner, PipedProcessRunner>();
                 
+                services.AddTransient<IProcessFactory, ProcessFactory>();
                 services.AddTransient<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddTransient<ICliCommandInvoker, CliCommandInvoker>();
                 break;
