@@ -80,7 +80,7 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
                     .WithWorkingDirectory(Environment.SystemDirectory)
                     .WithValidation(ProcessResultValidation.ExitCodeZero);
             
-                CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
+                Core.Primitives.CliCommandConfiguration? commandConfiguration = configurationBuilder.Build();
                 
                 ProcessResult result = await _cliCommandInvoker.ExecuteAsync(commandConfiguration, CancellationToken.None);
                 

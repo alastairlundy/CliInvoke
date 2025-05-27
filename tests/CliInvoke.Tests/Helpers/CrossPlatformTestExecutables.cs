@@ -60,7 +60,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                         .WithArguments("dotnet --list-sdks");
                 }
                 
-                CliCommandConfiguration dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    
+                Core.Primitives.CliCommandConfiguration? dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    
             
                 Task<BufferedProcessResult> dotnetBufferredOutput = _cliInvoker.ExecuteBufferedAsync(dotnetCommandConfiguration);
 
@@ -86,8 +86,8 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
 
         public static string DotnetExePath => dotnetExePath;
            
-        public static string CrossPlatformPowershellExePath =>
-            new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
+       // public static string CrossPlatformPowershellExePath =>
+         //   new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
 
     }
 }

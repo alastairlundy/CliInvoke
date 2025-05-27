@@ -22,7 +22,10 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Abstractions;
+
 using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 

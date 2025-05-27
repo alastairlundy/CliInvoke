@@ -27,6 +27,7 @@ using AlastairLundy.CliInvoke.Abstractions;
 
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
+using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Exceptions;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-
+using System.Threading.Tasks;
 using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
@@ -28,7 +28,7 @@ using CliInvoke.Benchmarking.Data;
 
 using CliWrap;
 
-using CliCommandConfiguration = AlastairLundy.CliInvoke.CliCommandConfiguration;
+using CliCommandConfiguration = AlastairLundy.CliInvoke.Core.Primitives.CliCommandConfiguration;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 

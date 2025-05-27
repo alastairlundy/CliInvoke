@@ -4,11 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Security;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
+
 using Xunit;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -85,7 +88,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         commandBuilder = commandBuilder.WithTargetFile("bar");
               
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        Core.Primitives.CliCommandConfiguration command = commandBuilder.Build();
                         Assert.Equal("bar", command.TargetFilePath);
                 }
 
@@ -115,7 +118,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         commandBuilder = commandBuilder.WithValidation(ProcessResultValidation.ExitCodeZero);
                 
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        Core.Primitives.CliCommandConfiguration command = commandBuilder.Build();
                         Assert.Equal(ProcessResultValidation.ExitCodeZero, command.ResultValidation);
                 }
 
@@ -147,7 +150,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         commandBuilder = commandBuilder.WithUserCredential(userCredential);
                 
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        Core.Primitives.CliCommandConfiguration command = commandBuilder.Build();
                         Assert.Equal(userCredential, command.Credential);
                 }
 
@@ -174,7 +177,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         commandBuilder = commandBuilder.WithProcessResourcePolicy(resourcePolicy);
                 
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        Core.Primitives.CliCommandConfiguration command = commandBuilder.Build();
                         Assert.Equal(resourcePolicy, command.ResourcePolicy);
                 }
 
@@ -189,7 +192,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         commandBuilder = commandBuilder.WithAdministratorPrivileges(true);
              
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        Core.Primitives.CliCommandConfiguration command = commandBuilder.Build();
                         Assert.True(command.RequiresAdministrator);
                 }
 
@@ -204,7 +207,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         commandBuilder = commandBuilder.WithWorkingDirectory("dir2");
                 
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        Core.Primitives.CliCommandConfiguration command = commandBuilder.Build();
                         Assert.Equal("dir2", command.WorkingDirectoryPath);
                 }
         }

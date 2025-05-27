@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using CliWrap;
 using CliWrap.Buffered;
 
