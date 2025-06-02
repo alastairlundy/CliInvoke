@@ -37,7 +37,7 @@ public class DotnetBufferedInvokationBenchmark
         _cliCommandInvoker = CliInvokeHelpers.CreateCliCommandInvoker();
     }
     
-    [Benchmark]
+    /*[Benchmark]
     public async Task<(string standardOutput, string standardError)> CliInvoke_ProcessFactory()
     {
         ProcessConfiguration processConfiguration =
@@ -111,5 +111,5 @@ public class DotnetBufferedInvokationBenchmark
         string standardError = string.Join(Environment.NewLine, standardErrorTask.Result);
         
         return (standardOut, standardError);
-    }
+    }*/
 }
