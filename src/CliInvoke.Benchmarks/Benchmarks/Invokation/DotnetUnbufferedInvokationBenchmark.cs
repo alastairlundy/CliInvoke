@@ -16,8 +16,6 @@ using CliInvoke.Benchmarking.Helpers;
 
 using CliWrap;
 
-using CliCommandConfiguration = AlastairLundy.CliInvoke.CliCommandConfiguration;
-
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 [MemoryDiagnoser(true), 
