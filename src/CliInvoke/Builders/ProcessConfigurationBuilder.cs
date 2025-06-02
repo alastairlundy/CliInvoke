@@ -14,6 +14,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 
@@ -27,7 +28,7 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
-/// 
+/// Builder class for creating process configurations.
 /// </summary>
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
@@ -35,48 +36,53 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     private readonly ProcessConfiguration _configuration;
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
+    /// which is used to build and configure a process.
     /// </summary>
-    /// <param name="targetFilePath"></param>
+    /// <param name="targetFilePath">The file path of the target file to be executed.</param>
     public ProcessConfigurationBuilder(string targetFilePath)
     {
         _configuration = new ProcessConfiguration(targetFilePath);
     }
     
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
+    /// which is used to build and configure a process.
     /// </summary>
-    /// <param name="processStartInfo"></param>
+    /// <param name="processStartInfo">The start information for the process configuration.</param>
     public ProcessConfigurationBuilder(ProcessStartInfo processStartInfo)
     {
         _configuration = new ProcessConfiguration(processStartInfo);
     }
     
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
+    /// which is used to build and configure a process.
     /// </summary>
-    /// <param name="configuration"></param>
+    /// <param name="configuration">A process configuration to update.</param>
     protected ProcessConfigurationBuilder(ProcessConfiguration configuration)
     {
         _configuration = configuration;
     }
     
     /// <summary>
-    /// 
+    /// Adds process arguments to the Process Configuration builder.
     /// </summary>
-    /// <param name="arguments"></param>
-    /// <returns></returns>
+    /// <param name="arguments">The process arguments to be added.</param>
+    /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments)
     {
         return WithArguments(arguments, false);
     }
 
     /// <summary>
-    /// 
+    /// Adds process arguments to the Process Configuration builder.
     /// </summary>
-    /// <param name="arguments"></param>
-    /// <param name="escapeArguments"></param>
-    /// <returns></returns>
+    /// <param name="arguments">The process arguments to be added or updated.</param>
+    /// <param name="escapeArguments">Whether the arguments should be escaped.</param>
+    /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments, bool escapeArguments)
     {
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
@@ -101,10 +107,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Adds process arguments to the Process Configuration builder.
     /// </summary>
-    /// <param name="arguments"></param>
-    /// <returns></returns>
+    /// <param name="arguments">The argument string to be added.</param>
+    /// <returns>A reference to this builder with the added string arguments, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithArguments(string arguments)
     {
         return new ProcessConfigurationBuilder(
@@ -124,10 +131,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Sets the target file path for the process configuration.
     /// </summary>
-    /// <param name="targetFilePath"></param>
-    /// <returns></returns>
+    /// <param name="targetFilePath">The file path where the process configuration will be saved.</param>
+    /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithTargetFile(string targetFilePath)
     {
         return new ProcessConfigurationBuilder(
@@ -147,10 +155,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Sets environment variables for the process configuration.
     /// </summary>
-    /// <param name="environmentVariables"></param>
-    /// <returns></returns>
+    /// <param name="environmentVariables">The environment variables to be added to the process configuration.</param>
+    /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
     {
         return new ProcessConfigurationBuilder(
@@ -170,10 +179,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures the process to run with administrator privileges.
     /// </summary>
-    /// <param name="runAsAdministrator"></param>
-    /// <returns></returns>
+    /// <param name="runAsAdministrator">Whether the process should be executed as an administrator.</param>
+    /// <returns>A reference to this builder with the updated administrator privileges,
+    /// allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithAdministratorPrivileges(bool runAsAdministrator)
     {
         return new ProcessConfigurationBuilder(
@@ -193,10 +204,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Sets the working directory path for the process configuration.
     /// </summary>
-    /// <param name="workingDirectoryPath"></param>
-    /// <returns></returns>
+    /// <param name="workingDirectoryPath">The file system path where the process will be executed.</param>
+    /// <returns>A reference to this builder, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithWorkingDirectory(string workingDirectoryPath)
     {
         return new ProcessConfigurationBuilder(
@@ -216,18 +228,19 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures the process to use a user credential.
     /// </summary>
-    /// <param name="credentials"></param>
-    /// <returns></returns>
-    public IProcessConfigurationBuilder WithUserCredential(UserCredential credentials)
+    /// <param name="credential">The user credential to be used for authentication.</param>
+    /// <returns>A reference to this builder with an updated user credential, allowing method chaining.</returns>
+    [Pure]
+    public IProcessConfigurationBuilder WithUserCredential(UserCredential credential)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                credentials, _configuration.ResultValidation,
+                credential, _configuration.ResultValidation,
                 _configuration.StandardInput, _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
@@ -239,10 +252,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Enables or disables Process Result Validation (i.e. whether to throw an exception if Exit Code is not 0).
     /// </summary>
-    /// <param name="validation"></param>
-    /// <returns></returns>
+    /// <param name="validation">The validation mode to be used for the process result.</param>
+    /// <returns>A reference to this builder with the specified validation configuration,
+    /// allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithValidation(ProcessResultValidation validation)
     {
         return new ProcessConfigurationBuilder(
@@ -262,10 +277,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures the standard input pipe for the process.
     /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
+    /// <param name="source">The source of the standard input data.</param>
+    /// <returns>A reference to this builder with the added standard input pipe, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithStandardInputPipe(StreamWriter source)
     {
         return new ProcessConfigurationBuilder(
@@ -285,10 +301,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures the standard output pipe for the process.
     /// </summary>
-    /// <param name="target"></param>
-    /// <returns></returns>
+    /// <param name="target">The target stream where the process standard output will be written.</param>
+    /// <returns>A reference to this builder with the added standard output pipe, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithStandardOutputPipe(StreamReader target)
     {
         return new ProcessConfigurationBuilder(
@@ -308,10 +325,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures the standard error pipe for the process.
     /// </summary>
-    /// <param name="target"></param>
-    /// <returns></returns>
+    /// <param name="target">The target stream where the process standard error output will be written.</param>
+    /// <returns>A reference to this builder with the added standard error pipe, allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithStandardErrorPipe(StreamReader target)
     {
         return new ProcessConfigurationBuilder(
@@ -331,10 +349,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Sets the policy for managing process resources.
     /// </summary>
-    /// <param name="processResourcePolicy"></param>
-    /// <returns></returns>
+    /// <param name="processResourcePolicy">The policy that determines how the process resource is managed.</param>
+    /// <returns>A reference to this builder with the updated Process Resource Policy,
+    /// allowing method chaining.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy)
     {
         return new ProcessConfigurationBuilder(
@@ -354,10 +374,14 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures whether shell execution should be used for the process.
     /// </summary>
-    /// <param name="useShellExecution"></param>
+    /// <param name="useShellExecution">True to use shell execution, false otherwise.</param>
     /// <returns>The updated Process Configuration builder with the updated configuration info.</returns>
+    /// <remarks>Using Shell Execution whilst also Redirecting Standard Input will throw an Exception.
+    /// This is a known issue with the System Process class.</remarks>
+    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput"/>
+    [Pure]
     public IProcessConfigurationBuilder WithShellExecution(bool useShellExecution)
     {
         return new ProcessConfigurationBuilder(
@@ -381,6 +405,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// </summary>
     /// <param name="enableWindowCreation">A boolean indicating whether to enable or disable window creation.</param>
     /// <returns>The updated Process Configuration builder with the updated window creation configuration.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithWindowCreation(bool enableWindowCreation)
     {
         return new ProcessConfigurationBuilder(
@@ -409,6 +434,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="standardErrorEncoding">The encoding scheme to use for standard error.
     /// Uses the Default Encoding if null.</param>
     /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
+    [Pure]
     public IProcessConfigurationBuilder WithEncoding(Encoding standardInputEncoding = null,
         Encoding standardOutputEncoding = null, Encoding standardErrorEncoding = null)
     {
