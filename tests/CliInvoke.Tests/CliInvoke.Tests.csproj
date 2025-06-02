@@ -13,8 +13,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AlastairLundy.Extensions.IO" Version="3.1.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -24,7 +25,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="PolyFill" Version="7.31.0" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'"/>
+        <PackageReference Include="PolyFill" Version="7.33.0" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -33,6 +34,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke.Specializations\CliInvoke.Specializations.csproj" />
       <ProjectReference Include="..\..\src\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 
