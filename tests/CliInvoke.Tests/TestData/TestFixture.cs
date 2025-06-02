@@ -14,7 +14,7 @@ public class TestFixture
         var hostBuilder = Host.CreateDefaultBuilder()
             .ConfigureServices(serviceCollection=>
             {
-                serviceCollection.AddCliInvoke();
+               serviceCollection = serviceCollection.AddCliInvoke();
             })
             .Build();
             

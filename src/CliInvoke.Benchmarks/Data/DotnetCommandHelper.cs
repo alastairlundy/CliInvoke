@@ -24,10 +24,11 @@ public class DotnetCommandHelper
         }
         else
         {
-            _dotnetFilePath =
-                $"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}{Path.DirectorySeparatorChar}dotnet{Path.DirectorySeparatorChar}dotnet.exe";
+            _dotnetFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}{Path.DirectorySeparatorChar}dotnet{Path.DirectorySeparatorChar}dotnet.exe";
         }
     }
     
     public string DotnetExecutableTargetFilePath => _dotnetFilePath;
+
+    public string Arguments => "--list-sdks";
 }
