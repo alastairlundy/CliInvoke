@@ -15,7 +15,8 @@ using AlastairLundy.CliInvoke.Legacy.Piping;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Tests.Helpers;
 using AlastairLundy.CliInvoke.Tests.TestData;
-using AlastairLundy.Extensions.IO.Files;
+
+using AlastairLundy.Resyslib.IO.Files;
 using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
