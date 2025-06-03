@@ -9,6 +9,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 
 using CliInvoke.Benchmarking.Data;
@@ -18,16 +19,17 @@ using CliWrap;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
+[SimpleJob(RuntimeMoniker.Net90)]
 [MemoryDiagnoser(true), 
  Orderer(SummaryOrderPolicy.FastestToSlowest)]
-public class DotnetUnbufferedInvokationBenchmark
+public class BasicUnbufferedInvokationBenchmark
 {
     private readonly IProcessFactory _processFactory;
     private readonly ICliCommandInvoker _cliCommandInvoker;
     
     private DotnetCommandHelper _dotnetCommandHelper;
     
-    public DotnetUnbufferedInvokationBenchmark()
+    public BasicUnbufferedInvokationBenchmark()
     {
         _dotnetCommandHelper = new DotnetCommandHelper();
         _processFactory = CliInvokeHelpers.CreateProcessFactory();
@@ -83,5 +85,16 @@ public class DotnetUnbufferedInvokationBenchmark
             .Run(_dotnetCommandHelper.DotnetExecutableTargetFilePath, _dotnetCommandHelper.Arguments).Task;
         
         return result.ExitCode;
+    }
+
+    [Benchmark]
+    public async Task<int> SimpleExec()
+    {
+        int exitCode = 0;
+        
+        await global::SimpleExec.Command.RunAsync(_dotnetCommandHelper.DotnetExecutableTargetFilePath,
+            _dotnetCommandHelper.Arguments, createNoWindow:true,  handleExitCode: code => (exitCode = code) < 8);
+
+        return await new ValueTask<int>(exitCode);
     }
 }

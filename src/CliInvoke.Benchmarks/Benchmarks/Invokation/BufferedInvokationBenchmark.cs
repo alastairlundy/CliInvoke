@@ -23,14 +23,14 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 [MemoryDiagnoser(true),
  Orderer(SummaryOrderPolicy.FastestToSlowest)]
-public class DotnetBufferedInvokationBenchmark
+public class BufferedInvokationBenchmark
 {
     private readonly IProcessFactory _processFactory;
     private readonly ICliCommandInvoker _cliCommandInvoker;
     
     private BufferedTestHelper _bufferedTestHelper;
 
-    public DotnetBufferedInvokationBenchmark()
+    public BufferedInvokationBenchmark()
     {
         _bufferedTestHelper = new BufferedTestHelper();
         _processFactory = CliInvokeHelpers.CreateProcessFactory();
