@@ -18,8 +18,8 @@ using AlastairLundy.CliInvoke.Legacy.Utilities;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
-using AlastairLundy.Extensions.IO.Abstractions.Files;
-using AlastairLundy.Extensions.IO.Files;
+using AlastairLundy.Resyslib.IO.Core.Files;
+using AlastairLundy.Resyslib.IO.Files;
 
 
 namespace CliInvoke.Specializations.Tests.Helpers

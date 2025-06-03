@@ -11,6 +11,7 @@
 #else
 using System.Runtime.Versioning;
 #endif
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -18,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
+
 using AlastairLundy.CliInvoke.Core.Extensions.Processes;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
@@ -25,7 +27,7 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.DotExtensions.Processes;
 
-using AlastairLundy.Extensions.IO.Abstractions.Files;
+using AlastairLundy.Resyslib.IO.Core.Files;
 
 namespace AlastairLundy.CliInvoke.Legacy.Utilities;
 

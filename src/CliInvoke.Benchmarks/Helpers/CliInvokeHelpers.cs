@@ -7,8 +7,9 @@ using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Legacy;
 using AlastairLundy.CliInvoke.Legacy.Piping;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
-using AlastairLundy.Extensions.IO.Abstractions.Files;
-using AlastairLundy.Extensions.IO.Files;
+
+using AlastairLundy.Resyslib.IO.Core.Files;
+using AlastairLundy.Resyslib.IO.Files;
 
 namespace CliInvoke.Benchmarking.Helpers;
 
