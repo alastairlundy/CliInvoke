@@ -26,9 +26,6 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
-using UserCredential = AlastairLundy.CliInvoke.Core.Primitives.UserCredential;
-using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
-
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
