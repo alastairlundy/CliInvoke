@@ -64,5 +64,27 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions
             ProcessResultValidation processResultValidation,
             ProcessResourcePolicy? processResourcePolicy = null,
             CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="processConfiguration"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration,
+            CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="processStartInfo"></param>
+        /// <param name="processResultValidation"></param>
+        /// <param name="processResourcePolicy"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo,
+            ProcessResultValidation processResultValidation,
+            ProcessResourcePolicy? processResourcePolicy = null,
+            CancellationToken cancellationToken = default);
     }
 }

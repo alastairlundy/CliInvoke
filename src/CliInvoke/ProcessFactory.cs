@@ -41,13 +41,16 @@ public class ProcessFactory : IProcessFactory
 {
     private readonly IFilePathResolver _filePathResolver;
     
+    private readonly IProcessPipeHandler _processPipeHandler;
+    
     /// <summary>
     /// 
     /// </summary>
     /// <param name="filePathResolver"></param>
-    public ProcessFactory(IFilePathResolver filePathResolver)
+    public ProcessFactory(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
+        _processPipeHandler = processPipeHandler;
     }
     
     /// <summary>
@@ -380,6 +383,73 @@ public class ProcessFactory : IProcessFactory
             await process.StandardOutput.ReadToEndAsync(cancellationToken),
             await process.StandardError.ReadToEndAsync(cancellationToken),
             process.StartTime, process.ExitTime);
+        
+        process.Dispose();
+        
+        return processResult;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="process"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+#endif
+    public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, CancellationToken cancellationToken = default)
+    {
+       return await ContinueWhenExitPipedAsync(process, ProcessResultValidation.None, cancellationToken);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="process"></param>
+    /// <param name="resultValidation"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="ProcessNotSuccessfulException"></exception>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+#endif
+    public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, ProcessResultValidation resultValidation,
+        CancellationToken cancellationToken = default)
+    {
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        
+        await process.WaitForExitAsync(cancellationToken);
+        
+        if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
+        {
+            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
+        }
+
+        Stream output = await _processPipeHandler.PipeStandardOutputAsync(process);
+        Stream error = await _processPipeHandler.PipeStandardErrorAsync(process);
+        
+        PipedProcessResult processResult = new PipedProcessResult(
+            process.StartInfo.FileName, process.ExitCode,
+            process.StartTime, process.ExitTime,
+            output, error);
         
         process.Dispose();
         
