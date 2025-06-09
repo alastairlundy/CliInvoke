@@ -5,14 +5,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Abstractions;
 
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
-using AlastairLundy.CliInvoke.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
@@ -47,6 +43,5 @@ namespace CliInvoke.Specializations.Tests.Helpers
             }
         }
 
-        public static string CrossPlatformPowershellExePath => new PowershellCommandConfiguration().TargetFilePath;
     }
 }

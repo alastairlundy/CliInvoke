@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-
+using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
@@ -14,7 +14,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
 {
     public class CrossPlatformTestExecutables
     {
-        private static ICliCommandInvoker _cliInvoker;
+   //     private static ICliCommandInvoker _cliInvoker;
 
         private static readonly string dotnetExePath;
         private static readonly string cmdExePath;
@@ -24,8 +24,8 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                 IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
                 IFilePathResolver filePathResolver = new FilePathResolver();
 
-                _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
-                    processPipeHandler, commandProcessFactory);
+          //      _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
+          //             processPipeHandler, commandProcessFactory);
 
                 ICliCommandConfigurationBuilder dotnetConfigurationBuilder;
 
