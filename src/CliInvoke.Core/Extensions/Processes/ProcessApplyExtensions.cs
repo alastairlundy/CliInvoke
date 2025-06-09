@@ -10,12 +10,11 @@
 
 using System;
 using System.Diagnostics;
-
+using AlastairLundy.CliInvoke.Core.Primitives;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
-using AlastairLundy.CliInvoke.Core.Primitives;
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace AlastairLundy.CliInvoke.Core.Extensions.Processes

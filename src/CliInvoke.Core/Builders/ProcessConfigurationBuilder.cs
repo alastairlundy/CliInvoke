@@ -17,9 +17,12 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
-using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
+
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
+
 using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;

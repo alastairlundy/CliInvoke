@@ -8,10 +8,6 @@ using System.Threading.Tasks;
 using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
-using AlastairLundy.CliInvoke.Legacy;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Specializations.Invokers;
 using AlastairLundy.Extensions.IO.Files;
@@ -25,7 +21,7 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 
     public class CmdInvokerTests : IClassFixture<TestFixture>
     {
-        private readonly ISpecializedCliCommandInvoker _specializedCliCommandInvoker;
+        private readonly ISpecializedProcessInvoker _specializedCliCommandInvoker;
     
         public CmdInvokerTests(TestFixture testFixture)
         {
@@ -54,7 +50,7 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
             
                 CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
 
-                CliCommandConfiguration runnerCommand = _specializedCliCommandInvoker.CreateRunnerCommand(commandConfiguration);
+                CliCommandConfiguration runnerCommand = _specializedCliCommandInvoker.CreateRunnerProcess(commandConfiguration);
 
                 ProcessResult result = await _specializedCliCommandInvoker.ExecuteAsync(runnerCommand, CancellationToken.None);
                 

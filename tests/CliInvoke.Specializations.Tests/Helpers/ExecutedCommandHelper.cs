@@ -9,10 +9,7 @@ using AlastairLundy.CliInvoke.Abstractions;
 
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
-using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Core;
-
-using AlastairLundy.CliInvoke.Legacy;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;

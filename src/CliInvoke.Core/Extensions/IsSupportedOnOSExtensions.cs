@@ -13,7 +13,6 @@ using System;
 #else
 using System.Runtime.InteropServices;
 #endif
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Core.Extensions

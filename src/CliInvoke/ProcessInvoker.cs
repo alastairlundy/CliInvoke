@@ -8,7 +8,7 @@
    */
 
 #nullable enable
-using System;
+
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core.Abstractions;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
@@ -24,7 +24,7 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke.Legacy;
+namespace AlastairLundy.CliInvoke;
 
 /// <summary>
 /// The default implementation of IProcessRunner, a safer way to execute processes.

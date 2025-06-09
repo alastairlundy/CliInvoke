@@ -14,17 +14,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-
+using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
+using AlastairLundy.CliInvoke.Core.Internal;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
-
-using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
-
-using AlastairLundy.CliInvoke.Core.Internal;
-
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 // ReSharper disable MemberCanBePrivate.Global
 
