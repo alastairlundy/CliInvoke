@@ -12,7 +12,6 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
 using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Piping;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Specializations.Invokers;
 using AlastairLundy.Extensions.IO.Files;

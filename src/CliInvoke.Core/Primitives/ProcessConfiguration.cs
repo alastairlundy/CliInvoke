@@ -513,15 +513,17 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
 #endif
         public ProcessStartInfo ToProcessStartInfo()
         {
+            bool redirectStandardInput = StandardInput is not null;
             bool redirectStandardError = StandardError is not null;
             bool redirectStandardOutput = StandardOutput is not null;
-                
-            return ToProcessStartInfo(redirectStandardOutput, redirectStandardError);
+            
+            return ToProcessStartInfo(redirectStandardInput, redirectStandardOutput, redirectStandardError);
         }
-        
+
         /// <summary>
         /// Creates Process Start Information based on specified parameters and Process configuration object values.
         /// </summary>
+        /// <param name="redirectStandardInput"></param>
         /// <param name="redirectStandardOutput">Whether to redirect the Standard Output.</param>
         /// <param name="redirectStandardError">Whether to redirect the Standard Error.</param>
         /// <returns>A new ProcessStartInfo object configured with the specified parameters and Process object values.</returns>
@@ -538,7 +540,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         [UnsupportedOSPlatform("watchos")]
         [UnsupportedOSPlatform("browser")]
 #endif
-        public ProcessStartInfo ToProcessStartInfo(bool redirectStandardOutput, bool redirectStandardError)
+        public ProcessStartInfo ToProcessStartInfo(bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError)
         {
             if (string.IsNullOrEmpty(TargetFilePath))
             {

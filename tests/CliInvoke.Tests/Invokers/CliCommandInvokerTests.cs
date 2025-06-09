@@ -11,8 +11,8 @@ using AlastairLundy.CliInvoke.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Piping;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
+using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Tests.Helpers;
 using AlastairLundy.CliInvoke.Tests.TestData;
 
