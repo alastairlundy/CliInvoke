@@ -193,23 +193,6 @@ public class CliCommandConfigurationBuilder : ICliCommandConfigurationBuilder
                 _commandConfiguration.UseShellExecution));
 
     /// <summary>
-    /// Sets the environment variables for the Command to be executed.
-    /// </summary>
-    /// <param name="configure">The environment variables to be configured</param>
-    /// <returns>The new CommandBuilder with the specified environment variables.</returns>
-    [Pure]
-    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
-    public ICliCommandConfigurationBuilder WithEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configure)
-    {
-        IEnvironmentVariablesBuilder environmentVariablesBuilder = new EnvironmentVariablesBuilder()
-            .Set(_commandConfiguration.EnvironmentVariables);
-
-        configure(environmentVariablesBuilder);
-
-        return WithEnvironmentVariables(environmentVariablesBuilder.Build());
-    }
-
-    /// <summary>
     /// Sets whether to execute the Command with Administrator Privileges.
     /// </summary>
     /// <param name="runAsAdministrator">Whether to execute the Command with Administrator Privileges.</param>

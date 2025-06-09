@@ -86,7 +86,10 @@ public class CliCommandInvoker : ICliCommandInvoker
 #endif
         public async Task<ProcessResult> ExecuteAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default)
         {
-            Process process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration));
+            Process process = new Process()
+            {
+                StartInfo = _commandProcessFactory.ConfigureProcess(commandConfiguration)
+            };
             
             if (process.StartInfo.RedirectStandardInput &&
                 commandConfiguration.StandardInput is not null
@@ -141,8 +144,11 @@ public class CliCommandInvoker : ICliCommandInvoker
         public async Task<BufferedProcessResult> ExecuteBufferedAsync(CliCommandConfiguration commandConfiguration,
             CancellationToken cancellationToken = default)
         {
-            Process process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration,
-                true, true));
+            Process process = new Process()
+            {
+                StartInfo =_commandProcessFactory.ConfigureProcess(commandConfiguration,
+                    true, true)
+            };
 
             if (process.StartInfo.RedirectStandardInput &&
                 commandConfiguration.StandardInput is not null

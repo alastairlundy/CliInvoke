@@ -34,40 +34,6 @@ namespace AlastairLundy.CliInvoke;
 /// </summary>
 public class CommandProcessFactory : ICommandProcessFactory
 {
-    /// <summary>
-    /// Creates a process with the specified process start information.
-    /// </summary>
-    /// <param name="processStartInfo">The process start information to be used to configure the process to be created.</param>
-    /// <returns>The newly created Process with the specified start information.</returns>
-    /// <exception cref="ArgumentException">Thrown if the Process Start Info's File Name is null or empty.</exception>
-#if NET5_0_OR_GREATER
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [UnsupportedOSPlatform("ios")]
-        [SupportedOSPlatform("android")]
-        [UnsupportedOSPlatform("tvos")]
-        [UnsupportedOSPlatform("watchos")]
-        [UnsupportedOSPlatform("browser")]
-#endif
-        [Obsolete(DeprecationMessages.ClassDeprecationV2)]
-        public Process CreateProcess(ProcessStartInfo processStartInfo)
-        {
-            if (string.IsNullOrEmpty(processStartInfo.FileName))
-            {
-                throw new ArgumentException(Resources.Process_FileName_Empty);
-            }
-
-            Process output = new Process
-            {
-                StartInfo = processStartInfo,
-            };
-            
-            return output;
-        }
-
         /// <summary>
         /// Creates Process Start Information based on specified Command configuration object values.
         /// </summary>

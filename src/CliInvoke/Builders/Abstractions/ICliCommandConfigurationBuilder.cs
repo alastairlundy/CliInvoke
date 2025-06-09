@@ -63,14 +63,6 @@ public interface ICliCommandConfigurationBuilder
     /// <param name="environmentVariables">The environment variables to be configured.</param>
     /// <returns>The new CommandBuilder with the specified environment variables.</returns>
     ICliCommandConfigurationBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables);
-
-    /// <summary>
-    /// Sets the environment variables for the Command to be executed.
-    /// </summary>
-    /// <param name="configure">The environment variables to be configured</param>
-    /// <returns>The new CommandBuilder with the specified environment variables.</returns>
-    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
-    ICliCommandConfigurationBuilder WithEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configure);
     
     /// <summary>
     /// Sets whether to execute the Command with Administrator Privileges.

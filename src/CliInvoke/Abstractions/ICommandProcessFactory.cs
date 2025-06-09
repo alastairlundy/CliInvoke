@@ -20,13 +20,6 @@ namespace AlastairLundy.CliInvoke.Abstractions;
 /// </summary>
 public interface ICommandProcessFactory
 {
-    /// <summary>
-    /// Creates a process with the specified process start information.
-    /// </summary>
-    /// <param name="processStartInfo">The process start information to be used to configure the process to be created.</param>
-    /// <returns>The newly created Process with the specified start information.</returns>
-    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
-    Process CreateProcess(ProcessStartInfo processStartInfo);
 
     /// <summary>
     /// Creates Process Start Information based on specified Command configuration object values.
