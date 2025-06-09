@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Security;
 using System.Text;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
@@ -16,13 +16,13 @@ using System.Runtime.Versioning;
 
 namespace AlastairLundy.CliInvoke.Tests.Builders
 {
-        public class CliCommandConfigurationBuilderTests
+        public class ProcessConfigurationBuilderTests
         {
 
                 [Fact]
                 public void TestDefaultConfiguration()
                 {
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
 
                         var builtCommand = commandBuilder.Build();
                         Assert.Equal("foo", builtCommand.TargetFilePath);
@@ -53,7 +53,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 [Fact]
                 public void TestIncompatiblePipingOptionsThrowsException()
                 {
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
 
                         //Assert
                         Assert.Throws<ArgumentException>(() =>
@@ -79,13 +79,13 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 public void TestTargetFileReconfigured()
                 { 
                         //Arrange
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo");
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
               
                         //Act
                         commandBuilder = commandBuilder.WithTargetFile("bar");
               
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        ProcessConfiguration command = commandBuilder.Build();
                         Assert.Equal("bar", command.TargetFilePath);
                 }
 
@@ -93,7 +93,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 public void TestArgumentsReplaced()
                 {
                         //Arrange
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
                                 .WithArguments("--arg-value=value");
              
                         //Act
@@ -108,14 +108,14 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 public void TestValidationReconfigured()
                 {
                         //Arrange
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
                                 .WithValidation(ProcessResultValidation.None);
                 
                         //Act
                         commandBuilder = commandBuilder.WithValidation(ProcessResultValidation.ExitCodeZero);
                 
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        ProcessConfiguration command = commandBuilder.Build();
                         Assert.Equal(ProcessResultValidation.ExitCodeZero, command.ResultValidation);
                 }
 
@@ -132,7 +132,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         password.AppendChar('3');
                         password.AppendChar('4');
                 
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
                                 .WithUserCredential(new UserCredential("", "admin", password, false));
                 
                         //Act
@@ -147,7 +147,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         commandBuilder = commandBuilder.WithUserCredential(userCredential);
                 
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        ProcessConfiguration command = commandBuilder.Build();
                         Assert.Equal(userCredential, command.Credential);
                 }
 
@@ -161,7 +161,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 public void TestReconfiguredResourcePolicy()
                 {
                         //Arrange
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
                                 .WithProcessResourcePolicy(ProcessResourcePolicy.Default);
                 
                 
@@ -174,7 +174,7 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         commandBuilder = commandBuilder.WithProcessResourcePolicy(resourcePolicy);
                 
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        ProcessConfiguration command = commandBuilder.Build();
                         Assert.Equal(resourcePolicy, command.ResourcePolicy);
                 }
 
@@ -182,14 +182,14 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 public void TestReconfiguredAdminPrivileges()
                 {
                         //Act
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
                                 .WithAdministratorPrivileges(false);
              
                         //Arrange
                         commandBuilder = commandBuilder.WithAdministratorPrivileges(true);
              
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        ProcessConfiguration command = commandBuilder.Build();
                         Assert.True(command.RequiresAdministrator);
                 }
 
@@ -197,14 +197,14 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 public void TestReconfiguredWorkingDirectory()
                 {
                         //Act
-                        ICliCommandConfigurationBuilder commandBuilder = new CliCommandConfigurationBuilder("foo")
+                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
                                 .WithWorkingDirectory("dir");
                 
                         //Arrange
                         commandBuilder = commandBuilder.WithWorkingDirectory("dir2");
                 
                         //Assert
-                        CliCommandConfiguration command = commandBuilder.Build();
+                        ProcessConfiguration command = commandBuilder.Build();
                         Assert.Equal("dir2", command.WorkingDirectoryPath);
                 }
         }

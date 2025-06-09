@@ -10,12 +10,11 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-namespace AlastairLundy.CliInvoke.Core
+namespace AlastairLundy.CliInvoke.Core.Abstractions
 {
     /// <summary>
     /// Defines the contract for a class that executes processes.
@@ -62,6 +61,28 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Buffered Process Results from running the process.</returns>
         Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo,
+            ProcessResultValidation processResultValidation,
+            ProcessResourcePolicy? processResourcePolicy = null,
+            CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="processConfiguration"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration,
+            CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="processStartInfo"></param>
+        /// <param name="processResultValidation"></param>
+        /// <param name="processResourcePolicy"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo,
             ProcessResultValidation processResultValidation,
             ProcessResourcePolicy? processResourcePolicy = null,
             CancellationToken cancellationToken = default);

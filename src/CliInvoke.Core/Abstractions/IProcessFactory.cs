@@ -14,7 +14,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-namespace AlastairLundy.CliInvoke.Core
+namespace AlastairLundy.CliInvoke.Core.Abstractions
 {
     /// <summary>
     /// Create and manage processes efficiently.
@@ -89,7 +89,7 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
         /// <returns>The task and processResult that are returned upon completion of the task.</returns>
         Task<ProcessResult> ContinueWhenExitAsync(Process process, CancellationToken cancellationToken = default);
-    
+        
         /// <summary>
         /// Creates a Task that returns a ProcessResult when the specified process exits.
         /// </summary>
@@ -98,7 +98,7 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
         /// <returns>The task and ProcessResult that are returned upon completion of the task.</returns>
         Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation, CancellationToken cancellationToken = default);
-    
+        
         /// <summary>
         /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
         /// </summary>
@@ -115,5 +115,23 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
         /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
         Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, ProcessResultValidation resultValidation, CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="process"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="process"></param>
+        /// <param name="resultValidation"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, ProcessResultValidation resultValidation, CancellationToken cancellationToken = default);
+
     }
 }

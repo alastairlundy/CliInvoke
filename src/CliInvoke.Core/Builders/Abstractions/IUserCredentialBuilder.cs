@@ -11,7 +11,7 @@ using System;
 using System.Security;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders
+namespace AlastairLundy.CliInvoke.Core.Builders.Abstractions
 {
     public interface IUserCredentialBuilder : IDisposable
     {

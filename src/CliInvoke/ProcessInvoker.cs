@@ -8,7 +8,7 @@
    */
 
 #nullable enable
-using System;
+
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core.Abstractions;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
@@ -24,16 +24,19 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke.Legacy;
+namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of IProcessRunner, a safer way to execute processes.
+/// The default implementation of IProcessInvoker, a safer way to execute processes.
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
     private readonly IProcessFactory _processFactory;
     
-    [Obsolete]
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processFactory"></param>
     public ProcessInvoker(IProcessFactory processFactory)
     {
         _processFactory = processFactory;
@@ -42,7 +45,6 @@ public class ProcessInvoker : IProcessInvoker
     /// <summary>
     /// Runs the process synchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="process">The process to be run.</param>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
@@ -120,7 +122,6 @@ public class ProcessInvoker : IProcessInvoker
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="process">The process to be run.</param>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
@@ -139,21 +140,20 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default)
     {
         Process process = _processFactory.StartNew(processConfiguration);
-        
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        
-       BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
-            cancellationToken);
-        
-        return result;
+                              
+                              process.StartInfo.RedirectStandardOutput = true;
+                              process.StartInfo.RedirectStandardError = true;
+                              
+                             BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
+                                  cancellationToken);
+                              
+                              return result;
     }
-
-
+    
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="process">The process to be run.</param>
+    /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The resource policy to be set if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
@@ -183,6 +183,69 @@ public class ProcessInvoker : IProcessInvoker
 
         BufferedProcessResult result =
             await _processFactory.ContinueWhenExitBufferedAsync(process, processResultValidation, cancellationToken);
+
+        return result;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processConfiguration"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+#endif
+    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    {
+        Process process = _processFactory.StartNew(processConfiguration);
+        
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        
+        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process, processConfiguration.ResultValidation,
+            cancellationToken);
+        
+        return result;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processStartInfo"></param>
+    /// <param name="processResultValidation"></param>
+    /// <param name="processResourcePolicy"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+#endif
+    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy? processResourcePolicy = null, CancellationToken cancellationToken = default)
+    {
+        Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
+        
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+
+        PipedProcessResult result =
+            await _processFactory.ContinueWhenExitPipedAsync(process, processResultValidation, cancellationToken);
 
         return result;
     }

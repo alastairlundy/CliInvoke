@@ -13,7 +13,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Security;
-using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 

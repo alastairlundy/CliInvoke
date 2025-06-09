@@ -23,8 +23,6 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-using AlastairLundy.CliInvoke.Extensibility.Abstractions;
-
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations
@@ -40,7 +38,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
         [UnsupportedOSPlatform("freebsd")]
         [UnsupportedOSPlatform("android")]
 #endif
-    public class ClassicPowershellCommandConfiguration : CliCommandConfiguration
+    public class ClassicPowershellCommandConfiguration : ProcessConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the ClassicPowershellCommandConfiguration class.

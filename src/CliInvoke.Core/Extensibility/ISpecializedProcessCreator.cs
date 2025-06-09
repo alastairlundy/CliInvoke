@@ -7,18 +7,18 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using AlastairLundy.CliInvoke.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-namespace AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers
+namespace AlastairLundy.CliInvoke.Core.Extensibility
 {
-    public interface ISpecializedCliCommandInvoker : ICliCommandInvoker
+    public interface ISpecializedProcessCreator
     {
         /// <summary>
         /// Create the command to be run from the Command runner configuration and an input command.
         /// </summary>
         /// <param name="inputCommand">The command to be run by the Command Runner command.</param>
         /// <returns>The built Command that will run the input command.</returns>
-        CliCommandConfiguration CreateRunnerCommand(CliCommandConfiguration inputCommand);
+        ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputCommand);
     }
 }

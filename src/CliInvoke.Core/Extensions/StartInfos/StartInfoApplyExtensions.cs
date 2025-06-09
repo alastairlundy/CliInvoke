@@ -8,20 +8,19 @@
    */
 
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using AlastairLundy.CliInvoke.Core.Primitives;
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-using AlastairLundy.CliInvoke.Core.Primitives;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 // ReSharper disable UnusedMethodReturnValue.Global

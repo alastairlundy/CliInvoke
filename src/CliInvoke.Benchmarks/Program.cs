@@ -2,8 +2,6 @@
 
 using System.Reflection;
 using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Core.Abstractions;
-
 using BenchmarkDotNet.Running;
 
 using CliInvoke.Benchmarking.Benchmarks.Invokation;

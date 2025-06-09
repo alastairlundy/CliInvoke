@@ -42,7 +42,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
 #endif
-    public class CmdCommandConfiguration : CliCommandConfiguration
+    public class CmdCommandConfiguration : ProcessConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the CmdCommandConfiguration class.

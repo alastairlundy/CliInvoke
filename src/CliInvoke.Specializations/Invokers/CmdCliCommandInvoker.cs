@@ -8,12 +8,13 @@
 */
 
 using System;
-using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
-
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
@@ -22,46 +23,39 @@ namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 /// <summary>
 /// Run commands through CMD with ease.
 /// </summary>
-public class CmdCliCommandInvoker : SpecializedCliCommandInvoker, ISpecializedCliCommandInvoker
+public class CmdCliCommandInvoker : IProcessInvoker
 {
-    
-    /// <summary>
-    /// Instantiates the Cmd Cli command invoker
-    /// </summary>
-    /// <remarks>Only supported on Windows based operating systems.</remarks>
-    /// <param name="commandInvoker">The cli command invoker service to be used to run commands.</param>
-    #if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [UnsupportedOSPlatform("linux")]
-    [UnsupportedOSPlatform("macos")]
-    [UnsupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("freebsd")]
-    #endif
-    public CmdCliCommandInvoker(ICliCommandInvoker commandInvoker) : base(commandInvoker, new CmdCommandConfiguration())
+    public async Task<ProcessResult> ExecuteProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
     {
-        
+        throw new NotImplementedException();
     }
 
-    public override CliCommandConfiguration CreateRunnerCommand(CliCommandConfiguration inputCommand)
+    public async Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
     {
-        ICliCommandConfigurationBuilder configurationBuilder =
-            new CliCommandConfigurationBuilder(new CmdCommandConfiguration())
-                .WithArguments($"{inputCommand.TargetFilePath} {inputCommand.Arguments}")
-                .WithWorkingDirectory(inputCommand.WorkingDirectoryPath)
-                .WithValidation(inputCommand.ResultValidation)
-                .WithStandardInputPipe(inputCommand.StandardInput)
-                .WithStandardOutputPipe(inputCommand.StandardOutput)
-                .WithStandardErrorPipe(inputCommand.StandardError)
-                .WithUserCredential(inputCommand.Credential)
-                .WithWindowCreation(inputCommand.WindowCreation)
-                .WithAdministratorPrivileges(inputCommand.RequiresAdministrator)
-                .WithEncoding(inputCommand.StandardInputEncoding, inputCommand.StandardOutputEncoding,
-                    inputCommand.StandardErrorEncoding)
-                .WithEnvironmentVariables(inputCommand.EnvironmentVariables)
-                .WithProcessResourcePolicy(inputCommand.ResourcePolicy);
-        
-        CliCommandConfiguration runnerCommand = configurationBuilder.Build();
-        return runnerCommand;
+        throw new NotImplementedException();
+    }
 
+    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessConfiguration processConfiguration,
+        CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -11,15 +11,11 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-
 using AlastairLundy.DotExtensions.Processes;
-
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-using System.Runtime.InteropServices;
 #endif
 
 namespace AlastairLundy.CliInvoke.Core.Extensions.Processes

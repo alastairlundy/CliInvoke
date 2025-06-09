@@ -3,19 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-
-using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
-using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
-using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Utilities;
+using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
@@ -26,7 +14,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
 {
     public class CrossPlatformTestExecutables
     {
-        private static ICliCommandInvoker _cliInvoker;
+   //     private static ICliCommandInvoker _cliInvoker;
 
         private static readonly string dotnetExePath;
         private static readonly string cmdExePath;
@@ -35,16 +23,9 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
         {
                 IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
                 IFilePathResolver filePathResolver = new FilePathResolver();
-            
-                IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
-            
-                IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility,
-                    processPipeHandler);
-            
-                ICommandProcessFactory commandProcessFactory = new CommandProcessFactory();
-            
-                _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
-                    processPipeHandler, commandProcessFactory);
+
+          //      _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
+          //             processPipeHandler, commandProcessFactory);
 
                 ICliCommandConfigurationBuilder dotnetConfigurationBuilder;
 

@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders
+namespace AlastairLundy.CliInvoke.Core.Builders.Abstractions
 {
     public interface IEnvironmentVariablesBuilder
     {
