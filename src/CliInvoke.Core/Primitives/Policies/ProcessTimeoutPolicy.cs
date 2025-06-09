@@ -5,10 +5,15 @@ using System.ComponentModel;
 
 namespace AlastairLundy.CliInvoke.Core.Primitives.Policies
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     {
         
-        
+        /// <summary>
+        /// 
+        /// </summary>
         public ProcessTimeoutPolicy()
         {
             TimeoutThreshold = TimeSpan.FromMinutes(30);
@@ -16,6 +21,11 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Policies
             CancellationMode = ProcessCancellationMode.Graceful;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeoutThreshold"></param>
+        /// <param name="cancellationMode"></param>
         public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, ProcessCancellationMode cancellationMode)
         {
             TimeoutThreshold = timeoutThreshold;
@@ -44,6 +54,11 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Policies
         /// </summary>
         public ProcessCancellationMode CancellationMode { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(ProcessTimeoutPolicy? other)
         {
             if (other is null)
