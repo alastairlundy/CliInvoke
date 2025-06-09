@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>13</LangVersion>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <TargetFrameworks>net8.0;net9.0;net472;net48</TargetFrameworks>
+        <RootNamespace>AlastairLundy.CliInvoke.Tests</RootNamespace>
+        <AssemblyName>AlastairLundy.CliInvoke.Tests</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AlastairLundy.Resyslib.IO" Version="3.1.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Bogus" Version="35.6.3" />
+        <PackageReference Include="xunit.v3" Version="2.0.2" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="PolyFill" Version="7.33.0" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Factories\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke.Extensions\CliInvoke.Extensions.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke.Specializations\CliInvoke.Specializations.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke\CliInvoke.csproj" />
+    </ItemGroup>
+
+</Project>

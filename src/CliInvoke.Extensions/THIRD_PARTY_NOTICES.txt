@@ -1,7 +1,7 @@
 This library makes use of some open source libraries and some code from open source libraries.
 
 -----------------------------------------------------------------------------
-CliInvoke.Extensions.DependencyInjection makes use of Microsoft.Extensions.DependencyInjection.Abstractions.
+CliInvoke.Extensions makes use of Microsoft.Extensions.DependencyInjection.Abstractions.
 
 Microsoft.Extensions.DependencyInjection.Abstractions is licensed under the MIT License.
 

@@ -1,5 +1,5 @@
 ﻿/*
-    CliInvoke.Core 
+    AlastairLundy.CliInvoke.Core 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,19 +7,20 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using AlastairLundy.CliInvoke.Core.Primitives;
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-using AlastairLundy.CliInvoke.Core.Primitives;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 // ReSharper disable UnusedMethodReturnValue.Global
@@ -137,11 +138,11 @@ namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos
         /// <param name="processStartInfo"></param>
         public static void RunAsAdministrator(this ProcessStartInfo processStartInfo)
         {
-            if (OperatingSystem.IsWindows())
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 processStartInfo.Verb = "runas";
             }
-            else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || OperatingSystem.IsFreeBSD())
             {
                 processStartInfo.Verb = "sudo";
             }

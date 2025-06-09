@@ -15,26 +15,37 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReleaseNotes>## Changes
 
-- Update Polyfill dependency and replace SystemExtensions dependency with DotExtensions dependency @alastairlundy (#22)</PackageReleaseNotes>
+- Add simple exec to basic benchmark comparison @alastairlundy (#45)
+- Add Basic Benchmark comparing CliInvoke to other alternatives @alastairlundy (#40)
+
+## 🚀 Features
+
+- Update to CliInvoke.Core 1.4.1 and Resyslib.IO 3.1.0 @alastairlundy (#44)
+- Update DotExtensions from 6.8.0 to 7.1.1, and Polyfill from 7.31.0 to 7.33.0
+
+## 🐛 Bug Fixes
+
+- Add missing ``ProcessConfigurationBuilder`` to CliInvoke @alastairlundy (#43)</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.2.0</PackageVersion>
+        <PackageVersion>1.4.0</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
-        <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
         <PackageId>AlastairLundy.CliInvoke</PackageId>
         <Product>CliInvoke</Product>
+        <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="6.6.0"/>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.1.1" />
+        <PackageReference Include="AlastairLundy.Resyslib.IO.Core" Version="3.1.0"/>
     </ItemGroup>
     
     <ItemGroup >
-        <PackageReference Include="PolyFill" Version="7.27.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"/>
+        <PackageReference Include="PolyFill" Version="7.33.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"/>
     </ItemGroup>
     
     <ItemGroup>
@@ -71,5 +82,8 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-
+    
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+    </ItemGroup>
 </Project>

@@ -12,14 +12,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-
-using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Extensibility.Abstractions;
-
-using AlastairLundy.Extensions.Processes;
-using AlastairLundy.Extensions.Processes.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -32,7 +30,7 @@ using System.Runtime.Versioning;
 namespace AlastairLundy.CliInvoke.Specializations.Configurations
 {
     /// <summary>
-    /// A Command configuration to make running commands through cross-platform Powershell easier.
+    /// A Command configuration to make running commands through cross-platform PowerShell easier.
     /// </summary>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
@@ -46,14 +44,14 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
 #endif
-    public class PowershellCommandConfiguration : SpecializedCliCommandConfiguration
+    public class PowershellCommandConfiguration : ProcessConfiguration
     {
-        private readonly ICliCommandInvoker _commandInvoker;
+        private readonly IProcessInvoker _invoker;
 
         /// <summary>
         /// Initializes a new instance of the PowershellCommandConfiguration class.
         /// </summary>
-        /// <param name="commandInvoker">The command runner to be used to get the Target File Path.</param>
+        /// <param name="processInvoker"></param>
         /// <param name="arguments">The arguments to be passed to the command.</param>
         /// <param name="workingDirectoryPath">The working directory for the command.</param>
         /// <param name="requiresAdministrator">Indicates whether the command requires administrator privileges.</param>
@@ -69,7 +67,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
         /// <param name="processResourcePolicy">The processor resource policy for the command.</param>
         /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
         /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
-        public PowershellCommandConfiguration(ICliCommandInvoker commandInvoker, string arguments = null,
+        public PowershellCommandConfiguration(IProcessInvoker processInvoker, string arguments = null,
             string workingDirectoryPath = null, bool requiresAdministrator = false,
             IReadOnlyDictionary<string, string> environmentVariables = null, UserCredential credentials = null,
             ProcessResultValidation resultValidation = ProcessResultValidation.ExitCodeZero,
@@ -82,11 +80,12 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
             standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
             useShellExecution, windowCreation)
         {
-            _commandInvoker = commandInvoker;
+            base.TargetFilePath = TargetFilePath;
+            _invoker = processInvoker;
         }
         
         /// <summary>
-        /// The target file path of cross-platform Powershell.
+        /// The target file path of cross-platform PowerShell.
         /// </summary>
         /// <exception cref="PlatformNotSupportedException">Thrown if run on an operating system besides Windows, macOS, Linux, and FreeBSD.</exception>
 #if NET5_0_OR_GREATER
@@ -141,12 +140,12 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
 
         private string GetUnixInstallLocation()
         {
-           ICliCommandConfigurationBuilder installLocationBuilder = new CliCommandConfigurationBuilder("/usr/bin/which")
+           IProcessConfigurationBuilder installLocationBuilder = new ProcessConfigurationBuilder("/usr/bin/which")
                 .WithArguments("pwsh");
            
-           CliCommandConfiguration command = installLocationBuilder.Build();
+           ProcessConfiguration command = installLocationBuilder.Build();
            
-          Task<BufferedProcessResult> task = _commandInvoker.ExecuteBufferedAsync(command);
+          Task<BufferedProcessResult> task = _invoker.ExecuteBufferedProcessAsync(command);
           
           task.RunSynchronously();
           

@@ -18,19 +18,19 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.1</Version>
-        <PackageReleaseNotes>Moved abstractions code to this library and merged with ProcessInvoke Primitives and ProcessInvoke Abstractions</PackageReleaseNotes>
+        <Version>1.4.1</Version>
+        <PackageReleaseNotes>Update DotExtensions from 7.0.0 to 7.1.1, and Polyfill from 7.32.0 to 7.33.0</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="6.6.0"/>
-         <PackageReference Include="System.IO.Pipelines" Version="9.0.4" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1' OR '$(TargetFramework)' == 'net8.0'"/>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.1.1" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
         
-        <PackageReference Include="Polyfill" Version="7.27.0" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" />
+        <PackageReference Include="Polyfill" Version="7.33.0" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" />
 
     </ItemGroup>
 

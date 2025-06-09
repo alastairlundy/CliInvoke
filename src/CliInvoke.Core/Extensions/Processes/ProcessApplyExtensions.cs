@@ -1,5 +1,5 @@
 ﻿/*
-    CliInvoke.Core 
+    AlastairLundy.CliInvoke.Core 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,14 +7,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+
 using System;
 using System.Diagnostics;
-
+using AlastairLundy.CliInvoke.Core.Primitives;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
-using AlastairLundy.CliInvoke.Core.Primitives;
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace AlastairLundy.CliInvoke.Core.Extensions.Processes

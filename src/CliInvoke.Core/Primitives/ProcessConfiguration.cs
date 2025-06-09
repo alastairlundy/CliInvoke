@@ -1,5 +1,5 @@
 ﻿/*
-    CliInvoke.Core
+    AlastairLundy.CliInvoke.Core 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,23 +7,20 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-
+using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
+using AlastairLundy.CliInvoke.Core.Internal;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
-
-using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
-
-using AlastairLundy.CliInvoke.Core.Internal;
-
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -208,47 +205,47 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// <summary>
         /// Whether administrator privileges should be used when executing the Command.
         /// </summary>
-        public bool RequiresAdministrator { get; }
+        public bool RequiresAdministrator { get;protected set; }
 
         /// <summary>
         /// The file path of the executable to be run and wrapped.
         /// </summary>
-        public string TargetFilePath { get; }
+        public string TargetFilePath { get; protected set; }
 
         /// <summary>
         /// The working directory path to be used when executing the Command.
         /// </summary>
-        public string WorkingDirectoryPath { get; }
+        public string WorkingDirectoryPath { get; protected set; }
 
         /// <summary>
         /// The arguments to be provided to the executable to be run.
         /// </summary>
-        public string Arguments { get; }
+        public string Arguments { get; protected set;  }
 
         /// <summary>
         /// Whether to enable window creation or not when the Command's Process is run.
         /// </summary>
-        public bool WindowCreation { get; }
+        public bool WindowCreation { get; protected set; }
         
         /// <summary>
         /// The environment variables to be set.
         /// </summary>
-        public IReadOnlyDictionary<string, string> EnvironmentVariables { get; }
+        public IReadOnlyDictionary<string, string> EnvironmentVariables { get; protected set;  }
         
         /// <summary>
         /// The ProcessStartInfo to be used for the Process.
         /// </summary>
-        public ProcessStartInfo StartInfo { get; }
+        public ProcessStartInfo StartInfo { get; protected set;  }
         
         /// <summary>
         /// The credential to be used when executing the Command.
         /// </summary>
-        public UserCredential? Credential { get; }
+        public UserCredential? Credential { get; protected set;  }
 
         /// <summary>
         /// The result validation to apply to the Command when it is executed.
         /// </summary>
-        public ProcessResultValidation ResultValidation { get; }
+        public ProcessResultValidation ResultValidation { get; protected set;  }
 
         /// <summary>
         /// Whether to use Shell Execution or not when executing the Command.
@@ -262,40 +259,40 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// </summary>
         /// <remarks>Using Shell Execution whilst also Redirecting Standard Input will throw an Exception. This is a known issue with the System Process class.</remarks>
         /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror" />
-        public StreamWriter? StandardInput { get; }
+        public StreamWriter? StandardInput { get; protected set;  }
 
         /// <summary>
         /// The Standard Output target to redirect Standard Output to if configured.
         /// </summary>
-        public StreamReader? StandardOutput { get; }
+        public StreamReader? StandardOutput { get; protected set;  }
 
         /// <summary>
         /// The Standard Error target to redirect Standard Output to if configured.
         /// </summary>
-        public StreamReader? StandardError { get; }
+        public StreamReader? StandardError { get; protected set;  }
 
         /// <summary>
         /// The Process Resource Policy to be used for executing the Command.
         /// </summary>
         /// <remarks>Process Resource Policy objects enable configuring Processor Affinity and other resource settings to be applied to the Command if supported by the currently running operating system.
         /// <para>Not all properties of a Process Resource Policy support all operating systems. Check before configuring a property.</para></remarks>
-        public ProcessResourcePolicy? ResourcePolicy { get; }
+        public ProcessResourcePolicy? ResourcePolicy { get; protected set;  }
         
         /// <summary>
         /// The encoding to use for the Standard Input.
         /// </summary>
         /// <remarks>This is ignored on .NET Standard 2.0 as it is unsupported on that Target Framework's Process class.</remarks>
-        public Encoding StandardInputEncoding { get; }
+        public Encoding StandardInputEncoding { get; protected set;  }
         
         /// <summary>
         /// The encoding to use for the Standard Output.
         /// </summary>
-        public Encoding StandardOutputEncoding { get; }
+        public Encoding StandardOutputEncoding { get; protected set;  }
         
         /// <summary>
         /// The encoding to use for the Standard Error.
         /// </summary>
-        public Encoding StandardErrorEncoding { get; }
+        public Encoding StandardErrorEncoding { get; protected set;  }
 
                 
         /// <summary>
@@ -512,15 +509,17 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
 #endif
         public ProcessStartInfo ToProcessStartInfo()
         {
+            bool redirectStandardInput = StandardInput is not null;
             bool redirectStandardError = StandardError is not null;
             bool redirectStandardOutput = StandardOutput is not null;
-                
-            return ToProcessStartInfo(redirectStandardOutput, redirectStandardError);
+            
+            return ToProcessStartInfo(redirectStandardInput, redirectStandardOutput, redirectStandardError);
         }
-        
+
         /// <summary>
         /// Creates Process Start Information based on specified parameters and Process configuration object values.
         /// </summary>
+        /// <param name="redirectStandardInput"></param>
         /// <param name="redirectStandardOutput">Whether to redirect the Standard Output.</param>
         /// <param name="redirectStandardError">Whether to redirect the Standard Error.</param>
         /// <returns>A new ProcessStartInfo object configured with the specified parameters and Process object values.</returns>
@@ -537,7 +536,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         [UnsupportedOSPlatform("watchos")]
         [UnsupportedOSPlatform("browser")]
 #endif
-        public ProcessStartInfo ToProcessStartInfo(bool redirectStandardOutput, bool redirectStandardError)
+        public ProcessStartInfo ToProcessStartInfo(bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError)
         {
             if (string.IsNullOrEmpty(TargetFilePath))
             {

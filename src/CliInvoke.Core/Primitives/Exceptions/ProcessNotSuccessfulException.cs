@@ -13,8 +13,8 @@
 
 using System;
 using System.Diagnostics;
-
 using AlastairLundy.CliInvoke.Core.Internal;
+
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 // ReSharper disable MemberCanBePrivate.Global
