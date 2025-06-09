@@ -8,16 +8,12 @@
 */
 
 using System;
-using AlastairLundy.CliInvoke.Abstractions;
+
 using AlastairLundy.CliInvoke.Core.Abstractions;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
-using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 
-using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Piping;
-using AlastairLundy.CliInvoke.Legacy.Utilities;
+using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 
+using AlastairLundy.CliInvoke.Piping;
 using IFilePathResolver = AlastairLundy.Resyslib.IO.Core.Files.IFilePathResolver;
 using AlastairLundy.Resyslib.IO.Files;
 
@@ -45,32 +41,24 @@ public static class DependencyInjectionExtensions
             case ServiceLifetime.Singleton:
                 services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
                 services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
-                services.TryAddSingleton<IProcessRunnerUtility, ProcessRunnerUtility>();
-                services.TryAddSingleton<IPipedProcessRunner, PipedProcessRunner>();
-                
+
                 services.AddSingleton<IProcessFactory, ProcessFactory>();
-                services.AddSingleton<ICommandProcessFactory, CommandProcessFactory>();
-                services.AddSingleton<ICliCommandInvoker, CliCommandInvoker>();
+                services.AddSingleton<IProcessInvoker, ProcessInvoker>();
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
-                services.TryAddScoped<IProcessRunnerUtility, ProcessRunnerUtility>();
-                services.TryAddScoped<IPipedProcessRunner, PipedProcessRunner>();
                 
                 services.AddScoped<IProcessFactory, ProcessFactory>();
-                services.AddScoped<ICommandProcessFactory, CommandProcessFactory>();
-                services.AddScoped<ICliCommandInvoker, CliCommandInvoker>();
+                services.AddScoped<IProcessInvoker, ProcessInvoker>();
+                
                 break;
             case ServiceLifetime.Transient:
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
                 services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
-                services.TryAddTransient<IProcessRunnerUtility, ProcessRunnerUtility>();
-                services.TryAddTransient<IPipedProcessRunner, PipedProcessRunner>();
-                
+
                 services.AddTransient<IProcessFactory, ProcessFactory>();
-                services.AddTransient<ICommandProcessFactory, CommandProcessFactory>();
-                services.AddTransient<ICliCommandInvoker, CliCommandInvoker>();
+                services.AddTransient<IProcessInvoker, ProcessInvoker>();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);

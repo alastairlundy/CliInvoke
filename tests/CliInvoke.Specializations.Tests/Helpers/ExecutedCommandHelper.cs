@@ -10,8 +10,10 @@ using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
-
+using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
 using AlastairLundy.Resyslib.IO.Core.Files;
@@ -22,22 +24,14 @@ namespace CliInvoke.Specializations.Tests.Helpers
 {
     public static class ExecutedCommandHelper
     {
-        private static ICliCommandInvoker _cliInvoker;
+        private static IProcessFactory _processFactory;
         
         static ExecutedCommandHelper()
         {
             IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
             IFilePathResolver filePathResolver = new FilePathResolver();
-            
-            IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
-            
-            IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility,
-                processPipeHandler);
-            
-            ICommandProcessFactory commandProcessFactory = new CommandProcessFactory();
-            
-            _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
-                processPipeHandler, commandProcessFactory);
+
+            _processFactory = new ProcessFactory(filePathResolver, processPipeHandler);
         }
         
         public static string WinCalcExePath
@@ -53,6 +47,6 @@ namespace CliInvoke.Specializations.Tests.Helpers
             }
         }
 
-        public static string CrossPlatformPowershellExePath => new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
+        public static string CrossPlatformPowershellExePath => new PowershellCommandConfiguration().TargetFilePath;
     }
 }

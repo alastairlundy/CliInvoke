@@ -7,10 +7,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using AlastairLundy.CliInvoke.Abstractions;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
-using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
-
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
 #if NET5_0_OR_GREATER
@@ -23,24 +27,46 @@ namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 /// <summary>
 /// Run commands through Windows PowerShell with ease.
 /// </summary>
-public class ClassicPowershellCommandInvoker : SpecializedCliCommandInvoker, ISpecializedCliCommandInvoker
+public class ClassicPowershellCommandInvoker : IProcessInvoker
 {
-    
-    /// <summary>
-    /// Instantiates the Classic PowerShell Cli command invoker.
-    /// </summary>
-    /// <remarks>Only supported on Windows-based operating systems.</remarks>
-    /// <param name="commandInvoker">The cli command invoker service to be used to run commands.</param>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [UnsupportedOSPlatform("linux")]
-    [UnsupportedOSPlatform("macos")]
-    [UnsupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("freebsd")]
-#endif
-    public ClassicPowershellCommandInvoker(ICliCommandInvoker commandInvoker) : base(commandInvoker,
-        new ClassicPowershellCommandConfiguration())
+    private readonly IProcessFactory _processFactory;
+
+    public ClassicPowershellCommandInvoker(IProcessFactory processFactory)
     {
-        
+        _processFactory = processFactory;
+    }
+
+    public async Task<ProcessResult> ExecuteProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public async Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessConfiguration processConfiguration,
+        CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
     }
 }
