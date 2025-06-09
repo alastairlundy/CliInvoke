@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -138,11 +139,11 @@ namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos
         /// <param name="processStartInfo"></param>
         public static void RunAsAdministrator(this ProcessStartInfo processStartInfo)
         {
-            if (OperatingSystem.IsWindows())
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 processStartInfo.Verb = "runas";
             }
-            else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || OperatingSystem.IsFreeBSD())
             {
                 processStartInfo.Verb = "sudo";
             }

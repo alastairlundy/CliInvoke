@@ -20,14 +20,14 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders
         /// </summary>
         /// <param name="domain">The domain to set.</param>
         /// <returns>A new instance of the CredentialsBuilder with the updated domain.</returns>
-        IUserCredentialBuilder SetDomain(string domain);
+        IUserCredentialBuilder SetDomain(string? domain);
 
         /// <summary>
         /// Sets the username for the credential to be created.
         /// </summary>
         /// <param name="username">The username to set.</param>
         /// <returns>A new instance of the CredentialsBuilder with the updated username.</returns>
-        IUserCredentialBuilder SetUsername(string username);
+        IUserCredentialBuilder SetUsername(string? username);
 
         /// <summary>
         /// Sets the password for the credential to be created.

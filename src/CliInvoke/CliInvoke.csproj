@@ -83,8 +83,4 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Legacy\" />
-    </ItemGroup>
 </Project>

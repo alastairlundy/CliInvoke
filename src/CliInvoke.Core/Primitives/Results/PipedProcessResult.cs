@@ -8,7 +8,7 @@
    */
 
 using System;
-using System.IO.Pipelines;
+using System.IO;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ClassNeverInstantiated.Global
@@ -24,12 +24,12 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Results
         /// <summary>
         /// The Standard Output from a Process or Command represented as a Pipe.
         /// </summary>
-        public Pipe StandardOutput { get; }
+        public Stream StandardOutput { get; }
     
         /// <summary>
         /// The Standard Error from a Process or Command represented as a Pipe.
         /// </summary>
-        public Pipe StandardError { get; }
+        public Stream StandardError { get; }
     
         /// <summary>
         /// Initializes the PipedProcessResult with process information.
@@ -41,7 +41,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Results
         /// <param name="standardOutput">The process' standard output.</param>
         /// <param name="standardError">The process' standard error.</param>
         public PipedProcessResult(string executableFilePath, int exitCode, DateTime startTime, DateTime exitTime,
-            Pipe standardOutput, Pipe standardError) : base(executableFilePath, exitCode, startTime, exitTime)
+            Stream standardOutput, Stream standardError) : base(executableFilePath, exitCode, startTime, exitTime)
         {
             StandardOutput = standardOutput;
             StandardError = standardError;

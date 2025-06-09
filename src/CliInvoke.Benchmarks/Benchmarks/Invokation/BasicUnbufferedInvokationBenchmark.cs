@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 
 using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
@@ -39,28 +39,29 @@ public class BasicUnbufferedInvokationBenchmark
     [Benchmark]
     public async Task<int> CliInvoke_ProcessFactory()
     {
-        ProcessConfiguration processConfiguration =
-#pragma warning disable CA1416
-            new ProcessConfiguration(_dotnetCommandHelper.DotnetExecutableTargetFilePath, "--list-sdks", 
-                commandResultValidation: ProcessResultValidation.ExitCodeZero);
-#pragma warning restore CA1416
+        IProcessConfigurationBuilder processConfigurationBuilder = new
+                ProcessConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
+            .WithArguments(_dotnetCommandHelper.Arguments)
+            .WithValidation(ProcessResultValidation.ExitCodeZero);
+        
+        ProcessConfiguration configuration = processConfigurationBuilder.Build();
 
-        Process process = _processFactory.StartNew(processConfiguration);
+        Process process = _processFactory.StartNew(configuration);
        
-      ProcessResult result = await _processFactory.ContinueWhenExitAsync(process);
+        ProcessResult result = await _processFactory.ContinueWhenExitAsync(process);
       
-      return result.ExitCode;
+        return result.ExitCode;
     }
     
     [Benchmark]
     public async Task<int> CliInvoke_CliCommandInvoker()
     {
-        ICliCommandConfigurationBuilder commandConfigurationBuilder = new
-                CliCommandConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
+        IProcessConfigurationBuilder processConfigurationBuilder = new
+                ProcessConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
             .WithArguments(_dotnetCommandHelper.Arguments)
             .WithValidation(ProcessResultValidation.ExitCodeZero);
         
-        CliCommandConfiguration configuration = commandConfigurationBuilder.Build();
+        ProcessConfiguration configuration = processConfigurationBuilder.Build();
 
         ProcessResult result = await _cliCommandInvoker.ExecuteAsync(configuration);
         

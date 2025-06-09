@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+#nullable enable
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -28,98 +29,14 @@ namespace AlastairLundy.CliInvoke.Legacy;
 /// <summary>
 /// The default implementation of IProcessRunner, a safer way to execute processes.
 /// </summary>
-public class ProcessRunner : IProcessInvoker
+public class ProcessInvoker : IProcessInvoker
 {
-    private readonly IProcessRunnerUtility _processRunnerUtils;
+    private readonly IProcessFactory _processFactory;
     
     [Obsolete]
-    public ProcessRunner(IProcessRunnerUtility processRunnerUtils)
+    public ProcessInvoker(IProcessFactory processFactory)
     {
-        _processRunnerUtils = processRunnerUtils;
-    }
-    
-    /// <summary>
-    /// Runs the process synchronously, waits for exit, and safely disposes of the Process before returning.
-    /// </summary>
-    /// <remarks>Use the Async version of this method where possible to avoid UI freezes and other potential issues.</remarks>
-    /// <param name="process">The process to be run.</param>
-    /// <param name="processResultValidation">The process result validation to be used.</param>
-    /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
-    /// <returns>The Process Results from the running the process.</returns>
-    /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
-    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
-    [Obsolete]
-    public ProcessResult ExecuteProcess(Process process, ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy? processResourcePolicy = null)
-    {
-        if (File.Exists(process.StartInfo.FileName) == false)
-        {
-            throw new FileNotFoundException(Resources.Exceptions_FileNotFound.Replace("{file}", process.StartInfo.FileName));
-        }
-
-        _processRunnerUtils.Execute(process, processResultValidation, processResourcePolicy);
-
-        if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
-        }
-
-        return _processRunnerUtils.GetResult(process, disposeOfProcess: true);
-    }
-
-    /// <summary>
-    /// Runs the process synchronously, waits for exit, and safely disposes of the Process before returning.
-    /// </summary>
-    /// <remarks>Use the Async version of this method where possible to avoid UI freezes and other potential issues.</remarks>
-    /// <param name="process">The process to be run.</param>
-    /// <param name="processResultValidation">The process result validation to be used.</param>
-    /// <param name="processResourcePolicy">The process resource policy to set if it is not null.</param>
-    /// <returns>The Buffered Process Results from running the process.</returns>
-    /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
-    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
-    [Obsolete]
-    public BufferedProcessResult ExecuteBufferedProcess(Process process,
-        ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy? processResourcePolicy = null)
-    {
-        if (File.Exists(process.StartInfo.FileName) == false)
-        {
-            throw new FileNotFoundException(Resources.Exceptions_FileNotFound.Replace("{file}", process.StartInfo.FileName));
-        }
-        
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        
-        _processRunnerUtils.Execute(process, processResultValidation, processResourcePolicy);
-       
-        if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
-        }
-        
-        return _processRunnerUtils.GetBufferedResult(process, disposeOfProcess: true);
+        _processFactory = processFactory;
     }
 
     /// <summary>
@@ -142,31 +59,31 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<ProcessResult> ExecuteProcessAsync(Process process, ProcessConfiguration processConfiguration,
+    public async Task<ProcessResult> ExecuteProcessAsync(ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
+       Process process = _processFactory.StartNew(processConfiguration);
+        
         if (File.Exists(process.StartInfo.FileName) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound.Replace("{file}", process.StartInfo.FileName));
         }
         
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        
-        await _processRunnerUtils.ExecuteAsync(process, processConfiguration.ResultValidation, processConfiguration.ResourcePolicy, cancellationToken);
+        ProcessResult result = await _processFactory.ContinueWhenExitAsync(process,
+            processConfiguration.ResultValidation, cancellationToken);
        
         if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
             throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
         }
-        
-        return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+
+        return result;
     }
 
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="process">The process to be run.</param>
+    /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
@@ -184,14 +101,20 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<ProcessResult> ExecuteProcessAsync(Process process,
+    public async Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
         CancellationToken cancellationToken = default)
     {
-        await _processRunnerUtils.ExecuteAsync(process, processResultValidation, processResourcePolicy , cancellationToken);
-       
-        return await _processRunnerUtils.GetResultAsync(process, disposeOfProcess: true);
+        Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
+        
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+
+        ProcessResult result =
+            await _processFactory.ContinueWhenExitAsync(process, processResultValidation, cancellationToken);
+
+        return result;
     }
 
     /// <summary>
@@ -212,18 +135,18 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(Process process,
-        ProcessConfiguration processConfiguration,
+    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
+        Process process = _processFactory.StartNew(processConfiguration);
+        
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         
-        await _processRunnerUtils.ExecuteAsync(process, processConfiguration.ResultValidation,
-            processConfiguration.ResourcePolicy,
+       BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
             cancellationToken);
         
-        return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+        return result;
     }
 
 
@@ -248,16 +171,19 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(Process process,
+    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
         CancellationToken cancellationToken = default)
     {
+       Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
+        
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
-        
-        await _processRunnerUtils.ExecuteAsync(process, processResultValidation, processResourcePolicy, cancellationToken);
-        
-        return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+
+        BufferedProcessResult result =
+            await _processFactory.ContinueWhenExitBufferedAsync(process, processResultValidation, cancellationToken);
+
+        return result;
     }
 }

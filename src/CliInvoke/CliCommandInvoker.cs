@@ -28,9 +28,8 @@ using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
-using AlastairLundy.CliInvoke.Exceptions;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -47,29 +46,24 @@ public class CliCommandInvoker : ICliCommandInvoker
         private readonly IPipedProcessRunner _pipedProcessRunner;
         
         private readonly IProcessPipeHandler _processPipeHandler;
-        
-        private readonly ICommandProcessFactory _commandProcessFactory;
 
         /// <summary>
         /// Initializes the CommandInvoker with the ICommandPipeHandler to be used.
         /// </summary>
         /// <param name="pipedProcessRunner">The piped process runner to be used.</param>
         /// <param name="processPipeHandler">The process pipe handler to be used.</param>
-        /// <param name="commandProcessFactory">The command process factory to be used.</param>
         public CliCommandInvoker(IPipedProcessRunner pipedProcessRunner,
-            IProcessPipeHandler processPipeHandler,
-            ICommandProcessFactory commandProcessFactory)
+            IProcessPipeHandler processPipeHandler)
         {
             _pipedProcessRunner = pipedProcessRunner;
             _processPipeHandler = processPipeHandler;
-            _commandProcessFactory = commandProcessFactory;
         }
         
         
         /// <summary>
         /// Executes a command configuration asynchronously and returns Command execution information as a ProcessResult.
         /// </summary>
-        /// <param name="commandConfiguration">The command configuration to be executed.</param>
+        /// <param name="processConfiguration">The command configuration to be executed.</param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>A ProcessResult object containing the execution information of the command.</returns>
         /// <exception cref="FileNotFoundException">Thrown if the executable's specified file path is not found.</exception>
@@ -84,40 +78,40 @@ public class CliCommandInvoker : ICliCommandInvoker
         [UnsupportedOSPlatform("tvos")]
         [UnsupportedOSPlatform("browser")]
 #endif
-        public async Task<ProcessResult> ExecuteAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default)
+        public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
         {
             Process process = new Process()
             {
-                StartInfo = _commandProcessFactory.ConfigureProcess(commandConfiguration)
+                StartInfo = processConfiguration.ToProcessStartInfo()
             };
             
             if (process.StartInfo.RedirectStandardInput &&
-                commandConfiguration.StandardInput is not null
-                && commandConfiguration.StandardInput != StreamWriter.Null)
+                processConfiguration.StandardInput is not null
+                && processConfiguration.StandardInput != StreamWriter.Null)
             {
-                await _processPipeHandler.PipeStandardInputAsync(commandConfiguration.StandardInput.BaseStream, process);
+                await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream, process);
             }
             
             (ProcessResult processResult, Stream standardOutput, Stream standardError) result =
-                await _pipedProcessRunner.ExecuteProcessWithPipingAsync(process, ProcessResultValidation.None, commandConfiguration.ResourcePolicy,
+                await _pipedProcessRunner.ExecuteProcessWithPipingAsync(process, ProcessResultValidation.None, processConfiguration.ResourcePolicy,
                     cancellationToken);
 
             // Throw a CommandNotSuccessful exception if required.
-            if (result.processResult.ExitCode != 0 && commandConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
+            if (result.processResult.ExitCode != 0 && processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
             {
-                throw new CliCommandNotSuccessfulException(result.processResult.ExitCode, commandConfiguration);
+                throw new ProcessNotSuccessfulException(result.processResult.ExitCode, process);
             }
             
             if (process.StartInfo.RedirectStandardOutput && 
-                commandConfiguration.StandardOutput is not null)
+                processConfiguration.StandardOutput is not null)
             {
-                await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
+                await result.standardOutput.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
                     cancellationToken);
             }
             if (process.StartInfo.RedirectStandardError &&
-                commandConfiguration.StandardError is not null)
+                processConfiguration.StandardError is not null)
             {
-                await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
+                await result.standardError.CopyToAsync(processConfiguration.StandardError.BaseStream, cancellationToken);
             }
             
             return result.processResult;
@@ -126,7 +120,7 @@ public class CliCommandInvoker : ICliCommandInvoker
         /// <summary>
         /// Executes a command configuration asynchronously and returns Command execution information and Command output as a BufferedProcessResult.
         /// </summary>
-        /// <param name="commandConfiguration">The command configuration to be executed.</param>
+        /// <param name="processConfiguration"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>A BufferedProcessResult object containing the output of the command.</returns>
         /// <exception cref="FileNotFoundException">Thrown if the executable's specified file path is not found.</exception>
@@ -141,43 +135,43 @@ public class CliCommandInvoker : ICliCommandInvoker
         [UnsupportedOSPlatform("tvos")]
         [UnsupportedOSPlatform("browser")]
 #endif
-        public async Task<BufferedProcessResult> ExecuteBufferedAsync(CliCommandConfiguration commandConfiguration,
+        public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
             CancellationToken cancellationToken = default)
         {
             Process process = new Process()
             {
-                StartInfo =_commandProcessFactory.ConfigureProcess(commandConfiguration,
-                    true, true)
+                StartInfo = processConfiguration.ToProcessStartInfo(true, true)
             };
 
             if (process.StartInfo.RedirectStandardInput &&
-                commandConfiguration.StandardInput is not null
-                && commandConfiguration.StandardInput != StreamWriter.Null)
+                processConfiguration.StandardInput is not null
+                && processConfiguration.StandardInput != StreamWriter.Null)
             {
-                await _processPipeHandler.PipeStandardInputAsync(commandConfiguration.StandardInput.BaseStream, process);
+                await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream, process);
             }
             
             // PipedProcessRunner runs the Process for us.
             (BufferedProcessResult processResult, Stream standardOutput, Stream standardError) result =
-                await _pipedProcessRunner.ExecuteBufferedProcessWithPipingAsync(process, ProcessResultValidation.None, commandConfiguration.ResourcePolicy,
+                await _pipedProcessRunner.ExecuteBufferedProcessWithPipingAsync(process, ProcessResultValidation.None, processConfiguration.ResourcePolicy,
                     cancellationToken);
             
             // Throw a CommandNotSuccessful exception if required.
-            if (result.processResult.ExitCode != 0 && commandConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
+            if (result.processResult.ExitCode != 0 && processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
             {
-                throw new CliCommandNotSuccessfulException(result.processResult.ExitCode, commandConfiguration);
+                throw new ProcessNotSuccessfulException(result.processResult.ExitCode,
+                    process);
             }
             
             if (process.StartInfo.RedirectStandardOutput &&
-                commandConfiguration.StandardOutput is not null)
+                processConfiguration.StandardOutput is not null)
             {
-                await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
+                await result.standardOutput.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
                     cancellationToken);
             }
             if (process.StartInfo.RedirectStandardError &&
-                commandConfiguration.StandardError is not null)
+                processConfiguration.StandardError is not null)
             {
-                await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
+                await result.standardError.CopyToAsync(processConfiguration.StandardError.BaseStream, cancellationToken);
             }
             
             return result.processResult;

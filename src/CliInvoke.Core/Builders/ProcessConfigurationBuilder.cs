@@ -11,11 +11,13 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
@@ -230,6 +232,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// </summary>
     /// <param name="credential">The user credential to be used for authentication.</param>
     /// <returns>A reference to this builder with an updated user credential, allowing method chaining.</returns>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+    [UnsupportedOSPlatform("macos")]
+    [UnsupportedOSPlatform("linux")]
+    [UnsupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("android")]
+#endif
     [Pure]
     public IProcessConfigurationBuilder WithUserCredential(UserCredential credential)
     {
@@ -249,12 +258,59 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.UseShellExecution));
     }
 
+    
+    /// <summary>
+    /// Sets the credentials for the Command to be executed.
+    /// </summary>
+    /// <param name="configure">The CredentialsBuilder configuration.</param>
+    /// <returns>The new CommandBuilder with the specified Credentials.</returns>
+    /// <remarks>Credentials are only supported with the Process class on Windows. This is a limitation of .NET's Process class.</remarks>
+    [Pure]
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+    [UnsupportedOSPlatform("macos")]
+    [UnsupportedOSPlatform("linux")]
+    [UnsupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("android")]
+#endif
+    public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
+    {
+        UserCredential credential;
+
+        if (_configuration.Credential is null)
+        {
+            credential = UserCredential.Null;
+        }
+        else
+        {
+            credential = _configuration.Credential;
+        }
+        
+        IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
+            .SetDomain(credential.Domain)
+            .SetPassword(credential.Password)
+            .SetUsername(credential.UserName);
+
+        configure(credentialBuilder);
+
+        return WithUserCredential(credentialBuilder.Build());
+    }
+
     /// <summary>
     /// Enables or disables Process Result Validation (i.e. whether to throw an exception if Exit Code is not 0).
     /// </summary>
     /// <param name="validation">The validation mode to be used for the process result.</param>
     /// <returns>A reference to this builder with the specified validation configuration,
     /// allowing method chaining.</returns>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+#endif
     [Pure]
     public IProcessConfigurationBuilder WithValidation(ProcessResultValidation validation)
     {
@@ -275,10 +331,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// Configures the standard input pipe for the process.
+    /// Sets the Standard Input Pipe source.
     /// </summary>
-    /// <param name="source">The source of the standard input data.</param>
-    /// <returns>A reference to this builder with the added standard input pipe, allowing method chaining.</returns>
+    /// <param name="source">The source to use for the Standard Input pipe.</param>
+    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Input pipe source.</returns>
+    /// <remarks>Using Shell Execution whilst also Redirecting Standard Input will throw an Exception.
+    /// This is a known issue with the System Process class.</remarks>
+    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput"/>
     [Pure]
     public IProcessConfigurationBuilder WithStandardInputPipe(StreamWriter source)
     {
@@ -299,10 +358,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// Configures the standard output pipe for the process.
+    /// Sets the Standard Output Pipe target.
     /// </summary>
-    /// <param name="target">The target stream where the process standard output will be written.</param>
-    /// <returns>A reference to this builder with the added standard output pipe, allowing method chaining.</returns>
+    /// <param name="target">The target to send the Standard Output to.</param>
+    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Output Pipe Target.</returns>
+    /// <remarks>Using Shell Execution whilst also Redirecting Standard Output will throw an Exception. This is a known issue with the System Process class.</remarks>
+    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput"/>
     [Pure]
     public IProcessConfigurationBuilder WithStandardOutputPipe(StreamReader target)
     {
@@ -323,10 +384,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// Configures the standard error pipe for the process.
+    /// Sets the Standard Error Pipe target.
     /// </summary>
-    /// <param name="target">The target stream where the process standard error output will be written.</param>
-    /// <returns>A reference to this builder with the added standard error pipe, allowing method chaining.</returns>
+    /// <param name="target">The target to send the Standard Error to.</param>
+    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Error Pipe Target.</returns>
+    /// <remarks>Using Shell Execution whilst also Redirecting Standard Error will throw an Exception. This is a known issue with the System Process class.</remarks>
+    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror"/>
     [Pure]
     public IProcessConfigurationBuilder WithStandardErrorPipe(StreamReader target)
     {
@@ -433,8 +496,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// Uses the Default Encoding if null.</param>
     /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithEncoding(Encoding standardInputEncoding = null,
-        Encoding standardOutputEncoding = null, Encoding standardErrorEncoding = null)
+    public IProcessConfigurationBuilder WithEncoding(Encoding? standardInputEncoding = null,
+        Encoding? standardOutputEncoding = null, Encoding? standardErrorEncoding = null)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,

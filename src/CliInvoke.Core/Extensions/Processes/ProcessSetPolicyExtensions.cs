@@ -10,6 +10,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
@@ -20,7 +21,6 @@ using AlastairLundy.DotExtensions.Processes;
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 using System.Runtime.InteropServices;
 #endif
-
 
 namespace AlastairLundy.CliInvoke.Core.Extensions.Processes
 {
@@ -49,10 +49,10 @@ namespace AlastairLundy.CliInvoke.Core.Extensions.Processes
                     }
                 }
 
-                if (OperatingSystem.IsMacOS() ||
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
                     OperatingSystem.IsMacCatalyst() ||
                     OperatingSystem.IsFreeBSD() ||
-                    OperatingSystem.IsWindows())
+                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     if (resourcePolicy.MinWorkingSet != null)
                     {
