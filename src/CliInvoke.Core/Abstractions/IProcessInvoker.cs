@@ -10,12 +10,11 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-namespace AlastairLundy.CliInvoke.Core
+namespace AlastairLundy.CliInvoke.Core.Abstractions
 {
     /// <summary>
     /// Defines the contract for a class that executes processes.
