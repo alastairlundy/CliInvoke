@@ -17,15 +17,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
-
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-
 using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-namespace AlastairLundy.CliInvoke.Builders;
+namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
 /// Builder class for creating process configurations.

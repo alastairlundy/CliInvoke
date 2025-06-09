@@ -18,19 +18,18 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 
-using AlastairLundy.CliInvoke.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using AlastairLundy.CliInvoke.Internal;
-using AlastairLundy.CliInvoke.Internal.Localizations;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
-namespace AlastairLundy.CliInvoke.Builders;
+namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
 /// A class to build Command Configurations with a Fluent configuration interface. 

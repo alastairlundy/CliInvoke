@@ -14,15 +14,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-
 using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
-
 using AlastairLundy.DotExtensions.Collections.Generic.Dictionaries;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 // ReSharper disable RedundantExplicitArrayCreation
 
-namespace AlastairLundy.CliInvoke.Builders;
+namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
 /// A class that provides builder methods for constructing Environment Variables.

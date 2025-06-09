@@ -22,7 +22,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 // ReSharper disable PossibleNullReferenceException
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
-namespace AlastairLundy.CliInvoke.Builders;
+namespace AlastairLundy.CliInvoke.Core.Builders;
 
 #nullable enable
 
