@@ -25,12 +25,14 @@ namespace AlastairLundy.CliInvoke.Core.Primitives.Policies
         /// <summary>
         /// 
         /// </summary>
-        public static ProcessTimeoutPolicy Default { get; } = new ProcessTimeoutPolicy(TimeSpan.FromMinutes(30), ProcessCancellationMode.Graceful);
+        public static ProcessTimeoutPolicy Default { get; } = new ProcessTimeoutPolicy(TimeSpan.FromMinutes(30),
+            ProcessCancellationMode.Graceful);
         
         /// <summary>
         /// 
         /// </summary>
-        public static ProcessTimeoutPolicy None { get; } = new ProcessTimeoutPolicy(TimeSpan.FromSeconds(0), ProcessCancellationMode.None);
+        public static ProcessTimeoutPolicy None { get; } = new ProcessTimeoutPolicy(TimeSpan.FromSeconds(0),
+            ProcessCancellationMode.None);
         
         /// <summary>
         /// The timespan after which a Process should no longer be allowed to continue waiting to exit.
