@@ -140,17 +140,16 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default)
     {
         Process process = _processFactory.StartNew(processConfiguration);
-        
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        
-       BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
-            cancellationToken);
-        
-        return result;
+                              
+                              process.StartInfo.RedirectStandardOutput = true;
+                              process.StartInfo.RedirectStandardError = true;
+                              
+                             BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
+                                  cancellationToken);
+                              
+                              return result;
     }
-
-
+    
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
@@ -188,6 +187,12 @@ public class ProcessInvoker : IProcessInvoker
         return result;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processConfiguration"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -201,9 +206,25 @@ public class ProcessInvoker : IProcessInvoker
 #endif
     public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
     {
+        Process process = _processFactory.StartNew(processConfiguration);
         
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        
+        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process, processConfiguration.ResultValidation,
+            cancellationToken);
+        
+        return result;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processStartInfo"></param>
+    /// <param name="processResultValidation"></param>
+    /// <param name="processResourcePolicy"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -218,6 +239,14 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null, CancellationToken cancellationToken = default)
     {
+        Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
         
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+
+        PipedProcessResult result =
+            await _processFactory.ContinueWhenExitPipedAsync(process, processResultValidation, cancellationToken);
+
+        return result;
     }
 }
