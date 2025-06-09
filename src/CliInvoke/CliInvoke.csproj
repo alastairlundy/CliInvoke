@@ -34,14 +34,13 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
-        <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
         <PackageId>AlastairLundy.CliInvoke</PackageId>
         <Product>CliInvoke</Product>
+        <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
     </PropertyGroup>
     
     <ItemGroup>
         <PackageReference Include="AlastairLundy.DotExtensions" Version="7.1.1" />
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.4.1" />
         <PackageReference Include="AlastairLundy.Resyslib.IO.Core" Version="3.1.0"/>
     </ItemGroup>
     
@@ -82,5 +81,9 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
 </Project>
