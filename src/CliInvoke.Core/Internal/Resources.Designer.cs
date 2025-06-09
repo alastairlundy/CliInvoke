@@ -8,9 +8,6 @@
 //------------------------------------------------------------------------------
 
 namespace AlastairLundy.CliInvoke.Core.Internal {
-    using System;
-    
-    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -92,6 +89,42 @@ namespace AlastairLundy.CliInvoke.Core.Internal {
         internal static string Command_ToString_WorkingDirectory {
             get {
                 return ResourceManager.GetString("Command.ToString.WorkingDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UseShellExecution value of true conflicts with setting of Standard Error to a non-null value. See https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror.
+        /// </summary>
+        internal static string CommandBuilder_ArgumentConflict_ShellExecution_Error {
+            get {
+                return ResourceManager.GetString("CommandBuilder.ArgumentConflict.ShellExecution.Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UseShellExecution value of true conflicts with setting of Standard Input to a non-null value. See https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput.
+        /// </summary>
+        internal static string CommandBuilder_ArgumentConflict_ShellExecution_Input {
+            get {
+                return ResourceManager.GetString("CommandBuilder.ArgumentConflict.ShellExecution.Input", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UseShellExecution value of true conflicts with setting of Standard Output to a non-null value. See https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput.
+        /// </summary>
+        internal static string CommandBuilder_ArgumentConflict_ShellExecution_Output {
+            get {
+                return ResourceManager.GetString("CommandBuilder.ArgumentConflict.ShellExecution.Output", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ArgumentBuilder buffer size cannot be added to as it is the maximum size of {x}.
+        /// </summary>
+        internal static string Exceptions_ArgumentBuilder_Buffer_MaximumSize {
+            get {
+                return ResourceManager.GetString("Exceptions.ArgumentBuilder.Buffer.MaximumSize", resourceCulture);
             }
         }
         

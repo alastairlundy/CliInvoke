@@ -13,7 +13,6 @@ using System.Runtime.Versioning;
 #else
 using System.Runtime.InteropServices;
 #endif
-
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;

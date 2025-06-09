@@ -5,43 +5,29 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Abstractions;
 
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
-using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Core;
-
-using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Piping;
-using AlastairLundy.CliInvoke.Legacy.Utilities;
-
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
+using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
-using AlastairLundy.Extensions.IO.Abstractions.Files;
-using AlastairLundy.Extensions.IO.Files;
+using AlastairLundy.Resyslib.IO.Core.Files;
+using AlastairLundy.Resyslib.IO.Files;
 
 
 namespace CliInvoke.Specializations.Tests.Helpers
 {
     public static class ExecutedCommandHelper
     {
-        private static ICliCommandInvoker _cliInvoker;
+        private static IProcessFactory _processFactory;
         
         static ExecutedCommandHelper()
         {
             IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
             IFilePathResolver filePathResolver = new FilePathResolver();
-            
-            IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
-            
-            IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility,
-                processPipeHandler);
-            
-            ICommandProcessFactory commandProcessFactory = new CommandProcessFactory();
-            
-            _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
-                processPipeHandler, commandProcessFactory);
+
+            _processFactory = new ProcessFactory(filePathResolver, processPipeHandler);
         }
         
         public static string WinCalcExePath
@@ -50,15 +36,12 @@ namespace CliInvoke.Specializations.Tests.Helpers
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    return Environment.SystemDirectory + Path.DirectorySeparatorChar
-                                                       + "System32" + Path.DirectorySeparatorChar
-                                                       + "calc.exe";
+                    return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}calc.exe";
                 }
                 
                 throw new PlatformNotSupportedException();
             }
         }
 
-        public static string CrossPlatformPowershellExePath => new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
     }
 }

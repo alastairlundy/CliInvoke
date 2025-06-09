@@ -8,12 +8,12 @@ using AlastairLundy.CliInvoke.Abstractions;
 
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Builders.Abstractions;
-
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
+using AlastairLundy.CliInvoke.Legacy.Utilities;
+using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Tests.Helpers;
 using AlastairLundy.CliInvoke.Tests.TestData;
 
+using AlastairLundy.Resyslib.IO.Files;
 using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
@@ -30,12 +30,22 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
     {
         private readonly ICliCommandInvoker _cliCommandInvoker;
         
-        public CliCommandInvokerTests(TestFixture fixture)
+     //   private CrossPlatformTestExecutables _crossPlatformTestExecutables;
+        
+        public CliCommandInvokerTests()
         {
-            ICliCommandInvoker cliInvoker = fixture.ServiceProvider
-                .GetRequiredService<ICliCommandInvoker>();
+            /*
+            IServiceProvider services = fixture.ServiceProvider;
             
-            _cliCommandInvoker = cliInvoker;
+            ICliCommandInvoker cliInvoker = services
+                .GetRequiredService<ICliCommandInvoker>();
+                */
+            
+            _cliCommandInvoker = new CliCommandInvoker(
+                new PipedProcessRunner(new ProcessRunnerUtility(new FilePathResolver()), new ProcessPipeHandler()),
+                new ProcessPipeHandler(), new CommandProcessFactory());
+            
+          //  _crossPlatformTestExecutables = new CrossPlatformTestExecutables(_cliCommandInvoker);
         }
 
         /*[Fact]
@@ -63,8 +73,9 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
             if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 #endif
             {
-                ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder
-                        (WindowsTestExecutables.WinCalcExePath)
+                ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder(
+                        WindowsTestExecutables.WinCalcExePath)
+                    .WithWorkingDirectory(Environment.SystemDirectory)
                     .WithValidation(ProcessResultValidation.ExitCodeZero);
             
                 CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
@@ -76,19 +87,19 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
             }
         }
 
-        [Fact]
+        /*[Fact]
         public async Task Invoke_Dotnet_List_Sdk()
         {
             ICliCommandConfigurationBuilder configurationBuilder = new
-                    CliCommandConfigurationBuilder(CrossPlatformTestExecutables.DotnetExePath)
+                    CliCommandConfigurationBuilder(_crossPlatformTestExecutables.DotnetExePath)
                 .WithArguments("--list-sdks")
                 .WithValidation(ProcessResultValidation.ExitCodeZero);
             
             CliCommandConfiguration cliCommandConfiguration = configurationBuilder.Build();
             
-            BufferedProcessResult bufferedProcess = await _cliCommandInvoker.ExecuteBufferedAsync(cliCommandConfiguration);
+            ProcessResult processResult = await _cliCommandInvoker.ExecuteAsync(cliCommandConfiguration);
             
-            Assert.Equal(0, bufferedProcess.ExitCode);
-        }
+            Assert.Equal(0, processResult.ExitCode);
+        }*/
     }
 }

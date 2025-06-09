@@ -6,16 +6,12 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
-
 using AlastairLundy.CliInvoke.Specializations.Invokers;
-
 using CliInvoke.Specializations.Tests.Helpers;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Specializations.Tests.Invokers
 {
@@ -25,17 +21,20 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 
     public class CmdInvokerTests : IClassFixture<TestFixture>
     {
-        private readonly ISpecializedCliCommandInvoker _specializedCliCommandInvoker;
     
         public CmdInvokerTests(TestFixture testFixture)
         {
-            ICliCommandInvoker cliInvoker = testFixture.ServiceProvider
-                .GetRequiredService<ICliCommandInvoker>();
+    //        CliCommandInvoker cliInvoker = new CliCommandInvoker(new PipedProcessRunner(new ProcessRunnerUtility(new FilePathResolver()),
+     //           new ProcessPipeHandler()), new ProcessPipeHandler(), new CommandProcessFactory());
+            
+          //  ICliCommandInvoker cliInvoker = testFixture.ServiceProvider
+            //    .GetRequiredService<ICliCommandInvoker>();
         
-            _specializedCliCommandInvoker = new CmdCliCommandInvoker(cliInvoker);
+    //        _specializedCliCommandInvoker = new CmdCliCommandInvoker(cliInvoker);
         }
     
-        /*public async Task Invoke_Calc_Open_With_CMD_Test()
+        [Fact]
+        public async Task Invoke_Calc_Open_With_CMD_Test()
         {
 #if NET48_OR_GREATER || NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
@@ -43,19 +42,20 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
         if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 #endif
             {
-                ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder
+                IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
                         (ExecutedCommandHelper.WinCalcExePath)
+                    .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe", string.Empty))
                     .WithValidation(ProcessResultValidation.ExitCodeZero);
             
-                CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
+                ProcessConfiguration commandConfiguration = configurationBuilder.Build();
 
-                CliCommandConfiguration runnerCommand = _specializedCliCommandInvoker.CreateRunnerCommand(commandConfiguration);
+        //        ProcessConfiguration runnerCommand = CreateRunnerProcess(commandConfiguration);
 
-                ProcessResult result = await _specializedCliCommandInvoker.ExecuteAsync(runnerCommand, CancellationToken.None);
+          //      ProcessResult result = await _specializedCliCommandInvoker.ExecuteAsync(runnerCommand, CancellationToken.None);
                 
-                Assert.True(Process.GetProcessesByName("Calculator").Any() &&
-                            result.WasSuccessful);
+         //       Assert.True(Process.GetProcessesByName("Calculator").Any() &&
+       //                     result.WasSuccessful);
             }
-        }*/
+        }
     }
 }

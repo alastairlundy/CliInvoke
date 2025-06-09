@@ -22,16 +22,15 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.3.1</Version>
-        <PackageReleaseNotes>Update Polyfill dependency to 7.31.0 and update DotExtensions to 6.8.0 @alastairlundy (#34)</PackageReleaseNotes>
+        <Version>1.4.1</Version>
+        <PackageReleaseNotes>Update DotExtensions from 7.0.0 to 7.1.1, and Polyfill from 7.32.0 to 7.33.0</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.0.0" />
-         <PackageReference Include="System.IO.Pipelines" Version="9.0.5" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1' OR '$(TargetFramework)' == 'net8.0'"/>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.1.1" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
         
-        <PackageReference Include="Polyfill" Version="7.32.0" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" />
+        <PackageReference Include="Polyfill" Version="7.33.0" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" />
 
     </ItemGroup>
 

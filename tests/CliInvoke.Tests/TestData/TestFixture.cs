@@ -1,7 +1,5 @@
 ﻿using System;
-
 using AlastairLundy.CliInvoke.Extensions;
-
 using Microsoft.Extensions.Hosting;
 
 namespace AlastairLundy.CliInvoke.Tests.TestData;
@@ -15,7 +13,7 @@ public class TestFixture
         var hostBuilder = Host.CreateDefaultBuilder()
             .ConfigureServices(serviceCollection=>
             {
-                serviceCollection.AddCliInvoke();
+               serviceCollection = serviceCollection.AddCliInvoke();
             })
             .Build();
             
