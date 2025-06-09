@@ -1,7 +1,30 @@
-﻿namespace AlastairLundy.CliInvoke.Core.Primitives.Policies;
+﻿/*
+    AlastairLundy.CliInvoke.Core 
+    Copyright (C) 2024-2025  Alastair Lundy
 
-public enum ProcessCancellationMode
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+   */
+
+namespace AlastairLundy.CliInvoke.Core.Primitives
 {
-    Graceful,
-    None,
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum ProcessCancellationMode
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        Forceful,
+        /// <summary>
+        /// 
+        /// </summary>
+        Graceful,
+        /// <summary>
+        /// 
+        /// </summary>
+        None,
+    }
 }
