@@ -1,8 +1,6 @@
 ﻿using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
-using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
-using AlastairLundy.CliInvoke.Legacy.Utilities;
+
+using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.Resyslib.IO.Core.Files;
 using AlastairLundy.Resyslib.IO.Files;
 
@@ -12,17 +10,11 @@ internal class CliInvokeHelpers
 {
     internal static ProcessFactory CreateProcessFactory()
     {
-        return new ProcessFactory(new FilePathResolver());
+        return new ProcessFactory(new FilePathResolver(), new ProcessPipeHandler());
     }
 
-    internal static CliCommandInvoker CreateCliCommandInvoker()
+    internal static ProcessInvoker CreateProcessInvoker()
     {
-        IFilePathResolver filePathResolver = new FilePathResolver();
-        IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
-        IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        
-        IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility, processPipeHandler);
-        
-        return new CliCommandInvoker(pipedProcessRunner, processPipeHandler);
+        return new ProcessInvoker(CreateProcessFactory());
     }
 }

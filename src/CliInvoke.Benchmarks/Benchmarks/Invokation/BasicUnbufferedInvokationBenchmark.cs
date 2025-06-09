@@ -1,7 +1,10 @@
 ﻿using System.Diagnostics;
 
-using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
@@ -19,7 +22,7 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 public class BasicUnbufferedInvokationBenchmark
 {
     private readonly IProcessFactory _processFactory;
-    private readonly ICliCommandInvoker _cliCommandInvoker;
+    private readonly IProcessInvoker _processInvoker;
     
     private DotnetCommandHelper _dotnetCommandHelper;
     
@@ -27,7 +30,7 @@ public class BasicUnbufferedInvokationBenchmark
     {
         _dotnetCommandHelper = new DotnetCommandHelper();
         _processFactory = CliInvokeHelpers.CreateProcessFactory();
-        _cliCommandInvoker = CliInvokeHelpers.CreateCliCommandInvoker();
+        _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
     }
 
     [Benchmark]
@@ -57,7 +60,7 @@ public class BasicUnbufferedInvokationBenchmark
         
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
 
-        ProcessResult result = await _cliCommandInvoker.ExecuteAsync(configuration);
+        ProcessResult result = await _processInvoker.ExecuteProcessAsync(configuration);
         
         return result.ExitCode;
     }
