@@ -15,7 +15,7 @@ using AlastairLundy.CliInvoke.Legacy;
 using AlastairLundy.CliInvoke.Legacy.Piping;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Specializations.Invokers;
-using AlastairLundy.Extensions.IO.Files;
+using AlastairLundy.Resyslib.IO.Files;
 using CliInvoke.Specializations.Tests.Helpers;
 
 namespace CliInvoke.Specializations.Tests.Invokers
