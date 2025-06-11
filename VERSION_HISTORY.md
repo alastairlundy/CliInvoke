@@ -6,6 +6,7 @@
 ### 1.4
 | Version | Release Date | Changelog |
 |-|-|-|
+| 1.4.1 | June 11th 2025 |  https://github.com/alastairlundy/CliInvoke/releases/1.4.1|
 | 1.4.0 | June 9th 2025 |  https://github.com/alastairlundy/CliInvoke/releases/1.4.0|
 
 ### 1.3
