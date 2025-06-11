@@ -10,7 +10,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.4.0</PackageVersion>
+        <PackageVersion>1.4.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -18,7 +18,7 @@
         <RepositoryType>git</RepositoryType>
         <LangVersion>13</LangVersion>
         <PackageReleaseNotes>### Changes since 1.3.0
-* Updated CliInvoke dependency to 1.4.0</PackageReleaseNotes>
+* Updated CliInvoke dependency to 1.4.1</PackageReleaseNotes>
         <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
@@ -26,7 +26,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="7.33.0" PrivateAssets="All"/>
+        <PackageReference Include="Polyfill" Version="8.0.0" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -61,7 +61,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.3.1" />
-      <PackageReference Include="AlastairLundy.CliInvoke.Extensibility" Version="1.3.1" />
+      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.4.1" />
+      <PackageReference Include="AlastairLundy.CliInvoke.Extensibility" Version="1.4.1" />
     </ItemGroup>
 </Project>
