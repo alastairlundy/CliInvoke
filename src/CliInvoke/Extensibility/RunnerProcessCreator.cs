@@ -19,9 +19,9 @@ using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 namespace AlastairLundy.CliInvoke.Extensibility
 {
     /// <summary>
-    /// A class to allow creating Specialized Processes that can be run through other Processes.
+    /// A class to allow creating Processes that can be run through other Processes.
     /// </summary>
-    public class SpecializedProcessCreator : ISpecializedProcessCreator
+    public class RunnerProcessCreator : IRunnerProcessCreator
     {
         private readonly ProcessConfiguration _commandRunnerConfiguration;
     
@@ -29,7 +29,7 @@ namespace AlastairLundy.CliInvoke.Extensibility
         /// Instantiates the Command Running configuration and the CommandRunner.
         /// </summary>
         /// <param name="commandRunnerConfiguration">The command running configuration to use for the Command that will run other Commands.</param>
-        protected SpecializedProcessCreator(ProcessConfiguration commandRunnerConfiguration)
+        protected RunnerProcessCreator(ProcessConfiguration commandRunnerConfiguration)
         {
             _commandRunnerConfiguration = commandRunnerConfiguration;
         }
@@ -51,7 +51,7 @@ namespace AlastairLundy.CliInvoke.Extensibility
                 .WithStandardInputPipe(inputProcess.StandardInput ?? StreamWriter.Null)
                 .WithStandardOutputPipe(inputProcess.StandardOutput ?? StreamReader.Null)
                 .WithStandardErrorPipe(inputProcess.StandardError ?? StreamReader.Null)
-                .WithUserCredential(inputProcess.Credential)
+                .WithUserCredential(inputProcess.Credential ?? UserCredential.Null)
                 .WithValidation(inputProcess.ResultValidation)
                 .WithAdministratorPrivileges(inputProcess.RequiresAdministrator)
                 .WithShellExecution(inputProcess.UseShellExecution)

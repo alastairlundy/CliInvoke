@@ -7,12 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Core.Extensibility
 {
-    public interface ISpecializedProcessCreator
+    public interface IRunnerProcessCreator
     {
         /// <summary>
         /// Create the command to be run from the Command runner configuration and an input command.
