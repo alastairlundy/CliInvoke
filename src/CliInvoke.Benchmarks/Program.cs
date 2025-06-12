@@ -1,7 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Reflection;
-using AlastairLundy.CliInvoke.Abstractions;
 using BenchmarkDotNet.Running;
 
 using CliInvoke.Benchmarking.Benchmarks.Invokation;

@@ -4,17 +4,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AlastairLundy.CliInvoke.Abstractions;
-
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Legacy.Utilities;
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Tests.Helpers;
 using AlastairLundy.CliInvoke.Tests.TestData;
 
 using AlastairLundy.Resyslib.IO.Files;
-using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
 
@@ -28,7 +27,7 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
 {
     public class CliCommandInvokerTests : IClassFixture<TestFixture>
     {
-        private readonly ICliCommandInvoker _cliCommandInvoker;
+        private readonly IProcessInvoker _processInvoker;
         
      //   private CrossPlatformTestExecutables _crossPlatformTestExecutables;
         
@@ -36,14 +35,10 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
         {
             /*
             IServiceProvider services = fixture.ServiceProvider;
-            
-            ICliCommandInvoker cliInvoker = services
-                .GetRequiredService<ICliCommandInvoker>();
                 */
             
-            _cliCommandInvoker = new CliCommandInvoker(
-                new PipedProcessRunner(new ProcessRunnerUtility(new FilePathResolver()), new ProcessPipeHandler()),
-                new ProcessPipeHandler(), new CommandProcessFactory());
+            _processInvoker = new ProcessInvoker(
+                new ProcessFactory(new FilePathResolver(), new ProcessPipeHandler()));
             
           //  _crossPlatformTestExecutables = new CrossPlatformTestExecutables(_cliCommandInvoker);
         }
@@ -73,14 +68,14 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
             if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 #endif
             {
-                ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder(
+                IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder(
                         WindowsTestExecutables.WinCalcExePath)
                     .WithWorkingDirectory(Environment.SystemDirectory)
                     .WithValidation(ProcessResultValidation.ExitCodeZero);
             
-                CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
+                ProcessConfiguration commandConfiguration = configurationBuilder.Build();
                 
-                ProcessResult result = await _cliCommandInvoker.ExecuteAsync(commandConfiguration, CancellationToken.None);
+                ProcessResult result = await _processInvoker.ExecuteProcessAsync(commandConfiguration, CancellationToken.None);
                 
                 Assert.True(Process.GetProcessesByName("Calculator").Any() &&
                             result.WasSuccessful);
