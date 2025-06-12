@@ -42,11 +42,12 @@ public class ProcessFactory : IProcessFactory
     private readonly IFilePathResolver _filePathResolver;
     
     private readonly IProcessPipeHandler _processPipeHandler;
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="filePathResolver"></param>
+    /// <param name="processPipeHandler"></param>
     public ProcessFactory(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
