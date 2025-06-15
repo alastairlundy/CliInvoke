@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
@@ -42,8 +43,10 @@ public class CmdCliCommandInvoker : IProcessInvoker
         throw new NotImplementedException();
     }
 
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
+    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo,
+        ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, UserCredential userCredential = null,
+        CancellationToken cancellationToken = bad)
     {
         throw new NotImplementedException();
     }
@@ -53,8 +56,10 @@ public class CmdCliCommandInvoker : IProcessInvoker
         throw new NotImplementedException();
     }
 
-    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
+    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo,
+        ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, UserCredential userCredential = null,
+        CancellationToken cancellationToken = bad)
     {
         throw new NotImplementedException();
     }
