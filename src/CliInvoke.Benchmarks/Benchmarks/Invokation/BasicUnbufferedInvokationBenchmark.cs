@@ -61,7 +61,7 @@ public class BasicUnbufferedInvokationBenchmark
         
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
 
-        ProcessResult result = await _processInvoker.ExecuteProcessAsync(configuration);
+        ProcessResult result = await _processInvoker.ExecuteAsync(configuration);
         
         return result.ExitCode;
     }
