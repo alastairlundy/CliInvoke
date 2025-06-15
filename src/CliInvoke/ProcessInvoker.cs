@@ -89,6 +89,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if not null.</param>
+    /// <param name="userCredential"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -107,6 +108,7 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
+        UserCredential? userCredential = null,
         CancellationToken cancellationToken = default)
     {
         Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
@@ -157,6 +159,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The resource policy to be set if not null.</param>
+    /// <param name="userCredential"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -175,7 +178,8 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
-        CancellationToken cancellationToken = default)
+        UserCredential? userCredential = null,
+        CancellationToken cancellationToken = bad)
     {
        Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
         
@@ -224,6 +228,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation"></param>
     /// <param name="processResourcePolicy"></param>
+    /// <param name="userCredential"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
 #if NET5_0_OR_GREATER
@@ -237,8 +242,10 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy? processResourcePolicy = null, CancellationToken cancellationToken = default)
+    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo,
+        ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy? processResourcePolicy = null, UserCredential? userCredential = null,
+        CancellationToken cancellationToken = bad)
     {
         Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
         
