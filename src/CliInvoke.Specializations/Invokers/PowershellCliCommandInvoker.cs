@@ -8,6 +8,7 @@
 */
 
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Core;
@@ -28,40 +29,38 @@ namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 /// </summary>
 public class PowershellCliCommandInvoker : IProcessInvoker
 {
-    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    public Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
     }
 
-    public async Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
-        CancellationToken cancellationToken = default)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo,
-        ProcessResultValidation processResultValidation,
+    public Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
         ProcessResourcePolicy processResourcePolicy = null, UserCredential userCredential = null,
-        CancellationToken cancellationToken = bad)
+        StreamWriter standardInput = null, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
     }
 
-    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    public Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
     }
 
-    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo,
-        ProcessResultValidation processResultValidation,
+    public Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
         ProcessResourcePolicy processResourcePolicy = null, UserCredential userCredential = null,
-        CancellationToken cancellationToken = bad)
+        StreamWriter standardInput = null, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy processResourcePolicy = null, UserCredential userCredential = null,
+        StreamWriter standardInput = null, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
     }
