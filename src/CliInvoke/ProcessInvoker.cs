@@ -85,6 +85,10 @@ public class ProcessInvoker : IProcessInvoker
         
         ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo();
         
+        startInfo.RedirectStandardInput = processConfiguration.StandardInput is not null;
+        startInfo.RedirectStandardOutput = processConfiguration.StandardOutput is not null;
+        startInfo.RedirectStandardError = processConfiguration.StandardError is not null;
+        
         startInfo.FileName = filePath;
         
         Process process = new Process()
@@ -172,7 +176,8 @@ public class ProcessInvoker : IProcessInvoker
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
                 .Replace("{file}", filePath));
         }
-        
+
+        processStartInfo.RedirectStandardInput = standardInput is not null;
         processStartInfo.FileName = filePath;
         
         Process process = new Process()
@@ -240,6 +245,10 @@ public class ProcessInvoker : IProcessInvoker
         }
         
         ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo();
+        
+        startInfo.RedirectStandardInput = processConfiguration.StandardInput is not null;
+        startInfo.RedirectStandardOutput = true;
+        startInfo.RedirectStandardError = true;
         
         startInfo.FileName = filePath;
         
@@ -334,12 +343,17 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default)
     {
         _filePathResolver.ResolveFilePath(processStartInfo.FileName, out string filePath);
+
         
         if (File.Exists(filePath) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
                 .Replace("{file}", filePath));
         }
+
+        processStartInfo.RedirectStandardInput = standardInput is not null;
+        processStartInfo.RedirectStandardOutput = true;
+        processStartInfo.RedirectStandardError = true;
         
         processStartInfo.FileName = filePath;
         
@@ -420,6 +434,10 @@ public class ProcessInvoker : IProcessInvoker
         }
         
         ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo();
+
+        startInfo.RedirectStandardInput = processConfiguration.StandardInput is not null;
+        startInfo.RedirectStandardOutput = true;
+        startInfo.RedirectStandardError = true;
         
         startInfo.FileName = filePath;
         
@@ -513,6 +531,10 @@ public class ProcessInvoker : IProcessInvoker
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
                 .Replace("{file}", filePath));
         }
+        
+        processStartInfo.RedirectStandardInput = standardInput is not null;
+        processStartInfo.RedirectStandardOutput = true;
+        processStartInfo.RedirectStandardError = true;
         
         processStartInfo.FileName = filePath;
         
