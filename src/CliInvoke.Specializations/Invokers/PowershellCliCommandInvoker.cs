@@ -28,7 +28,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 /// </summary>
 public class PowershellCliCommandInvoker : IProcessInvoker
 {
-    public async Task<ProcessResult> ExecuteProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
     }
@@ -39,7 +39,7 @@ public class PowershellCliCommandInvoker : IProcessInvoker
         throw new System.NotImplementedException();
     }
 
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessConfiguration processConfiguration,
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
@@ -53,7 +53,7 @@ public class PowershellCliCommandInvoker : IProcessInvoker
         throw new System.NotImplementedException();
     }
 
-    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
     }

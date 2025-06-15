@@ -10,11 +10,14 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+
+#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
+#endif
+
 using System.Threading;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Abstractions;
 
 using AlastairLundy.CliInvoke.Core.Extensions;
 using AlastairLundy.CliInvoke.Core.Extensions.Processes;

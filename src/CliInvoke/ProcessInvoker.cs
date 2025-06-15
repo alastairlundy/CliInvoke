@@ -72,7 +72,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<ProcessResult> ExecuteProcessAsync(
+    public async Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
@@ -162,7 +162,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo,
+    public async Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
         UserCredential? userCredential = null,
@@ -232,7 +232,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
@@ -334,7 +334,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
@@ -421,7 +421,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<PipedProcessResult> ExecutePipedProcessAsync(
+    public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
@@ -517,7 +517,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo,
+    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
         UserCredential? userCredential = null,

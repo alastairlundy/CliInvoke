@@ -146,7 +146,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations
            
            ProcessConfiguration command = installLocationBuilder.Build();
            
-          Task<BufferedProcessResult> task = _invoker.ExecuteBufferedProcessAsync(command);
+          Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(command);
           
           task.RunSynchronously();
           

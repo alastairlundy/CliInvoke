@@ -29,7 +29,7 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="processConfiguration"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Process Results from the running the process.</returns>
-        Task<ProcessResult> ExecuteProcessAsync(ProcessConfiguration processConfiguration,
+        Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="standardInput"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Process Results from the running the process.</returns>
-        Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo,
+        Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
              ProcessResultValidation processResultValidation,
              ProcessResourcePolicy? processResourcePolicy = null,
              UserCredential? userCredential = null,
@@ -55,7 +55,7 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="processConfiguration"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Buffered Process Results from running the process.</returns>
-         Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessConfiguration processConfiguration,
+         Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="standardInput"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Buffered Process Results from running the process.</returns>
-        Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo,
+        Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
             ProcessResultValidation processResultValidation,
             ProcessResourcePolicy? processResourcePolicy = null,
             UserCredential? userCredential = null,
@@ -81,7 +81,7 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="processConfiguration"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration,
+        Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace AlastairLundy.CliInvoke.Core
         /// <param name="standardInput"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo,
+        Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo,
             ProcessResultValidation processResultValidation,
             ProcessResourcePolicy? processResourcePolicy = null,
             UserCredential? userCredential = null,
