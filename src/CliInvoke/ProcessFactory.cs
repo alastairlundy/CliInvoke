@@ -35,7 +35,7 @@ using AlastairLundy.Resyslib.IO.Core.Files;
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of IProcesFactory.
+/// The default implementation of IProcessFactory.
 /// </summary>
 public class ProcessFactory : IProcessFactory
 {
