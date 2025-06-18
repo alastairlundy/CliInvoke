@@ -509,9 +509,9 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
 #endif
         public ProcessStartInfo ToProcessStartInfo()
         {
-            bool redirectStandardInput = StandardInput is not null;
-            bool redirectStandardError = StandardError is not null;
-            bool redirectStandardOutput = StandardOutput is not null;
+            bool redirectStandardInput = StandardInput is not null && StandardInput != StreamWriter.Null;
+            bool redirectStandardError = StandardError is not null && StandardOutput != StreamReader.Null;
+            bool redirectStandardOutput = StandardOutput is not null && StandardError != StreamReader.Null;
             
             return ToProcessStartInfo(redirectStandardInput, redirectStandardOutput, redirectStandardError);
         }
@@ -549,9 +549,9 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
                 WorkingDirectory = WorkingDirectoryPath,
                 UseShellExecute = UseShellExecution,
                 CreateNoWindow = WindowCreation,
-                RedirectStandardInput = StandardInput != StreamWriter.Null && StandardInput != StreamWriter.Null,
-                RedirectStandardOutput = redirectStandardOutput || StandardOutput != StreamReader.Null,
-                RedirectStandardError = redirectStandardError || StandardError != StreamReader.Null,
+                RedirectStandardInput = redirectStandardInput,
+                RedirectStandardOutput = redirectStandardOutput,
+                RedirectStandardError = redirectStandardError,
             };
 
             if (string.IsNullOrEmpty(Arguments) == false)
