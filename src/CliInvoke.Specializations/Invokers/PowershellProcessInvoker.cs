@@ -15,6 +15,7 @@ using AlastairLundy.CliInvoke.Core.Extensibility;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
+using AlastairLundy.CliInvoke.Extensibility;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
 #if NET5_0_OR_GREATER
@@ -31,10 +32,10 @@ public class PowershellProcessInvoker : IProcessInvoker
     private readonly IProcessInvoker _processInvoker;
     private readonly IRunnerProcessCreator _runnerProcessCreator;
 
-    public PowershellProcessInvoker(IProcessInvoker processInvoker, IRunnerProcessCreator runnerProcessCreator)
+    public PowershellProcessInvoker(IProcessInvoker processInvoker)
     {
         _processInvoker = processInvoker;
-        _runnerProcessCreator = runnerProcessCreator;
+        _runnerProcessCreator = new RunnerProcessCreator(new PowershellProcessConfiguration(processInvoker));
     }
     
     public async Task<ProcessResult> ExecuteProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
@@ -45,9 +46,7 @@ public class PowershellProcessInvoker : IProcessInvoker
     public async Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
         ProcessResourcePolicy processResourcePolicy = null, CancellationToken cancellationToken = default)
     {
-        ProcessConfiguration runnerProcess = _runnerProcessCreator.CreateRunnerProcess(processConfiguration);
-        
-        return await _processInvoker.ExecuteProcessAsync(runnerProcess, cancellationToken);
+        throw new System.NotImplementedException();
     }
 
     public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessConfiguration processConfiguration,

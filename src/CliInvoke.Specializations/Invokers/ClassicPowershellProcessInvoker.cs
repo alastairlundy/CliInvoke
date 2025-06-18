@@ -17,6 +17,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Extensibility;
+using AlastairLundy.CliInvoke.Specializations.Configurations;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -41,7 +42,7 @@ public class ClassicPowershellProcessInvoker : IProcessInvoker
     public ClassicPowershellProcessInvoker(IProcessInvoker processInvoker)
     {
         _processInvoker = processInvoker;
-        _runnerProcessCreator = new RunnerProcessCreator();
+        _runnerProcessCreator = new RunnerProcessCreator(new ClassicPowershellProcessConfiguration());
     }
 
     /// <summary>

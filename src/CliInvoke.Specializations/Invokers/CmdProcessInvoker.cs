@@ -17,6 +17,8 @@ using AlastairLundy.CliInvoke.Core.Extensibility;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
+using AlastairLundy.CliInvoke.Extensibility;
+using AlastairLundy.CliInvoke.Specializations.Configurations;
 
 namespace AlastairLundy.CliInvoke.Specializations.Invokers;
 
@@ -33,10 +35,10 @@ public class CmdProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processInvoker"></param>
     /// <param name="runnerProcessCreator"></param>
-    public CmdProcessInvoker(IProcessInvoker processInvoker, IRunnerProcessCreator runnerProcessCreator)
+    public CmdProcessInvoker(IProcessInvoker processInvoker)
     {
         _processInvoker = processInvoker;
-        _runnerProcessCreator = runnerProcessCreator;
+        _runnerProcessCreator = new RunnerProcessCreator(new CmdProcessConfiguration());
     }
     
     /// <summary>
