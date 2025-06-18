@@ -29,7 +29,7 @@ public class RunnerProcessCreator : IRunnerProcessCreator
     /// Instantiates the Command Running configuration and the CommandRunner.
     /// </summary>
     /// <param name="commandRunnerConfiguration">The command running configuration to use for the Command that will run other Commands.</param>
-    protected RunnerProcessCreator(ProcessConfiguration commandRunnerConfiguration)
+    public RunnerProcessCreator(ProcessConfiguration commandRunnerConfiguration)
     {
         _commandRunnerConfiguration = commandRunnerConfiguration;
     }
@@ -38,7 +38,7 @@ public class RunnerProcessCreator : IRunnerProcessCreator
     /// Create the command to be run from the Command runner configuration and an input command.
     /// </summary>
     /// <param name="inputProcess">The command to be run by the Command Runner command.</param>
-    /// <returns>The built Process Configuration that can be run.</returns>
+    /// <returns>The Process Configuration to be run.</returns>
     public ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputProcess)
     {
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(_commandRunnerConfiguration)

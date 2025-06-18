@@ -24,7 +24,11 @@
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
     </PropertyGroup>
-    
+
+    <ItemGroup>
+        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-alpha.1" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.1" />
+    </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
         <PackageReference Include="Polyfill" Version="8.0.1" PrivateAssets="All"/>
     </ItemGroup>
@@ -58,9 +62,5 @@
         <PackagePath></PackagePath>
         <Link>icon.png</Link>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 </Project>
