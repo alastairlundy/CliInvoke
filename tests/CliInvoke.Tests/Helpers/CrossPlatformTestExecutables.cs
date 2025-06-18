@@ -35,7 +35,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    cmdExePath = new CmdCommandConfiguration().TargetFilePath;
+                    cmdExePath = new CmdProcessConfiguration().TargetFilePath;
                     dotnetConfigurationBuilder = new ProcessConfigurationBuilder(cmdExePath)
                         .WithArguments("dotnet --list-sdks");
                 }
@@ -72,7 +72,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
         public static string DotnetExePath => dotnetExePath;
            
         public static string CrossPlatformPowershellExePath =>
-            new PowershellCommandConfiguration(processInvoker).TargetFilePath;
+            new PowershellProcessConfiguration(processInvoker).TargetFilePath;
 
     }
 }
