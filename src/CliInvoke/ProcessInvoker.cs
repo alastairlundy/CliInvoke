@@ -11,16 +11,11 @@
 
 using System.Diagnostics;
 using System.IO;
-
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
-
 using System.Threading;
 using System.Threading.Tasks;
-
 using AlastairLundy.CliInvoke.Core;
-
+using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Extensions.Processes;
 using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
@@ -29,7 +24,6 @@ using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Internal.Localizations;
-using AlastairLundy.Resyslib.IO.Core.Files;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -38,18 +32,17 @@ namespace AlastairLundy.CliInvoke;
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
-    private readonly IFilePathResolver _filePathResolver;
-    
     private readonly IProcessPipeHandler _processPipeHandler;
-
+    
+    private readonly IProcessFactory _processFactory;
+    
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="filePathResolver"></param>
-    /// <param name="processPipeHandler"></param>
-    public ProcessInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
+    /// <param name="processFactory"></param>
+    public ProcessInvoker(IProcessFactory processFactory, IProcessPipeHandler processPipeHandler)
     {
-        _filePathResolver = filePathResolver;
+        _processFactory = processFactory;
         _processPipeHandler = processPipeHandler;
     }
 
@@ -72,69 +65,25 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<ProcessResult> ExecuteAsync(
-        ProcessConfiguration processConfiguration,
+    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
-        _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath, out string filePath);
         
-        if (File.Exists(filePath) == false)
+        if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
-            throw new FileNotFoundException(Resources.Exceptions_FileNotFound.Replace("{file}", filePath));
+            throw new FileNotFoundException(
+                Resources.Exceptions_FileNotFound.Replace("{file}", processConfiguration.TargetFilePath));
         }
         
-        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo();
-        
-        startInfo.RedirectStandardInput = processConfiguration.StandardInput is not null;
-        startInfo.RedirectStandardOutput = processConfiguration.StandardOutput is not null;
-        startInfo.RedirectStandardError = processConfiguration.StandardError is not null;
-        
-        startInfo.FileName = filePath;
-        
-        Process process = new Process()
-        {
-            StartInfo = startInfo
-        };
+        Process process = _processFactory.StartNew(processConfiguration);
 
-        if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
-        {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream, process);
-        }
-        
-        if(processConfiguration.Credential is not null)
-            process.TryApplyUserCredential(processConfiguration.Credential);
-        
-        process.Start();
-        
-        if(processConfiguration.ResourcePolicy is not null)
-            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
-        await process.WaitForExitAsync(cancellationToken);
-
-        if (process.StartInfo.RedirectStandardOutput && processConfiguration.StandardOutput is not null)
-        {
-           Stream standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
-           
-           await standardOutput.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
-               cancellationToken);
-        }
-
-        if (process.StartInfo.RedirectStandardError && processConfiguration.StandardError is not null)
-        {
-            Stream standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
-            
-            await standardError.CopyToAsync(processConfiguration.StandardError.BaseStream,
-                cancellationToken);
-        }
-        
-        ProcessResult result = new ProcessResult(filePath, process.ExitCode, process.StartTime, process.ExitTime);
+        ProcessResult result = await _processFactory.ContinueWhenExitAsync(process,
+            processConfiguration.ResultValidation, cancellationToken);
        
         if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
             throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
         }
-        
-        process.Dispose();
 
         return result;
     }
@@ -169,48 +118,28 @@ public class ProcessInvoker : IProcessInvoker
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
-       _filePathResolver.ResolveFilePath(processStartInfo.FileName, out string filePath);
-        
-        if (File.Exists(filePath) == false)
+        if (File.Exists(processStartInfo.FileName) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}", filePath));
+                .Replace("{file}", processStartInfo.FileName));
         }
-
-        processStartInfo.RedirectStandardInput = standardInput is not null;
-        processStartInfo.FileName = filePath;
         
-        Process process = new Process()
-        {
-            StartInfo = processStartInfo
-        };
+        Process process = _processFactory.From(processStartInfo, 
+            userCredential ?? UserCredential.Null);
         
-        if (process.StartInfo.RedirectStandardInput && standardInput is not null)
+        if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
             process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
         }
-        
-        if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential);
-        
+
         process.Start();
         
         if(processResourcePolicy is not null)
             process.SetResourcePolicy(processResourcePolicy);
 
-        await process.WaitForExitAsync(cancellationToken);
         
-        ProcessResult result = new ProcessResult(filePath,
-            process.ExitCode,
-            process.StartTime,
-            process.ExitTime);
-       
-        if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
-        }
-        
-        process.Dispose();
+        ProcessResult result =
+            await _processFactory.ContinueWhenExitAsync(process, processResultValidation, cancellationToken);
 
         return result;
     }
@@ -236,77 +165,20 @@ public class ProcessInvoker : IProcessInvoker
         ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
-        _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath, out string filePath);
-        
-        if (File.Exists(filePath) == false)
+        if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}", filePath));
-        }
-        
-        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo();
-        
-        startInfo.RedirectStandardInput = processConfiguration.StandardInput is not null;
-        startInfo.RedirectStandardOutput = true;
-        startInfo.RedirectStandardError = true;
-        
-        startInfo.FileName = filePath;
-        
-        Process process = new Process()
-        {
-            StartInfo = startInfo
-        };
-
-        if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
-        {
-            process = await _processPipeHandler.PipeStandardInputAsync(
-                processConfiguration.StandardInput.BaseStream, process);
-        }
-        
-        if(processConfiguration.Credential is not null)
-            process.TryApplyUserCredential(processConfiguration.Credential);
-        
-        process.Start();
-        
-        if(processConfiguration.ResourcePolicy is not null)
-            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
-        await process.WaitForExitAsync(cancellationToken);
-
-        string standardOutput = string.Empty;
-        string standardError = string.Empty;
-        
-        if (process.StartInfo.RedirectStandardOutput && processConfiguration.StandardOutput is not null)
-        {
-           Stream standardOutputStream = await _processPipeHandler.PipeStandardOutputAsync(process);
-           
-           standardOutput = await process.StandardOutput.ReadToEndAsync(cancellationToken);
-           
-           await standardOutputStream.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
-               cancellationToken);
+                .Replace("{file}", processConfiguration.TargetFilePath));
         }
 
-        if (process.StartInfo.RedirectStandardError && processConfiguration.StandardError is not null)
-        {
-           Stream standardErrorStream = await _processPipeHandler.PipeStandardErrorAsync(process);
-           
-           standardError = await process.StandardError.ReadToEndAsync(cancellationToken);
-           
-            await standardErrorStream.CopyToAsync(processConfiguration.StandardError.BaseStream,
-                cancellationToken);
-        }
-        
-        BufferedProcessResult result = new BufferedProcessResult(filePath,process.ExitCode,
-            standardOutput, standardError, process.StartTime, process.ExitTime);
-       
-        if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-            && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
-        }
-        
-        process.Dispose();
+        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(processConfiguration.StandardInput is not null,
+            true, true);
 
+        Process process = _processFactory.StartNew(processConfiguration);
+                              
+        BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
+            cancellationToken);
+                              
         return result;
     }
 
@@ -321,8 +193,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
-    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero
-    /// and the process exits with a different exit code.</exception>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -334,72 +205,32 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
-        ProcessStartInfo processStartInfo,
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
-        _filePathResolver.ResolveFilePath(processStartInfo.FileName, out string filePath);
-
-        
-        if (File.Exists(filePath) == false)
-        {
-            throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}", filePath));
-        }
-
         processStartInfo.RedirectStandardInput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.RedirectStandardError = true;
         
-        processStartInfo.FileName = filePath;
-        
-        Process process = new Process()
-        {
-            StartInfo = processStartInfo
-        };
+       Process process = _processFactory.From(processStartInfo,
+           userCredential ?? UserCredential.Null);
 
-        if (process.StartInfo.RedirectStandardInput && standardInput is not null)
-        {
-            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
-        }
-        
-        if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential);
-        
-        process.Start();
-        
-        if(processResourcePolicy is not null)
-            process.SetResourcePolicy(processResourcePolicy);
+       if (processStartInfo.RedirectStandardInput && standardInput is not null)
+       {
+           process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
+       }
 
-        await process.WaitForExitAsync(cancellationToken);
+       process.Start();
+        
+       if(processResourcePolicy is not null)
+           process.SetResourcePolicy(processResourcePolicy);
 
-        string standardOutput = string.Empty;
-        string standardError = string.Empty;
-        
-        if (process.StartInfo.RedirectStandardOutput)
-        {
-           standardOutput = await process.StandardOutput.ReadToEndAsync(cancellationToken);
-        }
-
-        if (process.StartInfo.RedirectStandardError)
-        {
-           standardError = await process.StandardError.ReadToEndAsync(cancellationToken);
-        }
-        
-        BufferedProcessResult result = new BufferedProcessResult(filePath,process.ExitCode,
-            standardOutput, standardError, process.StartTime, process.ExitTime);
-       
-        if (processResultValidation == ProcessResultValidation.ExitCodeZero
-            && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
-        }
-        
-        process.Dispose();
+        BufferedProcessResult result =
+            await _processFactory.ContinueWhenExitBufferedAsync(process, processResultValidation, cancellationToken);
 
         return result;
     }
@@ -421,78 +252,18 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<PipedProcessResult> ExecutePipedAsync(
-        ProcessConfiguration processConfiguration,
+    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
-        _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath, out string filePath);
+        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(
+            processConfiguration.StandardInput is not null,
+            true, true);
         
-        if (File.Exists(filePath) == false)
-        {
-            throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}", filePath));
-        }
-        
-        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo();
+        Process process = _processFactory.StartNew(startInfo);
 
-        startInfo.RedirectStandardInput = processConfiguration.StandardInput is not null;
-        startInfo.RedirectStandardOutput = true;
-        startInfo.RedirectStandardError = true;
+        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process, processConfiguration.ResultValidation,
+            cancellationToken);
         
-        startInfo.FileName = filePath;
-        
-        Process process = new Process()
-        {
-            StartInfo = startInfo
-        };
-
-        if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
-        {
-            process = await _processPipeHandler.PipeStandardInputAsync(
-                processConfiguration.StandardInput.BaseStream, process);
-        }
-        
-        if(processConfiguration.Credential is not null)
-            process.TryApplyUserCredential(processConfiguration.Credential);
-        
-        process.Start();
-        
-        if(processConfiguration.ResourcePolicy is not null)
-            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
-        await process.WaitForExitAsync(cancellationToken);
-
-        Stream standardOutput = Stream.Null;
-        Stream standardError = Stream.Null;
-        
-        if (process.StartInfo.RedirectStandardOutput && processConfiguration.StandardOutput is not null)
-        {
-            standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
-           
-           await standardOutput.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
-               cancellationToken);
-        }
-
-        if (process.StartInfo.RedirectStandardError && processConfiguration.StandardError is not null)
-        {
-           standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
-           
-            await standardError.CopyToAsync(processConfiguration.StandardError.BaseStream,
-                cancellationToken);
-        }
-        
-        PipedProcessResult result = new PipedProcessResult(filePath, process.ExitCode,
-           startTime: process.StartTime, exitTime: process.ExitTime,
-           standardOutput: standardOutput, standardError: standardError);
-       
-        if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-            && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
-        }
-        
-        process.Dispose();
-
         return result;
     }
 
@@ -519,70 +290,35 @@ public class ProcessInvoker : IProcessInvoker
 #endif
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy? processResourcePolicy = null,
-        UserCredential? userCredential = null,
+        ProcessResourcePolicy? processResourcePolicy = null, UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
-        _filePathResolver.ResolveFilePath(processStartInfo.FileName, out string filePath);
-        
-        if (File.Exists(filePath) == false)
+        if (File.Exists(processStartInfo.FileName) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}", filePath));
+                .Replace("{file}", processStartInfo.FileName));
         }
         
-        processStartInfo.RedirectStandardInput = standardInput is not null;
+        processStartInfo.RedirectStandardOutput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.RedirectStandardError = true;
         
-        processStartInfo.FileName = filePath;
-        
-        Process process = new Process()
-        {
-            StartInfo = processStartInfo
-        };
+        Process process = _processFactory.From(processStartInfo, 
+            userCredential ?? UserCredential.Null);
 
-        if (process.StartInfo.RedirectStandardInput && standardInput is not null)
+        if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(
-                standardInput.BaseStream, process);
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
         }
-        
-        if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential);
-        
+
         process.Start();
         
         if(processResourcePolicy is not null)
             process.SetResourcePolicy(processResourcePolicy);
-
-        await process.WaitForExitAsync(cancellationToken);
-
-        Stream standardOutput = Stream.Null;
-        Stream standardError = Stream.Null;
         
-        if (process.StartInfo.RedirectStandardOutput)
-        {
-            standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
-        }
-
-        if (process.StartInfo.RedirectStandardError)
-        {
-           standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
-        }
-        
-        PipedProcessResult result = new PipedProcessResult(filePath, process.ExitCode,
-           startTime: process.StartTime, exitTime: process.ExitTime,
-           standardOutput: standardOutput, standardError: standardError);
-       
-        if (processResultValidation == ProcessResultValidation.ExitCodeZero
-            && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
-        }
-        
-        process.Dispose();
+        PipedProcessResult result =
+            await _processFactory.ContinueWhenExitPipedAsync(process, processResultValidation, cancellationToken);
 
         return result;
     }
