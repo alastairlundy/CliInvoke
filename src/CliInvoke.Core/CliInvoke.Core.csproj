@@ -27,13 +27,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.1.1" />
-         <PackageReference Include="System.IO.Pipelines" Version="9.0.5" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1' OR '$(TargetFramework)' == 'net8.0'"/>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.2.1" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
         
-        <PackageReference Include="Polyfill" Version="7.33.0"
-                          Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'"
-        PrivateAssets="All"/>
+        <PackageReference Include="Polyfill" Version="8.0.1" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" PrivateAssets="All" />
 
     </ItemGroup>
 
@@ -66,5 +63,17 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+      <PackageReference Include="System.IO.Pipelines" Version="9.0.6" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <PackageReference Include="System.IO.Pipelines" Version="9.0.6" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+      <PackageReference Include="System.IO.Pipelines" Version="9.0.6" />
     </ItemGroup>
 </Project>
