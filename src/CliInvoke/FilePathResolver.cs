@@ -11,7 +11,7 @@
 using System.IO;
 using System.Linq;
 
-using AlastairLundy.CliInvoke.Core.Files;
+using AlastairLundy.CliInvoke.Core;
 
 namespace AlastairLundy.CliInvoke;
 
