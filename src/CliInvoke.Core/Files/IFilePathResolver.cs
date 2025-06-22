@@ -9,6 +9,9 @@
 
 namespace AlastairLundy.CliInvoke.Core.Files;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IFilePathResolver
 {
     /// <summary>

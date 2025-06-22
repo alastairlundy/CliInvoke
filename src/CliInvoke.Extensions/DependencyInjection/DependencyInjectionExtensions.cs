@@ -10,12 +10,10 @@
 using System;
 
 using AlastairLundy.CliInvoke.Core.Abstractions;
-
+using AlastairLundy.CliInvoke.Core.Files;
 using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 
 using AlastairLundy.CliInvoke.Piping;
-using AlastairLundy.Resyslib.IO.Core.Files;
-using AlastairLundy.Resyslib.IO.Files;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
