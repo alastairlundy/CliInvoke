@@ -18,7 +18,7 @@ using AlastairLundy.CliInvoke.Core.Abstractions;
 
 using AlastairLundy.CliInvoke.Core.Extensions;
 using AlastairLundy.CliInvoke.Core.Extensions.Processes;
-
+using AlastairLundy.CliInvoke.Core.Files;
 using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
@@ -27,8 +27,6 @@ using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Internal.Localizations;
-
-using AlastairLundy.Resyslib.IO.Core.Files;
 
 // ReSharper disable UnusedType.Global
 
@@ -70,11 +68,11 @@ public class ProcessFactory : IProcessFactory
 #if NET5_0_OR_GREATER
         if (Path.IsPathFullyQualified(processStartInfo.FileName) == false)
         {
-            _filePathResolver.ResolveFilePath(processStartInfo.FileName, out string resolvedFilePath);
+           string resolvedFilePath = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
             processStartInfo.FileName = resolvedFilePath;
         }
 #else
-          _filePathResolver.ResolveFilePath(processStartInfo.FileName, out string resolvedFilePath);
+            string resolvedFilePath = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
             processStartInfo.FileName = resolvedFilePath;
 #endif
 
