@@ -10,7 +10,6 @@ using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using AlastairLundy.CliInvoke.Specializations.Invokers;
 using CliInvoke.Specializations.Tests.Helpers;
 
 namespace CliInvoke.Specializations.Tests.Invokers

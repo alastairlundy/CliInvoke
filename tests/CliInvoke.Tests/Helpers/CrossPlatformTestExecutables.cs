@@ -29,7 +29,9 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                 IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
                 IFilePathResolver filePathResolver = new FilePathResolver();
 
-                processInvoker = new ProcessInvoker(new ProcessFactory(filePathResolver, processPipeHandler));
+                processInvoker = new ProcessInvoker(new ProcessFactory(filePathResolver,
+                        processPipeHandler),
+                    processPipeHandler);
 
                 IProcessConfigurationBuilder dotnetConfigurationBuilder;
 
@@ -47,7 +49,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                 
                 ProcessConfiguration dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    
             
-                Task<BufferedProcessResult> dotnetBufferredOutput = processInvoker.ExecuteBufferedProcessAsync(dotnetCommandConfiguration);
+                Task<BufferedProcessResult> dotnetBufferredOutput = processInvoker.ExecuteBufferedAsync(dotnetCommandConfiguration);
 
                 dotnetBufferredOutput.Start();
                 
