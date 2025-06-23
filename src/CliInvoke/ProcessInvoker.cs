@@ -14,9 +14,10 @@ using System.IO;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Abstractions;
-
+using AlastairLundy.CliInvoke.Core.Extensions.Processes;
+using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
@@ -31,15 +32,18 @@ namespace AlastairLundy.CliInvoke;
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
+    private readonly IProcessPipeHandler _processPipeHandler;
+    
     private readonly IProcessFactory _processFactory;
     
     /// <summary>
     /// 
     /// </summary>
     /// <param name="processFactory"></param>
-    public ProcessInvoker(IProcessFactory processFactory)
+    public ProcessInvoker(IProcessFactory processFactory, IProcessPipeHandler processPipeHandler)
     {
         _processFactory = processFactory;
+        _processPipeHandler = processPipeHandler;
     }
 
     /// <summary>
@@ -61,16 +65,18 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<ProcessResult> ExecuteProcessAsync(ProcessConfiguration processConfiguration,
+    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
-       Process process = _processFactory.StartNew(processConfiguration);
         
-        if (File.Exists(process.StartInfo.FileName) == false)
+        if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
-            throw new FileNotFoundException(Resources.Exceptions_FileNotFound.Replace("{file}", process.StartInfo.FileName));
+            throw new FileNotFoundException(
+                Resources.Exceptions_FileNotFound.Replace("{file}", processConfiguration.TargetFilePath));
         }
         
+        Process process = _processFactory.StartNew(processConfiguration);
+
         ProcessResult result = await _processFactory.ContinueWhenExitAsync(process,
             processConfiguration.ResultValidation, cancellationToken);
        
@@ -88,6 +94,8 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if not null.</param>
+    /// <param name="userCredential"></param>
+    /// <param name="standardInput"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -103,16 +111,33 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<ProcessResult> ExecuteProcessAsync(ProcessStartInfo processStartInfo,
+    public async Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
+        UserCredential? userCredential = null,
+        StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
-        Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
+        if (File.Exists(processStartInfo.FileName) == false)
+        {
+            throw new FileNotFoundException(Resources.Exceptions_FileNotFound
+                .Replace("{file}", processStartInfo.FileName));
+        }
         
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
+        Process process = _processFactory.From(processStartInfo, 
+            userCredential ?? UserCredential.Null);
+        
+        if (processStartInfo.RedirectStandardInput && standardInput is not null)
+        {
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
+        }
 
+        process.Start();
+        
+        if(processResourcePolicy is not null)
+            process.SetResourcePolicy(processResourcePolicy);
+
+        
         ProcessResult result =
             await _processFactory.ContinueWhenExitAsync(process, processResultValidation, cancellationToken);
 
@@ -136,26 +161,35 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessConfiguration processConfiguration,
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
+        ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
+        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        {
+            throw new FileNotFoundException(Resources.Exceptions_FileNotFound
+                .Replace("{file}", processConfiguration.TargetFilePath));
+        }
+
+        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(processConfiguration.StandardInput is not null,
+            true, true);
+
         Process process = _processFactory.StartNew(processConfiguration);
                               
-                              process.StartInfo.RedirectStandardOutput = true;
-                              process.StartInfo.RedirectStandardError = true;
+        BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
+            cancellationToken);
                               
-                             BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
-                                  cancellationToken);
-                              
-                              return result;
+        return result;
     }
-    
+
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The resource policy to be set if not null.</param>
+    /// <param name="userCredential"></param>
+    /// <param name="standardInput"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -171,15 +205,29 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(ProcessStartInfo processStartInfo,
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
+        UserCredential? userCredential = null,
+        StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
-       Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
+        processStartInfo.RedirectStandardInput = standardInput is not null;
+        processStartInfo.RedirectStandardOutput = true;
+        processStartInfo.RedirectStandardError = true;
         
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
+       Process process = _processFactory.From(processStartInfo,
+           userCredential ?? UserCredential.Null);
+
+       if (processStartInfo.RedirectStandardInput && standardInput is not null)
+       {
+           process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
+       }
+
+       process.Start();
+        
+       if(processResourcePolicy is not null)
+           process.SetResourcePolicy(processResourcePolicy);
 
         BufferedProcessResult result =
             await _processFactory.ContinueWhenExitBufferedAsync(process, processResultValidation, cancellationToken);
@@ -204,13 +252,15 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default)
+    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
+        CancellationToken cancellationToken = default)
     {
-        Process process = _processFactory.StartNew(processConfiguration);
+        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(
+            processConfiguration.StandardInput is not null,
+            true, true);
         
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        
+        Process process = _processFactory.StartNew(startInfo);
+
         PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process, processConfiguration.ResultValidation,
             cancellationToken);
         
@@ -223,6 +273,8 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation"></param>
     /// <param name="processResourcePolicy"></param>
+    /// <param name="userCredential"></param>
+    /// <param name="standardInput"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
 #if NET5_0_OR_GREATER
@@ -236,14 +288,35 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<PipedProcessResult> ExecutePipedProcessAsync(ProcessStartInfo processStartInfo, ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy? processResourcePolicy = null, CancellationToken cancellationToken = default)
+    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo,
+        ProcessResultValidation processResultValidation,
+        ProcessResourcePolicy? processResourcePolicy = null, UserCredential? userCredential = null,
+        StreamWriter? standardInput = null,
+        CancellationToken cancellationToken = default)
     {
-        Process process = _processFactory.StartNew(processStartInfo, processResourcePolicy ?? ProcessResourcePolicy.Default);
+        if (File.Exists(processStartInfo.FileName) == false)
+        {
+            throw new FileNotFoundException(Resources.Exceptions_FileNotFound
+                .Replace("{file}", processStartInfo.FileName));
+        }
         
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
+        processStartInfo.RedirectStandardOutput = standardInput is not null;
+        processStartInfo.RedirectStandardOutput = true;
+        processStartInfo.RedirectStandardError = true;
+        
+        Process process = _processFactory.From(processStartInfo, 
+            userCredential ?? UserCredential.Null);
 
+        if (processStartInfo.RedirectStandardInput && standardInput is not null)
+        {
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
+        }
+
+        process.Start();
+        
+        if(processResourcePolicy is not null)
+            process.SetResourcePolicy(processResourcePolicy);
+        
         PipedProcessResult result =
             await _processFactory.ContinueWhenExitPipedAsync(process, processResultValidation, cancellationToken);
 

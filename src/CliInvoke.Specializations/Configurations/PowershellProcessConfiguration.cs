@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
@@ -146,7 +146,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
            
         ProcessConfiguration command = installLocationBuilder.Build();
            
-        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedProcessAsync(command);
+        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(command);
           
         task.RunSynchronously();
           

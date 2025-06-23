@@ -14,7 +14,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-namespace AlastairLundy.CliInvoke.Core.Abstractions;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// Create and manage processes efficiently.
