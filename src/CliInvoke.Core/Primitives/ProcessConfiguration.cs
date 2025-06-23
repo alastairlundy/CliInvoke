@@ -68,6 +68,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardErrorEncoding = processConfiguration.StandardErrorEncoding;
             
         ResourcePolicy = processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default;
+        TimeoutPolicy = processConfiguration.TimeoutPolicy ?? ProcessTimeoutPolicy.Default;
+        
         WindowCreation = processConfiguration.WindowCreation;
         UseShellExecution = processConfiguration.UseShellExecution;
 
@@ -87,12 +89,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
-    /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
-    /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
-    /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
     /// <param name="standardInputEncoding">The Standard Input Encoding to be used (if specified).</param>
     /// <param name="standardOutputEncoding">The Standard Output Encoding to be used (if specified).</param>
     /// <param name="standardErrorEncoding">The Standard Error Encoding to be used (if specified).</param>
+    /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
+    /// <param name="processTimeoutPolicy"></param>
+    /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
+    /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -118,6 +121,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null,
         ProcessResourcePolicy? processResourcePolicy = null,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         bool windowCreation = false,
         bool useShellExecution = false)
     {
@@ -129,6 +133,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Credential = credential ?? UserCredential.Null;
             
         ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+        TimeoutPolicy = processTimeoutPolicy ?? ProcessTimeoutPolicy.Default;
+
 
         ResultValidation = commandResultValidation;
 
@@ -145,7 +151,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
         StartInfo = ToProcessStartInfo();
     }
-        
+
     /// <summary>
     /// Instantiates the Process Configuration class with a ProcessStartInfo and other optional parameters.
     /// </summary>
@@ -157,6 +163,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
+    /// <param name="processTimeoutPolicy"></param>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -176,7 +183,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
         StreamReader? standardError = null,
-        ProcessResourcePolicy? processResourcePolicy = null)
+        ProcessResourcePolicy? processResourcePolicy = null,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null)
     {
         StartInfo = processStartInfo;
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
@@ -184,6 +192,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Credential = credential ?? UserCredential.Null;
             
         ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+        TimeoutPolicy = processTimeoutPolicy ?? ProcessTimeoutPolicy.Default;
 
         ResultValidation = resultValidation;
 
@@ -278,6 +287,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <para>Not all properties of a Process Resource Policy support all operating systems. Check before configuring a property.</para></remarks>
     public ProcessResourcePolicy? ResourcePolicy { get; protected set;  }
         
+    public ProcessTimeoutPolicy? TimeoutPolicy  { get; protected set;  }
+    
     /// <summary>
     /// The encoding to use for the Standard Input.
     /// </summary>
@@ -310,7 +321,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         if (Credential is not null &&
             other.Credential is not null &&
             StartInfo.FileName != other.StartInfo.FileName &&
-            ResourcePolicy is not null)
+            ResourcePolicy is not null && TimeoutPolicy is not null)
         {
 
             if (StandardOutput is not null && StandardError is not null)
@@ -320,6 +331,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                        Credential.Equals(other.Credential)
                        && ResultValidation == other.ResultValidation &&
                        ResourcePolicy.Equals(other.ResourcePolicy) &&
+                       TimeoutPolicy.Equals(other.TimeoutPolicy) &&
                        StandardOutput.Equals(other.StandardOutput) &&
                        StandardError.Equals(other.StandardError) &&
                        StandardInputEncoding.Equals(other.StandardInputEncoding) &&
@@ -330,8 +342,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             {
                 return StartInfo.Equals(other.StartInfo) &&
                        EnvironmentVariables.Equals(other.EnvironmentVariables) &&
-                       Credential.Equals(other.Credential)
-                       && ResultValidation == other.ResultValidation &&
+                       Credential.Equals(other.Credential) &&
+                       ResultValidation == other.ResultValidation &&
+                       TimeoutPolicy.Equals(other.TimeoutPolicy) &&
                        ResourcePolicy.Equals(other.ResourcePolicy) &&
                        StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                        StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
@@ -394,6 +407,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(StandardOutput);
         hashCode.Add(StandardError);
         hashCode.Add(ResourcePolicy);
+        hashCode.Add(TimeoutPolicy);
         hashCode.Add(StandardInputEncoding);
         hashCode.Add(StandardOutputEncoding);
         hashCode.Add(StandardErrorEncoding);
