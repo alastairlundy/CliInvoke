@@ -22,8 +22,8 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.4.2</Version>
-        <PackageReleaseNotes>Hide CliInvoke's dependency on Polyfill (See https://github.com/alastairlundy/CliInvoke/pull/49)</PackageReleaseNotes>
+        <Version>1.4.3</Version>
+        <PackageReleaseNotes>Update internal Polyfill dependency to 8.0.1 and updated DotExtensions to 7.2.1 from 7.1.1</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
