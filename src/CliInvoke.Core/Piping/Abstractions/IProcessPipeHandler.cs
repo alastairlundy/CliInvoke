@@ -11,33 +11,33 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace AlastairLundy.CliInvoke.Core.Piping.Abstractions
-{
-    /// <summary>
-    /// An interface to allow for a standardized way of Process pipe handling.
-    /// </summary>
-    public interface IProcessPipeHandler
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="destination"></param>
-        /// <returns></returns>
-        Task<Process> PipeStandardInputAsync(Stream source, Process destination);
+namespace AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        Task<Stream> PipeStandardOutputAsync(Process source);
+/// <summary>
+/// An interface to allow for a standardized way of Process pipe handling.
+/// </summary>
+public interface IProcessPipeHandler
+{
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        Task<Stream> PipeStandardErrorAsync(Process source);
-    }
+    /// <summary>
+    /// Asynchronously pipes the standard input from a source stream to a specified process.
+    /// </summary>
+    /// <param name="source">The stream from which to read the standard input data.</param>
+    /// <param name="destination">The process to which the standard input will be piped.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
+    Task<Process> PipeStandardInputAsync(Stream source, Process destination);
+
+    /// <summary>
+    /// Asynchronously retrieves the standard output stream from a specified process.
+    /// </summary>
+    /// <param name="source">The process from which to read the standard output data.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
+    Task<Stream> PipeStandardOutputAsync(Process source);
+
+    /// <summary>
+    /// Asynchronously retrieves the standard error stream from a specified process.
+    /// </summary>
+    /// <param name="source">The process from which to read the standard error data.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
+    Task<Stream> PipeStandardErrorAsync(Process source);
 }

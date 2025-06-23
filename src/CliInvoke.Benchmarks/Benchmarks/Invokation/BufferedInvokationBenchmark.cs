@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
-
-using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Abstractions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 
@@ -19,7 +18,7 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 public class BufferedInvokationBenchmark
 {
     private readonly IProcessFactory _processFactory;
-    private readonly ICliCommandInvoker _cliCommandInvoker;
+    private readonly IProcessInvoker _processInvoker;
     
     private BufferedTestHelper _bufferedTestHelper;
 
@@ -27,7 +26,7 @@ public class BufferedInvokationBenchmark
     {
         _bufferedTestHelper = new BufferedTestHelper();
         _processFactory = CliInvokeHelpers.CreateProcessFactory();
-        _cliCommandInvoker = CliInvokeHelpers.CreateCliCommandInvoker();
+        _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
     }
     
     /*[Benchmark]

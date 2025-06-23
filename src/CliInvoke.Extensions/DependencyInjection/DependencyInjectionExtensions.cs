@@ -8,14 +8,11 @@
 */
 
 using System;
-
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Abstractions;
-
 using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 
 using AlastairLundy.CliInvoke.Piping;
-using IFilePathResolver = AlastairLundy.Resyslib.IO.Core.Files.IFilePathResolver;
-using AlastairLundy.Resyslib.IO.Files;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

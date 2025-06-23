@@ -22,15 +22,29 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.4.1</Version>
-        <PackageReleaseNotes>Update DotExtensions from 7.0.0 to 7.1.1, and Polyfill from 7.32.0 to 7.33.0</PackageReleaseNotes>
+        <Version>2.0.0-alpha.1</Version>
+        <PackageReleaseNotes>### Changes since 1.4.x
+* Removed deprecated code marked for removal in v2 - https://github.com/alastairlundy/CliInvoke/pull/47
+* Moved Builder implementations from CliInvoke to CliInvoke.Core - https://github.com/alastairlundy/CliInvoke/pull/46
+* Removed ``CliCommandConfiguration`` - This is being replaced by ``ProcessConfiguration``
+* Removed ``ICliCoommandConfigurationBuilder`` and ``CliCommandConfigurationBuilder`` - These are being replaced by ``IProcessConfigurationBuilder`` and ``ProcessConfigurationBuilder respectively.
+* Removed ``ICliCommandInvoker`` and ``CliCommandInvoker`` This has been replaced with ``IProcessInvoker``
+* Reworked ``PipedProcessResult`` to be easier to use.
+* Reworked ``IProcessFactory`` and ``ProcessFactory`` to support ``PipedProcessResult``
+* Reworked ``IProcessInvoker`` and ``ProcessInvoker`` to support ``PipedProcessResult`` and removed reliance on now removed and deprecated code.
+* Removed Extensibility package code and discontinued the Extensibility package - Reworked extensibility code has been moved to CliInvoke.Core for abstractions and CliInvoke for implementations.
+
+#### Core Only
+* Added ``IRunnerProcessCreator`` - An interface for creating Processes that run other processes.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.1.1" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.2.0" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
         
-        <PackageReference Include="Polyfill" Version="7.33.0" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" />
+        <PackageReference Include="Polyfill" Version="8.0.1" 
+                          Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'"
+        PrivateAssets="All"/>
 
     </ItemGroup>
 
