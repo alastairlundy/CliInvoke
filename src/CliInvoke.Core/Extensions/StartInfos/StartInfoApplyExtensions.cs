@@ -25,127 +25,126 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 // ReSharper disable UnusedMethodReturnValue.Global
 
-namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos
+namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
+
+public static class StartInfoApplyExtensions
 {
-    public static class StartInfoApplyExtensions
-    {
-        /// <summary>
-        /// Adds the specified Credential to the current ProcessStartInfo object.
-        /// </summary>
-        /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
-        /// <param name="credential">The credential to be added.</param>
+    /// <summary>
+    /// Adds the specified Credential to the current ProcessStartInfo object.
+    /// </summary>
+    /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
+    /// <param name="credential">The credential to be added.</param>
 #if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
 #endif
-        public static void ApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
-        {
+    public static void ApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
+    {
 #pragma warning disable CA1416
-            if (credential.IsSupportedOnCurrentOS())
+        if (credential.IsSupportedOnCurrentOS())
+        {
+            if (credential.Domain is not null)
             {
-                if (credential.Domain is not null)
-                {
-                    processStartInfo.Domain = credential.Domain;
-                }
-
-                if (credential.UserName is not null)
-                {
-                    processStartInfo.UserName = credential.UserName;
-                }
-
-                if (credential.Password is not null)
-                {
-                    processStartInfo.Password = credential.Password;
-                }
-
-                if (credential.LoadUserProfile is not null)
-                {
-                    processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
-                }
+                processStartInfo.Domain = credential.Domain;
             }
-            else
+
+            if (credential.UserName is not null)
             {
-                throw new PlatformNotSupportedException();
+                processStartInfo.UserName = credential.UserName;
             }
-#pragma warning restore CA1416
+
+            if (credential.Password is not null)
+            {
+                processStartInfo.Password = credential.Password;
+            }
+
+            if (credential.LoadUserProfile is not null)
+            {
+                processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+            }
         }
-        
-        /// <summary>
-        /// Attempts to add the specified Credential to the current ProcessStartInfo object.
-        /// </summary>
-        /// <param name="processStartInfo">The current Process start info object.</param>
-        /// <param name="credential">The credential to be added.</param>
-        /// <returns>True if successfully applied; false otherwise.</returns>
-        public static bool TryApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
+        else
         {
-            if (credential.IsSupportedOnCurrentOS())
-            {
-                try
-                {
-#pragma warning disable CA1416
-                    ApplyUserCredential(processStartInfo, credential);
+            throw new PlatformNotSupportedException();
+        }
 #pragma warning restore CA1416
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+    }
+        
+    /// <summary>
+    /// Attempts to add the specified Credential to the current ProcessStartInfo object.
+    /// </summary>
+    /// <param name="processStartInfo">The current Process start info object.</param>
+    /// <param name="credential">The credential to be added.</param>
+    /// <returns>True if successfully applied; false otherwise.</returns>
+    public static bool TryApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
+    {
+        if (credential.IsSupportedOnCurrentOS())
+        {
+            try
+            {
+#pragma warning disable CA1416
+                ApplyUserCredential(processStartInfo, credential);
+#pragma warning restore CA1416
+                return true;
             }
-            else
+            catch
             {
                 return false;
             }
         }
+        else
+        {
+            return false;
+        }
+    }
 
         
-        /// <summary>
-        /// Applies a specific ProcessConfiguration to a specified ProcessStartInfo object.
-        /// </summary>
-        /// <param name="processStartInfo">The ProcessStartInfo object to apply the ProcessConfiguration to.</param>
-        /// <param name="processConfiguration">A ProcessConfiguration object that defines the environment variables to be applied.</param>
-        public static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
-            ProcessConfiguration processConfiguration)
+    /// <summary>
+    /// Applies a specific ProcessConfiguration to a specified ProcessStartInfo object.
+    /// </summary>
+    /// <param name="processStartInfo">The ProcessStartInfo object to apply the ProcessConfiguration to.</param>
+    /// <param name="processConfiguration">A ProcessConfiguration object that defines the environment variables to be applied.</param>
+    public static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
+        ProcessConfiguration processConfiguration)
+    {
+        if (processConfiguration.EnvironmentVariables is not null)
         {
-            if (processConfiguration.EnvironmentVariables is not null)
-            {
-                processStartInfo.ApplyEnvironmentVariables(processConfiguration.EnvironmentVariables);
-            }
+            processStartInfo.ApplyEnvironmentVariables(processConfiguration.EnvironmentVariables);
         }
+    }
 
-        /// <summary>
-        /// Applies environment variables to a specified ProcessStartInfo object.
-        /// </summary>
-        /// <param name="processStartInfo">The ProcessStartInfo object to apply environment variables to.</param>
-        /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
-        public static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
-            IReadOnlyDictionary<string, string> environmentVariables)
+    /// <summary>
+    /// Applies environment variables to a specified ProcessStartInfo object.
+    /// </summary>
+    /// <param name="processStartInfo">The ProcessStartInfo object to apply environment variables to.</param>
+    /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
+    public static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
+        IReadOnlyDictionary<string, string> environmentVariables)
+    {
+        if (environmentVariables.Count > 0)
         {
-            if (environmentVariables.Count > 0)
+            foreach (KeyValuePair<string, string> variable in environmentVariables)
             {
-                foreach (KeyValuePair<string, string> variable in environmentVariables)
+                if (variable.Value is not null)
                 {
-                    if (variable.Value is not null)
-                    {
-                        processStartInfo.Environment[variable.Key] = variable.Value;
-                    }
+                    processStartInfo.Environment[variable.Key] = variable.Value;
                 }
             }
         }
+    }
         
-        /// <summary>
-        /// Applies a requirement to run the process start info as an administrator.
-        /// </summary>
-        /// <param name="processStartInfo"></param>
-        public static void RunAsAdministrator(this ProcessStartInfo processStartInfo)
+    /// <summary>
+    /// Applies a requirement to run the process start info as an administrator.
+    /// </summary>
+    /// <param name="processStartInfo"></param>
+    public static void RunAsAdministrator(this ProcessStartInfo processStartInfo)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                processStartInfo.Verb = "runas";
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || OperatingSystem.IsFreeBSD())
-            {
-                processStartInfo.Verb = "sudo";
-            }
+            processStartInfo.Verb = "runas";
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || OperatingSystem.IsFreeBSD())
+        {
+            processStartInfo.Verb = "sudo";
         }
     }
 }

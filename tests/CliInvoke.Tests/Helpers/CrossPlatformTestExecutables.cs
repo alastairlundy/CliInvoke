@@ -3,18 +3,23 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
-using AlastairLundy.Resyslib.IO.Core.Files;
-using AlastairLundy.Resyslib.IO.Files;
 
 namespace AlastairLundy.CliInvoke.Tests.Helpers
 {
     public class CrossPlatformTestExecutables
     {
-   //     private static ICliCommandInvoker _cliInvoker;
+        private static IProcessInvoker processInvoker;
 
         private static readonly string dotnetExePath;
         private static readonly string cmdExePath;
@@ -24,26 +29,25 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                 IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
                 IFilePathResolver filePathResolver = new FilePathResolver();
 
-          //      _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
-          //             processPipeHandler, commandProcessFactory);
+                processInvoker = new ProcessInvoker(new ProcessFactory(filePathResolver, processPipeHandler));
 
-                ICliCommandConfigurationBuilder dotnetConfigurationBuilder;
+                IProcessConfigurationBuilder dotnetConfigurationBuilder;
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    cmdExePath = new CmdCommandConfiguration().TargetFilePath;
-                    dotnetConfigurationBuilder = new CliCommandConfigurationBuilder(cmdExePath)
+                    cmdExePath = new CmdProcessConfiguration().TargetFilePath;
+                    dotnetConfigurationBuilder = new ProcessConfigurationBuilder(cmdExePath)
                         .WithArguments("dotnet --list-sdks");
                 }
                 else
                 {
-                    dotnetConfigurationBuilder = new CliCommandConfigurationBuilder("/usr/bin/which")
+                    dotnetConfigurationBuilder = new ProcessConfigurationBuilder("/usr/bin/which")
                         .WithArguments("dotnet --list-sdks");
                 }
                 
-                CliCommandConfiguration dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    
+                ProcessConfiguration dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    
             
-                Task<BufferedProcessResult> dotnetBufferredOutput = _cliInvoker.ExecuteBufferedAsync(dotnetCommandConfiguration);
+                Task<BufferedProcessResult> dotnetBufferredOutput = processInvoker.ExecuteBufferedProcessAsync(dotnetCommandConfiguration);
 
                 dotnetBufferredOutput.Start();
                 
@@ -68,7 +72,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
         public static string DotnetExePath => dotnetExePath;
            
         public static string CrossPlatformPowershellExePath =>
-            new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
+            new PowershellProcessConfiguration(processInvoker).TargetFilePath;
 
     }
 }
