@@ -11,11 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using UserCredential = AlastairLundy.CliInvoke.Core.Primitives.UserCredential;
-using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
 
 namespace AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 
