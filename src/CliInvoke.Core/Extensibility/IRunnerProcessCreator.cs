@@ -9,15 +9,14 @@
 
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-namespace AlastairLundy.CliInvoke.Core.Extensibility
+namespace AlastairLundy.CliInvoke.Core.Extensibility;
+
+public interface IRunnerProcessCreator
 {
-    public interface IRunnerProcessCreator
-    {
-        /// <summary>
-        /// Create the command to be run from the Command runner configuration and an input command.
-        /// </summary>
-        /// <param name="inputCommand">The command to be run by the Command Runner command.</param>
-        /// <returns>The built Command that will run the input command.</returns>
-        ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputCommand);
-    }
+    /// <summary>
+    /// Create the command to be run from the Command runner configuration and an input command.
+    /// </summary>
+    /// <param name="inputCommand">The command to be run by the Command Runner command.</param>
+    /// <returns>The built Command that will run the input command.</returns>
+    ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputCommand);
 }

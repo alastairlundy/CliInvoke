@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
@@ -12,8 +14,6 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
-using AlastairLundy.Resyslib.IO.Core.Files;
-using AlastairLundy.Resyslib.IO.Files;
 
 namespace AlastairLundy.CliInvoke.Tests.Helpers
 {
