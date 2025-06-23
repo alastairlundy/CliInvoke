@@ -16,48 +16,47 @@ using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Extensibility
+namespace AlastairLundy.CliInvoke.Extensibility;
+
+/// <summary>
+/// A class to allow creating Processes that can be run through other Processes.
+/// </summary>
+public class RunnerProcessCreator : IRunnerProcessCreator
 {
+    private readonly ProcessConfiguration _commandRunnerConfiguration;
+    
     /// <summary>
-    /// A class to allow creating Processes that can be run through other Processes.
+    /// Instantiates the Command Running configuration and the CommandRunner.
     /// </summary>
-    public class RunnerProcessCreator : IRunnerProcessCreator
+    /// <param name="commandRunnerConfiguration">The command running configuration to use for the Command that will run other Commands.</param>
+    public RunnerProcessCreator(ProcessConfiguration commandRunnerConfiguration)
     {
-        private readonly ProcessConfiguration _commandRunnerConfiguration;
+        _commandRunnerConfiguration = commandRunnerConfiguration;
+    }
     
-        /// <summary>
-        /// Instantiates the Command Running configuration and the CommandRunner.
-        /// </summary>
-        /// <param name="commandRunnerConfiguration">The command running configuration to use for the Command that will run other Commands.</param>
-        protected RunnerProcessCreator(ProcessConfiguration commandRunnerConfiguration)
-        {
-            _commandRunnerConfiguration = commandRunnerConfiguration;
-        }
-    
-        /// <summary>
-        /// Create the command to be run from the Command runner configuration and an input command.
-        /// </summary>
-        /// <param name="inputProcess">The command to be run by the Command Runner command.</param>
-        /// <returns>The built Process Configuration that can be run.</returns>
-        public ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputProcess)
-        {
-            IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(_commandRunnerConfiguration)
-                .WithArguments(inputProcess.TargetFilePath + " " + inputProcess.Arguments)
-                .WithEnvironmentVariables(inputProcess.EnvironmentVariables)
-                .WithProcessResourcePolicy(inputProcess.ResourcePolicy ?? ProcessResourcePolicy.Default)
-                .WithEncoding(inputProcess.StandardInputEncoding,
-                    inputProcess.StandardOutputEncoding,
-                    inputProcess.StandardErrorEncoding)
-                .WithStandardInputPipe(inputProcess.StandardInput ?? StreamWriter.Null)
-                .WithStandardOutputPipe(inputProcess.StandardOutput ?? StreamReader.Null)
-                .WithStandardErrorPipe(inputProcess.StandardError ?? StreamReader.Null)
-                .WithUserCredential(inputProcess.Credential ?? UserCredential.Null)
-                .WithValidation(inputProcess.ResultValidation)
-                .WithAdministratorPrivileges(inputProcess.RequiresAdministrator)
-                .WithShellExecution(inputProcess.UseShellExecution)
-                .WithWindowCreation(inputProcess.WindowCreation);
+    /// <summary>
+    /// Create the command to be run from the Command runner configuration and an input command.
+    /// </summary>
+    /// <param name="inputProcess">The command to be run by the Command Runner command.</param>
+    /// <returns>The Process Configuration to be run.</returns>
+    public ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputProcess)
+    {
+        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(_commandRunnerConfiguration)
+            .WithArguments(inputProcess.TargetFilePath + " " + inputProcess.Arguments)
+            .WithEnvironmentVariables(inputProcess.EnvironmentVariables)
+            .WithProcessResourcePolicy(inputProcess.ResourcePolicy ?? ProcessResourcePolicy.Default)
+            .WithEncoding(inputProcess.StandardInputEncoding,
+                inputProcess.StandardOutputEncoding,
+                inputProcess.StandardErrorEncoding)
+            .WithStandardInputPipe(inputProcess.StandardInput ?? StreamWriter.Null)
+            .WithStandardOutputPipe(inputProcess.StandardOutput ?? StreamReader.Null)
+            .WithStandardErrorPipe(inputProcess.StandardError ?? StreamReader.Null)
+            .WithUserCredential(inputProcess.Credential ?? UserCredential.Null)
+            .WithValidation(inputProcess.ResultValidation)
+            .WithAdministratorPrivileges(inputProcess.RequiresAdministrator)
+            .WithShellExecution(inputProcess.UseShellExecution)
+            .WithWindowCreation(inputProcess.WindowCreation);
         
-            return commandBuilder.Build();
-        }
+        return commandBuilder.Build();
     }
 }

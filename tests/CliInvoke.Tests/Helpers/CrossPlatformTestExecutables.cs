@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Builders;
@@ -13,8 +14,6 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
-using AlastairLundy.Resyslib.IO.Core.Files;
-using AlastairLundy.Resyslib.IO.Files;
 
 namespace AlastairLundy.CliInvoke.Tests.Helpers
 {
@@ -30,15 +29,13 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                 IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
                 IFilePathResolver filePathResolver = new FilePathResolver();
 
-                processInvoker = new ProcessInvoker(new ProcessFactory(filePathResolver,
-                        processPipeHandler),
-                    processPipeHandler);
+                processInvoker = new ProcessInvoker(new ProcessFactory(filePathResolver, processPipeHandler));
 
                 IProcessConfigurationBuilder dotnetConfigurationBuilder;
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    cmdExePath = new CmdCommandConfiguration().TargetFilePath;
+                    cmdExePath = new CmdProcessConfiguration().TargetFilePath;
                     dotnetConfigurationBuilder = new ProcessConfigurationBuilder(cmdExePath)
                         .WithArguments("dotnet --list-sdks");
                 }
@@ -50,7 +47,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                 
                 ProcessConfiguration dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    
             
-                Task<BufferedProcessResult> dotnetBufferredOutput = processInvoker.ExecuteBufferedAsync(dotnetCommandConfiguration);
+                Task<BufferedProcessResult> dotnetBufferredOutput = processInvoker.ExecuteBufferedProcessAsync(dotnetCommandConfiguration);
 
                 dotnetBufferredOutput.Start();
                 
@@ -75,7 +72,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
         public static string DotnetExePath => dotnetExePath;
            
         public static string CrossPlatformPowershellExePath =>
-            new PowershellCommandConfiguration(processInvoker).TargetFilePath;
+            new PowershellProcessConfiguration(processInvoker).TargetFilePath;
 
     }
 }
