@@ -18,9 +18,6 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         /// 
         /// </summary>
         Forceful,
-        /// <summary>
-        /// 
-        /// </summary>
         Graceful,
         /// <summary>
         /// 
