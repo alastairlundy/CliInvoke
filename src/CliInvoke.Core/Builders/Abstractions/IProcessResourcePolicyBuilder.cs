@@ -9,12 +9,11 @@
 
 using System.Diagnostics;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
-namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders;
+namespace AlastairLundy.CliInvoke.Core.Builders.Abstractions;
 
 /// <summary>
 /// An interface that defines the fluent builder methods all ProcessResourcePolicyBuilder classes must implement.
