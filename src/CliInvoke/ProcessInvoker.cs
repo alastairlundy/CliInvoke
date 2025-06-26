@@ -15,7 +15,6 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Extensions.Processes;
 using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 using AlastairLundy.CliInvoke.Core.Primitives;

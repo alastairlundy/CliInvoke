@@ -9,7 +9,7 @@
 
 using System;
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Abstractions;
+
 using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 
 using AlastairLundy.CliInvoke.Piping;

@@ -70,7 +70,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         workingDirectoryPath,
         requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
         standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        useShellExecution, windowCreation)
+        windowCreation: useShellExecution, useShellExecution: windowCreation)
     {
         base.TargetFilePath = TargetFilePath;
     }
