@@ -7,7 +7,7 @@ version: 2
 updates:
   - package-ecosystem: "nuget" # See documentation for possible values
     directories:
-        - "src" # Location of package manifests
+        - "src/" # Location of package manifests
     schedule:
       interval: "weekly"
     versioning-strategy: increase-if-necessary
