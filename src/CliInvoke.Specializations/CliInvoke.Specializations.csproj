@@ -61,7 +61,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.4.3" />
+      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.4.4" />
       <PackageReference Include="AlastairLundy.CliInvoke.Extensibility" Version="1.4.3" />
     </ItemGroup>
 </Project>
