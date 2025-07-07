@@ -7,10 +7,6 @@ version: 2
 updates:
   - package-ecosystem: "nuget" # See documentation for possible values
     directories:
-        - "/src/CliInvoke" # Location of package manifests
-        - "/src/CliInvoke.Specializations"
-        - "/src/CliInvoke.Extensibility"
-        - "/src/CliInvoke.Extensions"
+        - "src/" # Location of package manifests
     schedule:
-      interval: "weekly"
-    versioning-strategy: increase-if-necessary
+      interval: "daily"
