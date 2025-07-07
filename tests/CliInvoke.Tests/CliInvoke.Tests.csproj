@@ -13,19 +13,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.Resyslib.IO" Version="3.1.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
+        <PackageReference Include="AlastairLundy.Resyslib.IO" Version="3.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Bogus" Version="35.6.3" />
-        <PackageReference Include="xunit.v3" Version="2.0.2" />
+        <PackageReference Include="xunit.v3" Version="2.0.3" />
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="PolyFill" Version="7.33.0" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'"/>
+        <PackageReference Include="PolyFill" Version="8.4.0" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'"/>
     </ItemGroup>
 
     <ItemGroup>
