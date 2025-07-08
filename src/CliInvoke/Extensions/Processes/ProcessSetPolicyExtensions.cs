@@ -11,14 +11,17 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using AlastairLundy.CliInvoke.Core.Internal;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+
+using AlastairLundy.CliInvoke.Internal.Localizations;
+
 using AlastairLundy.DotExtensions.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-namespace AlastairLundy.CliInvoke.Core.Extensions.Processes;
+namespace AlastairLundy.CliInvoke.Extensions.Processes;
 
 public static class ProcessSetPolicyExtensions
 {

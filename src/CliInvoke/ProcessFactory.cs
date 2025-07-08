@@ -19,18 +19,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Abstractions;
-
-using AlastairLundy.CliInvoke.Core.Extensions;
-using AlastairLundy.CliInvoke.Core.Extensions.Processes;
-using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
-
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
+using AlastairLundy.CliInvoke.Core.Piping;
+using AlastairLundy.CliInvoke.Extensions;
+using AlastairLundy.CliInvoke.Extensions.Processes;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 
 // ReSharper disable UnusedType.Global
 

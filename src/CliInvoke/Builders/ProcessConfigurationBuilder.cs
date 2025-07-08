@@ -18,17 +18,15 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
-
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
-using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
 /// Builder class for creating process configurations.

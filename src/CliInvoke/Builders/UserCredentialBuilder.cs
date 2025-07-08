@@ -13,8 +13,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Security;
-using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.DotPrimitives.Processes;
 
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
@@ -22,7 +22,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 // ReSharper disable PossibleNullReferenceException
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace AlastairLundy.CliInvoke.Builders;
 
 #nullable enable
 

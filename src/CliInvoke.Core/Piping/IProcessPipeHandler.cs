@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace AlastairLundy.CliInvoke.Core.Piping.Abstractions;
+namespace AlastairLundy.CliInvoke.Core.Piping;
 
 /// <summary>
 /// An interface to allow for a standardized way of Process pipe handling.

@@ -1,5 +1,4 @@
 ﻿using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
 using AlastairLundy.CliInvoke.Piping;
 
 namespace CliInvoke.Benchmarking.Helpers;

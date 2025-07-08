@@ -11,8 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
-
-using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
+using AlastairLundy.CliInvoke.Core.Piping;
 
 namespace AlastairLundy.CliInvoke.Piping;
 

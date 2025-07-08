@@ -11,14 +11,13 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
-using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.DotPrimitives.Processes.Policies;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
 /// A class to fluently configure and build ProcessResourcePolicy objects.
