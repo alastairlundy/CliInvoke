@@ -38,8 +38,8 @@ public interface IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="userCredential"></param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
+    /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
     /// <param name="standardInput"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
@@ -66,11 +66,11 @@ public interface IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="userCredential"></param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
+    /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
     /// <param name="standardInput"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns>The Buffered Process Results from running the process.</returns>
+    /// <returns>The Buffered Process Result that is returned from running the process.</returns>
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
@@ -78,27 +78,27 @@ public interface IProcessInvoker
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default);
-        
+
     /// <summary>
-    /// 
+    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="processConfiguration">The configuration for the process to be executed.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 
+    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processStartInfo"></param>
-    /// <param name="processResultValidation"></param>
-    /// <param name="processResourcePolicy"></param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="userCredential"></param>
+    /// <param name="processResultValidation">The process result validation to be used.</param>
+    /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
+    /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
     /// <param name="standardInput"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
