@@ -319,11 +319,10 @@ public class ProcessFactory : IProcessFactory
             {
                 await process.WaitForExitAsync(cancellationToken);
             }
-            else if (processTimeoutPolicy.CancellationMode == ProcessCancellationMode.Graceful)
+            else
             {
-                await process.WaitForExitAsync(, cancellationToken);
+                await process.WaitForExitAsync(processTimeoutPolicy, cancellationToken);
             }
-            
         }
         else
         {
@@ -399,8 +398,22 @@ public class ProcessFactory : IProcessFactory
     {
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
-        
-        await process.WaitForExitAsync(cancellationToken);
+     
+        if (processTimeoutPolicy is not null)
+        {
+            if (processTimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
+            {
+                await process.WaitForExitAsync(cancellationToken);
+            }
+            else
+            {
+                await process.WaitForExitAsync(processTimeoutPolicy, cancellationToken);
+            }
+        }
+        else
+        {
+            await process.WaitForExitAsync(cancellationToken);
+        }
         
         if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
         {
@@ -473,7 +486,21 @@ public class ProcessFactory : IProcessFactory
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         
-        await process.WaitForExitAsync(cancellationToken);
+        if (processTimeoutPolicy is not null)
+        {
+            if (processTimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
+            {
+                await process.WaitForExitAsync(cancellationToken);
+            }
+            else
+            {
+                await process.WaitForExitAsync(processTimeoutPolicy, cancellationToken);
+            }
+        }
+        else
+        {
+            await process.WaitForExitAsync(cancellationToken);
+        }
         
         if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
         {

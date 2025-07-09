@@ -43,7 +43,7 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.4.1" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.5.0-preview.2" />
     </ItemGroup>
     
     <ItemGroup >
