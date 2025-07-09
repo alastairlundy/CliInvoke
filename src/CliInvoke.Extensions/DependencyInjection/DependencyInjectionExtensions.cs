@@ -8,8 +8,8 @@
 */
 
 using System;
+
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Piping;
 

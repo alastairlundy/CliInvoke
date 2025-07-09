@@ -103,6 +103,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -127,6 +128,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -151,6 +153,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -175,6 +178,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -200,6 +204,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -224,6 +229,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -255,6 +261,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -327,6 +334,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -354,6 +362,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -380,6 +389,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -406,6 +416,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 _configuration.UseShellExecution));
     }
@@ -431,6 +442,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -458,6 +470,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
+                _configuration.TimeoutPolicy,
                 _configuration.WindowCreation,
                 useShellExecution: useShellExecution));
     }

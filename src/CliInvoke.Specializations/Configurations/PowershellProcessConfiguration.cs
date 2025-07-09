@@ -73,12 +73,12 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         ProcessResultValidation resultValidation = ProcessResultValidation.ExitCodeZero,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("", arguments,
+        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null, 
+        ProcessTimeoutPolicy timeoutPolicy = null, bool useShellExecution = false, bool windowCreation = false) : base("", arguments,
         workingDirectoryPath,
         requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
         standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        useShellExecution, windowCreation)
+         timeoutPolicy, windowCreation, useShellExecution)
     {
         base.TargetFilePath = TargetFilePath;
         _invoker = processInvoker;

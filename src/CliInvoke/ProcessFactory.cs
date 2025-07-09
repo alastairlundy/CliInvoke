@@ -20,9 +20,13 @@ using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Piping;
+
+using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Extensions;
 using AlastairLundy.CliInvoke.Extensions.Processes;
+
 using AlastairLundy.CliInvoke.Internal.Localizations;
+
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;

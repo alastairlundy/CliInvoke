@@ -65,11 +65,11 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("", arguments,
+        bool useShellExecution = false, ProcessTimeoutPolicy timeoutPolicy = null, bool windowCreation = false) : base("", arguments,
         workingDirectoryPath,
         requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
         standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        useShellExecution, windowCreation)
+        timeoutPolicy,windowCreation, useShellExecution)
     {
         base.TargetFilePath = TargetFilePath;
     }

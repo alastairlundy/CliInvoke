@@ -57,4 +57,13 @@
     <data name="Exceptions.TargetFile.NullOrEmpty" xml:space="preserve">
         <value>Input file path cannot be null or empty.</value>
     </data>
+    <data name="Exceptions.ProcessNotSuccessful.Generic" xml:space="preserve">
+        <value>The executed process was not succesful and returned an exit code of {x}.</value>
+    </data>
+    <data name="Exceptions.ProcessNotSuccessful.Specific" xml:space="preserve">
+        <value>The executed process, with executable name of {x}, was not succesful and returned an exit code of {y}.</value>
+    </data>
+    <data name="Exceptions.ResourcePolicy.CannotSetToNonStartedProcess" xml:space="preserve">
+        <value>Cannot set Resource Policy to a Process that has not already been started.</value>
+    </data>
 </root>

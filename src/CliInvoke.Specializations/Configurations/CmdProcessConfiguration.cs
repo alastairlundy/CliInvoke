@@ -69,12 +69,12 @@ public class CmdProcessConfiguration : ProcessConfiguration
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : 
+        ProcessTimeoutPolicy timeoutPolicy = null, bool useShellExecution = false, bool windowCreation = false) : 
         base("", arguments,
             workingDirectoryPath,
             requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
             standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-            useShellExecution, windowCreation)
+            timeoutPolicy, windowCreation, useShellExecution)
     {
         base.TargetFilePath = this.TargetFilePath;
     }
