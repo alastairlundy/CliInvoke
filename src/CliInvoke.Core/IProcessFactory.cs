@@ -89,15 +89,17 @@ public interface IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and processResult that are returned upon completion of the task.</returns>
     Task<ProcessResult> ContinueWhenExitAsync(Process process, CancellationToken cancellationToken = default);
-        
+
     /// <summary>
     /// Creates a Task that returns a ProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and ProcessResult that are returned upon completion of the task.</returns>
-    Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation, CancellationToken cancellationToken = default);
+    Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null, CancellationToken cancellationToken = default);
         
     /// <summary>
     /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
@@ -106,15 +108,18 @@ public interface IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
     Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
-    Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, ProcessResultValidation resultValidation, CancellationToken cancellationToken = default);
+    Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process,
+        ProcessResultValidation resultValidation, ProcessTimeoutPolicy? processTimeoutPolicy = null,
+        CancellationToken cancellationToken = default);
         
     /// <summary>
     /// 
@@ -129,8 +134,10 @@ public interface IProcessFactory
     /// </summary>
     /// <param name="process"></param>
     /// <param name="resultValidation"></param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, ProcessResultValidation resultValidation, CancellationToken cancellationToken = default);
+    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, ProcessResultValidation resultValidation,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null, CancellationToken cancellationToken = default);
 
 }
