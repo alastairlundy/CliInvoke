@@ -102,6 +102,16 @@ public interface IProcessFactory
         ProcessTimeoutPolicy? processTimeoutPolicy = null, CancellationToken cancellationToken = default);
         
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="process"></param>
+    /// <param name="processConfiguration"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessConfiguration processConfiguration,
+        CancellationToken cancellationToken = default);
+    
+    /// <summary>
     /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
@@ -120,7 +130,17 @@ public interface IProcessFactory
     Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process,
         ProcessResultValidation resultValidation, ProcessTimeoutPolicy? processTimeoutPolicy = null,
         CancellationToken cancellationToken = default);
-        
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="process"></param>
+    /// <param name="processConfiguration"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process,
+        ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);  
+    
     /// <summary>
     /// 
     /// </summary>
@@ -139,5 +159,15 @@ public interface IProcessFactory
     /// <returns></returns>
     Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, ProcessResultValidation resultValidation,
         ProcessTimeoutPolicy? processTimeoutPolicy = null, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="process"></param>
+    /// <param name="processConfiguration"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
+        ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);  
 
 }
