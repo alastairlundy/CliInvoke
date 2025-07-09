@@ -11,12 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
-namespace AlastairLundy.CliInvoke.Core.Builders.Abstractions;
+namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
 /// An interface that defines the fluent builder methods all ProcessConfigurationBuilder classes must implement. 

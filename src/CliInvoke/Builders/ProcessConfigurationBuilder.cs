@@ -17,18 +17,18 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 #if NET5_0_OR_GREATER
-using System.Runtime.Versioning;
 #endif
 
-using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
 /// Builder class for creating process configurations.
@@ -456,7 +456,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="processTimeoutPolicy"></param>
     /// <returns></returns>
     [Pure]
-    public IProcessConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy)
+    public IProcessConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy? processTimeoutPolicy)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
