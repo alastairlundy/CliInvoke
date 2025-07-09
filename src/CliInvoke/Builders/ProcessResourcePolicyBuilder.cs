@@ -11,11 +11,9 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.DotPrimitives.Processes.Policies;
-#if NET5_0_OR_GREATER
-using System.Runtime.Versioning;
-#endif
 
 namespace AlastairLundy.CliInvoke.Builders;
 

@@ -8,7 +8,9 @@
    */
 
 using System.Diagnostics;
+
 using AlastairLundy.DotPrimitives.Processes.Policies;
+
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
@@ -27,8 +29,8 @@ public interface IProcessResourcePolicyBuilder
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
 #if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
 #endif
     IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity);
     

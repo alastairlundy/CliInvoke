@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
+
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
@@ -73,12 +74,12 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         ProcessResultValidation resultValidation = ProcessResultValidation.ExitCodeZero,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null, 
-        ProcessTimeoutPolicy timeoutPolicy = null, bool useShellExecution = false, bool windowCreation = false) : base("", arguments,
+        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        bool useShellExecution = false, bool windowCreation = false) : base("", arguments,
         workingDirectoryPath,
         requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
         standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-         timeoutPolicy, windowCreation, useShellExecution)
+        windowCreation: useShellExecution, useShellExecution: windowCreation)
     {
         base.TargetFilePath = TargetFilePath;
         _invoker = processInvoker;

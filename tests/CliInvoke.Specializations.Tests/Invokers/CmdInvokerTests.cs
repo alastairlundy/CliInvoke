@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke;
+using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Results;

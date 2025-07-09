@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security;
 using System.Text;
-
+using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;

@@ -43,11 +43,11 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.4.1" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.5.0-preview.2" />
     </ItemGroup>
     
     <ItemGroup >
-        <PackageReference Include="PolyFill" Version="8.6.0" 
+        <PackageReference Include="PolyFill" Version="8.7.0" 
                           Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"
         PrivateAssets="All"/>
     </ItemGroup>

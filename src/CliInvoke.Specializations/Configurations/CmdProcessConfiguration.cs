@@ -13,7 +13,6 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
@@ -69,12 +68,12 @@ public class CmdProcessConfiguration : ProcessConfiguration
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        ProcessTimeoutPolicy timeoutPolicy = null, bool useShellExecution = false, bool windowCreation = false) : 
+        bool useShellExecution = false, bool windowCreation = false) : 
         base("", arguments,
             workingDirectoryPath,
             requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
             standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-            timeoutPolicy, windowCreation, useShellExecution)
+            windowCreation: useShellExecution, useShellExecution: windowCreation)
     {
         base.TargetFilePath = this.TargetFilePath;
     }
