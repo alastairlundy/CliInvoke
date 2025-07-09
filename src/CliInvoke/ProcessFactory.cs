@@ -365,6 +365,10 @@ public class ProcessFactory : IProcessFactory
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
+        if(process.HasStarted() == false)
+            process = StartNew(process.StartInfo, processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default,
+            processConfiguration.Credential ?? UserCredential.Null);
+        
         process.StartInfo.RedirectStandardOutput = processConfiguration.StandardOutput is not null &&
                                                    processConfiguration.StandardOutput != StreamReader.Null;
         process.StartInfo.RedirectStandardError = processConfiguration.StandardError is not null &&
