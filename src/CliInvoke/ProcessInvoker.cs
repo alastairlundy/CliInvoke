@@ -141,7 +141,8 @@ public class ProcessInvoker : IProcessInvoker
 
         
         ProcessResult result =
-            await _processFactory.ContinueWhenExitAsync(process, processResultValidation, cancellationToken: cancellationToken);
+            await _processFactory.ContinueWhenExitAsync(process, processResultValidation, processTimeoutPolicy,
+                cancellationToken: cancellationToken);
 
         return result;
     }
@@ -176,7 +177,7 @@ public class ProcessInvoker : IProcessInvoker
         ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(processConfiguration.StandardInput is not null,
             true, true);
 
-        Process process = _processFactory.StartNew(processConfiguration);
+        Process process = _processFactory.StartNew(startInfo);
                               
         BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process,
             processConfiguration.ResultValidation, processConfiguration.TimeoutPolicy,
