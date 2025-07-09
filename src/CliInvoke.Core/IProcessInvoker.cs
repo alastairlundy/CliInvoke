@@ -38,6 +38,7 @@ public interface IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <param name="userCredential"></param>
     /// <param name="standardInput"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
@@ -45,6 +46,7 @@ public interface IProcessInvoker
     Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
+        ProcessTimeoutPolicy? processTimeoutPolicy  = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default);
@@ -64,6 +66,7 @@ public interface IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <param name="userCredential"></param>
     /// <param name="standardInput"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
@@ -71,6 +74,7 @@ public interface IProcessInvoker
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default);
@@ -90,6 +94,7 @@ public interface IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation"></param>
     /// <param name="processResourcePolicy"></param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <param name="userCredential"></param>
     /// <param name="standardInput"></param>
     /// <param name="cancellationToken"></param>
@@ -97,6 +102,7 @@ public interface IProcessInvoker
     Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default);
