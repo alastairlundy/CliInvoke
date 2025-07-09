@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.DotPrimitives.Processes;
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
@@ -25,7 +25,7 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 // ReSharper disable UnusedMethodReturnValue.Global
 
-namespace AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
+namespace AlastairLundy.CliInvoke.Extensions.StartInfos;
 
 public static class StartInfoApplyExtensions
 {

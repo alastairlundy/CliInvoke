@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Tests.Helpers;
 using AlastairLundy.CliInvoke.Tests.TestData;
-
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Results;
 using AlastairLundy.Resyslib.IO.Files;
 
 using Xunit;

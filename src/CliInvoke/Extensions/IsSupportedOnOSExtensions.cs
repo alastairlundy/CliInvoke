@@ -13,9 +13,10 @@ using System;
 #else
 using System.Runtime.InteropServices;
 #endif
-using AlastairLundy.CliInvoke.Core.Primitives;
 
-namespace AlastairLundy.CliInvoke.Core.Extensions;
+using AlastairLundy.DotPrimitives.Processes;
+
+namespace AlastairLundy.CliInvoke.Extensions;
 
 public static class IsSupportedOnOsExtensions
 {

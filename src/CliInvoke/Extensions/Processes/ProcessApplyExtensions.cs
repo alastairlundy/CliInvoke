@@ -10,14 +10,14 @@
 
 using System;
 using System.Diagnostics;
-using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.DotPrimitives.Processes;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Core.Extensions.Processes;
+namespace AlastairLundy.CliInvoke.Extensions.Processes;
 
 public static class ProcessApplyExtensions
 {

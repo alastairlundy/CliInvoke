@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
+
 using AlastairLundy.CliInvoke.Core;
+
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 
