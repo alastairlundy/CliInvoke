@@ -14,16 +14,16 @@ using System.IO;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Abstractions;
-using AlastairLundy.CliInvoke.Core.Extensions.Processes;
-using AlastairLundy.CliInvoke.Core.Piping.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Piping;
+
+using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+using AlastairLundy.DotPrimitives.Extensions.Processes;
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -78,7 +78,7 @@ public class ProcessInvoker : IProcessInvoker
         Process process = _processFactory.StartNew(processConfiguration);
 
         ProcessResult result = await _processFactory.ContinueWhenExitAsync(process,
-            processConfiguration.ResultValidation, cancellationToken);
+            processConfiguration.ResultValidation, cancellationToken: cancellationToken);
        
         if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
@@ -94,6 +94,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if not null.</param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <param name="userCredential"></param>
     /// <param name="standardInput"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
@@ -114,6 +115,7 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
@@ -139,7 +141,8 @@ public class ProcessInvoker : IProcessInvoker
 
         
         ProcessResult result =
-            await _processFactory.ContinueWhenExitAsync(process, processResultValidation, cancellationToken);
+            await _processFactory.ContinueWhenExitAsync(process, processResultValidation, processTimeoutPolicy,
+                cancellationToken: cancellationToken);
 
         return result;
     }
@@ -174,10 +177,11 @@ public class ProcessInvoker : IProcessInvoker
         ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(processConfiguration.StandardInput is not null,
             true, true);
 
-        Process process = _processFactory.StartNew(processConfiguration);
+        Process process = _processFactory.StartNew(startInfo);
                               
-        BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process, processConfiguration.ResultValidation,
-            cancellationToken);
+        BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process,
+            processConfiguration.ResultValidation, processConfiguration.TimeoutPolicy,
+             cancellationToken);
                               
         return result;
     }
@@ -188,6 +192,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The resource policy to be set if not null.</param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <param name="userCredential"></param>
     /// <param name="standardInput"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
@@ -208,6 +213,7 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
@@ -230,7 +236,7 @@ public class ProcessInvoker : IProcessInvoker
            process.SetResourcePolicy(processResourcePolicy);
 
         BufferedProcessResult result =
-            await _processFactory.ContinueWhenExitBufferedAsync(process, processResultValidation, cancellationToken);
+            await _processFactory.ContinueWhenExitBufferedAsync(process, processResultValidation, processTimeoutPolicy, cancellationToken);
 
         return result;
     }
@@ -262,7 +268,7 @@ public class ProcessInvoker : IProcessInvoker
         Process process = _processFactory.StartNew(startInfo);
 
         PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process, processConfiguration.ResultValidation,
-            cancellationToken);
+           processConfiguration.TimeoutPolicy, cancellationToken);
         
         return result;
     }
@@ -273,6 +279,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation"></param>
     /// <param name="processResourcePolicy"></param>
+    /// <param name="processTimeoutPolicy"></param>
     /// <param name="userCredential"></param>
     /// <param name="standardInput"></param>
     /// <param name="cancellationToken"></param>
@@ -290,7 +297,8 @@ public class ProcessInvoker : IProcessInvoker
 #endif
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo,
         ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy? processResourcePolicy = null, UserCredential? userCredential = null,
+        ProcessResourcePolicy? processResourcePolicy = null, ProcessTimeoutPolicy? processTimeoutPolicy = null,
+        UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
@@ -317,8 +325,8 @@ public class ProcessInvoker : IProcessInvoker
         if(processResourcePolicy is not null)
             process.SetResourcePolicy(processResourcePolicy);
         
-        PipedProcessResult result =
-            await _processFactory.ContinueWhenExitPipedAsync(process, processResultValidation, cancellationToken);
+        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process, processResultValidation, 
+            processTimeoutPolicy, cancellationToken);
 
         return result;
     }

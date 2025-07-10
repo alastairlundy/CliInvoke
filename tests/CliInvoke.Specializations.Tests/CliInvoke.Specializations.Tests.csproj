@@ -20,15 +20,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="PolyFill" Version="8.2.0" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'"/>
+        <PackageReference Include="PolyFill" Version="8.6.0" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'"/>
     </ItemGroup>
     
     <ItemGroup>
         <Using Include="Xunit"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Configurations\" />
     </ItemGroup>
 
     <ItemGroup>

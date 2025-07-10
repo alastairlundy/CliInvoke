@@ -56,7 +56,6 @@ CliInvoke's packages can be installed via the .NET SDK CLI, Nuget via your IDE o
 |-----------------------------------------|---------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
 | AlastairLundy.CliInvoke                 | [CliInvoke Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke)                                               | ``dotnet add package AlastairLundy.CliInvoke``                 |
 | AlastairLundy.CliInvoke.Extensions      | [AlastairLundy.CliInvoke.Extensions Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensions)           | ``dotnet add package AlastairLundy.CliInvoke.Extensions``      |
-| AlastairLundy.CliInvoke.Extensibility   | [AlastairLundy.CliInvoke.Extensibility Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensibility)     | ``dotnet add package AlastairLundy.CliInvoke.Extensibility``   |
 | AlastairLundy.CliInvoke.Specializations | [AlastairLundy.CliInvoke.Specializations Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations) | ``dotnet add package AlastairLundy.CliInvoke.Specializations`` |
 
 
@@ -95,27 +94,26 @@ The following example shows how to configure and build a Command that returns a 
 
 ```csharp
 using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
-
-using AlastairLundy.Extensions.Processes;
+using AlastairLundy.CliInvoke.Core.Builders;
 
   //Namespace and classs code ommitted for clarity 
 
   // ServiceProvider and Dependency Injection code ommitted for clarity
   
-  ICliCommandInvoker _commandInvoker = serviceProvider.GetRequiredService<ICliCommandInvoker>();
+  IProcessInvoker _processInvoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
   // Fluently configure your Command.
-  ICliCommandConfigurationBuilder builder = new CliCommandConfigurationBuilder("Path/To/Executable")
+  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
                             .WithArguments(["arg1", "arg2"])
                             .WithWorkingDirectory("/Path/To/Directory");
   
-  // Build it as a CliCommandConfiguration object when you're ready to use it.
-  CliCommandConfiguration commandConfig = builder.Build();
+  // Build it as a ProcessConfiguration object when you're ready to use it.
+  ProcessConfiguration config = builder.Build();
   
-  // Execute the CliCommand through CommandRunner and get the results.
-BufferedProcessResult result = await _commandInvoker.ExecuteBufferedAsync(commandConfig);
+  // Execute the process through ProcessInvoker and get the results.
+BufferedProcessResult result = await _processInvoker_.ExecuteBufferedAsync(config);
 ```
 
 ## How to Build CliInvoke's code

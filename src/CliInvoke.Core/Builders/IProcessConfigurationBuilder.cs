@@ -11,12 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using UserCredential = AlastairLundy.CliInvoke.Core.Primitives.UserCredential;
-using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 
-namespace AlastairLundy.CliInvoke.Core.Builders.Abstractions;
+namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
 /// An interface that defines the fluent builder methods all ProcessConfigurationBuilder classes must implement. 
@@ -121,6 +120,14 @@ public interface IProcessConfigurationBuilder
     /// <param name="processResourcePolicy">The process resource policy to use.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Process Resource Policy.</returns>
     IProcessConfigurationBuilder WithProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy);
+
+    /// <summary>
+    /// Sets the Process Timeout Policy to be used for this Process.
+    /// </summary>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use.</param>
+    /// <returns>The new ProcessConfigurationBuilder with the specified Process Timeout Policy.</returns>
+    IProcessConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
+
     
     /// <summary>
     /// Enables or disables Process execution via Shell Execution.

@@ -12,11 +12,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -74,7 +73,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
             workingDirectoryPath,
             requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
             standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-            useShellExecution, windowCreation)
+            windowCreation: useShellExecution, useShellExecution: windowCreation)
     {
         base.TargetFilePath = this.TargetFilePath;
     }

@@ -16,8 +16,9 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Internal;
+
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Internal.Localizations;
 using AlastairLundy.DotExtensions.Globalization;
 
 // ReSharper disable RedundantIfElseBlock
@@ -32,7 +33,7 @@ using AlastairLundy.DotExtensions.Globalization;
 
 #nullable enable
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
 /// A class that provides a fluent interface style builder for constructing Arguments to provide to a program.

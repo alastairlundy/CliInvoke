@@ -12,13 +12,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
+
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -79,7 +79,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         workingDirectoryPath,
         requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
         standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        useShellExecution, windowCreation)
+        windowCreation: useShellExecution, useShellExecution: windowCreation)
     {
         base.TargetFilePath = TargetFilePath;
         _invoker = processInvoker;

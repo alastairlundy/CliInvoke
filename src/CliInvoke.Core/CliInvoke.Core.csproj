@@ -22,29 +22,26 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.1</Version>
-        <PackageReleaseNotes>### Changes since 1.4.x
-* Removed deprecated code marked for removal in v2 - https://github.com/alastairlundy/CliInvoke/pull/47
-* Moved Builder implementations from CliInvoke to CliInvoke.Core - https://github.com/alastairlundy/CliInvoke/pull/46
-* Removed ``CliCommandConfiguration`` - This is being replaced by ``ProcessConfiguration``
-* Removed ``ICliCoommandConfigurationBuilder`` and ``CliCommandConfigurationBuilder`` - These are being replaced by ``IProcessConfigurationBuilder`` and ``ProcessConfigurationBuilder respectively.
-* Removed ``ICliCommandInvoker`` and ``CliCommandInvoker`` This has been replaced with ``IProcessInvoker``
-* Reworked ``PipedProcessResult`` to be easier to use.
-* Reworked ``IProcessFactory`` and ``ProcessFactory`` to support ``PipedProcessResult``
-* Reworked ``IProcessInvoker`` and ``ProcessInvoker`` to support ``PipedProcessResult`` and removed reliance on now removed and deprecated code.
-* Removed Extensibility package code and discontinued the Extensibility package - Reworked extensibility code has been moved to CliInvoke.Core for abstractions and CliInvoke for implementations.
+        <Version>2.0.0-alpha.2</Version>
+        <PackageReleaseNotes>## Changes
+* Updated dependencies
+* Moved Builder implementations back to CliInvoke from CliInvoke.Core
+* Moved primitives out of CliInvoke.Core into DotPrimitives
+* Moved ``IFilePathResolver`` into CliInvoke.Core  - Thereby allowing the removal of Resyslib.IO.Core as a dependency
 
-#### Core Only
-* Added ``IRunnerProcessCreator`` - An interface for creating Processes that run other processes.</PackageReleaseNotes>
+## 🚀 Features
+
+- add Initial Process Timeout Support @alastairlundy (#53) - ``IProcessInvoker`` and ``IProcessFactory`` have been updated to support this.
+- Added method ProcessConfiguration supporting method overloads for ``ContinueWhenExitAsync``, ``ContinueWhenBufferedExitAsync``, and ``ContinueWhenPipedAsync`` to `IProcessInvoker``, and ``IProcessFactory``</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.3.0" />
+        <PackageReference Include="AlastairLundy.DotPrimitives" Version="2.0.0" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
-        
-        <PackageReference Include="Polyfill" Version="8.0.1" 
+<!--        
+        <PackageReference Include="Polyfill" Version="8.6.0" 
                           Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'"
-        PrivateAssets="All"/>
+        PrivateAssets="All"/>-->
 
     </ItemGroup>
 

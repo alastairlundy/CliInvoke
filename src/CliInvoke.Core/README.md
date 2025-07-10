@@ -5,24 +5,15 @@ For an implementing package, check out [``AlastairLundy.CliInvoke``](https://www
 
 Key Abstractions:
 * ``IProcessFactory``
+* ``IProcessInvoker``
+
 * Piping:
   * ``IProcessPipeHandler``
 * Builders:
   * ``IEnvironmentVariablesBuilder``
   * ``IProcessResourcePolicyBuilder``
   * ``IUserCredentialBuilder``
-
-Some primitives added include:
-
-## Result Types
-* ``ProcessResult`` - For basic process result information
-* ``BufferedProcessResult`` - String copies of Standard Output and Standard Error + basic process result information.
-* ``PipedProcessResult`` - Process result information + Standard output and Standard Error pipes for more advanced piping scenarios.
-
-### Other Primitives
-* ``ProcessResultValidation`` - An enum representing whether process result validation should be performed or not.
-* ``ProcessConfiguration`` - A model class for representing Process configurations.
-
+  * 
 [![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
 

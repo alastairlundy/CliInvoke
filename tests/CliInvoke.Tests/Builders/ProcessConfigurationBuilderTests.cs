@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Security;
 using System.Text;
+using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Builders.Abstractions;
-using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
+using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.DotPrimitives.Processes.Results;
 using Xunit;
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;

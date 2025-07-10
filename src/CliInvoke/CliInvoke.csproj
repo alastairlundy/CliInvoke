@@ -13,26 +13,20 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### Changes since 1.4.x
-* Removed deprecated code marked for removal in v2 - https://github.com/alastairlundy/CliInvoke/pull/47
-* Moved Builder implementations from CliInvoke to CliInvoke.Core - https://github.com/alastairlundy/CliInvoke/pull/46
-* Removed ``CliCommandConfiguration`` - This is being replaced by ``ProcessConfiguration``
-* Removed ``ICliCoommandConfigurationBuilder`` and ``CliCommandConfigurationBuilder`` - These are being replaced by ``IProcessConfigurationBuilder`` and ``ProcessConfigurationBuilder respectively.
-* Removed ``ICliCommandInvoker`` and ``CliCommandInvoker`` This has been replaced with ``IProcessInvoker``
-* Reworked ``PipedProcessResult`` to be easier to use.
-* Reworked ``IProcessFactory`` and ``ProcessFactory`` to support ``PipedProcessResult``
-* Reworked ``IProcessInvoker`` and ``ProcessInvoker`` to support ``PipedProcessResult`` and removed reliance on now removed and deprecated code.
-* Removed Extensibility package code and discontinued the Extensibility package - Reworked extensibility code has been moved to CliInvoke.Core for abstractions and CliInvoke for implementations.
+        <PackageReleaseNotes>## Changes
+* Updated dependencies
+* Moved Builder implementations back to CliInvoke from CliInvoke.Core
+* Moved primitives out of CliInvoke.Core into DotPrimitives
+* Moved ``IFilePathResolver`` into CliInvoke.Core and ``FilePathResolver`` into CliInvoke directly - Thereby allowing the removal of Resyslib.IO.Core and Resyslib.IO as dependencies
 
-#### Core Only
-* Added ``IRunnerProcessCreator`` - An interface for creating Processes that run other processes.
+## 🚀 Features
 
-#### CliInvoke (main package) Only
-* Added ``RunnerProcessCreator`` - A class implementation of ``IRunnerProcessCreator`` for creating Processes that run other processes.</PackageReleaseNotes>
+- add Initial Process Timeout Support @alastairlundy (#53) - ``IProcessInvoker``, ``IProcessFactory``, ``ProcessInvoker``, and ``ProcessFactory`` have been updated to support this.
+- Added method ProcessConfiguration supporting method overloads for ``ContinueWhenExitAsync``, ``ContinueWhenBufferedExitAsync``, and ``ContinueWhenPipedAsync`` to `IProcessInvoker``, ``IProcessFactory``, ``ProcessInvoker``, and ``ProcessFactory``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.1</PackageVersion>
+        <PackageVersion>2.0.0-alpha.2</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -43,11 +37,12 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.3.0" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.2" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.5.0-preview.2" />
     </ItemGroup>
     
     <ItemGroup >
-        <PackageReference Include="PolyFill" Version="8.2.0" 
+        <PackageReference Include="PolyFill" Version="8.7.0" 
                           Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"
         PrivateAssets="All"/>
     </ItemGroup>
@@ -85,9 +80,5 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
 </Project>

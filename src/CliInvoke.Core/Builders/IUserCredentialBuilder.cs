@@ -9,9 +9,9 @@
 
 using System;
 using System.Security;
-using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.DotPrimitives.Processes;
 
-namespace AlastairLundy.CliInvoke.Core.Builders.Abstractions;
+namespace AlastairLundy.CliInvoke.Core.Builders;
 
 public interface IUserCredentialBuilder : IDisposable
 {
