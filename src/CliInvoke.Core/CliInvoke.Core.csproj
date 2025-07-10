@@ -22,15 +22,20 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.4.4</Version>
-        <PackageReleaseNotes>Update internal Polyfill dependency to 8.4.0 and updated DotExtensions to 7.4.1 from 7.2.1</PackageReleaseNotes>
+        <Version>1.4.5</Version>
+        <PackageReleaseNotes>### Changes since 1.4.4
+
+### Core 
+* Updated to DotExtensions 7.4.2 from 7.4.1
+* Updated internal Polyfill version from 8.4.0 to 8.7.0
+* Updated System.IO.Pipelines from 9.0.6 to 9.0.7</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.4.1" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.4.2" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
         
-        <PackageReference Include="Polyfill" Version="8.4.0" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" PrivateAssets="All" />
+        <PackageReference Include="Polyfill" Version="8.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" PrivateAssets="All" />
 
     </ItemGroup>
 
@@ -66,14 +71,14 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-      <PackageReference Include="System.IO.Pipelines" Version="9.0.6" />
+      <PackageReference Include="System.IO.Pipelines" Version="9.0.7" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-      <PackageReference Include="System.IO.Pipelines" Version="9.0.6" />
+      <PackageReference Include="System.IO.Pipelines" Version="9.0.7" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-      <PackageReference Include="System.IO.Pipelines" Version="9.0.6" />
+      <PackageReference Include="System.IO.Pipelines" Version="9.0.7" />
     </ItemGroup>
 </Project>
