@@ -16,6 +16,7 @@ All Command specialization classes come with an already configured TargetFilePat
 The CmdCommand's TargetFilePath points to Windows' copy of cmd.exe .
 
 ```csharp
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
@@ -39,6 +40,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
 If the result of the command being run is not of concern you can call ``ExecuteAsync()`` instead of ``ExecuteBufferedAsync()`` and ignore the returned CommandResult like so:
 ```csharp
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
@@ -65,6 +67,7 @@ using AlastairLundy.CliInvoke.Specializations;
 The ClassicPowershellCommand is a specialized Command class with an already configured TargetFilePath that points to Windows' copy of powershell.exe .
 
 ```csharp
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
@@ -89,6 +92,7 @@ using AlastairLundy.CliInvoke.Specializations;
 The PowershellCommand's TargetFilePath points to the installed copy of cross-platform Powershell if it is installed.
 
 ```csharp
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;

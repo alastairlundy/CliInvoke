@@ -26,7 +26,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="8.4.0" PrivateAssets="All"/>
+        <PackageReference Include="Polyfill" Version="8.7.0" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -61,7 +61,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.4.4" />
+      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.4.5" />
       <PackageReference Include="AlastairLundy.CliInvoke.Extensibility" Version="1.4.4" />
     </ItemGroup>
 </Project>
