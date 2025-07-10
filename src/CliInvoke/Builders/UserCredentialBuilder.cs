@@ -13,7 +13,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Security;
+
 using AlastairLundy.CliInvoke.Core.Builders;
+
 using AlastairLundy.DotPrimitives.Processes;
 
 
