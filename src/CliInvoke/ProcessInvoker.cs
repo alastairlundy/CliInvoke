@@ -35,11 +35,12 @@ public class ProcessInvoker : IProcessInvoker
     private readonly IProcessPipeHandler _processPipeHandler;
     
     private readonly IProcessFactory _processFactory;
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="processFactory"></param>
+    /// <param name="processPipeHandler"></param>
     public ProcessInvoker(IProcessFactory processFactory, IProcessPipeHandler processPipeHandler)
     {
         _processFactory = processFactory;
@@ -47,7 +48,7 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// Runs the process synchronously, waits for exit, and safely disposes of the Process before returning.
+    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
@@ -94,9 +95,9 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if not null.</param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="userCredential"></param>
-    /// <param name="standardInput"></param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
+    /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
+    /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -148,7 +149,8 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
+    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
+    /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
@@ -187,14 +189,15 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
+    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
+    /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
     /// <param name="processResourcePolicy">The resource policy to be set if not null.</param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="userCredential"></param>
-    /// <param name="standardInput"></param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
+    /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
+    /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -242,11 +245,12 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// 
+    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
+    /// gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Piped Process Results from running the process.</returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -274,16 +278,17 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// 
+    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
+    /// gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processStartInfo"></param>
-    /// <param name="processResultValidation"></param>
-    /// <param name="processResourcePolicy"></param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="userCredential"></param>
-    /// <param name="standardInput"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="processResultValidation">The process result validation to be used.</param>
+    /// <param name="processResourcePolicy">The resource policy to be set if not null.</param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
+    /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
+    /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Piped Process Results from running the process.</returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
