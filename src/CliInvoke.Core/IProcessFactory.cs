@@ -168,6 +168,6 @@ public interface IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
-        ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);  
+        ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);
 
 }
