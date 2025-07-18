@@ -348,7 +348,7 @@ public class ProcessFactory : IProcessFactory
     /// 
     /// </summary>
     /// <param name="process"></param>
-    /// <param name="processConfiguration"></param>
+    /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <exception cref="ProcessNotSuccessfulException"></exception>
@@ -448,7 +448,7 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
+    /// A Task that returns a BufferedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
@@ -510,13 +510,13 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// 
+    /// A Task that returns a BufferedProcessResult when the specified process exits.
     /// </summary>
-    /// <param name="process"></param>
-    /// <param name="processConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ProcessNotSuccessfulException"></exception>
+    /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The task and BufferedProcessResult that are returned upon the process' exit.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -588,11 +588,11 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// 
+    /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
-    /// <param name="process"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The Buffered Process Result that is returned from running the process.</returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -611,14 +611,14 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// 
+    /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
-    /// <param name="process"></param>
-    /// <param name="resultValidation"></param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ProcessNotSuccessfulException"></exception>
+    /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -676,13 +676,13 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// 
+    /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
-    /// <param name="process"></param>
-    /// <param name="processConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ProcessNotSuccessfulException"></exception>
+    /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]

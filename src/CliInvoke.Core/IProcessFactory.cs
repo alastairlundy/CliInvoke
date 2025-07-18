@@ -83,7 +83,7 @@ public interface IProcessFactory
     Process StartNew(ProcessConfiguration configuration);
 
     /// <summary>
-    /// Creates a Task that returns a ProcessResult when the specified process exits.
+    /// A Task that returns a ProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
@@ -91,7 +91,7 @@ public interface IProcessFactory
     Task<ProcessResult> ContinueWhenExitAsync(Process process, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a Task that returns a ProcessResult when the specified process exits.
+    /// A Task that returns a ProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
@@ -102,7 +102,7 @@ public interface IProcessFactory
         ProcessTimeoutPolicy? processTimeoutPolicy = null, CancellationToken cancellationToken = default);
         
     /// <summary>
-    /// Creates a Task that returns a ProcessResult when the specified process exits.
+    /// A Task that returns a ProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
@@ -112,7 +112,7 @@ public interface IProcessFactory
         CancellationToken cancellationToken = default);
     
     /// <summary>
-    /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
+    /// A Task that returns a BufferedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
@@ -120,7 +120,7 @@ public interface IProcessFactory
     Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
+    /// A Task that returns a BufferedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
@@ -132,7 +132,7 @@ public interface IProcessFactory
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
+    /// A Task that returns a BufferedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
@@ -142,7 +142,7 @@ public interface IProcessFactory
         ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);  
     
     /// <summary>
-    /// Creates a Task that returns a PipedProcessResult when the specified process exits.
+    /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
@@ -150,7 +150,7 @@ public interface IProcessFactory
     Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a Task that returns a PipedProcessResult when the specified process exits.
+    /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
@@ -161,7 +161,7 @@ public interface IProcessFactory
         ProcessTimeoutPolicy? processTimeoutPolicy = null, CancellationToken cancellationToken = default);
     
     /// <summary>
-    /// Creates a Task that returns a PipedProcessResult when the specified process exits.
+    /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>

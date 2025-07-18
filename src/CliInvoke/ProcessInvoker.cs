@@ -248,7 +248,7 @@ public class ProcessInvoker : IProcessInvoker
     /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
     /// gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfiguration"></param>
+    /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
 #if NET5_0_OR_GREATER

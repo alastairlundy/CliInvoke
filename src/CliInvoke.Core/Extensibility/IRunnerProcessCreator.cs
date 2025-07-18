@@ -11,6 +11,9 @@ using AlastairLundy.DotPrimitives.Processes;
 
 namespace AlastairLundy.CliInvoke.Core.Extensibility;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IRunnerProcessCreator
 {
     /// <summary>
