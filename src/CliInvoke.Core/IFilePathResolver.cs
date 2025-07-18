@@ -10,7 +10,7 @@
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
-/// 
+/// Defines a contract for a service that resolves file paths.
 /// </summary>
 public interface IFilePathResolver
 {
