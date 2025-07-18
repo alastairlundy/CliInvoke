@@ -11,7 +11,6 @@
 
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,6 +23,10 @@ using AlastairLundy.DotPrimitives.Extensions.Processes;
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
+
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 
 namespace AlastairLundy.CliInvoke;
 

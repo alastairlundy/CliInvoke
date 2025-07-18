@@ -19,6 +19,7 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+
 using AlastairLundy.DotExtensions.Globalization;
 
 // ReSharper disable RedundantIfElseBlock
@@ -113,7 +114,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
             }
             else
             {
-                throw new InvalidOperationException(Resources.Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}", int.MaxValue.ToString()));
+                throw new InvalidOperationException(Resources
+                    .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}", int.MaxValue.ToString()));
             }
             
             if (_argumentValidationLogic != null)
@@ -158,10 +160,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<string> values, bool escapeSpecialChars)
     {
-        if (escapeSpecialChars)
-        {
+        if (escapeSpecialChars) 
             values = values.Select(x => EscapeSpecialCharacters(x));
-        }
         
         values = values.Where(x => IsValidArgument(x));
         
@@ -222,7 +222,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         {
             string? newVal = (string?)cultureInfo.GetFormat(value.GetType());
 
-            if (newVal == null)
+            if (newVal is null)
             {
                 throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace("{x}", nameof(value)));
             }
