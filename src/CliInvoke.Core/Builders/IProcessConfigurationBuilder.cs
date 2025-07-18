@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
@@ -18,7 +19,7 @@ using AlastairLundy.DotPrimitives.Processes.Results;
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
-/// An interface that defines the fluent builder methods all ProcessConfigurationBuilder classes must implement. 
+/// An interface that defines fluent builder methods for configuring a Process Configuration. 
 /// </summary>
 public interface IProcessConfigurationBuilder
 {
@@ -151,8 +152,8 @@ public interface IProcessConfigurationBuilder
     /// <param name="standardErrorEncoding">The encoding type to be used for the Standard Error.</param>
     /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
     IProcessConfigurationBuilder WithEncoding(Encoding? standardInputEncoding = null,
-        Encoding standardOutputEncoding = null,
-        Encoding standardErrorEncoding = null);
+        Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null);
 
     /// <summary>
     /// Builds the Process configuration with the configured parameters.
