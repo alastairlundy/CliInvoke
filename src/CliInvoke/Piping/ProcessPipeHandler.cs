@@ -9,8 +9,13 @@
 
 using System.Diagnostics;
 using System.IO;
+
+#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
+#endif
+
 using System.Threading.Tasks;
+
 using AlastairLundy.CliInvoke.Core.Piping;
 
 namespace AlastairLundy.CliInvoke.Piping;
