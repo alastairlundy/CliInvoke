@@ -13,6 +13,7 @@
 
 using System;
 using System.Diagnostics;
+
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -27,12 +28,11 @@ namespace AlastairLundy.CliInvoke.Exceptions;
 public sealed class ProcessNotSuccessfulException : Exception
 {
 
-#if NET5_0_OR_GREATER 
     /// <summary>
     /// The command that was executed.
     /// </summary>
     public Process? ExecutedProcess { get; private set; }
-#endif
+
     /// <summary>
     /// The exit code of the Command that was executed.
     /// </summary>
@@ -46,9 +46,7 @@ public sealed class ProcessNotSuccessfulException : Exception
     {
         ExitCode = exitCode;
             
-#if NET5_0_OR_GREATER
         ExecutedProcess = null;
-#endif
     }
 
     /// <summary>
@@ -59,14 +57,12 @@ public sealed class ProcessNotSuccessfulException : Exception
     public ProcessNotSuccessfulException(int exitCode, Process process) : base(Resources.Exceptions_ProcessNotSuccessful_Specific.Replace("{y}", exitCode.ToString()
         .Replace("{x}", process.StartInfo.FileName)))
     {
-#if NET5_0_OR_GREATER
         ExecutedProcess = process;
 
         if (ExecutedProcess is not null)
         {
             Source = ExecutedProcess.StartInfo.FileName;
         }
-#endif
             
         ExitCode = exitCode;
     }

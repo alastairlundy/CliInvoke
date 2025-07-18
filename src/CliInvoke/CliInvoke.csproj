@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net8.0;netstandard2.0;netstandard2.1;net9.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
         <Title>AlastairLundy.CliInvoke</Title>
@@ -42,7 +42,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="PolyFill" Version="8.7.3" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" PrivateAssets="All" />
+        <PackageReference Include="PolyFill" Version="8.7.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" PrivateAssets="All" />
     </ItemGroup>
     
     <ItemGroup>

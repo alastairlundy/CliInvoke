@@ -17,14 +17,16 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Builders;
+
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
+
 #if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
 #endif
 
 

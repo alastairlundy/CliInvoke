@@ -13,6 +13,9 @@ using AlastairLundy.DotPrimitives.Processes;
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IUserCredentialBuilder : IDisposable
 {
     /// <summary>
