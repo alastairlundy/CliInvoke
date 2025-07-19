@@ -95,8 +95,11 @@ The following example shows how to configure and build a Command that returns a 
 ```csharp
 using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Core;
+
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
+
+using AlastairLundy.DotPrimitives.Processes.Results;
 
   //Namespace and classs code ommitted for clarity 
 
