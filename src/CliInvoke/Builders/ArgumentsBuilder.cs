@@ -103,14 +103,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
             if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
             {
-                if (escapeSpecialCharacters)
-                {
-                    _buffer.Append(EscapeSpecialCharacters(value));
-                }
-                else
-                {
-                    _buffer.Append(value);
-                }
+                _buffer.Append(escapeSpecialCharacters ? EscapeSpecialCharacters(value) : value);
             }
             else
             {
@@ -293,14 +286,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
             
             newVal = val.ToString(newVal, formatProvider);
 
-            if (escapeSpecialChars)
-            {
-                strings.Add(EscapeSpecialCharacters(newVal));
-            }
-            else
-            {
-                strings.Add(newVal);
-            }
+            strings.Add(escapeSpecialChars ? EscapeSpecialCharacters(newVal) : newVal);
         }
 
         return Add(strings, escapeSpecialChars);
