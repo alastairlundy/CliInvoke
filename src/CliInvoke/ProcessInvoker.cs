@@ -39,11 +39,11 @@ public class ProcessInvoker : IProcessInvoker
     
     private readonly IProcessFactory _processFactory;
 
-    /// <summary>
-    /// 
+    /// <summary>  
+    /// Instantiates an invoker for invoking processes, providing a centralized way to execute external commands.
     /// </summary>
-    /// <param name="processFactory"></param>
-    /// <param name="processPipeHandler"></param>
+    /// <param name="processFactory">The process factory to be used to create and run the invoked processes.</param>
+    /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessInvoker(IProcessFactory processFactory, IProcessPipeHandler processPipeHandler)
     {
         _processFactory = processFactory;

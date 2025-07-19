@@ -128,7 +128,6 @@ public interface IProcessConfigurationBuilder
     /// <param name="processTimeoutPolicy">The process timeout policy to use.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Process Timeout Policy.</returns>
     IProcessConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
-
     
     /// <summary>
     /// Enables or disables Process execution via Shell Execution.

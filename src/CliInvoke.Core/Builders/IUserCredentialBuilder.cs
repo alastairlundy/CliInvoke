@@ -14,7 +14,7 @@ using AlastairLundy.DotPrimitives.Processes;
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
-/// 
+/// A fluent builder interface for configuring and building a UserCredential.
 /// </summary>
 public interface IUserCredentialBuilder : IDisposable
 {

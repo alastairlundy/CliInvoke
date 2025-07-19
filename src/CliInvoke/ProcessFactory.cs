@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+#nullable enable
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -37,7 +39,7 @@ using AlastairLundy.DotPrimitives.Processes.Results;
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// 
+/// Factory class for creating new processes.
 /// </summary>
 public class ProcessFactory : IProcessFactory
 {
@@ -46,10 +48,10 @@ public class ProcessFactory : IProcessFactory
     private readonly IProcessPipeHandler _processPipeHandler;
 
     /// <summary>
-    /// 
+    /// Instantiates a ProcessFactory to be used for creating and running Processes, as well as safely disposing of a Process when it exits.
     /// </summary>
-    /// <param name="filePathResolver"></param>
-    /// <param name="processPipeHandler"></param>
+    /// <param name="filePathResolver">The file path resolver to use.</param>
+    /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessFactory(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
@@ -295,7 +297,7 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
-    /// <param name="processTimeoutPolicy"></param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and ProcessResult that are returned upon completion of the task.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
@@ -311,7 +313,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("browser")]
 #endif
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation,
-        ProcessTimeoutPolicy processTimeoutPolicy = null,
+        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         CancellationToken cancellationToken = default)
     {
         if (processTimeoutPolicy is not null)
@@ -345,12 +347,12 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// 
+    /// Creates a Task that returns a ProcessResult when the specified process exits.
     /// </summary>
-    /// <param name="process"></param>
+    /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The task and ProcessResult that are returned upon completion of the task.</returns>
     /// <exception cref="ProcessNotSuccessfulException"></exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
@@ -452,7 +454,7 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
-    /// <param name="processTimeoutPolicy"></param>
+    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>

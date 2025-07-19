@@ -19,6 +19,8 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 
+#nullable enable
+
 using AlastairLundy.CliInvoke.Core.Builders;
 
 using AlastairLundy.DotPrimitives.Processes;

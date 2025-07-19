@@ -8,7 +8,9 @@
  */
 
 using System.IO;
+
 using AlastairLundy.CliInvoke.Builders;
+
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Extensibility;
 

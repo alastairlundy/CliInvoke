@@ -7,9 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#if NET5_0_OR_GREATER
 #nullable enable
-#endif
 
 using System;
 using System.Diagnostics;
@@ -27,7 +25,7 @@ namespace AlastairLundy.CliInvoke.Exceptions;
 /// </summary>
 public sealed class ProcessNotSuccessfulException : Exception
 {
-
+    
     /// <summary>
     /// The command that was executed.
     /// </summary>
