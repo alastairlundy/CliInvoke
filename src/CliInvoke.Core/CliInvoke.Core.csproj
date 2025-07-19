@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>AlastairLundy.CliInvoke.Core</AssemblyName>
@@ -32,10 +32,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.4.2" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.5.1" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
         
-        <PackageReference Include="Polyfill" Version="8.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'" PrivateAssets="All" />
+        <PackageReference Include="Polyfill" Version="8.7.3" Condition="'$(TargetFramework)' == 'netstandard2.0'"
+                          PrivateAssets="All" />
 
     </ItemGroup>
 
@@ -75,10 +76,6 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-      <PackageReference Include="System.IO.Pipelines" Version="9.0.7" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
       <PackageReference Include="System.IO.Pipelines" Version="9.0.7" />
     </ItemGroup>
 </Project>
