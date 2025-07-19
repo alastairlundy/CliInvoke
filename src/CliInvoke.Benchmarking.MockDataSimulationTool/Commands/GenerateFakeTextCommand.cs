@@ -89,6 +89,7 @@ public class GenerateFakeTextCommand : ICommand<GenerateFakeTextCommand.Settings
             NumberOfFakeTextLines = 100,
         };
         
-        return await Execute(context, settingsActual);
+        return await Execute(context,
+            settingsActual);
     }
 }

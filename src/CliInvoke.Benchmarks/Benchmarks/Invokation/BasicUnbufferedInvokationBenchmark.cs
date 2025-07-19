@@ -80,7 +80,8 @@ public class BasicUnbufferedInvokationBenchmark
     public async Task<int> MedallionShell()
     {
         Medallion.Shell.CommandResult result = await Medallion.Shell.Command
-            .Run(_dotnetCommandHelper.DotnetExecutableTargetFilePath, _dotnetCommandHelper.Arguments).Task;
+            .Run(_dotnetCommandHelper.DotnetExecutableTargetFilePath,
+                _dotnetCommandHelper.Arguments).Task;
         
         return result.ExitCode;
     }
@@ -91,7 +92,9 @@ public class BasicUnbufferedInvokationBenchmark
         int exitCode = 0;
         
         await global::SimpleExec.Command.RunAsync(_dotnetCommandHelper.DotnetExecutableTargetFilePath,
-            _dotnetCommandHelper.Arguments, createNoWindow:true,  handleExitCode: code => (exitCode = code) < 8);
+            _dotnetCommandHelper.Arguments,
+            createNoWindow: true,
+            handleExitCode: code => (exitCode = code) < 8);
 
         return await new ValueTask<int>(exitCode);
     }

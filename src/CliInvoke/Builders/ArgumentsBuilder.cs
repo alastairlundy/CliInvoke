@@ -108,12 +108,14 @@ public class ArgumentsBuilder : IArgumentsBuilder
             else
             {
                 throw new InvalidOperationException(Resources
-                    .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}", int.MaxValue.ToString()));
+                    .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
+                        int.MaxValue.ToString()));
             }
             
             if (_argumentValidationLogic != null)
             {
-                return new ArgumentsBuilder(_buffer, _argumentValidationLogic);
+                return new ArgumentsBuilder(_buffer,
+                    _argumentValidationLogic);
             }
             else
             {
@@ -136,7 +138,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         if (IsValidArgument(value) == true )
         {
-            return Add(value, false);
+            return Add(value,
+                false);
         }
         else
         {
@@ -158,9 +161,11 @@ public class ArgumentsBuilder : IArgumentsBuilder
         
         values = values.Where(x => IsValidArgument(x));
         
-        string joinedValues = string.Join(" ", values);
+        string joinedValues = string.Join(" ",
+            values);
         
-        return Add(joinedValues, escapeSpecialChars);
+        return Add(joinedValues,
+            escapeSpecialChars);
     }
 
     /// <summary>
@@ -171,7 +176,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<string> values)
     {
-        return Add(values, false);
+        return Add(values,
+            false);
     }
 
     /// <summary>
@@ -190,10 +196,14 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
             if (val == null)
             {
-                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace("{x}", nameof(value)));
+                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace(
+                    "{x}",
+                    nameof(value)));
             }
            
-            return Add(value.ToString(val, formatProvider), escapeSpecialChars);
+            return Add(value.ToString(val,
+                    formatProvider),
+                escapeSpecialChars);
         }
         else
         {
@@ -217,10 +227,14 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
             if (newVal is null)
             {
-                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace("{x}", nameof(value)));
+                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace(
+                    "{x}",
+                    nameof(value)));
             }
             
-            return Add(value.ToString(newVal, DefaultFormatProvider), escapeSpecialChars);
+            return Add(value.ToString(newVal,
+                    DefaultFormatProvider),
+                escapeSpecialChars);
         }
         else
         {
@@ -237,7 +251,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IFormattable value, CultureInfo cultureInfo)
     {
-        return Add(value, cultureInfo, false);
+        return Add(value,
+            cultureInfo,
+            false);
     }
 
     /// <summary>
@@ -249,7 +265,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IFormattable value, bool escapeSpecialChars)
     {
-        return Add(value, CultureInfo.CurrentCulture, escapeSpecialChars);
+        return Add(value,
+            CultureInfo.CurrentCulture,
+            escapeSpecialChars);
     }
 
     /// <summary>
@@ -260,7 +278,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IFormattable value)
     {
-        return Add(value, false);
+        return Add(value,
+            false);
     }
         
     /// <summary>
@@ -281,15 +300,19 @@ public class ArgumentsBuilder : IArgumentsBuilder
            
             if (newVal == null)
             {
-                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace("{x}", nameof(val)));
+                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace(
+                    "{x}",
+                    nameof(val)));
             }
             
-            newVal = val.ToString(newVal, formatProvider);
+            newVal = val.ToString(newVal,
+                formatProvider);
 
             strings.Add(escapeSpecialChars ? EscapeSpecialCharacters(newVal) : newVal);
         }
 
-        return Add(strings, escapeSpecialChars);
+        return Add(strings,
+            escapeSpecialChars);
     }
 
     /// <summary>
@@ -306,17 +329,21 @@ public class ArgumentsBuilder : IArgumentsBuilder
         
         foreach (IFormattable val in values)
         {
-            string newVal = val.ToString((string?)cultureInfo.GetFormat(val.GetType()), DefaultFormatProvider);
+            string newVal = val.ToString((string?)cultureInfo.GetFormat(val.GetType()),
+                DefaultFormatProvider);
 
             if (newVal == null)
             {
-                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace("{x}", nameof(newVal)));
+                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace(
+                    "{x}",
+                    nameof(newVal)));
             }
             
             strings.Add(escapeSpecialChars ? EscapeSpecialCharacters(newVal) : newVal);
         }
         
-        return Add(strings, escapeSpecialChars);
+        return Add(strings,
+            escapeSpecialChars);
     }
 
     /// <summary>
@@ -328,7 +355,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<IFormattable> values, CultureInfo cultureInfo)
     {
-        return Add(values, cultureInfo, false);
+        return Add(values,
+            cultureInfo,
+            false);
     }
         
     /// <summary>
@@ -340,7 +369,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<IFormattable> values, bool escapeSpecialChars)
     {
-        return Add(values, CultureInfo.CurrentCulture, escapeSpecialChars);
+        return Add(values,
+            CultureInfo.CurrentCulture,
+            escapeSpecialChars);
     }
 
     /// <summary>
@@ -351,7 +382,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<IFormattable> values)
     {
-        return Add(values, false);
+        return Add(values,
+            false);
     }
 
     /// <summary>
@@ -362,12 +394,18 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public string EscapeSpecialCharacters(string argument)
     {
-        return argument.Replace("\\", "\\\\")
-            .Replace("\n", "\\n")
-            .Replace("\t", "\\t")
-            .Replace("\r", "\\r")
-            .Replace("\"", "\\\"")
-            .Replace("'", "\\'");
+        return argument.Replace("\\",
+                "\\\\")
+            .Replace("\n",
+                "\\n")
+            .Replace("\t",
+                "\\t")
+            .Replace("\r",
+                "\\r")
+            .Replace("\"",
+                "\\\"")
+            .Replace("'",
+                "\\'");
     }
 
     /// <summary>
