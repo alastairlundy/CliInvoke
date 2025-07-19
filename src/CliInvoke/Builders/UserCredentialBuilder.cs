@@ -51,7 +51,8 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public IUserCredentialBuilder SetDomain(string? domain) =>
         new UserCredentialBuilder
         {
-           _userCredential = new UserCredential(domain, _userCredential.UserName, 
+           _userCredential = new UserCredential(domain,
+               _userCredential.UserName,
 #pragma warning disable CA1416
                _userCredential.Password,
                _userCredential.LoadUserProfile)
@@ -68,7 +69,8 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         new UserCredentialBuilder
         {
 #pragma warning disable CA1416
-            _userCredential = new UserCredential(_userCredential.Domain, username, 
+            _userCredential = new UserCredential(_userCredential.Domain,
+                username,
                 _userCredential.Password,
                 _userCredential.LoadUserProfile)
 #pragma warning restore CA1416
@@ -84,8 +86,9 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         new UserCredentialBuilder
         {
 #pragma warning disable CA1416
-            _userCredential = new UserCredential(_userCredential.Domain, 
-                _userCredential.UserName, password,
+            _userCredential = new UserCredential(_userCredential.Domain,
+                _userCredential.UserName,
+                password,
                 _userCredential.LoadUserProfile)
 #pragma warning restore CA1416
         };
@@ -100,7 +103,8 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         new UserCredentialBuilder
         {
 #pragma warning disable CA1416
-            _userCredential = new UserCredential(_userCredential.Domain, _userCredential.UserName, 
+            _userCredential = new UserCredential(_userCredential.Domain,
+                _userCredential.UserName,
                 _userCredential.Password,
                 loadUserProfile)
 #pragma warning restore CA1416
@@ -113,7 +117,8 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public UserCredential Build() =>
 #pragma warning disable CA1416
-        new UserCredential(_userCredential.Domain, _userCredential.UserName,
+        new UserCredential(_userCredential.Domain,
+            _userCredential.UserName,
             _userCredential.Password,
             _userCredential.LoadUserProfile);
 #pragma warning restore CA1416

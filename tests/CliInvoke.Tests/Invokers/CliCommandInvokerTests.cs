@@ -40,7 +40,9 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
                 */
             
             _processInvoker = new ProcessInvoker(
-                new ProcessFactory(new FilePathResolver(), new ProcessPipeHandler()), new ProcessPipeHandler());
+                new ProcessFactory(new FilePathResolver(),
+                    new ProcessPipeHandler()),
+                new ProcessPipeHandler());
             
           //  _crossPlatformTestExecutables = new CrossPlatformTestExecutables(_cliCommandInvoker);
         }
@@ -77,7 +79,8 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
             
                 ProcessConfiguration commandConfiguration = configurationBuilder.Build();
                 
-                ProcessResult result = await _processInvoker.ExecuteAsync(commandConfiguration, CancellationToken.None);
+                ProcessResult result = await _processInvoker.ExecuteAsync(commandConfiguration,
+                    CancellationToken.None);
                 
                 Assert.True(Process.GetProcessesByName("Calculator").Any() &&
                             result.WasSuccessful);

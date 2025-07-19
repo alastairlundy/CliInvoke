@@ -58,7 +58,9 @@ public static class DependencyInjectionExtensions
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
+                throw new ArgumentOutOfRangeException(nameof(lifetime),
+                    lifetime,
+                    null);
         }
         
         return services;
