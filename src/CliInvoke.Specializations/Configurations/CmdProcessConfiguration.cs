@@ -13,6 +13,7 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
+
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
