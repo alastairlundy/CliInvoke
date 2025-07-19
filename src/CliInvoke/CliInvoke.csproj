@@ -38,7 +38,7 @@ Update to CliInvoke.Core 1.4.5</PackageReleaseNotes>
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.4.2" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.5.1" />
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.4.5" />
         <PackageReference Include="AlastairLundy.Resyslib.IO.Core" Version="[3.2.0, 4.0.0)" />
     </ItemGroup>
