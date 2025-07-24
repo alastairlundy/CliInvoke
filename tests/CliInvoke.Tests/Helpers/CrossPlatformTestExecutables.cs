@@ -7,11 +7,10 @@ using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Piping;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Results;
-
 
 namespace AlastairLundy.CliInvoke.Tests.Helpers
 {

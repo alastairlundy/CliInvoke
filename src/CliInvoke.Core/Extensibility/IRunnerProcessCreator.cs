@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.DotPrimitives.Processes;
 
 namespace AlastairLundy.CliInvoke.Core.Extensibility;

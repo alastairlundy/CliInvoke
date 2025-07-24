@@ -13,7 +13,7 @@ using AlastairLundy.CliInvoke.Builders;
 
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Extensibility;
-
+using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 

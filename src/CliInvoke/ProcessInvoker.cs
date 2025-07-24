@@ -16,13 +16,13 @@ using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Piping;
-
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
-using AlastairLundy.DotPrimitives.Extensions.Processes;
+
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Processes.Results;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;

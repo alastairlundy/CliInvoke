@@ -11,9 +11,11 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Results;
+
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Processes.Results;
 
 namespace AlastairLundy.CliInvoke.Core;
 
