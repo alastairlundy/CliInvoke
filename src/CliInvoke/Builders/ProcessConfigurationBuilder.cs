@@ -19,13 +19,11 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 #nullable enable
 
 using AlastairLundy.CliInvoke.Core.Builders;
-
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;

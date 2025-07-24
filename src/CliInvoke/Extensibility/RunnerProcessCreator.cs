@@ -14,15 +14,14 @@ using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Extensibility;
 using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace AlastairLundy.CliInvoke.Extensibility;
 
 /// <summary>
-/// A class to allow creating Processes that can be run through other Processes.
+/// A class to allow creating ProcessPrimitives that can be run through other ProcessPrimitives.
 /// </summary>
 public class RunnerProcessCreator : IRunnerProcessCreator
 {

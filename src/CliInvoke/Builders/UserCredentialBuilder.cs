@@ -14,9 +14,7 @@ using System.Diagnostics.Contracts;
 using System.Security;
 
 using AlastairLundy.CliInvoke.Core.Builders;
-
-using AlastairLundy.DotPrimitives.Processes;
-
+using AlastairLundy.CliInvoke.Core.Primitives;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 // ReSharper disable PossibleInvalidOperationException

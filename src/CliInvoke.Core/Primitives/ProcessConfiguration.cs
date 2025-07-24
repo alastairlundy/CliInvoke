@@ -23,7 +23,9 @@ using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
+
+using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
+using ProcessTimeoutPolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessTimeoutPolicy;
 
 // ReSharper disable MemberCanBePrivate.Global
 
