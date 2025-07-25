@@ -9,18 +9,20 @@
 
 
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Runtime.Versioning;
+
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.DotPrimitives.Processes.Policies;
+
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 
 namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
 /// A class to fluently configure and build ProcessResourcePolicy objects.
 /// </summary>
-[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 {
     private readonly ProcessResourcePolicy _processResourcePolicy;

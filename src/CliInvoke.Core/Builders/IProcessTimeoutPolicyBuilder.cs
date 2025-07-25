@@ -19,6 +19,7 @@ namespace AlastairLundy.CliInvoke.Core.Builders;
 /// </summary>
 public interface IProcessTimeoutPolicyBuilder
 {
+    
     /// <summary>
     /// Sets the timeout threshold for the process.
     /// </summary>

@@ -18,14 +18,14 @@ using AlastairLundy.DotPrimitives.Processes.Policies;
 namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
-/// 
+/// Implements the IProcessTimeoutPolicyBuilder fluent interface.
 /// </summary>
 public class ProcessTimeoutPolicyBuilder : IProcessTimeoutPolicyBuilder
 {
     private readonly ProcessTimeoutPolicy _policy;
-    
+
     /// <summary>
-    /// 
+    /// Instantiates the <see cref="ProcessTimeoutPolicyBuilder"/> allowing for the construction of a ProcessTimeoutPolicy instance.
     /// </summary>
     public ProcessTimeoutPolicyBuilder()
     {
@@ -33,35 +33,35 @@ public class ProcessTimeoutPolicyBuilder : IProcessTimeoutPolicyBuilder
     }
 
     /// <summary>
-    /// 
+    /// Instantiates the <see cref="ProcessTimeoutPolicyBuilder"/> with the specified Timeout Policy.
     /// </summary>
-    /// <param name="policy"></param>
+    /// <param name="policy">The process timeout policy to configure.</param>
     protected ProcessTimeoutPolicyBuilder(ProcessTimeoutPolicy policy)
     {
         _policy = policy;
     }
     
     /// <summary>
-    /// 
+    /// Sets the timeout threshold for the process.
     /// </summary>
-    /// <param name="timeoutThreshold"></param>
-    /// <returns></returns>
+    /// <param name="timeoutThreshold">The TimeSpan that the process is allowed to run before timing out.</param>
+    /// <return>This method returns itself allowing for method chaining.</return>
     public IProcessTimeoutPolicyBuilder WithTimeoutThreshold(TimeSpan timeoutThreshold) =>
         new ProcessTimeoutPolicyBuilder(
             new ProcessTimeoutPolicy(timeoutThreshold, _policy.CancellationMode));
 
     /// <summary>
-    /// 
+    /// Sets the cancellation mode for the process if the timeout is reached.
     /// </summary>
-    /// <param name="cancellationMode"></param>
-    /// <returns></returns>
+    /// <param name="cancellationMode">The ProcessCancellationMode to use.</param>
+    /// <returns>This method returns itself allowing for method chaining.</returns>
     public IProcessTimeoutPolicyBuilder WithCancellationMode(ProcessCancellationMode cancellationMode) =>
         new ProcessTimeoutPolicyBuilder(
             new ProcessTimeoutPolicy(_policy.TimeoutThreshold, cancellationMode));
 
     /// <summary>
-    /// 
+    /// Builds a new instance of ProcessTimeoutPolicy based on the specified settings.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The ProcessTimeoutPolicy based on the specified settings</returns>
     public ProcessTimeoutPolicy Build() => _policy;
 }

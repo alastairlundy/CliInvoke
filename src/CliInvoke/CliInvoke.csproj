@@ -79,4 +79,8 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+    </ItemGroup>
 </Project>
