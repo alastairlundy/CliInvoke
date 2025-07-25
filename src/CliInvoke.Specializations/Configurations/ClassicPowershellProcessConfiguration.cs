@@ -8,7 +8,7 @@
 */
 
 
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else
 using System.Runtime.Versioning;
@@ -20,6 +20,7 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
+
 using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
@@ -65,11 +66,22 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("", arguments,
+        bool useShellExecution = false, bool windowCreation = false) : base("",
+        arguments,
         workingDirectoryPath,
-        requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
-        standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        windowCreation: useShellExecution, useShellExecution: windowCreation)
+        requiresAdministrator,
+        environmentVariables,
+        credentials,
+        resultValidation,
+        standardInput,
+        standardOutput,
+        standardError,
+        standardInputEncoding,
+        standardOutputEncoding,
+        standardErrorEncoding,
+        processResourcePolicy,
+        windowCreation: useShellExecution,
+        useShellExecution: windowCreation)
     {
         base.TargetFilePath = TargetFilePath;
     }

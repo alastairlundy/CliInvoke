@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net8.0;netstandard2.0;netstandard2.1;net9.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
         <Title>AlastairLundy.CliInvoke</Title>
@@ -13,20 +13,17 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes
-* Updated dependencies
-* Moved Builder implementations back to CliInvoke from CliInvoke.Core
-* Moved primitives out of CliInvoke.Core into DotPrimitives
-* Moved ``IFilePathResolver`` into CliInvoke.Core and ``FilePathResolver`` into CliInvoke directly - Thereby allowing the removal of Resyslib.IO.Core and Resyslib.IO as dependencies
+        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 2
+- Removed .NET Standard 2.1 TFM @alastairlundy (#63) - .NET Standard 2.1 is still implicitly supported via the .NET Standard 2.0 TFM
+- Update DotExtensions from 7.5.0 Preview 2 to 7.5.1
+- Added missing xml doc comments
 
-## 🚀 Features
-
-- add Initial Process Timeout Support @alastairlundy (#53) - ``IProcessInvoker``, ``IProcessFactory``, ``ProcessInvoker``, and ``ProcessFactory`` have been updated to support this.
-- Added method ProcessConfiguration supporting method overloads for ``ContinueWhenExitAsync``, ``ContinueWhenBufferedExitAsync``, and ``ContinueWhenPipedAsync`` to `IProcessInvoker``, ``IProcessFactory``, ``ProcessInvoker``, and ``ProcessFactory``</PackageReleaseNotes>
+### Core only
+- Removed direct dependency on ``Microsoft.Bcl.HashCode``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.2</PackageVersion>
+        <PackageVersion>2.0.0-alpha.3</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -37,12 +34,12 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.2" />
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.5.1" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.3" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.6.0" />
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="PolyFill" Version="8.7.3" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" PrivateAssets="All" />
+        <PackageReference Include="PolyFill" Version="8.7.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" PrivateAssets="All" />
     </ItemGroup>
     
     <ItemGroup>

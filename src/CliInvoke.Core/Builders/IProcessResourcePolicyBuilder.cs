@@ -18,7 +18,7 @@ using System.Runtime.Versioning;
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
-/// An interface that defines the fluent builder methods all ProcessResourcePolicyBuilder classes must implement.
+/// A fluent builder interface for configuring and building a Process Resource Policy.
 /// </summary>
 public interface IProcessResourcePolicyBuilder
 {

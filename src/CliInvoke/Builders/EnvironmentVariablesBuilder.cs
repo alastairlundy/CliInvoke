@@ -45,7 +45,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <param name="vars">The initial environment variables to use.</param>
     protected EnvironmentVariablesBuilder(IDictionary<string, string> vars)
     {
-        _environmentVariables = new Dictionary<string, string>(vars, StringComparer.Ordinal);
+        _environmentVariables = new Dictionary<string, string>(vars,
+            StringComparer.Ordinal);
     }
         
     /// <summary>
@@ -56,7 +57,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     [Pure]
     public IEnvironmentVariablesBuilder Set(string name, string value){
-        Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables, StringComparer.Ordinal) { { name, value } };
+        Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
+            StringComparer.Ordinal) { { name, value } };
 
         return new EnvironmentVariablesBuilder(output);
     }
@@ -69,7 +71,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     [Pure]
     public IEnvironmentVariablesBuilder Set(IEnumerable<KeyValuePair<string, string>> variables)
     {
-        Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables, StringComparer.Ordinal);
+        Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
+            StringComparer.Ordinal);
         output.AddRange(variables);
         
         return new EnvironmentVariablesBuilder(output);
@@ -83,7 +86,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     [Pure]
     public IEnvironmentVariablesBuilder Set(IReadOnlyDictionary<string, string> variables)
     {
-        Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables, StringComparer.Ordinal);
+        Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
+            StringComparer.Ordinal);
         output.AddRange(variables);
 
         return new EnvironmentVariablesBuilder(output);

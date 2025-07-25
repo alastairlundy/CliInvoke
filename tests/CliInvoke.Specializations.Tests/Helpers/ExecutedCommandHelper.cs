@@ -21,7 +21,8 @@ namespace CliInvoke.Specializations.Tests.Helpers
             IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
             IFilePathResolver filePathResolver = new FilePathResolver();
 
-            _processFactory = new ProcessFactory(filePathResolver, processPipeHandler);
+            _processFactory = new ProcessFactory(filePathResolver,
+                processPipeHandler);
         }
         
         public static string WinCalcExePath

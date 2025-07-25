@@ -12,7 +12,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+
 using AlastairLundy.CliInvoke.Builders;
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 
@@ -20,7 +22,7 @@ using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
 
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else
 using System.Runtime.Versioning;
@@ -75,11 +77,22 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("", arguments,
+        bool useShellExecution = false, bool windowCreation = false) : base("",
+        arguments,
         workingDirectoryPath,
-        requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
-        standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        windowCreation: useShellExecution, useShellExecution: windowCreation)
+        requiresAdministrator,
+        environmentVariables,
+        credentials,
+        resultValidation,
+        standardInput,
+        standardOutput,
+        standardError,
+        standardInputEncoding,
+        standardOutputEncoding,
+        standardErrorEncoding,
+        processResourcePolicy,
+        windowCreation: useShellExecution,
+        useShellExecution: windowCreation)
     {
         base.TargetFilePath = TargetFilePath;
         _invoker = processInvoker;

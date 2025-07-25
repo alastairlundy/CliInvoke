@@ -62,7 +62,9 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                         if (string.IsNullOrWhiteSpace(line) == false)
                         {
                            dotnetExePath = line.Split(' ').Last()
-                                .Replace("[", string.Empty).Replace("]", string.Empty);
+                                .Replace("[",
+                                    string.Empty).Replace("]",
+                                    string.Empty);
                            break;
                         }
                     }

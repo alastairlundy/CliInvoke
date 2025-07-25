@@ -17,7 +17,7 @@ using System.Globalization;
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
-/// An interface that defines the fluent builder methods all ArgumentsBuilder classes must implement.
+/// An interface that defines the fluent builder methods for building arguments and escaping them (as needed).
 /// </summary>
 public interface IArgumentsBuilder
 {
@@ -133,6 +133,11 @@ public interface IArgumentsBuilder
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     IArgumentsBuilder Add(IEnumerable<IFormattable> values);
 
+    /// <summary>
+    /// Escapes special characters in an argument such that it is suitable to be used with a Process.
+    /// </summary>
+    /// <param name="argument">The argument to escape</param>
+    /// <returns>The argument with special characters escaped.</returns>
     string EscapeSpecialCharacters(string argument);
     
     /// <summary>

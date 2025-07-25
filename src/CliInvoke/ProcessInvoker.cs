@@ -11,7 +11,6 @@
 
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,6 +24,10 @@ using AlastairLundy.DotPrimitives.Processes;
 using AlastairLundy.DotPrimitives.Processes.Policies;
 using AlastairLundy.DotPrimitives.Processes.Results;
 
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
+
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
@@ -36,11 +39,11 @@ public class ProcessInvoker : IProcessInvoker
     
     private readonly IProcessFactory _processFactory;
 
-    /// <summary>
-    /// 
+    /// <summary>  
+    /// Instantiates an invoker for invoking processes, providing a centralized way to execute external commands.
     /// </summary>
-    /// <param name="processFactory"></param>
-    /// <param name="processPipeHandler"></param>
+    /// <param name="processFactory">The process factory to be used to create and run the invoked processes.</param>
+    /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessInvoker(IProcessFactory processFactory, IProcessPipeHandler processPipeHandler)
     {
         _processFactory = processFactory;
@@ -73,17 +76,20 @@ public class ProcessInvoker : IProcessInvoker
         if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
             throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace("{file}", processConfiguration.TargetFilePath));
+                Resources.Exceptions_FileNotFound.Replace("{file}",
+                    processConfiguration.TargetFilePath));
         }
         
         Process process = _processFactory.StartNew(processConfiguration);
 
         ProcessResult result = await _processFactory.ContinueWhenExitAsync(process,
-            processConfiguration.ResultValidation, cancellationToken: cancellationToken);
+            processConfiguration.ResultValidation,
+            cancellationToken: cancellationToken);
        
         if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
-            throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
+            throw new ProcessNotSuccessfulException(process: process,
+                exitCode: process.ExitCode);
         }
 
         return result;
@@ -124,7 +130,8 @@ public class ProcessInvoker : IProcessInvoker
         if (File.Exists(processStartInfo.FileName) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}", processStartInfo.FileName));
+                .Replace("{file}",
+                    processStartInfo.FileName));
         }
         
         Process process = _processFactory.From(processStartInfo, 
@@ -132,7 +139,8 @@ public class ProcessInvoker : IProcessInvoker
         
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
+                process);
         }
 
         process.Start();
@@ -142,7 +150,9 @@ public class ProcessInvoker : IProcessInvoker
 
         
         ProcessResult result =
-            await _processFactory.ContinueWhenExitAsync(process, processResultValidation, processTimeoutPolicy,
+            await _processFactory.ContinueWhenExitAsync(process,
+                processResultValidation,
+                processTimeoutPolicy,
                 cancellationToken: cancellationToken);
 
         return result;
@@ -173,17 +183,21 @@ public class ProcessInvoker : IProcessInvoker
         if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}", processConfiguration.TargetFilePath));
+                .Replace("{file}",
+                    processConfiguration.TargetFilePath));
         }
 
-        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(processConfiguration.StandardInput is not null,
-            true, true);
+        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(
+            processConfiguration.StandardInput is not null,
+            true,
+            true);
 
         Process process = _processFactory.StartNew(startInfo);
                               
         BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process,
-            processConfiguration.ResultValidation, processConfiguration.TimeoutPolicy,
-             cancellationToken);
+            processConfiguration.ResultValidation,
+            processConfiguration.TimeoutPolicy,
+            cancellationToken);
                               
         return result;
     }
@@ -230,7 +244,8 @@ public class ProcessInvoker : IProcessInvoker
 
        if (processStartInfo.RedirectStandardInput && standardInput is not null)
        {
-           process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
+           process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
+               process);
        }
 
        process.Start();
@@ -239,7 +254,10 @@ public class ProcessInvoker : IProcessInvoker
            process.SetResourcePolicy(processResourcePolicy);
 
         BufferedProcessResult result =
-            await _processFactory.ContinueWhenExitBufferedAsync(process, processResultValidation, processTimeoutPolicy, cancellationToken);
+            await _processFactory.ContinueWhenExitBufferedAsync(process,
+                processResultValidation,
+                processTimeoutPolicy,
+                cancellationToken);
 
         return result;
     }
@@ -267,12 +285,15 @@ public class ProcessInvoker : IProcessInvoker
     {
         ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(
             processConfiguration.StandardInput is not null,
-            true, true);
+            true,
+            true);
         
         Process process = _processFactory.StartNew(startInfo);
 
-        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process, processConfiguration.ResultValidation,
-           processConfiguration.TimeoutPolicy, cancellationToken);
+        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process,
+            processConfiguration.ResultValidation,
+            processConfiguration.TimeoutPolicy,
+            cancellationToken);
         
         return result;
     }
@@ -310,7 +331,8 @@ public class ProcessInvoker : IProcessInvoker
         if (File.Exists(processStartInfo.FileName) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}", processStartInfo.FileName));
+                .Replace("{file}",
+                    processStartInfo.FileName));
         }
         
         processStartInfo.RedirectStandardOutput = standardInput is not null;
@@ -322,7 +344,8 @@ public class ProcessInvoker : IProcessInvoker
 
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream, process);
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
+                process);
         }
 
         process.Start();
@@ -330,8 +353,10 @@ public class ProcessInvoker : IProcessInvoker
         if(processResourcePolicy is not null)
             process.SetResourcePolicy(processResourcePolicy);
         
-        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process, processResultValidation, 
-            processTimeoutPolicy, cancellationToken);
+        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process,
+            processResultValidation,
+            processTimeoutPolicy,
+            cancellationToken);
 
         return result;
     }

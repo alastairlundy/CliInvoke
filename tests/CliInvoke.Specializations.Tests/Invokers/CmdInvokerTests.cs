@@ -43,7 +43,8 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
             {
                 IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
                         (ExecutedCommandHelper.WinCalcExePath)
-                    .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe", string.Empty))
+                    .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
+                        string.Empty))
                     .WithValidation(ProcessResultValidation.ExitCodeZero);
             
                 ProcessConfiguration commandConfiguration = configurationBuilder.Build();
