@@ -10,6 +10,8 @@
 
 
 using System;
+using System.Diagnostics.Contracts;
+
 using AlastairLundy.CliInvoke.Core.Builders;
 
 using AlastairLundy.DotPrimitives.Processes;
@@ -46,6 +48,7 @@ public class ProcessTimeoutPolicyBuilder : IProcessTimeoutPolicyBuilder
     /// </summary>
     /// <param name="timeoutThreshold">The TimeSpan that the process is allowed to run before timing out.</param>
     /// <return>This method returns itself allowing for method chaining.</return>
+    [Pure]
     public IProcessTimeoutPolicyBuilder WithTimeoutThreshold(TimeSpan timeoutThreshold) =>
         new ProcessTimeoutPolicyBuilder(
             new ProcessTimeoutPolicy(timeoutThreshold, _policy.CancellationMode));
@@ -55,6 +58,7 @@ public class ProcessTimeoutPolicyBuilder : IProcessTimeoutPolicyBuilder
     /// </summary>
     /// <param name="cancellationMode">The ProcessCancellationMode to use.</param>
     /// <returns>This method returns itself allowing for method chaining.</returns>
+    [Pure]
     public IProcessTimeoutPolicyBuilder WithCancellationMode(ProcessCancellationMode cancellationMode) =>
         new ProcessTimeoutPolicyBuilder(
             new ProcessTimeoutPolicy(_policy.TimeoutThreshold, cancellationMode));

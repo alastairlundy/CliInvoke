@@ -8,6 +8,7 @@
    */
 
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 using AlastairLundy.CliInvoke.Core.Builders;
 
