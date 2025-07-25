@@ -22,8 +22,6 @@ using System.Text;
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-using AlastairLundy.DotPrimitives.Processes;
-
 using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
 using ProcessTimeoutPolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessTimeoutPolicy;
 
