@@ -32,7 +32,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotPrimitives" Version="2.0.0" />
+        <PackageReference Include="AlastairLundy.DotPrimitives" Version="3.0.0-preview.1" />
+        <PackageReference Include="PolyFill" Condition="'$(TargetFramework)' == 'netstandard2.0'"
+                          Version="8.7.3"/>
 
     </ItemGroup>
 
@@ -65,5 +67,9 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions\Internal\" />
     </ItemGroup>
 </Project>

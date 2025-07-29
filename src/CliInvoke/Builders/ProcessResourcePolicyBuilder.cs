@@ -11,8 +11,8 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 
 using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
-using AlastairLundy.DotPrimitives.Processes.Policies;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
