@@ -13,9 +13,8 @@ using System;
 using System.Diagnostics.Contracts;
 
 using AlastairLundy.CliInvoke.Core.Builders;
-
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 namespace AlastairLundy.CliInvoke.Builders;
 

@@ -9,8 +9,8 @@
 
 using System;
 using System.Security;
-using AlastairLundy.DotPrimitives.Processes;
-using UserCredential = AlastairLundy.CliInvoke.Core.Primitives.UserCredential;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 

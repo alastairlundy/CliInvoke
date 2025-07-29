@@ -8,7 +8,6 @@
  */
 
 using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.DotPrimitives.Processes;
 
 namespace AlastairLundy.CliInvoke.Core.Extensibility;
 

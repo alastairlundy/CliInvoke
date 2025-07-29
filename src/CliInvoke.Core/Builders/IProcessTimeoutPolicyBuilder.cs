@@ -9,8 +9,8 @@
 
 using System;
 
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
