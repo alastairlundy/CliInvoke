@@ -10,6 +10,7 @@
 using System.Diagnostics;
 
 using AlastairLundy.DotPrimitives.Processes.Policies;
+using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;

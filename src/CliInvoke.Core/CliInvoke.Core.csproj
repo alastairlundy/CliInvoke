@@ -66,4 +66,8 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions\Internal\" />
+    </ItemGroup>
 </Project>
