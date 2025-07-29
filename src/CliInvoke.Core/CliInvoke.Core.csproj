@@ -33,7 +33,9 @@
 
     <ItemGroup>
         <PackageReference Include="AlastairLundy.DotPrimitives" Version="3.0.0" />
-
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="PolyFill" Version="8.7.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
