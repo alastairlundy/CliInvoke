@@ -5,12 +5,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke;
+
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using AlastairLundy.DotPrimitives.Processes;
+
 using CliInvoke.Specializations.Tests.Helpers;
 
 namespace CliInvoke.Specializations.Tests.Invokers
