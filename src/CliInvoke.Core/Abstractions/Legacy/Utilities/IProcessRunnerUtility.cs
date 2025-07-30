@@ -94,7 +94,6 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
         /// <param name="disposeOfProcess">Whether to dispose of the Process before returning.</param>
         /// <returns>The results from an exited process.</returns>
         [Obsolete]
-
         Task<BufferedProcessResult> GetBufferedResultAsync(Process process, bool disposeOfProcess);
     }
 }

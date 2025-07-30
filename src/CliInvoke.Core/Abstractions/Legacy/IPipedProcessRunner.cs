@@ -32,6 +32,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy
         /// <param name="processResourcePolicy"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Process Results from the running the process with the Piped Standard Output and Standard Error.</returns>
+        [Obsolete]
         Task<(ProcessResult processResult, Stream standardOutput, Stream standardError)>
             ExecuteProcessWithPipingAsync(Process process, ProcessResultValidation processResultValidation,
                 ProcessResourcePolicy? processResourcePolicy = null,
@@ -46,6 +47,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy
         /// <param name="processResourcePolicy"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Buffered Process Results from running the process with the Piped Standard Output and Standard Error.</returns>
+        [Obsolete]
         Task<(BufferedProcessResult processResult, Stream standardOutput, Stream standardError)>
             ExecuteBufferedProcessWithPipingAsync(Process process,
                 ProcessResultValidation processResultValidation,
