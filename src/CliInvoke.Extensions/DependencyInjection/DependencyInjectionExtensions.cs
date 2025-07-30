@@ -15,9 +15,8 @@ using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 
 using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Piping;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
-
+using AlastairLundy.CliInvoke.Piping;
 using IFilePathResolver = AlastairLundy.Resyslib.IO.Core.Files.IFilePathResolver;
 using AlastairLundy.Resyslib.IO.Files;
 
@@ -48,6 +47,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddSingleton<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddSingleton<IPipedProcessRunner, PipedProcessRunner>();
                 
+                services.TryAddSingleton<IProcessInvoker, ProcessInvoker>();
                 services.AddSingleton<IProcessFactory, ProcessFactory>();
                 services.AddSingleton<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddSingleton<ICliCommandInvoker, CliCommandInvoker>();
@@ -58,6 +58,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddScoped<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddScoped<IPipedProcessRunner, PipedProcessRunner>();
                 
+                services.TryAddScoped<IProcessInvoker, ProcessInvoker>();
                 services.AddScoped<IProcessFactory, ProcessFactory>();
                 services.AddScoped<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddScoped<ICliCommandInvoker, CliCommandInvoker>();
@@ -68,6 +69,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddTransient<IProcessRunnerUtility, ProcessRunnerUtility>();
                 services.TryAddTransient<IPipedProcessRunner, PipedProcessRunner>();
                 
+                services.TryAddTransient<IProcessInvoker, ProcessInvoker>();
                 services.AddTransient<IProcessFactory, ProcessFactory>();
                 services.AddTransient<ICommandProcessFactory, CommandProcessFactory>();
                 services.AddTransient<ICliCommandInvoker, CliCommandInvoker>();
