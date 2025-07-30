@@ -89,6 +89,7 @@ public class CommandProcessFactory : ICommandProcessFactory
         [UnsupportedOSPlatform("watchos")]
         [UnsupportedOSPlatform("browser")]
     #endif
+        [Obsolete(DeprecationMessages.ClassDeprecationV2)]
         public ProcessStartInfo ConfigureProcess(CliCommandConfiguration commandConfiguration)
         {
             return ConfigureProcess(commandConfiguration, commandConfiguration.StandardOutput is not null,
@@ -115,6 +116,7 @@ public class CommandProcessFactory : ICommandProcessFactory
         [UnsupportedOSPlatform("watchos")]
         [UnsupportedOSPlatform("browser")]
 #endif
+        [Obsolete(DeprecationMessages.ClassDeprecationV2)]
         public ProcessStartInfo ConfigureProcess(CliCommandConfiguration commandConfiguration, bool redirectStandardOutput,
             bool redirectStandardError)
         {
