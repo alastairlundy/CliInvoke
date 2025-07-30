@@ -19,6 +19,7 @@ using System.Runtime.Versioning;
 #endif
 
 using System.Text;
+
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
