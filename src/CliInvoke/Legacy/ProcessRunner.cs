@@ -21,7 +21,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
+using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 namespace AlastairLundy.CliInvoke.Legacy;
@@ -29,11 +29,12 @@ namespace AlastairLundy.CliInvoke.Legacy;
 /// <summary>
 /// The default implementation of IProcessRunner, a safer way to execute processes.
 /// </summary>
+[Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class ProcessRunner : IProcessInvoker
 {
     private readonly IProcessRunnerUtility _processRunnerUtils;
     
-    [Obsolete]
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public ProcessRunner(IProcessRunnerUtility processRunnerUtils)
     {
         _processRunnerUtils = processRunnerUtils;
