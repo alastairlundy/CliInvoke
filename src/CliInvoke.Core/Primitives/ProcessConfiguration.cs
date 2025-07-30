@@ -576,7 +576,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
                 WorkingDirectory = WorkingDirectoryPath,
                 UseShellExecute = UseShellExecution,
                 CreateNoWindow = WindowCreation,
-                RedirectStandardInput = StandardInput != StreamWriter.Null && StandardInput != StreamWriter.Null,
+                RedirectStandardInput = redirectStandardInput || StandardInput != StreamWriter.Null,
                 RedirectStandardOutput = redirectStandardOutput || StandardOutput != StreamReader.Null,
                 RedirectStandardError = redirectStandardError || StandardError != StreamReader.Null,
             };
