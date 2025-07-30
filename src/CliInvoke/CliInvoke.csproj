@@ -13,21 +13,18 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### Changes since 1.4.4
-
-### All packages
-* Updated to DotExtensions from 7.4.1 to 7.4.2
-* Updated internal Polyfill version from 8.4.0 to 8.7.0
-
-### Core only
-* Updated System.IO.Pipelines from 9.0.6 to 9.0.7
-
-### Main package only
-Update to CliInvoke.Core 1.4.5</PackageReleaseNotes>
+        <PackageReleaseNotes>### Changes since 1.4.x
+* Updated DotExtensions from 7.5.1 to 7.6.2
+* Updated internal Polyfill usage from 8.7.0 to 8.7.3
+* Added ``ProcessInvoker`` the replacement for ``ProcessRunner`` - Please use ``ProcessInvoker`` instead going forward.
+* Moved ``ProcessFactory`` from its Legacy namespace into the main CliInvoke namespace
+* Moved ``ProcessPipeHandler`` from its Legacy namespace into the ``CliInvoke.Piping`` namespace
+* Deprecated ``ProcessRunner`` class
+* Deprecated ``ICommandProcessFactory`` interface</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.4.5</PackageVersion>
+        <PackageVersion>1.5.0</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -38,12 +35,13 @@ Update to CliInvoke.Core 1.4.5</PackageReleaseNotes>
     </PropertyGroup>
     
     <ItemGroup>
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.5.0"/>
         <PackageReference Include="AlastairLundy.DotExtensions" Version="7.6.2" />
         <PackageReference Include="AlastairLundy.Resyslib.IO.Core" Version="[3.2.0, 4.0.0)" />
     </ItemGroup>
     
     <ItemGroup >
-        <PackageReference Include="PolyFill" Version="8.7.3"
+        <PackageReference Include="Polyfill" Version="8.7.3"
                           Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"
                         PrivateAssets="All"
         />
@@ -86,9 +84,5 @@ Update to CliInvoke.Core 1.4.5</PackageReleaseNotes>
     
     <ItemGroup>
       <Folder Include="Legacy\" />
-    </ItemGroup>
-    
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
 </Project>
