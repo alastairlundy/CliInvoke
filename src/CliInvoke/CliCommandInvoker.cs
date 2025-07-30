@@ -18,6 +18,8 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
+#nullable enable
+
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
