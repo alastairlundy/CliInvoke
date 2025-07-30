@@ -516,9 +516,9 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
             bool redirectStandardError = StandardError is not null;
             bool redirectStandardOutput = StandardOutput is not null;
                 
-            return ToProcessStartInfo(redirectStandardOutput, redirectStandardError);
+            return ToProcessStartInfo(false, redirectStandardOutput, redirectStandardError);
         }
-        
+
         /// <summary>
         /// Creates Process Start Information based on specified parameters and Process configuration object values.
         /// </summary>
@@ -539,6 +539,31 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
         [UnsupportedOSPlatform("browser")]
 #endif
         public ProcessStartInfo ToProcessStartInfo(bool redirectStandardOutput, bool redirectStandardError)
+        {
+            return ToProcessStartInfo(false, redirectStandardOutput, redirectStandardError);
+        }
+
+        /// <summary>
+        /// Creates Process Start Information based on specified parameters and Process configuration object values.
+        /// </summary>
+        /// <param name="redirectStandardInput"></param>
+        /// <param name="redirectStandardOutput">Whether to redirect the Standard Output.</param>
+        /// <param name="redirectStandardError">Whether to redirect the Standard Error.</param>
+        /// <returns>A new ProcessStartInfo object configured with the specified parameters and Process object values.</returns>
+        /// <exception cref="ArgumentException">Thrown if the process configuration's Target File Path is null or empty.</exception>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [UnsupportedOSPlatform("ios")]
+        [SupportedOSPlatform("android")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("watchos")]
+        [UnsupportedOSPlatform("browser")]
+#endif
+        public ProcessStartInfo ToProcessStartInfo(bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError)
         {
             if (string.IsNullOrEmpty(TargetFilePath))
             {
