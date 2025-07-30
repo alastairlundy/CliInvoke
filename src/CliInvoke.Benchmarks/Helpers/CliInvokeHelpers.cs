@@ -5,9 +5,8 @@ using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Legacy;
-using AlastairLundy.CliInvoke.Legacy.Piping;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
-
+using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.Resyslib.IO.Core.Files;
 using AlastairLundy.Resyslib.IO.Files;
 
