@@ -16,7 +16,7 @@ using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 using AlastairLundy.DotExtensions.Processes;
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 using System.Runtime.InteropServices;
 #endif
