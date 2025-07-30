@@ -18,6 +18,7 @@ namespace AlastairLundy.CliInvoke.Abstractions;
 /// <summary>
 /// An interface to enable Creating Processes from Command Configuration inputs.
 /// </summary>
+[Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
 public interface ICommandProcessFactory
 {
     /// <summary>
@@ -33,6 +34,7 @@ public interface ICommandProcessFactory
     /// </summary>
     /// <param name="commandConfiguration">The command configuration object to specify Process info.</param>
     /// <returns>A new ProcessStartInfo object configured with the specified Command object values.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     ProcessStartInfo ConfigureProcess(CliCommandConfiguration commandConfiguration);
 
     /// <summary>
@@ -42,5 +44,6 @@ public interface ICommandProcessFactory
     /// <param name="redirectStandardOutput">Whether to redirect the Standard Output.</param>
     /// <param name="redirectStandardError">Whether to redirect the Standard Error.</param>
     /// <returns>A new ProcessStartInfo object configured with the specified parameters and Command object values.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     ProcessStartInfo ConfigureProcess(CliCommandConfiguration commandConfiguration, bool redirectStandardOutput, bool redirectStandardError);
 }
