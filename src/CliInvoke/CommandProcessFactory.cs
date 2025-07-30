@@ -9,6 +9,8 @@
 
 // ReSharper disable RedundantBoolCompare
 
+#nullable enable
+
 #if NETSTANDARD2_0 || NETSTANDARD2_1
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else
@@ -32,6 +34,7 @@ namespace AlastairLundy.CliInvoke;
 /// <summary>
 /// A class to enable easy Process Creation with Command Configuration information.
 /// </summary>
+[Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class CommandProcessFactory : ICommandProcessFactory
 {
     /// <summary>
@@ -88,7 +91,8 @@ public class CommandProcessFactory : ICommandProcessFactory
     #endif
         public ProcessStartInfo ConfigureProcess(CliCommandConfiguration commandConfiguration)
         {
-            return ConfigureProcess(commandConfiguration, commandConfiguration.StandardOutput != null, commandConfiguration.StandardError != null);
+            return ConfigureProcess(commandConfiguration, commandConfiguration.StandardOutput is not null,
+                commandConfiguration.StandardError is not null);
         }
 
         /// <summary>
@@ -159,7 +163,7 @@ public class CommandProcessFactory : ICommandProcessFactory
             {
                 foreach (KeyValuePair<string, string> variable in commandConfiguration.EnvironmentVariables)
                 {
-                    if (variable.Value != null)
+                    if (variable.Value is not null)
                     {
                         output.Environment[variable.Key] = variable.Value;
                     }
