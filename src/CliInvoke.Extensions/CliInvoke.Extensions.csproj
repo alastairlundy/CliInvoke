@@ -29,8 +29,7 @@
 
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-alpha.3" />
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.3" />
+
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
     </ItemGroup>
 
@@ -63,5 +62,10 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Resources.resx</DependentUpon>
       </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 </Project>
