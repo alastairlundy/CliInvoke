@@ -1,10 +1,13 @@
 # CliInvoke
-CliInvoke is a library for interacting with Command Line Interfaces and wrapping around executables.
-
-<img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
 
 [![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/) 
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
+
+CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
+
+Launch processes, redirect standard input and output streams, await process completion and so much more.
+
+<img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
 
 ## Table of Contents
 * [Features](#features)
@@ -24,7 +27,7 @@ CliInvoke is a library for interacting with Command Line Interfaces and wrapping
 * Promotes the single responsibility principle and separation of concerns
 * For .NET 8 and newer TFMs CliRunner has few dependencies.
 * Compatible with .NET Standard 2.0<sup>1</sup>
-* Dependency Injection extensions to make using it easier.
+* Dependency Injection extensions to make using CliInvoke a breeze.
 * Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows <sup>2</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
@@ -75,7 +78,7 @@ The following table details which target platforms are supported for executing c
 | IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. <sup>3</sup>                             | 
 | tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS <sup>3</sup>                             |
 | watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                          |
-| Browser          | Not Supported and Not Planned :x:  | Not supported due to not being a valid target Platform for executing programs or processes. |
+| Browser          | Not Planned :x:  | Not supported due to not being a valid target Platform for executing programs or processes. |
 
 <sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
@@ -99,11 +102,11 @@ using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 
-using AlastairLundy.DotPrimitives.Processes.Results;
+using AlastairLundy.CliInvoke.Primitives.Results;
 
-  //Namespace and classs code ommitted for clarity 
+  //Namespace and class code ommitted for clarity 
 
-  // ServiceProvider and Dependency Injection code ommitted for clarity
+  // ServiceProvider and Dependency Injection setup code ommitted for clarity
   
   IProcessInvoker _processInvoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
@@ -167,7 +170,7 @@ To manually build a project for release, enter ``dotnet build -c Release /p:Cont
 Builds should generally always include Source Link and symbol packages if intended for wider distribution.
 
 **NOTES**: 
-* ``CliInvoke.Specializations`` and ``CliInvoke.Extensions.DependencyInjection`` both take a dependency on the CliInvoke base package from Nuget - For the respective libraries to use a newer CliInvoke version, that version must be published on Nuget.
+* ``CliInvoke.Specializations`` and ``CliInvoke.Extensions`` both take a dependency on the CliInvoke base package from Nuget - For the respective libraries to use a newer CliInvoke version, that version must be published on Nuget.
 
 ## How to Contribute to CliInvoke
 Thank you in advance for considering contributing to CliInvoke.
