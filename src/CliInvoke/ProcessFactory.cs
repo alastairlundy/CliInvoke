@@ -112,6 +112,17 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration information to use to configure the Process.</param>
     /// <returns>The newly created Process with the configuration.</returns>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+#endif
     public Process From(ProcessConfiguration configuration)
     {
         Process output;
@@ -119,12 +130,12 @@ public class ProcessFactory : IProcessFactory
         // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
         if (configuration.Credential != null)
         {
-            output = From(configuration.StartInfo,
+            output = From(configuration.ToProcessStartInfo(),
                 configuration.Credential);
         }
         else
         {
-            output = From(configuration.StartInfo);
+            output = From(configuration.ToProcessStartInfo());
         }
 
         return output; 

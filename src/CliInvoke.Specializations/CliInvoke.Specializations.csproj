@@ -25,8 +25,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-alpha.3" /> 
-       <!-- <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.1" /> -->
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="Polyfill" Version="8.7.3" PrivateAssets="All" />
@@ -61,5 +59,9 @@
         <PackagePath></PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 </Project>
