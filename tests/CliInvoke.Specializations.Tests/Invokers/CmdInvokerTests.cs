@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using CliInvoke.Specializations.Tests.Helpers;
 

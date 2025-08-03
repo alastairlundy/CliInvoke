@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.DotPrimitives 
+    AlastairLundy.CliInvoke.Core 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,10 +21,6 @@ using System.Runtime.Versioning;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Internal;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
-using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
-using ProcessTimeoutPolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessTimeoutPolicy;
 
 // ReSharper disable MemberCanBePrivate.Global
 

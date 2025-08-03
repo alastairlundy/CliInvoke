@@ -19,7 +19,7 @@ using System;
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Core.Primitives.Results;
+namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>
 /// A class that represents the results from an executed Process or Command.

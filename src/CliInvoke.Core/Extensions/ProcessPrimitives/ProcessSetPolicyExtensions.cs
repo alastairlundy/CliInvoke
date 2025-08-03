@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 
 using AlastairLundy.CliInvoke.Core.Internal;
 
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -35,7 +35,7 @@ public static class ProcessSetPolicyExtensions
     /// <exception cref="InvalidOperationException"></exception>
     public static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
     {
-        bool processHasStarted = false;
+        bool processHasStarted;
 
         try
         {

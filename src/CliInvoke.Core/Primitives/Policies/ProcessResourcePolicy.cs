@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 // ReSharper disable MemberCanBePrivate.Global
 
 
-namespace AlastairLundy.CliInvoke.Core.Primitives.Policies;
+namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>
 /// A class that defines a Process' resource configuration.

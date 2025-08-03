@@ -28,7 +28,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 using AlastairLundy.DotExtensions.Processes;
 

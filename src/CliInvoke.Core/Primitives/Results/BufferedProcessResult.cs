@@ -18,7 +18,7 @@ using System;
 // ReSharper disable MemberCanBePrivate.Global
 
 
-namespace AlastairLundy.CliInvoke.Core.Primitives.Results;
+namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>
 /// A buffered ProcessResult containing a Process's or Command's StandardOutput and StandardError information.

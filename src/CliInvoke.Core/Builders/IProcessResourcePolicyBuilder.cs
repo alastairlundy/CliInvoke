@@ -8,7 +8,7 @@
    */
 
 using System.Diagnostics;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;

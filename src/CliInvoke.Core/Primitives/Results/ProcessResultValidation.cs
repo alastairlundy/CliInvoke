@@ -7,7 +7,7 @@
 
 using System;
 
-namespace AlastairLundy.CliInvoke.Core.Primitives.Results;
+namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>
 /// An enum to represent Result Validation states, and whether Result Validation should be performed. 

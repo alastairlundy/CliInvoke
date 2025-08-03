@@ -11,7 +11,7 @@ using System;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Core.Primitives.Policies;
+namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>
 /// 

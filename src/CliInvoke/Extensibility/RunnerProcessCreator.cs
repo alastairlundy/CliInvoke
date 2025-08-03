@@ -13,8 +13,8 @@ using AlastairLundy.CliInvoke.Builders;
 
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Extensibility;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 // ReSharper disable MemberCanBePrivate.Global
 

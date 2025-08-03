@@ -10,7 +10,6 @@
 using System;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 

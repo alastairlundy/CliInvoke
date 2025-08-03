@@ -13,7 +13,7 @@ using System.IO;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace AlastairLundy.CliInvoke.Core.Primitives.Results;
+namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>
 /// A Piped ProcessResult containing a Process's or Command's StandardOutput and StandardError information.
