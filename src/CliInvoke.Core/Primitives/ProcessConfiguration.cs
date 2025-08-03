@@ -72,8 +72,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         
         WindowCreation = processConfiguration.WindowCreation;
         UseShellExecution = processConfiguration.UseShellExecution;
-
-        StartInfo = ToProcessStartInfo();
     }
 
     /// <summary>
@@ -147,8 +145,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardInputEncoding = standardInputEncoding ?? Encoding.Default;
         StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
         StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
-
-        StartInfo = ToProcessStartInfo();
     }
 
     /// <summary>
@@ -185,7 +181,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         ProcessResourcePolicy? processResourcePolicy = null,
         ProcessTimeoutPolicy? processTimeoutPolicy = null)
     {
-        StartInfo = processStartInfo;
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
                 
         Credential = credential ?? UserCredential.Null;
@@ -237,11 +232,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// The environment variables to be set.
     /// </summary>
     public IReadOnlyDictionary<string, string> EnvironmentVariables { get; protected set;  }
-        
-    /// <summary>
-    /// The ProcessStartInfo to be used for the Process.
-    /// </summary>
-    public ProcessStartInfo StartInfo { get; protected set;  }
         
     /// <summary>
     /// The credential to be used when executing the Command.
@@ -317,13 +307,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
         if (Credential is not null &&
             other.Credential is not null &&
-            StartInfo.FileName != other.StartInfo.FileName &&
+            TargetFilePath != other.TargetFilePath &&
             ResourcePolicy is not null && TimeoutPolicy is not null)
         {
 
             if (StandardOutput is not null && StandardError is not null)
             {
-                return StartInfo.Equals(other.StartInfo) &&
+                return TargetFilePath.Equals(other.TargetFilePath) &&
                        EnvironmentVariables.Equals(other.EnvironmentVariables) &&
                        Credential.Equals(other.Credential)
                        && ResultValidation == other.ResultValidation &&
@@ -337,7 +327,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             }
             else
             {
-                return StartInfo.Equals(other.StartInfo) &&
+                return TargetFilePath.Equals(other.TargetFilePath) &&
                        EnvironmentVariables.Equals(other.EnvironmentVariables) &&
                        Credential.Equals(other.Credential) &&
                        ResultValidation == other.ResultValidation &&
@@ -351,7 +341,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         }
         else
         {
-            return StartInfo.Equals(other.StartInfo) &&
+            return TargetFilePath.Equals(other.TargetFilePath) &&
                    EnvironmentVariables.Equals(other.EnvironmentVariables)
                    && ResultValidation == other.ResultValidation &&
                    StandardInputEncoding.Equals(other.StandardInputEncoding) &&
@@ -392,7 +382,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             
         hashCode.Add(TargetFilePath);
         hashCode.Add(EnvironmentVariables);
-        hashCode.Add(StartInfo);
 
         if (Credential is not null)
         {
