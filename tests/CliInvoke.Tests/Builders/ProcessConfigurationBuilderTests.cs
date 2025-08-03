@@ -4,11 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Security;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
-using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using Xunit;
 #if NET5_0_OR_GREATER
