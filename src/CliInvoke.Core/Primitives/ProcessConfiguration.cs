@@ -274,6 +274,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <para>Not all properties of a Process Resource Policy support all operating systems. Check before configuring a property.</para></remarks>
     public ProcessResourcePolicy? ResourcePolicy { get; protected set;  }
         
+    /// <summary>
+    /// 
+    /// </summary>
     public ProcessTimeoutPolicy? TimeoutPolicy  { get; protected set;  }
     
     /// <summary>

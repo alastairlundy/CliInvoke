@@ -120,15 +120,11 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     {
 #pragma warning disable CA1416
         if (other is null)
-        {
             return false;
-        }
 
         if (other.UserName is null || other.Domain is null || other.Password is null ||
             other.LoadUserProfile is null)
-        {
             return false;
-        }
             
         return Domain == other.Domain &&
                UserName == other.UserName &&
@@ -149,9 +145,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     public static bool Equals(UserCredential? left, UserCredential? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
             
         return left.Equals(right);
     }
@@ -164,18 +158,12 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     public override bool Equals(object? obj)
     {
         if (obj is null)
-        {
             return false;
-        }
 
         if (obj is UserCredential other)
-        {
             return Equals(other);
-        }
         else
-        {
             return false;
-        }
     }
 
     /// <summary>
@@ -198,10 +186,8 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <param name="left">A UserCredential to be compared.</param>
     /// <param name="right">The other UserCredential to be compared.</param>
     /// <returns>True if both UserCredentials are equal to each other, false otherwise.</returns>
-    public static bool operator ==(UserCredential? left, UserCredential? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(UserCredential? left, UserCredential? right) 
+        => Equals(left, right);
 
     /// <summary>
     /// Determines if a UserCredential is not equal to another UserCredential.
@@ -209,8 +195,6 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <param name="left">A UserCredential to be compared.</param>
     /// <param name="right">The other UserCredential to be compared.</param>
     /// <returns>True if both UserCredentials are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(UserCredential? left, UserCredential? right)
-    {
-        return Equals(left, right) == false;
-    }
+    public static bool operator !=(UserCredential? left, UserCredential? right) 
+        => Equals(left, right) == false;
 }

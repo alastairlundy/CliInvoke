@@ -39,10 +39,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
         bool enablePriorityBoost = true)
     {
-        if (processorAffinity == null)
-        {
-            processorAffinity = new IntPtr(0x0001);  
-        }
+        processorAffinity ??= new IntPtr(0x0001);
 
 #if NET5_0_OR_GREATER
         if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
@@ -128,9 +125,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     public bool Equals(ProcessResourcePolicy? other)
     {
         if (other is null)
-        {
             return false;
-        }
             
 #pragma warning disable CA1416
         return ProcessorAffinity == other.ProcessorAffinity && PriorityClass == other.PriorityClass &&
@@ -148,9 +143,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     public override bool Equals(object? obj)
     {
         if (obj is null)
-        {
             return false;
-        }
 
         if (obj is ProcessResourcePolicy policy)
         {
@@ -182,9 +175,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     public static bool Equals(ProcessResourcePolicy? left, ProcessResourcePolicy? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
             
         return left.Equals(right);
     }
@@ -195,10 +186,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="left">A Process Resource Policy to be compared.</param>
     /// <param name="right">The other  Process Resource Policy to be compared.</param>
     /// <returns>True if both  Process Resource Policies are equal to each other; false otherwise.</returns>
-    public static bool operator ==(ProcessResourcePolicy? left, ProcessResourcePolicy? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(ProcessResourcePolicy? left, ProcessResourcePolicy? right) 
+        => Equals(left, right);
 
     /// <summary>
     /// Determines if a Process Resource Policy is not equal to another Process Resource Policy.
@@ -206,8 +195,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="left">A Process Resource Policy to be compared.</param>
     /// <param name="right">The other Process Resource Policy to be compared.</param>
     /// <returns>True if both Process Resource Policies are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right)
-    {
-        return Equals(left, right) == false;
-    }
+    public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right) 
+        => Equals(left, right) == false;
 }

@@ -168,5 +168,4 @@ public interface IProcessFactory
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
         ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);
-
 }
