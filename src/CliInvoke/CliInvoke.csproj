@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <ImplicitUsings>disable</ImplicitUsings>
         <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <ImplicitUsings>disable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
         <Title>AlastairLundy.CliInvoke</Title>
@@ -35,6 +35,7 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.4" />
         <PackageReference Include="AlastairLundy.DotExtensions" Version="8.0.0-preview.1" />
     </ItemGroup>
     
@@ -75,9 +76,5 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
 </Project>
