@@ -13,8 +13,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-using AlastairLundy.CliInvoke.Builders;
-
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
@@ -122,7 +120,8 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             {
                 filePath = $"{GetWindowsInstallLocation()}{Path.DirectorySeparatorChar}pwsh.exe";
             }
-            else if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
+            else if (OperatingSystem.IsMacOS() ||
+                     OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
             {
                 filePath = GetUnixInstallLocation();
             }
@@ -142,9 +141,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         foreach (string directory in directories)
         {
             if (File.Exists($"{directory}{Path.DirectorySeparatorChar}pwsh.exe"))
-            {
                 return directory;
-            }
         }
             
         throw new FileNotFoundException("Could not find Powershell installation.");
@@ -152,17 +149,14 @@ public class PowershellProcessConfiguration : ProcessConfiguration
 
     private string GetUnixInstallLocation()
     {
-        IProcessConfigurationBuilder installLocationBuilder = new ProcessConfigurationBuilder("/usr/bin/which")
-            .WithArguments("pwsh");
-           
-        ProcessConfiguration command = installLocationBuilder.Build();
-           
-        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(command);
-          
-        task.RunSynchronously();
-          
-        Task.WaitAll(task);
-          
+        ProcessConfiguration configuration = new ProcessConfiguration("/usr/bin/which",
+            arguments: "pwsh");
+        
+        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(configuration);
+
+        task.Start();
+
+        task.Wait();
         return task.Result.StandardOutput;
     }
 }
