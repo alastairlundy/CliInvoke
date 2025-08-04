@@ -22,13 +22,14 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.3</Version>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 2
-- Removed .NET Standard 2.1 TFM @alastairlundy (#63) - .NET Standard 2.1 is still implicitly supported via the .NET Standard 2.0 TFM
-- Added missing xml doc comments
-
-### Core only
-- Removed direct dependency on ``Microsoft.Bcl.HashCode``</PackageReleaseNotes>
+        <Version>2.0.0-alpha.4</Version>
+        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 3
+* Brought back Primitives into CliInvoke.Core
+* Added ``ProcessTimeoutPolicy`` Support
+* Simplified Primitives namespace
+* Updated to internal Polyfill version 8.7.4 from 8.7.3
+* Removed reliance on DotPrimitives packages
+* Removed ``StartInfo`` property from ``ProcessConfiguration``</PackageReleaseNotes>
     </PropertyGroup>
     
     <ItemGroup>

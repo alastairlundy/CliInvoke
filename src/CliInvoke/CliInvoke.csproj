@@ -13,17 +13,18 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 2
-- Removed .NET Standard 2.1 TFM @alastairlundy (#63) - .NET Standard 2.1 is still implicitly supported via the .NET Standard 2.0 TFM
-- Update DotExtensions from 7.5.0 Preview 2 to 7.5.1
-- Added missing xml doc comments
-
-### Core only
-- Removed direct dependency on ``Microsoft.Bcl.HashCode``</PackageReleaseNotes>
+        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 3
+* Brought back Primitives into CliInvoke.Core
+* Added ``ProcessTimeoutPolicy`` Support
+* Simplified Primitives namespace
+* Updated to DotExtensions 8.0.0 Preview 1 from 7.6.2
+* Updated to internal Polyfill version 8.7.4 from 8.7.3
+* Removed reliance on DotPrimitives packages
+* Removed ``StartInfo`` property from ``ProcessConfiguration``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.3</PackageVersion>
+        <PackageVersion>2.0.0-alpha.4</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
