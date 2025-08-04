@@ -13,7 +13,7 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageTags>process, processes, runner, iprocessfactory, iprocessrunner</PackageTags>
+        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <Description>Process and Cli program running related abstractions implemented by AlastairLundy.CliInvoke</Description>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
