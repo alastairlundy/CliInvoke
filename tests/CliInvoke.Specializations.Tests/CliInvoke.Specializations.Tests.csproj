@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="PolyFill" Version="8.7.3" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'" />
+        <PackageReference Include="PolyFill" Version="8.7.4" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'" />
     </ItemGroup>
     
     <ItemGroup>
