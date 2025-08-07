@@ -86,14 +86,7 @@ public interface IProcessStartInfoBuilder
     /// <param name="configure">The CredentialsBuilder configuration.</param>
     /// <returns>The new ProcessStartInfoBuilder with the specified Credentials.</returns>
     IProcessStartInfoBuilder WithUserCredential(Action<IUserCredentialBuilder> configure);
-    
-    /// <summary>
-    /// Sets the Result Validation whether to throw an exception or not if the Process does not execute successfully.
-    /// </summary>
-    /// <param name="validation">The result validation behaviour to be used.</param>
-    /// <returns>The new ProcessStartInfoBuilder object with the configured Result Validation behaviour.</returns>
-    IProcessStartInfoBuilder WithValidation(ProcessResultValidation validation);
-    
+
     /// <summary>
     /// Sets the Standard Input Pipe source.
     /// </summary>
@@ -121,13 +114,6 @@ public interface IProcessStartInfoBuilder
     /// <param name="processResourcePolicy">The process resource policy to use.</param>
     /// <returns>The new ProcessStartInfoBuilder with the specified Process Resource Policy.</returns>
     IProcessStartInfoBuilder WithProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy);
-
-    /// <summary>
-    /// Sets the Process Timeout Policy to be used for this Process.
-    /// </summary>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use.</param>
-    /// <returns>The new ProcessStartInfoBuilder with the specified Process Timeout Policy.</returns>
-    IProcessStartInfoBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
     
     /// <summary>
     /// Enables or disables Process execution via Shell Execution.
