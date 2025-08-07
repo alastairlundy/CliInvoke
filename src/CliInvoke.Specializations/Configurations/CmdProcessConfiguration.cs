@@ -12,11 +12,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Processes.Results;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -65,7 +62,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
     public CmdProcessConfiguration(string arguments = null,
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         IReadOnlyDictionary<string, string> environmentVariables = null, UserCredential credentials = null,
-        ProcessResultValidation resultValidation = ProcessResultValidation.ExitCodeZero,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
@@ -76,7 +72,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
             requiresAdministrator,
             environmentVariables,
             credentials,
-            resultValidation,
             standardInput,
             standardOutput,
             standardError,

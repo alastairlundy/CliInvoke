@@ -66,9 +66,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public bool Equals(BufferedProcessResult? other)
     {
         if (other is null)
-        {
             return false;
-        }
             
         return StandardOutput == other.StandardOutput &&
                StandardError == other.StandardError &&
@@ -83,14 +81,10 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public override bool Equals(object? obj)
     {
         if (obj is null)
-        {
             return false;
-        }
 
         if (obj.GetType() != typeof(BufferedProcessResult))
-        {
             return false;
-        }
             
         return Equals((BufferedProcessResult)obj);
     }
@@ -99,10 +93,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// Returns the hash code for the current BufferedProcessResult.
     /// </summary>
     /// <returns>The hash code for the current BufferedProcessResult.</returns>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(StandardOutput, StandardError, ExitCode);
-    }
+    public override int GetHashCode() 
+        => HashCode.Combine(StandardOutput, StandardError, ExitCode);
 
     /// <summary>
     /// Determines whether two BufferedProcessResults are equal.
@@ -110,21 +102,17 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">The first BufferedProcessResult to compare.</param>
     /// <param name="right">The second BufferedProcessResult to compare.</param>
     /// <returns>True if the two BufferedProcessResult objects are equal; false otherwise.</returns>
-    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right)
-    {
-        return left.Equals(right);
-    }
-        
+    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right) 
+        => left.Equals(right);
+
     /// <summary>
     /// Determines if a BufferedProcessResult is equal to another BufferedProcessResult.
     /// </summary>
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are equal to each other; false otherwise.</returns>
-    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right) 
+        => Equals(left, right);
 
     /// <summary>
     /// Determines if a BufferedProcessResult is not equal to another BufferedProcessResult.
@@ -132,8 +120,6 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right)
-    {
-        return Equals(left, right) == false;
-    }
+    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right) 
+        => Equals(left, right) == false;
 }

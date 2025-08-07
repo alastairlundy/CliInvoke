@@ -69,25 +69,17 @@ public static class ProcessApplyExtensions
 #pragma warning disable CA1416
         if (credential.IsSupportedOnCurrentOS())
         {
-            if (credential.Domain is not null)
-            {
+            if (credential.Domain is not null) 
                 process.StartInfo.Domain = credential.Domain;
-            }
 
-            if (credential.UserName is not null)
-            {
+            if (credential.UserName is not null) 
                 process.StartInfo.UserName = credential.UserName;
-            }
 
-            if (credential.Password is not null)
-            {
+            if (credential.Password is not null) 
                 process.StartInfo.Password = credential.Password;
-            }
 
-            if (credential.LoadUserProfile is not null)
-            {
+            if (credential.LoadUserProfile is not null) 
                 process.StartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
-            }
         }
         else
         {

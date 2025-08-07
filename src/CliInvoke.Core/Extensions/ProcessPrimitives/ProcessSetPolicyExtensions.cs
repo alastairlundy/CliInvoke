@@ -67,12 +67,12 @@ public static class ProcessSetPolicyExtensions
                 OperatingSystem.IsFreeBSD() ||
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if (resourcePolicy.MinWorkingSet != null)
+                if (resourcePolicy.MinWorkingSet is not null)
                 {
                     process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
                 }
 
-                if (resourcePolicy.MaxWorkingSet != null)
+                if (resourcePolicy.MaxWorkingSet is not null)
                 {
                     process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
                 }

@@ -25,7 +25,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public ProcessTimeoutPolicy()
     {
         TimeoutThreshold = TimeSpan.FromMinutes(30);
-
         CancellationMode = ProcessCancellationMode.Graceful;
     }
 
@@ -70,9 +69,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public bool Equals(ProcessTimeoutPolicy? other)
     {
         if (other is null)
-        {
             return false;
-        }
             
         return TimeoutThreshold.Equals(other.TimeoutThreshold)
                && CancellationMode == other.CancellationMode;
@@ -86,14 +83,10 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public override bool Equals(object? obj)
     {
         if(obj is null)
-        {
             return false;
-        }
             
         if (obj is ProcessTimeoutPolicy policy)
-        {
             return Equals(policy);
-        }
 
         return false;
     }
@@ -116,9 +109,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public static bool Equals(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
             
         return left.Equals(right);
     }
@@ -154,9 +145,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public static bool operator >(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
 
         return left.TimeoutThreshold > right.TimeoutThreshold;
     }
@@ -170,15 +159,11 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public static bool operator <(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
 
         if (left.CancellationMode == ProcessCancellationMode.None &&
             right.CancellationMode != ProcessCancellationMode.None)
-        {
             return false;
-        }
 
         return left.TimeoutThreshold < right.TimeoutThreshold;
     }
@@ -192,9 +177,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public static bool operator >=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
 
         return left.TimeoutThreshold >= right.TimeoutThreshold;
     }
@@ -208,9 +191,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public static bool operator <=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
 
         return left.TimeoutThreshold <= right.TimeoutThreshold;
     }
