@@ -72,12 +72,12 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
             {
                 IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder(
                         WindowsTestExecutables.WinCalcExePath)
-                    .WithWorkingDirectory(Environment.SystemDirectory)
-                    .WithValidation(ProcessResultValidation.ExitCodeZero);
-            
+                    .WithWorkingDirectory(Environment.SystemDirectory);
+                
                 ProcessConfiguration commandConfiguration = configurationBuilder.Build();
                 
                 ProcessResult result = await _processInvoker.ExecuteAsync(commandConfiguration,
+                   null,
                     CancellationToken.None);
                 
                 Assert.True(Process.GetProcessesByName("Calculator").Any() &&

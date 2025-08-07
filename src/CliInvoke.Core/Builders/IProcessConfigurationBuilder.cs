@@ -86,13 +86,6 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure);
     
     /// <summary>
-    /// Sets the Result Validation whether to throw an exception or not if the Process does not execute successfully.
-    /// </summary>
-    /// <param name="validation">The result validation behaviour to be used.</param>
-    /// <returns>The new ProcessConfigurationBuilder object with the configured Result Validation behaviour.</returns>
-    IProcessConfigurationBuilder WithValidation(ProcessResultValidation validation);
-    
-    /// <summary>
     /// Sets the Standard Input Pipe source.
     /// </summary>
     /// <param name="source">The source to use for the Standard Input pipe.</param>
@@ -120,13 +113,6 @@ public interface IProcessConfigurationBuilder
     /// <returns>The new ProcessConfigurationBuilder with the specified Process Resource Policy.</returns>
     IProcessConfigurationBuilder WithProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy);
 
-    /// <summary>
-    /// Sets the Process Timeout Policy to be used for this Process.
-    /// </summary>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Process Timeout Policy.</returns>
-    IProcessConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
-    
     /// <summary>
     /// Enables or disables Process execution via Shell Execution.
     /// </summary>
