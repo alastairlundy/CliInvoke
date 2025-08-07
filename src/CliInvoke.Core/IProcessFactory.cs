@@ -119,33 +119,15 @@ public interface IProcessFactory
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// A Task that returns a BufferedProcessResult when the specified process exits.
-    /// </summary>
-    /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
-    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The task and BufferedProcessResult that are returned upon the process' exit.</returns>
-    Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process,
-        ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);  
-    
-    /// <summary>
-    /// A Task that returns a PipedProcessResult when the specified process exits.
-    /// </summary>
-    /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The Buffered Process Result that is returned from running the process.</returns>
-    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, 
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process"></param>
     /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
-    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, 
-        ProcessExitInfo? processExitInfo = null, CancellationToken cancellationToken = default);
+    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
+        ProcessExitInfo? processExitInfo = null, 
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// A Task that returns a PipedProcessResult when the specified process exits.

@@ -53,6 +53,7 @@ public class ProcessInvoker : IProcessInvoker
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -162,6 +163,7 @@ public class ProcessInvoker : IProcessInvoker
     /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
 #if NET5_0_OR_GREATER
@@ -296,6 +298,7 @@ public class ProcessInvoker : IProcessInvoker
         Process process = _processFactory.StartNew(startInfo);
 
         PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process,
+            processExitInfo,
             cancellationToken: cancellationToken);
         
         return result;
@@ -323,10 +326,15 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, ProcessExitInfo? processExitInfo = null,
-        ProcessResourcePolicy? processResourcePolicy = null, UserCredential? userCredential = null,
+    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, 
+        ProcessExitInfo? processExitInfo = null,
+        ProcessResourcePolicy? processResourcePolicy = null,
+        UserCredential? userCredential = null,
         StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
     {
+        if (processExitInfo is null) 
+            processExitInfo = ProcessExitInfo.Default;
+        
         if (File.Exists(processStartInfo.FileName) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
@@ -353,7 +361,7 @@ public class ProcessInvoker : IProcessInvoker
             process.SetResourcePolicy(processResourcePolicy);
         
         PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process,
-            cancellationToken: cancellationToken);
+            processExitInfo, cancellationToken);
 
         return result;
     }
