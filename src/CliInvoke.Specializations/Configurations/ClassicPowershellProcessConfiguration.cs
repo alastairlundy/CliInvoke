@@ -47,7 +47,6 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="requiresAdministrator">Indicates whether the command requires administrator privileges.</param>
     /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
     /// <param name="credentials">The user credentials to be used when running the command.</param>
-    /// <param name="resultValidation">The validation criteria for the command result.</param>
     /// <param name="standardInput">The stream for the standard input.</param>
     /// <param name="standardOutput">The stream for the standard output.</param>
     /// <param name="standardError">The stream for the standard error.</param>
@@ -71,7 +70,6 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         requiresAdministrator,
         environmentVariables,
         credentials,
-        resultValidation,
         standardInput,
         standardOutput,
         standardError,
