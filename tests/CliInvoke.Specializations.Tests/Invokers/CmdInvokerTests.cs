@@ -41,12 +41,11 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else
         if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 #endif
-            {
-                IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
-                        (ExecutedCommandHelper.WinCalcExePath)
-                    .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
-                        string.Empty))
-                    .WithValidation(ProcessResultValidation.ExitCodeZero);
+        {
+            IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
+                    (ExecutedCommandHelper.WinCalcExePath)
+                .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
+                    string.Empty));
             
                 ProcessConfiguration commandConfiguration = configurationBuilder.Build();
 

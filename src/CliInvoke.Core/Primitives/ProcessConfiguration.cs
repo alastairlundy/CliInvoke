@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -58,7 +57,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         RequiresAdministrator = processConfiguration.RequiresAdministrator;
         EnvironmentVariables = processConfiguration.EnvironmentVariables;
         Credential = processConfiguration.Credential ?? UserCredential.Null;
-        ResultValidation = processConfiguration.ResultValidation;
         StandardInput = processConfiguration.StandardInput ?? StreamWriter.Null;
         StandardOutput = processConfiguration.StandardOutput ?? StreamReader.Null;
         StandardError = processConfiguration.StandardError ?? StreamReader.Null;
@@ -68,7 +66,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardErrorEncoding = processConfiguration.StandardErrorEncoding;
             
         ResourcePolicy = processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default;
-        TimeoutPolicy = processConfiguration.TimeoutPolicy ?? ProcessTimeoutPolicy.Default;
         
         WindowCreation = processConfiguration.WindowCreation;
         UseShellExecution = processConfiguration.UseShellExecution;
@@ -111,7 +108,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         bool requiresAdministrator = false,
         IReadOnlyDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
-        ProcessResultValidation commandResultValidation = ProcessResultValidation.ExitCodeZero,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
         StreamReader? standardError = null,
@@ -119,7 +115,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null,
         ProcessResourcePolicy? processResourcePolicy = null,
-        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         bool windowCreation = false,
         bool useShellExecution = false)
     {
@@ -131,9 +126,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Credential = credential ?? UserCredential.Null;
             
         ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
-        TimeoutPolicy = processTimeoutPolicy ?? ProcessTimeoutPolicy.Default;
-        
-        ResultValidation = commandResultValidation;
 
         StandardInput = standardInput ?? StreamWriter.Null;
         StandardOutput = standardOutput ?? StreamReader.Null;
@@ -174,22 +166,17 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public ProcessConfiguration(ProcessStartInfo processStartInfo,
         IReadOnlyDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
-        ProcessResultValidation resultValidation = ProcessResultValidation.ExitCodeZero,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
         StreamReader? standardError = null,
-        ProcessResourcePolicy? processResourcePolicy = null,
-        ProcessTimeoutPolicy? processTimeoutPolicy = null)
+        ProcessResourcePolicy? processResourcePolicy = null)
     {
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
                 
         Credential = credential ?? UserCredential.Null;
             
         ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
-        TimeoutPolicy = processTimeoutPolicy ?? ProcessTimeoutPolicy.Default;
-
-        ResultValidation = resultValidation;
-
+        
         StandardInput = standardInput ?? StreamWriter.Null;
         StandardOutput = standardOutput ?? StreamReader.Null;
         StandardError = standardError ?? StreamReader.Null;
@@ -239,11 +226,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public UserCredential? Credential { get; protected set;  }
 
     /// <summary>
-    /// The result validation to apply to the Command when it is executed.
-    /// </summary>
-    public ProcessResultValidation ResultValidation { get; protected set;  }
-
-    /// <summary>
     /// Whether to use Shell Execution or not when executing the Command.
     /// </summary>
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Input will throw an Exception. This is a known issue with the System Process class.</remarks>
@@ -273,11 +255,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <remarks>Process Resource Policy objects enable configuring Processor Affinity and other resource settings to be applied to the Command if supported by the currently running operating system.
     /// <para>Not all properties of a Process Resource Policy support all operating systems. Check before configuring a property.</para></remarks>
     public ProcessResourcePolicy? ResourcePolicy { get; protected set;  }
-        
-    /// <summary>
-    /// 
-    /// </summary>
-    public ProcessTimeoutPolicy? TimeoutPolicy  { get; protected set;  }
     
     /// <summary>
     /// The encoding to use for the Standard Input.
@@ -311,17 +288,15 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         if (Credential is not null &&
             other.Credential is not null &&
             TargetFilePath != other.TargetFilePath &&
-            ResourcePolicy is not null && TimeoutPolicy is not null)
+            ResourcePolicy is not null)
         {
 
             if (StandardOutput is not null && StandardError is not null)
             {
                 return TargetFilePath.Equals(other.TargetFilePath) &&
                        EnvironmentVariables.Equals(other.EnvironmentVariables) &&
-                       Credential.Equals(other.Credential)
-                       && ResultValidation == other.ResultValidation &&
+                       Credential.Equals(other.Credential) &&
                        ResourcePolicy.Equals(other.ResourcePolicy) &&
-                       TimeoutPolicy.Equals(other.TimeoutPolicy) &&
                        StandardOutput.Equals(other.StandardOutput) &&
                        StandardError.Equals(other.StandardError) &&
                        StandardInputEncoding.Equals(other.StandardInputEncoding) &&
@@ -333,8 +308,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                 return TargetFilePath.Equals(other.TargetFilePath) &&
                        EnvironmentVariables.Equals(other.EnvironmentVariables) &&
                        Credential.Equals(other.Credential) &&
-                       ResultValidation == other.ResultValidation &&
-                       TimeoutPolicy.Equals(other.TimeoutPolicy) &&
                        ResourcePolicy.Equals(other.ResourcePolicy) &&
                        StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                        StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
@@ -345,8 +318,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         else
         {
             return TargetFilePath.Equals(other.TargetFilePath) &&
-                   EnvironmentVariables.Equals(other.EnvironmentVariables)
-                   && ResultValidation == other.ResultValidation &&
+                   EnvironmentVariables.Equals(other.EnvironmentVariables) &&
                    StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                    StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                    StandardErrorEncoding.Equals(other.StandardErrorEncoding);
@@ -391,12 +363,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             hashCode.Add(Credential);
         }
             
-        hashCode.Add((int)ResultValidation);
         hashCode.Add(StandardInput);
         hashCode.Add(StandardOutput);
         hashCode.Add(StandardError);
         hashCode.Add(ResourcePolicy);
-        hashCode.Add(TimeoutPolicy);
         hashCode.Add(StandardInputEncoding);
         hashCode.Add(StandardOutputEncoding);
         hashCode.Add(StandardErrorEncoding);

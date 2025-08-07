@@ -40,8 +40,6 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
 
                         Assert.Equal(builtCommand.Credential,
                                 UserCredential.Null);
-                        Assert.Equal(ProcessResultValidation.ExitCodeZero,
-                                builtCommand.ResultValidation);
 
                         Assert.Equal(builtCommand.StandardInput,
                                 StreamWriter.Null);
@@ -115,22 +113,6 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         //Assert
                         Assert.NotEqual(newArguments,
                                 commandBuilder.Build());
-                }
-
-                [Fact]
-                public void TestValidationReconfigured()
-                {
-                        //Arrange
-                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
-                                .WithValidation(ProcessResultValidation.None);
-                
-                        //Act
-                        commandBuilder = commandBuilder.WithValidation(ProcessResultValidation.ExitCodeZero);
-                
-                        //Assert
-                        ProcessConfiguration command = commandBuilder.Build();
-                        Assert.Equal(ProcessResultValidation.ExitCodeZero,
-                                command.ResultValidation);
                 }
 
 #if NET5_0_OR_GREATER

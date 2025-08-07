@@ -72,7 +72,9 @@ public interface IProcessFactory
     /// <param name="resourcePolicy">The process resource policy to use when creating and starting the new Process.</param>
     /// <param name="credential">The credential to use when creating and starting the Process.</param>
     /// <returns>The newly created and started Process with the start info and Process Resource Policy.</returns>
-    Process StartNew(ProcessStartInfo startInfo, ProcessResourcePolicy resourcePolicy, UserCredential credential);
+    Process StartNew(ProcessStartInfo startInfo,
+        ProcessResourcePolicy resourcePolicy,
+        UserCredential credential);
     
     /// <summary>
     /// Creates and starts a new Process with the specified configuration.
@@ -80,54 +82,40 @@ public interface IProcessFactory
     /// <param name="configuration">The configuration to use when creating and starting the process.</param>
     /// <returns>The newly created and started Process with the specified configuration.</returns>
     Process StartNew(ProcessConfiguration configuration);
-
+    
     /// <summary>
     /// A Task that returns a ProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and ProcessResult that are returned upon the process' exit.</returns>
-    Task<ProcessResult> ContinueWhenExitAsync(Process process, CancellationToken cancellationToken = default);
+    Task<ProcessResult> ContinueWhenExitAsync(Process process, 
+        ProcessExitInfo? processExitInfo = null,
+        CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// A Task that returns a ProcessResult when the specified process exits.
-    /// </summary>
-    /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
-    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The task and ProcessResult that are returned upon the process' exit.</returns>
-    Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation,
-        ProcessTimeoutPolicy? processTimeoutPolicy = null, CancellationToken cancellationToken = default);
-        
     /// <summary>
     /// A Task that returns a ProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and ProcessResult that are returned upon the process' exit.</returns>
-    Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessConfiguration processConfiguration,
+    Task<ProcessResult> ContinueWhenExitAsync(Process process,
+        ProcessConfiguration processConfiguration,
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// A Task that returns a BufferedProcessResult when the specified process exits.
-    /// </summary>
-    /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The task and BufferedProcessResult that are returned upon the process' exit.</returns>
-    Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// A Task that returns a BufferedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
     /// <returns>The task and BufferedProcessResult that are returned upon the process' exit.</returns>
     Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process,
-        ProcessResultValidation resultValidation, ProcessTimeoutPolicy? processTimeoutPolicy = null,
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -146,26 +134,29 @@ public interface IProcessFactory
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The Buffered Process Result that is returned from running the process.</returns>
-    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, CancellationToken cancellationToken = default);
+    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, 
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// A Task that returns a PipedProcessResult when the specified process exits.
+    /// </summary>
+    /// <param name="process"></param>
+    /// <param name="processExitInfo"></param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
+    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, 
+        ProcessExitInfo? processExitInfo = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
-    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The Piped Process Result that is returned from running the process.</returns>
-    Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, ProcessResultValidation resultValidation,
-        ProcessTimeoutPolicy? processTimeoutPolicy = null, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// A Task that returns a PipedProcessResult when the specified process exits.
-    /// </summary>
-    /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
-        ProcessConfiguration processConfiguration, CancellationToken cancellationToken = default);
+        ProcessConfiguration processConfiguration,
+        ProcessExitInfo? processExitInfo = null,
+        CancellationToken cancellationToken = default);
 }

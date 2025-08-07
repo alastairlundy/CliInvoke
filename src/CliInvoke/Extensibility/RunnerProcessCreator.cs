@@ -54,7 +54,6 @@ public class RunnerProcessCreator : IRunnerProcessCreator
             .WithStandardOutputPipe(inputProcess.StandardOutput ?? StreamReader.Null)
             .WithStandardErrorPipe(inputProcess.StandardError ?? StreamReader.Null)
             .WithUserCredential(inputProcess.Credential ?? UserCredential.Null)
-            .WithValidation(inputProcess.ResultValidation)
             .WithAdministratorPrivileges(inputProcess.RequiresAdministrator)
             .WithShellExecution(inputProcess.UseShellExecution)
             .WithWindowCreation(inputProcess.WindowCreation);
