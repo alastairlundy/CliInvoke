@@ -36,16 +36,16 @@ public class ProcessInvoker : IProcessInvoker
 {
     private readonly IProcessPipeHandler _processPipeHandler;
     
-    private readonly IProcessFactory _processFactory;
+    private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>  
     /// Instantiates an invoker for invoking processes, providing a centralized way to execute external commands.
     /// </summary>
-    /// <param name="processFactory">The process factory to be used to create and run the invoked processes.</param>
+    /// <param name="filePathResolver"></param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
-    public ProcessInvoker(IProcessFactory processFactory, IProcessPipeHandler processPipeHandler)
+    public ProcessInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
-        _processFactory = processFactory;
+        _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;
     }
 
