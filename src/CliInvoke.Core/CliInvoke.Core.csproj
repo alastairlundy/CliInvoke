@@ -22,14 +22,10 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.4</Version>
-        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 3
-* Brought back Primitives into CliInvoke.Core
-* Added ``ProcessTimeoutPolicy`` Support
-* Simplified Primitives namespace
-* Updated to internal Polyfill version 8.7.4 from 8.7.3
-* Removed reliance on DotPrimitives packages
-* Removed ``StartInfo`` property from ``ProcessConfiguration``</PackageReleaseNotes>
+        <Version>2.0.0-alpha.5</Version>
+        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 4
+* Updated Polyfill from 8.7.3 to 8.7.4
+* Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` into a new type ``ProcessExitInfo``</PackageReleaseNotes>
     </PropertyGroup>
     
     <ItemGroup>
