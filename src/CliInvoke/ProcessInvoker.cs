@@ -261,7 +261,6 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
-    /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
@@ -317,6 +316,8 @@ public class ProcessInvoker : IProcessInvoker
             await process.StandardError.ReadToEndAsync(cancellationToken),
             process.StartTime, process.ExitTime);
 
+        process.Dispose();
+        
         return result;
     }
 
@@ -373,16 +374,17 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// 
+    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
+    /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processStartInfo"></param>
     /// <param name="processExitInfo"></param>
-    /// <param name="processResourcePolicy"></param>
-    /// <param name="userCredential"></param>
-    /// <param name="standardInput"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="FileNotFoundException"></exception>
+    /// <param name="processResourcePolicy">The resource policy to be set if not null.</param>
+    /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
+    /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Buffered Process Results from running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -404,13 +406,6 @@ public class ProcessInvoker : IProcessInvoker
         
         if (processExitInfo is null) 
             processExitInfo = ProcessExitInfo.Default;
-        
-        if (File.Exists(processStartInfo.FileName) == false)
-        {
-            throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}",
-                    processStartInfo.FileName));
-        }
         
         processStartInfo.RedirectStandardOutput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
