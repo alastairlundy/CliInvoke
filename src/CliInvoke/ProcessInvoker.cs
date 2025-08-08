@@ -74,6 +74,8 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitInfo? processExitInfo,
         CancellationToken cancellationToken = default)
     {
+        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
+        
         if (processExitInfo is null)
             processExitInfo = ProcessExitInfo.Default;
         
@@ -89,7 +91,7 @@ public class ProcessInvoker : IProcessInvoker
         process.ApplyProcessConfiguration(processConfiguration, 
             processConfiguration.StandardOutput is not null && processConfiguration.StandardOutput != StreamReader.Null,
             processConfiguration.StandardError is not null && processConfiguration.StandardError != StreamReader.Null);
-
+        
         process.Start();
         
         process.SetResourcePolicy(processConfiguration.ResourcePolicy);
@@ -140,6 +142,8 @@ public class ProcessInvoker : IProcessInvoker
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
+        processStartInfo.FileName = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
+
         if(processExitInfo is null)
             processExitInfo = ProcessExitInfo.Default;
         
@@ -210,6 +214,8 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitInfo? processExitInfo,
         CancellationToken cancellationToken = default)
     {
+        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
+        
         if (processExitInfo is null) 
             processExitInfo = ProcessExitInfo.Default;
         
@@ -275,6 +281,11 @@ public class ProcessInvoker : IProcessInvoker
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
+        processStartInfo.FileName = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
+        
+        if(processExitInfo is null)
+            processExitInfo = ProcessExitInfo.Default;
+        
         processStartInfo.RedirectStandardInput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.RedirectStandardError = true;
@@ -298,6 +309,8 @@ public class ProcessInvoker : IProcessInvoker
         if(processResourcePolicy is not null)
             process.SetResourcePolicy(processResourcePolicy);
 
+        await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        
         BufferedProcessResult result = new BufferedProcessResult(
             process.StartInfo.FileName, process.ExitCode,
             await process.StandardOutput.ReadToEndAsync(cancellationToken),
@@ -331,6 +344,8 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitInfo? processExitInfo,
         CancellationToken cancellationToken = default)
     {
+        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
+        
         if (processExitInfo is null) 
             processExitInfo = ProcessExitInfo.Default;
         
@@ -385,6 +400,8 @@ public class ProcessInvoker : IProcessInvoker
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
     {
+        processStartInfo.FileName = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
+        
         if (processExitInfo is null) 
             processExitInfo = ProcessExitInfo.Default;
         
