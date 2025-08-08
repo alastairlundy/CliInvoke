@@ -1,3 +1,13 @@
+/*
+    AlastairLundy.CliInvoke
+     
+    Copyright (C) 2024-2025  Alastair Lundy
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,14 +24,14 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// </summary>
 public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
 {
-    private readonly ProcessStartInfo _startInfo;
+    private readonly ProcessConfiguration _configuration;
 
     /// <summary>
     /// 
     /// </summary>
     public ProcessStartInfoBuilder()
     {
-        _startInfo = new ProcessStartInfo();
+        _configuration = new ProcessConfiguration();
     }
     
     /// <summary>
@@ -30,7 +40,7 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
     /// <param name="startInfo"></param>
     protected ProcessStartInfoBuilder(ProcessStartInfo startInfo)
     {
-        _startInfo = startInfo;
+        
     }
     
     
