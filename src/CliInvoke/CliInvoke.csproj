@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
@@ -40,19 +40,11 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="Polyfill" Version="8.7.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" PrivateAssets="All" />
-    </ItemGroup>
-    
-    <ItemGroup>
       <Content Include="..\..\README.md">
         <Link>README.md</Link>
           <PackagePath>README.md</PackagePath>
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <None Include="..\..\THIRD_PARTY_NOTICES.txt">
-        <Link>THIRD_PARTY_NOTICES.txt</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
     
     <ItemGroup>

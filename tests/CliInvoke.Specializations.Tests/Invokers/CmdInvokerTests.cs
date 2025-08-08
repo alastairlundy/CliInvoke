@@ -15,9 +15,6 @@ using CliInvoke.Specializations.Tests.Helpers;
 
 namespace CliInvoke.Specializations.Tests.Invokers
 {
-#if NET48_OR_GREATER
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
 
     public class CmdInvokerTests : IClassFixture<TestFixture>
     {
@@ -36,11 +33,7 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
         [Fact]
         public async Task Invoke_Calc_Open_With_CMD_Test()
         {
-#if NET48_OR_GREATER || NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
-#else
-        if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
         {
             IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
                     (ExecutedCommandHelper.WinCalcExePath)

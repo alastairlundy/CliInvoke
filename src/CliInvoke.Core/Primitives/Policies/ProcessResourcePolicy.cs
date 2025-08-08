@@ -7,9 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 using System;
 using System.Diagnostics;
@@ -41,21 +41,15 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     {
         processorAffinity ??= new IntPtr(0x0001);
 
-#if NET5_0_OR_GREATER
+
         if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
-#else
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-#endif
         {
             MinWorkingSet = minWorkingSet;
             MaxWorkingSet = maxWorkingSet;
         }
 
-#if NET5_0_OR_GREATER
+
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
-#else
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-#endif
         {
             ProcessorAffinity = processorAffinity;
         }
@@ -68,10 +62,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// The cores and threads to assign to the Process.
     /// </summary>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-#endif
     public IntPtr? ProcessorAffinity { get; }
     
     /// <summary>
@@ -88,28 +80,26 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// The Minimum Working Set size to be used for the Process.
     /// </summary>
     /// <remarks>This property is not supported on Linux-based operating systems.</remarks>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
-#endif
     public nint? MinWorkingSet { get; }
     
     /// <summary>
     /// Maximum Working Set size to be used for the Process.
     /// </summary>
     /// <remarks>This property is not supported on Linux-based operating systems.</remarks>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
-#endif
+
     public nint? MaxWorkingSet { get; }
     
     /// <summary>

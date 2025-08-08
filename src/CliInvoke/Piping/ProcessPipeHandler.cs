@@ -10,9 +10,9 @@
 using System.Diagnostics;
 using System.IO;
 
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 using System.Threading.Tasks;
 
@@ -32,7 +32,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
     /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -42,7 +42,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif 
+ 
     public async Task<Process> PipeStandardInputAsync(Stream source, Process destination)
     {
         if (destination.StartInfo.RedirectStandardInput && destination.StandardInput != StreamWriter.Null)
@@ -60,7 +60,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// </summary>
     /// <param name="source">The process from which to read the standard output data.</param>
     /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -70,7 +70,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif 
+ 
     public async Task<Stream> PipeStandardOutputAsync(Process source)
     {
         Stream destination = new MemoryStream();
@@ -91,7 +91,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// </summary>
     /// <param name="source">The process from which to read the standard error data.</param>
     /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -101,7 +101,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif 
+ 
     public async Task<Stream> PipeStandardErrorAsync(Process source)
     {
         Stream destination = new MemoryStream();

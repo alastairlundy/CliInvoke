@@ -10,9 +10,9 @@ using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using Xunit;
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 namespace AlastairLundy.CliInvoke.Tests.Builders
 {
@@ -115,9 +115,9 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                                 commandBuilder.Build());
                 }
 
-#if NET5_0_OR_GREATER
+
                 [SupportedOSPlatform("windows")]
-#endif
+
                 [Fact]
                 public void TestReconfiguredUserCredential()
                 {
@@ -154,12 +154,12 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                                 command.Credential);
                 }
 
-#if NET5_0_OR_GREATER
+
                 [SupportedOSPlatform("windows")]
                 [SupportedOSPlatform("linux")]
                 [SupportedOSPlatform("macos")]
                 [SupportedOSPlatform("freebsd")]
-#endif
+
                 [Fact]
                 public void TestReconfiguredResourcePolicy()
                 {
