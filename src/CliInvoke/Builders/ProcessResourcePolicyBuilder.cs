@@ -14,9 +14,9 @@ using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 namespace AlastairLundy.CliInvoke.Builders;
 
@@ -50,10 +50,8 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-#endif
     [Pure]
     public IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity) =>
         new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
@@ -70,7 +68,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// </summary>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -79,7 +77,6 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("android")]
-#endif
     [Pure]
     public IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet) =>
         new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
@@ -97,7 +94,6 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
     [Pure]
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -106,7 +102,6 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("android")]
-#endif
     public IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet) =>
         new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
 #pragma warning disable CA1416

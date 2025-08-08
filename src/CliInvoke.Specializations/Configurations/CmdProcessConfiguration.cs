@@ -13,22 +13,18 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
+
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#else
 using System.Runtime.Versioning;
-#endif
-// ReSharper disable UnusedMember.Global
 
+// ReSharper disable UnusedMember.Global
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;
 
 /// <summary>
 /// A Command configuration to make running commands through Windows CMD easier.
 /// </summary>
-#if NET5_0_OR_GREATER
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]
 [UnsupportedOSPlatform("linux")]
@@ -38,7 +34,6 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations;
 [UnsupportedOSPlatform("browser")]
 [UnsupportedOSPlatform("tvos")]
 [UnsupportedOSPlatform("watchos")]
-#endif
 public class CmdProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
@@ -49,7 +44,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="requiresAdministrator">Indicates whether the command requires administrator privileges.</param>
     /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
     /// <param name="credentials">The user credentials to be used when running the command.</param>
-    /// <param name="resultValidation">The validation criteria for the command result.</param>
     /// <param name="standardInput">The stream for the standard input.</param>
     /// <param name="standardOutput">The stream for the standard output.</param>
     /// <param name="standardError">The stream for the standard error.</param>
@@ -85,14 +79,12 @@ public class CmdProcessConfiguration : ProcessConfiguration
         base.TargetFilePath = this.TargetFilePath;
     }
 
-        
+
     /// <summary>
     /// The target file path of Cmd.
     /// </summary>
-    /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Windows based operating system.</exception>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]        
-#endif
+    /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Windows-based operating system.</exception>
+    [SupportedOSPlatform("windows")]
     public new string TargetFilePath
     {
         get
@@ -102,7 +94,8 @@ public class CmdProcessConfiguration : ProcessConfiguration
                 throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
             }
 
-            return Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe"; ;
+            return Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe";
+            ;
         }
     }
 }

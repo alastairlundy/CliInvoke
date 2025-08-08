@@ -22,10 +22,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
-
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
 
 namespace AlastairLundy.CliInvoke;
 
@@ -58,7 +55,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <returns>The Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -68,7 +65,7 @@ public class ProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitInfo? processExitInfo,
         CancellationToken cancellationToken = default)
@@ -110,7 +107,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <returns>The Process Results from the running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -120,7 +117,7 @@ public class ProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public async Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
         ProcessExitInfo? processExitInfo,
         ProcessResourcePolicy? processResourcePolicy = null,
@@ -166,7 +163,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -176,7 +173,7 @@ public class ProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitInfo? processExitInfo,
@@ -219,7 +216,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -229,7 +226,7 @@ public class ProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
         ProcessExitInfo? processExitInfo,
         ProcessResourcePolicy? processResourcePolicy = null,
@@ -271,7 +268,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -281,7 +278,7 @@ public class ProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitInfo? processExitInfo,
@@ -315,7 +312,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <exception cref="FileNotFoundException"></exception>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -325,7 +322,7 @@ public class ProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, 
         ProcessExitInfo? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,

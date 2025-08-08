@@ -25,9 +25,9 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Core.Builders;
 
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 
 namespace AlastairLundy.CliInvoke.Builders;
@@ -251,13 +251,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// </summary>
     /// <param name="credential">The user credential to be used for authentication.</param>
     /// <returns>A reference to this builder with an updated user credential, allowing method chaining.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-#endif
+
     [Pure]
     public IProcessConfigurationBuilder WithUserCredential(UserCredential credential)
     {
@@ -287,13 +287,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <returns>The new CommandBuilder with the specified Credentials.</returns>
     /// <remarks>Credentials are only supported with the Process class on Windows. This is a limitation of .NET's Process class.</remarks>
     [Pure]
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-#endif
+
     public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
         UserCredential credential;
@@ -323,7 +323,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="validation">The validation mode to be used for the process result.</param>
     /// <returns>A reference to this builder with the specified validation configuration,
     /// allowing method chaining.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("macos")]
@@ -331,7 +331,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-#endif
+
     [Pure]
     public IProcessConfigurationBuilder WithValidation(Process validation)
     {

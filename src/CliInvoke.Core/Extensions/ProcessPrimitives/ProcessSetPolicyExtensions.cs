@@ -10,15 +10,10 @@
 
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 using AlastairLundy.CliInvoke.Core.Internal;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
-
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
 
 namespace AlastairLundy.CliInvoke.Core;
 
@@ -46,44 +41,37 @@ public static class ProcessSetPolicyExtensions
         {
             processHasStarted = false;
         }
-        
-        if (processHasStarted && resourcePolicy != null)
-        {
-#if NET5_0_OR_GREATER
-            if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
-#else
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ||
-                    RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-#endif
-            {
-                if (resourcePolicy.ProcessorAffinity is not null)
-                {
-                    process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
-                }
-            }
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
-                OperatingSystem.IsMacCatalyst() ||
-                OperatingSystem.IsFreeBSD() ||
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                if (resourcePolicy.MinWorkingSet is not null)
-                {
-                    process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
-                }
-
-                if (resourcePolicy.MaxWorkingSet is not null)
-                {
-                    process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
-                }
-            }
-        
-            process.PriorityClass = resourcePolicy.PriorityClass;
-            process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
-        }
-        else
+        if (!processHasStarted || resourcePolicy == null)
         {
             throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
         }
+        
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        {
+            if (resourcePolicy.ProcessorAffinity is not null)
+            {
+                process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
+            }
+        }
+
+        if (OperatingSystem.IsMacOS() ||
+            OperatingSystem.IsMacCatalyst() ||
+            OperatingSystem.IsFreeBSD() ||
+            OperatingSystem.IsWindows())
+        {
+            if (resourcePolicy.MinWorkingSet is not null)
+            {
+                process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
+            }
+
+            if (resourcePolicy.MaxWorkingSet is not null)
+            {
+                process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
+            }
+        }
+
+        process.PriorityClass = resourcePolicy.PriorityClass;
+        process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
     }
 }

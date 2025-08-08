@@ -13,9 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
 
 using System.Text;
 
@@ -37,7 +35,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// Configures this Command configuration with the specified Command configuration.
     /// </summary>
     /// <param name="processConfiguration">The command configuration to be used to configure the Command to be run.</param>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -48,7 +45,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public ProcessConfiguration(ProcessConfiguration processConfiguration)
     {
         TargetFilePath = processConfiguration.TargetFilePath;
@@ -91,7 +87,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processTimeoutPolicy"></param>
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -102,7 +97,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public ProcessConfiguration(string targetFilePath,
         string? arguments = null, string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
@@ -145,13 +139,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processStartInfo"></param>
     /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
     /// <param name="credential">The credential to be used (if specified).</param>
-    /// <param name="resultValidation">Whether to perform Result Validation and exception throwing if the Command exits with an exit code other than 0.</param>
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
-    /// <param name="processTimeoutPolicy"></param>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -162,7 +153,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public ProcessConfiguration(ProcessStartInfo processStartInfo,
         IReadOnlyDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
@@ -471,7 +461,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     /// <returns>A new ProcessStartInfo object configured with the specified Process object values.</returns>
     /// <exception cref="ArgumentException">Thrown if the Target File Path is null or empty.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -482,7 +471,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public ProcessStartInfo ToProcessStartInfo()
     {
         bool redirectStandardInput = StandardInput is not null && StandardInput != StreamWriter.Null;
@@ -500,7 +488,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="redirectStandardError">Whether to redirect the Standard Error.</param>
     /// <returns>A new ProcessStartInfo object configured with the specified parameters and Process object values.</returns>
     /// <exception cref="ArgumentException">Thrown if the process configuration's Target File Path is null or empty.</exception>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -511,7 +499,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public ProcessStartInfo ToProcessStartInfo(bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError)
     {
         if (string.IsNullOrEmpty(TargetFilePath))
@@ -552,9 +539,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             
         if (output.RedirectStandardInput)
         {
-#if NETSTANDARD2_1 || NET5_0_OR_GREATER
             output.StandardInputEncoding = StandardInputEncoding;
-#endif
         }
 
         output.StandardOutputEncoding = StandardOutputEncoding;
