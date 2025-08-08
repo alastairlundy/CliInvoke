@@ -3,16 +3,40 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Builders;
 
+/// <summary>
+/// 
+/// </summary>
 public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
 {
+    private readonly ProcessStartInfo _startInfo;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public ProcessStartInfoBuilder()
+    {
+        _startInfo = new ProcessStartInfo();
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="startInfo"></param>
+    protected ProcessStartInfoBuilder(ProcessStartInfo startInfo)
+    {
+        _startInfo = startInfo;
+    }
+    
+    
     public IProcessStartInfoBuilder WithArguments(IEnumerable<string> arguments)
     {
-        
+       
     }
 
     public IProcessStartInfoBuilder WithArguments(IEnumerable<string> arguments, bool escapeArguments)
@@ -81,17 +105,17 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
         
     }
 
-    public ProcessStartInfo Build()
-    {
-        
-    }
-
     public IProcessStartInfoBuilder WithProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy)
     {
         
     }
 
     public IProcessStartInfoBuilder WithUserCredential(UserCredential credentials)
+    {
+        
+    }
+    
+    public ProcessStartInfo Build()
     {
         
     }
