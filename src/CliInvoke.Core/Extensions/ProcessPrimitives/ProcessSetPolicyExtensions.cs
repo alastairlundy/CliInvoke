@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using AlastairLundy.CliInvoke.Core.Internal;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.DotExtensions.Processes;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -35,19 +36,7 @@ public static class ProcessSetPolicyExtensions
     /// <exception cref="InvalidOperationException"></exception>
     public static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
     {
-        bool processHasStarted;
-
-        try
-        {
-            processHasStarted = process.HasExited == false
-                                && process.StartTime.ToUniversalTime() <= DateTime.UtcNow;
-        }
-        catch
-        {
-            processHasStarted = false;
-        }
-        
-        if (processHasStarted && resourcePolicy != null)
+        if (process.HasStarted() && resourcePolicy != null)
         {
 #if NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())

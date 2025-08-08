@@ -60,7 +60,6 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         IReadOnlyDictionary<string, string> environmentVariables = null, 
         UserCredential credentials = null,
-        ProcessResultValidation resultValidation = ProcessResultValidation.ExitCodeZero,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,

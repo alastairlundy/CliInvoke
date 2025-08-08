@@ -80,7 +80,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
     /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
     /// <param name="credential">The credential to be used (if specified).</param>
-    /// <param name="commandResultValidation">Whether to perform Result Validation and exception throwing if the Command exits with an exit code other than 0.</param>
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
@@ -88,7 +87,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="standardOutputEncoding">The Standard Output Encoding to be used (if specified).</param>
     /// <param name="standardErrorEncoding">The Standard Error Encoding to be used (if specified).</param>
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
-    /// <param name="processTimeoutPolicy"></param>
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
 #if NET5_0_OR_GREATER
@@ -145,12 +143,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processStartInfo"></param>
     /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
     /// <param name="credential">The credential to be used (if specified).</param>
-    /// <param name="resultValidation">Whether to perform Result Validation and exception throwing if the Command exits with an exit code other than 0.</param>
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
-    /// <param name="processTimeoutPolicy"></param>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -464,102 +460,5 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             .Labels_ProcessConfiguration_ToString_ShellExecution}" : "";
 
         return $"{commandString}{workingDirectory}{adminPrivileges}{shellExecution}";
-    }
-        
-    /// <summary>
-    /// Creates Process Start Information based on this Process configuration's values.
-    /// </summary>
-    /// <returns>A new ProcessStartInfo object configured with the specified Process object values.</returns>
-    /// <exception cref="ArgumentException">Thrown if the Target File Path is null or empty.</exception>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("watchos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
-    public ProcessStartInfo ToProcessStartInfo()
-    {
-        bool redirectStandardInput = StandardInput is not null && StandardInput != StreamWriter.Null;
-        bool redirectStandardError = StandardError is not null && StandardOutput != StreamReader.Null;
-        bool redirectStandardOutput = StandardOutput is not null && StandardError != StreamReader.Null;
-            
-        return ToProcessStartInfo(redirectStandardInput, redirectStandardOutput, redirectStandardError);
-    }
-
-    /// <summary>
-    /// Creates Process Start Information based on specified parameters and Process configuration object values.
-    /// </summary>
-    /// <param name="redirectStandardInput"></param>
-    /// <param name="redirectStandardOutput">Whether to redirect the Standard Output.</param>
-    /// <param name="redirectStandardError">Whether to redirect the Standard Error.</param>
-    /// <returns>A new ProcessStartInfo object configured with the specified parameters and Process object values.</returns>
-    /// <exception cref="ArgumentException">Thrown if the process configuration's Target File Path is null or empty.</exception>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("watchos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
-    public ProcessStartInfo ToProcessStartInfo(bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError)
-    {
-        if (string.IsNullOrEmpty(TargetFilePath))
-        {
-            throw new ArgumentException(Resources.Exceptions_ProcessConfiguration_TargetFilePath_Empty);
-        }
-            
-        ProcessStartInfo output = new ProcessStartInfo()
-        {
-            FileName = TargetFilePath,
-            WorkingDirectory = WorkingDirectoryPath,
-            UseShellExecute = UseShellExecution,
-            CreateNoWindow = WindowCreation,
-            RedirectStandardInput = redirectStandardInput,
-            RedirectStandardOutput = redirectStandardOutput,
-            RedirectStandardError = redirectStandardError,
-        };
-
-        if (string.IsNullOrEmpty(Arguments) == false)
-        {
-            output.Arguments = Arguments;
-        }
-            
-        if (RequiresAdministrator)
-        {
-            output.RunAsAdministrator();
-        }
-
-        if (Credential is not null)
-        {
-            output.TryApplyUserCredential(Credential);
-        }
-
-        if (EnvironmentVariables.Any())
-        {
-            output.ApplyEnvironmentVariables(EnvironmentVariables);
-        }
-            
-        if (output.RedirectStandardInput)
-        {
-#if NETSTANDARD2_1 || NET5_0_OR_GREATER
-            output.StandardInputEncoding = StandardInputEncoding;
-#endif
-        }
-
-        output.StandardOutputEncoding = StandardOutputEncoding;
-        output.StandardErrorEncoding = StandardErrorEncoding;
-            
-        return output;
     }
 }

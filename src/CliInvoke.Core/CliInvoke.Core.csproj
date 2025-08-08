@@ -29,6 +29,7 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.0.0-preview.2" />
         <PackageReference Include="Polyfill" Version="8.7.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" PrivateAssets="All" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
     </ItemGroup>

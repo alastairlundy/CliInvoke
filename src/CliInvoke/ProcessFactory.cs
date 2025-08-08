@@ -125,20 +125,13 @@ public class ProcessFactory : IProcessFactory
 #endif
     public Process From(ProcessConfiguration configuration)
     {
-        Process output;
+        Process output = new Process();
         
-        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        if (configuration.Credential != null)
-        {
-            output = From(configuration.ToProcessStartInfo(),
-                configuration.Credential);
-        }
-        else
-        {
-            output = From(configuration.ToProcessStartInfo());
-        }
+        output.ApplyProcessConfiguration(configuration, 
+            configuration.StandardOutput is not null && configuration.StandardOutput != StreamReader.Null,
+            configuration.StandardError is not null && configuration.StandardError != StreamReader.Null);
 
-        return output; 
+        return output;
     }
 
     /// <summary>

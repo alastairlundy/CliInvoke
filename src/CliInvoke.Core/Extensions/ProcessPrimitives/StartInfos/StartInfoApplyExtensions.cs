@@ -132,7 +132,9 @@ public static class StartInfoApplyExtensions
         {
             processStartInfo.Verb = "runas";
         }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || OperatingSystem.IsFreeBSD())
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
+                 RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
+                 OperatingSystem.IsFreeBSD())
         {
             processStartInfo.Verb = "sudo";
         }

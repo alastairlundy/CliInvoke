@@ -27,8 +27,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                 IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
                 IFilePathResolver filePathResolver = new FilePathResolver();
 
-                processInvoker = new ProcessInvoker(new ProcessFactory(filePathResolver,
-                        processPipeHandler),
+                processInvoker = new ProcessInvoker(filePathResolver,
                     processPipeHandler);
 
                 IProcessConfigurationBuilder dotnetConfigurationBuilder;

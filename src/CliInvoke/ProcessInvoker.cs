@@ -20,6 +20,7 @@ using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
+using AlastairLundy.CliInvoke.Extensions.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 
@@ -82,12 +83,21 @@ public class ProcessInvoker : IProcessInvoker
                 Resources.Exceptions_FileNotFound.Replace("{file}",
                     processConfiguration.TargetFilePath));
         }
-        
-        Process process = _processFactory.StartNew(processConfiguration);
 
-        ProcessResult result = await _processFactory.ContinueWhenExitAsync(process,
-            processExitInfo,
-            cancellationToken: cancellationToken);
+        Process process = new Process();
+        
+        process.ApplyProcessConfiguration(processConfiguration, 
+            processConfiguration.StandardOutput is not null && processConfiguration.StandardOutput != StreamReader.Null,
+            processConfiguration.StandardError is not null && processConfiguration.StandardError != StreamReader.Null);
+
+        process.Start();
+        
+        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+
+        await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        
+        ProcessResult result = new ProcessResult(process.StartInfo.FileName,
+            process.ExitCode, process.StartTime, process.ExitTime);
        
         if (processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
@@ -95,6 +105,8 @@ public class ProcessInvoker : IProcessInvoker
                 exitCode: process.ExitCode);
         }
 
+        process.Dispose();
+        
         return result;
     }
 
@@ -122,21 +134,34 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
 #endif
     public async Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
-        ProcessExitInfo? processExitInfo,
+        ProcessExitInfo? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
+        if(processExitInfo is null)
+            processExitInfo = ProcessExitInfo.Default;
+        
         if (File.Exists(processStartInfo.FileName) == false)
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound
                 .Replace("{file}",
                     processStartInfo.FileName));
         }
+
+        if (standardInput is not null && standardInput != StreamWriter.Null)
+        {
+            processStartInfo.RedirectStandardInput = true;
+        }
         
-        Process process = _processFactory.From(processStartInfo, 
-            userCredential ?? UserCredential.Null);
+        Process process = new Process()
+        {
+            StartInfo = processStartInfo,
+        };
+
+        if(userCredential is not null)
+            process.TryApplyUserCredential(userCredential);
         
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
@@ -148,13 +173,16 @@ public class ProcessInvoker : IProcessInvoker
         
         if(processResourcePolicy is not null)
             process.SetResourcePolicy(processResourcePolicy);
-
         
-        ProcessResult result =
-            await _processFactory.ContinueWhenExitAsync(process,
-                processExitInfo,
-                cancellationToken: cancellationToken);
+        await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        
+        ProcessResult result = new ProcessResult(executableFilePath: process.StartInfo.FileName,
+            exitCode: process.ExitCode,
+            exitTime: process.ExitTime,
+            startTime: process.StartTime);
 
+        process.Dispose();
+        
         return result;
     }
 
@@ -192,17 +220,27 @@ public class ProcessInvoker : IProcessInvoker
                     processConfiguration.TargetFilePath));
         }
 
-        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(
-            processConfiguration.StandardInput is not null,
-            true,
+        Process process = new Process();
+
+        process.ApplyProcessConfiguration(processConfiguration, true,
             true);
 
-        Process process = _processFactory.StartNew(startInfo);
+        process.Start();
+        
+        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+        
+        await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+
+        BufferedProcessResult result = new BufferedProcessResult(
+            process.StartInfo.FileName,
+            process.ExitCode,
+            await process.StandardOutput.ReadToEndAsync(cancellationToken),
+            await process.StandardError.ReadToEndAsync(cancellationToken),
+            process.StartTime,
+            process.ExitTime);
                               
-        BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process,
-            processExitInfo,
-            cancellationToken);
-                              
+        process.Dispose();
+        
         return result;
     }
 
@@ -240,9 +278,14 @@ public class ProcessInvoker : IProcessInvoker
         processStartInfo.RedirectStandardInput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.RedirectStandardError = true;
+
+        Process process = new Process()
+        {
+            StartInfo = processStartInfo
+        };
         
-       Process process = _processFactory.From(processStartInfo,
-           userCredential ?? UserCredential.Null);
+        if(userCredential is not null)
+            process.TryApplyUserCredential(userCredential);
 
        if (processStartInfo.RedirectStandardInput && standardInput is not null)
        {
@@ -294,12 +337,21 @@ public class ProcessInvoker : IProcessInvoker
             processConfiguration.StandardInput is not null,
             true,
             true);
-        
-        Process process = _processFactory.StartNew(startInfo);
 
-        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process,
-            processExitInfo,
-            cancellationToken: cancellationToken);
+        Process process = new Process();
+        
+        process.ApplyProcessConfiguration(processConfiguration, true,
+            true);
+
+        process.Start();
+        
+        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+        
+        await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+
+        PipedProcessResult result = new PipedProcessResult();
+        
+        process.Dispose();
         
         return result;
     }
