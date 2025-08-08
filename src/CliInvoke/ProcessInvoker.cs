@@ -285,23 +285,24 @@ public class ProcessInvoker : IProcessInvoker
         };
         
         if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential);
-
-       if (processStartInfo.RedirectStandardInput && standardInput is not null)
-       {
-           process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
-               process);
-       }
-
-       process.Start();
+            process.TryApplyUserCredential(userCredential); 
         
-       if(processResourcePolicy is not null)
-           process.SetResourcePolicy(processResourcePolicy);
+        if (processStartInfo.RedirectStandardInput && standardInput is not null)
+        {
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
+                process);
+        }
 
-        BufferedProcessResult result =
-            await _processFactory.ContinueWhenExitBufferedAsync(process,
-                processExitInfo,
-                cancellationToken);
+        process.Start();
+        
+        if(processResourcePolicy is not null)
+            process.SetResourcePolicy(processResourcePolicy);
+
+        BufferedProcessResult result = new BufferedProcessResult(
+            process.StartInfo.FileName, process.ExitCode,
+            await process.StandardOutput.ReadToEndAsync(cancellationToken),
+            await process.StandardError.ReadToEndAsync(cancellationToken),
+            process.StartTime, process.ExitTime);
 
         return result;
     }
@@ -333,11 +334,6 @@ public class ProcessInvoker : IProcessInvoker
         if (processExitInfo is null) 
             processExitInfo = ProcessExitInfo.Default;
         
-        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo(
-            processConfiguration.StandardInput is not null,
-            true,
-            true);
-
         Process process = new Process();
         
         process.ApplyProcessConfiguration(processConfiguration, true,
@@ -349,7 +345,12 @@ public class ProcessInvoker : IProcessInvoker
         
         await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
 
-        PipedProcessResult result = new PipedProcessResult();
+        Stream standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
+        Stream standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
+        
+        PipedProcessResult result = new PipedProcessResult(process.StartInfo.FileName,
+            process.ExitCode, process.StartTime, process.ExitTime,
+            standardOutput, standardError);
         
         process.Dispose();
         
@@ -397,9 +398,14 @@ public class ProcessInvoker : IProcessInvoker
         processStartInfo.RedirectStandardOutput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.RedirectStandardError = true;
+
+        Process process = new Process()
+        {
+            StartInfo = processStartInfo
+        };
         
-        Process process = _processFactory.From(processStartInfo, 
-            userCredential ?? UserCredential.Null);
+        if(userCredential is not null)
+            process.TryApplyUserCredential(userCredential);
 
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
@@ -409,11 +415,18 @@ public class ProcessInvoker : IProcessInvoker
 
         process.Start();
         
-        if(processResourcePolicy is not null)
-            process.SetResourcePolicy(processResourcePolicy);
+        process.SetResourcePolicy(processResourcePolicy);
         
-        PipedProcessResult result = await _processFactory.ContinueWhenExitPipedAsync(process,
-            processExitInfo, cancellationToken);
+        await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+
+        Stream standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
+        Stream standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
+        
+        PipedProcessResult result = new PipedProcessResult(process.StartInfo.FileName,
+            process.ExitCode, process.StartTime, process.ExitTime,
+            standardOutput, standardError);
+        
+        process.Dispose();
 
         return result;
     }
