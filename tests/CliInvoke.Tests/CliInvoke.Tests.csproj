@@ -20,7 +20,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Bogus" Version="35.6.3" />
-        <PackageReference Include="xunit.v3" Version="3.0.0" />
+        <PackageReference Include="xunit.v3" Version="3.0.1" />
     </ItemGroup>
 
     <ItemGroup>
