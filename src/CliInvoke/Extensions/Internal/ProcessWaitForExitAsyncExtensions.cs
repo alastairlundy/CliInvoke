@@ -45,12 +45,10 @@ internal static class ProcessWaitForExitAsyncExtensions
     /// Waits for the specified process to exit or for the timeout time, whichever is sooner.
     /// </summary>
     /// <param name="process">The process to wait for.</param>
-    /// <param name="timeout">The timeout timespan to wait for before cancelling.</param>
-    /// <param name="cancellationMode">The cancellation mode to use in case the Process hasn't exited before the timeout time.</param>
+    /// <param name="timeoutPolicy"></param>
     /// <param name="cancellationToken">A cancellation token that determines whether the operation should continue to run or be cancelled.</param>
     internal static async Task WaitForExitAsync(this Process process,
-        TimeSpan timeout,
-        ProcessCancellationMode cancellationMode,
+        ProcessTimeoutPolicy timeoutPolicy,
         CancellationToken cancellationToken = default)
     {
         Task processTask = new Task(async () =>
@@ -62,7 +60,7 @@ internal static class ProcessWaitForExitAsyncExtensions
             
         processTask.Start();
 
-        if (cancellationMode == ProcessCancellationMode.None)
+        if (timeoutPolicy.CancellationMode == ProcessCancellationMode.None)
         {
             await processTask;
             return;
@@ -75,11 +73,11 @@ internal static class ProcessWaitForExitAsyncExtensions
             
             while (stopWatch.IsRunning && process.IsRunning())
             {
-                if (stopWatch.Elapsed > timeout)
+                if (stopWatch.Elapsed > timeoutPolicy.TimeoutThreshold)
                 {
                     stopWatch.Stop();
 
-                    if (cancellationMode == ProcessCancellationMode.Forceful)
+                    if (timeoutPolicy.CancellationMode == ProcessCancellationMode.Forceful)
                     {
 
                         process.Kill(true);
@@ -93,7 +91,7 @@ internal static class ProcessWaitForExitAsyncExtensions
                     return;
                 }
 
-                if (timeout.TotalMilliseconds >= 100)
+                if (timeoutPolicy.TimeoutThreshold.TotalMilliseconds >= 100)
                 {
                     Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
                 }
@@ -107,19 +105,5 @@ internal static class ProcessWaitForExitAsyncExtensions
         timeoutTask.Start();
             
         await timeoutTask;
-    }
-
-    /// <summary>
-    /// Waits for the specified process to exit or for the ProcessTimeoutPolicy's timeout time, whichever is sooner.
-    /// </summary>
-    /// <param name="process">The process to wait for.</param>
-    /// <param name="timeoutPolicy">The ProcessTimeoutPolicy to use for the process.</param>
-    /// <param name="cancellationToken">A cancellation token that determines whether the operation
-    /// should continue to run or be cancelled.</param>
-    internal static async Task WaitForExitAsync(this Process process,
-        ProcessTimeoutPolicy timeoutPolicy,
-        CancellationToken cancellationToken = default)
-    {
-        await WaitForExitAsync(process, timeoutPolicy.TimeoutThreshold, timeoutPolicy.CancellationMode, cancellationToken);
     }
 }

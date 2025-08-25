@@ -557,8 +557,5 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// Builds and returns a ProcessConfiguration object with the specified properties.
     /// </summary>
     /// <returns>The configured ProcessConfiguration object.</returns>
-    public ProcessConfiguration Build()
-    {
-        return _configuration;
-    }
+    public ProcessConfiguration Build() => _configuration;
 }

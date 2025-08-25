@@ -14,7 +14,6 @@
  */
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
-
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable MemberCanBePrivate.Global
 
