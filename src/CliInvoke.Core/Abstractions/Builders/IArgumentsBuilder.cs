@@ -1,5 +1,5 @@
 ﻿/*
-    CliInvoke 
+    AlastairLundy.CliInvoke.Core 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace AlastairLundy.CliInvoke.Builders.Abstractions;
+namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 
 /// <summary>
 /// An interface that defines the fluent builder methods all ArgumentsBuilder classes must implement.
