@@ -8,11 +8,9 @@
 */
 
 
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#else
+
 using System.Runtime.Versioning;
-#endif
+
 
 using System;
 using System.Collections.Generic;
@@ -20,23 +18,20 @@ using System.IO;
 using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
+
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-
-
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;
 
 /// <summary>
 /// A Command configuration to make running commands through Windows PowerShell easier.
 /// </summary>
-#if NET5_0_OR_GREATER
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]
 [UnsupportedOSPlatform("maccatalyst")]
 [UnsupportedOSPlatform("linux")]
 [UnsupportedOSPlatform("freebsd")]
 [UnsupportedOSPlatform("android")]
-#endif
 public class ClassicPowershellProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
@@ -86,14 +81,12 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// The target file path of Windows PowerShell.
     /// </summary>
     /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Windows-based operating system.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-#endif
     // ReSharper disable once MemberCanBePrivate.Global
     public new string TargetFilePath
     {

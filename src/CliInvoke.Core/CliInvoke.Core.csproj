@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>AlastairLundy.CliInvoke.Core</AssemblyName>
@@ -27,12 +27,11 @@
 * Updated Polyfill from 8.7.3 to 8.7.4
 * Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` into a new type ``ProcessExitInfo``</PackageReleaseNotes>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.0.0-preview.2" />
-        <PackageReference Include="Polyfill" Version="8.7.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.2.0" />
     </ItemGroup>
+
 
     <ItemGroup>
         <Content Include="README.md">

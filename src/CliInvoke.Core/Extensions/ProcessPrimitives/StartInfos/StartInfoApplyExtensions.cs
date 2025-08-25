@@ -8,9 +8,9 @@
    */
 
 
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 using System;
 using System.Collections.Generic;
@@ -18,10 +18,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
-
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -39,9 +35,7 @@ public static class StartInfoApplyExtensions
     /// </summary>
     /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
     /// <param name="credential">The credential to be added.</param>
-#if NET5_0_OR_GREATER
-        [SupportedOSPlatform("windows")]
-#endif
+    [SupportedOSPlatform("windows")]
     public static void ApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
     {
 #pragma warning disable CA1416

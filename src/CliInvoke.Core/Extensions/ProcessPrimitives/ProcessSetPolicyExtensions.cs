@@ -10,16 +10,11 @@
 
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 using AlastairLundy.CliInvoke.Core.Internal;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.DotExtensions.Processes;
-
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
 
 namespace AlastairLundy.CliInvoke.Core;
 
@@ -36,43 +31,31 @@ public static class ProcessSetPolicyExtensions
     /// <exception cref="InvalidOperationException"></exception>
     public static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
     {
-        if (process.HasStarted() && resourcePolicy != null)
+        if (process.HasStarted() && resourcePolicy != null && (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()))
         {
-#if NET5_0_OR_GREATER
-            if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
-#else
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ||
-                    RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-#endif
+            if (resourcePolicy.ProcessorAffinity is not null)
             {
-                if (resourcePolicy.ProcessorAffinity is not null)
-                {
-                    process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
-                }
+                process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
+            }
+        }
+
+        if (OperatingSystem.IsMacOS() ||
+            OperatingSystem.IsMacCatalyst() ||
+            OperatingSystem.IsFreeBSD() ||
+            OperatingSystem.IsWindows())
+        {
+            if (resourcePolicy.MinWorkingSet is not null)
+            {
+                process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
             }
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
-                OperatingSystem.IsMacCatalyst() ||
-                OperatingSystem.IsFreeBSD() ||
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (resourcePolicy.MaxWorkingSet is not null)
             {
-                if (resourcePolicy.MinWorkingSet is not null)
-                {
-                    process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
-                }
-
-                if (resourcePolicy.MaxWorkingSet is not null)
-                {
-                    process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
-                }
+                process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
             }
-        
-            process.PriorityClass = resourcePolicy.PriorityClass;
-            process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
         }
-        else
-        {
-            throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
-        }
+
+        process.PriorityClass = resourcePolicy.PriorityClass;
+        process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
     }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
@@ -36,11 +36,7 @@
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.4" />
 -->
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.5" />
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.0.0-preview.2" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <PackageReference Include="Polyfill" Version="8.7.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" PrivateAssets="All" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.2.0" />
     </ItemGroup>
     
     <ItemGroup>
@@ -49,10 +45,6 @@
           <PackagePath>README.md</PackagePath>
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <None Include="..\..\THIRD_PARTY_NOTICES.txt">
-        <Link>THIRD_PARTY_NOTICES.txt</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
     
     <ItemGroup>

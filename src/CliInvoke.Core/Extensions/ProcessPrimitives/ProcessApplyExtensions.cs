@@ -13,9 +13,7 @@ using System.Diagnostics;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -61,9 +59,7 @@ public static class ProcessApplyExtensions
     /// <param name="process">The current Process object.</param>
     /// <param name="credential">The credential to be added.</param>
     /// <exception cref="PlatformNotSupportedException">Thrown if not supported on the current operating system.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
-#endif
     public static void ApplyUserCredential(this Process process, UserCredential credential)
     {
 #pragma warning disable CA1416

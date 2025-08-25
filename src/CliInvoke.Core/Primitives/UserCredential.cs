@@ -14,15 +14,12 @@
  */
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
-
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable MemberCanBePrivate.Global
 
 using System;
 
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
 
 using System.Security;
 
@@ -67,9 +64,8 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <summary>
     /// The domain to be used.
     /// </summary>
-#if NET6_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
-#endif
     public string? Domain { get; private set; }
         
     /// <summary>
@@ -80,17 +76,15 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <summary>
     /// The password to be used.
     /// </summary>
-#if NET6_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
-#endif
     public SecureString? Password { get; private set; }
         
     /// <summary>
     /// Whether to load the UserCredential information and user profile.
     /// </summary>
-#if NET6_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
-#endif
     public bool? LoadUserProfile { get; private set; }
         
     /// <summary>
