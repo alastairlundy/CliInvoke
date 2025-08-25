@@ -76,7 +76,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
     /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
     /// <param name="credential">The credential to be used (if specified).</param>
-    /// <param name="commandResultValidation">Whether to perform Result Validation and exception throwing if the Command exits with an exit code other than 0.</param>
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
@@ -84,7 +83,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="standardOutputEncoding">The Standard Output Encoding to be used (if specified).</param>
     /// <param name="standardErrorEncoding">The Standard Error Encoding to be used (if specified).</param>
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
-    /// <param name="processTimeoutPolicy"></param>
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
     [SupportedOSPlatform("windows")]
@@ -188,7 +186,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The file path of the executable to be run and wrapped.
     /// </summary>
-    public string TargetFilePath { get; protected set; }
+    public string TargetFilePath { get; set; }
 
     /// <summary>
     /// The working directory path to be used when executing the Command.

@@ -32,8 +32,7 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
                 */
             
             _processInvoker = new ProcessInvoker(
-                new ProcessFactory(new FilePathResolver(),
-                    new ProcessPipeHandler()),
+                new FilePathResolver(),
                 new ProcessPipeHandler());
             
           //  _crossPlatformTestExecutables = new CrossPlatformTestExecutables(_cliCommandInvoker);

@@ -92,6 +92,7 @@ public interface IProcessInvoker
     /// </summary>
     /// <param name="processStartInfo"></param>
     /// <param name="processResultValidation">The process result validation to be used.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
     /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
     /// <param name="userCredential">The credential to use when creating and starting the Process.</param>

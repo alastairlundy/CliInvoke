@@ -29,6 +29,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.2.0" />
+    </ItemGroup>
+
+
+    <ItemGroup>
         <Content Include="README.md">
             <Link>README.md</Link>
             <PackagePath>README.md</PackagePath>
