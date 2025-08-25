@@ -445,7 +445,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         string? s = FormattableToStringExtensions.ToString(value);
 
-        if (s != null)
+        if (s is not null)
         {
             return IsValidArgument(s);
         }
