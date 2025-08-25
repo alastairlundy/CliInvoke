@@ -15,7 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
-
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
@@ -459,5 +459,12 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
     /// </summary>
     /// <returns>The configured ProcessStartInfo object.</returns>
     public ProcessStartInfo Build()
-        => _processConfiguration.ToProcessStartInfo();
+    { 
+       Process process = new Process();
+       process.ApplyProcessConfiguration(_processConfiguration,
+           _processConfiguration.StandardOutput is not null,
+           _processConfiguration.StandardError is not null);
+       
+       return process.StartInfo;
+    }
 }
