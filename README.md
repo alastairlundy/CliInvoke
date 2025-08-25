@@ -46,7 +46,7 @@ CliInvoke is available on Nuget.
 
 These are the CliInvoke projects:
 * CliInvoke - The main CliInvoke package.
-* [CliInvoke.Extensions](CliInvokeLibrary/CliInvoke.Extensions/README.md)
+* [CliInvoke.Extensions](src/CliInvoke.Extensions/README.md)
 * [CliInvoke.Specializations](SPECIALIZATIONS_README.md)
 
 ### Installing CliInvoke
