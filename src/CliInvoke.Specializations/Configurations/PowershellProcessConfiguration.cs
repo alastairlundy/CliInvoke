@@ -14,15 +14,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#else
 using System.Runtime.Versioning;
-#endif
 
 // ReSharper disable RedundantBoolCompare
 
@@ -31,7 +25,6 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations;
 /// <summary>
 /// A Command configuration to make running commands through cross-platform PowerShell easier.
 /// </summary>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -42,7 +35,6 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations;
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
-#endif
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
     private readonly IProcessInvoker _invoker;
@@ -95,7 +87,6 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// The target file path of cross-platform PowerShell.
     /// </summary>
     /// <exception cref="PlatformNotSupportedException">Thrown if run on an operating system besides Windows, macOS, Linux, and FreeBSD.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -106,7 +97,6 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
-#endif
     public new string TargetFilePath
     {
         get

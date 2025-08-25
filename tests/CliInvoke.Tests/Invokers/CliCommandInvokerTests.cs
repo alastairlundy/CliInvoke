@@ -17,12 +17,6 @@ using AlastairLundy.CliInvoke.Tests.TestData;
 
 using Xunit;
 
-#if NET48_OR_GREATER
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#elif NET472
-using System.Runtime.InteropServices;
-#endif
-
 namespace AlastairLundy.CliInvoke.Tests.Invokers
 {
     public class CliCommandInvokerTests : IClassFixture<TestFixture>
@@ -64,11 +58,7 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
         [Fact]
         public async Task Invoke_Open_Windows_Calc_Test()
         {
-#if NET48_OR_GREATER || NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
-#else
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
             {
                 IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder(
                         WindowsTestExecutables.WinCalcExePath)

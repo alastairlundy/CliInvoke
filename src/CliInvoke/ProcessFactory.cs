@@ -13,9 +13,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,16 +68,12 @@ public class ProcessFactory : IProcessFactory
             throw new ArgumentException(Resources.Process_FileName_Empty);
         }
         
-#if NET5_0_OR_GREATER
+
         if (Path.IsPathFullyQualified(processStartInfo.FileName) == false)
         {
            string resolvedFilePath = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
             processStartInfo.FileName = resolvedFilePath;
         }
-#else
-            string resolvedFilePath = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
-            processStartInfo.FileName = resolvedFilePath;
-#endif
 
         Process output = new Process
         {
@@ -112,7 +108,7 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration information to use to configure the Process.</param>
     /// <returns>The newly created Process with the configuration.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -122,7 +118,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public Process From(ProcessConfiguration configuration)
     {
         Process output;
@@ -146,7 +142,7 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <returns>The newly created and started Process with the start info.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -156,7 +152,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public Process StartNew(ProcessStartInfo startInfo)
     {
         Process process = From(startInfo);
@@ -172,7 +168,7 @@ public class ProcessFactory : IProcessFactory
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <param name="credential">The credential to use when creating and starting the Process.</param>
     /// <returns>The newly created and started Process with the start info and credential.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -182,7 +178,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public Process StartNew(ProcessStartInfo startInfo,
         UserCredential credential)
     {
@@ -200,7 +196,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <param name="resourcePolicy">The process resource policy to use when creating and starting the new Process.</param>
     /// <returns>The newly created and started Process with the start info and Process Resource Policy.</returns>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -210,7 +205,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public Process StartNew(ProcessStartInfo startInfo,
         ProcessResourcePolicy resourcePolicy)
     {
@@ -230,7 +224,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="resourcePolicy">The process resource policy to use when creating and starting the new Process.</param>
     /// <param name="credential">The credential to use when creating and starting the Process.</param>
     /// <returns>The newly created and started Process with the start info and Process Resource Policy.</returns>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -240,7 +233,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public Process StartNew(ProcessStartInfo startInfo, 
         ProcessResourcePolicy resourcePolicy,
         UserCredential credential)
@@ -260,7 +252,6 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration to use when creating and starting the process.</param>
     /// <returns>The newly created and started Process with the specified configuration.</returns>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -270,7 +261,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public Process StartNew(ProcessConfiguration configuration)
     {
         Process process = From(configuration);
@@ -299,7 +289,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <exception cref="ProcessNotSuccessfulException"></exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -309,7 +298,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, 
         ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
@@ -356,7 +344,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and ProcessResult that are returned upon completion of the task.</returns>
     /// <exception cref="ProcessNotSuccessfulException"></exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -366,7 +353,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessConfiguration processConfiguration,
         ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
@@ -441,7 +427,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
     /// <exception cref="ProcessNotSuccessfulException"></exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -451,7 +436,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, 
         ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
@@ -503,7 +487,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and BufferedProcessResult that are returned upon the process' exit.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -513,7 +496,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, ProcessConfiguration processConfiguration,
         ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
@@ -586,7 +568,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -596,7 +577,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
         ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
@@ -651,7 +631,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -661,7 +640,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
         ProcessConfiguration processConfiguration,
         ProcessExitInfo? processExitInfo = null,

@@ -10,11 +10,7 @@
 
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-#if NET5_0_OR_GREATER
 using System;
-#else
-using System.Runtime.InteropServices;
-#endif
 
 namespace AlastairLundy.CliInvoke.Core;
 
@@ -29,11 +25,5 @@ public static class IsSupportedOnOsExtensions
     /// <param name="userCredential"></param>
     /// <returns>True if supported; false otherwise.</returns>
     public static bool IsSupportedOnCurrentOS(this UserCredential userCredential)
-    {
-#if NET5_0_OR_GREATER
-        return OperatingSystem.IsWindows();
-#else
-        return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#endif
-    }
+        => OperatingSystem.IsWindows();
 }

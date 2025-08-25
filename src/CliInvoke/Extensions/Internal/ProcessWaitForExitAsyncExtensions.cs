@@ -79,11 +79,8 @@ internal static class ProcessWaitForExitAsyncExtensions
 
                     if (timeoutPolicy.CancellationMode == ProcessCancellationMode.Forceful)
                     {
-#if NET5_0_OR_GREATER
+
                         process.Kill(true);
-#else
-                        process.Kill();
-#endif
                     }
                     else
                     {
