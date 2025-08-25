@@ -25,7 +25,7 @@
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>1.5.0</PackageVersion>
-        <PackageTags>shell, cli, process, wrapping, commandline, invoke</PackageTags>
+        <PackageTags>shell, cli, process, wrapping, commandline, invoke, processinvoker, processfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
