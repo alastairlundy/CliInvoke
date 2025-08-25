@@ -23,12 +23,9 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 using AlastairLundy.DotExtensions.Globalization;
 
 // ReSharper disable RedundantIfElseBlock
-
-// ReSharper disable UseIndexFromEndExpression
 // ReSharper disable ConvertClosureToMethodGroup
 
 // ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable HeapView.ObjectAllocation.Evident
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable RedundantBoolCompare
 
@@ -95,7 +92,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
             if (_buffer.Length is > 0 and < int.MaxValue)
             {
                 // Add a space if it's missing before adding the new string.
-                if (_buffer[_buffer.Length - 1] != ' ')
+                if (_buffer[^1] != ' ')
                 {
                     _buffer.Append(' ');
                 }
@@ -112,7 +109,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
                         int.MaxValue.ToString()));
             }
             
-            if (_argumentValidationLogic != null)
+            if (_argumentValidationLogic is not null)
             {
                 return new ArgumentsBuilder(_buffer,
                     _argumentValidationLogic);
