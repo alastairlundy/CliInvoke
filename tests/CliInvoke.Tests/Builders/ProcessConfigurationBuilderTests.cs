@@ -18,46 +18,47 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
 {
         public class ProcessConfigurationBuilderTests
         {
-
                 [Fact]
                 public void TestDefaultConfiguration()
                 {
-                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
-
-                        var builtCommand = commandBuilder.Build();
-                        Assert.Equal("foo",
-                                builtCommand.TargetFilePath);
-                        Assert.Equal(string.Empty,
-                                builtCommand.Arguments);
-                        Assert.Equal(Directory.GetCurrentDirectory(),
-                                builtCommand.WorkingDirectoryPath);
-
-                        Assert.Equal(new Dictionary<string, string>(),
-                                builtCommand.EnvironmentVariables);
-                        Assert.True(builtCommand.StandardInputEncoding.Equals(Encoding.Default) &&
-                                    builtCommand.StandardOutputEncoding.Equals(Encoding.Default) &&
-                                    builtCommand.StandardErrorEncoding.Equals(Encoding.Default));
-
-                        Assert.Equal(builtCommand.Credential,
-                                UserCredential.Null);
-
-                        Assert.Equal(builtCommand.StandardInput,
-                                StreamWriter.Null);
-                        Assert.Equal(builtCommand.StandardOutput,
-                                StreamReader.Null);
-                        Assert.Equal(builtCommand.StandardError,
-                                StreamReader.Null);
-
-                        Assert.Equal(builtCommand.Credential,
-                                UserCredential.Null);
-                
-                        Assert.Equal(ProcessResourcePolicy.Default,
-                                builtCommand.ResourcePolicy);
-
-                        Assert.False(builtCommand.WindowCreation);
-                        Assert.False(builtCommand.UseShellExecution);
-                        Assert.False(builtCommand.RequiresAdministrator);
+                            IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
+                            var builtCommand = commandBuilder.Build();
+                            Assert.Equal("foo", builtCommand.TargetFilePath);
+                            Assert.Equal(string.Empty, builtCommand.Arguments);
+                            Assert.Equal(Directory.GetCurrentDirectory(), builtCommand.WorkingDirectoryPath);
+                            Assert.Equal(new Dictionary<string, string>(), builtCommand.EnvironmentVariables);
+                            Assert.True(builtCommand.StandardInputEncoding.Equals(Encoding.Default) &&
+                                        builtCommand.StandardOutputEncoding.Equals(Encoding.Default) &&
+                                        builtCommand.StandardErrorEncoding.Equals(Encoding.Default));
+                            Assert.Equal(builtCommand.Credential, UserCredential.Null);
+                            Assert.Equal(builtCommand.StandardInput, StreamWriter.Null);
+                            Assert.Equal(builtCommand.StandardOutput, StreamReader.Null);
+                            Assert.Equal(builtCommand.StandardError, StreamReader.Null);
+                            Assert.Equal(builtCommand.Credential, UserCredential.Null);
+                            Assert.Equal(ProcessResourcePolicy.Default, builtCommand.ResourcePolicy);
+                            Assert.False(builtCommand.WindowCreation);
+                            Assert.False(builtCommand.UseShellExecution);
+                            Assert.False(builtCommand.RequiresAdministrator);
                 }
+
+                [Fact]
+                public void WithStartInfo_ShouldSetStartInfo()
+                {
+                        // TODO: Test WithStartInfo method
+                }
+
+                [Fact]
+                public void WithResourcePolicy_ShouldSetResourcePolicy()
+                {
+                        // TODO: Test WithResourcePolicy method
+                }
+
+                [Fact]
+                public void Build_ShouldReturnConfiguration()
+                {
+                        // TODO: Test Build method
+                }
+        }
 
                 [Fact]
                 public void TestIncompatiblePipingOptionsThrowsException()
