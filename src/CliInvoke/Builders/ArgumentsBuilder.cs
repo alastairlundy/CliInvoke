@@ -17,7 +17,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using AlastairLundy.DotExtensions.Globalization;
