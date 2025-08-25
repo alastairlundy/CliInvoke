@@ -22,10 +22,11 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.5</Version>
-        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 4
-* Updated Polyfill from 8.7.3 to 8.7.4
-* Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` into a new type ``ProcessExitInfo``</PackageReleaseNotes>
+        <Version>2.0.0-alpha.6</Version>
+        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 5
+* Updated DotExtensions from 8.0.0 Preview 2 to 8.2.0 (#76 &amp; #78 )
+* Removed .NET Standard 2.0 Support @alastairlundy (https://github.com/alastairlundy/CliInvoke/pull/74)
+* Moved ``ProcessConfiguration``'s ``ToProcessStartInfo`` method logic to ``ApplyProcessConfiguration`` extension method</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
