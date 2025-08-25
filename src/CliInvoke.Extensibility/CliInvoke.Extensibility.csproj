@@ -4,7 +4,7 @@
         <LangVersion>13</LangVersion>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net9.0;net8.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net9.0;net8.0;netstandard2.0;</TargetFrameworks>
         <Title>AlastairLundy.CliInvoke.Extensibility</Title>
         <Authors>AlastairLundy</Authors>
         <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
@@ -20,9 +20,9 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.4.4</Version>
-        <PackageReleaseNotes>### Changes since 1.4.3
-* Updated to use CliInvoke 1.4.4</PackageReleaseNotes>
+        <Version>1.5.1</Version>
+        <PackageReleaseNotes>### Changes since 1.4.4
+* Updated to use CliInvoke 1.5.1</PackageReleaseNotes>
         <RootNamespace>AlastairLundy.CliInvoke.Extensibility</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Extensibility</AssemblyName>
     </PropertyGroup>
@@ -45,7 +45,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.5.0" />
-      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.5.0" />
+      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.5.1" />
+      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.5.1" />
     </ItemGroup>
 </Project>

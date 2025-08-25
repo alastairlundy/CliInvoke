@@ -7,13 +7,16 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#if NET8_0_OR_GREATER
 using System.Runtime.Versioning;
+#endif
+
 using System.Threading;
 using System.Threading.Tasks;
 
-using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 

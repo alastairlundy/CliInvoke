@@ -8,7 +8,6 @@
 */
 
 using System;
-using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
@@ -22,6 +21,9 @@ using AlastairLundy.Resyslib.IO.Files;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+
+using ICliCommandInvoker = AlastairLundy.CliInvoke.Core.Abstractions.ICliCommandInvoker;
+using ICommandProcessFactory = AlastairLundy.CliInvoke.Core.Abstractions.ICommandProcessFactory;
 
 // ReSharper disable RedundantAssignment
 // ReSharper disable UnusedMember.Global

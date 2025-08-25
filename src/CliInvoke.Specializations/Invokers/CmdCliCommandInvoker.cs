@@ -9,10 +9,11 @@
 
 using System;
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions;
+using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
+
 using AlastairLundy.CliInvoke.Extensibility.Abstractions.Invokers;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;
