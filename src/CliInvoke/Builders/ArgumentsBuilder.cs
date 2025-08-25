@@ -429,7 +429,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         bool output;
         
-        if (_argumentValidationLogic != null)
+        if (_argumentValidationLogic is not null)
         {
             output = _argumentValidationLogic.Invoke(value);
         }
