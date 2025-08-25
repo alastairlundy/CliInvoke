@@ -24,7 +24,7 @@ public class ProcessExitInfo : IEquatable<ProcessExitInfo>
         TimeoutPolicy = ProcessTimeoutPolicy.Default;
         ResultValidation = ProcessResultValidation.ExitCodeZero;
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -82,6 +82,10 @@ public class ProcessExitInfo : IEquatable<ProcessExitInfo>
         return false;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public override int GetHashCode()
     {
         return HashCode.Combine((int)ResultValidation, TimeoutPolicy);
@@ -107,10 +111,8 @@ public class ProcessExitInfo : IEquatable<ProcessExitInfo>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool operator ==(ProcessExitInfo? left, ProcessExitInfo? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(ProcessExitInfo? left, ProcessExitInfo? right) 
+        => Equals(left, right);
 
     /// <summary>
     /// 
