@@ -1,33 +1,32 @@
 using Xunit;
-using CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Builders;
 
-namespace CliInvoke.Tests.Builders
+namespace CliInvoke.Tests.Builders;
+
+public class ProcessExitInfoBuilderTests
 {
-    public class ProcessExitInfoBuilderTests
+    [Fact]
+    public void Constructor_ShouldInstantiate()
     {
-        [Fact]
-        public void Constructor_ShouldInstantiate()
-        {
-            var builder = new ProcessExitInfoBuilder();
-            Assert.NotNull(builder);
-        }
+        var builder = new ProcessExitInfoBuilder();
+        Assert.NotNull(builder);
+    }
 
-        [Fact]
-        public void WithExitCode_ShouldSetExitCode()
-        {
-            // TODO: Test WithExitCode method
-        }
+    [Fact]
+    public void WithExitCode_ShouldSetExitCode()
+    {
+        // TODO: Test WithExitCode method
+    }
 
-        [Fact]
-        public void WithExitTime_ShouldSetExitTime()
-        {
-            // TODO: Test WithExitTime method
-        }
+    [Fact]
+    public void WithExitTime_ShouldSetExitTime()
+    {
+        // TODO: Test WithExitTime method
+    }
 
-        [Fact]
-        public void Build_ShouldReturnExitInfo()
-        {
-            // TODO: Test Build method
-        }
+    [Fact]
+    public void Build_ShouldReturnExitInfo()
+    {
+        // TODO: Test Build method
     }
 }

@@ -1,33 +1,32 @@
 using Xunit;
-using CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Builders;
 
-namespace CliInvoke.Tests.Builders
+namespace CliInvoke.Tests.Builders;
+
+public class ProcessResourcePolicyBuilderTests
 {
-    public class ProcessResourcePolicyBuilderTests
+    [Fact]
+    public void Constructor_ShouldInstantiate()
     {
-        [Fact]
-        public void Constructor_ShouldInstantiate()
-        {
-            var builder = new ProcessResourcePolicyBuilder();
-            Assert.NotNull(builder);
-        }
+        var builder = new ProcessResourcePolicyBuilder();
+        Assert.NotNull(builder);
+    }
 
-        [Fact]
-        public void WithCpuLimit_ShouldSetCpuLimit()
-        {
-            // TODO: Test WithCpuLimit method
-        }
+    [Fact]
+    public void WithCpuLimit_ShouldSetCpuLimit()
+    {
+        // TODO: Test WithCpuLimit method
+    }
 
-        [Fact]
-        public void WithMemoryLimit_ShouldSetMemoryLimit()
-        {
-            // TODO: Test WithMemoryLimit method
-        }
+    [Fact]
+    public void WithMemoryLimit_ShouldSetMemoryLimit()
+    {
+        // TODO: Test WithMemoryLimit method
+    }
 
-        [Fact]
-        public void Build_ShouldReturnPolicy()
-        {
-            // TODO: Test Build method
-        }
+    [Fact]
+    public void Build_ShouldReturnPolicy()
+    {
+        // TODO: Test Build method
     }
 }

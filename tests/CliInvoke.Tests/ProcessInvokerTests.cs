@@ -1,17 +1,16 @@
 using Xunit;
 using CliInvoke;
 
-namespace CliInvoke.Tests
+namespace CliInvoke.Tests;
+
+public class ProcessInvokerTests
 {
-    public class ProcessInvokerTests
+    [Fact]
+    public void Constructor_ShouldInstantiate()
     {
-        [Fact]
-        public void Constructor_ShouldInstantiate()
-        {
-            // Use mocks for dependencies if needed
-            var invoker = new ProcessInvoker(null, null);
-            Assert.NotNull(invoker);
-        }
-        // Add more tests for Invoke, RunAsync, etc.
+        // Use mocks for dependencies if needed
+        var invoker = new ProcessInvoker(null, null);
+        Assert.NotNull(invoker);
     }
+    // Add more tests for Invoke, RunAsync, etc.
 }
