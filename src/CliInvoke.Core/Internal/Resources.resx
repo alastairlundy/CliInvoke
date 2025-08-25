@@ -51,4 +51,16 @@
     <data name="CommandBuilder.ArgumentConflict.ShellExecution.Error" xml:space="preserve">
         <value>UseShellExecution value of true conflicts with setting of Standard Error to a non-null value. See https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror</value>
     </data>
+    <data name="Labels.ProcessConfiguration.ToString.ShellExecution" xml:space="preserve">
+        <value>(Uses Shell Execution)</value>
+    </data>
+    <data name="Labels.ProcessConfiguration.ToString.RequiresAdmin" xml:space="preserve">
+        <value>(Requires Administrator) </value>
+    </data>
+    <data name="Labels.ProcessConfiguration.ToString.WorkingDirectory" xml:space="preserve">
+        <value>(Working Directory) </value>
+    </data>
+    <data name="Exceptions.ProcessConfiguration.TargetFilePath.Empty" xml:space="preserve">
+        <value />
+    </data>
 </root>

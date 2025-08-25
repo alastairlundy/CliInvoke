@@ -12,7 +12,9 @@ public static class WindowsTestExecutables
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return string.Format("{0}{1}calc.exe", Environment.SystemDirectory, Path.DirectorySeparatorChar);
+                return string.Format("{0}{1}calc.exe",
+                    Environment.SystemDirectory,
+                    Path.DirectorySeparatorChar);
             }
                 
             throw new PlatformNotSupportedException();

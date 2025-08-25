@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net8.0;netstandard2.0;netstandard2.1;net9.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
         <Title>AlastairLundy.CliInvoke</Title>
@@ -13,21 +13,16 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes
-* Updated dependencies
-* Moved Builder implementations back to CliInvoke from CliInvoke.Core
-* Moved primitives out of CliInvoke.Core into DotPrimitives
-* Moved ``IFilePathResolver`` into CliInvoke.Core and ``FilePathResolver`` into CliInvoke directly - Thereby allowing the removal of Resyslib.IO.Core and Resyslib.IO as dependencies
-
-## 🚀 Features
-
-- add Initial Process Timeout Support @alastairlundy (#53) - ``IProcessInvoker``, ``IProcessFactory``, ``ProcessInvoker``, and ``ProcessFactory`` have been updated to support this.
-- Added method ProcessConfiguration supporting method overloads for ``ContinueWhenExitAsync``, ``ContinueWhenBufferedExitAsync``, and ``ContinueWhenPipedAsync`` to `IProcessInvoker``, ``IProcessFactory``, ``ProcessInvoker``, and ``ProcessFactory``</PackageReleaseNotes>
+        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 4
+* Updated Polyfill from 8.7.3 to 8.7.4
+* Updated DotExtensions 8.0.0 Preview 1 to 8.0.0 Preview 2
+* Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` into a new type ``ProcessExitInfo``
+* Clean up ``ProcessFactory`` and ``ProcessInvoker``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.2</PackageVersion>
-        <PackageTags>shell, cli, process, wrapping, commandline, invoke</PackageTags>
+        <PackageVersion>2.0.0-alpha.5</PackageVersion>
+        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
@@ -37,14 +32,11 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.2" />
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.5.0-preview.2" />
-    </ItemGroup>
-    
-    <ItemGroup >
-        <PackageReference Include="PolyFill" Version="8.7.0" 
-                          Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'"
-        PrivateAssets="All"/>
+<!--
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.4" />
+-->
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.5" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.2.0" />
     </ItemGroup>
     
     <ItemGroup>
@@ -53,10 +45,6 @@
           <PackagePath>README.md</PackagePath>
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <None Include="..\..\THIRD_PARTY_NOTICES.txt">
-        <Link>THIRD_PARTY_NOTICES.txt</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
     
     <ItemGroup>
@@ -81,4 +69,9 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+    </ItemGroup>
+   
 </Project>

@@ -12,6 +12,9 @@ using System.Collections.Generic;
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IEnvironmentVariablesBuilder
 {
     /// <summary>

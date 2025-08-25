@@ -9,25 +9,30 @@
 
 using System.Diagnostics;
 using System.IO;
+
+
 using System.Runtime.Versioning;
+
+
 using System.Threading.Tasks;
+
 using AlastairLundy.CliInvoke.Core.Piping;
 
 namespace AlastairLundy.CliInvoke.Piping;
 
 /// <summary>
-/// 
+/// An implementation of IProcessPipeHandler. Pipes Process Standard Input, Output, and Error as required.
 /// </summary>
 public class ProcessPipeHandler : IProcessPipeHandler
 {
    
     /// <summary>
-    /// 
+    /// Asynchronously pipes the standard input from a source stream to a specified process.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="destination"></param>
-    /// <returns></returns>
-#if NET5_0_OR_GREATER
+    /// <param name="source">The stream from which to read the standard input data.</param>
+    /// <param name="destination">The process to which the standard input will be piped.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -37,7 +42,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif 
+ 
     public async Task<Process> PipeStandardInputAsync(Stream source, Process destination)
     {
         if (destination.StartInfo.RedirectStandardInput && destination.StandardInput != StreamWriter.Null)
@@ -51,11 +56,11 @@ public class ProcessPipeHandler : IProcessPipeHandler
     }
 
     /// <summary>
-    /// 
+    /// Asynchronously retrieves the standard output stream from a specified process.
     /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-#if NET5_0_OR_GREATER
+    /// <param name="source">The process from which to read the standard output data.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -65,7 +70,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif 
+ 
     public async Task<Stream> PipeStandardOutputAsync(Process source)
     {
         Stream destination = new MemoryStream();
@@ -82,11 +87,11 @@ public class ProcessPipeHandler : IProcessPipeHandler
     }
 
     /// <summary>
-    /// 
+    /// Asynchronously retrieves the standard error stream from a specified process.
     /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-#if NET5_0_OR_GREATER
+    /// <param name="source">The process from which to read the standard error data.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -96,7 +101,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif 
+ 
     public async Task<Stream> PipeStandardErrorAsync(Process source)
     {
         Stream destination = new MemoryStream();

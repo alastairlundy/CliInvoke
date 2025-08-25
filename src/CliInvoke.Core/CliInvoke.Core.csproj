@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>AlastairLundy.CliInvoke.Core</AssemblyName>
@@ -13,7 +13,7 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageTags>process, processes, runner, iprocessfactory, iprocessrunner</PackageTags>
+        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <Description>Process and Cli program running related abstractions implemented by AlastairLundy.CliInvoke</Description>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
@@ -22,28 +22,11 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.2</Version>
-        <PackageReleaseNotes>## Changes
-* Updated dependencies
-* Moved Builder implementations back to CliInvoke from CliInvoke.Core
-* Moved primitives out of CliInvoke.Core into DotPrimitives
-* Moved ``IFilePathResolver`` into CliInvoke.Core  - Thereby allowing the removal of Resyslib.IO.Core as a dependency
-
-## 🚀 Features
-
-- add Initial Process Timeout Support @alastairlundy (#53) - ``IProcessInvoker`` and ``IProcessFactory`` have been updated to support this.
-- Added method ProcessConfiguration supporting method overloads for ``ContinueWhenExitAsync``, ``ContinueWhenBufferedExitAsync``, and ``ContinueWhenPipedAsync`` to `IProcessInvoker``, and ``IProcessFactory``</PackageReleaseNotes>
+        <Version>2.0.0-alpha.5</Version>
+        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 4
+* Updated Polyfill from 8.7.3 to 8.7.4
+* Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` into a new type ``ProcessExitInfo``</PackageReleaseNotes>
     </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotPrimitives" Version="2.0.0" />
-        <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
-<!--        
-        <PackageReference Include="Polyfill" Version="8.6.0" 
-                          Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'"
-        PrivateAssets="All"/>-->
-
-    </ItemGroup>
 
     <ItemGroup>
         <Content Include="README.md">
@@ -74,5 +57,9 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions\Internal\" />
     </ItemGroup>
 </Project>

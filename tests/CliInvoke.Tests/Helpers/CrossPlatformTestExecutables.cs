@@ -1,17 +1,17 @@
 ﻿using System;
-using System.IO;
+
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Builders;
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Piping;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Results;
-
 
 namespace AlastairLundy.CliInvoke.Tests.Helpers
 {
@@ -62,7 +62,9 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers
                         if (string.IsNullOrWhiteSpace(line) == false)
                         {
                            dotnetExePath = line.Split(' ').Last()
-                                .Replace("[", string.Empty).Replace("]", string.Empty);
+                                .Replace("[",
+                                    string.Empty).Replace("]",
+                                    string.Empty);
                            break;
                         }
                     }

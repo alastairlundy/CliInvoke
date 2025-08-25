@@ -4,15 +4,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Security;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Processes.Results;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 using Xunit;
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 namespace AlastairLundy.CliInvoke.Tests.Builders
 {
@@ -25,25 +25,34 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
 
                         var builtCommand = commandBuilder.Build();
-                        Assert.Equal("foo", builtCommand.TargetFilePath);
-                        Assert.Equal(string.Empty, builtCommand.Arguments);
-                        Assert.Equal(Directory.GetCurrentDirectory(), builtCommand.WorkingDirectoryPath);
+                        Assert.Equal("foo",
+                                builtCommand.TargetFilePath);
+                        Assert.Equal(string.Empty,
+                                builtCommand.Arguments);
+                        Assert.Equal(Directory.GetCurrentDirectory(),
+                                builtCommand.WorkingDirectoryPath);
 
-                        Assert.Equal(new Dictionary<string, string>(), builtCommand.EnvironmentVariables);
+                        Assert.Equal(new Dictionary<string, string>(),
+                                builtCommand.EnvironmentVariables);
                         Assert.True(builtCommand.StandardInputEncoding.Equals(Encoding.Default) &&
                                     builtCommand.StandardOutputEncoding.Equals(Encoding.Default) &&
                                     builtCommand.StandardErrorEncoding.Equals(Encoding.Default));
 
-                        Assert.Equal(builtCommand.Credential, UserCredential.Null);
-                        Assert.Equal(ProcessResultValidation.ExitCodeZero, builtCommand.ResultValidation);
+                        Assert.Equal(builtCommand.Credential,
+                                UserCredential.Null);
 
-                        Assert.Equal(builtCommand.StandardInput, StreamWriter.Null);
-                        Assert.Equal(builtCommand.StandardOutput, StreamReader.Null);
-                        Assert.Equal(builtCommand.StandardError, StreamReader.Null);
+                        Assert.Equal(builtCommand.StandardInput,
+                                StreamWriter.Null);
+                        Assert.Equal(builtCommand.StandardOutput,
+                                StreamReader.Null);
+                        Assert.Equal(builtCommand.StandardError,
+                                StreamReader.Null);
 
-                        Assert.Equal(builtCommand.Credential, UserCredential.Null);
+                        Assert.Equal(builtCommand.Credential,
+                                UserCredential.Null);
                 
-                        Assert.Equal(ProcessResourcePolicy.Default, builtCommand.ResourcePolicy);
+                        Assert.Equal(ProcessResourcePolicy.Default,
+                                builtCommand.ResourcePolicy);
 
                         Assert.False(builtCommand.WindowCreation);
                         Assert.False(builtCommand.UseShellExecution);
@@ -86,7 +95,8 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
               
                         //Assert
                         ProcessConfiguration command = commandBuilder.Build();
-                        Assert.Equal("bar", command.TargetFilePath);
+                        Assert.Equal("bar",
+                                command.TargetFilePath);
                 }
 
                 [Fact]
@@ -101,27 +111,13 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                                 .Build();
              
                         //Assert
-                        Assert.NotEqual(newArguments, commandBuilder.Build());
+                        Assert.NotEqual(newArguments,
+                                commandBuilder.Build());
                 }
 
-                [Fact]
-                public void TestValidationReconfigured()
-                {
-                        //Arrange
-                        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
-                                .WithValidation(ProcessResultValidation.None);
-                
-                        //Act
-                        commandBuilder = commandBuilder.WithValidation(ProcessResultValidation.ExitCodeZero);
-                
-                        //Assert
-                        ProcessConfiguration command = commandBuilder.Build();
-                        Assert.Equal(ProcessResultValidation.ExitCodeZero, command.ResultValidation);
-                }
 
-#if NET5_0_OR_GREATER
                 [SupportedOSPlatform("windows")]
-#endif
+
                 [Fact]
                 public void TestReconfiguredUserCredential()
                 {
@@ -133,7 +129,10 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         password.AppendChar('4');
                 
                         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
-                                .WithUserCredential(new UserCredential("", "admin", password, false));
+                                .WithUserCredential(new UserCredential("",
+                                        "admin",
+                                        password,
+                                        false));
                 
                         //Act
                         SecureString password2 = new SecureString();
@@ -142,21 +141,25 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                         password2.AppendChar('7');
                         password2.AppendChar('6');
 
-                        UserCredential userCredential = new UserCredential("", "root", password2, false);
+                        UserCredential userCredential = new UserCredential("",
+                                "root",
+                                password2,
+                                false);
                 
                         commandBuilder = commandBuilder.WithUserCredential(userCredential);
                 
                         //Assert
                         ProcessConfiguration command = commandBuilder.Build();
-                        Assert.Equal(userCredential, command.Credential);
+                        Assert.Equal(userCredential,
+                                command.Credential);
                 }
 
-#if NET5_0_OR_GREATER
+
                 [SupportedOSPlatform("windows")]
                 [SupportedOSPlatform("linux")]
                 [SupportedOSPlatform("macos")]
                 [SupportedOSPlatform("freebsd")]
-#endif
+
                 [Fact]
                 public void TestReconfiguredResourcePolicy()
                 {
@@ -175,7 +178,8 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 
                         //Assert
                         ProcessConfiguration command = commandBuilder.Build();
-                        Assert.Equal(resourcePolicy, command.ResourcePolicy);
+                        Assert.Equal(resourcePolicy,
+                                command.ResourcePolicy);
                 }
 
                 [Fact]
@@ -205,7 +209,8 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
                 
                         //Assert
                         ProcessConfiguration command = commandBuilder.Build();
-                        Assert.Equal("dir2", command.WorkingDirectoryPath);
+                        Assert.Equal("dir2",
+                                command.WorkingDirectoryPath);
                 }
         }
 }

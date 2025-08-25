@@ -10,14 +10,11 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Security;
 
 using AlastairLundy.CliInvoke.Core.Builders;
-
-using AlastairLundy.DotPrimitives.Processes;
-
+using AlastairLundy.CliInvoke.Core.Primitives;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 // ReSharper disable PossibleInvalidOperationException
@@ -31,10 +28,9 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// <summary>
 /// A class that provides builder methods for constructing UserCredentials.
 /// </summary>
-[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class UserCredentialBuilder : IUserCredentialBuilder
 {
-    private UserCredential? _userCredential;
+    private readonly UserCredential? _userCredential;
 
     /// <summary>
     /// Instantiates the UserCredentialBuilder class.
@@ -43,7 +39,12 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     {
         _userCredential = new UserCredential();
     }
-        
+
+    protected UserCredentialBuilder(UserCredential credential)
+    {
+        _userCredential = credential;
+    }
+    
     /// <summary>
     /// Sets the domain for the credential to be created.
     /// </summary>
@@ -51,11 +52,14 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// <returns>A new instance of the CredentialsBuilder with the updated domain.</returns>
     [Pure]
     public IUserCredentialBuilder SetDomain(string? domain) =>
-        new UserCredentialBuilder
-        {
-           _userCredential = new UserCredential(domain, _userCredential.UserName, _userCredential.Password,
-                   _userCredential.LoadUserProfile)
-        };
+        new UserCredentialBuilder(
+            new UserCredential(domain,
+                    _userCredential.UserName,
+#pragma warning disable CA1416
+                    _userCredential.Password,
+                    _userCredential.LoadUserProfile)
+#pragma warning restore CA1416
+            );
 
     /// <summary>
     /// Sets the username for the credential to be created.
@@ -65,10 +69,14 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetUsername(string? username) =>
         new UserCredentialBuilder
-        {
-            _userCredential = new UserCredential(_userCredential.Domain, username, _userCredential.Password,
+        (
+#pragma warning disable CA1416
+            new UserCredential(_userCredential.Domain,
+                username,
+                _userCredential.Password,
                 _userCredential.LoadUserProfile)
-        };
+#pragma warning restore CA1416
+        );
 
     /// <summary>
     /// Sets the password for the credential to be created.
@@ -78,10 +86,14 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetPassword(SecureString? password) =>
         new UserCredentialBuilder
-        {
-            _userCredential = new UserCredential(_userCredential.Domain, _userCredential.UserName, password,
+        (
+#pragma warning disable CA1416
+            new UserCredential(_userCredential.Domain,
+                _userCredential.UserName,
+                password,
                 _userCredential.LoadUserProfile)
-        };
+#pragma warning restore CA1416
+        );
         
     /// <summary>
     /// Specifies whether to load the user profile.
@@ -91,10 +103,14 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder LoadUserProfile(bool loadUserProfile) =>
         new UserCredentialBuilder
-        {
-            _userCredential = new UserCredential(_userCredential.Domain, _userCredential.UserName, _userCredential.Password,
+        (
+#pragma warning disable CA1416
+            new UserCredential(_userCredential.Domain,
+                _userCredential.UserName,
+                _userCredential.Password,
                 loadUserProfile)
-        };
+#pragma warning restore CA1416
+        );
 
     /// <summary>
     /// Builds a new instance of UserCredentials using the current settings.
@@ -102,8 +118,12 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// <returns>The built UserCredentials.</returns>
     [Pure]
     public UserCredential Build() =>
-        new UserCredential(_userCredential.Domain, _userCredential.UserName, _userCredential.Password,
+#pragma warning disable CA1416
+        new UserCredential(_userCredential.Domain,
+            _userCredential.UserName,
+            _userCredential.Password,
             _userCredential.LoadUserProfile);
+#pragma warning restore CA1416
         
     /// <summary>
     /// Disposes of the provided settings.

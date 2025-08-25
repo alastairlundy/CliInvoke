@@ -7,20 +7,22 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Runtime.Versioning;
+
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+
+
+using System.Runtime.Versioning;
+
 
 namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
 /// A class to fluently configure and build ProcessResourcePolicy objects.
 /// </summary>
-[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 {
     private readonly ProcessResourcePolicy _processResourcePolicy;
@@ -48,16 +50,16 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-#endif
     [Pure]
     public IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity) =>
         new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
             processorAffinity,
+#pragma warning disable CA1416
             _processResourcePolicy.MinWorkingSet,
             _processResourcePolicy.MaxWorkingSet,
+#pragma warning restore CA1416
             _processResourcePolicy.PriorityClass,
             _processResourcePolicy.EnablePriorityBoost));
 
@@ -66,7 +68,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// </summary>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -75,11 +77,12 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("android")]
-#endif
     [Pure]
     public IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet) =>
         new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+#pragma warning disable CA1416
             _processResourcePolicy.ProcessorAffinity,
+#pragma warning restore CA1416
             minWorkingSet,
             _processResourcePolicy.MaxWorkingSet,
             _processResourcePolicy.PriorityClass,
@@ -91,7 +94,6 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
     [Pure]
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -100,10 +102,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("android")]
-#endif
     public IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet) =>
         new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+#pragma warning disable CA1416
             _processResourcePolicy.ProcessorAffinity,
+#pragma warning restore CA1416
             _processResourcePolicy.MinWorkingSet,
             maxWorkingSet,
             _processResourcePolicy.PriorityClass,
@@ -117,9 +120,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder WithPriorityClass(ProcessPriorityClass processPriorityClass) =>
         new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+#pragma warning disable CA1416
             _processResourcePolicy.ProcessorAffinity,
             _processResourcePolicy.MinWorkingSet,
             _processResourcePolicy.MaxWorkingSet,
+#pragma warning restore CA1416
             processPriorityClass,
             _processResourcePolicy.EnablePriorityBoost));
     
@@ -131,9 +136,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder WithPriorityBoost(bool enablePriorityBoost) =>
         new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+#pragma warning disable CA1416
             _processResourcePolicy.ProcessorAffinity,
             _processResourcePolicy.MinWorkingSet,
             _processResourcePolicy.MaxWorkingSet,
+#pragma warning restore CA1416
             _processResourcePolicy.PriorityClass,
             enablePriorityBoost));
     

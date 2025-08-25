@@ -8,17 +8,16 @@
    */
 
 using System.Diagnostics;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
-using AlastairLundy.DotPrimitives.Processes.Policies;
 
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
+
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
-/// An interface that defines the fluent builder methods all ProcessResourcePolicyBuilder classes must implement.
+/// A fluent builder interface for configuring and building a Process Resource Policy.
 /// </summary>
 public interface IProcessResourcePolicyBuilder
 {
@@ -28,10 +27,10 @@ public interface IProcessResourcePolicyBuilder
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
-#if NET5_0_OR_GREATER
+
         [SupportedOSPlatform("windows")]
         [SupportedOSPlatform("linux")]
-#endif
+
     IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity);
     
     /// <summary>

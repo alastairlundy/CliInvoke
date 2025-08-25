@@ -15,7 +15,8 @@ namespace AlastairLundy.CliInvoke.Tests.Builders
 
             string expected = "new list --help";
         
-            Assert.Equal(expected, argumentsBuilder.ToString());
+            Assert.Equal(expected,
+                argumentsBuilder.ToString());
         }
     
     

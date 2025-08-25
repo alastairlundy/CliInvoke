@@ -17,15 +17,17 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
 
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+#nullable enable
+
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Processes.Results;
-#if NET5_0_OR_GREATER
-#endif
+
+
+using System.Runtime.Versioning;
+
 
 
 namespace AlastairLundy.CliInvoke.Builders;
@@ -76,7 +78,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [Pure]
     public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments)
     {
-        return WithArguments(arguments, false);
+        return WithArguments(arguments,
+            false);
     }
 
     /// <summary>
@@ -89,7 +92,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments, bool escapeArguments)
     {
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
-            .Add(arguments, escapeArguments);
+            .Add(arguments,
+                escapeArguments);
 
         string args = argumentsBuilder.ToString();
         
@@ -97,15 +101,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 args,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -122,15 +127,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -147,15 +153,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(targetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -172,15 +179,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, environmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                environmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -198,15 +206,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                runAsAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                runAsAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -223,15 +232,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 workingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -241,13 +251,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// </summary>
     /// <param name="credential">The user credential to be used for authentication.</param>
     /// <returns>A reference to this builder with an updated user credential, allowing method chaining.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-#endif
+
     [Pure]
     public IProcessConfigurationBuilder WithUserCredential(UserCredential credential)
     {
@@ -255,15 +265,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -276,13 +287,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <returns>The new CommandBuilder with the specified Credentials.</returns>
     /// <remarks>Credentials are only supported with the Process class on Windows. This is a limitation of .NET's Process class.</remarks>
     [Pure]
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-#endif
+
     public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
         UserCredential credential;
@@ -312,7 +323,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="validation">The validation mode to be used for the process result.</param>
     /// <returns>A reference to this builder with the specified validation configuration,
     /// allowing method chaining.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("macos")]
@@ -320,23 +331,24 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-#endif
+
     [Pure]
-    public IProcessConfigurationBuilder WithValidation(ProcessResultValidation validation)
+    public IProcessConfigurationBuilder WithValidation(Process validation)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, validation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -356,15 +368,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                source, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                source,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -383,15 +396,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, target,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                target,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -410,15 +424,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 target,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -436,44 +451,20 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
 
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <returns></returns>
-    [Pure]
-    public IProcessConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy? processTimeoutPolicy)
-    {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(_configuration.TargetFilePath,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
-                _configuration.StandardError,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                processTimeoutPolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution));
-    }
     
     /// <summary>
     /// Configures whether shell execution should be used for the process.
@@ -490,15 +481,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: useShellExecution));
     }
@@ -515,15 +507,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: enableWindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -546,15 +539,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator, _configuration.EnvironmentVariables,
-                _configuration.Credential, _configuration.ResultValidation,
-                _configuration.StandardInput, _configuration.StandardOutput,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
                 _configuration.StandardError,
                 standardInputEncoding: standardInputEncoding ?? Encoding.Default,
                 standardOutputEncoding: standardOutputEncoding ?? Encoding.Default,
                 standardErrorEncoding: standardErrorEncoding ?? Encoding.Default,
                 processResourcePolicy: _configuration.ResourcePolicy,
-                _configuration.TimeoutPolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
@@ -563,8 +557,5 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// Builds and returns a ProcessConfiguration object with the specified properties.
     /// </summary>
     /// <returns>The configured ProcessConfiguration object.</returns>
-    public ProcessConfiguration Build()
-    {
-        return _configuration;
-    }
+    public ProcessConfiguration Build() => _configuration;
 }

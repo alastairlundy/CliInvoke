@@ -1,10 +1,13 @@
 # CliInvoke
-CliInvoke is a library for interacting with Command Line Interfaces and wrapping around executables.
-
-<img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
 
 [![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/) 
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
+
+CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
+
+Launch processes, redirect standard input and output streams, await process completion and so much more.
+
+<img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
 
 ## Table of Contents
 * [Features](#features)
@@ -23,12 +26,12 @@ CliInvoke is a library for interacting with Command Line Interfaces and wrapping
 ## Features
 * Promotes the single responsibility principle and separation of concerns
 * For .NET 8 and newer TFMs CliRunner has few dependencies.
-* Compatible with .NET Standard 2.0 and 2.1 <sup>1</sup>
-* Dependency Injection extensions to make using it easier.
+* Compatible with .NET Standard 2.0<sup>1</sup>
+* Dependency Injection extensions to make using CliInvoke a breeze.
 * Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows <sup>2</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
-<sup>1</sup> - [Polyfill](https://github.com/SimonCropp/Polyfill) is a dependency only required for .NET Standard 2.0 and 2.1 users. [Microsoft.Bcl.HashCode](https://www.nuget.org/packages/Microsoft.Bcl.HashCode) is a dependency only required for .NET Standard 2.0 users.
+<sup>1</sup> - [Polyfill](https://github.com/SimonCropp/Polyfill) is a dependency only required for .NET Standard 2.0 users. [Microsoft.Bcl.HashCode](https://www.nuget.org/packages/Microsoft.Bcl.HashCode) is a dependency only required for .NET Standard 2.0 users.
 
 <sup>2</sup> - The Specialization library is distributed separately [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations).
 
@@ -60,7 +63,7 @@ CliInvoke's packages can be installed via the .NET SDK CLI, Nuget via your IDE o
 
 
 ### Supported Platforms
-CliInvoke can be added to .NET Standard 2.0, .NET Standard 2.1, .NET 8, or .NET 9 supported projects.
+CliInvoke can be added to .NET Standard 2.0, .NET 8, or .NET 9 supported projects.
 
 The following table details which target platforms are supported for executing commands via CliInvoke. 
 
@@ -75,7 +78,7 @@ The following table details which target platforms are supported for executing c
 | IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. <sup>3</sup>                             | 
 | tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS <sup>3</sup>                             |
 | watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                          |
-| Browser          | Not Supported and Not Planned :x:  | Not supported due to not being a valid target Platform for executing programs or processes. |
+| Browser          | Not Planned :x:  | Not supported due to not being a valid target Platform for executing programs or processes. |
 
 <sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
@@ -95,12 +98,15 @@ The following example shows how to configure and build a Command that returns a 
 ```csharp
 using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Core;
+
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 
-  //Namespace and classs code ommitted for clarity 
+using AlastairLundy.CliInvoke.Primitives.Results;
 
-  // ServiceProvider and Dependency Injection code ommitted for clarity
+  //Namespace and class code ommitted for clarity 
+
+  // ServiceProvider and Dependency Injection setup code ommitted for clarity
   
   IProcessInvoker _processInvoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
@@ -127,7 +133,6 @@ The current build targets include:
 * .NET 8
 * .NET 9
 * .NET Standard 2.0
-* .NET Standard 2.1
 
 Any version of the .NET 9 SDK can be used, but using the latest version is preferred.
 
@@ -165,7 +170,7 @@ To manually build a project for release, enter ``dotnet build -c Release /p:Cont
 Builds should generally always include Source Link and symbol packages if intended for wider distribution.
 
 **NOTES**: 
-* ``CliInvoke.Specializations`` and ``CliInvoke.Extensions.DependencyInjection`` both take a dependency on the CliInvoke base package from Nuget - For the respective libraries to use a newer CliInvoke version, that version must be published on Nuget.
+* ``CliInvoke.Specializations`` and ``CliInvoke.Extensions`` both take a dependency on the CliInvoke base package from Nuget - For the respective libraries to use a newer CliInvoke version, that version must be published on Nuget.
 
 ## How to Contribute to CliInvoke
 Thank you in advance for considering contributing to CliInvoke.
@@ -205,6 +210,6 @@ If you fork CliInvoke and re-distribute it, please replace the usage of the icon
 ### Projects
 This project would like to thank the following projects for their work:
 * [CliWrap](https://github.com/Tyrrrz/CliWrap/) for inspiring this project
-* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying .NET Standard 2.0 & 2.1 support
+* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying .NET Standard 2.0 support
 
 For more information, please see the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).

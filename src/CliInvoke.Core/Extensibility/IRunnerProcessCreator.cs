@@ -7,10 +7,13 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using AlastairLundy.DotPrimitives.Processes;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Core.Extensibility;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IRunnerProcessCreator
 {
     /// <summary>

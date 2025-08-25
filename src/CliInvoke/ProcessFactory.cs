@@ -7,13 +7,15 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+#nullable enable
+
 using System;
 using System.Diagnostics;
 using System.IO;
 
-#if NET5_0_OR_GREATER
+
 using System.Runtime.Versioning;
-#endif
+
 
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,23 +23,20 @@ using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Piping;
 
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+
 using AlastairLundy.CliInvoke.Exceptions;
-
+using AlastairLundy.CliInvoke.Extensions.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
-
 using AlastairLundy.DotExtensions.Processes;
-
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Extensions.Processes;
-using AlastairLundy.DotPrimitives.Processes.Results;
 
 // ReSharper disable UnusedType.Global
 
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// 
+/// The default implementation of <see cref="IProcessFactory"/>, an easy and safe way to create, run, and dispose of ProcessPrimitives.
 /// </summary>
 public class ProcessFactory : IProcessFactory
 {
@@ -46,10 +45,10 @@ public class ProcessFactory : IProcessFactory
     private readonly IProcessPipeHandler _processPipeHandler;
 
     /// <summary>
-    /// 
+    /// Instantiates a ProcessFactory to be used for creating and running ProcessPrimitives, as well as safely disposing of a Process when it exits.
     /// </summary>
-    /// <param name="filePathResolver"></param>
-    /// <param name="processPipeHandler"></param>
+    /// <param name="filePathResolver">The file path resolver to use.</param>
+    /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessFactory(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
@@ -69,16 +68,12 @@ public class ProcessFactory : IProcessFactory
             throw new ArgumentException(Resources.Process_FileName_Empty);
         }
         
-#if NET5_0_OR_GREATER
+
         if (Path.IsPathFullyQualified(processStartInfo.FileName) == false)
         {
            string resolvedFilePath = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
             processStartInfo.FileName = resolvedFilePath;
         }
-#else
-            string resolvedFilePath = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
-            processStartInfo.FileName = resolvedFilePath;
-#endif
 
         Process output = new Process
         {
@@ -113,6 +108,17 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration information to use to configure the Process.</param>
     /// <returns>The newly created Process with the configuration.</returns>
+
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+
     public Process From(ProcessConfiguration configuration)
     {
         Process output;
@@ -120,11 +126,12 @@ public class ProcessFactory : IProcessFactory
         // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
         if (configuration.Credential != null)
         {
-            output = From(configuration.StartInfo, configuration.Credential);
+            output = From(configuration.ToProcessStartInfo(),
+                configuration.Credential);
         }
         else
         {
-            output = From(configuration.StartInfo);
+            output = From(configuration.ToProcessStartInfo());
         }
 
         return output; 
@@ -135,7 +142,7 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <returns>The newly created and started Process with the start info.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -145,7 +152,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public Process StartNew(ProcessStartInfo startInfo)
     {
         Process process = From(startInfo);
@@ -161,7 +168,7 @@ public class ProcessFactory : IProcessFactory
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <param name="credential">The credential to use when creating and starting the Process.</param>
     /// <returns>The newly created and started Process with the start info and credential.</returns>
-#if NET5_0_OR_GREATER
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -171,11 +178,12 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
+
     public Process StartNew(ProcessStartInfo startInfo,
         UserCredential credential)
     {
-        Process process = From(startInfo, credential);
+        Process process = From(startInfo,
+            credential);
         
         process.Start();
         
@@ -188,7 +196,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <param name="resourcePolicy">The process resource policy to use when creating and starting the new Process.</param>
     /// <returns>The newly created and started Process with the start info and Process Resource Policy.</returns>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -198,7 +205,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public Process StartNew(ProcessStartInfo startInfo,
         ProcessResourcePolicy resourcePolicy)
     {
@@ -218,7 +224,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="resourcePolicy">The process resource policy to use when creating and starting the new Process.</param>
     /// <param name="credential">The credential to use when creating and starting the Process.</param>
     /// <returns>The newly created and started Process with the start info and Process Resource Policy.</returns>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -228,12 +233,12 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public Process StartNew(ProcessStartInfo startInfo, 
         ProcessResourcePolicy resourcePolicy,
         UserCredential credential)
     {
-        Process process = From(startInfo, credential);
+        Process process = From(startInfo,
+            credential);
         
         process.Start();
         
@@ -247,6 +252,15 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration to use when creating and starting the process.</param>
     /// <returns>The newly created and started Process with the specified configuration.</returns>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
     public Process StartNew(ProcessConfiguration configuration)
     {
         Process process = From(configuration);
@@ -268,12 +282,13 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// Creates a Task that returns a ProcessResult when the specified process exits.
+    /// 
     /// </summary>
-    /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The task and processResult that are returned upon completion of the task.</returns>
-#if NET5_0_OR_GREATER
+    /// <param name="process"></param>
+    /// <param name="processExitInfo"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="ProcessNotSuccessfulException"></exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -283,60 +298,36 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
-    public async Task<ProcessResult> ContinueWhenExitAsync(Process process, CancellationToken cancellationToken = default)
-    {
-        return await ContinueWhenExitAsync(process, ProcessResultValidation.None, ProcessTimeoutPolicy.None,
-            cancellationToken: cancellationToken);
-    }
-
-    /// <summary>
-    /// Creates a Task that returns a ProcessResult when the specified process exits.
-    /// </summary>
-    /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The task and ProcessResult that are returned upon completion of the task.</returns>
-    /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
-    public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation,
-        ProcessTimeoutPolicy processTimeoutPolicy = null,
+    public async Task<ProcessResult> ContinueWhenExitAsync(Process process, 
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
-        if (processTimeoutPolicy is not null)
-        {
-            if (processTimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-            {
-                await process.WaitForExitAsync(cancellationToken);
-            }
-            else
-            {
-                await process.WaitForExitAsync(processTimeoutPolicy, cancellationToken);
-            }
-        }
-        else
+        if(processExitInfo is null)
+            processExitInfo = ProcessExitInfo.Default;
+        
+        if(process.HasStarted() == false)
+            process = StartNew(process.StartInfo,
+                ProcessResourcePolicy.Default);
+
+        if (processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
         {
             await process.WaitForExitAsync(cancellationToken);
         }
-        
-
-        if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
+        else
         {
-            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
+            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
-        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName, process.ExitCode, process.StartTime,
+        if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
+        {
+            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode,
+                process: process);
+        }
+        
+        ProcessResult processResult = new ProcessResult(
+            process.StartInfo.FileName,
+            process.ExitCode,
+            process.StartTime,
             process.ExitTime);
         
         process.Dispose();
@@ -345,14 +336,14 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// 
+    /// Creates a Task that returns a ProcessResult when the specified process exits.
     /// </summary>
-    /// <param name="process"></param>
-    /// <param name="processConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="processConfiguration">The configuration to use for the process.</param>
+    /// <param name="processExitInfo"></param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The task and ProcessResult that are returned upon completion of the task.</returns>
     /// <exception cref="ProcessNotSuccessfulException"></exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -362,38 +353,36 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessConfiguration processConfiguration,
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
+        if (processExitInfo is null)
+            processExitInfo = ProcessExitInfo.Default;
+        
         if(process.HasStarted() == false)
-            process = StartNew(process.StartInfo, processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default,
-            processConfiguration.Credential ?? UserCredential.Null);
+            process = StartNew(process.StartInfo,
+                processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default,
+                processConfiguration.Credential ?? UserCredential.Null);
         
         process.StartInfo.RedirectStandardOutput = processConfiguration.StandardOutput is not null &&
                                                    processConfiguration.StandardOutput != StreamReader.Null;
         process.StartInfo.RedirectStandardError = processConfiguration.StandardError is not null &&
                                                   processConfiguration.StandardError != StreamReader.Null;
 
-        if (processConfiguration.TimeoutPolicy is not null)
-        {
-            if (processConfiguration.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-            {
-                await process.WaitForExitAsync(cancellationToken);
-            }
-            else
-            {
-                await process.WaitForExitAsync(processConfiguration.TimeoutPolicy, cancellationToken);
-            }
-        }
-        else
+        if (processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
         {
             await process.WaitForExitAsync(cancellationToken);
         }
-
-        if (process.ExitCode != 0 && processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
+        else
         {
-            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
+            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        }
+
+        if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
+        {
+            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode,
+                process: process);
         }
 
         if (process.StartInfo.RedirectStandardOutput)
@@ -402,7 +391,8 @@ public class ProcessFactory : IProcessFactory
 
             if (processConfiguration.StandardOutput != StreamReader.Null && processConfiguration.StandardOutput is not null)
             {
-                await standardOutput.CopyToAsync(processConfiguration.StandardOutput.BaseStream, cancellationToken);
+                await standardOutput.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
+                    cancellationToken);
             }
         }
 
@@ -412,11 +402,157 @@ public class ProcessFactory : IProcessFactory
 
             if (processConfiguration.StandardError != StreamReader.Null && processConfiguration.StandardError is not null)
             {
-                await standardError.CopyToAsync(processConfiguration.StandardError.BaseStream, cancellationToken);
+                await standardError.CopyToAsync(processConfiguration.StandardError.BaseStream,
+                    cancellationToken);
             }
         }
         
-        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName, process.ExitCode, process.StartTime,
+        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName,
+            process.ExitCode,
+            process.StartTime,
+            process.ExitTime);
+        
+        process.Dispose();
+        
+        return processResult;
+    }
+    
+
+    /// <summary>
+    /// A Task that returns a BufferedProcessResult when the specified process exits.
+    /// </summary>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
+    /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="processExitInfo"></param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
+    /// <exception cref="ProcessNotSuccessfulException"></exception>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+    public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, 
+        ProcessExitInfo? processExitInfo = null,
+        CancellationToken cancellationToken = default)
+    {
+        if(processExitInfo is null)
+            processExitInfo = ProcessExitInfo.Default;
+        
+        if(process.HasStarted() == false)
+            process = StartNew(process.StartInfo,
+                ProcessResourcePolicy.Default);
+        
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+
+        if (processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
+        {
+            await process.WaitForExitAsync(cancellationToken);
+        }
+        else
+        {
+            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        }
+        
+        if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
+        {
+            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode,
+                process: process);
+        }
+        
+        BufferedProcessResult processResult = new BufferedProcessResult(
+            process.StartInfo.FileName,
+            process.ExitCode,
+            await process.StandardOutput.ReadToEndAsync(cancellationToken),
+            await process.StandardError.ReadToEndAsync(cancellationToken),
+            process.StartTime,
+            process.ExitTime);
+        
+        process.Dispose();
+        
+        return processResult;
+    }
+    
+    /// <summary>
+    /// A Task that returns a BufferedProcessResult when the specified process exits.
+    /// </summary>
+    /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
+    /// <param name="processExitInfo"></param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The task and BufferedProcessResult that are returned upon the process' exit.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+    public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, ProcessConfiguration processConfiguration,
+        ProcessExitInfo? processExitInfo = null,
+        CancellationToken cancellationToken = default)
+    {
+        if(processExitInfo is null)
+            processExitInfo = ProcessExitInfo.Default;
+
+        if(process.HasStarted() == false)
+            process = StartNew(process.StartInfo, 
+                processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default,
+                processConfiguration.Credential ?? UserCredential.Null);
+        
+        if(processConfiguration.ResourcePolicy is not null)
+            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+        
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+
+        if (processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
+        {
+            await process.WaitForExitAsync(cancellationToken);
+        }
+        else
+        {
+            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        }
+        
+        if (process.ExitCode != 0 &&
+            processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
+        {
+            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode,
+                process: process);
+        }
+
+        Stream standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
+        Stream standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
+
+        if (processConfiguration.StandardOutput != StreamReader.Null &&
+            processConfiguration.StandardOutput is not null)
+        {
+           await standardOutput.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
+               cancellationToken);
+        }
+
+        if (processConfiguration.StandardError != StreamReader.Null &&
+            processConfiguration.StandardError is not null)
+        {
+            await standardError.CopyToAsync(processConfiguration.StandardError.BaseStream,
+                cancellationToken);
+        }
+        
+        BufferedProcessResult processResult = new BufferedProcessResult(
+            process.StartInfo.FileName,
+            process.ExitCode,
+            await process.StandardOutput.ReadToEndAsync(cancellationToken),
+            await process.StandardError.ReadToEndAsync(cancellationToken),
+            process.StartTime,
             process.ExitTime);
         
         process.Dispose();
@@ -425,38 +561,13 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
+    /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
     /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
-    public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, CancellationToken cancellationToken = default)
-    {
-        return await ContinueWhenExitBufferedAsync(process, ProcessResultValidation.None, ProcessTimeoutPolicy.None,
-            cancellationToken: cancellationToken);
-    }
-
-    /// <summary>
-    /// Creates a Task that returns a BufferedProcessResult when the specified process exits.
-    /// </summary>
-    /// <param name="process">The process to continue and wait for exit.</param>
-    /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
-    /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -466,209 +577,45 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
-    public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process,
-        ProcessResultValidation resultValidation, ProcessTimeoutPolicy?  processTimeoutPolicy = null,
-        CancellationToken cancellationToken = default)
-    {
-        if(process.HasStarted() == false)
-            process = StartNew(process.StartInfo, ProcessResourcePolicy.Default);
-        
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-     
-        if (processTimeoutPolicy is not null)
-        {
-            if (processTimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-            {
-                await process.WaitForExitAsync(cancellationToken);
-            }
-            else
-            {
-                await process.WaitForExitAsync(processTimeoutPolicy, cancellationToken);
-            }
-        }
-        else
-        {
-            await process.WaitForExitAsync(cancellationToken);
-        }
-        
-        if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
-        {
-            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
-        }
-        
-        BufferedProcessResult processResult = new BufferedProcessResult(
-            process.StartInfo.FileName, process.ExitCode,
-            await process.StandardOutput.ReadToEndAsync(cancellationToken),
-            await process.StandardError.ReadToEndAsync(cancellationToken),
-            process.StartTime, process.ExitTime);
-        
-        process.Dispose();
-        
-        return processResult;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="process"></param>
-    /// <param name="processConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ProcessNotSuccessfulException"></exception>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
-    public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, ProcessConfiguration processConfiguration,
-        CancellationToken cancellationToken = default)
-    {
-        if(process.HasStarted() == false)
-            process = StartNew(process.StartInfo, 
-                processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default,
-                processConfiguration.Credential ?? UserCredential.Null);
-        
-        if(processConfiguration.ResourcePolicy is not null)
-            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-        
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-     
-        if (processConfiguration.TimeoutPolicy is not null)
-        {
-            if (processConfiguration.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-            {
-                await process.WaitForExitAsync(cancellationToken);
-            }
-            else
-            {
-                await process.WaitForExitAsync(processConfiguration.TimeoutPolicy, cancellationToken);
-            }
-        }
-        else
-        {
-            await process.WaitForExitAsync(cancellationToken);
-        }
-        
-        if (process.ExitCode != 0 && processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
-        {
-            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
-        }
-
-        Stream standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
-        Stream standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
-
-        if (processConfiguration.StandardOutput != StreamReader.Null && processConfiguration.StandardOutput is not null)
-        {
-           await standardOutput.CopyToAsync(processConfiguration.StandardOutput.BaseStream, cancellationToken);
-        }
-
-        if (processConfiguration.StandardError != StreamReader.Null && processConfiguration.StandardError is not null)
-        {
-            await standardError.CopyToAsync(processConfiguration.StandardError.BaseStream, cancellationToken);
-        }
-        
-        BufferedProcessResult processResult = new BufferedProcessResult(
-            process.StartInfo.FileName, process.ExitCode,
-            await process.StandardOutput.ReadToEndAsync(cancellationToken),
-            await process.StandardError.ReadToEndAsync(cancellationToken),
-            process.StartTime, process.ExitTime);
-        
-        process.Dispose();
-        
-        return processResult;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="process"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
-    public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, CancellationToken cancellationToken = default)
-    {
-       return await ContinueWhenExitPipedAsync(process, ProcessResultValidation.None, ProcessTimeoutPolicy.None,
-           cancellationToken);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="process"></param>
-    /// <param name="resultValidation"></param>
-    /// <param name="processTimeoutPolicy"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ProcessNotSuccessfulException"></exception>
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-#endif
     public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
-        ProcessResultValidation resultValidation, ProcessTimeoutPolicy?  processTimeoutPolicy = null,
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
+        if(processExitInfo is null)
+            processExitInfo = ProcessExitInfo.Default;
+        
         if(process.HasStarted() == false)
             process = StartNew(process.StartInfo, 
                 ProcessResourcePolicy.Default);
         
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
-        
-        if (processTimeoutPolicy is not null)
-        {
-            if (processTimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-            {
-                await process.WaitForExitAsync(cancellationToken);
-            }
-            else
-            {
-                await process.WaitForExitAsync(processTimeoutPolicy, cancellationToken);
-            }
-        }
-        else
+
+        if (processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
         {
             await process.WaitForExitAsync(cancellationToken);
         }
-        
-        if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
+        else
         {
-            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
+            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        }
+
+        if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
+        {
+            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode,
+                process: process);
         }
 
         Stream output = await _processPipeHandler.PipeStandardOutputAsync(process);
         Stream error = await _processPipeHandler.PipeStandardErrorAsync(process);
         
         PipedProcessResult processResult = new PipedProcessResult(
-            process.StartInfo.FileName, process.ExitCode,
-            process.StartTime, process.ExitTime,
-            output, error);
+            process.StartInfo.FileName,
+            process.ExitCode,
+            process.StartTime,
+            process.ExitTime,
+            output,
+            error);
         
         process.Dispose();
         
@@ -676,14 +623,14 @@ public class ProcessFactory : IProcessFactory
     }
 
     /// <summary>
-    /// 
+    /// A Task that returns a PipedProcessResult when the specified process exits.
     /// </summary>
-    /// <param name="process"></param>
-    /// <param name="processConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ProcessNotSuccessfulException"></exception>
-#if NET5_0_OR_GREATER
+    /// <param name="process">The process to continue and wait for exit.</param>
+    /// <param name="processConfiguration">The configuration to use when running and waiting for the process to exit.</param>
+    /// <param name="processExitInfo"></param>
+    /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the process exit code is not zero AND exit code validation is performed.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -693,10 +640,14 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
-    public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process, ProcessConfiguration processConfiguration,
+    public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
+        ProcessConfiguration processConfiguration,
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
+        if(processExitInfo is null)
+            processExitInfo = ProcessExitInfo.Default;
+        
         if(process.HasStarted() == false)
             process = StartNew(process.StartInfo, 
                 processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default,
@@ -707,26 +658,20 @@ public class ProcessFactory : IProcessFactory
         
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
-        
-        if (processConfiguration.TimeoutPolicy is not null)
-        {
-            if (processConfiguration.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-            {
-                await process.WaitForExitAsync(cancellationToken);
-            }
-            else
-            {
-                await process.WaitForExitAsync(processConfiguration.TimeoutPolicy, cancellationToken);
-            }
-        }
-        else
+
+        if (processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
         {
             await process.WaitForExitAsync(cancellationToken);
         }
-        
-        if (process.ExitCode != 0 && processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
+        else
         {
-            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
+            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        }
+        
+        if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
+        {
+            throw new ProcessNotSuccessfulException(exitCode: process.ExitCode,
+                process: process);
         }
 
         Stream output = await _processPipeHandler.PipeStandardOutputAsync(process);
@@ -734,18 +679,23 @@ public class ProcessFactory : IProcessFactory
 
         if (processConfiguration.StandardOutput is not null && processConfiguration.StandardOutput != StreamReader.Null)
         {
-            await output.CopyToAsync(processConfiguration.StandardOutput.BaseStream, cancellationToken);
+            await output.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
+                cancellationToken);
         }
 
         if (processConfiguration.StandardError is not null && processConfiguration.StandardError != StreamReader.Null)
         {
-            await error.CopyToAsync(processConfiguration.StandardError.BaseStream, cancellationToken);
+            await error.CopyToAsync(processConfiguration.StandardError.BaseStream,
+                cancellationToken);
         }
         
         PipedProcessResult processResult = new PipedProcessResult(
-            process.StartInfo.FileName, process.ExitCode,
-            process.StartTime, process.ExitTime,
-            output, error);
+            process.StartInfo.FileName,
+            process.ExitCode,
+            process.StartTime,
+            process.ExitTime,
+            output,
+            error);
         
         process.Dispose();
         

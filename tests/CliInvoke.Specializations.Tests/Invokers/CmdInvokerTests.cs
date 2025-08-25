@@ -5,18 +5,16 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke;
+
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Results;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 using CliInvoke.Specializations.Tests.Helpers;
 
 namespace CliInvoke.Specializations.Tests.Invokers
 {
-#if NET48_OR_GREATER
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
 
     public class CmdInvokerTests : IClassFixture<TestFixture>
     {
@@ -35,16 +33,12 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
         [Fact]
         public async Task Invoke_Calc_Open_With_CMD_Test()
         {
-#if NET48_OR_GREATER || NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
-#else
-        if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
-            {
-                IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
-                        (ExecutedCommandHelper.WinCalcExePath)
-                    .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe", string.Empty))
-                    .WithValidation(ProcessResultValidation.ExitCodeZero);
+        {
+            IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
+                    (ExecutedCommandHelper.WinCalcExePath)
+                .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
+                    string.Empty));
             
                 ProcessConfiguration commandConfiguration = configurationBuilder.Build();
 

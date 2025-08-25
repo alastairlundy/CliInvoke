@@ -8,35 +8,30 @@
 */
 
 
-#if NETSTANDARD2_0 || NETSTANDARD2_1
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#else
+
 using System.Runtime.Versioning;
-#endif
+
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Processes.Results;
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;
 
 /// <summary>
 /// A Command configuration to make running commands through Windows PowerShell easier.
 /// </summary>
-#if NET5_0_OR_GREATER
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]
 [UnsupportedOSPlatform("maccatalyst")]
 [UnsupportedOSPlatform("linux")]
 [UnsupportedOSPlatform("freebsd")]
 [UnsupportedOSPlatform("android")]
-#endif
 public class ClassicPowershellProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
@@ -47,7 +42,6 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="requiresAdministrator">Indicates whether the command requires administrator privileges.</param>
     /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
     /// <param name="credentials">The user credentials to be used when running the command.</param>
-    /// <param name="resultValidation">The validation criteria for the command result.</param>
     /// <param name="standardInput">The stream for the standard input.</param>
     /// <param name="standardOutput">The stream for the standard output.</param>
     /// <param name="standardError">The stream for the standard error.</param>
@@ -61,15 +55,24 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         IReadOnlyDictionary<string, string> environmentVariables = null, 
         UserCredential credentials = null,
-        ProcessResultValidation resultValidation = ProcessResultValidation.ExitCodeZero,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("", arguments,
+        bool useShellExecution = false, bool windowCreation = false) : base("",
+        arguments,
         workingDirectoryPath,
-        requiresAdministrator, environmentVariables, credentials, resultValidation, standardInput, standardOutput,
-        standardError, standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        windowCreation: useShellExecution, useShellExecution: windowCreation)
+        requiresAdministrator,
+        environmentVariables,
+        credentials,
+        standardInput,
+        standardOutput,
+        standardError,
+        standardInputEncoding,
+        standardOutputEncoding,
+        standardErrorEncoding,
+        processResourcePolicy,
+        windowCreation: useShellExecution,
+        useShellExecution: windowCreation)
     {
         base.TargetFilePath = TargetFilePath;
     }
@@ -78,14 +81,12 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// The target file path of Windows PowerShell.
     /// </summary>
     /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Windows-based operating system.</exception>
-#if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-#endif
     // ReSharper disable once MemberCanBePrivate.Global
     public new string TargetFilePath
     {

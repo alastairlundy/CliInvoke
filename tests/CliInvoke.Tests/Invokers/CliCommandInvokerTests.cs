@@ -3,23 +3,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AlastairLundy.CliInvoke.Builders;
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 using AlastairLundy.CliInvoke.Piping;
+
 using AlastairLundy.CliInvoke.Tests.Helpers;
 using AlastairLundy.CliInvoke.Tests.TestData;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Results;
-using AlastairLundy.Resyslib.IO.Files;
 
 using Xunit;
-
-#if NET48_OR_GREATER
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#elif NET472
-using System.Runtime.InteropServices;
-#endif
 
 namespace AlastairLundy.CliInvoke.Tests.Invokers
 {
@@ -36,7 +32,9 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
                 */
             
             _processInvoker = new ProcessInvoker(
-                new ProcessFactory(new FilePathResolver(), new ProcessPipeHandler()), new ProcessPipeHandler());
+                new ProcessFactory(new FilePathResolver(),
+                    new ProcessPipeHandler()),
+                new ProcessPipeHandler());
             
           //  _crossPlatformTestExecutables = new CrossPlatformTestExecutables(_cliCommandInvoker);
         }
@@ -60,20 +58,17 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers
         [Fact]
         public async Task Invoke_Open_Windows_Calc_Test()
         {
-#if NET48_OR_GREATER || NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
-#else
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
             {
                 IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder(
                         WindowsTestExecutables.WinCalcExePath)
-                    .WithWorkingDirectory(Environment.SystemDirectory)
-                    .WithValidation(ProcessResultValidation.ExitCodeZero);
-            
+                    .WithWorkingDirectory(Environment.SystemDirectory);
+                
                 ProcessConfiguration commandConfiguration = configurationBuilder.Build();
                 
-                ProcessResult result = await _processInvoker.ExecuteAsync(commandConfiguration, CancellationToken.None);
+                ProcessResult result = await _processInvoker.ExecuteAsync(commandConfiguration,
+                   null,
+                    CancellationToken.None);
                 
                 Assert.True(Process.GetProcessesByName("Calculator").Any() &&
                             result.WasSuccessful);

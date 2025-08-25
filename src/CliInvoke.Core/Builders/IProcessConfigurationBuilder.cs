@@ -11,14 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Processes.Results;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
-/// An interface that defines the fluent builder methods all ProcessConfigurationBuilder classes must implement. 
+/// An interface that defines fluent builder methods for configuring a Process Configuration. 
 /// </summary>
 public interface IProcessConfigurationBuilder
 {
@@ -87,13 +86,6 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure);
     
     /// <summary>
-    /// Sets the Result Validation whether to throw an exception or not if the Process does not execute successfully.
-    /// </summary>
-    /// <param name="validation">The result validation behaviour to be used.</param>
-    /// <returns>The new ProcessConfigurationBuilder object with the configured Result Validation behaviour.</returns>
-    IProcessConfigurationBuilder WithValidation(ProcessResultValidation validation);
-    
-    /// <summary>
     /// Sets the Standard Input Pipe source.
     /// </summary>
     /// <param name="source">The source to use for the Standard Input pipe.</param>
@@ -122,14 +114,6 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder WithProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy);
 
     /// <summary>
-    /// Sets the Process Timeout Policy to be used for this Process.
-    /// </summary>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Process Timeout Policy.</returns>
-    IProcessConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
-
-    
-    /// <summary>
     /// Enables or disables Process execution via Shell Execution.
     /// </summary>
     /// <param name="useShellExecution">Whether to enable or disable shell execution.</param>
@@ -151,8 +135,8 @@ public interface IProcessConfigurationBuilder
     /// <param name="standardErrorEncoding">The encoding type to be used for the Standard Error.</param>
     /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
     IProcessConfigurationBuilder WithEncoding(Encoding? standardInputEncoding = null,
-        Encoding standardOutputEncoding = null,
-        Encoding standardErrorEncoding = null);
+        Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null);
 
     /// <summary>
     /// Builds the Process configuration with the configured parameters.

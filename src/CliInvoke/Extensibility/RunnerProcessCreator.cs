@@ -8,19 +8,20 @@
  */
 
 using System.IO;
+
 using AlastairLundy.CliInvoke.Builders;
+
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Extensibility;
 
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace AlastairLundy.CliInvoke.Extensibility;
 
 /// <summary>
-/// A class to allow creating Processes that can be run through other Processes.
+/// A class to allow creating ProcessPrimitives that can be run through other ProcessPrimitives.
 /// </summary>
 public class RunnerProcessCreator : IRunnerProcessCreator
 {
@@ -53,7 +54,6 @@ public class RunnerProcessCreator : IRunnerProcessCreator
             .WithStandardOutputPipe(inputProcess.StandardOutput ?? StreamReader.Null)
             .WithStandardErrorPipe(inputProcess.StandardError ?? StreamReader.Null)
             .WithUserCredential(inputProcess.Credential ?? UserCredential.Null)
-            .WithValidation(inputProcess.ResultValidation)
             .WithAdministratorPrivileges(inputProcess.RequiresAdministrator)
             .WithShellExecution(inputProcess.UseShellExecution)
             .WithWindowCreation(inputProcess.WindowCreation);

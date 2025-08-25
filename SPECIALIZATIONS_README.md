@@ -17,9 +17,9 @@ The CmdCommand's TargetFilePath points to Windows' copy of cmd.exe .
 
 ```csharp
 using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Abstractions;
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
+using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 using AlastairLundy.CliInvoke.Specializations;
 

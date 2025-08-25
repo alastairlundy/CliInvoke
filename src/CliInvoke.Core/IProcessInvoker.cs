@@ -12,9 +12,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AlastairLundy.DotPrimitives.Processes;
-using AlastairLundy.DotPrimitives.Processes.Policies;
-using AlastairLundy.DotPrimitives.Processes.Results;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Core;
 
@@ -27,26 +25,26 @@ public interface IProcessInvoker
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration"></param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
     Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processStartInfo"></param>
-    /// <param name="processResultValidation">The process result validation to be used.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
     /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
-    /// <param name="standardInput"></param>
+    /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
     Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
-        ProcessResultValidation processResultValidation,
+        ProcessExitInfo? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,
-        ProcessTimeoutPolicy? processTimeoutPolicy  = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default);
@@ -58,23 +56,22 @@ public interface IProcessInvoker
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processStartInfo"></param>
-    /// <param name="processResultValidation">The process result validation to be used.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
     /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
-    /// <param name="standardInput"></param>
+    /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Result that is returned from running the process.</returns>
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
-        ProcessResultValidation processResultValidation,
+        ProcessExitInfo? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,
-        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default);
@@ -83,9 +80,11 @@ public interface IProcessInvoker
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
+        ProcessExitInfo? processExitInfo = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -96,13 +95,12 @@ public interface IProcessInvoker
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
     /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
     /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
-    /// <param name="standardInput"></param>
+    /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo,
-        ProcessResultValidation processResultValidation,
+        ProcessExitInfo? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,
-        ProcessTimeoutPolicy? processTimeoutPolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default);
