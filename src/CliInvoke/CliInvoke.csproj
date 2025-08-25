@@ -13,15 +13,17 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 4
-* Updated Polyfill from 8.7.3 to 8.7.4
-* Updated DotExtensions 8.0.0 Preview 1 to 8.0.0 Preview 2
-* Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` into a new type ``ProcessExitInfo``
-* Clean up ``ProcessFactory`` and ``ProcessInvoker``</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 5
+* Implemented IProcessStartInfoBuilder through ProcessStartInfoBuilder
+* Implemented IProcessExitInfoBuilder through ProcessExitInfoBuilder
+* Updated DotExtensions from 8.0.0 Preview 2 to 8.2.0 (#76 &amp; #78 )
+* Removed .NET Standard 2.0 Support @alastairlundy (#74)
+* Reworked ProcessInvoker implementation to not require IProcessFactory @alastairlundy (#80)
+* Moved ProcessConfiguration's ToProcessStartInfo method logic to ApplyProcessConfiguration extension method in CliInvoke.Core</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.5</PackageVersion>
+        <PackageVersion>2.0.0-alpha.6</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -32,9 +34,7 @@
     </PropertyGroup>
     
     <ItemGroup>
-<!--
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.4" />
--->
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.6" />
         <PackageReference Include="AlastairLundy.DotExtensions" Version="8.2.0" />
     </ItemGroup>
     
@@ -69,8 +69,8 @@
       </None>
     </ItemGroup>
     
-    <ItemGroup>
+ <!--   <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
+    </ItemGroup>-->
    
 </Project>
