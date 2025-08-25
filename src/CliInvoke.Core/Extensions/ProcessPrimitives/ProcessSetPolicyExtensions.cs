@@ -31,7 +31,12 @@ public static class ProcessSetPolicyExtensions
     /// <exception cref="InvalidOperationException"></exception>
     public static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
     {
-        if (process.HasStarted() && resourcePolicy != null && (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()))
+        if (resourcePolicy is null)
+        {
+            resourcePolicy = ProcessResourcePolicy.Default;
+        }
+        
+        if (process.HasStarted() && (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()))
         {
             if (resourcePolicy.ProcessorAffinity is not null)
             {
@@ -54,7 +59,7 @@ public static class ProcessSetPolicyExtensions
                 process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
             }
         }
-
+        
         process.PriorityClass = resourcePolicy.PriorityClass;
         process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
     }
