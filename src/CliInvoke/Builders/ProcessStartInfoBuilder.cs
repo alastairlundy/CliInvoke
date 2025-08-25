@@ -14,9 +14,11 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Linq;
 using System.Text;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Builders;
@@ -460,11 +462,32 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
     /// <returns>The configured ProcessStartInfo object.</returns>
     public ProcessStartInfo Build()
     { 
-       Process process = new Process();
-       process.ApplyProcessConfiguration(_processConfiguration,
-           _processConfiguration.StandardOutput is not null,
-           _processConfiguration.StandardError is not null);
-       
-       return process.StartInfo;
+        ProcessStartInfo processStartInfo = new ProcessStartInfo
+        {
+            FileName = _processConfiguration.TargetFilePath,
+            WorkingDirectory = _processConfiguration.WorkingDirectoryPath,
+            UseShellExecute = _processConfiguration.UseShellExecution,
+            CreateNoWindow = _processConfiguration.WindowCreation,
+            RedirectStandardInput = _processConfiguration.StandardInput is not null && _processConfiguration.StandardInput != StreamWriter.Null,
+            RedirectStandardOutput = _processConfiguration.StandardOutput is not null && _processConfiguration.StandardOutput != StreamReader.Null,
+            RedirectStandardError = _processConfiguration.StandardError is not null && _processConfiguration.StandardError != StreamReader.Null
+        };
+        
+        if (string.IsNullOrEmpty(_processConfiguration.Arguments) == false) 
+            processStartInfo.Arguments = _processConfiguration.Arguments;
+
+        if (_processConfiguration.RequiresAdministrator) 
+            processStartInfo.RunAsAdministrator();
+
+        if (_processConfiguration.Credential is not null) 
+            processStartInfo.TryApplyUserCredential(_processConfiguration.Credential);
+
+        if (_processConfiguration.EnvironmentVariables.Any()) 
+            processStartInfo.ApplyEnvironmentVariables(_processConfiguration.EnvironmentVariables);
+
+        if (processStartInfo.RedirectStandardInput) 
+            processStartInfo.StandardInputEncoding = _processConfiguration.StandardInputEncoding;
+        
+        return processStartInfo;
     }
 }
