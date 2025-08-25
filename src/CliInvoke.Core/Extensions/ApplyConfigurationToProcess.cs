@@ -88,29 +88,19 @@ public static class ApplyConfigurationToProcess
             processStartInfo.RedirectStandardOutput = redirectStandardOutput;
             processStartInfo.RedirectStandardError = redirectStandardError;
 
-            if (string.IsNullOrEmpty(configuration.Arguments) == false)
-            {
+            if (string.IsNullOrEmpty(configuration.Arguments) == false) 
                 processStartInfo.Arguments = configuration.Arguments;
-            }
 
-            if (configuration.RequiresAdministrator)
-            {
+            if (configuration.RequiresAdministrator) 
                 processStartInfo.RunAsAdministrator();
-            }
 
-            if (configuration.Credential is not null)
-            {
+            if (configuration.Credential is not null) 
                 processStartInfo.TryApplyUserCredential(configuration.Credential);
-            }
 
-            if (configuration.EnvironmentVariables.Any())
-            {
+            if (configuration.EnvironmentVariables.Any()) 
                 processStartInfo.ApplyEnvironmentVariables(configuration.EnvironmentVariables);
-            }
 
-            if (processStartInfo.RedirectStandardInput)
-            {
+            if (processStartInfo.RedirectStandardInput) 
                 processStartInfo.StandardInputEncoding = configuration.StandardInputEncoding;
-            }
     }
 }
