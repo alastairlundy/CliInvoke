@@ -78,45 +78,39 @@ public static class ApplyConfigurationToProcess
         ProcessConfiguration configuration,  bool redirectStandardOutput, bool redirectStandardError)
     {
             if (string.IsNullOrEmpty(configuration.TargetFilePath))
-            {
                 throw new ArgumentException(Resources.Exceptions_ProcessConfiguration_TargetFilePath_Empty);
-            }
-
-            ProcessStartInfo output = new ProcessStartInfo()
-            {
-                FileName = configuration.TargetFilePath,
-                WorkingDirectory = configuration.WorkingDirectoryPath,
-                UseShellExecute = configuration.UseShellExecution,
-                CreateNoWindow = configuration.WindowCreation,
-                RedirectStandardInput = configuration.StandardInput is not null &&
-                                        configuration.StandardInput != StreamWriter.Null,
-                RedirectStandardOutput = redirectStandardOutput,
-                RedirectStandardError = redirectStandardError,
-            };
+            
+            processStartInfo.FileName = configuration.TargetFilePath;
+            processStartInfo.WorkingDirectory = configuration.WorkingDirectoryPath;
+            processStartInfo.UseShellExecute = configuration.UseShellExecution;
+            processStartInfo.CreateNoWindow = configuration.WindowCreation;
+            processStartInfo.RedirectStandardInput = configuration.StandardInput is not null && configuration.StandardInput != StreamWriter.Null;
+            processStartInfo.RedirectStandardOutput = redirectStandardOutput;
+            processStartInfo.RedirectStandardError = redirectStandardError;
 
             if (string.IsNullOrEmpty(configuration.Arguments) == false)
             {
-                output.Arguments = configuration.Arguments;
+                processStartInfo.Arguments = configuration.Arguments;
             }
 
             if (configuration.RequiresAdministrator)
             {
-                output.RunAsAdministrator();
+                processStartInfo.RunAsAdministrator();
             }
 
             if (configuration.Credential is not null)
             {
-                output.TryApplyUserCredential(configuration.Credential);
+                processStartInfo.TryApplyUserCredential(configuration.Credential);
             }
 
             if (configuration.EnvironmentVariables.Any())
             {
-                output.ApplyEnvironmentVariables(configuration.EnvironmentVariables);
+                processStartInfo.ApplyEnvironmentVariables(configuration.EnvironmentVariables);
             }
 
-            if (output.RedirectStandardInput)
+            if (processStartInfo.RedirectStandardInput)
             {
-                output.StandardInputEncoding = configuration.StandardInputEncoding;
+                processStartInfo.StandardInputEncoding = configuration.StandardInputEncoding;
             }
     }
 }
