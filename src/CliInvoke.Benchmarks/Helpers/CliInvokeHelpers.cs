@@ -1,5 +1,4 @@
 ﻿using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;

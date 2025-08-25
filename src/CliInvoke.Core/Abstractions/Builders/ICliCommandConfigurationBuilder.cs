@@ -11,17 +11,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
-using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
-
+using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives;
-using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-using AlastairLundy.CliInvoke.Internal;
+
 using UserCredential = AlastairLundy.CliInvoke.Core.Primitives.UserCredential;
+
 using ProcessResourcePolicy = AlastairLundy.CliInvoke.Core.Primitives.Policies.ProcessResourcePolicy;
 
-namespace AlastairLundy.CliInvoke.Builders.Abstractions;
+namespace AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 
 /// <summary>
 /// An interface that defines the fluent builder methods all CommandBuilder classes must implement. 

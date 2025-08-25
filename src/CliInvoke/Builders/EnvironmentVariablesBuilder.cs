@@ -17,10 +17,13 @@ using System.Diagnostics.Contracts;
 
 using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 
+#if NET8_0_OR_GREATER
+using AlastairLundy.DotExtensions.Collections.Dictionaries;
+#else
 using AlastairLundy.DotExtensions.Collections.Generic.Dictionaries;
+#endif
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
-// ReSharper disable RedundantExplicitArrayCreation
 
 namespace AlastairLundy.CliInvoke.Builders;
 
@@ -93,16 +96,10 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// Builds the dictionary of configured environment variables.
     /// </summary>
     /// <returns>A read-only dictionary containing the configured environment variables.</returns>
-    public IReadOnlyDictionary<string, string> Build()
-    {
-        return _environmentVariables;
-    }
+    public IReadOnlyDictionary<string, string> Build() => _environmentVariables;
 
     /// <summary>
     /// Deletes the environment variable values.
     /// </summary>
-    public void Clear()
-    {
-        _environmentVariables.Clear();
-    }
+    public void Clear() => _environmentVariables.Clear();
 }

@@ -83,6 +83,11 @@
     </ItemGroup>
     
     <ItemGroup>
+      <Folder Include="Abstractions\" />
       <Folder Include="Legacy\" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
 </Project>

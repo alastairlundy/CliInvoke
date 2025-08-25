@@ -9,13 +9,10 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
-
-// ReSharper disable once CheckNamespace
-namespace AlastairLundy.CliInvoke.Abstractions;
+namespace AlastairLundy.CliInvoke.Core.Abstractions;
 
 /// <summary>
 /// An interface to specify the required Command Running functionality.
