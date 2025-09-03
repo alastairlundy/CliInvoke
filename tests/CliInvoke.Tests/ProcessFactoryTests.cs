@@ -1,7 +1,7 @@
+using System.Threading.Tasks;
 using Xunit;
-using CliInvoke;
 
-namespace CliInvoke.Tests;
+namespace AlastairLundy.CliInvoke.Tests;
 
 public class ProcessFactoryTests
 {
@@ -10,6 +10,7 @@ public class ProcessFactoryTests
     {
         // TODO: Use mocks for dependencies
         var factory = new ProcessFactory(null, null);
+        
         Assert.NotNull(factory);
     }
 

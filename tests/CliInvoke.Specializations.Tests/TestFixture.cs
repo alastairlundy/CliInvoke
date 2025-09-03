@@ -1,10 +1,8 @@
 ﻿using System;
-
 using AlastairLundy.CliInvoke.Extensions;
-
 using Microsoft.Extensions.Hosting;
 
-namespace CliInvoke.Specializations.Tests;
+namespace AlastairLundy.CliInvoke.Specializations.Tests;
 
 public class TestFixture
 {

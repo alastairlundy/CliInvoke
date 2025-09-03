@@ -1,19 +1,11 @@
-﻿
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
+﻿using System;
 using System.Threading.Tasks;
-
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Specializations.Tests.Helpers;
 
-using CliInvoke.Specializations.Tests.Helpers;
-
-namespace CliInvoke.Specializations.Tests.Invokers;
+namespace AlastairLundy.CliInvoke.Specializations.Tests.Invokers;
 
 public class CmdInvokerTests : IClassFixture<TestFixture>
 {

@@ -1,7 +1,6 @@
 using Xunit;
-using CliInvoke;
 
-namespace CliInvoke.Tests;
+namespace AlastairLundy.CliInvoke.Tests;
 
 public class ProcessInvokerTests
 {

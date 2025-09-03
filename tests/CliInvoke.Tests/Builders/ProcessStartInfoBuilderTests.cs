@@ -1,14 +1,14 @@
-using Xunit;
 using AlastairLundy.CliInvoke.Builders;
+using Xunit;
 
-namespace CliInvoke.Tests.Builders;
+namespace AlastairLundy.CliInvoke.Tests.Builders;
 
 public class ProcessStartInfoBuilderTests
 {
     [Fact]
     public void Constructor_ShouldInstantiate()
     {
-        var builder = new ProcessStartInfoBuilder();
+        var builder = new ProcessStartInfoBuilder("");
         Assert.NotNull(builder);
     }
 

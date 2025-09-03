@@ -1,7 +1,7 @@
-using Xunit;
 using AlastairLundy.CliInvoke.Builders;
+using Xunit;
 
-namespace CliInvoke.Tests.Builders;
+namespace AlastairLundy.CliInvoke.Tests.Builders;
 
 public class ProcessExitInfoBuilderTests
 {
