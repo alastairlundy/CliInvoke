@@ -53,6 +53,7 @@ public interface IProcessInvoker
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration"></param>
+    /// <param name="processExitInfo"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
