@@ -22,7 +22,7 @@ Key Abstractions:
 * [Installing CliInvoke.Core](#how-to-install-and-use-cliinvokecore)
     * [Compatibility](#supported-platforms)
 * [Examples](#examples)
-* [Contributing to CliInvoke.Core](#how-to-contribute-to-cliinvokecore)
+* [Contributing to CliInvoke.Core](#how-to-contribute)
 * [License](#license)
 * [Acknowledgements](#acknowledgements)
 

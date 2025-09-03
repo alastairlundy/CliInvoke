@@ -13,9 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
 
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives;

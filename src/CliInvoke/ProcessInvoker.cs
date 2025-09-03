@@ -381,7 +381,6 @@ public class ProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, 
         ProcessExitInfo? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,

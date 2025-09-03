@@ -11,8 +11,6 @@
 using System;
 using System.Diagnostics;
 
-using AlastairLundy.CliInvoke.Core.Internal;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.DotExtensions.Processes;
 
