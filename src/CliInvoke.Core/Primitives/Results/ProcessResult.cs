@@ -17,7 +17,6 @@ using System;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
