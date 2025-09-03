@@ -23,7 +23,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives;
 /// <summary>
 /// A class that represents the results from an executed Process or Command.
 /// </summary>
-public class ProcessResult
+public class ProcessResult : IEquatable<ProcessResult>
 {
     /// <summary>
     /// Instantiates a ProcessResult with data about a Process' execution.
@@ -72,4 +72,77 @@ public class ProcessResult
     /// How long the Command took to execute represented as a TimeSpan.
     /// </summary>
     public TimeSpan RuntimeDuration => ExitTime.Subtract(StartTime);
+
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals(ProcessResult? other)
+    {
+        if(other is null)
+            return false;
+        
+        return ExitCode == other.ExitCode &&
+               ExecutedFilePath == other.ExecutedFilePath &&
+               StartTime == other.StartTime &&
+               ExitTime == other.ExitTime;
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj)
+    {
+        if(obj is null)
+            return false;
+        
+        if(obj is ProcessResult other)
+            return Equals(other);
+        
+        return false;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ExitCode, ExecutedFilePath, StartTime, ExitTime);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static bool Equals(ProcessResult? left, ProcessResult? right)
+    {
+        if(left is null || right is null)
+            return false;
+        
+        return left.Equals(right);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static bool operator ==(ProcessResult left, ProcessResult? right) 
+        => left.Equals(right);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static bool operator !=(ProcessResult left, ProcessResult? right) => left.Equals(right) == false;
 }
