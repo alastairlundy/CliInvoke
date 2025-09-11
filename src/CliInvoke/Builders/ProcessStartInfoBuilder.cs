@@ -16,6 +16,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Internal;
