@@ -14,7 +14,6 @@
  */
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable MemberCanBePrivate.Global
 
 using System;
@@ -22,7 +21,6 @@ using System;
 using System.Runtime.Versioning;
 
 using System.Security;
-
 
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
@@ -64,7 +62,6 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <summary>
     /// The domain to be used.
     /// </summary>
-
     [SupportedOSPlatform("windows")]
     public string? Domain { get; private set; }
         
@@ -76,14 +73,12 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <summary>
     /// The password to be used.
     /// </summary>
-
     [SupportedOSPlatform("windows")]
     public SecureString? Password { get; private set; }
         
     /// <summary>
     /// Whether to load the UserCredential information and user profile.
     /// </summary>
-
     [SupportedOSPlatform("windows")]
     public bool? LoadUserProfile { get; private set; }
         
