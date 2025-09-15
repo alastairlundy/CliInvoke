@@ -36,9 +36,6 @@
     <data name="Command.ToString.ShellExecution" xml:space="preserve">
         <value>(Uses Shell Execution)</value>
     </data>
-    <data name="Command.TargetFilePath.Empty" xml:space="preserve">
-        <value>The Command's Target File Path cannot be null or empty.</value>
-    </data>
     <data name="Exceptions.ArgumentBuilder.Buffer.MaximumSize" xml:space="preserve">
         <value>ArgumentBuilder buffer size cannot be added to as it is the maximum size of {x}</value>
     </data>
@@ -60,7 +57,7 @@
     <data name="Labels.ProcessConfiguration.ToString.WorkingDirectory" xml:space="preserve">
         <value>(Working Directory) </value>
     </data>
-    <data name="Exceptions.ProcessConfiguration.TargetFilePath.Empty" xml:space="preserve">
-        <value />
+    <data name="Exceptions.TargetFilePath.NullOrEmpty" xml:space="preserve">
+        <value>The provided target file path cannot be null or empty.</value>
     </data>
 </root>
