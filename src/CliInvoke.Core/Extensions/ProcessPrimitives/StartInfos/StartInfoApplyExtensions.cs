@@ -59,12 +59,6 @@ public static class StartInfoApplyExtensions
                 processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
             }
         }
-        else
-        {
-            throw new PlatformNotSupportedException();
-        }
-#pragma warning restore CA1416
-    }
         
     /// <summary>
     /// Attempts to add the specified Credential to the current ProcessStartInfo object.
@@ -80,6 +74,8 @@ public static class StartInfoApplyExtensions
             {
 #pragma warning disable CA1416
                 ApplyUserCredential(processStartInfo, credential);
+        throw new PlatformNotSupportedException();
+        
 #pragma warning restore CA1416
                 return true;
             }
