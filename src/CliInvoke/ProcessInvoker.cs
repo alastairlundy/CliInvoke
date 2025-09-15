@@ -108,6 +108,13 @@ public class ProcessInvoker : IProcessInvoker
         return result;
     }
 
+    //TODO: Implement
+    public Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo, ProcessExitInfo? processExitInfo = null,
+        StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
@@ -242,6 +249,13 @@ public class ProcessInvoker : IProcessInvoker
         return result;
     }
 
+    //TODO: Implement
+    public Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo, ProcessExitInfo? processExitInfo = null,
+        StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
+    }
+
     /// <summary>
     /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
     /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
@@ -359,6 +373,13 @@ public class ProcessInvoker : IProcessInvoker
         process.Dispose();
         
         return result;
+    }
+
+    //TODO: Implement
+    public Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, ProcessExitInfo? processExitInfo = null,
+        StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
     }
 
     /// <summary>
