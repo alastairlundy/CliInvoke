@@ -137,7 +137,7 @@ public class ProcessFactory : IProcessFactory
     {
         Process output = new Process();
         
-        ApplyConfigurationToProcess.ApplyProcessConfiguration(output, configuration, 
+        output.ApplyProcessConfiguration(configuration, 
             configuration.StandardOutput is not null && configuration.StandardOutput != StreamReader.Null,
             configuration.StandardError is not null && configuration.StandardError != StreamReader.Null);
 
