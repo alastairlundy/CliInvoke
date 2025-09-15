@@ -21,6 +21,7 @@ using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Internal;
 
 namespace AlastairLundy.CliInvoke.Builders;
 
@@ -482,8 +483,11 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
             processStartInfo.RunAsAdministrator();
 
         if (_processConfiguration.Credential is not null) 
-            processStartInfo.TryApplyUserCredential(_processConfiguration.Credential);
-
+            if(_processConfiguration.Credential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                processStartInfo.ApplyUserCredential(_processConfiguration.Credential);
+#pragma warning restore CA1416
+            
         if (_processConfiguration.EnvironmentVariables.Any()) 
             processStartInfo.ApplyEnvironmentVariables(_processConfiguration.EnvironmentVariables);
 

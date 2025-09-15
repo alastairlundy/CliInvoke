@@ -93,8 +93,11 @@ internal static class ApplyConfigurationToProcess
                 processStartInfo.RunAsAdministrator();
 
             if (configuration.Credential is not null) 
-                processStartInfo.TryApplyUserCredential(configuration.Credential);
-
+                if(configuration.Credential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                    processStartInfo.ApplyUserCredential(configuration.Credential);
+#pragma warning restore CA1416
+                
             if (configuration.EnvironmentVariables.Any()) 
                 processStartInfo.ApplyEnvironmentVariables(configuration.EnvironmentVariables);
 
