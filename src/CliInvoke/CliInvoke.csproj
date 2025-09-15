@@ -34,7 +34,9 @@
     </PropertyGroup>
     
     <ItemGroup>
+<!--
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.6" />
+-->
         <PackageReference Include="AlastairLundy.DotExtensions" Version="8.3.0" />
     </ItemGroup>
     
@@ -69,8 +71,8 @@
       </None>
     </ItemGroup>
     
- <!--   <ItemGroup>
+    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>-->
+    </ItemGroup>
    
 </Project>
