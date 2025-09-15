@@ -84,7 +84,7 @@ public class ProcessInvoker : IProcessInvoker
 
         Process process = new Process();
         
-        ApplyConfigurationToProcess.ApplyProcessConfiguration(process, processConfiguration, 
+        process.ApplyProcessConfiguration(processConfiguration, 
             processConfiguration.StandardOutput is not null && processConfiguration.StandardOutput != StreamReader.Null,
             processConfiguration.StandardError is not null && processConfiguration.StandardError != StreamReader.Null);
         
@@ -220,7 +220,7 @@ public class ProcessInvoker : IProcessInvoker
 
         Process process = new Process();
 
-        ApplyConfigurationToProcess.ApplyProcessConfiguration(process, processConfiguration, true,
+        process.ApplyProcessConfiguration(processConfiguration, true,
             true);
 
         process.Start();
@@ -340,7 +340,7 @@ public class ProcessInvoker : IProcessInvoker
         
         Process process = new Process();
         
-        ApplyConfigurationToProcess.ApplyProcessConfiguration(process, processConfiguration, true,
+        process.ApplyProcessConfiguration(processConfiguration, true,
             true);
 
         process.Start();
