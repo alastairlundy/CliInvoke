@@ -38,9 +38,7 @@ public static class ProcessSetPolicyExtensions
         }
 
         if (process.HasStarted() == false)
-        {
             throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
-        }
 
         if (process.HasStarted() && (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()))
         {
