@@ -23,9 +23,11 @@ using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Extensions.Internal;
+using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+
 using AlastairLundy.DotExtensions.Processes;
+using ApplyConfigurationToProcess = AlastairLundy.CliInvoke.Internal.ApplyConfigurationToProcess;
 
 // ReSharper disable UnusedType.Global
 
@@ -135,7 +137,7 @@ public class ProcessFactory : IProcessFactory
     {
         Process output = new Process();
         
-        output.ApplyProcessConfiguration(configuration, 
+        ApplyConfigurationToProcess.ApplyProcessConfiguration(output, configuration, 
             configuration.StandardOutput is not null && configuration.StandardOutput != StreamReader.Null,
             configuration.StandardError is not null && configuration.StandardError != StreamReader.Null);
 

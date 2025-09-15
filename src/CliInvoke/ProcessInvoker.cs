@@ -20,10 +20,11 @@ using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Extensions.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
+using AlastairLundy.CliInvoke.Internal;
+using ApplyConfigurationToProcess = AlastairLundy.CliInvoke.Internal.ApplyConfigurationToProcess;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -83,7 +84,7 @@ public class ProcessInvoker : IProcessInvoker
 
         Process process = new Process();
         
-        process.ApplyProcessConfiguration(processConfiguration, 
+        ApplyConfigurationToProcess.ApplyProcessConfiguration(process, processConfiguration, 
             processConfiguration.StandardOutput is not null && processConfiguration.StandardOutput != StreamReader.Null,
             processConfiguration.StandardError is not null && processConfiguration.StandardError != StreamReader.Null);
         
@@ -219,7 +220,7 @@ public class ProcessInvoker : IProcessInvoker
 
         Process process = new Process();
 
-        process.ApplyProcessConfiguration(processConfiguration, true,
+        ApplyConfigurationToProcess.ApplyProcessConfiguration(process, processConfiguration, true,
             true);
 
         process.Start();
@@ -339,7 +340,7 @@ public class ProcessInvoker : IProcessInvoker
         
         Process process = new Process();
         
-        process.ApplyProcessConfiguration(processConfiguration, true,
+        ApplyConfigurationToProcess.ApplyProcessConfiguration(process, processConfiguration, true,
             true);
 
         process.Start();
