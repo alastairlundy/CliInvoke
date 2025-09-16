@@ -78,7 +78,6 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Folder Include="Abstractions\" />
       <Folder Include="Legacy\" />
     </ItemGroup>
     
