@@ -20,20 +20,25 @@
 
 #nullable enable
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy;
 using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Exceptions;
+using AlastairLundy.CliInvoke.Internal.Extensions;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 #endif
 
 // ReSharper disable CheckNamespace
@@ -44,14 +49,16 @@ namespace AlastairLundy.CliInvoke;
 /// </summary>
 public class CliCommandInvoker : ICliCommandInvoker
 {
-        private readonly IPipedProcessRunner _pipedProcessRunner;
+        private readonly IPipedProcessRunner? _pipedProcessRunner;
         
         private readonly IProcessPipeHandler _processPipeHandler;
         
-        private readonly ICommandProcessFactory _commandProcessFactory;
+        private readonly ICommandProcessFactory? _commandProcessFactory;
+        
+        private readonly IProcessFactory? _processFactory;
 
         /// <summary>
-        /// Initializes the CommandInvoker with the ICommandPipeHandler to be used.
+        /// Initializes the CommandInvoker with the IProcessPipeHandler to be used.
         /// </summary>
         /// <param name="pipedProcessRunner">The piped process runner to be used.</param>
         /// <param name="processPipeHandler">The process pipe handler to be used.</param>
@@ -63,6 +70,21 @@ public class CliCommandInvoker : ICliCommandInvoker
             _pipedProcessRunner = pipedProcessRunner;
             _processPipeHandler = processPipeHandler;
             _commandProcessFactory = commandProcessFactory;
+            _processFactory = null;
+        }
+        
+        /// <summary>
+        /// Initializes the CommandInvoker with the IProcessPipeHandler to be used.
+        /// </summary>
+        /// <param name="processPipeHandler">The process pipe handler to be used.</param>
+        /// <param name="processFactory"></param>
+        public CliCommandInvoker(IProcessPipeHandler processPipeHandler,
+            IProcessFactory processFactory)
+        {
+            _pipedProcessRunner = null;
+            _commandProcessFactory = null;
+            _processPipeHandler = processPipeHandler;
+            _processFactory = processFactory;
         }
         
         
@@ -86,7 +108,20 @@ public class CliCommandInvoker : ICliCommandInvoker
 #endif
         public async Task<ProcessResult> ExecuteAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default)
         {
-            Process process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration));
+            Process process;
+            
+            if (_processFactory is not null)
+            {
+                process = _processFactory.From(commandConfiguration.ToProcessConfiguration());
+            }
+            else if(_commandProcessFactory is not null)
+            {
+                    process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration));   
+            }
+            else
+            {
+                throw new NullReferenceException();
+            }
             
             if (process.StartInfo.RedirectStandardInput &&
                 commandConfiguration.StandardInput is not null
@@ -94,27 +129,47 @@ public class CliCommandInvoker : ICliCommandInvoker
             {
                 await _processPipeHandler.PipeStandardInputAsync(commandConfiguration.StandardInput.BaseStream, process);
             }
+
+            (ProcessResult processResult, Stream? standardOutput, Stream? standardError) result;
             
-            (ProcessResult processResult, Stream standardOutput, Stream standardError) result =
-                await _pipedProcessRunner.ExecuteProcessWithPipingAsync(process, ProcessResultValidation.None, commandConfiguration.ResourcePolicy,
-                    cancellationToken);
+            if (_processFactory is not null)
+            {
+                ProcessResult processResult = await _processFactory.ContinueWhenExitAsync(process, cancellationToken);
+
+                result = (processResult, null, null);
+            }
+            else if (_pipedProcessRunner is not null)
+            {
+                result =
+                    await _pipedProcessRunner.ExecuteProcessWithPipingAsync(process, ProcessResultValidation.None,
+                        commandConfiguration.ResourcePolicy,
+                        cancellationToken);
+            }
+            else
+            {
+                throw new NullReferenceException();
+            }
+
 
             // Throw a CommandNotSuccessful exception if required.
             if (result.processResult.ExitCode != 0 && commandConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
             {
                 throw new CliCommandNotSuccessfulException(result.processResult.ExitCode, commandConfiguration);
             }
-            
-            if (process.StartInfo.RedirectStandardOutput && 
-                commandConfiguration.StandardOutput is not null)
+
+            if (_pipedProcessRunner is not null && result.standardOutput is not null && result.standardError is not null)
             {
-                await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
-                    cancellationToken);
-            }
-            if (process.StartInfo.RedirectStandardError &&
-                commandConfiguration.StandardError is not null)
-            {
-                await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
+                if (process.StartInfo.RedirectStandardOutput && 
+                    commandConfiguration.StandardOutput is not null)
+                {
+                    await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
+                        cancellationToken);
+                }
+                if (process.StartInfo.RedirectStandardError &&
+                    commandConfiguration.StandardError is not null)
+                {
+                    await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
+                }
             }
             
             return result.processResult;
@@ -141,8 +196,21 @@ public class CliCommandInvoker : ICliCommandInvoker
         public async Task<BufferedProcessResult> ExecuteBufferedAsync(CliCommandConfiguration commandConfiguration,
             CancellationToken cancellationToken = default)
         {
-            Process process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration,
-                true, true));
+            Process process;
+
+            if (_processFactory is not null)
+            {
+                process = _processFactory.From(commandConfiguration.ToProcessConfiguration());
+            }
+            else if (_commandProcessFactory is not null)
+            {
+               process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration,
+                    true, true));
+            }
+            else
+            {
+                throw new NullReferenceException();
+            }
 
             if (process.StartInfo.RedirectStandardInput &&
                 commandConfiguration.StandardInput is not null
@@ -152,26 +220,46 @@ public class CliCommandInvoker : ICliCommandInvoker
             }
             
             // PipedProcessRunner runs the Process for us.
-            (BufferedProcessResult processResult, Stream standardOutput, Stream standardError) result =
-                await _pipedProcessRunner.ExecuteBufferedProcessWithPipingAsync(process, ProcessResultValidation.None, commandConfiguration.ResourcePolicy,
+            (BufferedProcessResult processResult, Stream? standardOutput, Stream? standardError) result;
+
+            if (_processFactory is not null)
+            {
+                BufferedProcessResult processResult = await _processFactory.ContinueWhenExitBufferedAsync(process,
+                    commandConfiguration.ResultValidation,
                     cancellationToken);
+                
+                result = (processResult, null, null);
+            }
+            else if (_pipedProcessRunner is not null)
+            {
+                result = await _pipedProcessRunner.ExecuteBufferedProcessWithPipingAsync(process, ProcessResultValidation.None, commandConfiguration.ResourcePolicy,
+                    cancellationToken);
+            }
+            else
+            {
+                throw new NullReferenceException();
+            }
             
             // Throw a CommandNotSuccessful exception if required.
             if (result.processResult.ExitCode != 0 && commandConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
             {
                 throw new CliCommandNotSuccessfulException(result.processResult.ExitCode, commandConfiguration);
             }
-            
-            if (process.StartInfo.RedirectStandardOutput &&
-                commandConfiguration.StandardOutput is not null)
+
+            if (_pipedProcessRunner is not null && result.standardOutput is not null &&
+                result.standardError is not null)
             {
-                await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
-                    cancellationToken);
-            }
-            if (process.StartInfo.RedirectStandardError &&
-                commandConfiguration.StandardError is not null)
-            {
-                await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
+                if (process.StartInfo.RedirectStandardOutput &&
+                    commandConfiguration.StandardOutput is not null)
+                {
+                    await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
+                        cancellationToken);
+                }
+                if (process.StartInfo.RedirectStandardError &&
+                    commandConfiguration.StandardError is not null)
+                {
+                    await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
+                }
             }
             
             return result.processResult;
