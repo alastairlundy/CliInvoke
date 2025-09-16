@@ -19,13 +19,14 @@ using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
+using AlastairLundy.CliInvoke.Internal;
 
 namespace AlastairLundy.CliInvoke.Legacy;
 
 /// <summary>
 /// A Process Runner-esque class for Piping output after Executing processes.
 /// </summary>
-[Obsolete]
+[Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class PipedProcessRunner : IPipedProcessRunner
 {
     private readonly IProcessPipeHandler _processPipeHandler;
@@ -64,6 +65,7 @@ public class PipedProcessRunner : IPipedProcessRunner
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<(
         ProcessResult processResult, Stream standardOutput, Stream standardError)> ExecuteProcessWithPipingAsync(Process process,
         ProcessResultValidation processResultValidation, ProcessResourcePolicy? processResourcePolicy = null, CancellationToken cancellationToken = default)
@@ -108,6 +110,7 @@ public class PipedProcessRunner : IPipedProcessRunner
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<(BufferedProcessResult processResult, Stream standardOutput, Stream standardError)>
         ExecuteBufferedProcessWithPipingAsync(Process process, ProcessResultValidation processResultValidation,
             ProcessResourcePolicy? processResourcePolicy = null,
