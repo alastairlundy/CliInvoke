@@ -25,110 +25,110 @@ using System.Security;
 using System.Runtime.Versioning;
 #endif
 
-namespace AlastairLundy.CliInvoke.Core.Primitives
+namespace AlastairLundy.CliInvoke.Core.Primitives;
+
+/// <summary>
+/// A class to represent a User Credential to be used with Processes.
+/// </summary>
+public class UserCredential : IEquatable<UserCredential>, IDisposable
 {
     /// <summary>
-    /// A class to represent a User Credential to be used with Processes.
+    /// Instantiates the user credential with null values.
     /// </summary>
-    public class UserCredential : IEquatable<UserCredential>, IDisposable
+    public UserCredential()
     {
-        /// <summary>
-        /// Instantiates the user credential with null values.
-        /// </summary>
-        public UserCredential()
-        {
 #pragma warning disable CA1416
-            Domain = null;
-            UserName = null;
-            Password = null;
-            LoadUserProfile = false;
+        Domain = null;
+        UserName = null;
+        Password = null;
+        LoadUserProfile = false;
 #pragma warning restore CA1416
-        }
+    }
 
-        /// <summary>
-        /// Instantiates user credential with the specified values.
-        /// </summary>
-        /// <param name="domain">The domain to be used.</param>
-        /// <param name="username">The username to be used.</param>
-        /// <param name="password">The password to be used.</param>
-        /// <param name="loadUserProfile">Whether to load the user profile during Process creation.</param>
-        public UserCredential(string? domain, string? username, SecureString? password, bool? loadUserProfile)
-        {
+    /// <summary>
+    /// Instantiates user credential with the specified values.
+    /// </summary>
+    /// <param name="domain">The domain to be used.</param>
+    /// <param name="username">The username to be used.</param>
+    /// <param name="password">The password to be used.</param>
+    /// <param name="loadUserProfile">Whether to load the user profile during Process creation.</param>
+    public UserCredential(string? domain, string? username, SecureString? password, bool? loadUserProfile)
+    {
 #pragma warning disable CA1416
-            Domain = domain;
-            UserName = username;
-            Password = password;
-            LoadUserProfile = loadUserProfile;
+        Domain = domain;
+        UserName = username;
+        Password = password;
+        LoadUserProfile = loadUserProfile;
 #pragma warning restore CA1416
-        }
+    }
         
-        /// <summary>
-        /// The domain to be used.
-        /// </summary>
+    /// <summary>
+    /// The domain to be used.
+    /// </summary>
 #if NET6_0_OR_GREATER
         [SupportedOSPlatform("windows")]
 #endif
-        public string? Domain { get; private set; }
+    public string? Domain { get; private set; }
         
-        /// <summary>
-        /// The username to be used.
-        /// </summary>
-        public string? UserName { get; private set; }
+    /// <summary>
+    /// The username to be used.
+    /// </summary>
+    public string? UserName { get; private set; }
         
-        /// <summary>
-        /// The password to be used.
-        /// </summary>
+    /// <summary>
+    /// The password to be used.
+    /// </summary>
 #if NET6_0_OR_GREATER
         [SupportedOSPlatform("windows")]
 #endif
-        public SecureString? Password { get; private set; }
+    public SecureString? Password { get; private set; }
         
-        /// <summary>
-        /// Whether to load the UserCredential information and user profile.
-        /// </summary>
+    /// <summary>
+    /// Whether to load the UserCredential information and user profile.
+    /// </summary>
 #if NET6_0_OR_GREATER
         [SupportedOSPlatform("windows")]
 #endif
-        public bool? LoadUserProfile { get; private set; }
+    public bool? LoadUserProfile { get; private set; }
         
-        /// <summary>
-        /// A null UserCredential instance.
-        /// </summary>
-        public static UserCredential Null { get; } = new UserCredential();
+    /// <summary>
+    /// A null UserCredential instance.
+    /// </summary>
+    public static UserCredential Null { get; } = new UserCredential();
 
-        /// <summary>
-        /// Disposes of the Password SecureString and other UserCredential values.
-        /// </summary>
-        public void Dispose()
-        {
+    /// <summary>
+    /// Disposes of the Password SecureString and other UserCredential values.
+    /// </summary>
+    public void Dispose()
+    {
 #pragma warning disable CA1416
-            Domain = string.Empty;
-            UserName = string.Empty;
-            LoadUserProfile = false;
-            Password?.Dispose();
+        Domain = string.Empty;
+        UserName = string.Empty;
+        LoadUserProfile = false;
+        Password?.Dispose();
 #pragma warning restore CA1416
+    }
+
+    /// <summary>
+    /// Determines whether the specified user credential is equal to the current user credential.
+    /// </summary>
+    /// <param name="other">The user credential to compare with the current user credential.</param>
+    /// <returns>True if the specified user credential is equal to the current user credential; false otherwise.</returns>
+    public bool Equals(UserCredential? other)
+    {
+#pragma warning disable CA1416
+        if (other is null)
+        {
+            return false;
         }
 
-        /// <summary>
-        /// Determines whether the specified user credential is equal to the current user credential.
-        /// </summary>
-        /// <param name="other">The user credential to compare with the current user credential.</param>
-        /// <returns>True if the specified user credential is equal to the current user credential; false otherwise.</returns>
-        public bool Equals(UserCredential? other)
+        if (other.UserName is null || other.Domain is null || other.Password is null ||
+            other.LoadUserProfile is null)
         {
-#pragma warning disable CA1416
-            if (other is null)
-            {
-                return false;
-            }
-
-            if (other.UserName is null || other.Domain is null || other.Password is null ||
-                other.LoadUserProfile is null)
-            {
-                return false;
-            }
+            return false;
+        }
             
-            return Domain == other.Domain &&
+        return Domain == other.Domain &&
                UserName == other.UserName &&
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
                Password.Equals(other.Password)
@@ -136,80 +136,79 @@ namespace AlastairLundy.CliInvoke.Core.Primitives
                && LoadUserProfile == other.LoadUserProfile;
 #pragma warning restore CA1416
 
-        }
+    }
 
-        /// <summary>
-        /// Determines whether one User Credential is equal to another.
-        /// </summary>
-        /// <param name="left">The first user credential to compare.</param>
-        /// <param name="right">The second user credential to compare.</param>
-        /// <returns>True if the two user credential objects are equal; false otherwise.</returns>
-        public static bool Equals(UserCredential? left, UserCredential? right)
+    /// <summary>
+    /// Determines whether one User Credential is equal to another.
+    /// </summary>
+    /// <param name="left">The first user credential to compare.</param>
+    /// <param name="right">The second user credential to compare.</param>
+    /// <returns>True if the two user credential objects are equal; false otherwise.</returns>
+    public static bool Equals(UserCredential? left, UserCredential? right)
+    {
+        if (left is null || right is null)
         {
-            if (left is null || right is null)
-            {
-                return false;
-            }
+            return false;
+        }
             
-            return left.Equals(right);
-        }
+        return left.Equals(right);
+    }
         
-        /// <summary>
-        /// Determines whether the specified object is equal to the current user credential.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current user credential.</param>
-        /// <returns>True if the specified object is equal to the current user credential; false otherwise.</returns>
-        public override bool Equals(object? obj)
+    /// <summary>
+    /// Determines whether the specified object is equal to the current user credential.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current user credential.</param>
+    /// <returns>True if the specified object is equal to the current user credential; false otherwise.</returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
         {
-            if (obj is null)
-            {
-                return false;
-            }
-
-            if (obj is UserCredential other)
-            {
-                return Equals(other);
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
-        /// <summary>
-        /// Returns the hash code for the current user credential.
-        /// </summary>
-        /// <returns>The hash code for the current user credential.</returns>
-        public override int GetHashCode()
+        if (obj is UserCredential other)
         {
+            return Equals(other);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Returns the hash code for the current user credential.
+    /// </summary>
+    /// <returns>The hash code for the current user credential.</returns>
+    public override int GetHashCode()
+    {
 #pragma warning disable CA1416
-            return HashCode.Combine(Domain,
-                UserName,
-                Password,
-                LoadUserProfile);
+        return HashCode.Combine(Domain,
+            UserName,
+            Password,
+            LoadUserProfile);
 #pragma warning restore CA1416
-        }
+    }
 
-        /// <summary>
-        /// Determines if a UserCredential is equal to another UserCredential.
-        /// </summary>
-        /// <param name="left">A UserCredential to be compared.</param>
-        /// <param name="right">The other UserCredential to be compared.</param>
-        /// <returns>True if both UserCredentials are equal to each other, false otherwise.</returns>
-        public static bool operator ==(UserCredential? left, UserCredential? right)
-        {
-            return Equals(left, right);
-        }
+    /// <summary>
+    /// Determines if a UserCredential is equal to another UserCredential.
+    /// </summary>
+    /// <param name="left">A UserCredential to be compared.</param>
+    /// <param name="right">The other UserCredential to be compared.</param>
+    /// <returns>True if both UserCredentials are equal to each other, false otherwise.</returns>
+    public static bool operator ==(UserCredential? left, UserCredential? right)
+    {
+        return Equals(left, right);
+    }
 
-        /// <summary>
-        /// Determines if a UserCredential is not equal to another UserCredential.
-        /// </summary>
-        /// <param name="left">A UserCredential to be compared.</param>
-        /// <param name="right">The other UserCredential to be compared.</param>
-        /// <returns>True if both UserCredentials are not equal to each other; false otherwise.</returns>
-        public static bool operator !=(UserCredential? left, UserCredential? right)
-        {
-            return Equals(left, right) == false;
-        }
+    /// <summary>
+    /// Determines if a UserCredential is not equal to another UserCredential.
+    /// </summary>
+    /// <param name="left">A UserCredential to be compared.</param>
+    /// <param name="right">The other UserCredential to be compared.</param>
+    /// <returns>True if both UserCredentials are not equal to each other; false otherwise.</returns>
+    public static bool operator !=(UserCredential? left, UserCredential? right)
+    {
+        return Equals(left, right) == false;
     }
 }
