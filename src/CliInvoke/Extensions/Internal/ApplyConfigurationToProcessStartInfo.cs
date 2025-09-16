@@ -35,23 +35,5 @@ internal static class ApplyConfigurationToProcessStartInfo
         }
     }
     
-        /// <summary>
-    /// Applies environment variables to a specified ProcessStartInfo object.
-    /// </summary>
-    /// <param name="processStartInfo">The ProcessStartInfo object to apply environment variables to.</param>
-    /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
-    internal static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
-        IReadOnlyDictionary<string, string> environmentVariables)
-    {
-        if (environmentVariables.Any() == false)
-            return;
-        
-        foreach (KeyValuePair<string, string> variable in environmentVariables)
-        {
-            if (variable.Value is not null)
-            {
-                processStartInfo.Environment[variable.Key] = variable.Value;
-            }
-        }
-    }
+
 }
