@@ -17,8 +17,8 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <LangVersion>13</LangVersion>
-        <PackageReleaseNotes>### Changes since 1.4.4
-* Updated CliInvoke dependency to 1.5.1</PackageReleaseNotes>
+        <PackageReleaseNotes>### Changes since 1.5.1
+* Updated CliInvoke dependency to 1.5.2</PackageReleaseNotes>
         <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
