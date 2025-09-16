@@ -17,6 +17,7 @@
 ### 1.5
 | Version | Release Date | Changelog |
 |-|-|-|
+| 1.5.2 | September 16th 2025 |  https://github.com/alastairlundy/CliInvoke/releases/1.5.2 |
 | 1.5.1 | August 25th 2025 |  https://github.com/alastairlundy/CliInvoke/releases/1.5.1 |
 | 1.5.0 | July 30th 2025 | https://github.com/alastairlundy/CliInvoke/releases/1.5.0|
 
