@@ -24,7 +24,7 @@ using AlastairLundy.CliInvoke.Core.Extensions.Processes;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
-
+using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.DotExtensions.Processes;
 
 using AlastairLundy.Resyslib.IO.Core.Files;
@@ -35,7 +35,7 @@ namespace AlastairLundy.CliInvoke.Legacy.Utilities;
 /// A Process Running Utility to easily create different Process Runners.
 /// </summary>
 /// <remarks>This class is primarily intended for internal use OR use when creating a Process Runner or Command Runner implementation.</remarks>
-[Obsolete]
+[Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class ProcessRunnerUtility : IProcessRunnerUtility
 {
     private readonly IFilePathResolver _filePathResolver;
@@ -62,6 +62,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public int Execute(Process process)
     {
         return Execute(process, ProcessResultValidation.None);
@@ -86,6 +87,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public int Execute(Process process, ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null)
     {
@@ -125,6 +127,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<int> ExecuteAsync(Process process, CancellationToken cancellationToken = default)
     {
         return await ExecuteAsync(process, ProcessResultValidation.None,null, cancellationToken);
@@ -151,6 +154,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<int> ExecuteAsync(Process process,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
@@ -183,6 +187,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     /// Disposes of the specified process.
     /// </summary>
     /// <param name="process">The process to be disposed of.</param>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public void DisposeOfProcess(Process process)
     {
         if (process.HasExited == false)
@@ -200,6 +205,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     /// <param name="process">The process to retrieve results from.</param>
     /// <param name="disposeOfProcess">Whether to dispose of the Process before returning.</param>
     /// <returns>The results from an exited process.</returns>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public ProcessResult GetResult(Process process, bool disposeOfProcess)
     {
         if (process.HasStarted() == false)
@@ -247,6 +253,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public BufferedProcessResult GetBufferedResult(Process process, bool disposeOfProcess)
     {
         if (process.HasStarted() == false)
@@ -296,6 +303,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<ProcessResult> GetResultAsync(Process process, bool disposeOfProcess)
     {
         if (process.HasStarted() == false)
@@ -338,6 +346,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<BufferedProcessResult> GetBufferedResultAsync(Process process, bool disposeOfProcess)
     {
         if (process.HasStarted() == false)

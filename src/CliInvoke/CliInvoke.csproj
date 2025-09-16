@@ -13,16 +13,15 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### Changes since 1.5.0
-* Updated DotExtensions from 7.6.2 to 7.6.5 on .NET Standard 2.0
-* Updated DotExtensions from 7.6.2 to 8.2.0 on .NET 8 and .NET 9
-* Updated internal Polyfill usage from 8.7.3 to 8.8.0
-* Moved some abstractions to CliInvoke.Core
-* Updated to CliInvoke.Core 1.5.1</PackageReleaseNotes>
+        <PackageReleaseNotes>### Changes since 1.5.1
+* Updated DotExtensions from 7.6.5 to 7.7.0 on .NET Standard 2.0
+* Updated DotExtensions from 8.2.0 to 8.3.0 on .NET 8 and .NET 9
+* Updated internal Polyfill usage from 8.8.0 to 8.8.1
+* Marked some interfaces as deprecation for removal in v2</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.5.1</PackageVersion>
+        <PackageVersion>1.5.2</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke, processinvoker, processfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -33,13 +32,13 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="7.6.5" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="[7.7.0, 8.0.0)" />
         <PackageReference Include="Polyfill" Version="8.8.1" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AlastairLundy.Resyslib.IO.Core" Version="[3.2.0, 4.0.0)" />
         <PackageReference Include="AlastairLundy.DotExtensions" Version="8.3.0" Condition="'$(TargetFramework)' == 'net8.0' OR '$(TargetFramework)' == 'net9.0'" />
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.5.1" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.5.2" />
     </ItemGroup>
     
     <ItemGroup>

@@ -61,7 +61,7 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    [Obsolete]
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public ProcessResult ExecuteProcess(Process process, ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null)
     {
@@ -101,7 +101,7 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    [Obsolete]
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public BufferedProcessResult ExecuteBufferedProcess(Process process,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null)
@@ -144,6 +144,7 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<ProcessResult> ExecuteProcessAsync(Process process, ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
     {
@@ -186,6 +187,7 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<ProcessResult> ExecuteProcessAsync(Process process,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
@@ -214,6 +216,7 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(Process process,
         ProcessConfiguration processConfiguration,
         CancellationToken cancellationToken = default)
@@ -250,6 +253,7 @@ public class ProcessRunner : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(Process process,
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null,
