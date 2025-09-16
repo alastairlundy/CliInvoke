@@ -33,7 +33,7 @@ Launch processes, redirect standard input and output streams, await process comp
 <sup>1</sup> - The Specialization library is distributed separately [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations).
 
 ## Why use CliInvoke over [CliWrap](https://github.com/Tyrrrz/CliWrap/)?
-* Greater separation of concerns with the Command class - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
+* Greater separation of concerns - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
 * Supports Dependency Injection
 * Classes and code follow the Single Responsibility Principle
 * No hidden or additional licensing terms are required beyond the source code license.
@@ -46,7 +46,7 @@ CliInvoke is available on Nuget.
 
 These are the CliInvoke projects:
 * CliInvoke - The main CliInvoke package.
-* [CliInvoke.Extensions](CliInvokeLibrary/CliInvoke.Extensions/README.md)
+* [CliInvoke.Extensions](src/CliInvoke.Extensions/README.md)
 * [CliInvoke.Specializations](SPECIALIZATIONS_README.md)
 
 ### Installing CliInvoke
@@ -60,7 +60,7 @@ CliInvoke's packages can be installed via the .NET SDK CLI, Nuget via your IDE o
 
 
 ### Supported Platforms
-CliInvoke can currently be added to .NET Standard 2.0, .NET 8, or .NET 9 or newer supported projects.
+CliInvoke can currently be added to .NET 8, or .NET 9 or newer supported projects.
 
 The following table details which target platforms are supported for executing commands via CliInvoke. 
 
@@ -72,10 +72,10 @@ The following table details which target platforms are supported for executing c
 | Linux            | Fully Supported :white_check_mark: |                                                                                             |
 | FreeBSD          | Fully Supported :white_check_mark: |                                                                                             |
 | Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                |
-| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. <sup>3</sup>                             | 
-| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS <sup>3</sup>                             |
-| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                          |
-| Browser          | Not Planned :x:  | Not supported due to not being a valid target Platform for executing programs or processes. |
+| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. <sup>3</sup>                   | 
+| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS <sup>3</sup>                   |
+| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                |
+| Browser          | Not Planned :x:                    | Not supported due to not being a valid target Platform for executing programs or processes. |
 
 <sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
@@ -99,7 +99,7 @@ using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 
-using AlastairLundy.CliInvoke.Primitives.Results;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
   //Namespace and class code ommitted for clarity 
 
@@ -129,7 +129,7 @@ Currently, the required .NET SDK is .NET 9.
 The current build targets include: 
 * .NET 8
 * .NET 9
-* .NET Standard 2.0 (for CliInvoke 1.4 and 1.5 only)
+* .NET Standard 2.0 (for CliInvoke 1.x only)
 
 Any version of the .NET 9 SDK can be used, but using the latest version is preferred.
 
