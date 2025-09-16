@@ -25,82 +25,81 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 using System.Runtime.InteropServices;
 #endif
 
-namespace AlastairLundy.CliInvoke.Tests.Invokers
-{
-    public class CliCommandInvokerTests : IClassFixture<TestFixture>
-    {
-        private readonly ICliCommandInvoker _cliCommandInvoker;
-        
-     //   private CrossPlatformTestExecutables _crossPlatformTestExecutables;
-        
-        public CliCommandInvokerTests()
-        {
-            /*
-            IServiceProvider services = fixture.ServiceProvider;
-            
-            ICliCommandInvoker cliInvoker = services
-                .GetRequiredService<ICliCommandInvoker>();
-                */
-            
-            _cliCommandInvoker = new CliCommandInvoker(
-                new PipedProcessRunner(new ProcessRunnerUtility(new FilePathResolver()), new ProcessPipeHandler()),
-                new ProcessPipeHandler(), new CommandProcessFactory());
-            
-          //  _crossPlatformTestExecutables = new CrossPlatformTestExecutables(_cliCommandInvoker);
-        }
+namespace AlastairLundy.CliInvoke.Tests.Invokers;
 
-        /*[Fact]
-        public async Task Invoke_Shell_Echo()
-        {
-            ICliCommandConfigurationBuilder configurationBuilder = new
-                    CliCommandConfigurationBuilder(CrossPlatformTestExecutables.CrossPlatformShellPath)
-                .WithArguments("echo test")
-                .WithValidation(ProcessResultValidation.ExitCodeZero);
-            
-            CliCommandConfiguration cliCommandConfiguration = configurationBuilder.Build();
-            
-            BufferedProcessResult bufferedProcess = await _cliCommandInvoker.ExecuteBufferedAsync(cliCommandConfiguration);
-            
-            Assert.Equal(0, bufferedProcess.ExitCode);
-            Assert.Equal("test", bufferedProcess.StandardOutput);
-        }*/
+public class CliCommandInvokerTests : IClassFixture<TestFixture>
+{
+    private readonly ICliCommandInvoker _cliCommandInvoker;
         
-        [Fact]
-        public async Task Invoke_Open_Windows_Calc_Test()
-        {
+    //   private CrossPlatformTestExecutables _crossPlatformTestExecutables;
+        
+    public CliCommandInvokerTests()
+    {
+        /*
+        IServiceProvider services = fixture.ServiceProvider;
+
+        ICliCommandInvoker cliInvoker = services
+            .GetRequiredService<ICliCommandInvoker>();
+            */
+            
+        _cliCommandInvoker = new CliCommandInvoker(
+            new PipedProcessRunner(new ProcessRunnerUtility(new FilePathResolver()), new ProcessPipeHandler()),
+            new ProcessPipeHandler(), new CommandProcessFactory());
+            
+        //  _crossPlatformTestExecutables = new CrossPlatformTestExecutables(_cliCommandInvoker);
+    }
+
+    /*[Fact]
+    public async Task Invoke_Shell_Echo()
+    {
+        ICliCommandConfigurationBuilder configurationBuilder = new
+                CliCommandConfigurationBuilder(CrossPlatformTestExecutables.CrossPlatformShellPath)
+            .WithArguments("echo test")
+            .WithValidation(ProcessResultValidation.ExitCodeZero);
+
+        CliCommandConfiguration cliCommandConfiguration = configurationBuilder.Build();
+
+        BufferedProcessResult bufferedProcess = await _cliCommandInvoker.ExecuteBufferedAsync(cliCommandConfiguration);
+
+        Assert.Equal(0, bufferedProcess.ExitCode);
+        Assert.Equal("test", bufferedProcess.StandardOutput);
+    }*/
+        
+    [Fact]
+    public async Task Invoke_Open_Windows_Calc_Test()
+    {
 #if NET48_OR_GREATER || NET5_0_OR_GREATER
-            if (OperatingSystem.IsWindows())
+        if (OperatingSystem.IsWindows())
 #else
             if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 #endif
-            {
-                ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder(
-                        WindowsTestExecutables.WinCalcExePath)
-                    .WithWorkingDirectory(Environment.SystemDirectory)
-                    .WithValidation(ProcessResultValidation.ExitCodeZero);
-            
-                CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
-                
-                ProcessResult result = await _cliCommandInvoker.ExecuteAsync(commandConfiguration, CancellationToken.None);
-                
-                Assert.True(Process.GetProcessesByName("Calculator").Any() &&
-                            result.WasSuccessful);
-            }
-        }
-
-        /*[Fact]
-        public async Task Invoke_Dotnet_List_Sdk()
         {
-            ICliCommandConfigurationBuilder configurationBuilder = new
-                    CliCommandConfigurationBuilder(_crossPlatformTestExecutables.DotnetExePath)
-                .WithArguments("--list-sdks")
+            ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder(
+                    WindowsTestExecutables.WinCalcExePath)
+                .WithWorkingDirectory(Environment.SystemDirectory)
                 .WithValidation(ProcessResultValidation.ExitCodeZero);
             
-            CliCommandConfiguration cliCommandConfiguration = configurationBuilder.Build();
-            
-            ProcessResult processResult = await _cliCommandInvoker.ExecuteAsync(cliCommandConfiguration);
-            
-            Assert.Equal(0, processResult.ExitCode);
-        }*/
+            CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
+                
+            ProcessResult result = await _cliCommandInvoker.ExecuteAsync(commandConfiguration, CancellationToken.None);
+                
+            Assert.True(Process.GetProcessesByName("Calculator").Any() &&
+                        result.WasSuccessful);
+        }
     }
+
+    /*[Fact]
+    public async Task Invoke_Dotnet_List_Sdk()
+    {
+        ICliCommandConfigurationBuilder configurationBuilder = new
+                CliCommandConfigurationBuilder(_crossPlatformTestExecutables.DotnetExePath)
+            .WithArguments("--list-sdks")
+            .WithValidation(ProcessResultValidation.ExitCodeZero);
+
+        CliCommandConfiguration cliCommandConfiguration = configurationBuilder.Build();
+
+        ProcessResult processResult = await _cliCommandInvoker.ExecuteAsync(cliCommandConfiguration);
+
+        Assert.Equal(0, processResult.ExitCode);
+    }*/
 }

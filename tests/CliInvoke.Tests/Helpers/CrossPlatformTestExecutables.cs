@@ -20,72 +20,71 @@ using AlastairLundy.CliInvoke.Specializations.Configurations;
 using AlastairLundy.Resyslib.IO.Core.Files;
 using AlastairLundy.Resyslib.IO.Files;
 
-namespace AlastairLundy.CliInvoke.Tests.Helpers
+namespace AlastairLundy.CliInvoke.Tests.Helpers;
+
+public class CrossPlatformTestExecutables
 {
-    public class CrossPlatformTestExecutables
-    {
-        private static ICliCommandInvoker _cliInvoker;
+    private static ICliCommandInvoker _cliInvoker;
 
-        private static readonly string dotnetExePath;
-        private static readonly string cmdExePath;
+    private static readonly string dotnetExePath;
+    private static readonly string cmdExePath;
         
-        static CrossPlatformTestExecutables()
+    static CrossPlatformTestExecutables()
+    {
+        IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
+        IFilePathResolver filePathResolver = new FilePathResolver();
+            
+        IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
+            
+        IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility,
+            processPipeHandler);
+            
+        ICommandProcessFactory commandProcessFactory = new CommandProcessFactory();
+            
+        _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
+            processPipeHandler, commandProcessFactory);
+
+        ICliCommandConfigurationBuilder dotnetConfigurationBuilder;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-                IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-                IFilePathResolver filePathResolver = new FilePathResolver();
-            
-                IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
-            
-                IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility,
-                    processPipeHandler);
-            
-                ICommandProcessFactory commandProcessFactory = new CommandProcessFactory();
-            
-                _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
-                    processPipeHandler, commandProcessFactory);
-
-                ICliCommandConfigurationBuilder dotnetConfigurationBuilder;
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    cmdExePath = new CmdCommandConfiguration().TargetFilePath;
-                    dotnetConfigurationBuilder = new CliCommandConfigurationBuilder(cmdExePath)
-                        .WithArguments("dotnet --list-sdks");
-                }
-                else
-                {
-                    dotnetConfigurationBuilder = new CliCommandConfigurationBuilder("/usr/bin/which")
-                        .WithArguments("dotnet --list-sdks");
-                }
-                
-                CliCommandConfiguration dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    
-            
-                Task<BufferedProcessResult> dotnetBufferredOutput = _cliInvoker.ExecuteBufferedAsync(dotnetCommandConfiguration);
-
-                dotnetBufferredOutput.Start();
-                
-                dotnetBufferredOutput.Wait();
-
-                string[] lines = dotnetBufferredOutput.Result.StandardOutput.Split(Environment.NewLine.First());
-
-                if (lines.Any())
-                {
-                    foreach (string line in lines)
-                    {
-                        if (string.IsNullOrWhiteSpace(line) == false)
-                        {
-                           dotnetExePath = line.Split(' ').Last()
-                                .Replace("[", string.Empty).Replace("]", string.Empty);
-                           break;
-                        }
-                    }
-                }
+            cmdExePath = new CmdCommandConfiguration().TargetFilePath;
+            dotnetConfigurationBuilder = new CliCommandConfigurationBuilder(cmdExePath)
+                .WithArguments("dotnet --list-sdks");
         }
+        else
+        {
+            dotnetConfigurationBuilder = new CliCommandConfigurationBuilder("/usr/bin/which")
+                .WithArguments("dotnet --list-sdks");
+        }
+                
+        CliCommandConfiguration dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    
+            
+        Task<BufferedProcessResult> dotnetBufferredOutput = _cliInvoker.ExecuteBufferedAsync(dotnetCommandConfiguration);
 
-        public static string DotnetExePath => dotnetExePath;
-           
-        public static string CrossPlatformPowershellExePath =>
-            new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
+        dotnetBufferredOutput.Start();
+                
+        dotnetBufferredOutput.Wait();
 
+        string[] lines = dotnetBufferredOutput.Result.StandardOutput.Split(Environment.NewLine.First());
+
+        if (lines.Any())
+        {
+            foreach (string line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line) == false)
+                {
+                    dotnetExePath = line.Split(' ').Last()
+                        .Replace("[", string.Empty).Replace("]", string.Empty);
+                    break;
+                }
+            }
+        }
     }
+
+    public static string DotnetExePath => dotnetExePath;
+           
+    public static string CrossPlatformPowershellExePath =>
+        new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
+
 }

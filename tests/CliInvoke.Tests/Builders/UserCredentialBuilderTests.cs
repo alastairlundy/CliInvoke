@@ -1,7 +1,6 @@
-﻿namespace AlastairLundy.CliInvoke.Tests.Builders
+﻿namespace AlastairLundy.CliInvoke.Tests.Builders;
+
+public class UserCredentialBuilderTests
 {
-    public class UserCredentialBuilderTests
-    {
     
-    }
 }

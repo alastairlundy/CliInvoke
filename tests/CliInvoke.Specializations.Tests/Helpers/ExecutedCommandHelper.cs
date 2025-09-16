@@ -19,41 +19,40 @@ using AlastairLundy.Resyslib.IO.Core.Files;
 using AlastairLundy.Resyslib.IO.Files;
 
 
-namespace CliInvoke.Specializations.Tests.Helpers
-{
-    public static class ExecutedCommandHelper
-    {
-        private static ICliCommandInvoker _cliInvoker;
-        
-        static ExecutedCommandHelper()
-        {
-            IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-            IFilePathResolver filePathResolver = new FilePathResolver();
-            
-            IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
-            
-            IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility,
-                processPipeHandler);
-            
-            ICommandProcessFactory commandProcessFactory = new CommandProcessFactory();
-            
-            _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
-                processPipeHandler, commandProcessFactory);
-        }
-        
-        public static string WinCalcExePath
-        {
-            get
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}calc.exe";
-                }
-                
-                throw new PlatformNotSupportedException();
-            }
-        }
+namespace CliInvoke.Specializations.Tests.Helpers;
 
-        public static string CrossPlatformPowershellExePath => new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
+public static class ExecutedCommandHelper
+{
+    private static ICliCommandInvoker _cliInvoker;
+        
+    static ExecutedCommandHelper()
+    {
+        IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
+        IFilePathResolver filePathResolver = new FilePathResolver();
+            
+        IProcessRunnerUtility processRunnerUtility = new ProcessRunnerUtility(filePathResolver);
+            
+        IPipedProcessRunner pipedProcessRunner = new PipedProcessRunner(processRunnerUtility,
+            processPipeHandler);
+            
+        ICommandProcessFactory commandProcessFactory = new CommandProcessFactory();
+            
+        _cliInvoker = new CliCommandInvoker(pipedProcessRunner,
+            processPipeHandler, commandProcessFactory);
     }
+        
+    public static string WinCalcExePath
+    {
+        get
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}calc.exe";
+            }
+                
+            throw new PlatformNotSupportedException();
+        }
+    }
+
+    public static string CrossPlatformPowershellExePath => new PowershellCommandConfiguration(_cliInvoker).TargetFilePath;
 }

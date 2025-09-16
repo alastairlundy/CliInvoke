@@ -25,50 +25,49 @@ using AlastairLundy.Resyslib.IO.Files;
 
 using CliInvoke.Specializations.Tests.Helpers;
 
-namespace CliInvoke.Specializations.Tests.Invokers
-{
+namespace CliInvoke.Specializations.Tests.Invokers;
+
 #if NET48_OR_GREATER
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-    public class CmdInvokerTests : IClassFixture<TestFixture>
+public class CmdInvokerTests : IClassFixture<TestFixture>
+{
+    private readonly ISpecializedCliCommandInvoker _specializedCliCommandInvoker;
+    
+    public CmdInvokerTests(TestFixture testFixture)
     {
-        private readonly ISpecializedCliCommandInvoker _specializedCliCommandInvoker;
-    
-        public CmdInvokerTests(TestFixture testFixture)
-        {
-            CliCommandInvoker cliInvoker = new CliCommandInvoker(new PipedProcessRunner(new ProcessRunnerUtility(new FilePathResolver()),
-                new ProcessPipeHandler()), new ProcessPipeHandler(), new CommandProcessFactory());
+        CliCommandInvoker cliInvoker = new CliCommandInvoker(new PipedProcessRunner(new ProcessRunnerUtility(new FilePathResolver()),
+            new ProcessPipeHandler()), new ProcessPipeHandler(), new CommandProcessFactory());
             
-          //  ICliCommandInvoker cliInvoker = testFixture.ServiceProvider
-            //    .GetRequiredService<ICliCommandInvoker>();
+        //  ICliCommandInvoker cliInvoker = testFixture.ServiceProvider
+        //    .GetRequiredService<ICliCommandInvoker>();
         
-            _specializedCliCommandInvoker = new CmdCliCommandInvoker(cliInvoker);
-        }
+        _specializedCliCommandInvoker = new CmdCliCommandInvoker(cliInvoker);
+    }
     
-        [Fact]
-        public async Task Invoke_Calc_Open_With_CMD_Test()
-        {
+    [Fact]
+    public async Task Invoke_Calc_Open_With_CMD_Test()
+    {
 #if NET48_OR_GREATER || NET5_0_OR_GREATER
-            if (OperatingSystem.IsWindows())
+        if (OperatingSystem.IsWindows())
 #else
         if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 #endif
-            {
-                ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder
-                        (ExecutedCommandHelper.WinCalcExePath)
-                    .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe", string.Empty))
-                    .WithValidation(ProcessResultValidation.ExitCodeZero);
+        {
+            ICliCommandConfigurationBuilder configurationBuilder = new CliCommandConfigurationBuilder
+                    (ExecutedCommandHelper.WinCalcExePath)
+                .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe", string.Empty))
+                .WithValidation(ProcessResultValidation.ExitCodeZero);
             
-                CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
+            CliCommandConfiguration commandConfiguration = configurationBuilder.Build();
 
-                CliCommandConfiguration runnerCommand = _specializedCliCommandInvoker.CreateRunnerCommand(commandConfiguration);
+            CliCommandConfiguration runnerCommand = _specializedCliCommandInvoker.CreateRunnerCommand(commandConfiguration);
 
-                ProcessResult result = await _specializedCliCommandInvoker.ExecuteAsync(runnerCommand, CancellationToken.None);
+            ProcessResult result = await _specializedCliCommandInvoker.ExecuteAsync(runnerCommand, CancellationToken.None);
                 
-                Assert.True(Process.GetProcessesByName("Calculator").Any() &&
-                            result.WasSuccessful);
-            }
+            Assert.True(Process.GetProcessesByName("Calculator").Any() &&
+                        result.WasSuccessful);
         }
     }
 }

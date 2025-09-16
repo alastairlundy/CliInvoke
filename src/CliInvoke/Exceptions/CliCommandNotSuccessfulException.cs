@@ -19,13 +19,13 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Exceptions
+namespace AlastairLundy.CliInvoke.Exceptions;
+
+/// <summary>
+/// Represents errors that occur if a Command being executed by CliInvoke is unsuccessful.
+/// </summary>
+public sealed class CliCommandNotSuccessfulException : Exception
 {
-    /// <summary>
-    /// Represents errors that occur if a Command being executed by CliInvoke is unsuccessful.
-    /// </summary>
-    public sealed class CliCommandNotSuccessfulException : Exception
-    {
 
 #if NET5_0_OR_GREATER
         /// <summary>
@@ -33,38 +33,37 @@ namespace AlastairLundy.CliInvoke.Exceptions
         /// </summary>
         public CliCommandConfiguration? ExecutedCliCommand { get; private set; }
 #endif
-        /// <summary>
-        /// The exit code of the Command that was executed.
-        /// </summary>
-        public int ExitCode { get; private set; }
+    /// <summary>
+    /// The exit code of the Command that was executed.
+    /// </summary>
+    public int ExitCode { get; private set; }
         
-        /// <summary>
-        /// Thrown when a Command that was executed exited with a non-zero exit code.
-        /// </summary>
-        /// <param name="exitCode">The exit code of the Command that was executed.</param>
-        public CliCommandNotSuccessfulException(int exitCode) : base(Resources.Exceptions_CommandNotSuccessful_Generic.Replace("{x}", exitCode.ToString()))
-        {
-            ExitCode = exitCode;
+    /// <summary>
+    /// Thrown when a Command that was executed exited with a non-zero exit code.
+    /// </summary>
+    /// <param name="exitCode">The exit code of the Command that was executed.</param>
+    public CliCommandNotSuccessfulException(int exitCode) : base(Resources.Exceptions_CommandNotSuccessful_Generic.Replace("{x}", exitCode.ToString()))
+    {
+        ExitCode = exitCode;
             
 #if NET5_0_OR_GREATER
             ExecutedCliCommand = null;
 #endif
-        }
+    }
 
-        /// <summary>
-        /// Thrown when a Command that was executed exited with a non-zero exit code.
-        /// </summary>
-        /// <param name="exitCode">The exit code of the Command that was executed.</param>
-        /// <param name="command">The command that was executed.</param>
-        public CliCommandNotSuccessfulException(int exitCode, CliCommandConfiguration command) : base(Resources.Exceptions_CommandNotSuccessful_Specific.Replace("{y}", exitCode.ToString()
-            .Replace("{x}", command.TargetFilePath)))
-        {
+    /// <summary>
+    /// Thrown when a Command that was executed exited with a non-zero exit code.
+    /// </summary>
+    /// <param name="exitCode">The exit code of the Command that was executed.</param>
+    /// <param name="command">The command that was executed.</param>
+    public CliCommandNotSuccessfulException(int exitCode, CliCommandConfiguration command) : base(Resources.Exceptions_CommandNotSuccessful_Specific.Replace("{y}", exitCode.ToString()
+        .Replace("{x}", command.TargetFilePath)))
+    {
 #if NET5_0_OR_GREATER
             ExecutedCliCommand = command;
             Source = ExecutedCliCommand.TargetFilePath;
 #endif
             
-            ExitCode = exitCode;
-        }
+        ExitCode = exitCode;
     }
 }
