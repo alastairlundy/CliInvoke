@@ -10,7 +10,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.5.1</PackageVersion>
+        <PackageVersion>1.5.2</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -61,7 +61,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.5.1" />
-      <PackageReference Include="AlastairLundy.CliInvoke.Extensibility" Version="1.5.1" />
+      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.5.2" />
+      <PackageReference Include="AlastairLundy.CliInvoke.Extensibility" Version="1.5.2" />
     </ItemGroup>
 </Project>
