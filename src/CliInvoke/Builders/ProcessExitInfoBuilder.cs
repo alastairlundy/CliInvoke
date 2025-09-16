@@ -25,9 +25,14 @@ public class ProcessExitInfoBuilder : IProcessExitInfoBuilder
     /// 
     /// </summary>
     /// <param name="processExitInfo"></param>
-    public ProcessExitInfoBuilder(ProcessExitInfo processExitInfo)
+    protected ProcessExitInfoBuilder(ProcessExitInfo processExitInfo)
     {
         _processExitInfo = processExitInfo;
+    }
+
+    public ProcessExitInfoBuilder()
+    {
+        _processExitInfo = new ProcessExitInfo();
     }
         
     /// <summary>

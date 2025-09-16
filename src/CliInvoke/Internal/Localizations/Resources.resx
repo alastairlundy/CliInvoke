@@ -27,20 +27,8 @@
     <data name="Exceptions.FileNotFound" xml:space="preserve">
         <value>The file {file} does not exist in the specified path.</value>
     </data>
-    <data name="Command.ToString.RequiresAdmin" xml:space="preserve">
-        <value>(Requires Administrator)</value>
-    </data>
-    <data name="Command.ToString.ShellExecution" xml:space="preserve">
-        <value>(Uses Shell Execution)</value>
-    </data>
-    <data name="Command.ToString.WorkingDirectory" xml:space="preserve">
-        <value>Working Directory</value>
-    </data>
     <data name="Process.FileName.Empty" xml:space="preserve">
         <value>The process start info's file name cannot be null or empty.</value>
-    </data>
-    <data name="Command.TargetFilePath.Empty" xml:space="preserve">
-        <value>The Command's Target File Path cannot be null or empty.</value>
     </data>
     <data name="CommandBuilder.ArgumentConflict.ShellExecution.Input" xml:space="preserve">
         <value>UseShellExecution value of true conflicts with setting of Standard Input to a non-null value. See https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput</value>
@@ -55,7 +43,7 @@
         <value>ArgumentBuilder buffer size cannot be added to as it is the maximum size of {x}</value>
     </data>
     <data name="Exceptions.TargetFile.NullOrEmpty" xml:space="preserve">
-        <value>Input file path cannot be null or empty.</value>
+        <value>The provided target file path cannot be null or empty.</value>
     </data>
     <data name="Exceptions.ProcessNotSuccessful.Generic" xml:space="preserve">
         <value>The executed process was not succesful and returned an exit code of {x}.</value>

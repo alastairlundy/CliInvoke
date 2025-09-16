@@ -24,8 +24,8 @@ public interface IProcessInvoker
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfiguration"></param>
-    /// <param name="processExitInfo"></param>
+    /// <param name="processConfiguration">The process configuration to use.</param>
+    /// <param name="processExitInfo">The process exit information to use.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
     Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
@@ -35,8 +35,8 @@ public interface IProcessInvoker
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processStartInfo"></param>
-    /// <param name="processExitInfo"></param>
+    /// <param name="processStartInfo">The process start information to use.</param>
+    /// <param name="processExitInfo">The process exit information to use.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
     /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
     /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
@@ -52,7 +52,8 @@ public interface IProcessInvoker
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfiguration"></param>
+    /// <param name="processConfiguration">The process configuration to use.</param>
+    /// <param name="processExitInfo">The process exit information to use.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
@@ -60,10 +61,10 @@ public interface IProcessInvoker
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
+    /// Runs the process asynchronously, waits for exit, reads the standard output, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processStartInfo"></param>
-    /// <param name="processExitInfo"></param>
+    /// <param name="processStartInfo">The process start information to use.</param>
+    /// <param name="processExitInfo">The process exit information to use.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
     /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
     /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
@@ -77,10 +78,11 @@ public interface IProcessInvoker
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
+    /// Pipes the Standard Input, runs the process asynchronously,
+    /// waits for exit, pipes the standard output and error, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitInfo"></param>
+    /// <param name="processExitInfo">The process exit information to use.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
@@ -88,13 +90,12 @@ public interface IProcessInvoker
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
+    /// Pipes the Standard Input, runs the process asynchronously,
+    /// waits for exit, pipes the standard output and error, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processStartInfo"></param>
-    /// <param name="processResultValidation">The process result validation to be used.</param>
-    /// <param name="processExitInfo"></param>
+    /// <param name="processStartInfo">The process start information to use.</param>
+    /// <param name="processExitInfo">The process exit information to use.</param>
     /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
-    /// <param name="processTimeoutPolicy">The process timeout policy to use when waiting for the process to exit.</param>
     /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
     /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>

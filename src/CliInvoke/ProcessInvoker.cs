@@ -20,10 +20,11 @@ using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Extensions.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
+using AlastairLundy.CliInvoke.Internal;
+using ApplyConfigurationToProcess = AlastairLundy.CliInvoke.Internal.ApplyConfigurationToProcess;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -158,7 +159,10 @@ public class ProcessInvoker : IProcessInvoker
         };
 
         if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential);
+            if(userCredential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                process.ApplyUserCredential(userCredential);
+#pragma warning restore CA1416
         
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
@@ -284,7 +288,10 @@ public class ProcessInvoker : IProcessInvoker
         };
         
         if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential); 
+            if(userCredential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                process.ApplyUserCredential(userCredential);
+#pragma warning restore CA1416
         
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
@@ -381,7 +388,6 @@ public class ProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, 
         ProcessExitInfo? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,
@@ -403,7 +409,10 @@ public class ProcessInvoker : IProcessInvoker
         };
         
         if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential);
+            if(userCredential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                process.ApplyUserCredential(userCredential);
+#pragma warning restore CA1416
 
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {

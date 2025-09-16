@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke.Core 
+    AlastairLundy.CliInvoke 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,19 +12,17 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
 
-using AlastairLundy.CliInvoke.Core.Internal;
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
+using AlastairLundy.CliInvoke.Internal.Localizations;
 using AlastairLundy.DotExtensions.Processes;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace AlastairLundy.CliInvoke.Internal;
 
-public static class ApplyConfigurationToProcess
+internal static class ApplyConfigurationToProcess
 {
     /// <summary>
     /// Applies Process Configuration information to a Process based on specified parameters and Process configuration object values.
@@ -44,7 +42,7 @@ public static class ApplyConfigurationToProcess
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-    public static void ApplyProcessConfiguration(this Process process,
+    internal static void ApplyProcessConfiguration(this Process process,
         ProcessConfiguration configuration, bool redirectStandardOutput, bool redirectStandardError)
     {
         if (process.HasStarted())
@@ -74,11 +72,11 @@ public static class ApplyConfigurationToProcess
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-    public static void ApplyProcessConfiguration(this ProcessStartInfo processStartInfo,
+    internal static void ApplyProcessConfiguration(this ProcessStartInfo processStartInfo,
         ProcessConfiguration configuration,  bool redirectStandardOutput, bool redirectStandardError)
     {
             if (string.IsNullOrEmpty(configuration.TargetFilePath))
-                throw new ArgumentException(Resources.Exceptions_ProcessConfiguration_TargetFilePath_Empty);
+                throw new ArgumentException(Resources.Exceptions_TargetFile_NullOrEmpty);
             
             processStartInfo.FileName = configuration.TargetFilePath;
             processStartInfo.WorkingDirectory = configuration.WorkingDirectoryPath;
@@ -95,8 +93,11 @@ public static class ApplyConfigurationToProcess
                 processStartInfo.RunAsAdministrator();
 
             if (configuration.Credential is not null) 
-                processStartInfo.TryApplyUserCredential(configuration.Credential);
-
+                if(configuration.Credential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                    processStartInfo.ApplyUserCredential(configuration.Credential);
+#pragma warning restore CA1416
+                
             if (configuration.EnvironmentVariables.Any()) 
                 processStartInfo.ApplyEnvironmentVariables(configuration.EnvironmentVariables);
 

@@ -9,14 +9,14 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.0.0-alpha.6</Version>
+        <Version>2.0.0-alpha.7</Version>
         <Title>AlastairLundy.CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>Updated to support CliInvoke 2.0.0 alpha 6</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated to support CliInvoke 2.0.0 alpha 7</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -29,11 +29,11 @@
     
     <ItemGroup>
 
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-alpha.6" />
+        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-alpha.7" />
 
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.6" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.7" />
 
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
     </ItemGroup>
 
     <ItemGroup>

@@ -14,6 +14,7 @@ using System.Diagnostics;
 using AlastairLundy.CliInvoke.Core.Internal;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
+
 using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke.Core;
@@ -35,7 +36,10 @@ public static class ProcessSetPolicyExtensions
         {
             resourcePolicy = ProcessResourcePolicy.Default;
         }
-        
+
+        if (process.HasStarted() == false)
+            throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
+
         if (process.HasStarted() && (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()))
         {
             if (resourcePolicy.ProcessorAffinity is not null)

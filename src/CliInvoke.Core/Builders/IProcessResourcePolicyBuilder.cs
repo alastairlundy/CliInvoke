@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke.Core 
+    AlastairLundy.CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,8 +9,6 @@
 
 using System.Diagnostics;
 using AlastairLundy.CliInvoke.Core.Primitives;
-
-
 using System.Runtime.Versioning;
 
 
@@ -27,40 +25,38 @@ public interface IProcessResourcePolicyBuilder
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
-
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
     IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity);
-    
+
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
     /// </summary>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
     IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet);
-    
+
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Maximum Working Set.
     /// </summary>
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
     IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet);
-    
+
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Process Priority Class.
     /// </summary>
     /// <param name="processPriorityClass">The Process Priority Class to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated Process Priority Class.</returns>
     IProcessResourcePolicyBuilder WithPriorityClass(ProcessPriorityClass processPriorityClass);
-    
+
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Priority Boost behaviour.
     /// </summary>
     /// <param name="enablePriorityBoost">The priority boost behaviour to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated priority boost behaviour.</returns>
     IProcessResourcePolicyBuilder WithPriorityBoost(bool enablePriorityBoost);
-    
+
     /// <summary>
     /// Builds the configured ProcessResourcePolicy
     /// </summary>
