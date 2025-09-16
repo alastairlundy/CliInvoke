@@ -12,7 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
@@ -21,7 +21,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy
     /// <summary>
     /// A Process Runner like interface for Piping output after Executing processes.
     /// </summary>
-    [Obsolete]
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     public interface IPipedProcessRunner
     {
         /// <summary>
@@ -32,7 +32,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy
         /// <param name="processResourcePolicy"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Process Results from the running the process with the Piped Standard Output and Standard Error.</returns>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         Task<(ProcessResult processResult, Stream standardOutput, Stream standardError)>
             ExecuteProcessWithPipingAsync(Process process, ProcessResultValidation processResultValidation,
                 ProcessResourcePolicy? processResourcePolicy = null,
@@ -47,7 +47,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy
         /// <param name="processResourcePolicy"></param>
         /// <param name="cancellationToken">A token to cancel the operation if required.</param>
         /// <returns>The Buffered Process Results from running the process with the Piped Standard Output and Standard Error.</returns>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         Task<(BufferedProcessResult processResult, Stream standardOutput, Stream standardError)>
             ExecuteBufferedProcessWithPipingAsync(Process process,
                 ProcessResultValidation processResultValidation,

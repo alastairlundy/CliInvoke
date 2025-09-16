@@ -11,7 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
@@ -21,13 +21,13 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
     /// A Process Running Utility interface to easily create different Process Runners.
     /// </summary>
     /// <remarks>This interface is primarily intended for internal use OR use when creating a Process Runner or Command Runner implementation.</remarks>
-    [Obsolete]
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     public interface IProcessRunnerUtility
     {
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         int Execute(Process process);
 
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         int Execute(Process process, ProcessResultValidation processResultValidation,
             ProcessResourcePolicy? processResourcePolicy = null);
     
@@ -37,7 +37,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
         /// <param name="process">The process to be executed.</param>
         /// <param name="cancellationToken">The cancellation token to use to cancel the waiting for process exit if required.</param>
         /// <returns>The process' exit code.</returns>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         Task<int> ExecuteAsync(Process process, CancellationToken cancellationToken = default);
     
         /// <summary>
@@ -48,7 +48,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
         /// <param name="processResourcePolicy">The process resource policy to be set if it is not null.</param>
         /// <param name="cancellationToken">The cancellation token to use to cancel the waiting for process exit if required.</param>
         /// <returns>The process' exit code.</returns>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         Task<int> ExecuteAsync(Process process, ProcessResultValidation processResultValidation, 
             ProcessResourcePolicy? processResourcePolicy = null,
             CancellationToken cancellationToken = default);
@@ -57,7 +57,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
         /// Disposes of the specified process.
         /// </summary>
         /// <param name="process">The process to be disposed of.</param>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         void DisposeOfProcess(Process process);
     
         /// <summary>
@@ -66,7 +66,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
         /// <param name="process">The process to retrieve results from.</param>
         /// <param name="disposeOfProcess">Whether to dispose of the Process before returning.</param>
         /// <returns>The results from an exited process.</returns>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         ProcessResult GetResult(Process process, bool disposeOfProcess); 
     
         /// <summary>
@@ -75,7 +75,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
         /// <param name="process">The process to retrieve results from.</param>
         /// <param name="disposeOfProcess">Whether to dispose of the Process before returning.</param>
         /// <returns>The results from an exited process.</returns>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         BufferedProcessResult GetBufferedResult(Process process, bool disposeOfProcess);
     
         /// <summary>
@@ -84,7 +84,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
         /// <param name="process">The process to retrieve results from.</param>
         /// <param name="disposeOfProcess">Whether to dispose of the Process before returning.</param>
         /// <returns>The results from an exited process.</returns>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         Task<ProcessResult> GetResultAsync(Process process, bool disposeOfProcess);
     
         /// <summary>
@@ -93,7 +93,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities
         /// <param name="process">The process to retrieve results from.</param>
         /// <param name="disposeOfProcess">Whether to dispose of the Process before returning.</param>
         /// <returns>The results from an exited process.</returns>
-        [Obsolete]
+        [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
         Task<BufferedProcessResult> GetBufferedResultAsync(Process process, bool disposeOfProcess);
     }
 }

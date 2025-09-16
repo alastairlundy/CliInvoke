@@ -10,6 +10,7 @@
 
 using System;
 using System.Diagnostics;
+using AlastairLundy.CliInvoke.Core.Internal;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -28,6 +29,7 @@ namespace AlastairLundy.CliInvoke.Core.Extensions.Processes
         /// <param name="process">The current Process object.</param>
         /// <param name="credential">The credential to be added.</param>
         /// <returns>True if successfully applied; false otherwise.</returns>
+        [Obsolete(DeprecationMessages.ClassDeprecationV2)]
         public static bool TryApplyUserCredential(this Process process, UserCredential credential)
         {
             if (credential.IsSupportedOnCurrentOS())

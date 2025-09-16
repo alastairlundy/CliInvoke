@@ -7,8 +7,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+
+using AlastairLundy.CliInvoke.Core.Internal;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
@@ -17,6 +21,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions;
 /// <summary>
 /// An interface to specify the required Command Running functionality.
 /// </summary>
+[Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
 public interface ICliCommandInvoker
 {
     /// <summary>
@@ -25,6 +30,7 @@ public interface ICliCommandInvoker
     /// <param name="commandConfiguration">The command to be executed.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>A ProcessResult object containing the execution information of the command.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Task<ProcessResult> ExecuteAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default);
         
     /// <summary>
@@ -33,5 +39,6 @@ public interface ICliCommandInvoker
     /// <param name="commandConfiguration">The command to be executed.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>A BufferedProcessResult object containing the output of the command.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Task<BufferedProcessResult> ExecuteBufferedAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default);
 }
