@@ -22,6 +22,7 @@ using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Internal;
+using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke.Builders;
 
@@ -147,14 +148,14 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
                 windowCreation: _processConfiguration.WindowCreation,
                 useShellExecution: _processConfiguration.UseShellExecution));
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="environmentVariables"></param>
     /// <returns></returns>
     [Pure]
-    public IProcessStartInfoBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
+    public IProcessStartInfoBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables)
     {
         return new ProcessStartInfoBuilder(
             new ProcessConfiguration(_processConfiguration.TargetFilePath,
@@ -489,7 +490,7 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
 #pragma warning restore CA1416
             
         if (_processConfiguration.EnvironmentVariables.Any()) 
-            processStartInfo.ApplyEnvironmentVariables(_processConfiguration.EnvironmentVariables);
+            processStartInfo.SetEnvironmentVariables(_processConfiguration.EnvironmentVariables);
 
         if (processStartInfo.RedirectStandardInput) 
             processStartInfo.StandardInputEncoding = _processConfiguration.StandardInputEncoding;
