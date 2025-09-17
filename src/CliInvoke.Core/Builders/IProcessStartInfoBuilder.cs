@@ -51,13 +51,13 @@ public interface IProcessStartInfoBuilder
     /// <param name="targetFilePath">The target file path of the Process.</param>
     /// <returns>The ProcessStartInfoBuilder with the updated Target File Path.</returns>
     IProcessStartInfoBuilder WithTargetFile(string targetFilePath);
-    
+
     /// <summary>
     /// Sets the environment variables to be configured.
     /// </summary>
     /// <param name="environmentVariables">The environment variables to be configured.</param>
     /// <returns>The new ProcessStartInfoBuilder with the specified environment variables.</returns>
-    IProcessStartInfoBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables);
+    IProcessStartInfoBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables);
     
     /// <summary>
     /// Sets whether to execute the Process with Administrator Privileges.

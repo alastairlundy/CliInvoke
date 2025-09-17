@@ -11,13 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 
 using System.Runtime.Versioning;
 
 using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Internal;
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -98,7 +98,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public ProcessConfiguration(string targetFilePath,
         string? arguments = null, string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
-        IReadOnlyDictionary<string, string>? environmentVariables = null,
+        Dictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
@@ -152,7 +152,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
     public ProcessConfiguration(ProcessStartInfo processStartInfo,
-        IReadOnlyDictionary<string, string>? environmentVariables = null,
+        Dictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
@@ -206,7 +206,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The environment variables to be set.
     /// </summary>
-    public IReadOnlyDictionary<string, string> EnvironmentVariables { get; protected set;  }
+    public Dictionary<string, string> EnvironmentVariables { get; protected set;  }
         
     /// <summary>
     /// The credential to be used when executing the Command.
