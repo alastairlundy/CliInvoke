@@ -99,7 +99,7 @@ internal static class ApplyConfigurationToProcess
 #pragma warning restore CA1416
                 
             if (configuration.EnvironmentVariables.Any()) 
-                processStartInfo.ApplyEnvironmentVariables(configuration.EnvironmentVariables);
+                processStartInfo.SetEnvironmentVariables(configuration.EnvironmentVariables);
 
             if (processStartInfo.RedirectStandardInput) 
                 processStartInfo.StandardInputEncoding = configuration.StandardInputEncoding;
