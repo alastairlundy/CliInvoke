@@ -49,13 +49,13 @@ public interface IProcessConfigurationBuilder
     /// <param name="targetFilePath">The target file path of the Process.</param>
     /// <returns>The ProcessConfigurationBuilder with the updated Target File Path.</returns>
     IProcessConfigurationBuilder WithTargetFile(string targetFilePath);
-    
+
     /// <summary>
     /// Sets the environment variables to be configured.
     /// </summary>
     /// <param name="environmentVariables">The environment variables to be configured.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified environment variables.</returns>
-    IProcessConfigurationBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables);
+    IProcessConfigurationBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables);
     
     /// <summary>
     /// Sets whether to execute the Process with Administrator Privileges.
