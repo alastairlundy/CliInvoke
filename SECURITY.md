@@ -14,7 +14,7 @@ Versions that are currently supported with Bug Fixes and/or Security Fixes.
 
 ## Reporting a Security Vulnerability
 
-To report a security vulnerability please privately report a Security Vulnerability in the Security tab on this project within GitHub.
+To report a security vulnerability please privately report a Security Vulnerability in the [Security tab](https://github.com/alastairlundy/CliInvoke/security) on this project within GitHub.
 Please ensure you provide all the details regarding the vulnerability. I will try to reply to your report within 2-3 Business Days acknowledging receipt of it.
 
 I will then investigate the issue further and decide whether or not to accept the vulnerability. I will then inform you whether I accept the vulnerability or not.
