@@ -32,42 +32,6 @@ namespace AlastairLundy.CliInvoke.Core.Primitives;
 public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposable
 {
     /// <summary>
-    /// Configures this Command configuration with the specified Command configuration.
-    /// </summary>
-    /// <param name="processConfiguration">The command configuration to be used to configure the Command to be run.</param>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("watchos")]
-    [UnsupportedOSPlatform("browser")]
-    public ProcessConfiguration(ProcessConfiguration processConfiguration)
-    {
-        TargetFilePath = processConfiguration.TargetFilePath;
-        Arguments = processConfiguration.Arguments; 
-        WorkingDirectoryPath = processConfiguration.WorkingDirectoryPath;
-        RequiresAdministrator = processConfiguration.RequiresAdministrator;
-        EnvironmentVariables = processConfiguration.EnvironmentVariables;
-        Credential = processConfiguration.Credential ?? UserCredential.Null;
-        StandardInput = processConfiguration.StandardInput ?? StreamWriter.Null;
-        StandardOutput = processConfiguration.StandardOutput ?? StreamReader.Null;
-        StandardError = processConfiguration.StandardError ?? StreamReader.Null;
-            
-        StandardInputEncoding = processConfiguration.StandardInputEncoding;
-        StandardOutputEncoding = processConfiguration.StandardOutputEncoding;
-        StandardErrorEncoding = processConfiguration.StandardErrorEncoding;
-            
-        ResourcePolicy = processConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default;
-        
-        WindowCreation = processConfiguration.WindowCreation;
-        UseShellExecution = processConfiguration.UseShellExecution;
-    }
-
-    /// <summary>
     /// Configures the Command configuration to be wrapped and executed.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
@@ -186,7 +150,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The file path of the executable to be run and wrapped.
     /// </summary>
-    public string TargetFilePath { get; set; }
 
     /// <summary>
     /// The working directory path to be used when executing the Command.
