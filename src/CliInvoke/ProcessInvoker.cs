@@ -166,7 +166,10 @@ public class ProcessInvoker : IProcessInvoker
         };
 
         if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential);
+            if(userCredential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                process.ApplyUserCredential(userCredential);
+#pragma warning restore CA1416
         
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
@@ -299,7 +302,10 @@ public class ProcessInvoker : IProcessInvoker
         };
         
         if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential); 
+            if(userCredential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                process.ApplyUserCredential(userCredential);
+#pragma warning restore CA1416
         
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
@@ -424,7 +430,10 @@ public class ProcessInvoker : IProcessInvoker
         };
         
         if(userCredential is not null)
-            process.TryApplyUserCredential(userCredential);
+            if(userCredential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                process.ApplyUserCredential(userCredential);
+#pragma warning restore CA1416
 
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {

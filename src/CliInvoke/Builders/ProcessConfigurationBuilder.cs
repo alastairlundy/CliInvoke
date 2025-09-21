@@ -173,7 +173,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="environmentVariables">The environment variables to be added to the process configuration.</param>
     /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
+    public IProcessConfigurationBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -251,13 +251,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// </summary>
     /// <param name="credential">The user credential to be used for authentication.</param>
     /// <returns>A reference to this builder with an updated user credential, allowing method chaining.</returns>
-
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-
     [Pure]
     public IProcessConfigurationBuilder WithUserCredential(UserCredential credential)
     {
@@ -287,13 +285,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <returns>The new CommandBuilder with the specified Credentials.</returns>
     /// <remarks>Credentials are only supported with the Process class on Windows. This is a limitation of .NET's Process class.</remarks>
     [Pure]
-
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-
     public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
         UserCredential credential;
@@ -323,7 +319,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="validation">The validation mode to be used for the process result.</param>
     /// <returns>A reference to this builder with the specified validation configuration,
     /// allowing method chaining.</returns>
-
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("macos")]
@@ -331,7 +326,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-
     [Pure]
     public IProcessConfigurationBuilder WithValidation(Process validation)
     {

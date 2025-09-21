@@ -10,10 +10,14 @@ Key Abstractions:
 * Piping:
   * ``IProcessPipeHandler``
 * Builders:
-  * ``IEnvironmentVariablesBuilder``
-  * ``IProcessResourcePolicyBuilder``
-  * ``IUserCredentialBuilder``
-  * 
+* ``IArgumentsBuilder``
+* ``IEnvironmentVariablesBuilder``
+* ``IProcessConfigurationBuilder``
+* ``IProcessExitInfoBuilder``
+* ``IProcessResourcePolicyBuilder``
+* ``IProcessStartInfoBuilder``
+* ``IProcessTimeoutPolicyBuilder``
+* ``IUserCredentialBuilder``
 [![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
 
@@ -29,10 +33,7 @@ Key Abstractions:
 ## Features
 * Easy to use safe Process Running classes and interfaces
 * Models that help abstract away some of the complicated nature of Process objects
-* Compatible with .NET Standard 2.0 and 2.1 ^1
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
-
-^1 - [Polyfill](https://github.com/SimonCropp/Polyfill) is a dependency only required for .NET Standard 2.0 and 2.1 users. [Microsoft.Bcl.HashCode](https://www.nuget.org/packages/Microsoft.Bcl.HashCode) is a dependency only required for .NET Standard 2.0 users.
 
 ## How to install and use CliInvoke.Core
 CliInvoke.Core is available on [Nuget](https://nuget.org).

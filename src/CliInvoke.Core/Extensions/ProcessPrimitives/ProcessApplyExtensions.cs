@@ -25,35 +25,6 @@ namespace AlastairLundy.CliInvoke.Core;
 public static class ProcessApplyExtensions
 {
     /// <summary>
-    /// Attempts to add the specified Credential to the current Process object.
-    /// </summary>
-    /// <param name="process">The current Process object.</param>
-    /// <param name="credential">The credential to be added.</param>
-    /// <returns>True if successfully applied; false otherwise.</returns>
-    public static bool TryApplyUserCredential(this Process process, UserCredential credential)
-    {
-        if (credential.IsSupportedOnCurrentOS())
-        {
-            try
-            {
-#pragma warning disable CA1416
-                ApplyUserCredential(process, credential);
-#pragma warning restore CA1416
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-
-    /// <summary>
     /// Adds the specified Credential to the current Process object.
     /// </summary>
     /// <param name="process">The current Process object.</param>
@@ -65,22 +36,60 @@ public static class ProcessApplyExtensions
 #pragma warning disable CA1416
         if (credential.IsSupportedOnCurrentOS())
         {
-            if (credential.Domain is not null) 
+            if (credential.Domain is not null)
                 process.StartInfo.Domain = credential.Domain;
 
-            if (credential.UserName is not null) 
+            if (credential.UserName is not null)
                 process.StartInfo.UserName = credential.UserName;
 
-            if (credential.Password is not null) 
+            if (credential.Password is not null)
                 process.StartInfo.Password = credential.Password;
 
-            if (credential.LoadUserProfile is not null) 
+            if (credential.LoadUserProfile is not null)
                 process.StartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
         }
         else
         {
             throw new PlatformNotSupportedException();
         }
+#pragma warning restore CA1416
+    }
+    
+    /// <summary>
+    /// Adds the specified Credential to the current ProcessStartInfo object.
+    /// </summary>
+    /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
+    /// <param name="credential">The credential to be added.</param>
+    [SupportedOSPlatform("windows")]
+    public static void ApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
+    {
+        if (credential.IsSupportedOnCurrentOS() == false)
+        {
+            throw new PlatformNotSupportedException();
+        }
+
+#pragma warning disable CA1416
+        if (credential.Domain is not null)
+        {
+            processStartInfo.Domain = credential.Domain;
+        }
+
+        if (credential.UserName is not null)
+        {
+            processStartInfo.UserName = credential.UserName;
+        }
+
+        if (credential.Password is not null)
+        {
+            processStartInfo.Password = credential.Password;
+        }
+
+        if (credential.LoadUserProfile is not null)
+        {
+            processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+        }
+
+
 #pragma warning restore CA1416
     }
 }
