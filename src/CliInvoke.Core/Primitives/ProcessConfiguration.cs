@@ -316,7 +316,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         {
             hashCode.Add(Credential);
         }
-            
         hashCode.Add(StandardInput);
         hashCode.Add(StandardOutput);
         hashCode.Add(StandardError);
