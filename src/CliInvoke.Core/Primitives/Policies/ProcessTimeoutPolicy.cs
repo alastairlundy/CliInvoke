@@ -46,7 +46,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         ProcessCancellationMode.Graceful);
         
     /// <summary>
-    /// 
+    /// Disables waiting for Process Timeout.
     /// </summary>
     public static ProcessTimeoutPolicy None { get; } = new ProcessTimeoutPolicy(TimeSpan.FromSeconds(0),
         ProcessCancellationMode.None);
