@@ -19,9 +19,10 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Internal;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Internal;
+
 using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke.Builders;
@@ -235,9 +236,7 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
     [Pure]
     public IProcessStartInfoBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
-        UserCredential credential;
-
-        credential = _processConfiguration.Credential ?? UserCredential.Null;
+        UserCredential credential = _processConfiguration.Credential ?? UserCredential.Null;
         
         IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
             .SetDomain(credential.Domain)
