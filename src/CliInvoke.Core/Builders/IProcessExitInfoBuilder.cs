@@ -36,5 +36,5 @@ public interface IProcessExitInfoBuilder
     /// 
     /// </summary>
     /// <returns></returns>
-    ProcessExitInfo Build();
+    ProcessExitConfiguration Build();
 }
