@@ -394,8 +394,6 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processStartInfo"></param>
     /// <param name="processExitInfo"></param>
-    /// <param name="processResourcePolicy">The resource policy to be set if not null.</param>
-    /// <param name="userCredential">The credential to use when creating and starting the Process.</param>
     /// <param name="standardInput">The Stream to redirect to the Standard Input if not null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
@@ -411,24 +409,15 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, 
         ProcessExitConfiguration? processExitInfo = null,
-        ProcessResourcePolicy? processResourcePolicy = null,
-        UserCredential? userCredential = null,
         StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
     {
         processStartInfo.FileName = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
         
-        if (processExitInfo is null) 
-            processExitInfo = ProcessExitConfiguration.Default;
+        processExitInfo ??= ProcessExitConfiguration.Default;
         
         processStartInfo.RedirectStandardOutput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.RedirectStandardError = true;
-        
-        if(userCredential is not null)
-            if(userCredential.IsSupportedOnCurrentOS())
-#pragma warning disable CA1416
-                processStartInfo.ApplyUserCredential(userCredential);
-#pragma warning restore CA1416
         
         Process process = new Process()
         {
