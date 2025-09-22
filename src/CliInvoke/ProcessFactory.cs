@@ -133,12 +133,13 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("browser")]
     public Process From(ProcessConfiguration configuration)
     {
-        Process output = new Process();
+        Process output = new Process()
+        {
+            StartInfo = configuration.ToProcessStartInfo(
+                configuration.StandardOutput is not null && configuration.StandardOutput != StreamReader.Null,
+                configuration.StandardError is not null && configuration.StandardError != StreamReader.Null)
+        };
         
-        output.ApplyProcessConfiguration(configuration, 
-            configuration.StandardOutput is not null && configuration.StandardOutput != StreamReader.Null,
-            configuration.StandardError is not null && configuration.StandardError != StreamReader.Null);
-
         return output;
     }
 
