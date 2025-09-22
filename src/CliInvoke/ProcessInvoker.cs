@@ -381,13 +381,7 @@ public class ProcessInvoker : IProcessInvoker
         return result;
     }
 
-    //TODO: Implement
-    public Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, ProcessExitConfiguration? processExitInfo = null,
-        StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
-    {
-        throw new System.NotImplementedException();
-    }
-
+    
     /// <summary>
     /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
     /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
@@ -447,4 +441,6 @@ public class ProcessInvoker : IProcessInvoker
 
         return result;
     }
+
+
 }
