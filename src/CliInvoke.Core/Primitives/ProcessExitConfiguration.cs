@@ -44,6 +44,12 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
             ProcessResultValidation.ExitCodeZero);
     
     /// <summary>
+    /// A preconfigured <see cref="ProcessExitConfiguration"/> instance with Exit Code Validation and without a Timeout Policy.
+    /// </summary>
+    public static readonly ProcessExitConfiguration NoTimeoutDefault =
+        new ProcessExitConfiguration(ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
+    
+    /// <summary>
     /// Gets the result validation strategy used to determine if the process exited successfully.
     /// </summary>
     public ProcessResultValidation ResultValidation { get; }
