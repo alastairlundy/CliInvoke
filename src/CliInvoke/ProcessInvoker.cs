@@ -105,7 +105,7 @@ public class ProcessInvoker : IProcessInvoker
         
         process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
-        await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+        await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         
         ProcessResult result = new ProcessResult(process.StartInfo.FileName,
             process.ExitCode, process.StartTime, process.ExitTime);
@@ -175,7 +175,7 @@ public class ProcessInvoker : IProcessInvoker
         
         process.SetResourcePolicy(processConfiguration.ResourcePolicy);
         
-        await process.WaitForExitAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
+        await process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
 
         BufferedProcessResult result = new BufferedProcessResult(
             process.StartInfo.FileName,
@@ -236,7 +236,7 @@ public class ProcessInvoker : IProcessInvoker
         
         process.SetResourcePolicy(processConfiguration.ResourcePolicy);
         
-        await process.WaitForExitAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
+        await process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
 
         Stream standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
         Stream standardError = await _processPipeHandler.PipeStandardErrorAsync(process);

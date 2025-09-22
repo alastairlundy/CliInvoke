@@ -317,7 +317,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -378,7 +378,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
 
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -458,7 +458,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -522,7 +522,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
         if (process.ExitCode != 0 &&
@@ -599,7 +599,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
 
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -667,7 +667,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
