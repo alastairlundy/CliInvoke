@@ -86,7 +86,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardInput = standardInput ?? StreamWriter.Null;
         StandardOutput = standardOutput ?? StreamReader.Null;
         StandardError = standardError ?? StreamReader.Null;
-            
+        
         UseShellExecution = useShellExecution;
         WindowCreation = windowCreation;
             
@@ -150,6 +150,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The file path of the executable to be run and wrapped.
     /// </summary>
+    public string TargetFilePath { get; protected set; }
 
     /// <summary>
     /// The working directory path to be used when executing the Command.
