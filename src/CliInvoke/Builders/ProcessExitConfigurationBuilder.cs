@@ -17,7 +17,7 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// <summary>
 /// 
 /// </summary>
-public class ProcessExitInfoBuilder : IProcessExitInfoBuilder
+public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
 {
     private readonly ProcessExitConfiguration _processExitInfo;
 
@@ -25,12 +25,12 @@ public class ProcessExitInfoBuilder : IProcessExitInfoBuilder
     /// 
     /// </summary>
     /// <param name="processExitInfo"></param>
-    protected ProcessExitInfoBuilder(ProcessExitConfiguration processExitInfo)
+    protected ProcessExitConfigurationBuilder(ProcessExitConfiguration processExitInfo)
     {
         _processExitInfo = processExitInfo;
     }
 
-    public ProcessExitInfoBuilder()
+    public ProcessExitConfigurationBuilder()
     {
         _processExitInfo = new ProcessExitConfiguration();
     }
@@ -40,8 +40,8 @@ public class ProcessExitInfoBuilder : IProcessExitInfoBuilder
     /// </summary>
     /// <param name="validation">The result validation behaviour to be used.</param>
     /// <returns>The new ProcessExitInfoBuilder object with the configured Result Validation behaviour.</returns>
-    public IProcessExitInfoBuilder WithValidation(ProcessResultValidation validation) =>
-        new ProcessExitInfoBuilder(
+    public IProcessExitConfigurationBuilder WithValidation(ProcessResultValidation validation) =>
+        new ProcessExitConfigurationBuilder(
             new ProcessExitConfiguration(_processExitInfo.TimeoutPolicy, validation));
 
     /// <summary>
@@ -49,8 +49,8 @@ public class ProcessExitInfoBuilder : IProcessExitInfoBuilder
     /// </summary>
     /// <param name="processTimeoutPolicy">The process timeout policy to use.</param>
     /// <returns>The new ProcessExitInfoBuilder with the specified Process Timeout Policy.</returns>
-    public IProcessExitInfoBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy) =>
-        new ProcessExitInfoBuilder(
+    public IProcessExitConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy) =>
+        new ProcessExitConfigurationBuilder(
             new ProcessExitConfiguration(processTimeoutPolicy, _processExitInfo.ResultValidation));
 
     /// <summary>

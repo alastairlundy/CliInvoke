@@ -14,7 +14,7 @@ namespace AlastairLundy.CliInvoke.Core.Builders;
 /// <summary>
 /// 
 /// </summary>
-public interface IProcessExitInfoBuilder
+public interface IProcessExitConfigurationBuilder
 {
         
     /// <summary>
@@ -22,7 +22,7 @@ public interface IProcessExitInfoBuilder
     /// </summary>
     /// <param name="validation">The result validation behaviour to be used.</param>
     /// <returns>The new ProcessConfigurationBuilder object with the configured Result Validation behaviour.</returns>
-    IProcessExitInfoBuilder WithValidation(ProcessResultValidation validation);
+    IProcessExitConfigurationBuilder WithValidation(ProcessResultValidation validation);
 
     
     /// <summary>
@@ -30,7 +30,7 @@ public interface IProcessExitInfoBuilder
     /// </summary>
     /// <param name="processTimeoutPolicy">The process timeout policy to use.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Process Timeout Policy.</returns>
-    IProcessExitInfoBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
+    IProcessExitConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
 
     /// <summary>
     /// 
