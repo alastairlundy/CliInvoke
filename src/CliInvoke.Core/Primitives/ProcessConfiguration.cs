@@ -215,7 +215,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The encoding to use for the Standard Input.
     /// </summary>
-    /// <remarks>This is ignored on .NET Standard 2.0 as it is unsupported on that Target Framework's Process class.</remarks>
     public Encoding StandardInputEncoding { get; protected set;  }
         
     /// <summary>
