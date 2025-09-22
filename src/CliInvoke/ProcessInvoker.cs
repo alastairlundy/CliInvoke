@@ -443,7 +443,7 @@ public class ProcessInvoker : IProcessInvoker
 
         process.Start();
         
-        process.SetResourcePolicy(processResourcePolicy);
+      //  process.SetResourcePolicy(processResourcePolicy);
         
         await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
 
