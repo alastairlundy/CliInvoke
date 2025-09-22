@@ -416,4 +416,53 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
         return $"{commandString}{workingDirectory}{adminPrivileges}{shellExecution}";
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public ProcessStartInfo ToProcessStartInfo()
+        => ToProcessStartInfo(true, true);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardOutput"></param>
+    /// <param name="redirectStandardError"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public ProcessStartInfo ToProcessStartInfo(bool redirectStandardOutput, bool redirectStandardError)
+    {
+        ProcessStartInfo processStartInfo = new ProcessStartInfo()
+        {
+            FileName = this.TargetFilePath,
+            Arguments = string.IsNullOrEmpty(this.Arguments) ? string.Empty : this.Arguments,
+            WorkingDirectory = this.WorkingDirectoryPath,
+            UseShellExecute = this.UseShellExecution,
+            CreateNoWindow = this.WindowCreation,
+            RedirectStandardInput = StandardInput is not null && StandardInput != StreamWriter.Null,
+            RedirectStandardOutput = redirectStandardOutput,
+            RedirectStandardError = redirectStandardError,
+        };
+        
+        if (string.IsNullOrEmpty(TargetFilePath))
+            throw new ArgumentException(Resources.Exceptions_TargetFilePath_NullOrEmpty);
+        
+        if (RequiresAdministrator) 
+            processStartInfo.RunAsAdministrator();
+
+        if (Credential is not null) 
+            if(Credential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                processStartInfo.ApplyUserCredential(Credential);
+#pragma warning restore CA1416
+                
+        if (EnvironmentVariables.Any()) 
+            processStartInfo.SetEnvironmentVariables(EnvironmentVariables);
+
+        if (processStartInfo.RedirectStandardInput) 
+            processStartInfo.StandardInputEncoding = StandardInputEncoding;
+
+        return processStartInfo;
+    }
 }
