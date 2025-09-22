@@ -223,8 +223,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// The encoding to use for the Standard Error.
     /// </summary>
     public Encoding StandardErrorEncoding { get; protected set;  }
-
-                
+    
     /// <summary>
     /// Determines if a Process configuration is equal to another Process configuration.
     /// </summary>

@@ -24,7 +24,6 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Internal;
-using ApplyConfigurationToProcess = AlastairLundy.CliInvoke.Internal.ApplyConfigurationToProcess;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -67,13 +66,13 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
-        ProcessExitInfo? processExitInfo,
+        ProcessExitConfiguration? processExitInfo,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
         
         if (processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
@@ -109,7 +108,7 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     //TODO: Implement
-    public Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo, ProcessExitInfo? processExitInfo = null,
+    public Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo, ProcessExitConfiguration? processExitInfo = null,
         StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
@@ -137,7 +136,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ProcessResult> ExecuteAsync(ProcessStartInfo processStartInfo,
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
@@ -146,7 +145,7 @@ public class ProcessInvoker : IProcessInvoker
         processStartInfo.FileName = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
 
         if(processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         if (File.Exists(processStartInfo.FileName) == false)
         {
@@ -160,16 +159,16 @@ public class ProcessInvoker : IProcessInvoker
             processStartInfo.RedirectStandardInput = true;
         }
         
+        if(userCredential is not null)
+            if(userCredential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                processStartInfo.ApplyUserCredential(userCredential);
+#pragma warning restore CA1416
+        
         Process process = new Process()
         {
             StartInfo = processStartInfo,
         };
-
-        if(userCredential is not null)
-            if(userCredential.IsSupportedOnCurrentOS())
-#pragma warning disable CA1416
-                process.ApplyUserCredential(userCredential);
-#pragma warning restore CA1416
         
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
@@ -213,13 +212,13 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitInfo? processExitInfo,
+        ProcessExitConfiguration? processExitInfo,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
         
         if (processExitInfo is null) 
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
@@ -253,7 +252,7 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     //TODO: Implement
-    public Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo, ProcessExitInfo? processExitInfo = null,
+    public Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo, ProcessExitConfiguration? processExitInfo = null,
         StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
@@ -281,7 +280,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo processStartInfo,
-        ProcessExitInfo? processExitInfo,
+        ProcessExitConfiguration? processExitInfo,
         ProcessResourcePolicy? processResourcePolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null,
@@ -290,22 +289,23 @@ public class ProcessInvoker : IProcessInvoker
         processStartInfo.FileName = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
         
         if(processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         processStartInfo.RedirectStandardInput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.RedirectStandardError = true;
 
+                
+        if(userCredential is not null)
+            if(userCredential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                processStartInfo.ApplyUserCredential(userCredential);
+#pragma warning restore CA1416
+        
         Process process = new Process()
         {
             StartInfo = processStartInfo
         };
-        
-        if(userCredential is not null)
-            if(userCredential.IsSupportedOnCurrentOS())
-#pragma warning disable CA1416
-                process.ApplyUserCredential(userCredential);
-#pragma warning restore CA1416
         
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
@@ -350,13 +350,13 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitInfo? processExitInfo,
+        ProcessExitConfiguration? processExitInfo,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
         
         if (processExitInfo is null) 
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         Process process = new Process();
         
@@ -382,7 +382,7 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     //TODO: Implement
-    public Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, ProcessExitInfo? processExitInfo = null,
+    public Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, ProcessExitConfiguration? processExitInfo = null,
         StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
     {
         throw new System.NotImplementedException();
@@ -410,7 +410,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo processStartInfo, 
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         ProcessResourcePolicy? processResourcePolicy = null,
         UserCredential? userCredential = null,
         StreamWriter? standardInput = null, CancellationToken cancellationToken = default)
@@ -418,22 +418,22 @@ public class ProcessInvoker : IProcessInvoker
         processStartInfo.FileName = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
         
         if (processExitInfo is null) 
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         processStartInfo.RedirectStandardOutput = standardInput is not null;
         processStartInfo.RedirectStandardOutput = true;
         processStartInfo.RedirectStandardError = true;
-
-        Process process = new Process()
-        {
-            StartInfo = processStartInfo
-        };
         
         if(userCredential is not null)
             if(userCredential.IsSupportedOnCurrentOS())
 #pragma warning disable CA1416
-                process.ApplyUserCredential(userCredential);
+                processStartInfo.ApplyUserCredential(userCredential);
 #pragma warning restore CA1416
+        
+        Process process = new Process()
+        {
+            StartInfo = processStartInfo
+        };
 
         if (processStartInfo.RedirectStandardInput && standardInput is not null)
         {
