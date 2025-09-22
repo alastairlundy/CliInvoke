@@ -381,25 +381,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     public void Dispose()
     {
-        if (Credential is not null)
-        {
-            Credential.Dispose();
-        }
+        Credential?.Dispose();
 
-        if (StandardInput is not null)
-        { 
-            StandardInput.Dispose();
-        }
-
-        if (StandardOutput is not null)
-        {
-            StandardOutput.Dispose();
-        }
-
-        if (StandardError is not null)
-        {
-            StandardError.Dispose();
-        }
+        StandardInput?.Dispose();
+        StandardOutput?.Dispose();
+        StandardError?.Dispose();
     }
         
         
