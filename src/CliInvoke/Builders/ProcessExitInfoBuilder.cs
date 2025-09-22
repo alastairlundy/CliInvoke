@@ -19,20 +19,20 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// </summary>
 public class ProcessExitInfoBuilder : IProcessExitInfoBuilder
 {
-    private readonly ProcessExitInfo _processExitInfo;
+    private readonly ProcessExitConfiguration _processExitInfo;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="processExitInfo"></param>
-    protected ProcessExitInfoBuilder(ProcessExitInfo processExitInfo)
+    protected ProcessExitInfoBuilder(ProcessExitConfiguration processExitInfo)
     {
         _processExitInfo = processExitInfo;
     }
 
     public ProcessExitInfoBuilder()
     {
-        _processExitInfo = new ProcessExitInfo();
+        _processExitInfo = new ProcessExitConfiguration();
     }
         
     /// <summary>
@@ -42,7 +42,7 @@ public class ProcessExitInfoBuilder : IProcessExitInfoBuilder
     /// <returns>The new ProcessExitInfoBuilder object with the configured Result Validation behaviour.</returns>
     public IProcessExitInfoBuilder WithValidation(ProcessResultValidation validation) =>
         new ProcessExitInfoBuilder(
-            new ProcessExitInfo(_processExitInfo.TimeoutPolicy, validation));
+            new ProcessExitConfiguration(_processExitInfo.TimeoutPolicy, validation));
 
     /// <summary>
     /// Sets the Process Timeout Policy to be used for this Process.
@@ -51,12 +51,12 @@ public class ProcessExitInfoBuilder : IProcessExitInfoBuilder
     /// <returns>The new ProcessExitInfoBuilder with the specified Process Timeout Policy.</returns>
     public IProcessExitInfoBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy) =>
         new ProcessExitInfoBuilder(
-            new ProcessExitInfo(processTimeoutPolicy, _processExitInfo.ResultValidation));
+            new ProcessExitConfiguration(processTimeoutPolicy, _processExitInfo.ResultValidation));
 
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    public ProcessExitInfo Build() =>  
+    public ProcessExitConfiguration Build() =>  
         _processExitInfo;
 }
