@@ -238,45 +238,46 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         { 
             return false;
         }
+        
 
-        if (Credential is not null &&
-            other.Credential is not null &&
-            TargetFilePath != other.TargetFilePath &&
-            ResourcePolicy is not null)
-        {
-
-            if (StandardOutput is not null && StandardError is not null)
-            {
-                return TargetFilePath.Equals(other.TargetFilePath) &&
-                       EnvironmentVariables.Equals(other.EnvironmentVariables) &&
-                       Credential.Equals(other.Credential) &&
-                       ResourcePolicy.Equals(other.ResourcePolicy) &&
-                       StandardOutput.Equals(other.StandardOutput) &&
-                       StandardError.Equals(other.StandardError) &&
-                       StandardInputEncoding.Equals(other.StandardInputEncoding) &&
-                       StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
-                       StandardErrorEncoding.Equals(other.StandardErrorEncoding);   
-            }
-            else
-            {
-                return TargetFilePath.Equals(other.TargetFilePath) &&
-                       EnvironmentVariables.Equals(other.EnvironmentVariables) &&
-                       Credential.Equals(other.Credential) &&
-                       ResourcePolicy.Equals(other.ResourcePolicy) &&
-                       StandardInputEncoding.Equals(other.StandardInputEncoding) &&
-                       StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
-                       StandardErrorEncoding.Equals(other.StandardErrorEncoding);
-            }
-                                
-        }
-        else
+        if (StandardOutput is not null && StandardError is not null
+                                       && Credential is not null 
+                                       && other.Credential is not null)
         {
             return TargetFilePath.Equals(other.TargetFilePath) &&
                    EnvironmentVariables.Equals(other.EnvironmentVariables) &&
+                   Arguments.Equals(other.Arguments) &&
+                   WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
+                   Credential.Equals(other.Credential) &&
+                   ResourcePolicy.Equals(other.ResourcePolicy) &&
+                   StandardOutput.Equals(other.StandardOutput) &&
+                   StandardError.Equals(other.StandardError) &&
+                   StandardInputEncoding.Equals(other.StandardInputEncoding) &&
+                   StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
+                   StandardErrorEncoding.Equals(other.StandardErrorEncoding);   
+        }
+
+        if (Credential is null || other.Credential is null)
+        {
+            return TargetFilePath.Equals(other.TargetFilePath) &&
+                   Arguments.Equals(other.Arguments) &&
+                   WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
+                   EnvironmentVariables.Equals(other.EnvironmentVariables) &&
+                   ResourcePolicy.Equals(other.ResourcePolicy) &&
                    StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                    StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                    StandardErrorEncoding.Equals(other.StandardErrorEncoding);
         }
+        
+        return TargetFilePath.Equals(other.TargetFilePath) &&
+               Arguments.Equals(other.Arguments) &&
+               WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
+               EnvironmentVariables.Equals(other.EnvironmentVariables) &&
+               Credential.Equals(other.Credential) &&
+               ResourcePolicy.Equals(other.ResourcePolicy) &&
+               StandardInputEncoding.Equals(other.StandardInputEncoding) &&
+               StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
+               StandardErrorEncoding.Equals(other.StandardErrorEncoding);
     }
 
     /// <summary>
@@ -316,6 +317,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         {
             hashCode.Add(Credential);
         }
+        
         hashCode.Add(StandardInput);
         hashCode.Add(StandardOutput);
         hashCode.Add(StandardError);
