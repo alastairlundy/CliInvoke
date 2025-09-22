@@ -210,7 +210,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     /// <remarks>Process Resource Policy objects enable configuring Processor Affinity and other resource settings to be applied to the Command if supported by the currently running operating system.
     /// <para>Not all properties of a Process Resource Policy support all operating systems. Check before configuring a property.</para></remarks>
-    public ProcessResourcePolicy? ResourcePolicy { get; protected set;  }
+    public ProcessResourcePolicy ResourcePolicy { get; protected set;  }
     
     /// <summary>
     /// The encoding to use for the Standard Input.
