@@ -91,7 +91,7 @@ public interface IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and ProcessResult that are returned upon the process' exit.</returns>
     Task<ProcessResult> ContinueWhenExitAsync(Process process, 
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -104,7 +104,7 @@ public interface IProcessFactory
     /// <returns>The task and ProcessResult that are returned upon the process' exit.</returns>
     Task<ProcessResult> ContinueWhenExitAsync(Process process,
         ProcessConfiguration processConfiguration,
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -115,7 +115,7 @@ public interface IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and BufferedProcessResult that are returned upon the process' exit.</returns>
     Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process,
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -126,7 +126,7 @@ public interface IProcessFactory
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
-        ProcessExitInfo? processExitInfo = null, 
+        ProcessExitConfiguration? processExitInfo = null, 
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -139,6 +139,6 @@ public interface IProcessFactory
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
         ProcessConfiguration processConfiguration,
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default);
 }

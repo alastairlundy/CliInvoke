@@ -12,36 +12,42 @@ using System;
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>
-/// Represents information about the exit behavior of a process, including timeout policy and result validation.
+/// Represents configuration information about the exit behavior of a process, including timeout policy and result validation.
 /// </summary>
-public class ProcessExitInfo : IEquatable<ProcessExitInfo>
+public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProcessExitInfo"/> class with default timeout policy and result validation.
+    /// Initializes a new instance of the <see cref="ProcessExitConfiguration"/> class with default timeout policy and result validation.
     /// </summary>
-    public ProcessExitInfo()
+    public ProcessExitConfiguration()
     {
         TimeoutPolicy = ProcessTimeoutPolicy.Default;
         ResultValidation = ProcessResultValidation.ExitCodeZero;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProcessExitInfo"/> class with the specified timeout policy and result validation.
+    /// Initializes a new instance of the <see cref="ProcessExitConfiguration"/> class with the specified timeout policy and result validation.
     /// </summary>
     /// <param name="timeoutPolicy">The timeout policy to apply to the process.</param>
     /// <param name="resultValidation">The result validation strategy to use for the process exit.</param>
-    public ProcessExitInfo(ProcessTimeoutPolicy timeoutPolicy, ProcessResultValidation resultValidation)
+    public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy, ProcessResultValidation resultValidation)
     {
         TimeoutPolicy = timeoutPolicy;
         ResultValidation = resultValidation;
     }
 
     /// <summary>
-    /// Gets the default <see cref="ProcessExitInfo"/> instance, which uses the default timeout policy and exit code zero validation.
+    /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy and exit code zero validation.
     /// </summary>
-    public static ProcessExitInfo Default =
-        new ProcessExitInfo(ProcessTimeoutPolicy.Default,
+    public static readonly ProcessExitConfiguration Default =
+        new ProcessExitConfiguration(ProcessTimeoutPolicy.Default,
             ProcessResultValidation.ExitCodeZero);
+    
+    /// <summary>
+    /// A preconfigured <see cref="ProcessExitConfiguration"/> instance with Exit Code Validation and without a Timeout Policy.
+    /// </summary>
+    public static readonly ProcessExitConfiguration NoTimeoutDefault =
+        new ProcessExitConfiguration(ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
     
     /// <summary>
     /// Gets the result validation strategy used to determine if the process exited successfully.
@@ -55,11 +61,11 @@ public class ProcessExitInfo : IEquatable<ProcessExitInfo>
 
 
     /// <summary>
-    /// Determines whether the specified <see cref="ProcessExitInfo"/> is equal to the current instance.
+    /// Determines whether the specified <see cref="ProcessExitConfiguration"/> is equal to the current instance.
     /// </summary>
-    /// <param name="other">The <see cref="ProcessExitInfo"/> to compare with the current instance.</param>
+    /// <param name="other">The <see cref="ProcessExitConfiguration"/> to compare with the current instance.</param>
     /// <returns><c>true</c> if the specified object is equal to the current instance; otherwise, <c>false</c>.</returns>
-    public bool Equals(ProcessExitInfo? other)
+    public bool Equals(ProcessExitConfiguration? other)
     {
         if (other is null) return false;
 
@@ -76,7 +82,7 @@ public class ProcessExitInfo : IEquatable<ProcessExitInfo>
     {
         if (obj is null) return false;
 
-        if (obj is ProcessExitInfo exitInfo)
+        if (obj is ProcessExitConfiguration exitInfo)
             return Equals(exitInfo);
 
         return false;
@@ -92,12 +98,12 @@ public class ProcessExitInfo : IEquatable<ProcessExitInfo>
     }
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessExitInfo"/> instances are equal.
+    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessExitInfo"/> to compare.</param>
-    /// <param name="right">The second <see cref="ProcessExitInfo"/> to compare.</param>
+    /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
+    /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool Equals(ProcessExitInfo? left, ProcessExitInfo? right)
+    public static bool Equals(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
     {
         if(left is null || right is null)
             return false;
@@ -107,21 +113,21 @@ public class ProcessExitInfo : IEquatable<ProcessExitInfo>
 
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessExitInfo"/> instances are equal using the == operator.
+    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal using the == operator.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessExitInfo"/> to compare.</param>
-    /// <param name="right">The second <see cref="ProcessExitInfo"/> to compare.</param>
+    /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
+    /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(ProcessExitInfo? left, ProcessExitInfo? right)
+    public static bool operator ==(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
         => Equals(left, right);
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessExitInfo"/> instances are not equal using the != operator.
+    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are not equal using the != operator.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessExitInfo"/> to compare.</param>
-    /// <param name="right">The second <see cref="ProcessExitInfo"/> to compare.</param>
+    /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
+    /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are not equal; otherwise, <c>false</c>.</returns>
-    public static bool operator !=(ProcessExitInfo? left, ProcessExitInfo? right)
+    public static bool operator !=(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
     {
         return Equals(left, right) == false;
     }

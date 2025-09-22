@@ -9,6 +9,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,7 +32,16 @@ internal static class ProcessWaitForExitAsyncExtensions
     /// <param name="process">The process to wait for.</param>
     /// <param name="timeoutPolicy"></param>
     /// <param name="cancellationToken">A cancellation token that determines whether the operation should continue to run or be cancelled.</param>
-    internal static async Task WaitForExitAsync(this Process process,
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
+    internal static async Task WaitForExitOrTimeoutAsync(this Process process,
         ProcessTimeoutPolicy timeoutPolicy,
         CancellationToken cancellationToken = default)
     {

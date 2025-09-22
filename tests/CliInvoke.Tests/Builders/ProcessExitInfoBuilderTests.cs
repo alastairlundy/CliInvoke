@@ -8,7 +8,7 @@ public class ProcessExitInfoBuilderTests
     [Fact]
     public void Constructor_ShouldInstantiate()
     {
-        var builder = new ProcessExitInfoBuilder();
+        var builder = new ProcessExitConfigurationBuilder();
         Assert.NotNull(builder);
     }
 

@@ -25,37 +25,6 @@ namespace AlastairLundy.CliInvoke.Core;
 public static class ProcessApplyExtensions
 {
     /// <summary>
-    /// Adds the specified Credential to the current Process object.
-    /// </summary>
-    /// <param name="process">The current Process object.</param>
-    /// <param name="credential">The credential to be added.</param>
-    /// <exception cref="PlatformNotSupportedException">Thrown if not supported on the current operating system.</exception>
-    [SupportedOSPlatform("windows")]
-    public static void ApplyUserCredential(this Process process, UserCredential credential)
-    {
-#pragma warning disable CA1416
-        if (credential.IsSupportedOnCurrentOS())
-        {
-            if (credential.Domain is not null)
-                process.StartInfo.Domain = credential.Domain;
-
-            if (credential.UserName is not null)
-                process.StartInfo.UserName = credential.UserName;
-
-            if (credential.Password is not null)
-                process.StartInfo.Password = credential.Password;
-
-            if (credential.LoadUserProfile is not null)
-                process.StartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
-        }
-        else
-        {
-            throw new PlatformNotSupportedException();
-        }
-#pragma warning restore CA1416
-    }
-    
-    /// <summary>
     /// Adds the specified Credential to the current ProcessStartInfo object.
     /// </summary>
     /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
