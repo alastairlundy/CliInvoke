@@ -47,7 +47,6 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>
         StandardError = standardError;
     }
 
-
     /// <summary>
     /// Determines whether this PipedProcessResult is equal to another PipedProcessResult object.
     /// </summary>

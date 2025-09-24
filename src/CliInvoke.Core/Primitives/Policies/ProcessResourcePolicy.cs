@@ -13,7 +13,6 @@ using System.Runtime.Versioning;
 
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 // ReSharper disable MemberCanBePrivate.Global
 

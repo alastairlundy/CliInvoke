@@ -13,22 +13,19 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-
 using System.Runtime.Versioning;
-
 
 using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Piping;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-
 using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Extensions.Internal;
+using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+
 using AlastairLundy.DotExtensions.Processes;
 
 // ReSharper disable UnusedType.Global
@@ -54,24 +51,32 @@ public class ProcessFactory : IProcessFactory
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;
     }
-    
+
     /// <summary>
     /// Creates a process from the specified start info.
     /// </summary>
     /// <param name="processStartInfo">The start information to use for the Process.</param>
     /// <returns>The newly created Process.</returns>
     /// <exception cref="ArgumentException">Thrown if the process start info FileName is empty.</exception>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
     public Process From(ProcessStartInfo processStartInfo)
     {
         if (string.IsNullOrEmpty(processStartInfo.FileName))
         {
             throw new ArgumentException(Resources.Process_FileName_Empty);
         }
-        
 
         if (Path.IsPathFullyQualified(processStartInfo.FileName) == false)
         {
-           string resolvedFilePath = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
+            string resolvedFilePath = _filePathResolver.ResolveFilePath(processStartInfo.FileName);
             processStartInfo.FileName = resolvedFilePath;
         }
 
@@ -79,7 +84,7 @@ public class ProcessFactory : IProcessFactory
         {
             StartInfo = processStartInfo,
         };
-            
+
         return output;
     }
 
@@ -89,17 +94,26 @@ public class ProcessFactory : IProcessFactory
     /// <param name="startInfo">The start information to use for the Process.</param>
     /// <param name="credential">The credential to use when creating the Process.</param>
     /// <returns>The newly created Process.</returns>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [UnsupportedOSPlatform("ios")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
     public Process From(ProcessStartInfo startInfo, UserCredential credential)
     {
-        Process output = From(startInfo);
-
         if (credential.IsSupportedOnCurrentOS())
         {
 #pragma warning disable CA1416
-            output.ApplyUserCredential(credential);
+            startInfo.ApplyUserCredential(credential);
 #pragma warning restore CA1416
         }
-
+        
+        Process output = From(startInfo);
+        
         return output;
     }
 
@@ -108,7 +122,6 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration information to use to configure the Process.</param>
     /// <returns>The newly created Process with the configuration.</returns>
-
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -118,23 +131,16 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-
     public Process From(ProcessConfiguration configuration)
     {
-        Process output;
+        Process output = new Process()
+        {
+            StartInfo = configuration.ToProcessStartInfo(
+                configuration.StandardOutput is not null && configuration.StandardOutput != StreamReader.Null,
+                configuration.StandardError is not null && configuration.StandardError != StreamReader.Null)
+        };
         
-        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        if (configuration.Credential != null)
-        {
-            output = From(configuration.ToProcessStartInfo(),
-                configuration.Credential);
-        }
-        else
-        {
-            output = From(configuration.ToProcessStartInfo());
-        }
-
-        return output; 
+        return output;
     }
 
     /// <summary>
@@ -142,7 +148,6 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <returns>The newly created and started Process with the start info.</returns>
-
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -152,7 +157,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-
     public Process StartNew(ProcessStartInfo startInfo)
     {
         Process process = From(startInfo);
@@ -168,7 +172,6 @@ public class ProcessFactory : IProcessFactory
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <param name="credential">The credential to use when creating and starting the Process.</param>
     /// <returns>The newly created and started Process with the start info and credential.</returns>
-
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -178,7 +181,6 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-
     public Process StartNew(ProcessStartInfo startInfo,
         UserCredential credential)
     {
@@ -299,11 +301,11 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, 
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
         if(processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         if(process.HasStarted() == false)
             process = StartNew(process.StartInfo,
@@ -315,7 +317,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -354,11 +356,11 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessConfiguration processConfiguration,
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
         if (processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         if(process.HasStarted() == false)
             process = StartNew(process.StartInfo,
@@ -376,7 +378,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
 
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -437,11 +439,11 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, 
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
         if(processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         if(process.HasStarted() == false)
             process = StartNew(process.StartInfo,
@@ -456,7 +458,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -497,11 +499,11 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, ProcessConfiguration processConfiguration,
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
         if(processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
 
         if(process.HasStarted() == false)
             process = StartNew(process.StartInfo, 
@@ -520,7 +522,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
         if (process.ExitCode != 0 &&
@@ -578,11 +580,11 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
         if(processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         if(process.HasStarted() == false)
             process = StartNew(process.StartInfo, 
@@ -597,7 +599,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
 
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -642,11 +644,11 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("browser")]
     public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
         ProcessConfiguration processConfiguration,
-        ProcessExitInfo? processExitInfo = null,
+        ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
         if(processExitInfo is null)
-            processExitInfo = ProcessExitInfo.Default;
+            processExitInfo = ProcessExitConfiguration.Default;
         
         if(process.HasStarted() == false)
             process = StartNew(process.StartInfo, 
@@ -665,7 +667,7 @@ public class ProcessFactory : IProcessFactory
         }
         else
         {
-            await process.WaitForExitAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
         }
         
         if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)

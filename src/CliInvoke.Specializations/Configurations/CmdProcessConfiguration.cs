@@ -95,7 +95,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
             }
 
             return Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe";
-            ;
         }
     }
 }

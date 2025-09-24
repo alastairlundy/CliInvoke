@@ -17,7 +17,7 @@ internal class CliInvokeHelpers
     internal static ProcessInvoker CreateProcessInvoker()
     {
         IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        return new ProcessInvoker(CreateProcessFactory(),
+        return new ProcessInvoker(new FilePathResolver(),
             processPipeHandler);
     }
 }

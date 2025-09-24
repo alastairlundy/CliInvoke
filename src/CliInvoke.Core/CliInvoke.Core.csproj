@@ -22,11 +22,20 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.5</Version>
-        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 4
-* Updated Polyfill from 8.7.3 to 8.7.4
-* Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` into a new type ``ProcessExitInfo``</PackageReleaseNotes>
+        <Version>2.0.0-alpha.7</Version>
+        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 6
+
+### Changes
+* Updated ``ProcessResult`` to implement ``IEquatable&lt;ProcessResult&gt;``
+*  Updated DotExtensions dependency from 8.2.0 to 8.3.0
+* Added missing xml doc comments to ``ProcessExitInfo`` class
+* Moved Process ``ApplyProcessConfiguration`` extensions to CliInvoke main package from CliInvoke.Core and made the extensions internal</PackageReleaseNotes>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.4.0" />
+    </ItemGroup>
+
 
     <ItemGroup>
         <Content Include="README.md">

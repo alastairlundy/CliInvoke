@@ -13,15 +13,18 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### Changes since 2.0.0 Alpha 4
-* Updated Polyfill from 8.7.3 to 8.7.4
-* Updated DotExtensions 8.0.0 Preview 1 to 8.0.0 Preview 2
-* Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` into a new type ``ProcessExitInfo``
-* Clean up ``ProcessFactory`` and ``ProcessInvoker``</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 6
+
+### Changes
+* Fixed incorrect access modifier for one of ``ProcessExitInfoBuilder``'s constructors
+* Updated ``ProcessResult`` to implement ``IEquatable&lt;ProcessResult&gt;``
+*  Updated DotExtensions dependency from 8.2.0 to 8.3.0
+* Added missing xml doc comments to ``ProcessExitInfo`` class
+* Moved Process ``ApplyProcessConfiguration`` extensions to CliInvoke main package from CliInvoke.Core and made the extensions internal</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.5</PackageVersion>
+        <PackageVersion>2.0.0-alpha.7</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -33,10 +36,9 @@
     
     <ItemGroup>
 <!--
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.4" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.7" />
 -->
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.5" />
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.2.0" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.4.0" />
     </ItemGroup>
     
     <ItemGroup>

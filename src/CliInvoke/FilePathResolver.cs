@@ -33,8 +33,8 @@ public class FilePathResolver : IFilePathResolver
         {
             return filePathToResolve;
         }
-
-        string[] directories = Directory.GetDirectories(Path.GetFullPath(filePathToResolve),
+        
+        string[] directories = Directory.GetDirectories(Path.GetDirectoryName(filePathToResolve) ?? Path.GetFullPath(filePathToResolve),
             "*",
             SearchOption.AllDirectories);
 

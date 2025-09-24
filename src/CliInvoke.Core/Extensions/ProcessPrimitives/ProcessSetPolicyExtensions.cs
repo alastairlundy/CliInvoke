@@ -15,6 +15,8 @@ using AlastairLundy.CliInvoke.Core.Internal;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
 
+using AlastairLundy.DotExtensions.Processes;
+
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
@@ -30,24 +32,15 @@ public static class ProcessSetPolicyExtensions
     /// <exception cref="InvalidOperationException"></exception>
     public static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
     {
-        bool processHasStarted;
-
-        try
+        if (resourcePolicy is null)
         {
-            processHasStarted = process.HasExited == false
-                                && process.StartTime.ToUniversalTime() <= DateTime.UtcNow;
-        }
-        catch
-        {
-            processHasStarted = false;
+            resourcePolicy = ProcessResourcePolicy.Default;
         }
 
-        if (!processHasStarted || resourcePolicy == null)
-        {
+        if (process.HasStarted() == false)
             throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
-        }
-        
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+
+        if (process.HasStarted() && (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()))
         {
             if (resourcePolicy.ProcessorAffinity is not null)
             {
@@ -70,7 +63,7 @@ public static class ProcessSetPolicyExtensions
                 process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
             }
         }
-
+        
         process.PriorityClass = resourcePolicy.PriorityClass;
         process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
     }

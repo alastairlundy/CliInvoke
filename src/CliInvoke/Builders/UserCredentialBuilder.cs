@@ -40,6 +40,10 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         _userCredential = new UserCredential();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="credential"></param>
     protected UserCredentialBuilder(UserCredential credential)
     {
         _userCredential = credential;

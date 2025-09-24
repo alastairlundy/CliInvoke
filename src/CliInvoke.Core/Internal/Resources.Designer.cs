@@ -81,12 +81,6 @@ namespace AlastairLundy.CliInvoke.Core.Internal {
             }
         }
         
-        internal static string Command_TargetFilePath_Empty {
-            get {
-                return ResourceManager.GetString("Command.TargetFilePath.Empty", resourceCulture);
-            }
-        }
-        
         internal static string Exceptions_ArgumentBuilder_Buffer_MaximumSize {
             get {
                 return ResourceManager.GetString("Exceptions.ArgumentBuilder.Buffer.MaximumSize", resourceCulture);
@@ -129,9 +123,9 @@ namespace AlastairLundy.CliInvoke.Core.Internal {
             }
         }
         
-        internal static string Exceptions_ProcessConfiguration_TargetFilePath_Empty {
+        internal static string Exceptions_TargetFilePath_NullOrEmpty {
             get {
-                return ResourceManager.GetString("Exceptions.ProcessConfiguration.TargetFilePath.Empty", resourceCulture);
+                return ResourceManager.GetString("Exceptions.TargetFilePath.NullOrEmpty", resourceCulture);
             }
         }
     }

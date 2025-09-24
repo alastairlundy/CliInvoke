@@ -1,10 +1,7 @@
 ## CliInvoke.Extensions
 This readme covers the **CliInvoke.Extensions** package. Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/blob/main/README.md)?
 
-This package adds:
-* extension methods that enable better interoperability between CliInvoke and existing .NET types
-* the ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package
-* 
+This package adds the ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package 
 
 [![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
@@ -18,12 +15,9 @@ The ``AddCliInvoke`` IServiceCollection extension method adds CliInvoke's and Pr
 
 The services injected includes:
 * ``IFilePathResolver``
-* ``ICommandRunner``
 * ``IProcessPipeHandler``
-* ``IProcessCreator``
-* ``IPipedProcessRunner``
-* ``IProcessRunner``
-* ``IProcessRunnerUtility``
+* ``IProcessInvoker``
+* ``IProcessFactory``
 
 ## Why a separate package?
 There's a few different reasons:
@@ -32,7 +26,7 @@ There's a few different reasons:
 * Helps de-couple the Dependency Injection extension functionality from the main library
 
 ## Licensing
-CliInvoke.Extensions is licensed under the MPL 2.0 license. If you modify any of the package's files then the modified files must be licensed under the MPL 2.0 .
+CliInvoke.Extensions is licensed under the MPL 2.0 license. If you modify any of the package's files then the modified files must remain licensed under the MPL 2.0 .
 
 If you use this package in your project please make an exact copy of the contents of the LICENSE.txt file available either in your third party licenses txt file or as a separate txt file.
 

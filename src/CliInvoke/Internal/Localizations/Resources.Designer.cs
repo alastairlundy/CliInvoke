@@ -63,33 +63,9 @@ namespace AlastairLundy.CliInvoke.Internal.Localizations {
             }
         }
         
-        internal static string Command_ToString_RequiresAdmin {
-            get {
-                return ResourceManager.GetString("Command.ToString.RequiresAdmin", resourceCulture);
-            }
-        }
-        
-        internal static string Command_ToString_ShellExecution {
-            get {
-                return ResourceManager.GetString("Command.ToString.ShellExecution", resourceCulture);
-            }
-        }
-        
-        internal static string Command_ToString_WorkingDirectory {
-            get {
-                return ResourceManager.GetString("Command.ToString.WorkingDirectory", resourceCulture);
-            }
-        }
-        
         internal static string Process_FileName_Empty {
             get {
                 return ResourceManager.GetString("Process.FileName.Empty", resourceCulture);
-            }
-        }
-        
-        internal static string Command_TargetFilePath_Empty {
-            get {
-                return ResourceManager.GetString("Command.TargetFilePath.Empty", resourceCulture);
             }
         }
         

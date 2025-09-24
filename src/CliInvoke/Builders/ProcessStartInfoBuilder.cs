@@ -14,10 +14,16 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Linq;
 using System.Text;
 
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Internal;
+
+using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke.Builders;
 
@@ -32,6 +38,7 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="targetFilePath"></param>
     public ProcessStartInfoBuilder(string targetFilePath)
     {
       _processConfiguration = new ProcessConfiguration(targetFilePath);
@@ -142,14 +149,14 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
                 windowCreation: _processConfiguration.WindowCreation,
                 useShellExecution: _processConfiguration.UseShellExecution));
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="environmentVariables"></param>
     /// <returns></returns>
     [Pure]
-    public IProcessStartInfoBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
+    public IProcessStartInfoBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables)
     {
         return new ProcessStartInfoBuilder(
             new ProcessConfiguration(_processConfiguration.TargetFilePath,
@@ -229,9 +236,7 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
     [Pure]
     public IProcessStartInfoBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
-        UserCredential credential;
-
-        credential = _processConfiguration.Credential ?? UserCredential.Null;
+        UserCredential credential = _processConfiguration.Credential ?? UserCredential.Null;
         
         IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
             .SetDomain(credential.Domain)
@@ -459,5 +464,36 @@ public class ProcessStartInfoBuilder : IProcessStartInfoBuilder
     /// </summary>
     /// <returns>The configured ProcessStartInfo object.</returns>
     public ProcessStartInfo Build()
-        => _processConfiguration.ToProcessStartInfo();
+    { 
+        ProcessStartInfo processStartInfo = new ProcessStartInfo
+        {
+            FileName = _processConfiguration.TargetFilePath,
+            WorkingDirectory = _processConfiguration.WorkingDirectoryPath,
+            UseShellExecute = _processConfiguration.UseShellExecution,
+            CreateNoWindow = _processConfiguration.WindowCreation,
+            RedirectStandardInput = _processConfiguration.StandardInput is not null && _processConfiguration.StandardInput != StreamWriter.Null,
+            RedirectStandardOutput = _processConfiguration.StandardOutput is not null && _processConfiguration.StandardOutput != StreamReader.Null,
+            RedirectStandardError = _processConfiguration.StandardError is not null && _processConfiguration.StandardError != StreamReader.Null
+        };
+        
+        if (string.IsNullOrEmpty(_processConfiguration.Arguments) == false) 
+            processStartInfo.Arguments = _processConfiguration.Arguments;
+
+        if (_processConfiguration.RequiresAdministrator) 
+            processStartInfo.RunAsAdministrator();
+
+        if (_processConfiguration.Credential is not null) 
+            if(_processConfiguration.Credential.IsSupportedOnCurrentOS())
+#pragma warning disable CA1416
+                processStartInfo.ApplyUserCredential(_processConfiguration.Credential);
+#pragma warning restore CA1416
+            
+        if (_processConfiguration.EnvironmentVariables.Any()) 
+            processStartInfo.SetEnvironmentVariables(_processConfiguration.EnvironmentVariables);
+
+        if (processStartInfo.RedirectStandardInput) 
+            processStartInfo.StandardInputEncoding = _processConfiguration.StandardInputEncoding;
+        
+        return processStartInfo;
+    }
 }
