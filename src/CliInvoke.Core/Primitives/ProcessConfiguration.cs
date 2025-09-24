@@ -19,6 +19,7 @@ using System.Text;
 using AlastairLundy.CliInvoke.Core.Internal;
 
 using AlastairLundy.DotExtensions.Processes;
+// ReSharper disable RedundantBoolCompare
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
@@ -102,7 +103,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// Instantiates the Process Configuration class with a ProcessStartInfo and other optional parameters.
     /// </summary>
     /// <param name="processStartInfo"></param>
-    /// <param name="processExitInfo"></param>
     /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
     /// <param name="credential">The credential to be used (if specified).</param>
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
@@ -425,11 +425,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     {
         ProcessStartInfo processStartInfo = new ProcessStartInfo()
         {
-            FileName = this.TargetFilePath,
+            FileName = TargetFilePath,
             Arguments = string.IsNullOrEmpty(this.Arguments) ? string.Empty : this.Arguments,
-            WorkingDirectory = this.WorkingDirectoryPath,
-            UseShellExecute = this.UseShellExecution,
-            CreateNoWindow = this.WindowCreation,
+            WorkingDirectory = WorkingDirectoryPath,
+            UseShellExecute = UseShellExecution,
+            CreateNoWindow = WindowCreation == false,
             RedirectStandardInput = StandardInput is not null && StandardInput != StreamWriter.Null,
             RedirectStandardOutput = redirectStandardOutput,
             RedirectStandardError = redirectStandardError,
