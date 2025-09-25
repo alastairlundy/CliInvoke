@@ -13,18 +13,26 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 6
+        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 7
 
-### Changes
-* Fixed incorrect access modifier for one of ``ProcessExitInfoBuilder``'s constructors
-* Updated ``ProcessResult`` to implement ``IEquatable&lt;ProcessResult&gt;``
-*  Updated DotExtensions dependency from 8.2.0 to 8.3.0
-* Added missing xml doc comments to ``ProcessExitInfo`` class
-* Moved Process ``ApplyProcessConfiguration`` extensions to CliInvoke main package from CliInvoke.Core and made the extensions internal</PackageReleaseNotes>
+### Breaking Changes
+* Restructured ``IProcessInvoker`` interface with methods for ExecuteAsync, ExecuteBufferedAsync, and ExecutePipedAsync
+* Moved ``ApplyEnvironmentVariables`` extension method in CliInvoke.Core to DotExtensions
+* Removed ``TryApplyUserCredential`` extension method
+* Removed redundant constructor in ``ProcessConfiguration``
+* Removed ``IProcessStartInfoBuilder`` and ``ProcessStartInfoBuilder``
+* Renamed some ``IProcessFactory`` interface methods
+* Renamed ``ProcessExitInfo`` to ``ProcessExitConfiguration
+* Renamed ``IProcessExitInfoBuilder`` and ``ProcessExitInfoBuilder``  to ``IProcessExitConfigurationBuilder`` and ``ProcessExitInfoConfigurationBuilder`` respectively
+
+### Non-Breaking Changes
+* Re-added ``ProcessConfiguration``'s ``ToProcessStartInfo`` methods
+* Cleaned up ``ProcessInvoker`` code
+* Updated to DotExtensions 8.4.0 from 8.3.0</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.7</PackageVersion>
+        <PackageVersion>2.0.0-alpha.8</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>

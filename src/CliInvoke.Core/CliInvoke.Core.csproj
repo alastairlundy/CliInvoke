@@ -22,14 +22,24 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.7</Version>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 6
+        <Version>2.0.0-alpha.8</Version>
+        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 7
 
-### Changes
-* Updated ``ProcessResult`` to implement ``IEquatable&lt;ProcessResult&gt;``
-*  Updated DotExtensions dependency from 8.2.0 to 8.3.0
-* Added missing xml doc comments to ``ProcessExitInfo`` class
-* Moved Process ``ApplyProcessConfiguration`` extensions to CliInvoke main package from CliInvoke.Core and made the extensions internal</PackageReleaseNotes>
+### Breaking Changes
+* Restructured ``IProcessInvoker`` interface with methods for ExecuteAsync, ExecuteBufferedAsync, and ExecutePipedAsync
+* Moved ``ApplyEnvironmentVariables`` extension method in CliInvoke.Core to DotExtensions
+* Removed ``TryApplyUserCredential`` extension method
+* Removed redundant constructor in ``ProcessConfiguration``
+* Removed ``IProcessStartInfoBuilder`` and ``ProcessStartInfoBuilder``
+* Renamed some ``IProcessFactory`` interface methods
+* Renamed ``ProcessExitInfo`` to ``ProcessExitConfiguration
+* Renamed ``IProcessExitInfoBuilder`` and ``ProcessExitInfoBuilder``  to ``IProcessExitConfigurationBuilder`` and ``ProcessExitInfoConfigurationBuilder`` respectively
+
+### Non-Breaking Changes
+* Re-added ``ProcessConfiguration``'s ``ToProcessStartInfo`` methods
+* Simplified ``ProcessConfiguration``'s ``Dispose`` method code
+* Improved ``ProcessConfiguration``'s ``Equals`` method code
+* Updated to DotExtensions 8.4.0 from 8.3.0</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
