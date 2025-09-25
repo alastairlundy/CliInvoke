@@ -19,11 +19,11 @@ public enum ProcessCancellationMode
     /// </summary>
     Forceful,
     /// <summary>
-    /// 
+    /// Graceful Cancellation is attempted, but the process's exit upon cancellation is not guaranteed.
     /// </summary>
     Graceful,
     /// <summary>
-    /// 
+    /// No cancellation is desired, Process will run until exit. 
     /// </summary>
     None,
 }
