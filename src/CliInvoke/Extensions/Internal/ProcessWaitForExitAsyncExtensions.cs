@@ -45,6 +45,12 @@ internal static class ProcessWaitForExitAsyncExtensions
         ProcessTimeoutPolicy timeoutPolicy,
         CancellationToken cancellationToken = default)
     {
+        if (timeoutPolicy.Equals(ProcessTimeoutPolicy.None))
+        {
+            await process.WaitForExitAsync(cancellationToken);
+            return;
+        }
+        
         Task processTask = new Task(async () =>
         {
             await process.WaitForExitAsync(cancellationToken);
