@@ -44,7 +44,7 @@ public class BasicUnbufferedInvokationBenchmark
 
         Process process = _processFactory.StartNew(configuration);
        
-        ProcessResult result = await _processFactory.ContinueWhenExitAsync(process);
+        ProcessResult result = await _processFactory.WaitForExitAsync(process);
       
         return result.ExitCode;
     }

@@ -300,7 +300,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<ProcessResult> ContinueWhenExitAsync(Process process, 
+    public async Task<ProcessResult> WaitForExitAsync(Process process, 
         ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
@@ -355,7 +355,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessConfiguration processConfiguration,
+    public async Task<ProcessResult> WaitForExitAsync(Process process, ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
@@ -438,7 +438,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, 
+    public async Task<BufferedProcessResult> WaitForBufferedExitAsync(Process process, 
         ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
@@ -579,7 +579,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
+    public async Task<PipedProcessResult> WaitForPipedExitAsync(Process process,
         ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
     {
@@ -642,7 +642,7 @@ public class ProcessFactory : IProcessFactory
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<PipedProcessResult> ContinueWhenExitPipedAsync(Process process,
+    public async Task<PipedProcessResult> WaitForPipedExitAsync(Process process,
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitInfo = null,
         CancellationToken cancellationToken = default)
