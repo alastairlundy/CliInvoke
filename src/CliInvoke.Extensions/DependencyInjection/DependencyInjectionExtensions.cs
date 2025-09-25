@@ -10,8 +10,9 @@
 using System;
 
 using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Extensibility;
 using AlastairLundy.CliInvoke.Core.Piping;
-
+using AlastairLundy.CliInvoke.Extensibility;
 using AlastairLundy.CliInvoke.Piping;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,8 @@ public static class DependencyInjectionExtensions
 
                 services.AddSingleton<IProcessFactory, ProcessFactory>();
                 services.AddSingleton<IProcessInvoker, ProcessInvoker>();
+
+                services.AddSingleton<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
@@ -49,6 +52,7 @@ public static class DependencyInjectionExtensions
                 services.AddScoped<IProcessFactory, ProcessFactory>();
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
                 
+                services.AddScoped<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
             case ServiceLifetime.Transient:
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
@@ -56,6 +60,8 @@ public static class DependencyInjectionExtensions
 
                 services.AddTransient<IProcessFactory, ProcessFactory>();
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
+                
+                services.AddTransient<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(lifetime),
