@@ -73,12 +73,12 @@ internal static class ProcessWaitForExitAsyncExtensions
 
                     if (timeoutPolicy.CancellationMode == ProcessCancellationMode.Forceful)
                     {
-
                         process.Kill(true);
                     }
-                    else
+                    else if(timeoutPolicy.CancellationMode ==  ProcessCancellationMode.Graceful)
                     {
-                        process.CloseMainWindow();
+                        bool successful =  process.CloseMainWindow();
+                        
                         cancellationToken = new CancellationToken(true);
                     }
                         
