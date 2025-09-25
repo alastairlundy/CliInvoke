@@ -23,11 +23,6 @@ using AlastairLundy.DotExtensions.Processes;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
-// ReSharper disable MemberCanBePrivate.Global
-
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable ClassNeverInstantiated.Global
-
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>

@@ -10,12 +10,8 @@
 
 using System.Runtime.Versioning;
 
-
 using System;
 using System.Diagnostics;
-
-// ReSharper disable MemberCanBePrivate.Global
-
 
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
