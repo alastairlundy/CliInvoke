@@ -52,7 +52,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
     public ClassicPowershellProcessConfiguration(string arguments = null,
         string workingDirectoryPath = null, bool requiresAdministrator = false,
-        IReadOnlyDictionary<string, string> environmentVariables = null, 
+        Dictionary<string, string> environmentVariables = null, 
         UserCredential credentials = null,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,

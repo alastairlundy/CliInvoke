@@ -55,7 +55,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
     public CmdProcessConfiguration(string arguments = null,
         string workingDirectoryPath = null, bool requiresAdministrator = false,
-        IReadOnlyDictionary<string, string> environmentVariables = null, UserCredential credentials = null,
+        Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
