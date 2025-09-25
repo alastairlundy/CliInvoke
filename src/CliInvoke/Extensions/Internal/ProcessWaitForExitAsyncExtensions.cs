@@ -45,7 +45,7 @@ internal static class ProcessWaitForExitAsyncExtensions
         ProcessTimeoutPolicy timeoutPolicy,
         CancellationToken cancellationToken = default)
     {
-        if (timeoutPolicy.Equals(ProcessTimeoutPolicy.None))
+        if (timeoutPolicy.CancellationMode.Equals(ProcessCancellationMode.None))
         {
             await process.WaitForExitAsync(cancellationToken);
             return;
@@ -59,12 +59,6 @@ internal static class ProcessWaitForExitAsyncExtensions
         });
             
         processTask.Start();
-
-        if (timeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-        {
-            await processTask;
-            return;
-        }
         
         Task timeoutTask = new Task(() =>
         {
