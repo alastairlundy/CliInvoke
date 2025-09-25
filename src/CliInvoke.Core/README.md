@@ -15,9 +15,9 @@ Key Abstractions:
 * ``IProcessConfigurationBuilder``
 * ``IProcessExitInfoBuilder``
 * ``IProcessResourcePolicyBuilder``
-* ``IProcessStartInfoBuilder``
 * ``IProcessTimeoutPolicyBuilder``
 * ``IUserCredentialBuilder``
+
 [![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
 

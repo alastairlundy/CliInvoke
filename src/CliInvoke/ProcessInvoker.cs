@@ -21,9 +21,9 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+using AlastairLundy.CliInvoke.Internal;
 
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Internal;
 
 namespace AlastairLundy.CliInvoke;
 
