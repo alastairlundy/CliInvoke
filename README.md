@@ -116,7 +116,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
   ProcessConfiguration config = builder.Build();
   
   // Execute the process through ProcessInvoker and get the results.
-BufferedProcessResult result = await _processInvoker_.ExecuteBufferedAsync(config);
+BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
 ```
 
 ## How to Build CliInvoke's code
