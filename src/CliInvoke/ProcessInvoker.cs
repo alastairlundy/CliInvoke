@@ -24,6 +24,7 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 using AlastairLundy.CliInvoke.Internal;
 
 using System.Runtime.Versioning;
+using System;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -100,23 +101,30 @@ public class ProcessInvoker : IProcessInvoker
             process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
-        
-        process.Start();
-        
-        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
-        await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
-        
-        ProcessResult result = new ProcessResult(process.StartInfo.FileName,
-            process.ExitCode, process.StartTime, process.ExitTime);
-       
-        if (processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+        ProcessResult result;
+
+        try
         {
-            throw new ProcessNotSuccessfulException(process: process,
-                exitCode: process.ExitCode);
-        }
+            process.Start();
 
-        process.Dispose();
+            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+
+             result = new ProcessResult(process.StartInfo.FileName,
+                process.ExitCode, process.StartTime, process.ExitTime);
+
+            if (processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process: process,
+                    exitCode: process.ExitCode);
+            }
+        }
+        finally
+        {
+            process.Dispose();
+        }
         
         return result;
     }
@@ -170,22 +178,34 @@ public class ProcessInvoker : IProcessInvoker
             process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
-        
-        process.Start();
-        
-        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-        
-        await process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
 
-        BufferedProcessResult result = new BufferedProcessResult(
-            process.StartInfo.FileName,
-            process.ExitCode,
-            await process.StandardOutput.ReadToEndAsync(cancellationToken),
-            await process.StandardError.ReadToEndAsync(cancellationToken),
-            process.StartTime,
-            process.ExitTime);
-                              
-        process.Dispose();
+        BufferedProcessResult result;
+
+        try
+        {
+            process.Start();
+
+            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+
+            Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
+            Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
+
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
+
+            await Task.WhenAll(standardOut, standardError, waitForExit);
+
+            result = new BufferedProcessResult(
+                process.StartInfo.FileName,
+                process.ExitCode,
+                await standardOut,
+                await standardError,
+                process.StartTime,
+                process.ExitTime);
+        }
+        finally
+        {
+            process.Dispose();
+        }
         
         return result;
     }
@@ -232,20 +252,30 @@ public class ProcessInvoker : IProcessInvoker
                 process);
         }
 
-        process.Start();
-        
-        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-        
-        await process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
+        PipedProcessResult result;
 
-        Stream standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
-        Stream standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
-        
-        PipedProcessResult result = new PipedProcessResult(process.StartInfo.FileName,
+        try
+        {
+            process.Start();
+
+            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+
+
+            Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
+            Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
+
+           Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
+
+            await Task.WhenAll(standardOutput, standardError, waitForExit);
+
+            result = new PipedProcessResult(process.StartInfo.FileName,
             process.ExitCode, process.StartTime, process.ExitTime,
-            standardOutput, standardError);
-        
-        process.Dispose();
+            await standardOutput, await standardError);
+        }
+        finally
+        {
+            process.Dispose();
+        }
         
         return result;
     }
