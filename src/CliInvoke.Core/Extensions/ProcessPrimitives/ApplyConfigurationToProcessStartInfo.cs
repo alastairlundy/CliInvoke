@@ -41,9 +41,8 @@ public static class ApplyConfigurationToProcessStartInfo
     /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
     /// <param name="credential">The credential to be added.</param>
     [SupportedOSPlatform("windows")]
-    public static void ApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
+    public static void SetUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
     {
-#pragma warning disable CA1416
         if (credential.Domain is not null)
         {
             processStartInfo.Domain = credential.Domain;
@@ -63,8 +62,5 @@ public static class ApplyConfigurationToProcessStartInfo
         {
             processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
         }
-
-
-#pragma warning restore CA1416
     }
 }
