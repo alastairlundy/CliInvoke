@@ -87,10 +87,43 @@ The following table details which target platforms are supported for executing c
 ## Using CliInvoke / Examples
 One of the main use cases for CliInvoke is intended to be executing programs programatically, but other valid use cases also exist such as [safer Process Running](#safer-process-running).
 
-### Executing Commands
-CliInvoke enables use of a fluent builder style of syntax to easily configure and run Commands.
+### Executing 
+CliInvoke enables use of a fluent builder style of syntax to easily configure and run ``ProcessConfiguration``s.
 
-The following example shows how to configure and build a Command that returns a BufferedProcessResult which contains redirected StandardOutput and StandardError as strings.
+The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
+
+### Non-Buffered Execution Example
+This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
+
+```csharp
+using AlastairLundy.CliInvoke;
+using AlastairLundy.CliInvoke.Core;
+
+using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Core.Builders;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+  //Namespace and class code ommitted for clarity 
+
+  // ServiceProvider and Dependency Injection setup code ommitted for clarity
+  
+  IProcessInvoker _processInvoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
+
+  // Fluently configure your Command.
+  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
+                            .WithArguments(["arg1", "arg2"])
+                            .WithWorkingDirectory("/Path/To/Directory");
+  
+  // Build it as a ProcessConfiguration object when you're ready to use it.
+  ProcessConfiguration config = builder.Build();
+  
+  // Execute the process through ProcessInvoker and get the results.
+ProcessResult result = await _processInvoker.ExecuteAsync(config);
+```
+
+### Buffered Execution Example
+This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
 using AlastairLundy.CliInvoke;
@@ -118,6 +151,8 @@ using AlastairLundy.CliInvoke.Core.Primitives;
   // Execute the process through ProcessInvoker and get the results.
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
 ```
+
+### Safer Process Running
 
 ## How to Build CliInvoke's code
 
