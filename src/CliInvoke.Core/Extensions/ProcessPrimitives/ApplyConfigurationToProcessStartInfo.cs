@@ -43,9 +43,6 @@ public static class ApplyConfigurationToProcessStartInfo
     [SupportedOSPlatform("windows")]
     public static void ApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
     {
-        if (credential.IsSupportedOnCurrentOS() == false)
-            throw new PlatformNotSupportedException();
-
 #pragma warning disable CA1416
         if (credential.Domain is not null)
         {
