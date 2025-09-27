@@ -69,51 +69,6 @@ public static class StartInfoApplyExtensions
         }
 #pragma warning restore CA1416
     }
-        
-    /// <summary>
-    /// Attempts to add the specified Credential to the current ProcessStartInfo object.
-    /// </summary>
-    /// <param name="processStartInfo">The current Process start info object.</param>
-    /// <param name="credential">The credential to be added.</param>
-    /// <returns>True if successfully applied; false otherwise.</returns>
-    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
-    public static bool TryApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            try
-            {
-#pragma warning disable CA1416
-                ApplyUserCredential(processStartInfo, credential);
-#pragma warning restore CA1416
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-        
-    /// <summary>
-    /// Applies a specific ProcessConfiguration to a specified ProcessStartInfo object.
-    /// </summary>
-    /// <param name="processStartInfo">The ProcessStartInfo object to apply the ProcessConfiguration to.</param>
-    /// <param name="processConfiguration">A ProcessConfiguration object that defines the environment variables to be applied.</param>
-    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
-    public static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
-        ProcessConfiguration processConfiguration)
-    {
-        if (processConfiguration.EnvironmentVariables is not null)
-        {
-            processStartInfo.ApplyEnvironmentVariables(processConfiguration.EnvironmentVariables);
-        }
-    }
 
     /// <summary>
     /// Applies environment variables to a specified ProcessStartInfo object.
