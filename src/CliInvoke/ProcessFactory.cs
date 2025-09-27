@@ -105,12 +105,9 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("browser")]
     public Process From(ProcessStartInfo startInfo, UserCredential credential)
     {
-        if (credential.IsSupportedOnCurrentOS())
-        {
 #pragma warning disable CA1416
-            startInfo.ApplyUserCredential(credential);
+            startInfo.SetUserCredential(credential);
 #pragma warning restore CA1416
-        }
         
         Process output = From(startInfo);
         
