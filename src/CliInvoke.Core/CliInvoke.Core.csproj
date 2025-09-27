@@ -24,8 +24,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>1.5.2</Version>
         <PackageReleaseNotes>### Changes since 1.5.0
-* Updated DotExtensions from 7.6.5 to 7.7.0 on .NET Standard 2.0
-* Updated DotExtensions from 8.2.0 to 8.3.0 on .NET 8 and .NET 9
+* Updated DotExtensions from 8.3.0 to 8.5.0 on .NET 8 and .NET 9
 * Updated internal Polyfill usage from 8.8.0 to 8.8.1
 * Marked some interfaces as deprecation for removal in v2</PackageReleaseNotes>
     </PropertyGroup>
