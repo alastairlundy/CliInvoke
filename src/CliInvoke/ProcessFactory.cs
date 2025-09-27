@@ -317,7 +317,7 @@ public class ProcessFactory : IProcessFactory
             }
             else
             {
-                await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+                await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
             }
 
             if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -408,7 +408,7 @@ public class ProcessFactory : IProcessFactory
             }
             else
             {
-                await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+                await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
             }
 
             if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -472,7 +472,7 @@ public class ProcessFactory : IProcessFactory
 
             Task waitForExit = processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
                 ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
 
             await Task.WhenAll(standardOutStringTask, standardErrorStringTask, waitForExit);
             
@@ -546,7 +546,7 @@ public class ProcessFactory : IProcessFactory
             
              Task waitForExit = processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
                 ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
             
             await Task.WhenAll(standardOutputStreamTask, standardErrorStreamTask, standardOutStringTask, standardErrorStringTask,
                 waitForExit);
@@ -633,7 +633,7 @@ public class ProcessFactory : IProcessFactory
 
             Task waitForExit = processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
                 ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
 
             await Task.WhenAll(outputTask, errorTask, waitForExit);
 
@@ -709,7 +709,7 @@ public class ProcessFactory : IProcessFactory
 
             Task waitForExit = processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
                 ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
+                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
 
             await Task.WhenAll(outputTask, errorTask, waitForExit);
             

@@ -78,6 +78,10 @@
       </None>
     </ItemGroup>
     
+    <ItemGroup>
+      <Folder Include="Extensions\Internal\" />
+    </ItemGroup>
+    
 <!--    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
