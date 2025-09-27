@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
@@ -189,20 +190,20 @@ public class CliCommandConfiguration : IEquatable<CliCommandConfiguration>
     {
         TargetFilePath = commandConfiguration.TargetFilePath;
         Arguments = commandConfiguration.Arguments; 
-        WorkingDirectoryPath = commandConfiguration.WorkingDirectoryPath ?? Directory.GetCurrentDirectory();
+        WorkingDirectoryPath = commandConfiguration.WorkingDirectoryPath;
         RequiresAdministrator = commandConfiguration.RequiresAdministrator;
-        EnvironmentVariables = commandConfiguration.EnvironmentVariables  ?? new Dictionary<string, string>();
-        Credential = commandConfiguration.Credential ?? UserCredential.Null;
+        EnvironmentVariables = commandConfiguration.EnvironmentVariables;
+        Credential = commandConfiguration.Credential;
         ResultValidation = commandConfiguration.ResultValidation;
-        StandardInput = commandConfiguration.StandardInput ?? StreamWriter.Null;
-        StandardOutput = commandConfiguration.StandardOutput ?? StreamReader.Null;
-        StandardError = commandConfiguration.StandardError ?? StreamReader.Null;
+        StandardInput = commandConfiguration.StandardInput;
+        StandardOutput = commandConfiguration.StandardOutput;
+        StandardError = commandConfiguration.StandardError;
             
-        StandardInputEncoding = commandConfiguration.StandardInputEncoding ?? Encoding.Default;
-        StandardOutputEncoding = commandConfiguration.StandardOutputEncoding ?? Encoding.Default;
-        StandardErrorEncoding = commandConfiguration.StandardErrorEncoding ?? Encoding.Default;
+        StandardInputEncoding = commandConfiguration.StandardInputEncoding;
+        StandardOutputEncoding = commandConfiguration.StandardOutputEncoding;
+        StandardErrorEncoding = commandConfiguration.StandardErrorEncoding;
             
-        ResourcePolicy = commandConfiguration.ResourcePolicy ?? ProcessResourcePolicy.Default;
+        ResourcePolicy = commandConfiguration.ResourcePolicy;
         WindowCreation = commandConfiguration.WindowCreation;
         UseShellExecution = commandConfiguration.UseShellExecution;
     }
@@ -226,7 +227,7 @@ public class CliCommandConfiguration : IEquatable<CliCommandConfiguration>
     /// </summary>
     /// <param name="other">The other Command configuration object to be compared.</param>
     /// <returns>true if both Command configuration objects are the same; false otherwise.</returns>
-    public bool Equals(CliCommandConfiguration other)
+    public bool Equals(CliCommandConfiguration? other)
     {
         if (other is null)
         {
@@ -253,7 +254,7 @@ public class CliCommandConfiguration : IEquatable<CliCommandConfiguration>
     /// </summary>
     /// <param name="obj">The other object to be compared.</param>
     /// <returns>true if both objects are Command objects and the same; false otherwise.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null)
         {
@@ -277,16 +278,16 @@ public class CliCommandConfiguration : IEquatable<CliCommandConfiguration>
         unchecked
         {
             var hashCode = RequiresAdministrator.GetHashCode();
-            hashCode = (hashCode * 397) ^ (TargetFilePath != null ? TargetFilePath.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (WorkingDirectoryPath != null ? WorkingDirectoryPath.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Arguments != null ? Arguments.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (TargetFilePath.GetHashCode());
+            hashCode = (hashCode * 397) ^ (WorkingDirectoryPath.GetHashCode());
+            hashCode = (hashCode * 397) ^ (Arguments.GetHashCode());
             hashCode = (hashCode * 397) ^ WindowCreation.GetHashCode();
-            hashCode = (hashCode * 397) ^ (EnvironmentVariables != null ? EnvironmentVariables.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Credential != null ? Credential.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (EnvironmentVariables.GetHashCode());
+            hashCode = (hashCode * 397) ^ (Credential.GetHashCode());
             hashCode = (hashCode * 397) ^ (int)ResultValidation;
-            hashCode = (hashCode * 397) ^ (StandardInput != null ? StandardInput.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (StandardOutput != null ? StandardOutput.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (StandardError != null ? StandardError.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (StandardInput.GetHashCode());
+            hashCode = (hashCode * 397) ^ (StandardOutput.GetHashCode());
+            hashCode = (hashCode * 397) ^ (StandardError.GetHashCode());
             hashCode = (hashCode * 397) ^ ResourcePolicy.GetHashCode();
             hashCode = (hashCode * 397) ^ UseShellExecution.GetHashCode();
             return hashCode;
