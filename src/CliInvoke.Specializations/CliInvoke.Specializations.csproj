@@ -10,14 +10,14 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.8</PackageVersion>
+        <PackageVersion>2.0.0-beta.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <LangVersion>13</LangVersion>
-        <PackageReleaseNotes>Updated to CliInvoke 2.0.0 Alpha 8</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated to CliInvoke 2.0.0 Beta 1</PackageReleaseNotes>
         <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
@@ -56,6 +56,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.8" />
+      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.1" />
     </ItemGroup>
 </Project>
