@@ -14,6 +14,8 @@ using System;
 using System.Runtime.InteropServices;
 #endif
 
+using System;
+using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Core.Extensions;
@@ -25,6 +27,7 @@ public static class IsSupportedOnOsExtensions
     /// </summary>
     /// <param name="userCredential"></param>
     /// <returns>True if supported; false otherwise.</returns>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public static bool IsSupportedOnCurrentOS(this UserCredential userCredential)
     {
 #if NET5_0_OR_GREATER

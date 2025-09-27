@@ -75,6 +75,7 @@ public static class StartInfoApplyExtensions
     /// <param name="processStartInfo">The current Process start info object.</param>
     /// <param name="credential">The credential to be added.</param>
     /// <returns>True if successfully applied; false otherwise.</returns>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public static bool TryApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
     {
         if (credential.IsSupportedOnCurrentOS())
@@ -103,6 +104,7 @@ public static class StartInfoApplyExtensions
     /// </summary>
     /// <param name="processStartInfo">The ProcessStartInfo object to apply the ProcessConfiguration to.</param>
     /// <param name="processConfiguration">A ProcessConfiguration object that defines the environment variables to be applied.</param>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public static void ApplyEnvironmentVariables(this ProcessStartInfo processStartInfo,
         ProcessConfiguration processConfiguration)
     {
