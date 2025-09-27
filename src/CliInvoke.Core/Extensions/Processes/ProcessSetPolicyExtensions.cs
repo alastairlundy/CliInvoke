@@ -10,7 +10,7 @@
 
 using System;
 using System.Diagnostics;
-
+using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 
@@ -32,6 +32,14 @@ public static class ProcessSetPolicyExtensions
     /// <param name="process">The process to apply the policy to.</param>
     /// <param name="resourcePolicy">The process resource policy to be applied.</param>
     /// <exception cref="InvalidOperationException"></exception>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
     public static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
     {
         if (process.HasStarted() && resourcePolicy != null)
