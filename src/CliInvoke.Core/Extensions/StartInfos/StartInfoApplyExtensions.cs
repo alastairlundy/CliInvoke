@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using AlastairLundy.CliInvoke.Core.Internal;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -40,7 +41,7 @@ public static class StartInfoApplyExtensions
     public static void ApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
     {
 #pragma warning disable CA1416
-        if (credential.IsSupportedOnCurrentOS())
+        if (OperatingSystem.IsWindows())
         {
             if (credential.Domain is not null)
             {
@@ -78,7 +79,7 @@ public static class StartInfoApplyExtensions
     [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public static bool TryApplyUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
     {
-        if (credential.IsSupportedOnCurrentOS())
+        if (OperatingSystem.IsWindows())
         {
             try
             {

@@ -16,6 +16,10 @@ using AlastairLundy.CliInvoke.Core.Internal;
 using System.Runtime.Versioning;
 #endif
 
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -32,7 +36,7 @@ public static class ProcessApplyExtensions
     [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public static bool TryApplyUserCredential(this Process process, UserCredential credential)
     {
-        if (credential.IsSupportedOnCurrentOS())
+        if (OperatingSystem.IsWindows())
         {
             try
             {
@@ -65,7 +69,7 @@ public static class ProcessApplyExtensions
     public static void ApplyUserCredential(this Process process, UserCredential credential)
     {
 #pragma warning disable CA1416
-        if (credential.IsSupportedOnCurrentOS())
+        if (OperatingSystem.IsWindows())
         {
             if (credential.Domain is not null)
             {

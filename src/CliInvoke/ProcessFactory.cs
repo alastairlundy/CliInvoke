@@ -14,7 +14,6 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Core.Abstractions;
-using AlastairLundy.CliInvoke.Core.Extensions;
 using AlastairLundy.CliInvoke.Core.Extensions.Processes;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
@@ -22,6 +21,10 @@ using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 using AlastairLundy.Resyslib.IO.Core.Files;
+
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
 
 // ReSharper disable UnusedType.Global
 
@@ -85,7 +88,7 @@ public class ProcessFactory : IProcessFactory
     {
         Process output = From(startInfo);
 
-        if (credential.IsSupportedOnCurrentOS())
+        if (OperatingSystem.IsWindows())
         {
 #pragma warning disable CA1416
             output.ApplyUserCredential(credential);

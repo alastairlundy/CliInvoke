@@ -17,6 +17,8 @@ using System.Text;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
+#else
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
 using AlastairLundy.CliInvoke.Core.Extensions.StartInfos;
@@ -458,25 +460,17 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     public void Dispose()
     {
-        if (Credential is not null)
-        {
+        if (Credential is not null) 
             Credential.Dispose();
-        }
 
-        if (StandardInput is not null)
-        { 
+        if (StandardInput is not null) 
             StandardInput.Dispose();
-        }
 
-        if (StandardOutput is not null)
-        {
+        if (StandardOutput is not null) 
             StandardOutput.Dispose();
-        }
 
-        if (StandardError is not null)
-        {
+        if (StandardError is not null) 
             StandardError.Dispose();
-        }
     }
         
         
@@ -581,19 +575,15 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             RedirectStandardError = redirectStandardError || StandardError != StreamReader.Null,
         };
 
-        if (string.IsNullOrEmpty(Arguments) == false)
-        {
+        if (string.IsNullOrEmpty(Arguments) == false) 
             output.Arguments = Arguments;
-        }
             
-        if (RequiresAdministrator)
-        {
+        if (RequiresAdministrator) 
             output.RunAsAdministrator();
-        }
 
-        if (Credential is not null)
+        if (Credential is not null && OperatingSystem.IsWindows())
         {
-            output.TryApplyUserCredential(Credential);
+            output.ApplyUserCredential(Credential);
         }
 
         if (EnvironmentVariables.Any())
