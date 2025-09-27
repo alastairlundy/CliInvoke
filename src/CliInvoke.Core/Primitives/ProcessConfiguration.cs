@@ -20,6 +20,7 @@ using AlastairLundy.CliInvoke.Core.Internal;
 
 using AlastairLundy.DotExtensions.Processes;
 // ReSharper disable RedundantBoolCompare
+// ReSharper disable ClassNeverInstantiated.Global
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
@@ -437,9 +438,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             processStartInfo.RunAsAdministrator();
 
         if (Credential is not null) 
-            if(Credential.IsSupportedOnCurrentOS())
 #pragma warning disable CA1416
-                processStartInfo.ApplyUserCredential(Credential);
+                processStartInfo.SetUserCredential(Credential);
 #pragma warning restore CA1416
                 
         if (EnvironmentVariables.Any()) 

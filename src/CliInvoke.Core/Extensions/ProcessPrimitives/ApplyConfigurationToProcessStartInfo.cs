@@ -43,7 +43,7 @@ public static class ApplyConfigurationToProcessStartInfo
     [SupportedOSPlatform("windows")]
     public static void SetUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
     {
-        if (credential.Domain is not null)
+        if (credential.Domain is not null && OperatingSystem.IsWindows())
         {
             processStartInfo.Domain = credential.Domain;
         }
@@ -53,12 +53,12 @@ public static class ApplyConfigurationToProcessStartInfo
             processStartInfo.UserName = credential.UserName;
         }
 
-        if (credential.Password is not null)
+        if (credential.Password is not null && OperatingSystem.IsWindows())
         {
             processStartInfo.Password = credential.Password;
         }
 
-        if (credential.LoadUserProfile is not null)
+        if (credential.LoadUserProfile is not null && OperatingSystem.IsWindows())
         {
             processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
         }
