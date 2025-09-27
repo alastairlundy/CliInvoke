@@ -50,10 +50,11 @@ public class ProcessInvoker : IProcessInvoker
         _processFactory = processFactory;
         _processPipeHandler = processPipeHandler;
     }
-    
+
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
+    /// <param name="process"></param>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
@@ -71,7 +72,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
 #endif
     public async Task<ProcessResult> ExecuteProcessAsync(Process process, ProcessConfiguration processConfiguration,
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken = default)
     {
         if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
@@ -115,7 +116,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
 #endif
     public async Task<ProcessResult> ExecuteProcessAsync(Process process, ProcessResultValidation processResultValidation,
-        ProcessResourcePolicy? processResourcePolicy = null, CancellationToken cancellationToken = new CancellationToken())
+        ProcessResourcePolicy? processResourcePolicy = null, CancellationToken cancellationToken = default)
     {
         if (File.Exists(process.StartInfo.FileName) == false)
         {
@@ -140,7 +141,7 @@ public class ProcessInvoker : IProcessInvoker
 
     public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(Process process, 
         ProcessConfiguration processConfiguration,
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken = default)
     {
         if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
@@ -185,7 +186,7 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<BufferedProcessResult> ExecuteBufferedProcessAsync(Process process, 
         ProcessResultValidation processResultValidation,
         ProcessResourcePolicy? processResourcePolicy = null, 
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken = default)
     {
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
