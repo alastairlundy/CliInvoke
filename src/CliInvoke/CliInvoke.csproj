@@ -13,26 +13,16 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 7
-
-### Breaking Changes
-* Restructured ``IProcessInvoker`` interface with methods for ExecuteAsync, ExecuteBufferedAsync, and ExecutePipedAsync
-* Moved ``ApplyEnvironmentVariables`` extension method in CliInvoke.Core to DotExtensions
-* Removed ``TryApplyUserCredential`` extension method
-* Removed redundant constructor in ``ProcessConfiguration``
-* Removed ``IProcessStartInfoBuilder`` and ``ProcessStartInfoBuilder``
-* Renamed some ``IProcessFactory`` interface methods
-* Renamed ``ProcessExitInfo`` to ``ProcessExitConfiguration
-* Renamed ``IProcessExitInfoBuilder`` and ``ProcessExitInfoBuilder``  to ``IProcessExitConfigurationBuilder`` and ``ProcessExitInfoConfigurationBuilder`` respectively
-
-### Non-Breaking Changes
-* Re-added ``ProcessConfiguration``'s ``ToProcessStartInfo`` methods
-* Cleaned up ``ProcessInvoker`` code
-* Updated to DotExtensions 8.4.0 from 8.3.0</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 8
+* Updated DotExtensions from 8.4.0 to 8.5.0
+* Improved ``ProcessFactory`` and ``ProcessInvoker`` implementation code reliability and performance
+* Removed ``UserCredential`` ``IsSupportedOnCurrentOs`` extension method
+* Rename ProcessStartInfo ``ApplyUserCredential`` extension method to ``SetUserCredential``
+* Reduced technical debt in CliInvoke main package</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.8</PackageVersion>
+        <PackageVersion>2.0.0-beta.1</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
