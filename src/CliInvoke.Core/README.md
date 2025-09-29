@@ -4,19 +4,20 @@ This package contains Process Running and handling abstractions as well as commo
 For an implementing package, check out [``CliInvoke``](https://www.nuget.org/packages/AlastairLundy.CliInvoke/).
 
 Key Abstractions:
-* ``IProcessFactory``
 * ``IProcessInvoker``
+* ``IProcessFactory``
 
 * Piping:
   * ``IProcessPipeHandler``
-* Builders:
-* ``IArgumentsBuilder``
-* ``IEnvironmentVariablesBuilder``
-* ``IProcessConfigurationBuilder``
-* ``IProcessExitInfoBuilder``
-* ``IProcessResourcePolicyBuilder``
-* ``IProcessTimeoutPolicyBuilder``
-* ``IUserCredentialBuilder``
+
+* Fluent Builders:
+  * ``IArgumentsBuilder`` - An interface to assist with Argument Building and argument escaping.
+  * ``IEnvironmentVariablesBuilder`` - An interface to assist with setting Environment variables.
+  * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
+  * ``IProcessExitConfigurationBuilder`` - An interface to fluently configure and build ``ProcessExitConfiguration`` objects.
+  * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy`` objects.
+  * ``IProcessTimeoutPolicyBuilder``
+  * ``IUserCredentialBuilder``
 
 [![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
