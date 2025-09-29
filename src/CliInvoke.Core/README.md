@@ -74,7 +74,7 @@ The following table details which target platforms are supported for running Pro
 ## Examples
 One of the main use cases for CliInvoke.Core is intended to be [safe Process Running](#safe-process-running).
 
-### Safe Process Running
+### Safer Process Running
 CliInvoke.Core offers safe abstractions around Process Running to avoid accidentally not disposing of Processes after they are executed.
 
 ``IProcessFactory`` provides for this in
