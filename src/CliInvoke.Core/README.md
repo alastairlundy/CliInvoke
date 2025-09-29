@@ -1,4 +1,4 @@
-# AlastairLundy.CliInvoke.Core
+# CliInvoke.Core
 This package contains Process Running and handling abstractions as well as common types used by implementing classes.
 
 For an implementing package, check out [``AlastairLundy.CliInvoke``](https://www.nuget.org/packages/AlastairLundy.CliInvoke/).
