@@ -51,26 +51,25 @@ CliInvoke.Core can be added to any .NET Standard 2.0, .NET Standard 2.1, .NET 8,
 
 The following table details which target platforms are supported for running Processes.
 
-| Operating System | Support Status                     | Notes                                                                           |
-|------------------|------------------------------------|---------------------------------------------------------------------------------|
-| Windows          | Fully Supported :white_check_mark: |                                                                                 |
-| macOS            | Fully Supported :white_check_mark: |                                                                                 |
-| Mac Catalyst     | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.    |
-| Linux            | Fully Supported :white_check_mark: |                                                                                 |
-| FreeBSD          | Fully Supported :white_check_mark: |                                                                                 |
-| Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.    |
-| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. ^2                 | 
-| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS ^2                 |
-| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^3              |
-| Browser          | Not Supported and Not Planned :x:  | Not supported due to not being a valid target Platform for executing processes. |
+| Operating System/Platform specific TFM | Support Status                     | Notes                                                                                               |
+|----------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------------|
+| Windows                                | Fully Supported :white_check_mark: |                                                                                                     |
+| macOS                                  | Fully Supported :white_check_mark: |                                                                                                     |
+| Mac Catalyst                           | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                        |
+| Linux                                  | Fully Supported :white_check_mark: |                                                                                                     |
+| FreeBSD                                | Fully Supported :white_check_mark: |                                                                                                     |
+| Android                                | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                        |
+| IOS                                    | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. ^2                                     | 
+| tvOS                                   | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS ^2                                     |
+| watchOS                                | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^3                                  |
+| Browser                                | Not Planned :x:                    | Not planned due to Client Side Rendering not being a valid target Platform for executing processes. |
 
 ^2 - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
-^3 - lack of IOS support implies Lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
+^3 - lack of IOS support implies lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 
 
 **Note:** This library has not been tested on Android or Tizen.
-
 
 ## Examples
 One of the main use cases for CliInvoke.Core is intended to be [safe Process Running](#safe-process-running).
