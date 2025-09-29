@@ -97,30 +97,52 @@ The ``WaitForExitAsync``, ``WaitForBufferedExitAsync``, ``WaitForPipedExitAsync`
 
 These examples show how they might be used:
 
+##### ``WaitForExitAsync``
 ```csharp
 using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 // Using namespaces for Dependency Injection code ommitted for clarity
 
       // Dependency Injection setup code ommitted for clarity
 
     IProcessFactory _processFactory = serviceProvider.GetRequiredService<IProcessFactory>();
     
-    // Define processStartInfo here.
-    
-    Process process1 = _processFactory.From(processStartInfo);
+    // Define processStartInfo here
     
     // This process that is returned is a Process that has been started.
-    Process process2 = _processFactory.StartNew(processStartInfo);
+    Process process = _processFactory.StartNew(processStartInfo);
     
     // Wait for the Process to finish before safely disposing of it.
-   ProcessResult result = await processFactory.ContinueWhenExitAsync(process2);
-    
-        
-    ProcessResult result = await _processRunner.ExecuteProcessAsync(process, ProcessResultValidation.None);
+   ProcessResult result = await processFactory.WaitForExitAsync(process);
 ```
 
-Asynchronous methods in ``IProcessFactory`` also allow for an optional CancellationToken parameter.
+##### ``WaitForBufferedExitAsync``
+```csharp
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
+// Using namespaces for Dependency Injection code ommitted for clarity
+
+      // Dependency Injection setup code ommitted for clarity
+
+    IProcessFactory _processFactory = serviceProvider.GetRequiredService<IProcessFactory>();
+    
+    // Define processStartInfo here
+    
+    Process process = _processFactory.From(processStartInfo);
+    
+    process.Start();
+    
+    // Wait for the Process to finish before safely disposing of it.
+   BufferedProcessResult result = await processFactory.WaitForBufferedExitAsync(process);
+```
+
+Asynchronous methods in ``IProcessFactory`` allow for an optional CancellationToken parameter.
+
+Some overloads for ``WaitForExitAsync`` and ``WaitForBufferedExitAsync`` allow for specifying ProcessResultValidation.
+
+### Command/Program Execution
 
 ## How to Contribute
 Thank you in advance for considering contributing to CliInvoke.
