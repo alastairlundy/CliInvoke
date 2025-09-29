@@ -127,7 +127,7 @@ Thanks.
 ## License
 CliInvoke.Core is licensed under the MPL 2.0 license. If you modify any of CliInvoke.Core's files, then the modified files must be licensed under the MPL 2.0.
 
-If you use CliInvoke.Core in your project, please make an exact copy of the contents of CliInvoke.Core' [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
+If you use CliInvoke.Core in your project, please make an exact copy of the contents of CliInvoke.Core's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 
 ## Acknowledgements
 
