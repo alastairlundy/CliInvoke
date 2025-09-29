@@ -33,7 +33,7 @@ using AlastairLundy.DotExtensions.Processes;
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of <see cref="IProcessFactory"/>, an easy and safe way to create, run, and dispose of ProcessPrimitives.
+/// The default implementation of <see cref="IProcessFactory"/>, an easy and safe way to create, run, and dispose of Processes.
 /// </summary>
 public class ProcessFactory : IProcessFactory
 {
@@ -42,7 +42,7 @@ public class ProcessFactory : IProcessFactory
     private readonly IProcessPipeHandler _processPipeHandler;
 
     /// <summary>
-    /// Instantiates a ProcessFactory to be used for creating and running ProcessPrimitives, as well as safely disposing of a Process when it exits.
+    /// Instantiates a ProcessFactory to be used for creating and running Processes, as well as safely disposing of a Process when it exits.
     /// </summary>
     /// <param name="filePathResolver">The file path resolver to use.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>

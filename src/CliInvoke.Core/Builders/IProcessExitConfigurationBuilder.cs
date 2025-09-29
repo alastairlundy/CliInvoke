@@ -12,7 +12,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
-/// 
+/// An interface that defines fluent builder methods for configuring a ProcessExitConfiguration. 
 /// </summary>
 public interface IProcessExitConfigurationBuilder
 {
@@ -23,7 +23,6 @@ public interface IProcessExitConfigurationBuilder
     /// <param name="validation">The result validation behaviour to be used.</param>
     /// <returns>The new ProcessConfigurationBuilder object with the configured Result Validation behaviour.</returns>
     IProcessExitConfigurationBuilder WithValidation(ProcessResultValidation validation);
-
     
     /// <summary>
     /// Sets the Process Timeout Policy to be used for this Process.
@@ -33,8 +32,8 @@ public interface IProcessExitConfigurationBuilder
     IProcessExitConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
 
     /// <summary>
-    /// 
+    /// Builds the ProcessExitConfiguration with the configured parameters.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The newly configured Process Exit Configuration.</returns>
     ProcessExitConfiguration Build();
 }
