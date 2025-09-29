@@ -77,17 +77,26 @@ One of the main use cases for CliInvoke.Core is intended to be [safe Process Run
 ### Safer Process Running
 CliInvoke.Core offers safe abstractions around Process Running to avoid accidentally not disposing of Processes after they are executed.
 
-``IProcessFactory`` provides for this in
+``IProcessFactory`` and ``IProcessInvoker`` are both equally capable of fulfilling this criterion, **however** ``IProcessFactory`` enables more direct control over Process related primitives prior to running the Process.
+
+If you don't want to use CliInvoke's abstractions around Processes, such as ``ProcessConfiguration`` and CliInvoke's other primitives,  then ``IProcessFactory`` is a better fit. 
+
+**Note**: Neither ``IProcessFactory`` nor ``IProcessInvoker`` are dependent upon on the other to work.
 
 #### ``IProcessFactory``
-IProcessFactory is an interface for enabling easy Process Creation, Running, and Disposal depending on the methods used.
+``IProcessFactory`` is an interface for enabling easy Process Creation, Running, and Disposal depending on the methods used.
 
 The ``From`` method and its overloads provide for easy standalone process creation.
-The ``StartNew`` method provides for creating and starting new processes easily.
+The ``StartNew`` method provides for creating and starting new processes within the same method call.
 
-The ``ContinueWhenExitAsync`` and ``ContinueWhenExitBufferedAsync`` methods provide for safe process running, and disposal after a Process has exited. 
+The ``WaitForExitAsync``, ``WaitForBufferedExitAsync``, ``WaitForPipedExitAsync`` methods provide for:
+1. safe process running (including process disposal in the case of an ``Exception``)
+2. gathering the results of the Process's execution (varies depending on the specific method)
+3. disposing of the Process after it has exited
+4. returning the gathered Process execution results
 
-This example shows how it might be used:
+These examples show how they might be used:
+
 ```csharp
 using AlastairLundy.CliInvoke.Core;
 // Using namespaces for Dependency Injection code ommitted for clarity
