@@ -17,10 +17,10 @@ Launch processes, redirect standard input and output streams, await process comp
     * [Supported Platforms](#supported-platforms)
 * [CliInvoke Examples](#using-CliInvoke--examples)
       * [Executing Commands](#executing-commands)
-* [Contributing to CliInvoke](#how-to-contribute-to-clirunner)
-* [Roadmap](#clirunners-roadmap)
+* [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
+* [Roadmap](#cliinvokes-roadmap)
 * [License](#license)
-  * [CliRunner Assets](#clirunner-assets)
+  * [CliRunner Assets](#cliinvoke-assets)
 * [Acknowledgements](#acknowledgements)
 
 ## Features
