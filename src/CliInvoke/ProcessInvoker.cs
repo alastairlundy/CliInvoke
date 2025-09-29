@@ -23,7 +23,7 @@ using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
-using System;
+
 using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke;
