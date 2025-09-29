@@ -112,7 +112,6 @@ using AlastairLundy.CliInvoke.Core;
 
 Asynchronous methods in ``IProcessFactory`` also allow for an optional CancellationToken parameter.
 
-Some overloads for ``ContinueWhenExitAsync`` and ``ContinueWhenExitBufferedAsync`` allow for specifying ProcessResultValidation.
 
 ## How to Contribute
 Thank you in advance for considering contributing to CliInvoke.
