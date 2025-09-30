@@ -21,9 +21,9 @@ using AlastairLundy.CliInvoke.Legacy.Utilities;
 
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Invokers;
-using AlastairLundy.Resyslib.IO.Files;
 
 using CliInvoke.Specializations.Tests.Helpers;
+using FilePathResolver = AlastairLundy.CliInvoke.FilePathResolver;
 
 namespace CliInvoke.Specializations.Tests.Invokers;
 

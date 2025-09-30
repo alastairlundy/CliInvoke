@@ -16,9 +16,7 @@ using AlastairLundy.CliInvoke.Core.Abstractions.Piping;
 using AlastairLundy.CliInvoke.Legacy;
 using AlastairLundy.CliInvoke.Legacy.Utilities;
 using AlastairLundy.CliInvoke.Piping;
-using IFilePathResolver = AlastairLundy.Resyslib.IO.Core.Files.IFilePathResolver;
-using AlastairLundy.Resyslib.IO.Files;
-
+using AlastairLundy.Resyslib.IO.Core.Files;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
