@@ -99,10 +99,8 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
                 process.Start();
             }
 
-            if (processResourcePolicy != null)
-            {
+            if (processResourcePolicy is not null) 
                 process.SetResourcePolicy(processResourcePolicy);
-            }
 
             process.WaitForExit();
 
@@ -168,10 +166,8 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
             process.Start();
         }
 
-        if (processResourcePolicy is not null)
-        {
+        if (processResourcePolicy is not null) 
             process.SetResourcePolicy(processResourcePolicy);
-        }
             
         await process.WaitForExitAsync(cancellationToken);
 
@@ -258,6 +254,9 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     {
         if (process.HasStarted() == false)
         {
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            
             if (Process.GetProcesses().Any(x => x.Equals(process)) == false)
             {
                 _filePathResolver.ResolveFilePath(process.StartInfo.FileName, out string resolvedFilePath);
@@ -353,6 +352,8 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
         {
             if (Process.GetProcesses().Contains(process) == false)
             {
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
                 process.Start();
             }
             
