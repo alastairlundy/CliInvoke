@@ -184,7 +184,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="environmentVariables">The environment variables to be added to the process configuration.</param>
     /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables)
+    public IProcessConfigurationBuilder WithEnvironmentVariables(IDictionary<string, string> environmentVariables)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,

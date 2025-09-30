@@ -33,6 +33,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// Configures the Command configuration to be wrapped and executed.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="redirectStandardError"></param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <param name="workingDirectoryPath">The working directory to be used.</param>
     /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
@@ -47,6 +48,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
+    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardOutput"></param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -61,7 +64,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string? arguments = null, string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
-        Dictionary<string, string>? environmentVariables = null,
+        IDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
@@ -123,7 +126,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("browser")]
     public ProcessConfiguration(ProcessStartInfo processStartInfo,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        Dictionary<string, string>? environmentVariables = null,
+        IDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
@@ -181,7 +184,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The environment variables to be set.
     /// </summary>
-    public Dictionary<string, string> EnvironmentVariables { get; protected set;  }
+    public IDictionary<string, string> EnvironmentVariables { get; protected set;  }
         
     /// <summary>
     /// The credential to be used when executing the Command.

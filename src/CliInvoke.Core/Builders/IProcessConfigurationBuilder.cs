@@ -55,7 +55,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="environmentVariables">The environment variables to be configured.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified environment variables.</returns>
-    IProcessConfigurationBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables);
+    IProcessConfigurationBuilder WithEnvironmentVariables(IDictionary<string, string> environmentVariables);
     
     /// <summary>
     /// Sets whether to execute the Process with Administrator Privileges.
