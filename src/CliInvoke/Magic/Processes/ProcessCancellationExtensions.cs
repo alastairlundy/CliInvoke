@@ -34,9 +34,6 @@ internal static class ProcessCancellationExtensions
         if (timeoutThreshold < TimeSpan.Zero)
             throw new ArgumentOutOfRangeException();
         
-        if (process.IsRunningOnRemoteDevice())
-            throw new NotSupportedException();
-        
         CancellationTokenSource cts = new CancellationTokenSource();
         
         cts.CancelAfter(timeoutThreshold);
