@@ -38,7 +38,7 @@ Some primitives added include:
 ## Features
 * Easy to use safe Process Running classes and interfaces
 * Models that help abstract away some of the complicated nature of Process objects
-* Compatible with .NET Standard 2.0 and 2.1 ^1
+* Compatible with .NET Standard 2.0 (and implicitly 2.1) ^1
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
 ^1 - [Polyfill](https://github.com/SimonCropp/Polyfill) is a dependency only required for .NET Standard 2.0 and 2.1 users. [Microsoft.Bcl.HashCode](https://www.nuget.org/packages/Microsoft.Bcl.HashCode) is a dependency only required for .NET Standard 2.0 users.
@@ -58,22 +58,22 @@ CliInvoke.Core can be added to any .NET Standard 2.0, .NET Standard 2.1, .NET 8,
 
 The following table details which target platforms are supported for running Processes.
 
-| Operating System | Support Status                     | Notes                                                                           |
-|------------------|------------------------------------|---------------------------------------------------------------------------------|
-| Windows          | Fully Supported :white_check_mark: |                                                                                 |
-| macOS            | Fully Supported :white_check_mark: |                                                                                 |
-| Mac Catalyst     | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.    |
-| Linux            | Fully Supported :white_check_mark: |                                                                                 |
-| FreeBSD          | Fully Supported :white_check_mark: |                                                                                 |
-| Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.    |
-| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. ^2                 | 
-| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS ^2                 |
-| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^3              |
-| Browser          | Not Supported and Not Planned :x:  | Not supported due to not being a valid target Platform for executing processes. |
+| Operating System | Support Status                     | Notes                                                                         |
+|------------------|------------------------------------|-------------------------------------------------------------------------------|
+| Windows          | Fully Supported :white_check_mark: |                                                                               |
+| macOS            | Fully Supported :white_check_mark: |                                                                               |
+| Mac Catalyst     | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.  |
+| Linux            | Fully Supported :white_check_mark: |                                                                               |
+| FreeBSD          | Fully Supported :white_check_mark: |                                                                               |
+| Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.  |
+| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. ^2               | 
+| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS ^2               |
+| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^3            |
+| Browser          | Not Planned :x:                    | Not planned due to not being a valid target Platform for executing processes. |
 
 ^2 - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
-^3 - lack of IOS support implies Lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
+^3 - lack of IOS support implies lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 
 
 **Note:** This library has not been tested on Android or Tizen.
@@ -106,16 +106,11 @@ using AlastairLundy.CliInvoke.Core;
     
     // Define processStartInfo here.
     
-    Process process1 = _processFactory.From(processStartInfo);
-    
     // This process that is returned is a Process that has been started.
-    Process process2 = _processFactory.StartNew(processStartInfo);
+    Process process = _processFactory.StartNew(processStartInfo);
     
     // Wait for the Process to finish before safely disposing of it.
-   ProcessResult result = await processFactory.ContinueWhenExitAsync(process2);
-    
-        
-    ProcessResult result = await _processRunner.ExecuteProcessAsync(process, ProcessResultValidation.None);
+   ProcessResult result = await processFactory.ContinueWhenExitAsync(process);
 ```
 
 Asynchronous methods in ``IProcessFactory`` also allow for an optional CancellationToken parameter.
