@@ -64,7 +64,7 @@ public class BasicUnbufferedInvokationBenchmark
         return result.ExitCode;
     }
 
-    [Benchmark]
+   // [Benchmark]
     public async Task<int> CliWrap()
     {
       CliWrap.CommandResult result = await Cli.Wrap(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
@@ -75,7 +75,7 @@ public class BasicUnbufferedInvokationBenchmark
       return result.ExitCode;
     }
 
-    [Benchmark]
+  //  [Benchmark]
     public async Task<int> MedallionShell()
     {
         Medallion.Shell.CommandResult result = await Medallion.Shell.Command
@@ -84,7 +84,7 @@ public class BasicUnbufferedInvokationBenchmark
         return result.ExitCode;
     }
 
-    [Benchmark]
+   // [Benchmark]
     public async Task<int> SimpleExec()
     {
         int exitCode = 0;
