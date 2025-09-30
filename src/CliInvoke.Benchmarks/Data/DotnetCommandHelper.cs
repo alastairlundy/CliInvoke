@@ -15,8 +15,8 @@ public class DotnetCommandHelper
             CommandTask<BufferedCommandResult> task = Cli.Wrap("which")
                 .WithArguments("dotnet")
                 .ExecuteBufferedAsync();
-
-            task.Task.Start();
+            
+            //task.Task.Start();
 
             task.Task.Wait();
         
