@@ -56,6 +56,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete("This constructor is deprecated and will be removed in version 2.")]
     public ProcessConfiguration(ProcessConfiguration processConfiguration)
     {
         TargetFilePath = processConfiguration.TargetFilePath;
