@@ -47,7 +47,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
     public ProcessConfigurationBuilder(string targetFilePath)
     {
-        _configuration = new ProcessConfiguration(targetFilePath);
+        _configuration = new ProcessConfiguration(targetFilePath, false,
+            true, true);
     }
         
     /// <summary>
@@ -57,7 +58,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="processStartInfo">The start information for the process configuration.</param>
     public ProcessConfigurationBuilder(ProcessStartInfo processStartInfo)
     {
-        _configuration = new ProcessConfiguration(processStartInfo);
+        _configuration = new ProcessConfiguration(processStartInfo, processStartInfo.RedirectStandardInput,
+            processStartInfo.RedirectStandardOutput, processStartInfo.RedirectStandardError);
     }
     
     /// <summary>
@@ -99,6 +101,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
         
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 args,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -125,6 +130,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -151,6 +159,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(targetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -177,6 +188,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -204,6 +218,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 runAsAdministrator,
@@ -230,6 +247,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 workingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -261,6 +281,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -331,6 +354,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -360,6 +386,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -388,6 +417,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -416,6 +448,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -443,6 +478,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -473,6 +511,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -499,6 +540,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -531,6 +575,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,

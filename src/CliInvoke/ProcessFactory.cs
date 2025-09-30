@@ -133,8 +133,10 @@ public class ProcessFactory : IProcessFactory
         Process output = new Process()
         {
             StartInfo = configuration.ToProcessStartInfo(
-                configuration.StandardOutput is not null && configuration.StandardOutput != StreamReader.Null,
-                configuration.StandardError is not null && configuration.StandardError != StreamReader.Null),
+                configuration.RedirectStandardOutput && configuration.StandardOutput is not null &&
+                configuration.StandardOutput != StreamReader.Null,
+                configuration.RedirectStandardError && configuration.StandardError is not null &&
+                configuration.StandardError != StreamReader.Null),
         };
         
         return output;
@@ -458,9 +460,11 @@ public class ProcessFactory : IProcessFactory
         
         try
         {
-            if(process.HasStarted() == false)
+            if (process.HasStarted() == false)
+            {
                 process = StartNew(process.StartInfo, ProcessResourcePolicy.Default);
-        
+            }        
+            
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
             
@@ -527,8 +531,8 @@ public class ProcessFactory : IProcessFactory
         try
         {
             if(process.HasStarted() == false)
-                process = StartNew(process.StartInfo, 
-                    processConfiguration.ResourcePolicy, processConfiguration.Credential ?? UserCredential.Null);
+                process = StartNew(process.StartInfo, processConfiguration.ResourcePolicy,
+                    processConfiguration.Credential ?? UserCredential.Null);
         
             process.SetResourcePolicy(processConfiguration.ResourcePolicy);
         
@@ -558,13 +562,13 @@ public class ProcessFactory : IProcessFactory
             standardOutputStream = await  standardOutputStreamTask;
             standardErrorStream = await standardErrorStreamTask;
 
-            if (processConfiguration.StandardOutput is not null)
+            if (processConfiguration.StandardOutput is not null && processConfiguration.RedirectStandardOutput)
             {
                 await standardOutputStream.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
                     cancellationToken);
             }
             
-            if (processConfiguration.StandardError is not null)
+            if (processConfiguration.StandardError is not null && processConfiguration.RedirectStandardError)
             {
                 await standardErrorStream.CopyToAsync(processConfiguration.StandardError.BaseStream,
                     cancellationToken);
@@ -713,11 +717,11 @@ public class ProcessFactory : IProcessFactory
             outputStream = await outputTask;
             errorStream = await errorTask;
         
-            if (processConfiguration.StandardOutput is not null)
+            if (processConfiguration.StandardOutput is not null && processConfiguration.RedirectStandardOutput)
                 await outputStream.CopyToAsync(processConfiguration.StandardOutput.BaseStream,
                     cancellationToken);
         
-            if (processConfiguration.StandardError is not null)
+            if (processConfiguration.StandardError is not null && processConfiguration.RedirectStandardError)
                 await errorStream.CopyToAsync(processConfiguration.StandardError.BaseStream,
                     cancellationToken);
         

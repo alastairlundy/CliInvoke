@@ -58,6 +58,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
     public ProcessConfiguration(string targetFilePath,
+        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string? arguments = null, string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
         Dictionary<string, string>? environmentVariables = null,
@@ -78,8 +79,12 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
         Credential = credential ?? UserCredential.Null;
-            
+        
         ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+        
+        RedirectStandardInput = redirectStandardInput;
+        RedirectStandardOutput = redirectStandardOutput;
+        RedirectStandardError = redirectStandardError;
 
         StandardInput = standardInput ?? StreamWriter.Null;
         StandardOutput = standardOutput ?? StreamReader.Null;
@@ -102,6 +107,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
+    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardOutput"></param>
+    /// <param name="redirectStandardError"></param>
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -113,7 +121,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-    public ProcessConfiguration(ProcessStartInfo processStartInfo, 
+    public ProcessConfiguration(ProcessStartInfo processStartInfo,
+        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         Dictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
@@ -134,6 +143,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardInputEncoding = Encoding.Default;
         StandardOutputEncoding = Encoding.Default;
         StandardErrorEncoding = Encoding.Default;
+        
+        RedirectStandardInput = redirectStandardInput;
+        RedirectStandardOutput = redirectStandardOutput;
+        RedirectStandardError = redirectStandardError;
             
         TargetFilePath = processStartInfo.FileName;
         Arguments = processStartInfo.Arguments;
@@ -200,6 +213,22 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public StreamReader? StandardError { get; protected set;  }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public bool RedirectStandardInput { get; protected set; }
+    
+    /// <summary>
+    ///
+    /// 
+    /// </summary>
+    public bool RedirectStandardOutput { get; protected set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool RedirectStandardError { get; protected set; }
+    
+    /// <summary>
     /// The Process Resource Policy to be used for executing the Command.
     /// </summary>
     /// <remarks>Process Resource Policy objects enable configuring Processor Affinity and other resource settings to be applied to the Command if supported by the currently running operating system.
@@ -246,6 +275,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                    ResourcePolicy.Equals(other.ResourcePolicy) &&
                    StandardOutput.Equals(other.StandardOutput) &&
                    StandardError.Equals(other.StandardError) &&
+                   RedirectStandardInput.Equals(other.RedirectStandardInput) &&
+                   RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
+                   RedirectStandardError.Equals(other.RedirectStandardError) &&
                    StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                    StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                    StandardErrorEncoding.Equals(other.StandardErrorEncoding);   
@@ -258,9 +290,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                    WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
                    EnvironmentVariables.Equals(other.EnvironmentVariables) &&
                    ResourcePolicy.Equals(other.ResourcePolicy) &&
+                   RedirectStandardInput.Equals(other.RedirectStandardInput) &&
+                   RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
+                   RedirectStandardError.Equals(other.RedirectStandardError) &&
                    StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                    StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                    StandardErrorEncoding.Equals(other.StandardErrorEncoding);
+            
         }
         
         return TargetFilePath.Equals(other.TargetFilePath) &&
@@ -269,6 +305,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                EnvironmentVariables.Equals(other.EnvironmentVariables) &&
                Credential.Equals(other.Credential) &&
                ResourcePolicy.Equals(other.ResourcePolicy) &&
+               RedirectStandardInput.Equals(other.RedirectStandardInput) &&
+               RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
+               RedirectStandardError.Equals(other.RedirectStandardError) &&
                StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                StandardErrorEncoding.Equals(other.StandardErrorEncoding);
@@ -305,6 +344,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         HashCode hashCode = new HashCode();
             
         hashCode.Add(TargetFilePath);
+        hashCode.Add(Arguments);
         hashCode.Add(EnvironmentVariables);
 
         if (Credential is not null)
