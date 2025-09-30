@@ -35,6 +35,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives;
 /// A class to represent the configuration of a Command to be run.
 /// </summary>
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
+[Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class CliCommandConfiguration : IEquatable<CliCommandConfiguration>
 {
     /// <summary>
