@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.DotPrimitives 
+    AlastairLundy.CliInvoke 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,18 +11,18 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Core.Internal;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-using AlastairLundy.DotExtensions.Processes;
+using AlastairLundy.CliInvoke.Internal.Localizations;
+// ReSharper disable RedundantBoolCompare
 
-// ReSharper disable once CheckNamespace
-namespace AlastairLundy.CliInvoke.Core;
+namespace AlastairLundy.CliInvoke.Magic.Processes;
 
 /// <summary>
 /// 
 /// </summary>
-public static class ProcessSetPolicyExtensions
+internal static class ProcessSetPolicyExtensions
 {
     /// <summary>
     /// Applies a ProcessResourcePolicy to a Process.
@@ -38,12 +38,9 @@ public static class ProcessSetPolicyExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    public static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
+    internal static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
     {
-        if (resourcePolicy is null)
-        {
-            resourcePolicy = ProcessResourcePolicy.Default;
-        }
+        resourcePolicy ??= ProcessResourcePolicy.Default;
 
         if (process.HasStarted() == false)
             throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
