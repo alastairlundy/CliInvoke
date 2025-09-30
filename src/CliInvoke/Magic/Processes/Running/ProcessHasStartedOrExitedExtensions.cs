@@ -4,7 +4,7 @@ using System.Runtime.Versioning;
 
 namespace AlastairLundy.CliInvoke.Magic.Processes;
 
-public static class ProcessHasStartedOrExitedExtensions
+internal static class ProcessHasStartedOrExitedExtensions
 {
     /// <summary>
     /// Determines if a process has started.
@@ -19,7 +19,7 @@ public static class ProcessHasStartedOrExitedExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    public static bool HasStarted(this Process process)
+    internal static bool HasStarted(this Process process)
     {
         try
         {
@@ -46,7 +46,7 @@ public static class ProcessHasStartedOrExitedExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    public static bool HasExited(this Process process)
+    internal static bool HasExited(this Process process)
     {
         try
         {

@@ -7,7 +7,7 @@ using System.Runtime.Versioning;
 
 namespace AlastairLundy.CliInvoke.Magic.Processes;
 
-public static class IsProcessRunningExtensions
+internal static class IsProcessRunningExtensions
 {
     /// <summary>
     /// Check to see if a specified process is running or not.
@@ -22,7 +22,7 @@ public static class IsProcessRunningExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    public static bool IsRunning(this Process process) => 
+    internal static bool IsRunning(this Process process) => 
         process.HasStarted() && process.HasExited() == false;
 
     /// <summary>
@@ -39,7 +39,7 @@ public static class IsProcessRunningExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    public static bool IsRunningOnRemoteDevice(this Process process)
+    internal static bool IsRunningOnRemoteDevice(this Process process)
     {
         if (process.IsRunning() == false)
             return false;
