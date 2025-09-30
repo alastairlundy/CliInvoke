@@ -386,6 +386,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     {
         HashCode hashCode = new HashCode();
             
+        hashCode.Add(Arguments);
         hashCode.Add(TargetFilePath);
         hashCode.Add(EnvironmentVariables);
         hashCode.Add(StartInfo);
