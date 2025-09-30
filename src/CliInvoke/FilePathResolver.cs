@@ -9,6 +9,7 @@
 
 #nullable enable
 
+using System;
 using System.IO;
 using System.Linq;
 
@@ -34,7 +35,13 @@ public class FilePathResolver : IFilePathResolver
             outputFilePath = inputFilePath;
         }
 
-        string[] directories = Directory.GetDirectories(Path.GetFullPath(inputFilePath),
+        string fileName = Path.GetFileName(inputFilePath);
+        
+        int index = inputFilePath.IndexOf(fileName, StringComparison.InvariantCultureIgnoreCase);
+        
+       inputFilePath = inputFilePath.Remove(index, fileName.Length);
+        
+        string[] directories = Directory.GetDirectories(inputFilePath,
             "*",
             SearchOption.AllDirectories);
 
