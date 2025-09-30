@@ -29,10 +29,6 @@
 * Rename ProcessStartInfo ``ApplyUserCredential`` extension method to ``SetUserCredential``</PackageReleaseNotes>
     </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.0" />
-    </ItemGroup>
-
 
     <ItemGroup>
         <Content Include="README.md">
@@ -63,9 +59,5 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Extensions\Internal\" />
     </ItemGroup>
 </Project>

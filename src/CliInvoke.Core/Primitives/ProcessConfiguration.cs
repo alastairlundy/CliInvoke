@@ -11,14 +11,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.Versioning;
 
 using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Internal;
 
-using AlastairLundy.DotExtensions.Processes;
 // ReSharper disable RedundantBoolCompare
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -401,53 +399,5 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             .Labels_ProcessConfiguration_ToString_ShellExecution}" : "";
 
         return $"{commandString}{workingDirectory}{adminPrivileges}{shellExecution}";
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public ProcessStartInfo ToProcessStartInfo()
-        => ToProcessStartInfo(true, true);
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="redirectStandardError"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public ProcessStartInfo ToProcessStartInfo(bool redirectStandardOutput, bool redirectStandardError)
-    {
-        ProcessStartInfo processStartInfo = new ProcessStartInfo()
-        {
-            FileName = TargetFilePath,
-            Arguments = string.IsNullOrEmpty(this.Arguments) ? string.Empty : this.Arguments,
-            WorkingDirectory = WorkingDirectoryPath,
-            UseShellExecute = UseShellExecution,
-            CreateNoWindow = WindowCreation == false,
-            RedirectStandardInput = StandardInput is not null && StandardInput != StreamWriter.Null,
-            RedirectStandardOutput = redirectStandardOutput,
-            RedirectStandardError = redirectStandardError,
-        };
-        
-        if (string.IsNullOrEmpty(TargetFilePath))
-            throw new ArgumentException(Resources.Exceptions_TargetFilePath_NullOrEmpty);
-        
-        if (RequiresAdministrator) 
-            processStartInfo.RunAsAdministrator();
-
-        if (Credential is not null) 
-#pragma warning disable CA1416
-                processStartInfo.SetUserCredential(Credential);
-#pragma warning restore CA1416
-                
-        if (EnvironmentVariables.Any()) 
-            processStartInfo.SetEnvironmentVariables(EnvironmentVariables);
-
-        if (processStartInfo.RedirectStandardInput) 
-            processStartInfo.StandardInputEncoding = StandardInputEncoding;
-
-        return processStartInfo;
     }
 }
