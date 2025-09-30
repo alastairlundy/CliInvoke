@@ -24,7 +24,7 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
 
-using AlastairLundy.DotExtensions.Processes;
+using AlastairLundy.CliInvoke.Magic.Processes;
 
 namespace AlastairLundy.CliInvoke;
 
