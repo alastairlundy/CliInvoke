@@ -102,8 +102,9 @@ public class ProcessInvoker : IProcessInvoker
         try
         {
             process.Start();
-
-            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+            
+            if(process.HasStarted() && process.HasExited() == false)
+                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
             Task waitForExit = processExitConfiguration.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
                 ? process.WaitForExitAsync(cancellationToken)
@@ -184,7 +185,8 @@ public class ProcessInvoker : IProcessInvoker
         {
             process.Start();
 
-            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+            if(process.HasStarted() && process.HasExited() == false)
+                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -259,8 +261,8 @@ public class ProcessInvoker : IProcessInvoker
         {
             process.Start();
 
-            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
+            if(process.HasStarted() && process.HasExited() == false)
+                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
             Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
