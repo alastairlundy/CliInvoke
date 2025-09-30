@@ -18,7 +18,6 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Internal;
 
-using AlastairLundy.DotExtensions.Processes;
 // ReSharper disable RedundantBoolCompare
 // ReSharper disable ClassNeverInstantiated.Global
 
