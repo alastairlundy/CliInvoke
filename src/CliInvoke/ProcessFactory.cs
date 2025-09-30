@@ -210,7 +210,8 @@ public class ProcessFactory : IProcessFactory
 
         process.Start();
         
-        process.SetResourcePolicy(resourcePolicy);
+        if(process.HasStarted() && process.HasStarted() == false)
+            process.SetResourcePolicy(resourcePolicy);
         
         return process;
     }
@@ -240,7 +241,8 @@ public class ProcessFactory : IProcessFactory
         
         process.Start();
         
-        process.SetResourcePolicy(resourcePolicy);
+        if(process.HasStarted() && process.HasStarted() == false)
+            process.SetResourcePolicy(resourcePolicy);
 
         return process;
     }
@@ -271,7 +273,8 @@ public class ProcessFactory : IProcessFactory
         
         process.Start();
 
-        process.SetResourcePolicy(configuration.ResourcePolicy);
+        if(process.HasStarted() && process.HasStarted() == false)
+            process.SetResourcePolicy(configuration.ResourcePolicy);
 
         return process;
     }
