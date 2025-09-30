@@ -51,13 +51,11 @@ namespace AlastairLundy.CliInvoke;
 [Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class CliCommandInvoker : ICliCommandInvoker
 {
-        private readonly IPipedProcessRunner? _pipedProcessRunner;
+        private readonly IPipedProcessRunner _pipedProcessRunner;
         
         private readonly IProcessPipeHandler _processPipeHandler;
         
-        private readonly ICommandProcessFactory? _commandProcessFactory;
-        
-        private readonly IProcessFactory? _processFactory;
+        private readonly ICommandProcessFactory _commandProcessFactory;
 
         /// <summary>
         /// Initializes the CommandInvoker with the IProcessPipeHandler to be used.
@@ -72,21 +70,6 @@ public class CliCommandInvoker : ICliCommandInvoker
             _pipedProcessRunner = pipedProcessRunner;
             _processPipeHandler = processPipeHandler;
             _commandProcessFactory = commandProcessFactory;
-            _processFactory = null;
-        }
-        
-        /// <summary>
-        /// Initializes the CommandInvoker with the IProcessPipeHandler to be used.
-        /// </summary>
-        /// <param name="processPipeHandler">The process pipe handler to be used.</param>
-        /// <param name="processFactory"></param>
-        public CliCommandInvoker(IProcessPipeHandler processPipeHandler,
-            IProcessFactory processFactory)
-        {
-            _pipedProcessRunner = null;
-            _commandProcessFactory = null;
-            _processPipeHandler = processPipeHandler;
-            _processFactory = processFactory;
         }
         
         
@@ -110,20 +93,7 @@ public class CliCommandInvoker : ICliCommandInvoker
 #endif
         public async Task<ProcessResult> ExecuteAsync(CliCommandConfiguration commandConfiguration, CancellationToken cancellationToken = default)
         {
-            Process process;
-            
-            if (_processFactory is not null)
-            {
-                process = _processFactory.From(commandConfiguration.ToProcessConfiguration());
-            }
-            else if(_commandProcessFactory is not null)
-            {
-                    process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration));   
-            }
-            else
-            {
-                throw new NullReferenceException();
-            }
+            Process process  = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration));   
             
             if (process.StartInfo.RedirectStandardInput &&
                 commandConfiguration.StandardInput is not null
@@ -133,24 +103,10 @@ public class CliCommandInvoker : ICliCommandInvoker
             }
 
             (ProcessResult processResult, Stream? standardOutput, Stream? standardError) result;
-            
-            if (_processFactory is not null)
-            {
-                ProcessResult processResult = await _processFactory.ContinueWhenExitAsync(process, cancellationToken);
 
-                result = (processResult, null, null);
-            }
-            else if (_pipedProcessRunner is not null)
-            {
-                result =
-                    await _pipedProcessRunner.ExecuteProcessWithPipingAsync(process, ProcessResultValidation.None,
+            result = await _pipedProcessRunner.ExecuteProcessWithPipingAsync(process, ProcessResultValidation.None,
                         commandConfiguration.ResourcePolicy,
                         cancellationToken);
-            }
-            else
-            {
-                throw new NullReferenceException();
-            }
 
 
             // Throw a CommandNotSuccessful exception if required.
@@ -198,21 +154,8 @@ public class CliCommandInvoker : ICliCommandInvoker
         public async Task<BufferedProcessResult> ExecuteBufferedAsync(CliCommandConfiguration commandConfiguration,
             CancellationToken cancellationToken = default)
         {
-            Process process;
-
-            if (_processFactory is not null)
-            {
-                process = _processFactory.From(commandConfiguration.ToProcessConfiguration());
-            }
-            else if (_commandProcessFactory is not null)
-            {
-               process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration,
+            Process process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration,
                     true, true));
-            }
-            else
-            {
-                throw new NullReferenceException();
-            }
 
             if (process.StartInfo.RedirectStandardInput &&
                 commandConfiguration.StandardInput is not null
@@ -223,24 +166,9 @@ public class CliCommandInvoker : ICliCommandInvoker
             
             // PipedProcessRunner runs the Process for us.
             (BufferedProcessResult processResult, Stream? standardOutput, Stream? standardError) result;
-
-            if (_processFactory is not null)
-            {
-                BufferedProcessResult processResult = await _processFactory.ContinueWhenExitBufferedAsync(process,
-                    commandConfiguration.ResultValidation,
+            
+            result = await _pipedProcessRunner.ExecuteBufferedProcessWithPipingAsync(process, ProcessResultValidation.None, commandConfiguration.ResourcePolicy,
                     cancellationToken);
-                
-                result = (processResult, null, null);
-            }
-            else if (_pipedProcessRunner is not null)
-            {
-                result = await _pipedProcessRunner.ExecuteBufferedProcessWithPipingAsync(process, ProcessResultValidation.None, commandConfiguration.ResourcePolicy,
-                    cancellationToken);
-            }
-            else
-            {
-                throw new NullReferenceException();
-            }
             
             // Throw a CommandNotSuccessful exception if required.
             if (result.processResult.ExitCode != 0 && commandConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero)
