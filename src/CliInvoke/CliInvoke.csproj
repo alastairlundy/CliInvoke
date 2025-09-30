@@ -34,7 +34,7 @@
     
     <ItemGroup>
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.1" />
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.0" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.1" />
     </ItemGroup>
     
     <ItemGroup>
