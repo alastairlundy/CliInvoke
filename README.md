@@ -14,10 +14,10 @@ CliInvoke is a library for interacting with Command Line Interfaces and wrapping
     * [Supported Platforms](#supported-platforms)
 * [CliInvoke Examples](#using-CliInvoke--examples)
       * [Executing Commands](#executing-commands)
-* [Contributing to CliInvoke](#how-to-contribute-to-clirunner)
-* [Roadmap](#clirunners-roadmap)
+* [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
+* [Roadmap](#cliinvokes-roadmap)
 * [License](#license)
-  * [CliRunner Assets](#clirunner-assets)
+  * [CliRunner Assets](#cliinvoke-assets)
 * [Acknowledgements](#acknowledgements)
 
 ## Features
@@ -46,7 +46,7 @@ CliInvoke is available on Nuget.
 
 These are the CliInvoke projects:
 * CliInvoke - The main CliInvoke package.
-* [CliInvoke.Extensions](CliInvokeLibrary/CliInvoke.Extensions/README.md)
+* [CliInvoke.Extensions](src/CliInvoke.Extensions/README.md)
 * [CliInvoke.Specializations](SPECIALIZATIONS_README.md)
 
 ### Installing CliInvoke
@@ -65,18 +65,18 @@ CliInvoke can be added to .NET Standard 2.0, .NET 8, or .NET 9 supported project
 
 The following table details which target platforms are supported for executing commands via CliInvoke. 
 
-| Operating System | Support Status                     | Notes                                                                                       |
-|------------------|------------------------------------|---------------------------------------------------------------------------------------------|
-| Windows          | Fully Supported :white_check_mark: |                                                                                             |
-| macOS            | Fully Supported :white_check_mark: |                                                                                             |
-| Mac Catalyst     | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                |
-| Linux            | Fully Supported :white_check_mark: |                                                                                             |
-| FreeBSD          | Fully Supported :white_check_mark: |                                                                                             |
-| Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                |
-| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. <sup>3</sup>                             | 
-| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS <sup>3</sup>                             |
-| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                          |
-| Browser          | Not Supported and Not Planned :x:  | Not supported due to not being a valid target Platform for executing programs or processes. |
+| Operating System | Support Status                     | Notes                                                                                     |
+|------------------|------------------------------------|-------------------------------------------------------------------------------------------|
+| Windows          | Fully Supported :white_check_mark: |                                                                                           |
+| macOS            | Fully Supported :white_check_mark: |                                                                                           |
+| Mac Catalyst     | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.              |
+| Linux            | Fully Supported :white_check_mark: |                                                                                           |
+| FreeBSD          | Fully Supported :white_check_mark: |                                                                                           |
+| Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.              |
+| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. <sup>3</sup>                 | 
+| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS <sup>3</sup>                 |
+| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>              |
+| Browser          | Not Planned :x:                    | Not planned due to not being a valid target Platform for executing programs or processes. |
 
 <sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
@@ -86,7 +86,7 @@ The following table details which target platforms are supported for executing c
 **Note:** This library has not been tested on Android or Tizen.
 
 ## Using CliInvoke / Examples
-One of the main use cases for CliInvoke is intended to be executing programs programatically, but other valid use cases also exist such as [safer Process Running](#safer-process-running).
+One of the main use cases for CliInvoke is intended to be executing programs programatically, but other valid use cases also exist such as safe Process Running.
 
 ### Executing Commands
 CliInvoke enables use of a fluent builder style of syntax to easily configure and run Commands.
