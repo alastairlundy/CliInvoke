@@ -315,16 +315,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
-        UserCredential credential;
-
-        if (_configuration.Credential is null)
-        {
-            credential = UserCredential.Null;
-        }
-        else
-        {
-            credential = _configuration.Credential;
-        }
+        UserCredential credential = _configuration.Credential ?? UserCredential.Null;
         
         IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
             .SetDomain(credential.Domain)
