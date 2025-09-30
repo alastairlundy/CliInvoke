@@ -9,7 +9,6 @@ namespace AlastairLundy.CliInvoke.Magic.Processes;
 
 internal static class ToStartInfoExtensions
 {
-    
     /// <summary>
     /// 
     /// </summary>
@@ -29,7 +28,7 @@ internal static class ToStartInfoExtensions
             UseShellExecute = processConfiguration.UseShellExecution,
             CreateNoWindow = processConfiguration.WindowCreation == false,
             RedirectStandardInput = processConfiguration.StandardInput is not null &&
-                                    processConfiguration.StandardInput != StreamWriter.Null,
+                                    processConfiguration.RedirectStandardInput,
             RedirectStandardOutput = redirectStandardOutput,
             RedirectStandardError = redirectStandardError,
         };

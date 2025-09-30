@@ -72,8 +72,7 @@ public class ProcessInvoker : IProcessInvoker
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
         
-        if (processExitConfiguration is null)
-            processExitConfiguration = ProcessExitConfiguration.Default;
+        processExitConfiguration ??= ProcessExitConfiguration.Default;
         
         if (File.Exists(processConfiguration.TargetFilePath) == false)
         {
@@ -84,11 +83,7 @@ public class ProcessInvoker : IProcessInvoker
 
         Process process = new Process()
         {
-            StartInfo = processConfiguration.ToProcessStartInfo(
-                processConfiguration.StandardOutput is not null &&
-                processConfiguration.StandardOutput != StreamReader.Null,
-                processConfiguration.StandardError is not null &&
-                processConfiguration.StandardError != StreamReader.Null)
+            StartInfo = processConfiguration.ToProcessStartInfo(false, false)
         };
         
         if (processConfiguration.StandardInput is not null && processConfiguration.StandardInput != StreamWriter.Null)

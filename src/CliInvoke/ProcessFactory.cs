@@ -132,11 +132,8 @@ public class ProcessFactory : IProcessFactory
     {
         Process output = new Process()
         {
-            StartInfo = configuration.ToProcessStartInfo(
-                configuration.RedirectStandardOutput && configuration.StandardOutput is not null &&
-                configuration.StandardOutput != StreamReader.Null,
-                configuration.RedirectStandardError && configuration.StandardError is not null &&
-                configuration.StandardError != StreamReader.Null),
+            StartInfo = configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
+                configuration.RedirectStandardError),
         };
         
         return output;
