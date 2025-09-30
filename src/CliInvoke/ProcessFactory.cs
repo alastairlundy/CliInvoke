@@ -20,6 +20,7 @@ using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+using AlastairLundy.DotExtensions.Processes;
 using AlastairLundy.Resyslib.IO.Core.Files;
 
 #if NETSTANDARD2_0
@@ -248,8 +249,8 @@ public class ProcessFactory : IProcessFactory
         }
         
         process.Start();
-        
-        if (configuration.ResourcePolicy is not null)
+
+        if (configuration.ResourcePolicy is not null && process.HasExited() == false)
         {
             process.SetResourcePolicy(configuration.ResourcePolicy);
         }
