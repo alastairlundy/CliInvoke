@@ -34,6 +34,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Exceptions;
+using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Extensions;
 
 #if NET5_0_OR_GREATER
@@ -47,6 +48,7 @@ namespace AlastairLundy.CliInvoke;
 /// <summary>
 /// The default implementation of the CliInvoke's command running mechanism, ICliCommandInvoker.
 /// </summary>
+[Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class CliCommandInvoker : ICliCommandInvoker
 {
         private readonly IPipedProcessRunner? _pipedProcessRunner;
