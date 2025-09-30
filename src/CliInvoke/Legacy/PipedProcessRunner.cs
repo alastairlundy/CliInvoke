@@ -70,7 +70,7 @@ public class PipedProcessRunner : IPipedProcessRunner
         ProcessResult processResult, Stream standardOutput, Stream standardError)> ExecuteProcessWithPipingAsync(Process process,
         ProcessResultValidation processResultValidation, ProcessResourcePolicy? processResourcePolicy = null, CancellationToken cancellationToken = default)
     {
-        await _processRunnerUtils.ExecuteAsync(process, ProcessResultValidation.None, processResourcePolicy, cancellationToken);
+        Task waitForExit = _processRunnerUtils.ExecuteAsync(process, ProcessResultValidation.None, processResourcePolicy, cancellationToken);
        
         if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
@@ -81,8 +81,10 @@ public class PipedProcessRunner : IPipedProcessRunner
         Stream standardError = Stream.Null;
         
         // Pipe Standard Output and Error
-        await _processPipeHandler.PipeStandardOutputAsync(process, standardOutput);
-        await _processPipeHandler.PipeStandardErrorAsync(process, standardError);
+        Task pipeStandardOutput = _processPipeHandler.PipeStandardOutputAsync(process, standardOutput);
+        Task pipeStandardError = _processPipeHandler.PipeStandardErrorAsync(process, standardError);
+
+        await Task.WhenAll(waitForExit, pipeStandardOutput, pipeStandardError);
         
         ProcessResult processResult = await _processRunnerUtils.GetResultAsync(process, true);
        
@@ -119,7 +121,7 @@ public class PipedProcessRunner : IPipedProcessRunner
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         
-        await _processRunnerUtils.ExecuteAsync(process, ProcessResultValidation.None, processResourcePolicy, cancellationToken);
+        Task waitForExit = _processRunnerUtils.ExecuteAsync(process, ProcessResultValidation.None, processResourcePolicy, cancellationToken);
         
         if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
@@ -130,9 +132,11 @@ public class PipedProcessRunner : IPipedProcessRunner
         Stream standardError = Stream.Null;
         
         // Pipe Standard Output and Error
-        await _processPipeHandler.PipeStandardOutputAsync(process, standardOutput);
-        await _processPipeHandler.PipeStandardErrorAsync(process, standardError);
-        
+      Task pipeStandardOutput =  _processPipeHandler.PipeStandardOutputAsync(process, standardOutput);
+      Task pipeStandardError = _processPipeHandler.PipeStandardErrorAsync(process, standardError);
+
+      await Task.WhenAll(waitForExit, pipeStandardOutput, pipeStandardError);
+      
         BufferedProcessResult output = await _processRunnerUtils.GetBufferedResultAsync(process, true);
 
         return (output, standardOutput, standardError);
