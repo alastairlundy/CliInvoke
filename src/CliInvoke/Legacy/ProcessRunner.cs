@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core.Abstractions;
 using AlastairLundy.CliInvoke.Core.Abstractions.Legacy.Utilities;
+using AlastairLundy.CliInvoke.Core.Extensions.Processes;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
@@ -32,7 +33,13 @@ namespace AlastairLundy.CliInvoke.Legacy;
 [Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class ProcessRunner : IProcessInvoker
 {
-    private readonly IProcessRunnerUtility _processRunnerUtils;
+    private readonly IProcessRunnerUtility? _processRunnerUtils;
+
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
+    public ProcessRunner()
+    {
+        _processRunnerUtils = null;
+    }
     
     [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public ProcessRunner(IProcessRunnerUtility processRunnerUtils)
@@ -69,15 +76,32 @@ public class ProcessRunner : IProcessInvoker
         {
             throw new FileNotFoundException(Resources.Exceptions_FileNotFound.Replace("{file}", process.StartInfo.FileName));
         }
-
-        _processRunnerUtils.Execute(process, processResultValidation, processResourcePolicy);
-
+        
+        if(_processRunnerUtils is not null)
+            _processRunnerUtils.Execute(process, processResultValidation, processResourcePolicy);
+        else
+        {
+            process.Start();
+            process.SetResourcePolicy(processResourcePolicy);
+            process.WaitForExit();
+        }
+        
         if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
             throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
         }
 
-        return _processRunnerUtils.GetResult(process, disposeOfProcess: true);
+        if(_processRunnerUtils is not null)
+            return _processRunnerUtils.GetResult(process, disposeOfProcess: true);
+        else
+        {
+            ProcessResult result = new ProcessResult(process.StartInfo.FileName,
+                process.ExitCode, process.StartTime, process.ExitTime);
+            
+            process.Dispose();
+
+            return result;
+        }
     }
 
     /// <summary>
@@ -114,14 +138,34 @@ public class ProcessRunner : IProcessInvoker
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         
-        _processRunnerUtils.Execute(process, processResultValidation, processResourcePolicy);
-       
+        if(_processRunnerUtils is not null)
+            _processRunnerUtils.Execute(process, processResultValidation, processResourcePolicy);
+        else
+        {
+            process.Start();
+            process.SetResourcePolicy(processResourcePolicy);
+            
+            process.WaitForExit();
+        }
+        
         if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
             throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
         }
         
-        return _processRunnerUtils.GetBufferedResult(process, disposeOfProcess: true);
+        if(_processRunnerUtils is not null)
+            return _processRunnerUtils.GetBufferedResult(process, disposeOfProcess: true);
+        else
+        {
+            BufferedProcessResult result = new BufferedProcessResult(process.StartInfo.FileName,
+                process.ExitCode, process.StandardOutput.ReadToEnd(),
+                process.StandardError.ReadToEnd(),
+                process.StartTime, process.ExitTime);
+            
+            process.Dispose();
+
+            return result;
+        }
     }
 
     /// <summary>
@@ -155,15 +199,40 @@ public class ProcessRunner : IProcessInvoker
         
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
+
+        if (_processRunnerUtils is not null)
+            await _processRunnerUtils.ExecuteAsync(process, processConfiguration.ResultValidation,
+                processConfiguration.ResourcePolicy, cancellationToken);
+        else
+        {
+            process.Start();
+            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+        }
         
-        await _processRunnerUtils.ExecuteAsync(process, processConfiguration.ResultValidation, processConfiguration.ResourcePolicy, cancellationToken);
-       
         if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
         {
             throw new ProcessNotSuccessfulException(process: process, exitCode: process.ExitCode);
         }
         
-        return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+        if(_processRunnerUtils is not null)
+           return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+        else
+        {
+           Task waitForExit = process.WaitForExitAsync(cancellationToken);
+           
+           Task<string> standardOutput = process.StandardOutput.ReadToEndAsync(cancellationToken);
+           Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
+           
+           await Task.WhenAll(waitForExit, standardOutput, standardError);
+
+           BufferedProcessResult result = new BufferedProcessResult(process.StartInfo.FileName,
+            process.ExitCode, await standardOutput, await standardError,
+            process.StartTime, process.ExitTime);
+           
+           process.Dispose();
+           
+           return result;
+        }
     }
 
     /// <summary>
@@ -193,9 +262,31 @@ public class ProcessRunner : IProcessInvoker
         ProcessResourcePolicy? processResourcePolicy = null,
         CancellationToken cancellationToken = default)
     {
-        await _processRunnerUtils.ExecuteAsync(process, processResultValidation, processResourcePolicy , cancellationToken);
-       
-        return await _processRunnerUtils.GetResultAsync(process, disposeOfProcess: true);
+        if (_processRunnerUtils is not null)
+        {
+            await _processRunnerUtils.ExecuteAsync(process, processResultValidation, processResourcePolicy , cancellationToken);
+            
+            return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+        }
+        else
+        {
+            process.Start();
+            process.SetResourcePolicy(processResourcePolicy ?? ProcessResourcePolicy.Default);
+            
+            await process.WaitForExitAsync(cancellationToken);
+            
+            if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process.ExitCode, process);
+            }
+            
+            ProcessResult result = new ProcessResult(process.StartInfo.FileName,
+                process.ExitCode, process.StartTime, process.ExitTime);
+           
+            process.Dispose();
+           
+            return result;
+        }
     }
 
     /// <summary>
@@ -224,11 +315,39 @@ public class ProcessRunner : IProcessInvoker
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         
-        await _processRunnerUtils.ExecuteAsync(process, processConfiguration.ResultValidation,
-            processConfiguration.ResourcePolicy,
-            cancellationToken);
-        
-        return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+        if (_processRunnerUtils is not null)
+        {
+            await _processRunnerUtils.ExecuteAsync(process, processConfiguration.ResultValidation,
+                processConfiguration.ResourcePolicy,
+                cancellationToken);
+            
+            return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+        }
+        else
+        {
+            process.Start();
+            process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+            
+            Task waitForExit = process.WaitForExitAsync(cancellationToken);
+           
+            Task<string> standardOutput = process.StandardOutput.ReadToEndAsync(cancellationToken);
+            Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
+           
+            await Task.WhenAll(waitForExit, standardOutput, standardError);
+
+            if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process.ExitCode, process);
+            }
+            
+            BufferedProcessResult result = new BufferedProcessResult(process.StartInfo.FileName,
+                process.ExitCode, await standardOutput, await standardError,
+                process.StartTime, process.ExitTime);
+           
+            process.Dispose();
+           
+            return result;
+        }
     }
 
 
@@ -262,8 +381,36 @@ public class ProcessRunner : IProcessInvoker
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         
-        await _processRunnerUtils.ExecuteAsync(process, processResultValidation, processResourcePolicy, cancellationToken);
-        
-        return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+        if (_processRunnerUtils is not null)
+        {
+            await _processRunnerUtils.ExecuteAsync(process, processResultValidation, processResourcePolicy, cancellationToken);
+            
+            return await _processRunnerUtils.GetBufferedResultAsync(process, disposeOfProcess: true);
+        }
+        else
+        {
+            process.Start();
+            process.SetResourcePolicy(processResourcePolicy ?? ProcessResourcePolicy.Default);
+            
+            Task waitForExit = process.WaitForExitAsync(cancellationToken);
+           
+            Task<string> standardOutput = process.StandardOutput.ReadToEndAsync(cancellationToken);
+            Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
+           
+            await Task.WhenAll(waitForExit, standardOutput, standardError);
+
+            if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process.ExitCode, process);
+            }
+            
+            BufferedProcessResult result = new BufferedProcessResult(process.StartInfo.FileName,
+                process.ExitCode, await standardOutput, await standardError,
+                process.StartTime, process.ExitTime);
+           
+            process.Dispose();
+           
+            return result;
+        }
     }
 }
