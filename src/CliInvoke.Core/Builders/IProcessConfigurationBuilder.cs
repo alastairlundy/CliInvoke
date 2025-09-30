@@ -86,6 +86,27 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure);
     
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardInput"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardOutput"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardError"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError);
+    
+    /// <summary>
     /// Sets the Standard Input Pipe source.
     /// </summary>
     /// <param name="source">The source to use for the Standard Input pipe.</param>
