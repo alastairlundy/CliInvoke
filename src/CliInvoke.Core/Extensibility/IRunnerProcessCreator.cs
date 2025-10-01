@@ -12,7 +12,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 namespace AlastairLundy.CliInvoke.Core.Extensibility;
 
 /// <summary>
-/// 
+/// An interface to allow creating a ProcessConfiguration that can be run through other Process' ProcessConfiguration.
 /// </summary>
 public interface IRunnerProcessCreator
 {

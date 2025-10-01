@@ -13,9 +13,9 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace AlastairLundy.CliInvoke.Internal.Processes;
 
-public static class ApplyConfigurationToProcessStartInfo
+internal static class ApplyConfigurationToProcessStartInfo
 {
     /// <summary>
     /// Applies a requirement to run the process start info as an administrator.
@@ -41,7 +41,7 @@ public static class ApplyConfigurationToProcessStartInfo
     /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
     /// <param name="credential">The credential to be added.</param>
     [SupportedOSPlatform("windows")]
-    public static void SetUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
+    internal static void SetUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
     {
         if (credential.Domain is not null && OperatingSystem.IsWindows())
         {

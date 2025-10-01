@@ -55,7 +55,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="environmentVariables">The environment variables to be configured.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified environment variables.</returns>
-    IProcessConfigurationBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables);
+    IProcessConfigurationBuilder WithEnvironmentVariables(IDictionary<string, string> environmentVariables);
     
     /// <summary>
     /// Sets whether to execute the Process with Administrator Privileges.
@@ -84,6 +84,27 @@ public interface IProcessConfigurationBuilder
     /// <param name="configure">The CredentialsBuilder configuration.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Credentials.</returns>
     IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardInput"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardOutput"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardError"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError);
     
     /// <summary>
     /// Sets the Standard Input Pipe source.

@@ -7,17 +7,11 @@ namespace CliInvoke.Benchmarking.Helpers;
 
 internal class CliInvokeHelpers
 {
-    internal static ProcessFactory CreateProcessFactory()
-    {
-        IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        return new ProcessFactory(new FilePathResolver(),
-            processPipeHandler);
-    }
 
-    internal static ProcessInvoker CreateProcessInvoker()
+    internal static ProcessConfigurationInvoker CreateProcessInvoker()
     {
         IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        return new ProcessInvoker(new FilePathResolver(),
+        return new ProcessConfigurationInvoker(new FilePathResolver(),
             processPipeHandler);
     }
 }

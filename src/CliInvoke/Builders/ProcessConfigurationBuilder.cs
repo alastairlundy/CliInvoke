@@ -47,7 +47,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
     public ProcessConfigurationBuilder(string targetFilePath)
     {
-        _configuration = new ProcessConfiguration(targetFilePath);
+        _configuration = new ProcessConfiguration(targetFilePath, false,
+            true, true);
     }
         
     /// <summary>
@@ -57,7 +58,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="processStartInfo">The start information for the process configuration.</param>
     public ProcessConfigurationBuilder(ProcessStartInfo processStartInfo)
     {
-        _configuration = new ProcessConfiguration(processStartInfo);
+        _configuration = new ProcessConfiguration(processStartInfo, processStartInfo.RedirectStandardInput,
+            processStartInfo.RedirectStandardOutput, processStartInfo.RedirectStandardError);
     }
     
     /// <summary>
@@ -99,6 +101,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
         
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 args,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -125,6 +130,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -151,6 +159,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(targetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -173,10 +184,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="environmentVariables">The environment variables to be added to the process configuration.</param>
     /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithEnvironmentVariables(Dictionary<string, string> environmentVariables)
+    public IProcessConfigurationBuilder WithEnvironmentVariables(IDictionary<string, string> environmentVariables)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -204,6 +218,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 runAsAdministrator,
@@ -230,6 +247,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 workingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -261,6 +281,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -292,16 +315,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
-        UserCredential credential;
-
-        if (_configuration.Credential is null)
-        {
-            credential = UserCredential.Null;
-        }
-        else
-        {
-            credential = _configuration.Credential;
-        }
+        UserCredential credential = _configuration.Credential ?? UserCredential.Null;
         
         IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
             .SetDomain(credential.Domain)
@@ -314,30 +328,54 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// Enables or disables Process Result Validation (i.e. whether to throw an exception if Exit Code is not 0).
+    /// 
     /// </summary>
-    /// <param name="validation">The validation mode to be used for the process result.</param>
-    /// <returns>A reference to this builder with the specified validation configuration,
-    /// allowing method chaining.</returns>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
+    /// <param name="redirectStandardInput"></param>
+    /// <returns></returns>
     [Pure]
-    public IProcessConfigurationBuilder WithValidation(Process validation)
+    public IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput)
+    {
+            return new ProcessConfigurationBuilder(
+                new ProcessConfiguration(_configuration.TargetFilePath,
+                    redirectStandardInput,
+                    _configuration.RedirectStandardOutput,
+                    _configuration.RedirectStandardError,
+                    _configuration.Arguments,
+                    _configuration.WorkingDirectoryPath,
+                    _configuration.RequiresAdministrator,
+                    _configuration.EnvironmentVariables,
+                    _configuration.Credential,
+                    _configuration.StandardInput ?? StreamWriter.Null,
+                    _configuration.StandardOutput,
+                    _configuration.StandardError,
+                    _configuration.StandardInputEncoding,
+                    _configuration.StandardOutputEncoding,
+                    _configuration.StandardErrorEncoding,
+                    _configuration.ResourcePolicy,
+                    windowCreation: _configuration.WindowCreation,
+                    useShellExecution: _configuration.UseShellExecution));
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardOutput"></param>
+    /// <returns></returns>
+    [Pure]
+    public IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                redirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
+                _configuration.StandardOutput ?? StreamReader.Null,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
@@ -347,6 +385,35 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 useShellExecution: _configuration.UseShellExecution));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="redirectStandardError"></param>
+    /// <returns></returns>
+    [Pure]
+    public IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError)
+    {
+        return new ProcessConfigurationBuilder(
+            new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                redirectStandardError,
+                _configuration.Arguments,
+                _configuration.WorkingDirectoryPath,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
+                _configuration.StandardError ??  StreamReader.Null,
+                _configuration.StandardInputEncoding,
+                _configuration.StandardOutputEncoding,
+                _configuration.StandardErrorEncoding,
+                _configuration.ResourcePolicy,
+                windowCreation: _configuration.WindowCreation,
+                useShellExecution: _configuration.UseShellExecution));
+    }
+    
     /// <summary>
     /// Sets the Standard Input Pipe source.
     /// </summary>
@@ -360,6 +427,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -388,6 +458,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -416,6 +489,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -443,6 +519,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -473,6 +552,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -499,6 +581,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,
@@ -531,6 +616,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
                 _configuration.RequiresAdministrator,

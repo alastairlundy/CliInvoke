@@ -21,36 +21,18 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
  Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BasicUnbufferedInvokationBenchmark
 {
-    private readonly IProcessFactory _processFactory;
-    private readonly IProcessInvoker _processInvoker;
+    private readonly IProcessConfigurationInvoker _processInvoker;
     
     private DotnetCommandHelper _dotnetCommandHelper;
     
     public BasicUnbufferedInvokationBenchmark()
     {
         _dotnetCommandHelper = new DotnetCommandHelper();
-        _processFactory = CliInvokeHelpers.CreateProcessFactory();
         _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
-    }
-
-    [Benchmark]
-    public async Task<int> CliInvoke_ProcessFactory()
-    {
-        IProcessConfigurationBuilder processConfigurationBuilder = new
-                ProcessConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithArguments(_dotnetCommandHelper.Arguments);
-        
-        ProcessConfiguration configuration = processConfigurationBuilder.Build();
-
-        Process process = _processFactory.StartNew(configuration);
-       
-        ProcessResult result = await _processFactory.WaitForExitAsync(process);
-      
-        return result.ExitCode;
     }
     
     [Benchmark]
-    public async Task<int> CliInvoke_CliCommandInvoker()
+    public async Task<int> CliInvoke_ProcessConfigInvoker()
     {
         IProcessConfigurationBuilder processConfigurationBuilder = new
                 ProcessConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)

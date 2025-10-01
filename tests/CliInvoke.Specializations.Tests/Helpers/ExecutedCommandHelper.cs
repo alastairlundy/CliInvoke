@@ -9,15 +9,11 @@ namespace AlastairLundy.CliInvoke.Specializations.Tests.Helpers;
 
 public static class ExecutedCommandHelper
 {
-    private static IProcessFactory _processFactory;
         
     static ExecutedCommandHelper()
     {
         IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
         IFilePathResolver filePathResolver = new FilePathResolver();
-
-        _processFactory = new ProcessFactory(filePathResolver,
-            processPipeHandler);
     }
         
     public static string WinCalcExePath
