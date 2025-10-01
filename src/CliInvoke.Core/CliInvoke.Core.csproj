@@ -22,11 +22,16 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-beta.1</Version>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 8
-* Updated DotExtensions from 8.4.0 to 8.5.0
-* Removed ``UserCredential`` ``IsSupportedOnCurrentOs`` extension method
-* Rename ProcessStartInfo ``ApplyUserCredential`` extension method to ``SetUserCredential``</PackageReleaseNotes>
+        <Version>2.0.0-beta.2</Version>
+        <PackageReleaseNotes>## 2.0.0 Beta 2
+
+### Core package only
+* Removed dependency on DotExtensions
+* Moved extension methods to CliInvoke main package
+* Deprecated some extension methods and constructors in classes for removal in v2
+* Renamed the existing ``IProcessInvoker`` interface to ``IProcessConfigurationInvoker``
+* Created a new ``IProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
+* Removed ``IProcessFactory``</PackageReleaseNotes>
     </PropertyGroup>
 
 

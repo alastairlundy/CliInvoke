@@ -9,7 +9,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.0.0-beta.1</Version>
+        <Version>2.0.0-beta.2</Version>
         <Title>AlastairLundy.CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
@@ -29,9 +29,9 @@
     
     <ItemGroup>
 
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-beta.1" />
+  <!--      <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-beta.1" />
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.1" />
-
+-->
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
     </ItemGroup>
 
@@ -64,5 +64,10 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Resources.resx</DependentUpon>
       </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 </Project>

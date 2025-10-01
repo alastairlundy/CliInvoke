@@ -18,11 +18,17 @@
 ### Core package only
 * Removed dependency on DotExtensions
 * Moved extension methods to CliInvoke main package
-* Deprecated some extension methods and constructors in classes for removal in v2.
+* Deprecated some extension methods and constructors in classes for removal in v2
+* Renamed the existing ``IProcessInvoker`` interface to ``IProcessConfigurationInvoker``
+* Created a new ``IProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
+* Removed ``IProcessFactory``
 
 ### Main package only
-* Updated DotExtensions on .NET 8 and newer from 8.3.0 to 8.5.1
-* Added some Process related extension methods from DotExtensions back into CliInvoke</PackageReleaseNotes>
+* Updated DotExtensions from 8.5.0 to 8.5.1
+* Added some Process related extension methods from DotExtensions back into CliInvoke
+* Renamed the existing ``ProcessInvoker`` interface to ``ProcessConfigurationInvoker``
+* Created a new ``ProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
+* Removed ``ProcessFactory``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
