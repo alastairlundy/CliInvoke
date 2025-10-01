@@ -19,7 +19,7 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 public class BufferedInvokationBenchmark
 {
     private readonly IProcessFactory _processFactory;
-    private readonly IProcessInvoker _processInvoker;
+    private readonly IProcessConfigurationInvoker _processInvoker;
     
     private BufferedTestHelper _bufferedTestHelper;
 
