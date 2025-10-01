@@ -22,7 +22,7 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 public class BasicUnbufferedInvokationBenchmark
 {
     private readonly IProcessFactory _processFactory;
-    private readonly IProcessInvoker _processInvoker;
+    private readonly IProcessConfigurationInvoker _processInvoker;
     
     private DotnetCommandHelper _dotnetCommandHelper;
     
