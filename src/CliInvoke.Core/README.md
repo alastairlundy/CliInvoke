@@ -1,22 +1,23 @@
-# AlastairLundy.CliInvoke.Core
+# CliInvoke.Core
 This package contains Process Running and handling abstractions as well as common types used by implementing classes.
 
-For an implementing package, check out [``AlastairLundy.CliInvoke``](https://www.nuget.org/packages/AlastairLundy.CliInvoke/).
+For an implementing package, check out [``CliInvoke``](https://www.nuget.org/packages/AlastairLundy.CliInvoke/).
 
 Key Abstractions:
-* ``IProcessFactory``
 * ``IProcessInvoker``
+* ``IProcessConfigurationInvoker``
 
 * Piping:
   * ``IProcessPipeHandler``
-* Builders:
-* ``IArgumentsBuilder``
-* ``IEnvironmentVariablesBuilder``
-* ``IProcessConfigurationBuilder``
-* ``IProcessExitInfoBuilder``
-* ``IProcessResourcePolicyBuilder``
-* ``IProcessTimeoutPolicyBuilder``
-* ``IUserCredentialBuilder``
+
+* Fluent Builders:
+  * ``IArgumentsBuilder`` - An interface to assist with Argument Building and argument escaping.
+  * ``IEnvironmentVariablesBuilder`` - An interface to assist with setting Environment variables.
+  * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
+  * ``IProcessExitConfigurationBuilder`` - An interface to fluently configure and build ``ProcessExitConfiguration`` objects.
+  * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy`` objects.
+  * ``IProcessTimeoutPolicyBuilder``
+  * ``IUserCredentialBuilder``
 
 [![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
 [![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
@@ -36,7 +37,7 @@ Key Abstractions:
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
 ## How to install and use CliInvoke.Core
-CliInvoke.Core is available on [Nuget](https://nuget.org).
+CliInvoke.Core is available on [the Nuget Gallery](https://nuget.org) [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Core).
 
 ### Installing CliInvoke.Core
 CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your IDE or code editor's package interface, or via the Nuget website.
@@ -50,69 +51,173 @@ CliInvoke.Core can be added to any .NET Standard 2.0, .NET Standard 2.1, .NET 8,
 
 The following table details which target platforms are supported for running Processes.
 
-| Operating System | Support Status                     | Notes                                                                           |
-|------------------|------------------------------------|---------------------------------------------------------------------------------|
-| Windows          | Fully Supported :white_check_mark: |                                                                                 |
-| macOS            | Fully Supported :white_check_mark: |                                                                                 |
-| Mac Catalyst     | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.    |
-| Linux            | Fully Supported :white_check_mark: |                                                                                 |
-| FreeBSD          | Fully Supported :white_check_mark: |                                                                                 |
-| Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.    |
-| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. ^2                 | 
-| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS ^2                 |
-| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^3              |
-| Browser          | Not Supported and Not Planned :x:  | Not supported due to not being a valid target Platform for executing processes. |
+| Operating System/Platform specific TFM | Support Status                     | Notes                                                                                               |
+|----------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------------|
+| Windows                                | Fully Supported :white_check_mark: |                                                                                                     |
+| macOS                                  | Fully Supported :white_check_mark: |                                                                                                     |
+| Mac Catalyst                           | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                        |
+| Linux                                  | Fully Supported :white_check_mark: |                                                                                                     |
+| FreeBSD                                | Fully Supported :white_check_mark: |                                                                                                     |
+| Android                                | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                        |
+| IOS                                    | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. ^2                                     | 
+| tvOS                                   | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS ^2                                     |
+| watchOS                                | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^3                                  |
+| Browser                                | Not Planned :x:                    | Not planned due to Client Side Rendering not being a valid target Platform for executing processes. |
 
 ^2 - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
-^3 - lack of IOS support implies Lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
+^3 - lack of IOS support implies lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 
 
 **Note:** This library has not been tested on Android or Tizen.
 
+## Using CliInvoke / Examples
+The two main use cases for CliInvoke are intended to be:
+1. [executing Programs/Commands programatically](#running-programscommands) which involves using abstractions to improve the experience of external Program/Command running.
+2. [safe Process Running](#safe-process-running) which involves avoiding the pitfalls of the ``Process`` class whilst still dealing with ``ProcessStartInfo``.
 
-## Examples
-One of the main use cases for CliInvoke.Core is intended to be [safe Process Running](#safe-process-running).
+CliInvoke provides both options to give developers a choice in the approach they adopt.
+They are both equally safe and valid.
 
-### Safe Process Running
-CliInvoke.Core offers safe abstractions around Process Running to avoid accidentally not disposing of Processes after they are executed.
+### Approaches
 
-``IProcessFactory`` provides for this in
+#### Safe Process Running
+CliInvoke offers safe abstractions around Process Running to avoid accidentally not disposing of Processes,
+along with avoiding other pitfalls.
 
-#### ``IProcessFactory``
-IProcessFactory is an interface for enabling easy Process Creation, Running, and Disposal depending on the methods used.
+``IProcessInvoker`` and ``IProcessConfigurationInvoker`` are both equally capable of fulfilling this criterion,
+**however** ``IProcessInvoker`` works with ``ProcessStartInfo`` objects and ``IProcessConfigurationInvoker`` works with ``ProcessConfiguration`` objects.
 
-The ``From`` method and its overloads provide for easy standalone process creation.
-The ``StartNew`` method provides for creating and starting new processes easily.
+If you don't want to use CliInvoke's abstractions around Processes, such as ``ProcessConfiguration`` and CliInvoke's other primitives,  then ``IProcessInvoker`` is a better fit.
 
-The ``ContinueWhenExitAsync`` and ``ContinueWhenExitBufferedAsync`` methods provide for safe process running, and disposal after a Process has exited. 
+**Note**: Neither ``IProcessInvoker`` nor ``IProcessConfigurationInvoker`` are dependent upon on the other to work.
 
-This example shows how it might be used:
+#### ``IProcessInvoker``
+``IProcessInvoker`` is an interface for creating, running, and safely disposing of Processes based on ``ProcessStartInfo`` objects.
+
+The ``ExecuteAsync``, ``ExecuteBufferedExitAsync``, ``ExecutePipedExitAsync`` methods provide for:
+1. process creation
+2. safe process running (including process disposal, even in the case of an ``Exception``)
+3. gathering the results of the Process's execution (varies depending on the specific method)
+4. disposing of the Process after it has exited
+5. returning the gathered Process execution results
+
+These examples show how they might be used:
+
+#### Running Programs/Commands
+Because of how much of a minefield the ``Process`` class is and how difficult it can be to configure correctly,
+CliInvoke provides some abstractions to make it easier to configure Programs/Commands to be run.
+
+CliInvoke provides fluent builder interfaces and implementing classes to easily configure ``ProcessConfiguration``.
+``ProcessConfiguration`` is CliInvoke's main form of Process configuration (hence the name).
+
+The use of ``ProcessConfiguration`` can be avoided if you want to stick with ``ProcessStartInfo`` for configuration, but this
+means ``IProcessInvoker`` is the appropriate interface to use for creating and executing Processes.
+
+### Approach Examples
+
+#### ``IProcessInvoker``
+
+##### ``ExecuteAsync``
 ```csharp
 using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
 // Using namespaces for Dependency Injection code ommitted for clarity
 
       // Dependency Injection setup code ommitted for clarity
 
-    IProcessFactory _processFactory = serviceProvider.GetRequiredService<IProcessFactory>();
+    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
     
-    // Define processStartInfo here.
+    // Define processStartInfo here
     
-    Process process1 = _processFactory.From(processStartInfo);
-    
-    // This process that is returned is a Process that has been started.
-    Process process2 = _processFactory.StartNew(processStartInfo);
-    
-    // Wait for the Process to finish before safely disposing of it.
-   ProcessResult result = await processFactory.ContinueWhenExitAsync(process2);
-    
-        
-    ProcessResult result = await _processRunner.ExecuteProcessAsync(process, ProcessResultValidation.None);
+    // This process is created, executed, disposed of, and the results returned.
+    ProcessResult process = await _processInvoker.ExecuteAsync(processStartInfo, ProcessResourcePolicy.Default,
+        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
 ```
 
-Asynchronous methods in ``IProcessFactory`` also allow for an optional CancellationToken parameter.
+###### ``ExecuteBufferedAsync``
+```csharp
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Primitives;
 
-Some overloads for ``ContinueWhenExitAsync`` and ``ContinueWhenExitBufferedAsync`` allow for specifying ProcessResultValidation.
+// Using namespaces for Dependency Injection code ommitted for clarity
+
+      // Dependency Injection setup code ommitted for clarity
+
+    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+    
+    // Define processStartInfo here
+    
+    // This process is created, executed, disposed of, and the results returned.
+    BufferedProcessResult process = await _processInvoker.ExecuteBufferedAsync(processStartInfo, ProcessResourcePolicy.Default,
+        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
+```
+
+#### ``IProcessConfigurationInvoker``
+The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
+
+##### Non-Buffered Execution Example
+This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
+
+```csharp
+using AlastairLundy.CliInvoke;
+using AlastairLundy.CliInvoke.Core;
+
+using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Core.Builders;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+  //Namespace and class code ommitted for clarity 
+
+  // ServiceProvider and Dependency Injection setup code ommitted for clarity
+  
+  IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+
+  // Fluently configure your Command.
+  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
+                            .WithArguments(["arg1", "arg2"])
+                            .WithWorkingDirectory("/Path/To/Directory");
+  
+  // Build it as a ProcessConfiguration object when you're ready to use it.
+  ProcessConfiguration config = builder.Build();
+  
+  // Execute the process through ProcessInvoker and get the results.
+ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
+```
+
+##### Buffered Execution Example
+This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
+
+```csharp
+using AlastairLundy.CliInvoke;
+using AlastairLundy.CliInvoke.Core;
+
+using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Core.Builders;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+  //Namespace and class code ommitted for clarity 
+
+  // ServiceProvider and Dependency Injection setup code ommitted for clarity
+  
+  IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+
+  // Fluently configure your Command.
+  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
+                            .WithArguments(["arg1", "arg2"])
+                            .WithWorkingDirectory("/Path/To/Directory");
+  
+  // Build it as a ProcessConfiguration object when you're ready to use it.
+  ProcessConfiguration config = builder.Build();
+  
+  // Execute the process through ProcessInvoker and get the results.
+BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(config);
+```
+
+### Command/Program Execution
 
 ## How to Contribute
 Thank you in advance for considering contributing to CliInvoke.
@@ -127,7 +232,7 @@ Thanks.
 ## License
 CliInvoke.Core is licensed under the MPL 2.0 license. If you modify any of CliInvoke.Core's files, then the modified files must be licensed under the MPL 2.0.
 
-If you use CliInvoke.Core in your project, please make an exact copy of the contents of CliInvoke.Core' [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
+If you use CliInvoke.Core in your project, please make an exact copy of the contents of CliInvoke.Core's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 
 ## Acknowledgements
 
