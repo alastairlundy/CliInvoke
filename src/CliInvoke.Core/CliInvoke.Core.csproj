@@ -22,11 +22,15 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.5.2</Version>
-        <PackageReleaseNotes>### Changes since 1.5.0
-* Updated DotExtensions from 8.3.0 to 8.5.0 on .NET 8 and .NET 9
-* Updated internal Polyfill usage from 8.8.0 to 8.8.1
-* Marked some interfaces as deprecation for removal in v2</PackageReleaseNotes>
+        <Version>1.6.0</Version>
+        <PackageReleaseNotes>## Changes since 1.5.x
+            ### All packages
+            * Updated DotExtensions on .NET 8 and newer from 8.3.0 to 8.5.1
+            * Fixed an issue where CliInvoke for .NET 10 (as an implicit TFM) would depend on DotExtensions 7.7.0 instead of 8.x
+            * Updated internal Polyfill usage on .NET Standard 2 from 8.8.1 to 8.9.0
+
+            ### Core package only
+            * Deprecated some extension methods and constructors in classes for removal in v2.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
@@ -35,7 +39,7 @@
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.0"/>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.1"/>
     </ItemGroup>
 
     <ItemGroup>

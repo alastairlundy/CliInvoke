@@ -13,15 +13,28 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### Changes since 1.5.1
-* Updated DotExtensions from 7.6.5 to 7.7.0 on .NET Standard 2.0
-* Updated DotExtensions from 8.2.0 to 8.3.0 on .NET 8 and .NET 9
-* Updated internal Polyfill usage from 8.8.0 to 8.8.1
-* Marked some interfaces as deprecation for removal in v2</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 1.5.x
+### All packages
+* Updated DotExtensions on .NET 8 and newer from 8.3.0 to 8.5.0
+* Fixed an issue where CliInvoke for .NET 10 (as an implicit TFM) would depend on DotExtensions 7.7.0 instead of 8.x
+* Updated internal Polyfill usage on .NET Standard 2 from 8.8.1 to 8.9.0
+
+### Core package only
+* Deprecated some extension methods and constructors in classes for removal in v2.
+
+### Main package only
+* Stability improvements
+* Added constructor overload for ProcessRunner class that doesn't rely on the deprecated IProcessRunnerUtility interface
+* Added FilePathResolver.cs directly into CliInvoke since Resyslib.IO is no longer maintained - This is a backport of CliInvoke v2's File Path Resolving logic but in the same interface that v1 was using.
+* Deprecated CliCommandInvoker class for removal in v2 - The intended replacement in v2 is ProcessInvoker.
+
+### Notes:
+* A migration guide for migrating from CliInvoke v1 to v2 will be created prior to v2's stable release
+* CliInvoke v2 is still in pre-release as of the date of this release</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.5.2</PackageVersion>
+        <PackageVersion>1.6.0</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke, processinvoker, processfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -36,12 +49,10 @@
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.0" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.1" />
     </ItemGroup>
     <ItemGroup>
-        <!--
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.5.2" />
--->
     </ItemGroup>
     
     <ItemGroup>
@@ -83,7 +94,7 @@
       <Folder Include="Legacy\" />
     </ItemGroup>
     
-    <ItemGroup>
+<!--    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
+    </ItemGroup>-->
 </Project>
