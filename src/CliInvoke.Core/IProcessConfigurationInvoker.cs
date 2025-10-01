@@ -15,7 +15,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
-/// Defines the contract for a class that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
+/// Defines a service that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
 /// </summary>
 public interface IProcessConfigurationInvoker
 {
