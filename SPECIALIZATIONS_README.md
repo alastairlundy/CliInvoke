@@ -26,7 +26,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
-    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+    IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
   IRunnerProcessCreator _runnerProcessCreator = serviceProvider.GetRequiredService<IRunnerProcessCreator>();
   
   //Build your command fluently
@@ -38,7 +38,7 @@ using AlastairLundy.CliInvoke.Specializations;
   
   ProcessConfiguration processToRun = _runnerProcessCreator.CreateRunnerProcess(config);
   
-  BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
+  BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(processToRun);
 ```
 
 If the result of the command being run is not of concern you can call ``ExecuteAsync()`` instead of ``ExecuteBufferedAsync()`` and ignore the returned ProcessResult like so:
@@ -53,7 +53,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
-    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+    IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
   IRunnerProcessCreator _runnerProcessCreator = serviceProvider.GetRequiredService<IRunnerProcessCreator>();
   
   //Build your command fluently
@@ -65,7 +65,7 @@ using AlastairLundy.CliInvoke.Specializations;
   
   ProcessConfiguration processToRun = _runnerProcessCreator.CreateRunnerProcess(config);
   
-  ProcessResult result = await _processInvoker.ExecuteAsync(processToRun);
+  ProcessResult result = await _processInvokerConfig.ExecuteAsync(processToRun);
 ```
 
 ### ClassicPowershellProcessConfiguration
@@ -82,7 +82,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
-    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+    IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
   IRunnerProcessCreator _runnerProcessCreator = serviceProvider.GetRequiredService<IRunnerProcessCreator>();
   
   //Build your command fluently
@@ -94,7 +94,7 @@ using AlastairLundy.CliInvoke.Specializations;
   
   ProcessConfiguration processToRun = _runnerProcessCreator.CreateRunnerProcess(config);
   
-  BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
+  BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(processToRun);
 ```
 
 ### PowershellProcessConfiguration
@@ -111,7 +111,7 @@ using AlastairLundy.CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
-    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+    IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
   IRunnerProcessCreator _runnerProcessCreator = serviceProvider.GetRequiredService<IRunnerProcessCreator>();
   
   //Build your command fluently
@@ -123,7 +123,7 @@ using AlastairLundy.CliInvoke.Specializations;
   
   ProcessConfiguration processToRun = _runnerProcessCreator.CreateRunnerProcess(config);
   
-  BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
+  BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(processToRun);
 ```
 
 ## Licensing
