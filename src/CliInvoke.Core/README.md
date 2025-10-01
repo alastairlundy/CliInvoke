@@ -5,7 +5,7 @@ For an implementing package, check out [``CliInvoke``](https://www.nuget.org/pac
 
 Key Abstractions:
 * ``IProcessInvoker``
-* ``IProcessFactory``
+* ``IProcessConfigurationInvoker``
 
 * Piping:
   * ``IProcessPipeHandler``
@@ -71,33 +71,54 @@ The following table details which target platforms are supported for running Pro
 
 **Note:** This library has not been tested on Android or Tizen.
 
-## Examples
-One of the main use cases for CliInvoke.Core is intended to be [safe Process Running](#safe-process-running).
+## Using CliInvoke / Examples
+The two main use cases for CliInvoke are intended to be:
+1. [executing Programs/Commands programatically](#running-programscommands) which involves using abstractions to improve the experience of external Program/Command running.
+2. [safe Process Running](#safe-process-running) which involves avoiding the pitfalls of the ``Process`` class whilst still dealing with ``ProcessStartInfo``.
 
-### Safer Process Running
-CliInvoke.Core offers safe abstractions around Process Running to avoid accidentally not disposing of Processes after they are executed.
+CliInvoke provides both options to give developers a choice in the approach they adopt.
+They are both equally safe and valid.
 
-``IProcessFactory`` and ``IProcessInvoker`` are both equally capable of fulfilling this criterion, **however** ``IProcessFactory`` enables more direct control over Process related primitives prior to running the Process.
+### Approaches
 
-If you don't want to use CliInvoke's abstractions around Processes, such as ``ProcessConfiguration`` and CliInvoke's other primitives,  then ``IProcessFactory`` is a better fit. 
+#### Safe Process Running
+CliInvoke offers safe abstractions around Process Running to avoid accidentally not disposing of Processes,
+along with avoiding other pitfalls.
 
-**Note**: Neither ``IProcessFactory`` nor ``IProcessInvoker`` are dependent upon on the other to work.
+``IProcessInvoker`` and ``IProcessConfigurationInvoker`` are both equally capable of fulfilling this criterion,
+**however** ``IProcessInvoker`` works with ``ProcessStartInfo`` objects and ``IProcessConfigurationInvoker`` works with ``ProcessConfiguration`` objects.
 
-#### ``IProcessFactory``
-``IProcessFactory`` is an interface for enabling easy Process Creation, Running, and Disposal depending on the methods used.
+If you don't want to use CliInvoke's abstractions around Processes, such as ``ProcessConfiguration`` and CliInvoke's other primitives,  then ``IProcessInvoker`` is a better fit.
 
-The ``From`` method and its overloads provide for easy standalone process creation.
-The ``StartNew`` method provides for creating and starting new processes within the same method call.
+**Note**: Neither ``IProcessInvoker`` nor ``IProcessConfigurationInvoker`` are dependent upon on the other to work.
 
-The ``WaitForExitAsync``, ``WaitForBufferedExitAsync``, ``WaitForPipedExitAsync`` methods provide for:
-1. safe process running (including process disposal in the case of an ``Exception``)
-2. gathering the results of the Process's execution (varies depending on the specific method)
-3. disposing of the Process after it has exited
-4. returning the gathered Process execution results
+#### ``IProcessInvoker``
+``IProcessInvoker`` is an interface for creating, running, and safely disposing of Processes based on ``ProcessStartInfo`` objects.
+
+The ``ExecuteAsync``, ``ExecuteBufferedExitAsync``, ``ExecutePipedExitAsync`` methods provide for:
+1. process creation
+2. safe process running (including process disposal, even in the case of an ``Exception``)
+3. gathering the results of the Process's execution (varies depending on the specific method)
+4. disposing of the Process after it has exited
+5. returning the gathered Process execution results
 
 These examples show how they might be used:
 
-##### ``WaitForExitAsync``
+#### Running Programs/Commands
+Because of how much of a minefield the ``Process`` class is and how difficult it can be to configure correctly,
+CliInvoke provides some abstractions to make it easier to configure Programs/Commands to be run.
+
+CliInvoke provides fluent builder interfaces and implementing classes to easily configure ``ProcessConfiguration``.
+``ProcessConfiguration`` is CliInvoke's main form of Process configuration (hence the name).
+
+The use of ``ProcessConfiguration`` can be avoided if you want to stick with ``ProcessStartInfo`` for configuration, but this
+means ``IProcessInvoker`` is the appropriate interface to use for creating and executing Processes.
+
+### Approach Examples
+
+#### ``IProcessInvoker``
+
+##### ``ExecuteAsync``
 ```csharp
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Primitives;
@@ -106,18 +127,16 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
       // Dependency Injection setup code ommitted for clarity
 
-    IProcessFactory _processFactory = serviceProvider.GetRequiredService<IProcessFactory>();
+    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
     
     // Define processStartInfo here
     
-    // This process that is returned is a Process that has been started.
-    Process process = _processFactory.StartNew(processStartInfo);
-    
-    // Wait for the Process to finish before safely disposing of it.
-   ProcessResult result = await processFactory.WaitForExitAsync(process);
+    // This process is created, executed, disposed of, and the results returned.
+    ProcessResult process = await _processInvoker.ExecuteAsync(processStartInfo, ProcessResourcePolicy.Default,
+        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
 ```
 
-##### ``WaitForBufferedExitAsync``
+###### ``ExecuteBufferedAsync``
 ```csharp
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Primitives;
@@ -126,21 +145,77 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
       // Dependency Injection setup code ommitted for clarity
 
-    IProcessFactory _processFactory = serviceProvider.GetRequiredService<IProcessFactory>();
+    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
     
     // Define processStartInfo here
     
-    Process process = _processFactory.From(processStartInfo);
-    
-    process.Start();
-    
-    // Wait for the Process to finish before safely disposing of it.
-   BufferedProcessResult result = await processFactory.WaitForBufferedExitAsync(process);
+    // This process is created, executed, disposed of, and the results returned.
+    BufferedProcessResult process = await _processInvoker.ExecuteBufferedAsync(processStartInfo, ProcessResourcePolicy.Default,
+        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
 ```
 
-Asynchronous methods in ``IProcessFactory`` allow for an optional CancellationToken parameter.
+#### ``IProcessConfigurationInvoker``
+The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
 
-Some overloads for ``WaitForExitAsync`` and ``WaitForBufferedExitAsync`` allow for specifying ProcessResultValidation.
+##### Non-Buffered Execution Example
+This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
+
+```csharp
+using AlastairLundy.CliInvoke;
+using AlastairLundy.CliInvoke.Core;
+
+using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Core.Builders;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+  //Namespace and class code ommitted for clarity 
+
+  // ServiceProvider and Dependency Injection setup code ommitted for clarity
+  
+  IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+
+  // Fluently configure your Command.
+  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
+                            .WithArguments(["arg1", "arg2"])
+                            .WithWorkingDirectory("/Path/To/Directory");
+  
+  // Build it as a ProcessConfiguration object when you're ready to use it.
+  ProcessConfiguration config = builder.Build();
+  
+  // Execute the process through ProcessInvoker and get the results.
+ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
+```
+
+##### Buffered Execution Example
+This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
+
+```csharp
+using AlastairLundy.CliInvoke;
+using AlastairLundy.CliInvoke.Core;
+
+using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Core.Builders;
+
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+  //Namespace and class code ommitted for clarity 
+
+  // ServiceProvider and Dependency Injection setup code ommitted for clarity
+  
+  IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+
+  // Fluently configure your Command.
+  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
+                            .WithArguments(["arg1", "arg2"])
+                            .WithWorkingDirectory("/Path/To/Directory");
+  
+  // Build it as a ProcessConfiguration object when you're ready to use it.
+  ProcessConfiguration config = builder.Build();
+  
+  // Execute the process through ProcessInvoker and get the results.
+BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(config);
+```
 
 ### Command/Program Execution
 
