@@ -17,7 +17,7 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <LangVersion>13</LangVersion>
-        <PackageReleaseNotes>Updated to CliInvoke 2.0.0 Beta 1</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated to CliInvoke 2.0.0 Beta 2</PackageReleaseNotes>
         <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
@@ -55,11 +55,11 @@
       </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
-
 <!--    <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.1" />
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>-->
+
+    <ItemGroup>
+      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.2" />
+    </ItemGroup>
 </Project>
