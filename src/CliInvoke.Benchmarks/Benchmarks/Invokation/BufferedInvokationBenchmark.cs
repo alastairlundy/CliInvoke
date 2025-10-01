@@ -18,7 +18,6 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
  Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BufferedInvokationBenchmark
 {
-    private readonly IProcessFactory _processFactory;
     private readonly IProcessConfigurationInvoker _processInvoker;
     
     private BufferedTestHelper _bufferedTestHelper;
@@ -26,7 +25,6 @@ public class BufferedInvokationBenchmark
     public BufferedInvokationBenchmark()
     {
         _bufferedTestHelper = new BufferedTestHelper();
-        _processFactory = CliInvokeHelpers.CreateProcessFactory();
         _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
     }
     
