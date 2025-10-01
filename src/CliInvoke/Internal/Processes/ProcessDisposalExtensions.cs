@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 
-namespace AlastairLundy.CliInvoke.Magic.Processes;
+namespace AlastairLundy.CliInvoke.Internal.Processes;
 
 /// <summary>
 /// 

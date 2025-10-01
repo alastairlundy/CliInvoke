@@ -1,11 +1,10 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke.Magic.Processes;
+namespace AlastairLundy.CliInvoke.Internal.Processes;
 
 internal static class ToStartInfoExtensions
 {

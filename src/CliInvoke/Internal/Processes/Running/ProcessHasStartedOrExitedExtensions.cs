@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-namespace AlastairLundy.CliInvoke.Magic.Processes;
+namespace AlastairLundy.CliInvoke.Internal.Processes;
 
 internal static class ProcessHasStartedOrExitedExtensions
 {
@@ -50,6 +50,9 @@ internal static class ProcessHasStartedOrExitedExtensions
     {
         try
         {
+            if(process.IsRunningOnRemoteDevice())
+                return false;
+            
             return process.ExitTime.ToUniversalTime() <= DateTime.UtcNow;
         }
         catch

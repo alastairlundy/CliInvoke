@@ -5,7 +5,7 @@ using System.Runtime.Versioning;
 
 // ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Magic.Processes;
+namespace AlastairLundy.CliInvoke.Internal.Processes;
 
 internal static class IsProcessRunningExtensions
 {
@@ -41,9 +41,6 @@ internal static class IsProcessRunningExtensions
     [SupportedOSPlatform("android")]
     internal static bool IsRunningOnRemoteDevice(this Process process)
     {
-        if (process.IsRunning() == false)
-            return false;
-
         if (process.IsDisposed())
         {
             throw new InvalidOperationException();

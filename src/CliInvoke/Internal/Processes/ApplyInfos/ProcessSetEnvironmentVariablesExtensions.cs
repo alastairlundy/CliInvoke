@@ -1,9 +1,8 @@
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace AlastairLundy.CliInvoke.Magic.Processes;
+namespace AlastairLundy.CliInvoke.Internal.Processes;
 
 internal static class ProcessSetEnvironmentVariablesExtensions
 {
