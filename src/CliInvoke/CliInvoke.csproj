@@ -34,6 +34,7 @@
         <PackageId>AlastairLundy.CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     
     <ItemGroup>
