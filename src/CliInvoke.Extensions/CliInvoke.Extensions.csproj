@@ -16,7 +16,7 @@
         <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>Updated to support CliInvoke 2.0.0 Beta 1</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated to support CliInvoke 2.0.0 Beta 2</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -29,9 +29,8 @@
     
     <ItemGroup>
 
-  <!--      <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-beta.1" />
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.1" />
--->
+        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-beta.2" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
     </ItemGroup>
 
@@ -66,8 +65,8 @@
       </Compile>
     </ItemGroup>
 
-    <ItemGroup>
+<!--    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
       <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
-    </ItemGroup>
+    </ItemGroup>-->
 </Project>
