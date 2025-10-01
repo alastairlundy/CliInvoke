@@ -17,7 +17,7 @@ namespace AlastairLundy.CliInvoke.Tests.Helpers;
 
 public class CrossPlatformTestExecutables
 {
-    private static IProcessInvoker processInvoker;
+    private static IProcessConfigurationInvoker processInvoker;
 
     private static readonly string dotnetExePath;
     private static readonly string cmdExePath;
@@ -27,7 +27,7 @@ public class CrossPlatformTestExecutables
         IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
         IFilePathResolver filePathResolver = new FilePathResolver();
 
-        processInvoker = new ProcessInvoker(filePathResolver,
+        processInvoker = new ProcessConfigurationInvoker(filePathResolver,
             processPipeHandler);
 
         IProcessConfigurationBuilder dotnetConfigurationBuilder;
