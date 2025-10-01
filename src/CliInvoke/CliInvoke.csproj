@@ -13,16 +13,20 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 8
-* Updated DotExtensions from 8.4.0 to 8.5.0
-* Improved ``ProcessFactory`` and ``ProcessInvoker`` implementation code reliability and performance
-* Removed ``UserCredential`` ``IsSupportedOnCurrentOs`` extension method
-* Rename ProcessStartInfo ``ApplyUserCredential`` extension method to ``SetUserCredential``
-* Reduced technical debt in CliInvoke main package</PackageReleaseNotes>
+        <PackageReleaseNotes>## 2.0.0 Beta 2
+
+### Core package only
+* Removed dependency on DotExtensions
+* Moved extension methods to CliInvoke main package
+* Deprecated some extension methods and constructors in classes for removal in v2.
+
+### Main package only
+* Updated DotExtensions on .NET 8 and newer from 8.3.0 to 8.5.1
+* Added some Process related extension methods from DotExtensions back into CliInvoke</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.1</PackageVersion>
+        <PackageVersion>2.0.0-beta.2</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>

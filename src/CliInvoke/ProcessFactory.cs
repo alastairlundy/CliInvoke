@@ -24,8 +24,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
-
-using AlastairLundy.CliInvoke.Magic.Processes;
+using AlastairLundy.CliInvoke.Internal.Processes;
 
 
 // ReSharper disable UnusedType.Global
@@ -309,15 +308,8 @@ public class ProcessFactory : IProcessFactory
             if (process.HasStarted() == false)
                 process = StartNew(process.StartInfo,
                     ProcessResourcePolicy.Default);
-
-            if (processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-            {
-                await process.WaitForExitAsync(cancellationToken);
-            }
-            else
-            {
-                await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
-            }
+            
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
 
             if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
             {
@@ -401,14 +393,7 @@ public class ProcessFactory : IProcessFactory
                 }
             }
             
-            if (processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None)
-            {
-                await process.WaitForExitAsync(cancellationToken);
-            }
-            else
-            {
-                await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
-            }
+            await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
 
             if (process.ExitCode != 0 && processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
             {
@@ -471,9 +456,8 @@ public class ProcessFactory : IProcessFactory
             Task<string> standardOutStringTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardErrorStringTask = process.StandardError.ReadToEndAsync(cancellationToken);
 
-            Task waitForExit = processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
-                ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy,
+                cancellationToken);
 
             await Task.WhenAll(standardOutStringTask, standardErrorStringTask, waitForExit);
             
@@ -545,12 +529,11 @@ public class ProcessFactory : IProcessFactory
             Task<string> standardOutStringTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardErrorStringTask = process.StandardError.ReadToEndAsync(cancellationToken);
             
-             Task waitForExit = processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
-                ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
+             Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy,
+                 cancellationToken);
             
-            await Task.WhenAll(standardOutputStreamTask, standardErrorStreamTask, standardOutStringTask, standardErrorStringTask,
-                waitForExit);
+            await Task.WhenAll(standardOutputStreamTask, standardErrorStreamTask,
+                standardOutStringTask, standardErrorStringTask, waitForExit);
             
             if (process.ExitCode != 0 &&
                 processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero)
@@ -632,9 +615,8 @@ public class ProcessFactory : IProcessFactory
             Task<Stream> outputTask =  _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> errorTask = _processPipeHandler.PipeStandardErrorAsync(process);
 
-            Task waitForExit = processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
-                ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy,
+                cancellationToken);
 
             await Task.WhenAll(outputTask, errorTask, waitForExit);
 
@@ -708,9 +690,7 @@ public class ProcessFactory : IProcessFactory
             Task<Stream> outputTask =  _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> errorTask = _processPipeHandler.PipeStandardErrorAsync(process);
 
-            Task waitForExit = processExitInfo.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
-                ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy.TimeoutThreshold);
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
 
             await Task.WhenAll(outputTask, errorTask, waitForExit);
             

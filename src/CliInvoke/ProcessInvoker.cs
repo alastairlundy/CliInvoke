@@ -24,7 +24,7 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
 
-using AlastairLundy.CliInvoke.Magic.Processes;
+using AlastairLundy.CliInvoke.Internal.Processes;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -40,7 +40,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <summary>  
     /// Instantiates an invoker for invoking processes, providing a centralized way to execute external commands.
     /// </summary>
-    /// <param name="filePathResolver"></param>
+    /// <param name="filePathResolver">The file path resolver to be used.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
@@ -106,9 +106,8 @@ public class ProcessInvoker : IProcessInvoker
             if(process.HasStarted() && process.HasExited() == false)
                 process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
-            Task waitForExit = processExitConfiguration.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
-                ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold);
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy,
+                cancellationToken);
 
             await waitForExit;
             
@@ -191,9 +190,8 @@ public class ProcessInvoker : IProcessInvoker
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
 
-            Task waitForExit = processExitConfiguration.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
-                ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold);
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy,
+                cancellationToken);
 
             await Task.WhenAll(standardOut, standardError, waitForExit);
 
@@ -267,9 +265,8 @@ public class ProcessInvoker : IProcessInvoker
             Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
 
-            Task waitForExit = processExitConfiguration.TimeoutPolicy.CancellationMode == ProcessCancellationMode.None
-                ? process.WaitForExitAsync(cancellationToken)
-                : process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold);
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy,
+                cancellationToken);
 
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
