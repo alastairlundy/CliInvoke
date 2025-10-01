@@ -35,7 +35,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>  
-    /// Instantiates an invoker for invoking processes, providing a centralized way to execute external commands.
+    /// Instantiates a <see cref="ProcessConfigurationInvoker"/> for creating and executing processes.
     /// </summary>
     /// <param name="filePathResolver">The file path resolver to be used.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>

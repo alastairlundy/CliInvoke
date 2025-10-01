@@ -24,18 +24,20 @@ using AlastairLundy.CliInvoke.Internal.Processes;
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// 
+/// The default implementation of <see cref="IProcessInvoker"/>,
+/// an interface that creates and runs Process objects from <see cref="ProcessStartInfo"/> objects.
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
     private readonly IFilePathResolver _filePathResolver;
     private readonly IProcessPipeHandler _processPipeHandler;
 
-    /// <summary>
-    /// 
+
+    /// <summary>  
+    /// Instantiates a <see cref="ProcessInvoker"/> for creating and executing processes.
     /// </summary>
-    /// <param name="filePathResolver"></param>
-    /// <param name="processPipeHandler"></param>
+    /// <param name="filePathResolver">The file path resolver to be used.</param>
+    /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessInvoker(IFilePathResolver filePathResolver,
         IProcessPipeHandler processPipeHandler)
     {
@@ -44,15 +46,15 @@ public class ProcessInvoker : IProcessInvoker
     }
     
     /// <summary>
-    /// 
+    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="startInfo"></param>
-    /// <param name="processResourcePolicy"></param>
-    /// <param name="processTimeoutPolicy"></param>
+    /// <param name="startInfo">The start info to use for <see cref="Process"/> creation.</param>
+    /// <param name="processResourcePolicy">The resource policy to use for <see cref="Process"/> creation.</param>
+    /// <param name="processTimeoutPolicy">The timeout policy to use when waiting for <see cref="Process"/> exit.</param>
     /// <param name="processResultValidation"></param>
-    /// <param name="standardInput"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="standardInput">The standard input to pipe to the Process, if specified.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Process Results from the running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -111,15 +113,15 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// 
+    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="startInfo"></param>
-    /// <param name="processResourcePolicy"></param>
-    /// <param name="processTimeoutPolicy"></param>
+    /// <param name="startInfo">The start info to use for <see cref="Process"/> creation.</param>
+    /// <param name="processResourcePolicy">The resource policy to use for <see cref="Process"/> creation.</param>
+    /// <param name="processTimeoutPolicy">The timeout policy to use when waiting for <see cref="Process"/> exit.</param>
     /// <param name="processResultValidation"></param>
-    /// <param name="standardInput"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="standardInput">The standard input to pipe to the Process, if specified.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -189,15 +191,16 @@ public class ProcessInvoker : IProcessInvoker
 
 
     /// <summary>
-    /// 
+    /// Pipes the Standard Input (if applicable), runs the process asynchronously,
+    /// waits for exit, pipes the standard output and error, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="startInfo"></param>
-    /// <param name="processResourcePolicy"></param>
-    /// <param name="processTimeoutPolicy"></param>
+    /// <param name="startInfo">The start info to use for <see cref="Process"/> creation.</param>
+    /// <param name="processResourcePolicy">The resource policy to use for <see cref="Process"/> creation.</param>
+    /// <param name="processTimeoutPolicy">The timeout policy to use when waiting for <see cref="Process"/> exit.</param>
     /// <param name="processResultValidation"></param>
-    /// <param name="standardInput"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="standardInput">The standard input to pipe to the Process, if specified.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
