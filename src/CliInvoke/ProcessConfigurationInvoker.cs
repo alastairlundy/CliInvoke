@@ -82,7 +82,9 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         Process process = new Process()
         {
-            StartInfo = processConfiguration.ToProcessStartInfo(false, false)
+            StartInfo = processConfiguration.ToProcessStartInfo(false,
+                false),
+            EnableRaisingEvents = true
         };
         
         if (processConfiguration.StandardInput is not null && processConfiguration.StandardInput != StreamWriter.Null)
@@ -105,10 +107,8 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
             if(process.HasStarted() && process.HasExited() == false)
                 process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
-            Task waitForExit = process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy,
+            await process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy,
                 cancellationToken);
-
-            await waitForExit;
             
              result = new ProcessResult(process.StartInfo.FileName,
                 process.ExitCode, process.StartTime, process.ExitTime);
@@ -136,6 +136,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     /// <param name="processExitConfiguration"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -163,7 +164,9 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         
         Process process = new Process()
         {
-            StartInfo = processConfiguration.ToProcessStartInfo(true, true),
+            StartInfo = processConfiguration.ToProcessStartInfo(true,
+                true),
+            EnableRaisingEvents = true
         };
         
         if (processConfiguration.StandardInput is not null && processConfiguration.StandardInput != StreamWriter.Null)
@@ -201,6 +204,12 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                 await standardError,
                 process.StartTime,
                 process.ExitTime);
+            
+            if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process: process,
+                    exitCode: process.ExitCode);
+            }
         }
         finally
         {
@@ -218,6 +227,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     /// <param name="processExitConfiguration"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -238,7 +248,9 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         Process process = new Process()
         {
-            StartInfo = processConfiguration.ToProcessStartInfo(true, true)
+            StartInfo = processConfiguration.ToProcessStartInfo(true,
+                true),
+            EnableRaisingEvents = true
         };
         
         if (processConfiguration.StandardInput is not null && processConfiguration.StandardInput != StreamWriter.Null)
@@ -272,6 +284,12 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
             result = new PipedProcessResult(process.StartInfo.FileName,
             process.ExitCode, process.StartTime, process.ExitTime,
             await standardOutput, await standardError);
+            
+            if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process: process,
+                    exitCode: process.ExitCode);
+            }
         }
         finally
         {
