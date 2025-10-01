@@ -14,10 +14,10 @@ internal class CliInvokeHelpers
             processPipeHandler);
     }
 
-    internal static ProcessInvoker CreateProcessInvoker()
+    internal static ProcessConfigurationInvoker CreateProcessInvoker()
     {
         IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        return new ProcessInvoker(new FilePathResolver(),
+        return new ProcessConfigurationInvoker(new FilePathResolver(),
             processPipeHandler);
     }
 }

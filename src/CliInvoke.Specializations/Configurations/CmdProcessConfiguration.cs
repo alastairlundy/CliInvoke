@@ -61,6 +61,9 @@ public class CmdProcessConfiguration : ProcessConfiguration
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
         base("",
+            false,
+            true,
+            true,
             arguments,
             workingDirectoryPath,
             requiresAdministrator,

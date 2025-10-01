@@ -15,9 +15,9 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
-/// Defines the contract for a class that executes processes.
+/// Defines the contract for a class that executes ProcessConfigurations.
 /// </summary>
-public interface IProcessInvoker
+public interface IProcessConfigurationInvoker
 {
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.

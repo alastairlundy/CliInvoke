@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Piping;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
@@ -31,7 +30,7 @@ namespace AlastairLundy.CliInvoke;
 /// <summary>
 /// The default implementation of IProcessInvoker, a safer way to execute processes.
 /// </summary>
-public class ProcessInvoker : IProcessInvoker
+public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 {
     private readonly IProcessPipeHandler _processPipeHandler;
     
@@ -42,7 +41,7 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="filePathResolver">The file path resolver to be used.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
-    public ProcessInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
+    public ProcessConfigurationInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;
