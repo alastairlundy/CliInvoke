@@ -73,13 +73,14 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-<!--    
     <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>-->
+    </ItemGroup>
     
     <ItemGroup>
+<!--
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.2" />
+-->
       <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.1" />
     </ItemGroup>
 </Project>
