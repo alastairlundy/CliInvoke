@@ -23,6 +23,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     {
         TimeoutPolicy = ProcessTimeoutPolicy.Default;
         ResultValidation = ProcessResultValidation.ExitCodeZero;
+        CancellationExceptionBehavior = ProcessCancellationExceptionBehavior.AllowException;
     }
 
     /// <summary>
@@ -30,24 +31,32 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// </summary>
     /// <param name="timeoutPolicy">The timeout policy to apply to the process.</param>
     /// <param name="resultValidation">The result validation strategy to use for the process exit.</param>
-    public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy, ProcessResultValidation resultValidation)
+    /// <param name="cancellationValidation"></param>
+    public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy, ProcessResultValidation resultValidation,
+        ProcessCancellationExceptionBehavior cancellationValidation)
     {
         TimeoutPolicy = timeoutPolicy;
         ResultValidation = resultValidation;
+        CancellationExceptionBehavior = cancellationValidation;
     }
 
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy and exit code zero validation.
     /// </summary>
-    public static readonly ProcessExitConfiguration Default =
-        new ProcessExitConfiguration(ProcessTimeoutPolicy.Default,
-            ProcessResultValidation.ExitCodeZero);
+    public static readonly ProcessExitConfiguration Default = new(ProcessTimeoutPolicy.Default,
+            ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowException);
+    
+    /// <summary>
+    /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy, but suppresses the Exception from cancellation.
+    /// </summary>
+    public static readonly ProcessExitConfiguration DefaultNoException = new(ProcessTimeoutPolicy.Default,
+            ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.SuppressException);
     
     /// <summary>
     /// A preconfigured <see cref="ProcessExitConfiguration"/> instance with Exit Code Validation and without a Timeout Policy.
     /// </summary>
-    public static readonly ProcessExitConfiguration NoTimeoutDefault =
-        new ProcessExitConfiguration(ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
+    public static readonly ProcessExitConfiguration NoTimeoutDefault = new(ProcessTimeoutPolicy.None,
+        ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.SuppressException);
     
     /// <summary>
     /// Gets the result validation strategy used to determine if the process exited successfully.
@@ -55,10 +64,14 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessResultValidation ResultValidation { get; }
     
     /// <summary>
+    /// Gets the result validation strategy used to determine if Process cancellation should throw an exception.
+    /// </summary>
+    public ProcessCancellationExceptionBehavior CancellationExceptionBehavior { get; }
+    
+    /// <summary>
     /// Gets the timeout policy applied to the process.
     /// </summary>
     public ProcessTimeoutPolicy TimeoutPolicy { get; }
-
 
     /// <summary>
     /// Determines whether the specified <see cref="ProcessExitConfiguration"/> is equal to the current instance.
@@ -70,7 +83,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         if (other is null) return false;
 
         return ResultValidation == other.ResultValidation &&
-               TimeoutPolicy.Equals(other.TimeoutPolicy);
+               TimeoutPolicy.Equals(other.TimeoutPolicy) &&
+               CancellationExceptionBehavior == other.CancellationExceptionBehavior;
     }
 
     /// <summary>
@@ -94,7 +108,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <returns>The hash code for the current instance.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine((int)ResultValidation, TimeoutPolicy);
+        return HashCode.Combine(ResultValidation, TimeoutPolicy, CancellationExceptionBehavior);
     }
 
     /// <summary>
