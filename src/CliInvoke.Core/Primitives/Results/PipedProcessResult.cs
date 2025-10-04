@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.DotPrimitives
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,6 +9,7 @@
 
 using System;
 using System.IO;
+// ReSharper disable RedundantBoolCompare
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ClassNeverInstantiated.Global
@@ -40,8 +41,12 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>
     /// <param name="exitTime">The exit time of the process.</param>
     /// <param name="standardOutput">The process' standard output.</param>
     /// <param name="standardError">The process' standard error.</param>
-    public PipedProcessResult(string executableFilePath, int exitCode, DateTime startTime, DateTime exitTime,
-        Stream standardOutput, Stream standardError) : base(executableFilePath, exitCode, startTime, exitTime)
+    public PipedProcessResult(string executableFilePath,
+        int exitCode,
+        DateTime startTime,
+        DateTime exitTime,
+        Stream standardOutput,
+        Stream standardError) : base(executableFilePath, exitCode, startTime, exitTime)
     {
         StandardOutput = standardOutput;
         StandardError = standardError;
@@ -77,8 +82,8 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>
 
         if (obj is PipedProcessResult pipedProcessResult)
             return Equals(pipedProcessResult);
-        else
-            return false;
+        
+        return false;
     }
 
     /// <summary>

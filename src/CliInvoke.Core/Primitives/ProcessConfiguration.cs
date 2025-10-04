@@ -11,21 +11,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.Versioning;
 
 using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Internal;
 
-using AlastairLundy.DotExtensions.Processes;
+// ReSharper disable RedundantBoolCompare
+// ReSharper disable ClassNeverInstantiated.Global
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
-
-// ReSharper disable MemberCanBePrivate.Global
-
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
@@ -38,6 +33,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// Configures the Command configuration to be wrapped and executed.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="redirectStandardError"></param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <param name="workingDirectoryPath">The working directory to be used.</param>
     /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
@@ -52,6 +48,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
+    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardOutput"></param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
@@ -63,9 +61,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
     public ProcessConfiguration(string targetFilePath,
+        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string? arguments = null, string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
-        Dictionary<string, string>? environmentVariables = null,
+        IDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
@@ -83,8 +82,12 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
         Credential = credential ?? UserCredential.Null;
-            
+        
         ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+        
+        RedirectStandardInput = redirectStandardInput;
+        RedirectStandardOutput = redirectStandardOutput;
+        RedirectStandardError = redirectStandardError;
 
         StandardInput = standardInput ?? StreamWriter.Null;
         StandardOutput = standardOutput ?? StreamReader.Null;
@@ -102,12 +105,14 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// Instantiates the Process Configuration class with a ProcessStartInfo and other optional parameters.
     /// </summary>
     /// <param name="processStartInfo"></param>
-    /// <param name="processExitInfo"></param>
     /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
     /// <param name="credential">The credential to be used (if specified).</param>
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
+    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardOutput"></param>
+    /// <param name="redirectStandardError"></param>
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -119,8 +124,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-    public ProcessConfiguration(ProcessStartInfo processStartInfo, 
-        Dictionary<string, string>? environmentVariables = null,
+    public ProcessConfiguration(ProcessStartInfo processStartInfo,
+        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
+        IDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
@@ -140,6 +146,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardInputEncoding = Encoding.Default;
         StandardOutputEncoding = Encoding.Default;
         StandardErrorEncoding = Encoding.Default;
+        
+        RedirectStandardInput = redirectStandardInput;
+        RedirectStandardOutput = redirectStandardOutput;
+        RedirectStandardError = redirectStandardError;
             
         TargetFilePath = processStartInfo.FileName;
         Arguments = processStartInfo.Arguments;
@@ -174,7 +184,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The environment variables to be set.
     /// </summary>
-    public Dictionary<string, string> EnvironmentVariables { get; protected set;  }
+    public IDictionary<string, string> EnvironmentVariables { get; protected set;  }
         
     /// <summary>
     /// The credential to be used when executing the Command.
@@ -205,6 +215,22 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     public StreamReader? StandardError { get; protected set;  }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool RedirectStandardInput { get; protected set; }
+    
+    /// <summary>
+    ///
+    /// 
+    /// </summary>
+    public bool RedirectStandardOutput { get; protected set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool RedirectStandardError { get; protected set; }
+    
     /// <summary>
     /// The Process Resource Policy to be used for executing the Command.
     /// </summary>
@@ -252,6 +278,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                    ResourcePolicy.Equals(other.ResourcePolicy) &&
                    StandardOutput.Equals(other.StandardOutput) &&
                    StandardError.Equals(other.StandardError) &&
+                   RedirectStandardInput.Equals(other.RedirectStandardInput) &&
+                   RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
+                   RedirectStandardError.Equals(other.RedirectStandardError) &&
                    StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                    StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                    StandardErrorEncoding.Equals(other.StandardErrorEncoding);   
@@ -264,9 +293,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                    WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
                    EnvironmentVariables.Equals(other.EnvironmentVariables) &&
                    ResourcePolicy.Equals(other.ResourcePolicy) &&
+                   RedirectStandardInput.Equals(other.RedirectStandardInput) &&
+                   RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
+                   RedirectStandardError.Equals(other.RedirectStandardError) &&
                    StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                    StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                    StandardErrorEncoding.Equals(other.StandardErrorEncoding);
+            
         }
         
         return TargetFilePath.Equals(other.TargetFilePath) &&
@@ -275,6 +308,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                EnvironmentVariables.Equals(other.EnvironmentVariables) &&
                Credential.Equals(other.Credential) &&
                ResourcePolicy.Equals(other.ResourcePolicy) &&
+               RedirectStandardInput.Equals(other.RedirectStandardInput) &&
+               RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
+               RedirectStandardError.Equals(other.RedirectStandardError) &&
                StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                StandardErrorEncoding.Equals(other.StandardErrorEncoding);
@@ -311,6 +347,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         HashCode hashCode = new HashCode();
             
         hashCode.Add(TargetFilePath);
+        hashCode.Add(Arguments);
         hashCode.Add(EnvironmentVariables);
 
         if (Credential is not null)
@@ -405,54 +442,5 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             .Labels_ProcessConfiguration_ToString_ShellExecution}" : "";
 
         return $"{commandString}{workingDirectory}{adminPrivileges}{shellExecution}";
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public ProcessStartInfo ToProcessStartInfo()
-        => ToProcessStartInfo(true, true);
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="redirectStandardError"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public ProcessStartInfo ToProcessStartInfo(bool redirectStandardOutput, bool redirectStandardError)
-    {
-        ProcessStartInfo processStartInfo = new ProcessStartInfo()
-        {
-            FileName = this.TargetFilePath,
-            Arguments = string.IsNullOrEmpty(this.Arguments) ? string.Empty : this.Arguments,
-            WorkingDirectory = this.WorkingDirectoryPath,
-            UseShellExecute = this.UseShellExecution,
-            CreateNoWindow = this.WindowCreation,
-            RedirectStandardInput = StandardInput is not null && StandardInput != StreamWriter.Null,
-            RedirectStandardOutput = redirectStandardOutput,
-            RedirectStandardError = redirectStandardError,
-        };
-        
-        if (string.IsNullOrEmpty(TargetFilePath))
-            throw new ArgumentException(Resources.Exceptions_TargetFilePath_NullOrEmpty);
-        
-        if (RequiresAdministrator) 
-            processStartInfo.RunAsAdministrator();
-
-        if (Credential is not null) 
-            if(Credential.IsSupportedOnCurrentOS())
-#pragma warning disable CA1416
-                processStartInfo.ApplyUserCredential(Credential);
-#pragma warning restore CA1416
-                
-        if (EnvironmentVariables.Any()) 
-            processStartInfo.SetEnvironmentVariables(EnvironmentVariables);
-
-        if (processStartInfo.RedirectStandardInput) 
-            processStartInfo.StandardInputEncoding = StandardInputEncoding;
-
-        return processStartInfo;
     }
 }

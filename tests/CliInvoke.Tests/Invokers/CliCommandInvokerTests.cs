@@ -21,7 +21,7 @@ namespace AlastairLundy.CliInvoke.Tests.Invokers;
 
 public class CliCommandInvokerTests : IClassFixture<TestFixture>
 {
-    private readonly IProcessInvoker _processInvoker;
+    private readonly IProcessConfigurationInvoker _processInvoker;
         
     //   private CrossPlatformTestExecutables _crossPlatformTestExecutables;
         
@@ -31,7 +31,7 @@ public class CliCommandInvokerTests : IClassFixture<TestFixture>
         IServiceProvider services = fixture.ServiceProvider;
             */
             
-        _processInvoker = new ProcessInvoker(
+        _processInvoker = new ProcessConfigurationInvoker(
             new FilePathResolver(),
             new ProcessPipeHandler());
             

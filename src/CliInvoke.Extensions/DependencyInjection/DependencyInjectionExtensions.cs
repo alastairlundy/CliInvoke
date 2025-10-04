@@ -10,7 +10,10 @@
 using System;
 
 using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Extensibility;
 using AlastairLundy.CliInvoke.Core.Piping;
+
+using AlastairLundy.CliInvoke.Extensibility;
 
 using AlastairLundy.CliInvoke.Piping;
 
@@ -39,23 +42,28 @@ public static class DependencyInjectionExtensions
                 services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
                 services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
 
-                services.AddSingleton<IProcessFactory, ProcessFactory>();
+                services.AddSingleton<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
                 services.AddSingleton<IProcessInvoker, ProcessInvoker>();
+
+                services.AddSingleton<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 
-                services.AddScoped<IProcessFactory, ProcessFactory>();
+                services.AddScoped<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
                 
+                services.AddScoped<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
             case ServiceLifetime.Transient:
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
                 services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
 
-                services.AddTransient<IProcessFactory, ProcessFactory>();
+                services.AddTransient<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
+                
+                services.AddTransient<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(lifetime),

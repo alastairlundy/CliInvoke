@@ -1,4 +1,4 @@
-﻿/*
+/*
     AlastairLundy.CliInvoke  
     Copyright (C) 2024-2025  Alastair Lundy
 
@@ -7,246 +7,261 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-#nullable enable
 
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Piping;
-
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Internal.Localizations;
-
-using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Internal;
+using AlastairLundy.CliInvoke.Helpers.Processes;
 
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of IProcessInvoker, a safer way to execute processes.
+/// The default implementation of <see cref="IProcessInvoker"/>,
+/// an interface that creates and runs Process objects from <see cref="ProcessStartInfo"/> objects.
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
-    private readonly IProcessPipeHandler _processPipeHandler;
-    
     private readonly IFilePathResolver _filePathResolver;
+    private readonly IProcessPipeHandler _processPipeHandler;
+
 
     /// <summary>  
-    /// Instantiates an invoker for invoking processes, providing a centralized way to execute external commands.
+    /// Instantiates a <see cref="ProcessInvoker"/> for creating and executing processes.
     /// </summary>
-    /// <param name="filePathResolver"></param>
+    /// <param name="filePathResolver">The file path resolver to be used.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
-    public ProcessInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
+    public ProcessInvoker(IFilePathResolver filePathResolver,
+        IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;
+    }
+    
+    /// <summary>
+    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
+    /// </summary>
+    /// <param name="startInfo">The start info to use for <see cref="Process"/> creation.</param>
+    /// <param name="processResourcePolicy">The resource policy to use for <see cref="Process"/> creation.</param>
+    /// <param name="processTimeoutPolicy">The timeout policy to use when waiting for <see cref="Process"/> exit.</param>
+    /// <param name="processResultValidation"></param>
+    /// <param name="standardInput">The standard input to pipe to the Process, if specified.</param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
+    /// <returns>The Process Results from the running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
+    public async Task<ProcessResult> ExecuteAsync(ProcessStartInfo startInfo,
+        ProcessResourcePolicy processResourcePolicy,
+        ProcessTimeoutPolicy processTimeoutPolicy, ProcessResultValidation processResultValidation,
+        StreamWriter? standardInput = null,
+        CancellationToken cancellationToken = default)
+    {
+        startInfo.FileName = _filePathResolver.ResolveFilePath(startInfo.FileName);
+        
+        Process process = new Process
+        {
+            StartInfo = startInfo,
+            EnableRaisingEvents = true,
+        };
+        
+        if (process.StartInfo.RedirectStandardInput && standardInput is not null)
+        {
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
+                process);
+        }
+
+        ProcessResult result;
+        
+        try
+        {
+            process.Start();
+            
+            if(process.HasStarted() && process.HasExited() == false)
+                process.SetResourcePolicy(processResourcePolicy);
+            
+            await process.WaitForExitOrTimeoutAsync(processTimeoutPolicy, cancellationToken);
+            
+            result = new ProcessResult(process.StartInfo.FileName,
+                process.ExitCode, process.StartTime, process.ExitTime);
+
+            if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process: process,
+                    exitCode: process.ExitCode);
+            }
+        }
+        finally
+        {
+            process.Dispose();
+        }
+
+        return result;
     }
 
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitInfo"></param>
-    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns>The Process Results from running the process.</returns>
-    /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
-    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitInfo,
-        CancellationToken cancellationToken = default)
-    {
-        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
-        
-        if (processExitInfo is null)
-            processExitInfo = ProcessExitConfiguration.Default;
-        
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
-        {
-            throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace("{file}",
-                    processConfiguration.TargetFilePath));
-        }
-
-        Process process = new Process()
-        {
-            StartInfo = processConfiguration.ToProcessStartInfo(
-                processConfiguration.StandardOutput is not null &&
-                processConfiguration.StandardOutput != StreamReader.Null,
-                processConfiguration.StandardError is not null &&
-                processConfiguration.StandardError != StreamReader.Null)
-        };
-        
-        if (processConfiguration.StandardInput is not null && processConfiguration.StandardInput != StreamWriter.Null)
-        {
-            process.StartInfo.RedirectStandardInput = true;
-        }
-
-        if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
-        {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
-                process);
-        }
-        
-        process.Start();
-        
-        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
-        await process.WaitForExitOrTimeoutAsync(processExitInfo.TimeoutPolicy, cancellationToken);
-        
-        ProcessResult result = new ProcessResult(process.StartInfo.FileName,
-            process.ExitCode, process.StartTime, process.ExitTime);
-       
-        if (processExitInfo.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process,
-                exitCode: process.ExitCode);
-        }
-
-        process.Dispose();
-        
-        return result;
-    }
-    
-
-    /// <summary>
-    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
-    /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
-    /// </summary>
-    /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitConfiguration"></param>
+    /// <param name="startInfo">The start info to use for <see cref="Process"/> creation.</param>
+    /// <param name="processResourcePolicy">The resource policy to use for <see cref="Process"/> creation.</param>
+    /// <param name="processTimeoutPolicy">The timeout policy to use when waiting for <see cref="Process"/> exit.</param>
+    /// <param name="processResultValidation"></param>
+    /// <param name="standardInput">The standard input to pipe to the Process, if specified.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
     [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
-        ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration,
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessStartInfo startInfo,
+        ProcessResourcePolicy processResourcePolicy,
+        ProcessTimeoutPolicy processTimeoutPolicy, ProcessResultValidation processResultValidation,
+        StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
-        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
+        startInfo.FileName = _filePathResolver.ResolveFilePath(startInfo.FileName);
+
+        startInfo.RedirectStandardOutput = true;
+        startInfo.RedirectStandardError = true;
         
-        processExitConfiguration ??= ProcessExitConfiguration.Default;
-        
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        Process process = new Process
         {
-            throw new FileNotFoundException(Resources.Exceptions_FileNotFound
-                .Replace("{file}",
-                    processConfiguration.TargetFilePath));
-        }
-        
-        Process process = new Process()
-        {
-            StartInfo = processConfiguration.ToProcessStartInfo(true, true),
+            StartInfo = startInfo,
+            EnableRaisingEvents = true,
         };
         
-        if (processConfiguration.StandardInput is not null && processConfiguration.StandardInput != StreamWriter.Null)
+        if (process.StartInfo.RedirectStandardInput && standardInput is not null)
         {
-            process.StartInfo.RedirectStandardInput = true;
-        }
-
-        if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
-        {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
                 process);
         }
         
-        process.Start();
-        
-        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-        
-        await process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
+        BufferedProcessResult result;
 
-        BufferedProcessResult result = new BufferedProcessResult(
-            process.StartInfo.FileName,
-            process.ExitCode,
-            await process.StandardOutput.ReadToEndAsync(cancellationToken),
-            await process.StandardError.ReadToEndAsync(cancellationToken),
-            process.StartTime,
-            process.ExitTime);
-                              
-        process.Dispose();
-        
+        try
+        {
+            process.Start();
+            
+            if(process.HasStarted() && process.HasExited() == false)
+                process.SetResourcePolicy(processResourcePolicy);
+            
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processTimeoutPolicy, cancellationToken);
+            
+            Task<string> standardOutputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+            Task<string> standardErrorTask = process.StandardError.ReadToEndAsync(cancellationToken);
+
+            await Task.WhenAll(waitForExit, standardOutputTask, standardErrorTask);
+            
+            result = new BufferedProcessResult(process.StartInfo.FileName,
+                process.ExitCode, await standardOutputTask,
+                await standardErrorTask,
+                 process.StartTime, process.ExitTime);
+
+            if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process: process,
+                    exitCode: process.ExitCode);
+            }
+        }
+        finally
+        {
+            process.Dispose();
+        }
+
         return result;
     }
-    
+
+
     /// <summary>
-    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
-    /// gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the Process before returning.
+    /// Pipes the Standard Input (if applicable), runs the process asynchronously,
+    /// waits for exit, pipes the standard output and error, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitConfiguration"></param>
+    /// <param name="startInfo">The start info to use for <see cref="Process"/> creation.</param>
+    /// <param name="processResourcePolicy">The resource policy to use for <see cref="Process"/> creation.</param>
+    /// <param name="processTimeoutPolicy">The timeout policy to use when waiting for <see cref="Process"/> exit.</param>
+    /// <param name="processResultValidation"></param>
+    /// <param name="standardInput">The standard input to pipe to the Process, if specified.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns>The Piped Process Results from running the process.</returns>
+    /// <returns>The Piped Process Result that is returned from running the process.</returns>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
     [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-    public async Task<PipedProcessResult> ExecutePipedAsync(
-        ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration,
+    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessStartInfo startInfo,
+        ProcessResourcePolicy processResourcePolicy,
+        ProcessTimeoutPolicy processTimeoutPolicy, ProcessResultValidation processResultValidation,
+        StreamWriter? standardInput = null,
         CancellationToken cancellationToken = default)
     {
-        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
+        startInfo.FileName = _filePathResolver.ResolveFilePath(startInfo.FileName);
         
-        processExitConfiguration ??= ProcessExitConfiguration.Default;
-
-        Process process = new Process()
+        Process process = new Process
         {
-            StartInfo = processConfiguration.ToProcessStartInfo(true, true)
+            StartInfo = startInfo,
+            EnableRaisingEvents = true,
         };
         
-        if (processConfiguration.StandardInput is not null && processConfiguration.StandardInput != StreamWriter.Null)
+        if (process.StartInfo.RedirectStandardInput && standardInput is not null)
         {
-            process.StartInfo.RedirectStandardInput = true;
-        }
-
-        if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
-        {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
                 process);
         }
+        
+        PipedProcessResult result;
 
-        process.Start();
-        
-        process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-        
-        await process.WaitForExitOrTimeoutAsync(processExitConfiguration.TimeoutPolicy, cancellationToken);
+        try
+        {
+            process.Start();
 
-        Stream standardOutput = await _processPipeHandler.PipeStandardOutputAsync(process);
-        Stream standardError = await _processPipeHandler.PipeStandardErrorAsync(process);
-        
-        PipedProcessResult result = new PipedProcessResult(process.StartInfo.FileName,
-            process.ExitCode, process.StartTime, process.ExitTime,
-            standardOutput, standardError);
-        
-        process.Dispose();
-        
+            if(process.HasStarted() && process.HasExited() == false)
+                process.SetResourcePolicy(processResourcePolicy);
+
+            Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
+            Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
+
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(processTimeoutPolicy,
+                cancellationToken);
+
+            await Task.WhenAll(standardOutput, standardError, waitForExit);
+
+            result = new PipedProcessResult(process.StartInfo.FileName,
+                process.ExitCode, process.StartTime, process.ExitTime,
+                await standardOutput, await standardError);
+            
+            if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException(process: process,
+                    exitCode: process.ExitCode);
+            }
+        }
+        finally
+        {
+            process.Dispose();
+        }
+
         return result;
     }
 }

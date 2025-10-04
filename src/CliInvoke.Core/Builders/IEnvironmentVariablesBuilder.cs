@@ -13,7 +13,7 @@ using System.Collections.Generic;
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
-/// 
+/// An interface that defines the fluent builder methods for configuring environment variables for a Process or ProcessConfiguration.
 /// </summary>
 public interface IEnvironmentVariablesBuilder
 {

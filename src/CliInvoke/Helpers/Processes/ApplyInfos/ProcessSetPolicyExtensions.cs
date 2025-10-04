@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.DotPrimitives 
+    AlastairLundy.CliInvoke 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,22 +7,21 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-
 using System;
 using System.Diagnostics;
-
-using AlastairLundy.CliInvoke.Core.Internal;
+using System.Runtime.Versioning;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Internal.Localizations;
 
-using AlastairLundy.DotExtensions.Processes;
+// ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 /// <summary>
 /// 
 /// </summary>
-public static class ProcessSetPolicyExtensions
+internal static class ProcessSetPolicyExtensions
 {
     /// <summary>
     /// Applies a ProcessResourcePolicy to a Process.
@@ -30,12 +29,17 @@ public static class ProcessSetPolicyExtensions
     /// <param name="process">The process to apply the policy to.</param>
     /// <param name="resourcePolicy">The process resource policy to be applied.</param>
     /// <exception cref="InvalidOperationException"></exception>
-    public static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
+    internal static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
     {
-        if (resourcePolicy is null)
-        {
-            resourcePolicy = ProcessResourcePolicy.Default;
-        }
+        resourcePolicy ??= ProcessResourcePolicy.Default;
 
         if (process.HasStarted() == false)
             throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);

@@ -9,8 +9,6 @@
 
 using System;
 
-// ReSharper disable MemberCanBePrivate.Global
-
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>

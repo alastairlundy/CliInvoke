@@ -22,19 +22,17 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-alpha.7</Version>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 6
+        <Version>2.0.0-beta.2</Version>
+        <PackageReleaseNotes>## 2.0.0 Beta 2
 
-### Changes
-* Updated ``ProcessResult`` to implement ``IEquatable&lt;ProcessResult&gt;``
-*  Updated DotExtensions dependency from 8.2.0 to 8.3.0
-* Added missing xml doc comments to ``ProcessExitInfo`` class
-* Moved Process ``ApplyProcessConfiguration`` extensions to CliInvoke main package from CliInvoke.Core and made the extensions internal</PackageReleaseNotes>
+### Core package only
+* Removed dependency on DotExtensions
+* Moved extension methods to CliInvoke main package
+* Deprecated some extension methods and constructors in classes for removal in v2
+* Renamed the existing ``IProcessInvoker`` interface to ``IProcessConfigurationInvoker``
+* Created a new ``IProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
+* Removed ``IProcessFactory``</PackageReleaseNotes>
     </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.4.0" />
-    </ItemGroup>
 
 
     <ItemGroup>
@@ -66,9 +64,5 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Extensions\Internal\" />
     </ItemGroup>
 </Project>

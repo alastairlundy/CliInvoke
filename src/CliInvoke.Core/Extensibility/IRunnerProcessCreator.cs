@@ -12,14 +12,14 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 namespace AlastairLundy.CliInvoke.Core.Extensibility;
 
 /// <summary>
-/// 
+/// An interface to allow creating a ProcessConfiguration that can be run through other Process' ProcessConfiguration.
 /// </summary>
 public interface IRunnerProcessCreator
 {
     /// <summary>
-    /// Create the command to be run from the Command runner configuration and an input command.
+    /// Creates a ProcessConfiguration to be run from a runner configuration and an input ProcessConfiguration.
     /// </summary>
-    /// <param name="inputCommand">The command to be run by the Command Runner command.</param>
+    /// <param name="inputCommand">The command to be run by the ProcessConfiguration Runner.</param>
     /// <returns>The built Command that will run the input command.</returns>
     ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputCommand);
 }

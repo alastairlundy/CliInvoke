@@ -13,18 +13,26 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.0.0 Alpha 6
+        <PackageReleaseNotes>## 2.0.0 Beta 2
 
-### Changes
-* Fixed incorrect access modifier for one of ``ProcessExitInfoBuilder``'s constructors
-* Updated ``ProcessResult`` to implement ``IEquatable&lt;ProcessResult&gt;``
-*  Updated DotExtensions dependency from 8.2.0 to 8.3.0
-* Added missing xml doc comments to ``ProcessExitInfo`` class
-* Moved Process ``ApplyProcessConfiguration`` extensions to CliInvoke main package from CliInvoke.Core and made the extensions internal</PackageReleaseNotes>
+### Core package only
+* Removed dependency on DotExtensions
+* Moved extension methods to CliInvoke main package
+* Deprecated some extension methods and constructors in classes for removal in v2
+* Renamed the existing ``IProcessInvoker`` interface to ``IProcessConfigurationInvoker``
+* Created a new ``IProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
+* Removed ``IProcessFactory``
+
+### Main package only
+* Updated DotExtensions from 8.5.0 to 8.5.1
+* Added some Process related extension methods from DotExtensions back into CliInvoke
+* Renamed the existing ``ProcessInvoker`` interface to ``ProcessConfigurationInvoker``
+* Created a new ``ProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
+* Removed ``ProcessFactory``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-alpha.7</PackageVersion>
+        <PackageVersion>2.0.0-beta.2</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -32,14 +40,8 @@
         <PackageId>AlastairLundy.CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
-    
-    <ItemGroup>
-<!--
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-alpha.7" />
--->
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.4.0" />
-    </ItemGroup>
     
     <ItemGroup>
       <Content Include="..\..\README.md">
@@ -71,9 +73,13 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-    
+<!--    
     <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+    </ItemGroup>-->
+    
+    <ItemGroup>
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.2" />
+      <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.1" />
     </ItemGroup>
-   
 </Project>

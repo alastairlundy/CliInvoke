@@ -21,7 +21,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 namespace AlastairLundy.CliInvoke.Extensibility;
 
 /// <summary>
-/// A class to allow creating ProcessPrimitives that can be run through other ProcessPrimitives.
+/// A class to allow creating a ProcessConfiguration that can be run through other Process' ProcessConfiguration.
 /// </summary>
 public class RunnerProcessCreator : IRunnerProcessCreator
 {
@@ -46,7 +46,7 @@ public class RunnerProcessCreator : IRunnerProcessCreator
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(_commandRunnerConfiguration)
             .WithArguments(inputProcess.TargetFilePath + " " + inputProcess.Arguments)
             .WithEnvironmentVariables(inputProcess.EnvironmentVariables)
-            .WithProcessResourcePolicy(inputProcess.ResourcePolicy ?? ProcessResourcePolicy.Default)
+            .WithProcessResourcePolicy(inputProcess.ResourcePolicy)
             .WithEncoding(inputProcess.StandardInputEncoding,
                 inputProcess.StandardOutputEncoding,
                 inputProcess.StandardErrorEncoding)
