@@ -8,6 +8,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Diagnostics.Contracts;
 using AlastairLundy.CliInvoke.Core.Builders;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
@@ -40,6 +41,7 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     /// </summary>
     /// <param name="validation">The result validation behaviour to be used.</param>
     /// <returns>The new ProcessExitInfoBuilder object with the configured Result Validation behaviour.</returns>
+    [Pure]
     public IProcessExitConfigurationBuilder WithValidation(ProcessResultValidation validation) =>
         new ProcessExitConfigurationBuilder(
             new ProcessExitConfiguration(_processExitInfo.TimeoutPolicy, validation));
@@ -49,6 +51,7 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     /// </summary>
     /// <param name="processTimeoutPolicy">The process timeout policy to use.</param>
     /// <returns>The new ProcessExitInfoBuilder with the specified Process Timeout Policy.</returns>
+    [Pure]
     public IProcessExitConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy) =>
         new ProcessExitConfigurationBuilder(
             new ProcessExitConfiguration(processTimeoutPolicy, _processExitInfo.ResultValidation));
