@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace AlastairLundy.CliInvoke.Tests.Helpers;
+namespace AlastairLundy.CliInvoke.Tests.Internal.Helpers;
 
 public static class WindowsTestExecutables
 {
