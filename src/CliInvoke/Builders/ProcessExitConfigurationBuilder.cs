@@ -16,7 +16,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
-/// 
+/// A class that implements fluent builder methods for configuring a ProcessExitConfiguration. 
 /// </summary>
 public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
 {
@@ -59,7 +59,7 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     /// <summary>
     /// 
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The newly configured Process Exit Configuration.</returns>
     public ProcessExitConfiguration Build() =>  
         _processExitConfiguration;
 }
