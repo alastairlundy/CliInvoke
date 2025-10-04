@@ -19,7 +19,7 @@ using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Internal.Processes;
+using AlastairLundy.CliInvoke.Helpers.Processes;
 
 namespace AlastairLundy.CliInvoke;
 

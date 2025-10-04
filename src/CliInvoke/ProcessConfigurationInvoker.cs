@@ -20,8 +20,7 @@ using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
-
-using AlastairLundy.CliInvoke.Internal.Processes;
+using AlastairLundy.CliInvoke.Helpers.Processes;
 
 namespace AlastairLundy.CliInvoke;
 
