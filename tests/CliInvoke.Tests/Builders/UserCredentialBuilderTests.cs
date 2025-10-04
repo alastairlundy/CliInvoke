@@ -1,4 +1,7 @@
-﻿using AlastairLundy.CliInvoke.Builders;
+﻿using System.Security;
+using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Core.Builders;
+using AlastairLundy.CliInvoke.Core.Primitives;
 using Xunit;
 
 
@@ -16,13 +19,45 @@ public class UserCredentialBuilderTests
     [Fact]
     public void WithUsername_ShouldSetUsername()
     {
-        // TODO: Test WithUsername method
+        // Arrange
+        // ReSharper disable once JoinDeclarationAndInitializer
+        IUserCredentialBuilder builder;
+       string userName = "fakeusername";
+       
+       // Act
+       builder = new UserCredentialBuilder()
+           .SetUsername(userName);
+       
+       // Assert
+
+      UserCredential credential = builder.Build();
+       
+       Assert.Equal(credential.UserName, userName);
     }
 
     [Fact]
     public void WithPassword_ShouldSetPassword()
     {
-        // TODO: Test WithPassword method
+        // Arrange
+        // ReSharper disable once JoinDeclarationAndInitializer
+        IUserCredentialBuilder builder;
+        SecureString password = new SecureString();
+        password.AppendChar('f');
+        password.AppendChar('a');
+        password.AppendChar('k');
+        password.AppendChar('e');
+        
+        // Act
+        builder = new UserCredentialBuilder()
+            .SetPassword(password);
+       
+        // Assert
+
+        UserCredential credential = builder.Build();
+       
+#pragma warning disable CA1416
+        Assert.Equal(credential.Password, password);
+#pragma warning restore CA1416
     }
 
     [Fact]
