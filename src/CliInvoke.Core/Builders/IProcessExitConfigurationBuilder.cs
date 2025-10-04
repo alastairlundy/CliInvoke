@@ -32,6 +32,13 @@ public interface IProcessExitConfigurationBuilder
     IProcessExitConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy);
 
     /// <summary>
+    /// Sets the Process Cancellation Exception Behaviour to be used for this Process.
+    /// </summary>
+    /// <param name="cancellationExceptionBehavior">The Process Cancellation Exception Behavior to Set.</param>
+    /// <returns>The new ProcessConfigurationBuilder with the specified <see cref="ProcessCancellationExceptionBehavior"/> strategy.</returns>
+    IProcessExitConfigurationBuilder WithCancellationExceptionBehaviour(ProcessCancellationExceptionBehavior cancellationExceptionBehavior);
+    
+    /// <summary>
     /// Builds the ProcessExitConfiguration with the configured parameters.
     /// </summary>
     /// <returns>The newly configured Process Exit Configuration.</returns>

@@ -19,12 +19,6 @@ public class EnvironmentVariablesBuilderTests
     }
 
     [Fact]
-    public void Remove_ShouldRemoveVariable()
-    {
-        // TODO: Test Remove method
-    }
-
-    [Fact]
     public void Build_ShouldReturnVariables()
     {
         // TODO: Test Build method
