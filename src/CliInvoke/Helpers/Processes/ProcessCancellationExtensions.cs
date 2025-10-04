@@ -69,7 +69,7 @@ internal static class ProcessCancellationExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    private static async Task WaitForExitOrTimeoutAsync(this Process process,TimeSpan timeoutThreshold)
+    internal static async Task WaitForExitOrTimeoutAsync(this Process process,TimeSpan timeoutThreshold)
     {
         if (timeoutThreshold < TimeSpan.Zero)
             throw new ArgumentOutOfRangeException();

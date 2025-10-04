@@ -42,7 +42,13 @@
         <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>AlastairLundy.CliInvoke.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
     <ItemGroup>
       <Content Include="..\..\README.md">
         <Link>README.md</Link>
