@@ -44,7 +44,8 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     [Pure]
     public IProcessExitConfigurationBuilder WithValidation(ProcessResultValidation validation) =>
         new ProcessExitConfigurationBuilder(
-            new ProcessExitConfiguration(_processExitInfo.TimeoutPolicy, validation));
+            new ProcessExitConfiguration(_processExitConfiguration.TimeoutPolicy, validation,
+                _processExitConfiguration.CancellationExceptionBehavior));
 
     /// <summary>
     /// Sets the Process Timeout Policy to be used for this Process.
@@ -54,10 +55,23 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     [Pure]
     public IProcessExitConfigurationBuilder WithProcessTimeoutPolicy(ProcessTimeoutPolicy processTimeoutPolicy) =>
         new ProcessExitConfigurationBuilder(
-            new ProcessExitConfiguration(processTimeoutPolicy, _processExitInfo.ResultValidation));
+            new ProcessExitConfiguration(processTimeoutPolicy, _processExitConfiguration.ResultValidation, 
+                _processExitConfiguration.CancellationExceptionBehavior));
 
     /// <summary>
-    /// 
+    /// Sets the Process Cancellation Exception Behaviour to be used for this Process.
+    /// </summary>
+    /// <param name="cancellationExceptionBehavior">The Process Cancellation Exception Behavior to Set.</param>
+    /// <returns>The new ProcessConfigurationBuilder with the specified <see cref="ProcessCancellationExceptionBehavior"/> strategy.</returns>
+    [Pure]
+    public IProcessExitConfigurationBuilder WithCancellationExceptionBehaviour(
+        ProcessCancellationExceptionBehavior cancellationExceptionBehavior) =>
+        new ProcessExitConfigurationBuilder(
+            new ProcessExitConfiguration(_processExitConfiguration.TimeoutPolicy, _processExitConfiguration.ResultValidation, 
+                cancellationExceptionBehavior));
+
+    /// <summary>
+    /// Builds the ProcessExitConfiguration with the configured parameters.
     /// </summary>
     /// <returns>The newly configured Process Exit Configuration.</returns>
     public ProcessExitConfiguration Build() =>  
