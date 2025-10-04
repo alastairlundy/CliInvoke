@@ -49,13 +49,14 @@ internal static class ProcessCancellationExtensions
                 return;
             }
             case ProcessCancellationMode.Forceful:
-                process.Kill();
+                await WaitForExitOrForcefulTimeoutAsync(process, processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                    processExitConfiguration.CancellationExceptionBehavior);
                 return;
             default:
                 throw new NotSupportedException();
         }
     }
-    
+
     /// <summary>
     /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
     /// </summary>
@@ -110,8 +111,60 @@ internal static class ProcessCancellationExtensions
         
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="process"></param>
+    /// <param name="timeoutThreshold"></param>
+    /// <param name="cancellationExceptionBehavior"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
+    private static async Task WaitForExitOrForcefulTimeoutAsync(this Process process,TimeSpan timeoutThreshold, 
+        ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+    {
+        if (timeoutThreshold < TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException();
         
+        DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
         
-        await process.WaitForExitAsync(cts.Token);
+        try
+        {
+            Task waitForExit = process.WaitForExitAsync();
+            
+            Task delay = Task.Delay(timeoutThreshold);
+            
+            await Task.WhenAny(delay, waitForExit);
+
+            if (process.HasExited() == false)
+            {
+                process.Kill();
+            }
+        }
+        catch (Exception)
+        {
+            DateTime actualExitTime = DateTime.UtcNow;
+            
+            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.SuppressException)
+            {
+                return;
+            }
+
+            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected ||
+                cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+            {
+                if (actualExitTime.Abs(expectedExitTime) > TimeSpan.FromSeconds(10) || 
+                    cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+                {
+                    throw;
+                }
+            }
+        }
     }
 }
