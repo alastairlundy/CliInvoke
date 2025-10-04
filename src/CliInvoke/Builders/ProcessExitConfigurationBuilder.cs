@@ -19,7 +19,7 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// </summary>
 public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
 {
-    private readonly ProcessExitConfiguration _processExitInfo;
+    private readonly ProcessExitConfiguration _processExitConfiguration;
 
     /// <summary>
     /// 
@@ -27,12 +27,12 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     /// <param name="processExitInfo"></param>
     protected ProcessExitConfigurationBuilder(ProcessExitConfiguration processExitInfo)
     {
-        _processExitInfo = processExitInfo;
+        _processExitConfiguration = processExitInfo;
     }
 
     public ProcessExitConfigurationBuilder()
     {
-        _processExitInfo = new ProcessExitConfiguration();
+        _processExitConfiguration = new ProcessExitConfiguration();
     }
         
     /// <summary>
@@ -58,5 +58,5 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     /// </summary>
     /// <returns></returns>
     public ProcessExitConfiguration Build() =>  
-        _processExitInfo;
+        _processExitConfiguration;
 }
