@@ -4,7 +4,6 @@ using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using Xunit;
 
-
 namespace AlastairLundy.CliInvoke.Tests.Builders;
 
 public class UserCredentialBuilderTests
@@ -50,11 +49,10 @@ public class UserCredentialBuilderTests
         // Act
         builder = new UserCredentialBuilder()
             .SetPassword(password);
-       
-        // Assert
-
+        
         UserCredential credential = builder.Build();
        
+        // Assert
 #pragma warning disable CA1416
         Assert.Equal(credential.Password, password);
 #pragma warning restore CA1416

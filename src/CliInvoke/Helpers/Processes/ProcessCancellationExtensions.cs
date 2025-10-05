@@ -14,6 +14,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
+
+using AlastairLundy.DotExtensions.Processes;
 using AlastairLundy.DotExtensions.Dates;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;

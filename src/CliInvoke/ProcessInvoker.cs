@@ -21,6 +21,8 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Helpers.Processes;
 
+using AlastairLundy.DotExtensions.Processes;
+
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
