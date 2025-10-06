@@ -18,6 +18,10 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
 using System.Runtime.Versioning;
 
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
+
 // ReSharper disable RedundantBoolCompare
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;
