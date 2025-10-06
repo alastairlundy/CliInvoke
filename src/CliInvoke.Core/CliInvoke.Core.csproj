@@ -22,16 +22,15 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-beta.2</Version>
-        <PackageReleaseNotes>## 2.0.0 Beta 2
+        <Version>2.0.0-beta.3</Version>
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 2
 
-### Core package only
-* Removed dependency on DotExtensions
-* Moved extension methods to CliInvoke main package
-* Deprecated some extension methods and constructors in classes for removal in v2
-* Renamed the existing ``IProcessInvoker`` interface to ``IProcessConfigurationInvoker``
-* Created a new ``IProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
-* Removed ``IProcessFactory``</PackageReleaseNotes>
+### Additions
+* Added ``ProcessCancellationExceptionBehaviour`` enum to enable configuring Cancellation Exception behaviour (i.e. suppressing the exception, allowing it, or allowing the exception if unexpected) - This has been added as a property to ``ProcessExitConfiguration``, with updates to the class to support the addition.
+
+### Improvements
+* Added some missing xml doc comments
+* Updated ``IProcessExitConfigurationBuilder`` to support ``ProcessCancellationExceptionBehaviour``'s addition to ``ProcessExitConfiguration``</PackageReleaseNotes>
     </PropertyGroup>
 
 

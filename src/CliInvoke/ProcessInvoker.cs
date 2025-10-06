@@ -19,7 +19,9 @@ using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Internal.Processes;
+using AlastairLundy.CliInvoke.Helpers.Processes;
+
+using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke;
 
@@ -93,7 +95,8 @@ public class ProcessInvoker : IProcessInvoker
             if(process.HasStarted() && process.HasExited() == false)
                 process.SetResourcePolicy(processResourcePolicy);
             
-            await process.WaitForExitOrTimeoutAsync(processTimeoutPolicy, cancellationToken);
+            await process.WaitForExitOrTimeoutAsync(new ProcessExitConfiguration(processTimeoutPolicy, processResultValidation,
+                ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected), cancellationToken: cancellationToken);
             
             result = new ProcessResult(process.StartInfo.FileName,
                 process.ExitCode, process.StartTime, process.ExitTime);
@@ -163,8 +166,9 @@ public class ProcessInvoker : IProcessInvoker
             if(process.HasStarted() && process.HasExited() == false)
                 process.SetResourcePolicy(processResourcePolicy);
             
-            Task waitForExit = process.WaitForExitOrTimeoutAsync(processTimeoutPolicy, cancellationToken);
-            
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(new ProcessExitConfiguration(processTimeoutPolicy, processResultValidation,
+                ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected), cancellationToken: cancellationToken);
+
             Task<string> standardOutputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardErrorTask = process.StandardError.ReadToEndAsync(cancellationToken);
 
@@ -242,9 +246,9 @@ public class ProcessInvoker : IProcessInvoker
             Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
 
-            Task waitForExit = process.WaitForExitOrTimeoutAsync(processTimeoutPolicy,
-                cancellationToken);
-
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(new ProcessExitConfiguration(processTimeoutPolicy, processResultValidation,
+                ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected), cancellationToken: cancellationToken);
+            
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
             result = new PipedProcessResult(process.StartInfo.FileName,

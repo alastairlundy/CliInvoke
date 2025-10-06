@@ -7,16 +7,17 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+using AlastairLundy.DotExtensions.Processes;
 
 // ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Internal.Processes;
+namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 /// <summary>
 /// 

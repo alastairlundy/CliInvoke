@@ -1,19 +1,16 @@
 ﻿using System;
-
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Builders;
-
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Core.Primitives;
-
 using AlastairLundy.CliInvoke.Piping;
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 
-namespace AlastairLundy.CliInvoke.Tests.Helpers;
+namespace AlastairLundy.CliInvoke.Tests.Internal.Helpers;
 
 public class CrossPlatformTestExecutables
 {

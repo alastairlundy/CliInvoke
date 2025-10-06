@@ -32,7 +32,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.2</PackageVersion>
+        <PackageVersion>2.0.0-beta.3</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -42,7 +42,13 @@
         <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>AlastairLundy.CliInvoke.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
     <ItemGroup>
       <Content Include="..\..\README.md">
         <Link>README.md</Link>
@@ -73,13 +79,12 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-<!--    
-    <ItemGroup>
+ <!--   <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>-->
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.2" />
-      <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.1" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
+      <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.0" />
     </ItemGroup>
 </Project>
