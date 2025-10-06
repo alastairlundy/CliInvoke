@@ -13,6 +13,10 @@ using System.Runtime.Versioning;
 using System;
 using System.Diagnostics;
 
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
+
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>

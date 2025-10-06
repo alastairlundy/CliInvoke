@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
@@ -48,6 +48,10 @@
             <_Parameter1>AlastairLundy.CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
+    </ItemGroup>
 
     <ItemGroup>
       <Content Include="..\..\README.md">
@@ -79,12 +83,14 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
- <!--   <ItemGroup>
+    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>-->
+    </ItemGroup>
     
     <ItemGroup>
+<!--
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
+-->
       <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.0" />
     </ItemGroup>
 </Project>
