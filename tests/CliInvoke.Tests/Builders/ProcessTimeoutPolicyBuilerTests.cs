@@ -34,7 +34,7 @@ public class ProcessTimeoutPolicyBuilerTests
     [Theory]
     [InlineData(-0.5)]
     [InlineData(-1)]
-    public void WithTimeoutThreshold_ShouldNotSetNegativeTimeout(int timeoutSpan)
+    public void WithTimeoutThreshold_ShouldNotSetNegativeTimeout(double timeoutSpan)
     {
         // Arrange
         TimeSpan timeout = TimeSpan.FromSeconds(timeoutSpan);
