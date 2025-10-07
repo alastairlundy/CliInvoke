@@ -26,7 +26,7 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Features
 * Promotes the single responsibility principle and separation of concerns
-* Supports .NET 8 and newer TFMs, and has few dependencies.
+* Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
 * Dependency Injection extensions to make using CliInvoke a breeze.
 * Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
@@ -35,12 +35,12 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Why use CliInvoke over [CliWrap](https://github.com/Tyrrrz/CliWrap/)?
 * Greater separation of concerns - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
-* Supports Dependency Injection
+* Supports and was designed with Dependency Injection in mind
 * Classes and code follow the Single Responsibility Principle
-* No hidden or additional licensing terms are required beyond the source code license.
+* No additional licensing terms are required beyond the source code license.
 * No imported C code - This library is entirely written in C#.
 * No lock in regarding Piping support
-* Uses .NET's built in ``Process`` type.
+* Supports .NET's built in ``ProcessStartInfo`` primitive.
 
 ## How to install and use CliInvoke
 CliInvoke is available on Nuget.
@@ -240,7 +240,7 @@ Currently, the required .NET SDK is .NET 9.
 The current build targets include: 
 * .NET 8
 * .NET 9
-* .NET Standard 2.0 (for CliInvoke 1.x only)
+* .NET Standard 2.0
 
 Any version of the .NET 9 SDK can be used, but using the latest version is preferred.
 

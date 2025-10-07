@@ -47,7 +47,7 @@ CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your ID
 | AlastairLundy.CliInvoke.Core | [AlastairLundy.CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core) | ``dotnet add package AlastairLundy.CliInvoke.Core`` |
 
 ### Supported Platforms
-CliInvoke.Core can be added to any .NET Standard 2.0, .NET Standard 2.1, .NET 8, or .NET 9 supported project.
+CliInvoke.Core can be added to any .NET Standard 2.0, .NET 8, or .NET 9 or newer supported project.
 
 The following table details which target platforms are supported for running Processes.
 
@@ -239,5 +239,6 @@ If you use CliInvoke.Core in your project, please make an exact copy of the cont
 ### Projects
 This project would like to thank the following projects for their work:
 * [Microsoft.Bcl.HashCode](https://github.com/dotnet/maintenance-packages) for providing a backport of the HashCode class and static methods to .NET Standard 2.0
+* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying .NET Standard 2.0 support
 
-For more information, please see the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke.Cores/blob/main/THIRD_PARTY_NOTICES.txt).
+For more information, please see the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).
