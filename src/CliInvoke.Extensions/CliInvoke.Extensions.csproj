@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -29,8 +29,8 @@
     
     <ItemGroup>
 
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-beta.3" />
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
+<!--        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-beta.3" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />-->
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
     </ItemGroup>
 
@@ -65,8 +65,8 @@
       </Compile>
     </ItemGroup>
 
-<!--    <ItemGroup>
+    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
       <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
-    </ItemGroup>-->
+    </ItemGroup>
 </Project>

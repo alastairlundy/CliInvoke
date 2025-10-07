@@ -16,6 +16,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
+
 using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;

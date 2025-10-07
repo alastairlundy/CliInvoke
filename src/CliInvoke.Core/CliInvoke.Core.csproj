@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>AlastairLundy.CliInvoke.Core</AssemblyName>
@@ -33,6 +33,10 @@
 * Updated ``IProcessExitConfigurationBuilder`` to support ``ProcessCancellationExceptionBehaviour``'s addition to ``ProcessExitConfiguration``</PackageReleaseNotes>
     </PropertyGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
+    </ItemGroup>
 
     <ItemGroup>
         <Content Include="README.md">

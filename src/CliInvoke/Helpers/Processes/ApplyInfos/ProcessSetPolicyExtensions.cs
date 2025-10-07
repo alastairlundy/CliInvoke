@@ -15,6 +15,10 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 using AlastairLundy.DotExtensions.Processes;
 
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
+
 // ReSharper disable RedundantBoolCompare
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;

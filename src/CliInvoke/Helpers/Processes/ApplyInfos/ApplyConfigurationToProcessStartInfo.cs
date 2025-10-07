@@ -8,10 +8,15 @@
    */
 
 
-using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Core.Primitives;
+
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#else
+using System;
+#endif
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>AlastairLundy.CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>
@@ -23,6 +23,10 @@
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
     </PropertyGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
+    </ItemGroup>
 
     <ItemGroup>
         <Content Include="..\..\SPECIALIZATIONS_README.md">
@@ -55,11 +59,11 @@
       </None>
     </ItemGroup>
 
-<!--    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>-->
-
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
+      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
+
+ <!--   <ItemGroup>
+      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
+    </ItemGroup>-->
 </Project>
