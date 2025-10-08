@@ -77,7 +77,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     public SecureString? Password { get; private set; }
         
     /// <summary>
-    /// Whether to load the UserCredential information and user profile.
+    /// Whether to load the Windows User Profile.
     /// </summary>
     [SupportedOSPlatform("windows")]
     public bool? LoadUserProfile { get; private set; }

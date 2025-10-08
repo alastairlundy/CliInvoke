@@ -25,7 +25,7 @@ namespace AlastairLundy.CliInvoke.Core.Primitives;
 public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 {
     /// <summary>
-    /// Instantiates the ProcessResourcePolicy with default values unless specified parameters are provided.
+    /// Instantiates the <see cref="ProcessResourcePolicy"/> with default values unless specified parameters are provided.
     /// </summary>
     /// <param name="processorAffinity">The processor affinity to be used for the Process.</param>
     /// <param name="minWorkingSet">The Minimum Working Set Size for the Process.</param>

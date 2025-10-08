@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Threading;
+
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
 /// <summary>
@@ -15,11 +17,11 @@ namespace AlastairLundy.CliInvoke.Core.Primitives;
 public enum ProcessCancellationMode
 {
     /// <summary>
-    /// 
+    /// Forcefully terminates the Process along with all child processes.
     /// </summary>
     Forceful,
     /// <summary>
-    /// Graceful Cancellation is attempted, but the process's exit upon cancellation is not guaranteed.
+    /// Gracefully cancels the Process using a new <see cref="CancellationTokenSource"/>. 
     /// </summary>
     Graceful,
     /// <summary>
