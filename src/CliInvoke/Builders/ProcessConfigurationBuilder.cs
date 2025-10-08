@@ -77,6 +77,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [Pure]
     public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments, bool escapeArguments)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(arguments));
+#endif
+        
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
             .Add(arguments,
                 escapeArguments);
@@ -170,6 +174,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [Pure]
     public IProcessConfigurationBuilder WithEnvironmentVariables(IDictionary<string, string> environmentVariables)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(environmentVariables));
+#endif
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.RedirectStandardInput,
