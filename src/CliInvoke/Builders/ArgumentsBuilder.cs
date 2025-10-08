@@ -29,8 +29,6 @@ using AlastairLundy.DotExtensions.Globalization;
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable RedundantBoolCompare
 
-#nullable enable
-
 namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
