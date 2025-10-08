@@ -21,8 +21,6 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-#nullable enable
-
 using AlastairLundy.CliInvoke.Core.Builders;
 
 
