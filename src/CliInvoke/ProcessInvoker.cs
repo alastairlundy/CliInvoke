@@ -184,6 +184,12 @@ public class ProcessInvoker : IProcessInvoker
                 throw new ProcessNotSuccessfulException(process: process,
                     exitCode: process.ExitCode);
             }
+            
+            if(standardOutputTask.IsCompleted)
+                standardOutputTask.Dispose();
+            
+            if(standardErrorTask.IsCompleted)
+                standardErrorTask.Dispose();
         }
         finally
         {
@@ -260,6 +266,12 @@ public class ProcessInvoker : IProcessInvoker
                 throw new ProcessNotSuccessfulException(process: process,
                     exitCode: process.ExitCode);
             }
+            
+            if(standardOutput.IsCompleted)
+                standardOutput.Dispose();
+            
+            if(standardError.IsCompleted)
+                standardError.Dispose();
         }
         finally
         {
