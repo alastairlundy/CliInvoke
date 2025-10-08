@@ -1,6 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Primitives;
@@ -9,7 +7,7 @@ using Xunit;
 
 namespace AlastairLundy.CliInvoke.Tests.Builders;
 
-public class ProcessTimeoutPolicyBuilerTests
+public class ProcessTimeoutPolicyBuilderTests
 {
     private readonly Faker _faker = new Faker();
 
@@ -29,7 +27,6 @@ public class ProcessTimeoutPolicyBuilerTests
         // Assert
         Assert.Equal(timeout, timeoutPolicy.TimeoutThreshold);
     }
-
 
     [Theory]
     [InlineData(-0.001)]
@@ -66,4 +63,27 @@ public class ProcessTimeoutPolicyBuilerTests
         Assert.Equal(cancellationMode, policy.CancellationMode);
     }
 
+    [Theory]
+    [InlineData(ProcessCancellationMode.None)]
+    [InlineData(ProcessCancellationMode.Graceful)]
+    [InlineData(ProcessCancellationMode.Forceful)]
+    public void Build_All_ShouldReturnPolicy(ProcessCancellationMode mode)
+    {
+        // Arrange
+        ProcessCancellationMode cancellationMode = mode;
+        TimeSpan timeoutThreshold = TimeSpan.FromSeconds(_faker.Random.Int(0, 1000));
+        
+        // Act
+        IProcessTimeoutPolicyBuilder builder = new
+                ProcessTimeoutPolicyBuilder()
+            .WithCancellationMode(cancellationMode)
+            .WithTimeoutThreshold(timeoutThreshold);
+        
+        ProcessTimeoutPolicy policy = builder.Build();
+        
+        // Assert
+        Assert.NotNull(policy);
+        Assert.Equal(cancellationMode, policy.CancellationMode);
+        Assert.Equal(timeoutThreshold, policy.TimeoutThreshold);
+    }
 }
