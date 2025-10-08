@@ -23,8 +23,6 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Builders;
 
-#nullable enable
-
 /// <summary>
 /// A class that provides builder methods for constructing UserCredentials.
 /// </summary>
