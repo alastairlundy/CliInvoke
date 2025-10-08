@@ -12,7 +12,6 @@ namespace AlastairLundy.CliInvoke.Core.Primitives;
 /// <summary>
 /// An enum to represent Result Validation states, and whether Result Validation should be performed. 
 /// </summary>
-[Flags]
 public enum ProcessResultValidation
 {
     /// <summary>

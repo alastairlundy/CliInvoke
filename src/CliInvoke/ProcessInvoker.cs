@@ -86,8 +86,6 @@ public class ProcessInvoker : IProcessInvoker
                 process);
         }
 
-        ProcessResult result;
-        
         try
         {
             process.Start();
@@ -98,7 +96,7 @@ public class ProcessInvoker : IProcessInvoker
             await process.WaitForExitOrTimeoutAsync(new ProcessExitConfiguration(processTimeoutPolicy, processResultValidation,
                 ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected), cancellationToken: cancellationToken);
             
-            result = new ProcessResult(process.StartInfo.FileName,
+            ProcessResult result = new ProcessResult(process.StartInfo.FileName,
                 process.ExitCode, process.StartTime, process.ExitTime);
 
             if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
@@ -106,13 +104,13 @@ public class ProcessInvoker : IProcessInvoker
                 throw new ProcessNotSuccessfulException(process: process,
                     exitCode: process.ExitCode);
             }
+            
+            return result;
         }
         finally
         {
             process.Dispose();
         }
-
-        return result;
     }
 
     /// <summary>
@@ -156,8 +154,6 @@ public class ProcessInvoker : IProcessInvoker
             process = await _processPipeHandler.PipeStandardInputAsync(standardInput.BaseStream,
                 process);
         }
-        
-        BufferedProcessResult result;
 
         try
         {
@@ -174,23 +170,29 @@ public class ProcessInvoker : IProcessInvoker
 
             await Task.WhenAll(waitForExit, standardOutputTask, standardErrorTask);
             
-            result = new BufferedProcessResult(process.StartInfo.FileName,
+            BufferedProcessResult result = new BufferedProcessResult(process.StartInfo.FileName,
                 process.ExitCode, await standardOutputTask,
                 await standardErrorTask,
-                 process.StartTime, process.ExitTime);
+                process.StartTime, process.ExitTime);
 
             if (processResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
             {
                 throw new ProcessNotSuccessfulException(process: process,
                     exitCode: process.ExitCode);
             }
+            
+            if(standardOutputTask.IsCompleted)
+                standardOutputTask.Dispose();
+            
+            if(standardErrorTask.IsCompleted)
+                standardErrorTask.Dispose();
+            
+            return result;
         }
         finally
         {
             process.Dispose();
         }
-
-        return result;
     }
 
 
@@ -234,8 +236,6 @@ public class ProcessInvoker : IProcessInvoker
                 process);
         }
         
-        PipedProcessResult result;
-
         try
         {
             process.Start();
@@ -251,7 +251,7 @@ public class ProcessInvoker : IProcessInvoker
             
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
-            result = new PipedProcessResult(process.StartInfo.FileName,
+            PipedProcessResult result = new PipedProcessResult(process.StartInfo.FileName,
                 process.ExitCode, process.StartTime, process.ExitTime,
                 await standardOutput, await standardError);
             
@@ -260,12 +260,18 @@ public class ProcessInvoker : IProcessInvoker
                 throw new ProcessNotSuccessfulException(process: process,
                     exitCode: process.ExitCode);
             }
+            
+            if(standardOutput.IsCompleted)
+                standardOutput.Dispose();
+            
+            if(standardError.IsCompleted)
+                standardError.Dispose();
+            
+            return result;
         }
         finally
         {
             process.Dispose();
         }
-
-        return result;
     }
 }

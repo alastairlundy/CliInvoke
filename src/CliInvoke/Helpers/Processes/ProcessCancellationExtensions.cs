@@ -146,7 +146,7 @@ internal static class ProcessCancellationExtensions
 
             if (process.HasExited() == false)
             {
-                process.Kill();
+                process.Kill(true);
             }
         }
         catch (Exception)

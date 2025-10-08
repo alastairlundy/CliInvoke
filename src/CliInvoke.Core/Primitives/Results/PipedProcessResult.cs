@@ -9,6 +9,8 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
+
 // ReSharper disable RedundantBoolCompare
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -19,7 +21,10 @@ namespace AlastairLundy.CliInvoke.Core.Primitives;
 /// <summary>
 /// A Piped ProcessResult containing a Process's or Command's StandardOutput and StandardError information.
 /// </summary>
-public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>
+public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>, IDisposable
+    #if NET8_0_OR_GREATER
+    ,IAsyncDisposable
+#endif
 {
     
     /// <summary>
@@ -124,4 +129,27 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>
     /// <returns>True if both PipedProcessResults are not equal to each other; false otherwise.</returns>
     public static bool operator !=(PipedProcessResult? left, PipedProcessResult? right) 
         => Equals(left, right) == false;
+
+    /// <summary>
+    /// Disposes of the <see cref="StandardOutput"/> and <see cref="StandardError"/> streams.
+    /// </summary>
+    public void Dispose()
+    {
+        StandardOutput.Dispose();
+        StandardError.Dispose();
+        
+        GC.SuppressFinalize(this);
+    }
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// 
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        await StandardOutput.DisposeAsync();
+        await StandardError.DisposeAsync();
+        
+        GC.SuppressFinalize(this);
+    }
+#endif
 }
