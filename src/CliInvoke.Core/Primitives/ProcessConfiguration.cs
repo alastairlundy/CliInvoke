@@ -109,9 +109,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
     /// <param name="standardError">The standard error destination to be used (if specified).</param>
-    /// <param name="redirectStandardInput"></param>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="redirectStandardError"></param>
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
