@@ -205,14 +205,14 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder Add(IEnumerable<IFormattable> values, IFormatProvider formatProvider,
         string? format = null, bool escapeSpecialChars = true)
     {
-        #if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(values, nameof(values));
-        #endif
+#endif
         
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
 
 #if NETSTANDARD2_0
-        string value = StringPolyfill.Join(' ', valuesAsStrings);
+        string value = StringPolyfill.Join(' ', valuesStrings);
 #else
         string value = string.Join(' ', valuesStrings);
 #endif
