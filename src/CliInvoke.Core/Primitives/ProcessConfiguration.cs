@@ -145,9 +145,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardOutputEncoding = Encoding.Default;
         StandardErrorEncoding = Encoding.Default;
         
-        RedirectStandardInput = redirectStandardInput;
-        RedirectStandardOutput = redirectStandardOutput;
-        RedirectStandardError = redirectStandardError;
+        RedirectStandardInput = processStartInfo.RedirectStandardInput;
+        RedirectStandardOutput = processStartInfo.RedirectStandardOutput;
+        RedirectStandardError = processStartInfo.RedirectStandardError;
             
         TargetFilePath = processStartInfo.FileName;
         Arguments = processStartInfo.Arguments;
