@@ -30,4 +30,8 @@
       <ProjectReference Include="..\..\src\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Invokers\" />
+    </ItemGroup>
+
 </Project>
