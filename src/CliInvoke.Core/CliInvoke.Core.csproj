@@ -22,15 +22,11 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.6.0</Version>
-        <PackageReleaseNotes>## Changes since 1.5.x
-            ### All packages
-            * Updated DotExtensions on .NET 8 and newer from 8.3.0 to 8.5.1
-            * Fixed an issue where CliInvoke for .NET 10 (as an implicit TFM) would depend on DotExtensions 7.7.0 instead of 8.x
-            * Updated internal Polyfill usage on .NET Standard 2 from 8.8.1 to 8.9.0
-
-            ### Core package only
-            * Deprecated some extension methods and constructors in classes for removal in v2.</PackageReleaseNotes>
+        <Version>1.6.1</Version>
+        <PackageReleaseNotes>## Changes since 1.6.x
+* Updated DotExtensions from 7.7.0 to 8.6.2 for .NET Standard 2.0 TFM
+* Updated DotExtensions from 8.5.1 to 8.6.2 for .NET 8+ TFMs
+* Deprecated ``IProcessFactory`` for removal in v2</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
