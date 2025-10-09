@@ -10,9 +10,8 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Internal.Localizations;
-
-using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 

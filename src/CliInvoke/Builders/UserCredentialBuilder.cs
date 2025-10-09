@@ -13,6 +13,7 @@
 using System.Diagnostics.Contracts;
 using System.Security;
 
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
