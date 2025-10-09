@@ -47,9 +47,8 @@ internal static class ToStartInfoExtensions
         if (processConfiguration.RequiresAdministrator) 
             processStartInfo.RunAsAdministrator();
 
-        if (processConfiguration.Credential is not null) 
 #pragma warning disable CA1416
-            processStartInfo.SetUserCredential(processConfiguration.Credential);
+        processStartInfo.SetUserCredential(processConfiguration.Credential);
 #pragma warning restore CA1416
                 
         if (processConfiguration.EnvironmentVariables.Any()) 
