@@ -7,10 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AlastairLundy.CliInvoke.Core.Internal;
 using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
@@ -20,6 +21,7 @@ namespace AlastairLundy.CliInvoke.Core.Abstractions;
 /// <summary>
 /// Create and manage processes efficiently.
 /// </summary>
+[Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
 public interface IProcessFactory
 {
     /// <summary>
@@ -27,6 +29,7 @@ public interface IProcessFactory
     /// </summary>
     /// <param name="startInfo">The start information to use for the Process.</param>
     /// <returns>The newly created Process.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process From(ProcessStartInfo startInfo);
     
     /// <summary>
@@ -35,6 +38,7 @@ public interface IProcessFactory
     /// <param name="startInfo">The start information to use for the Process.</param>
     /// <param name="credential">The credential to use when creating the Process.</param>
     /// <returns>The newly created Process.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process From(ProcessStartInfo startInfo, UserCredential credential);
     
     /// <summary>
@@ -42,6 +46,7 @@ public interface IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration information to use to configure the Process.</param>
     /// <returns>The newly created Process with the configuration.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process From(ProcessConfiguration configuration);
     
     /// <summary>
@@ -49,6 +54,7 @@ public interface IProcessFactory
     /// </summary>
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <returns>The newly created and started Process with the start info.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process StartNew(ProcessStartInfo startInfo);
     
     /// <summary>
@@ -57,6 +63,7 @@ public interface IProcessFactory
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <param name="credential">The credential to use when creating and starting the Process.</param>
     /// <returns>The newly created and started Process with the start info and credential.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process StartNew(ProcessStartInfo startInfo, UserCredential credential);
     
     /// <summary>
@@ -65,6 +72,7 @@ public interface IProcessFactory
     /// <param name="startInfo">The start info to use when creating and starting the new Process.</param>
     /// <param name="resourcePolicy">The process resource policy to use when creating and starting the new Process.</param>
     /// <returns>The newly created and started Process with the start info and Process Resource Policy.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process StartNew(ProcessStartInfo startInfo, ProcessResourcePolicy resourcePolicy);
     
     /// <summary>
@@ -74,6 +82,7 @@ public interface IProcessFactory
     /// <param name="resourcePolicy">The process resource policy to use when creating and starting the new Process.</param>
     /// <param name="credential">The credential to use when creating and starting the Process.</param>
     /// <returns>The newly created and started Process with the start info and Process Resource Policy.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process StartNew(ProcessStartInfo startInfo, ProcessResourcePolicy resourcePolicy, UserCredential credential);
     
     /// <summary>
@@ -81,6 +90,7 @@ public interface IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration to use when creating and starting the process.</param>
     /// <returns>The newly created and started Process with the specified configuration.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Process StartNew(ProcessConfiguration configuration);
 
     /// <summary>
@@ -89,6 +99,7 @@ public interface IProcessFactory
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and processResult that are returned upon completion of the task.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Task<ProcessResult> ContinueWhenExitAsync(Process process, CancellationToken cancellationToken = default);
     
     /// <summary>
@@ -98,6 +109,7 @@ public interface IProcessFactory
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and ProcessResult that are returned upon completion of the task.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation, CancellationToken cancellationToken = default);
     
     /// <summary>
@@ -106,6 +118,7 @@ public interface IProcessFactory
     /// <param name="process">The process to continue and wait for exit.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, CancellationToken cancellationToken = default);
     
     /// <summary>
@@ -115,5 +128,6 @@ public interface IProcessFactory
     /// <param name="resultValidation">Whether to perform Result validation on the process' exit code.</param>
     /// <param name="cancellationToken">The cancellation token to use in case cancellation is requested.</param>
     /// <returns>The task and BufferedProcessResult that are returned upon completion of the task.</returns>
+    [Obsolete(DeprecationMessages.InterfaceDeprecationV2)]
     Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, ProcessResultValidation resultValidation, CancellationToken cancellationToken = default);
 }

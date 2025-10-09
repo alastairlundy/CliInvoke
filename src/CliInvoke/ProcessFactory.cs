@@ -19,6 +19,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Core.Primitives.Exceptions;
 using AlastairLundy.CliInvoke.Core.Primitives.Policies;
 using AlastairLundy.CliInvoke.Core.Primitives.Results;
+using AlastairLundy.CliInvoke.Internal;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 using AlastairLundy.DotExtensions.Processes;
 using AlastairLundy.Resyslib.IO.Core.Files;
@@ -34,6 +35,7 @@ namespace AlastairLundy.CliInvoke;
 /// <summary>
 /// 
 /// </summary>
+[Obsolete(DeprecationMessages.ClassDeprecationV2)]
 public class ProcessFactory : IProcessFactory
 {
     private readonly IFilePathResolver _filePathResolver;
@@ -53,6 +55,7 @@ public class ProcessFactory : IProcessFactory
     /// <param name="processStartInfo">The start information to use for the Process.</param>
     /// <returns>The newly created Process.</returns>
     /// <exception cref="ArgumentException">Thrown if the process start info FileName is empty.</exception>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public Process From(ProcessStartInfo processStartInfo)
     {
         if (string.IsNullOrEmpty(processStartInfo.FileName))
@@ -85,6 +88,7 @@ public class ProcessFactory : IProcessFactory
     /// <param name="startInfo">The start information to use for the Process.</param>
     /// <param name="credential">The credential to use when creating the Process.</param>
     /// <returns>The newly created Process.</returns>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public Process From(ProcessStartInfo startInfo, UserCredential credential)
     {
         Process output = From(startInfo);
@@ -104,6 +108,7 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration information to use to configure the Process.</param>
     /// <returns>The newly created Process with the configuration.</returns>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public Process From(ProcessConfiguration configuration)
     {
         Process output;
@@ -137,6 +142,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public Process StartNew(ProcessStartInfo startInfo)
     {
         Process process = From(startInfo);
@@ -163,6 +169,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public Process StartNew(ProcessStartInfo startInfo,
         UserCredential credential)
     {
@@ -190,6 +197,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public Process StartNew(ProcessStartInfo startInfo,
         ProcessResourcePolicy resourcePolicy)
     {
@@ -220,6 +228,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public Process StartNew(ProcessStartInfo startInfo, 
         ProcessResourcePolicy resourcePolicy,
         UserCredential credential)
@@ -238,6 +247,7 @@ public class ProcessFactory : IProcessFactory
     /// </summary>
     /// <param name="configuration">The configuration to use when creating and starting the process.</param>
     /// <returns>The newly created and started Process with the specified configuration.</returns>
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public Process StartNew(ProcessConfiguration configuration)
     {
         Process process = From(configuration);
@@ -275,6 +285,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, CancellationToken cancellationToken = default)
     {
         return await ContinueWhenExitAsync(process, ProcessResultValidation.None, cancellationToken);
@@ -299,6 +310,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation,
         CancellationToken cancellationToken = default)
     {
@@ -334,6 +346,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process, CancellationToken cancellationToken = default)
     {
         return await ContinueWhenExitBufferedAsync(process, ProcessResultValidation.None, cancellationToken);
@@ -358,6 +371,7 @@ public class ProcessFactory : IProcessFactory
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public async Task<BufferedProcessResult> ContinueWhenExitBufferedAsync(Process process,
         ProcessResultValidation resultValidation,
         CancellationToken cancellationToken = default)
