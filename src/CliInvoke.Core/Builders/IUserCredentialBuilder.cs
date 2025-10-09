@@ -10,8 +10,6 @@
 using System;
 using System.Security;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 

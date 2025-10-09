@@ -12,8 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>

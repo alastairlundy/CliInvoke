@@ -10,7 +10,6 @@
 
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Core.Primitives;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;

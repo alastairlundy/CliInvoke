@@ -1,7 +1,7 @@
 using System;
 using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Primitives;
 using Bogus;
 using Xunit;
 

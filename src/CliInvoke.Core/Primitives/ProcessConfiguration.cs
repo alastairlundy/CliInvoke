@@ -12,9 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
-
 using System.Text;
-
 using AlastairLundy.CliInvoke.Core.Internal;
 
 // ReSharper disable RedundantBoolCompare
@@ -22,7 +20,7 @@ using AlastairLundy.CliInvoke.Core.Internal;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// A class to store Process configuration information.

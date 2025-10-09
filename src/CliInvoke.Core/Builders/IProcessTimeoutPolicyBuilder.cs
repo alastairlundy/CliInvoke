@@ -9,8 +9,6 @@
 
 using System;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>

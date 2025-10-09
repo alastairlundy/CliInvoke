@@ -2,7 +2,6 @@
 using System.Security;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Primitives;
 using Bogus;
 using Xunit;
 // ReSharper disable JoinDeclarationAndInitializer

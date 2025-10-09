@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Specializations.Tests.Helpers;
 
 namespace AlastairLundy.CliInvoke.Specializations.Tests.Invokers;

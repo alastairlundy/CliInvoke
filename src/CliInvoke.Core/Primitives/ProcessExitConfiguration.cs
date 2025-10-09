@@ -9,7 +9,7 @@
 
 using System;
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// Represents configuration information about the exit behavior of a process, including timeout policy and result validation.

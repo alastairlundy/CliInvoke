@@ -8,16 +8,15 @@
    */
 
 
-using System.Runtime.Versioning;
-
 using System;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' resource configuration.

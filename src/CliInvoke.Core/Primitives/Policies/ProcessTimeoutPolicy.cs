@@ -10,7 +10,7 @@
 using System;
 using AlastairLundy.CliInvoke.Core.Internal;
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' Timeout configuration, if any.

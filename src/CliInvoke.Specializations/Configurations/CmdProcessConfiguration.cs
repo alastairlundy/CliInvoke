@@ -16,11 +16,10 @@ using System.Text;
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
 using System.Runtime.Versioning;
+using AlastairLundy.CliInvoke.Core;
 
 // ReSharper disable UnusedMember.Global
 

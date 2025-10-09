@@ -10,8 +10,6 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-
-using AlastairLundy.CliInvoke.Core.Primitives;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using AlastairLundy.DotExtensions.Processes;

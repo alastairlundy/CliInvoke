@@ -10,8 +10,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>

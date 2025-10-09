@@ -9,9 +9,8 @@
  */
 
 using System.Diagnostics.Contracts;
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
-
-using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Builders;
 

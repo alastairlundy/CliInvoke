@@ -17,13 +17,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
-
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 using AlastairLundy.CliInvoke.Core.Builders;
 
 
 using System.Runtime.Versioning;
+using AlastairLundy.CliInvoke.Core;
 
 namespace AlastairLundy.CliInvoke.Builders;
 
