@@ -13,26 +13,20 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## 2.0.0 Beta 2
+        <PackageReleaseNotes>### Changes since 2.0.0 Beta 3
+* Re-added .NET Standard 2.0 support
 
-### Core package only
-* Removed dependency on DotExtensions
-* Moved extension methods to CliInvoke main package
-* Deprecated some extension methods and constructors in classes for removal in v2
-* Renamed the existing ``IProcessInvoker`` interface to ``IProcessConfigurationInvoker``
-* Created a new ``IProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
-* Removed ``IProcessFactory``
-
-### Main package only
-* Updated DotExtensions from 8.5.0 to 8.5.1
-* Added some Process related extension methods from DotExtensions back into CliInvoke
-* Renamed the existing ``ProcessInvoker`` interface to ``ProcessConfigurationInvoker``
-* Created a new ``ProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
-* Removed ``ProcessFactory``</PackageReleaseNotes>
+### Improvements
+* Fixed an issue where an invalid Process Timeout Threshold could be provided via ``ProcessTimeoutPolicyBuilder``'s ``WithTimeoutThreshold`` method - This now results in an ``ArgumentOutOfRangeException`` being thrown.
+* Updated Forceful Cancellation to now terminate the process and it's child processes.
+* Updated ``PipedProcessResult`` to implement ``IDisposable`` and dispose of the Stream parameters when Dispose or DisposeAsync is called
+* (Main package only) Moved Process extensions from DotExtensions into CliInvoke main package - These are now internal
+* Changed default value for ``ProcessResourcePolicy``'s ``PriorityBoostEnabled`` value from ``true`` to ``false``
+* Updated builder interfaces</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.3</PackageVersion>
+        <PackageVersion>2.0.0-beta.4</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -83,14 +77,12 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-    <ItemGroup>
+<!--    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
+    </ItemGroup>-->
     
     <ItemGroup>
-<!--
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
--->
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.4" />
       <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.2" />
     </ItemGroup>
 </Project>
