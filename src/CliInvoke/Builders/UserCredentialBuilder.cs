@@ -18,7 +18,6 @@ using AlastairLundy.CliInvoke.Core.Builders;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 // ReSharper disable PossibleInvalidOperationException
-// ReSharper disable PossibleNullReferenceException
 
 namespace AlastairLundy.CliInvoke.Builders;
 

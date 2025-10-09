@@ -17,8 +17,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
-using AlastairLundy.CliInvoke.Core.Builders;
 
+using AlastairLundy.CliInvoke.Core.Builders;
 
 using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Core;
@@ -305,7 +305,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
-        UserCredential credential = _configuration.Credential ?? UserCredential.Null;
+        UserCredential credential = _configuration.Credential;
         
         IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
             .SetDomain(credential.Domain)
@@ -323,28 +323,26 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="redirectStandardInput"></param>
     /// <returns></returns>
     [Pure]
-    public IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput)
-    {
-            return new ProcessConfigurationBuilder(
-                new ProcessConfiguration(_configuration.TargetFilePath,
-                    redirectStandardInput,
-                    _configuration.RedirectStandardOutput,
-                    _configuration.RedirectStandardError,
-                    _configuration.Arguments,
-                    _configuration.WorkingDirectoryPath,
-                    _configuration.RequiresAdministrator,
-                    _configuration.EnvironmentVariables,
-                    _configuration.Credential,
-                    _configuration.StandardInput ?? StreamWriter.Null,
-                    _configuration.StandardOutput,
-                    _configuration.StandardError,
-                    _configuration.StandardInputEncoding,
-                    _configuration.StandardOutputEncoding,
-                    _configuration.StandardErrorEncoding,
-                    _configuration.ResourcePolicy,
-                    windowCreation: _configuration.WindowCreation,
-                    useShellExecution: _configuration.UseShellExecution));
-    }
+    public IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput) =>
+        new ProcessConfigurationBuilder(
+            new ProcessConfiguration(_configuration.TargetFilePath,
+                redirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
+                _configuration.Arguments,
+                _configuration.WorkingDirectoryPath,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput ?? StreamWriter.Null,
+                _configuration.StandardOutput,
+                _configuration.StandardError,
+                _configuration.StandardInputEncoding,
+                _configuration.StandardOutputEncoding,
+                _configuration.StandardErrorEncoding,
+                _configuration.ResourcePolicy,
+                windowCreation: _configuration.WindowCreation,
+                useShellExecution: _configuration.UseShellExecution));
 
     /// <summary>
     /// 
@@ -352,9 +350,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="redirectStandardOutput"></param>
     /// <returns></returns>
     [Pure]
-    public IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput)
-    {
-        return new ProcessConfigurationBuilder(
+    public IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput) =>
+        new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.RedirectStandardInput,
                 redirectStandardOutput,
@@ -373,7 +370,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.ResourcePolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
-    }
 
     /// <summary>
     /// 
@@ -381,9 +377,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// <param name="redirectStandardError"></param>
     /// <returns></returns>
     [Pure]
-    public IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError)
-    {
-        return new ProcessConfigurationBuilder(
+    public IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError) =>
+        new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.RedirectStandardInput,
                 _configuration.RedirectStandardOutput,
@@ -402,8 +397,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.ResourcePolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
-    }
-    
+
     /// <summary>
     /// Sets the Standard Input Pipe source.
     /// </summary>

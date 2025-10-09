@@ -110,16 +110,12 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// Builds the dictionary of configured environment variables.
     /// </summary>
     /// <returns>A read-only dictionary containing the configured environment variables.</returns>
-    public IReadOnlyDictionary<string, string> Build()
-    {
-        return _environmentVariables;
-    }
+    public IReadOnlyDictionary<string, string> Build() 
+        => _environmentVariables;
 
     /// <summary>
     /// Deletes the environment variable values.
     /// </summary>
-    public void Clear()
-    {
-        _environmentVariables.Clear();
-    }
+    public void Clear() 
+        => _environmentVariables.Clear();
 }
