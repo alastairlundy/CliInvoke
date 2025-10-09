@@ -124,7 +124,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
     public ProcessConfiguration(ProcessStartInfo processStartInfo,
-        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         IDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
