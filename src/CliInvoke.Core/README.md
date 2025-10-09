@@ -85,25 +85,6 @@ They are both equally safe and valid.
 CliInvoke offers safe abstractions around Process Running to avoid accidentally not disposing of Processes,
 along with avoiding other pitfalls.
 
-``IProcessInvoker`` and ``IProcessConfigurationInvoker`` are both equally capable of fulfilling this criterion,
-**however** ``IProcessInvoker`` works with ``ProcessStartInfo`` objects and ``IProcessConfigurationInvoker`` works with ``ProcessConfiguration`` objects.
-
-If you don't want to use CliInvoke's abstractions around Processes, such as ``ProcessConfiguration`` and CliInvoke's other primitives,  then ``IProcessInvoker`` is a better fit.
-
-**Note**: Neither ``IProcessInvoker`` nor ``IProcessConfigurationInvoker`` are dependent upon on the other to work.
-
-#### ``IProcessInvoker``
-``IProcessInvoker`` is an interface for creating, running, and safely disposing of Processes based on ``ProcessStartInfo`` objects.
-
-The ``ExecuteAsync``, ``ExecuteBufferedExitAsync``, ``ExecutePipedExitAsync`` methods provide for:
-1. process creation
-2. safe process running (including process disposal, even in the case of an ``Exception``)
-3. gathering the results of the Process's execution (varies depending on the specific method)
-4. disposing of the Process after it has exited
-5. returning the gathered Process execution results
-
-These examples show how they might be used:
-
 #### Running Programs/Commands
 Because of how much of a minefield the ``Process`` class is and how difficult it can be to configure correctly,
 CliInvoke provides some abstractions to make it easier to configure Programs/Commands to be run.
@@ -111,48 +92,7 @@ CliInvoke provides some abstractions to make it easier to configure Programs/Com
 CliInvoke provides fluent builder interfaces and implementing classes to easily configure ``ProcessConfiguration``.
 ``ProcessConfiguration`` is CliInvoke's main form of Process configuration (hence the name).
 
-The use of ``ProcessConfiguration`` can be avoided if you want to stick with ``ProcessStartInfo`` for configuration, but this
-means ``IProcessInvoker`` is the appropriate interface to use for creating and executing Processes.
-
 ### Approach Examples
-
-#### ``IProcessInvoker``
-
-##### ``ExecuteAsync``
-```csharp
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
-// Using namespaces for Dependency Injection code ommitted for clarity
-
-      // Dependency Injection setup code ommitted for clarity
-
-    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-    
-    // Define processStartInfo here
-    
-    // This process is created, executed, disposed of, and the results returned.
-    ProcessResult process = await _processInvoker.ExecuteAsync(processStartInfo, ProcessResourcePolicy.Default,
-        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
-```
-
-###### ``ExecuteBufferedAsync``
-```csharp
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
-// Using namespaces for Dependency Injection code ommitted for clarity
-
-      // Dependency Injection setup code ommitted for clarity
-
-    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-    
-    // Define processStartInfo here
-    
-    // This process is created, executed, disposed of, and the results returned.
-    BufferedProcessResult process = await _processInvoker.ExecuteBufferedAsync(processStartInfo, ProcessResourcePolicy.Default,
-        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
-```
 
 #### ``IProcessConfigurationInvoker``
 The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.

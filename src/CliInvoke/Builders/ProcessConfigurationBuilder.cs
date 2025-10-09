@@ -13,7 +13,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
@@ -21,14 +20,10 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Primitives;
 
-#nullable enable
-
 using AlastairLundy.CliInvoke.Core.Builders;
 
 
 using System.Runtime.Versioning;
-
-
 
 namespace AlastairLundy.CliInvoke.Builders;
 
@@ -50,24 +45,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
         _configuration = new ProcessConfiguration(targetFilePath, false,
             true, true);
     }
-        
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
-    /// which is used to build and configure a process.
-    /// </summary>
-    /// <param name="processStartInfo">The start information for the process configuration.</param>
-    public ProcessConfigurationBuilder(ProcessStartInfo processStartInfo)
-    {
-        _configuration = new ProcessConfiguration(processStartInfo, processStartInfo.RedirectStandardInput,
-            processStartInfo.RedirectStandardOutput, processStartInfo.RedirectStandardError);
-    }
     
     /// <summary>
     /// Initializes a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
     /// which is used to build and configure a process.
     /// </summary>
     /// <param name="configuration">A process configuration to update.</param>
-    public ProcessConfigurationBuilder(ProcessConfiguration configuration)
+    protected ProcessConfigurationBuilder(ProcessConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -93,6 +77,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [Pure]
     public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments, bool escapeArguments)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(arguments));
+#endif
+        
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
             .Add(arguments,
                 escapeArguments);
@@ -186,6 +174,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [Pure]
     public IProcessConfigurationBuilder WithEnvironmentVariables(IDictionary<string, string> environmentVariables)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(environmentVariables));
+#endif
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
                 _configuration.RedirectStandardInput,

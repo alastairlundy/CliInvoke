@@ -43,7 +43,7 @@ public class RunnerProcessCreator : IRunnerProcessCreator
     /// <returns>The Process Configuration to be run.</returns>
     public ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputProcess)
     {
-        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(_commandRunnerConfiguration)
+        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(_commandRunnerConfiguration.TargetFilePath)
             .WithArguments(inputProcess.TargetFilePath + " " + inputProcess.Arguments)
             .WithEnvironmentVariables(inputProcess.EnvironmentVariables)
             .WithProcessResourcePolicy(inputProcess.ResourcePolicy)

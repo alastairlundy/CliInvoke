@@ -31,6 +31,9 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
         _processExitConfiguration = processExitInfo;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public ProcessExitConfigurationBuilder()
     {
         _processExitConfiguration = new ProcessExitConfiguration();

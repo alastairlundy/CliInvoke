@@ -44,6 +44,9 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <param name="vars">The initial environment variables to use.</param>
     protected EnvironmentVariablesBuilder(IDictionary<string, string> vars)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(vars));
+#endif
         _environmentVariables = new Dictionary<string, string>(vars,
             StringComparer.Ordinal);
     }
@@ -70,6 +73,10 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     [Pure]
     public IEnvironmentVariablesBuilder Set(IEnumerable<KeyValuePair<string, string>> variables)
     {
+        #if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(variables));
+        #endif
+        
         Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
             StringComparer.Ordinal);
         output.AddRange(variables);
@@ -85,6 +92,10 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     [Pure]
     public IEnvironmentVariablesBuilder Set(IReadOnlyDictionary<string, string> variables)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(variables));
+#endif
+        
         Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
             StringComparer.Ordinal);
         output.AddRange(variables);

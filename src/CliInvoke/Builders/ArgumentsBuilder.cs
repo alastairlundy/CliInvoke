@@ -29,8 +29,6 @@ using AlastairLundy.DotExtensions.Globalization;
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable RedundantBoolCompare
 
-#nullable enable
-
 namespace AlastairLundy.CliInvoke.Builders;
 
 /// <summary>
@@ -153,6 +151,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<string> values, bool escapeSpecialChars)
     {
+        #if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(values));
+        #endif
+        
         if (escapeSpecialChars) 
             values = values.Select(x => EscapeSpecialCharacters(x));
         
@@ -289,6 +291,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<IFormattable> values, IFormatProvider formatProvider, bool escapeSpecialChars = true)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(values));
+#endif
+
         List<string> strings = new List<string>();
         
         foreach (IFormattable val in values)
@@ -322,6 +328,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(IEnumerable<IFormattable> values, CultureInfo cultureInfo, bool escapeSpecialChars)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(nameof(values));
+#endif
+
         List<string> strings = new List<string>();
         
         foreach (IFormattable val in values)
@@ -440,15 +450,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
     private bool IsValidArgument(IFormattable value)
     {
-        string? s = FormattableToStringExtensions.ToString(value);
+        string s = FormattableToStringExtensions.ToString(value);
 
-        if (s is not null)
-        {
-            return IsValidArgument(s);
-        }
-        else
-        {
-            return false;   
-        }
+        return IsValidArgument(s);
     }
 }
