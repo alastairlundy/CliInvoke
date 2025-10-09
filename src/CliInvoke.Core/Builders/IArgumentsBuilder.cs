@@ -12,7 +12,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
