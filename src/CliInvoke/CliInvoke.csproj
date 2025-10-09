@@ -91,6 +91,6 @@
 <!--
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
 -->
-      <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.0" />
+      <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.2" />
     </ItemGroup>
 </Project>
