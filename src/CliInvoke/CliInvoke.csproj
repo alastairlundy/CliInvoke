@@ -45,11 +45,10 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="[7.7.0, 8.0.0)" />
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.5.1" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="[8.6.2, 9.0.0)" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.6.0" />
