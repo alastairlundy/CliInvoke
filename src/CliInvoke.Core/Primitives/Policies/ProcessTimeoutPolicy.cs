@@ -8,7 +8,7 @@
    */
 
 using System;
-using AlastairLundy.CliInvoke.Core.Internal;
+
 using AlastairLundy.CliInvoke.Core.Internal.Localizations;
 
 namespace AlastairLundy.CliInvoke.Core;
