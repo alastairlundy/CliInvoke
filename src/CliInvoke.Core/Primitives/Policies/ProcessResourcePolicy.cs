@@ -35,7 +35,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         nint? minWorkingSet = null, 
         nint? maxWorkingSet = null,
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
-        bool enablePriorityBoost = true)
+        bool enablePriorityBoost = false)
     {
         processorAffinity ??= new IntPtr(0x0001);
 
