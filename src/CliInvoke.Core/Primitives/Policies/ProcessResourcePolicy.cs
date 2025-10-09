@@ -40,13 +40,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     {
         processorAffinity ??= new IntPtr(0x0001);
 
-
         if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
         {
             MinWorkingSet = minWorkingSet;
             MaxWorkingSet = maxWorkingSet;
         }
-
 
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
         {
@@ -138,10 +136,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         {
             return Equals(policy);
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /// <summary>
@@ -151,7 +147,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        return HashCode.Combine(ProcessorAffinity, (int)PriorityClass, EnablePriorityBoost, MinWorkingSet, MaxWorkingSet);
+        return HashCode.Combine(ProcessorAffinity, (int)PriorityClass,
+            EnablePriorityBoost, MinWorkingSet, MaxWorkingSet);
 #pragma warning restore CA1416
     }
 
