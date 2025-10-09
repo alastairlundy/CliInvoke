@@ -107,7 +107,7 @@ public interface IArgumentsBuilder
     /// </summary>
     /// <param name="argument">The argument to escape</param>
     /// <returns>The argument with special characters escaped.</returns>
-    string EscapeSpecialCharacters(string argument);
+    string EscapeCharacters(string argument);
     
     /// <summary>
     /// Builds the arguments into a string.

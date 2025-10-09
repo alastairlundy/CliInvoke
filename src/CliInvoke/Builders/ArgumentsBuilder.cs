@@ -98,7 +98,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
         if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
         {
-            _buffer.Append(escapeSpecialCharacters ? EscapeSpecialCharacters(value) : value);
+            _buffer.Append(escapeSpecialCharacters ? EscapeCharacters(value) : value);
         }
         else
         {
@@ -143,7 +143,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
 #endif
         
         if (escapeSpecialChars) 
-            values = values.Select(x => EscapeSpecialCharacters(x));
+            values = values.Select(x => EscapeCharacters(x));
         
         values = values.Where(x => IsValidArgument(x));
         
@@ -209,13 +209,12 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(values, nameof(values));
         #endif
         
-        IEnumerable<string> valuesAsStrings = values
-            .Select(x => x.ToString(format, formatProvider));
+        IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
 
 #if NETSTANDARD2_0
         string value = StringPolyfill.Join(' ', valuesAsStrings);
 #else
-        string value = string.Join(' ', valuesAsStrings);
+        string value = string.Join(' ', valuesStrings);
 #endif
         
         return Add(value, escapeSpecialChars);
@@ -260,25 +259,19 @@ public class ArgumentsBuilder : IArgumentsBuilder
         => Add(values, true);
 
     /// <summary>
-    /// Escapes special characters in a string.
+    /// Escapes characters in a string.
     /// </summary>
     /// <param name="argument">The string to escape.</param>
     /// <returns>The escaped string.</returns>
     [Pure]
-    public string EscapeSpecialCharacters(string argument)
+    public string EscapeCharacters(string argument)
     {
-        return argument.Replace("\\",
-                "\\\\")
-            .Replace("\n",
-                "\\n")
-            .Replace("\t",
-                "\\t")
-            .Replace("\r",
-                "\\r")
-            .Replace("\"",
-                "\\\"")
-            .Replace("'",
-                "\\'");
+        return argument.Replace("\\", "\\\\")
+            .Replace("\n", "\\n")
+            .Replace("\t", "\\t")
+            .Replace("\r", "\\r")
+            .Replace("\"", "\\\"")
+            .Replace("'", "\\'");
     }
 
     /// <summary>

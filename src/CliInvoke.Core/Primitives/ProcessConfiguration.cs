@@ -63,7 +63,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string? arguments = null, string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
-        IDictionary<string, string>? environmentVariables = null,
+        IReadOnlyDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
@@ -121,7 +121,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
     public ProcessConfiguration(ProcessStartInfo processStartInfo,
-        IDictionary<string, string>? environmentVariables = null,
+        IReadOnlyDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
         StreamReader? standardOutput = null,
@@ -179,12 +179,12 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The environment variables to be set.
     /// </summary>
-    public IDictionary<string, string> EnvironmentVariables { get; protected set;  }
+    public IReadOnlyDictionary<string, string> EnvironmentVariables { get; protected set;  }
         
     /// <summary>
     /// The credential to be used when executing the Command.
     /// </summary>
-    public UserCredential? Credential { get; protected set;  }
+    public UserCredential Credential { get; protected set;  }
 
     /// <summary>
     /// Whether to use Shell Execution or not when executing the Command.
