@@ -260,55 +260,27 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             return false;
         }
         
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 
-        if (StandardOutput is not null && StandardError is not null
-                                       && Credential is not null 
-                                       && other.Credential is not null)
-        {
-            return TargetFilePath.Equals(other.TargetFilePath) &&
-                   EnvironmentVariables.Equals(other.EnvironmentVariables) &&
-                   Arguments.Equals(other.Arguments) &&
-                   WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
-                   Credential.Equals(other.Credential) &&
-                   ResourcePolicy.Equals(other.ResourcePolicy) &&
-                   StandardOutput.Equals(other.StandardOutput) &&
-                   StandardError.Equals(other.StandardError) &&
-                   RedirectStandardInput.Equals(other.RedirectStandardInput) &&
-                   RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
-                   RedirectStandardError.Equals(other.RedirectStandardError) &&
-                   StandardInputEncoding.Equals(other.StandardInputEncoding) &&
-                   StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
-                   StandardErrorEncoding.Equals(other.StandardErrorEncoding);   
-        }
-
-        if (Credential is null || other.Credential is null)
-        {
-            return TargetFilePath.Equals(other.TargetFilePath) &&
-                   Arguments.Equals(other.Arguments) &&
-                   WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
-                   EnvironmentVariables.Equals(other.EnvironmentVariables) &&
-                   ResourcePolicy.Equals(other.ResourcePolicy) &&
-                   RedirectStandardInput.Equals(other.RedirectStandardInput) &&
-                   RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
-                   RedirectStandardError.Equals(other.RedirectStandardError) &&
-                   StandardInputEncoding.Equals(other.StandardInputEncoding) &&
-                   StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
-                   StandardErrorEncoding.Equals(other.StandardErrorEncoding);
-            
-        }
-        
         return TargetFilePath.Equals(other.TargetFilePath) &&
-               Arguments.Equals(other.Arguments) &&
-               WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
                EnvironmentVariables.Equals(other.EnvironmentVariables) &&
+               Arguments.Equals(other.Arguments) &&
+               ResourcePolicy.Equals(other.ResourcePolicy) &&
+               WorkingDirectoryPath.Equals(other.WorkingDirectoryPath) &&
+               UseShellExecution.Equals(other.UseShellExecution) &&
                Credential.Equals(other.Credential) &&
                ResourcePolicy.Equals(other.ResourcePolicy) &&
+               StandardInput.Equals(other.StandardInput) &&
+               StandardOutput.Equals(other.StandardOutput) &&
+               StandardError.Equals(other.StandardError) &&
                RedirectStandardInput.Equals(other.RedirectStandardInput) &&
                RedirectStandardOutput.Equals(other.RedirectStandardOutput) &&
                RedirectStandardError.Equals(other.RedirectStandardError) &&
                StandardInputEncoding.Equals(other.StandardInputEncoding) &&
                StandardOutputEncoding.Equals(other.StandardOutputEncoding) &&
                StandardErrorEncoding.Equals(other.StandardErrorEncoding);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
     }
 
     /// <summary>
@@ -327,10 +299,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         {
             return Equals(other);
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /// <summary>
@@ -345,11 +315,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(Arguments);
         hashCode.Add(EnvironmentVariables);
 
-        if (Credential is not null)
-        {
-            hashCode.Add(Credential);
-        }
-        
+        hashCode.Add(Credential);
+
         hashCode.Add(StandardInput);
         hashCode.Add(StandardOutput);
         hashCode.Add(StandardError);
@@ -414,7 +381,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     public void Dispose()
     {
-        Credential?.Dispose();
+        Credential.Dispose();
 
         StandardInput?.Dispose();
         StandardOutput?.Dispose();
