@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
-using CliWrap;
-using CliWrap.Buffered;
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Primitives;
+using CliInvoke.Benchmarking.Helpers;
 
 namespace CliInvoke.Benchmarking.Data;
 
@@ -10,17 +11,18 @@ public class DotnetCommandHelper
     
     public DotnetCommandHelper()
     {
+        IProcessConfigurationInvoker processConfigurationInvoker = CliInvokeHelpers.CreateProcessInvoker();
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            CommandTask<BufferedCommandResult> task = Cli.Wrap("which")
-                .WithArguments("dotnet")
-                .ExecuteBufferedAsync();
+            ProcessConfiguration processConfiguration = new ProcessConfiguration("/usr/bin/which",
+                false, true, true,
+                "dotnet");
 
-            task.Task.Start();
-
-            task.Task.Wait();
+           Task<BufferedProcessResult> task = processConfigurationInvoker.ExecuteBufferedAsync(processConfiguration);
+           
+           task.Wait();
         
-            _dotnetFilePath = task.Task.Result.StandardOutput.Split(Environment.NewLine).First();
+            _dotnetFilePath = task.Result.StandardOutput.Split(Environment.NewLine).First();
         }
         else
         {
