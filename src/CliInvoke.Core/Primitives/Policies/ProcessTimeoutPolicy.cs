@@ -8,6 +8,7 @@
    */
 
 using System;
+using AlastairLundy.CliInvoke.Core.Internal;
 
 namespace AlastairLundy.CliInvoke.Core.Primitives;
 
@@ -34,6 +35,9 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, 
         ProcessCancellationMode cancellationMode =  ProcessCancellationMode.Graceful)
     {
+        if(timeoutThreshold < TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(timeoutThreshold), string.Format(Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero, nameof(timeoutThreshold)));
+        
         TimeoutThreshold = timeoutThreshold;
         CancellationMode = cancellationMode;
     }

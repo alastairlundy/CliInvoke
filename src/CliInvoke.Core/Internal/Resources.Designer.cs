@@ -128,5 +128,11 @@ namespace AlastairLundy.CliInvoke.Core.Internal {
                 return ResourceManager.GetString("Exceptions.TargetFilePath.NullOrEmpty", resourceCulture);
             }
         }
+        
+        internal static string Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero {
+            get {
+                return ResourceManager.GetString("Exceptions.ProcessTimeoutPolicy.Timeout.LessThanZero", resourceCulture);
+            }
+        }
     }
 }
