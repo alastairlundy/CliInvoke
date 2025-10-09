@@ -13,7 +13,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
-using AlastairLundy.CliInvoke.Core.Internal;
+
+using AlastairLundy.CliInvoke.Core.Internal.Localizations;
 
 // ReSharper disable RedundantBoolCompare
 // ReSharper disable ClassNeverInstantiated.Global
