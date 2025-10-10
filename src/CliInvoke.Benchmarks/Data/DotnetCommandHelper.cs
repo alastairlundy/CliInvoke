@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Primitives;
 using CliInvoke.Benchmarking.Helpers;
 
 namespace CliInvoke.Benchmarking.Data;
