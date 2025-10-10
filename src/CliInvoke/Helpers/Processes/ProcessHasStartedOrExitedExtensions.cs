@@ -39,14 +39,17 @@ internal static class ProcessHasStartedOrExitedExtensions
         }
     }
 
-    /// <summary>
-    /// Determines if a process has exited.
-    /// </summary>
-    /// <remarks>This extension method exists because accessing the Exited property on a Process can cause an exception to be thrown.</remarks>
-    /// <param name="process">The process to be checked.</param>
-    /// <returns>True if it has exited; false if it is still running.</returns>
-    /// <exception cref="NotSupportedException">Thrown if checking whether a Process has exited on a remote device.</exception>
-    /*[UnsupportedOSPlatform("ios")]
+    
+    /*
+     /// <summary>
+       /// Determines if a process has exited.
+       /// </summary>
+       /// <remarks>This extension method exists because accessing the Exited property on a Process can cause an exception to be thrown.</remarks>
+       /// <param name="process">The process to be checked.</param>
+       /// <returns>True if it has exited; false if it is still running.</returns>
+       /// <exception cref="NotSupportedException">Thrown if checking whether a Process has exited on a remote device.</exception>
+      
+     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("macos")]
