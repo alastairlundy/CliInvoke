@@ -143,7 +143,7 @@ internal static class ProcessCancellationExtensions
             
             await Task.WhenAny(delay, waitForExit);
 
-            if (process.HasExited() == false)
+            if (process.HasExited == false)
             {
                 process.Kill(true);
             }

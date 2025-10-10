@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
 
@@ -9,7 +9,6 @@ using BenchmarkDotNet.Order;
 
 using CliInvoke.Benchmarking.Data;
 using CliInvoke.Benchmarking.Helpers;
-
 using CliWrap;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
@@ -21,12 +20,12 @@ public class BasicUnbufferedInvokationBenchmark
 {
     private readonly IProcessConfigurationInvoker _processInvoker;
     
-    private DotnetCommandHelper _dotnetCommandHelper;
+    private readonly DotnetCommandHelper _dotnetCommandHelper;
     
     public BasicUnbufferedInvokationBenchmark()
     {
-        _dotnetCommandHelper = new DotnetCommandHelper();
         _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
+        _dotnetCommandHelper = new DotnetCommandHelper();
     }
     
     [Benchmark]
@@ -46,9 +45,9 @@ public class BasicUnbufferedInvokationBenchmark
     [Benchmark]
     public async Task<int> CliWrap()
     {
-      CliWrap.CommandResult result = await Cli.Wrap(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
+      CommandResult result = await Cli.Wrap(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
             .WithArguments(_dotnetCommandHelper.Arguments)
-            .WithValidation(global::CliWrap.CommandResultValidation.ZeroExitCode)
+            .WithValidation(CommandResultValidation.ZeroExitCode)
             .ExecuteAsync();
       
       return result.ExitCode;

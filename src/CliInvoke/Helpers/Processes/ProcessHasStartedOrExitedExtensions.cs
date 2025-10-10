@@ -33,7 +33,7 @@ internal static class ProcessHasStartedOrExitedExtensions
         {
             return process.StartTime.ToUniversalTime() <= DateTime.UtcNow;
         }
-        catch
+        catch(InvalidOperationException)
         {
             return false;
         }
@@ -46,7 +46,7 @@ internal static class ProcessHasStartedOrExitedExtensions
     /// <param name="process">The process to be checked.</param>
     /// <returns>True if it has exited; false if it is still running.</returns>
     /// <exception cref="NotSupportedException">Thrown if checking whether a Process has exited on a remote device.</exception>
-    [UnsupportedOSPlatform("ios")]
+    /*[UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("macos")]
@@ -58,14 +58,15 @@ internal static class ProcessHasStartedOrExitedExtensions
     {
         if (process.IsProcessOnRemoteDevice())
             throw new NotSupportedException(Resources.Exceptions_Processes_NotSupportedOnRemoteProcess);
+        
+        /*try
+        {#1#
+        //return process.ExitTime.ToUniversalTime() <= DateTime.UtcNow;
 
-        try
-        {
-            return process.ExitTime.ToUniversalTime() <= DateTime.UtcNow;
-        }
+        /*}
         catch
         {
             return false;
-        }
-    }
+        }#1#
+    }*/
 }
