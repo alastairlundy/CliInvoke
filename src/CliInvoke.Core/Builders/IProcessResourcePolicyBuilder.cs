@@ -8,7 +8,6 @@
    */
 
 using System.Diagnostics;
-using AlastairLundy.CliInvoke.Core.Primitives;
 using System.Runtime.Versioning;
 
 

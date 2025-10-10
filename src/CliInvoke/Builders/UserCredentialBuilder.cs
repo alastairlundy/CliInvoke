@@ -13,13 +13,11 @@
 using System.Diagnostics.Contracts;
 using System.Security;
 
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Primitives;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 // ReSharper disable PossibleInvalidOperationException
-// ReSharper disable PossibleNullReferenceException
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
 
 namespace AlastairLundy.CliInvoke.Builders;
 
@@ -28,7 +26,7 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// </summary>
 public class UserCredentialBuilder : IUserCredentialBuilder
 {
-    private readonly UserCredential? _userCredential;
+    private readonly UserCredential _userCredential;
 
     /// <summary>
     /// Instantiates the UserCredentialBuilder class.

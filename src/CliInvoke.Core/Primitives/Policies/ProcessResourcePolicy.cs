@@ -8,16 +8,15 @@
    */
 
 
-using System.Runtime.Versioning;
-
 using System;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' resource configuration.
@@ -36,7 +35,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         nint? minWorkingSet = null, 
         nint? maxWorkingSet = null,
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
-        bool enablePriorityBoost = true)
+        bool enablePriorityBoost = false)
     {
         processorAffinity ??= new IntPtr(0x0001);
 

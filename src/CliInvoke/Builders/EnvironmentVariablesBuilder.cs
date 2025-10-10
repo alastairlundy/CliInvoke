@@ -58,24 +58,19 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <param name="value">The value of the environment variable to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     [Pure]
-    public IEnvironmentVariablesBuilder Set(string name, string value){
+    public IEnvironmentVariablesBuilder Set(string name, string value)
+    {
         Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
             StringComparer.Ordinal) { { name, value } };
 
         return new EnvironmentVariablesBuilder(output);
     }
 
-    /// <summary>
-    /// Sets multiple environment variables.
-    /// </summary>
-    /// <param name="variables">The environment variables to set.</param>
-    /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    [Pure]
-    public IEnvironmentVariablesBuilder Set(IEnumerable<KeyValuePair<string, string>> variables)
+    protected IEnvironmentVariablesBuilder SetInternal(IEnumerable<KeyValuePair<string, string>> variables)
     {
-        #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(nameof(variables));
-        #endif
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(variables, nameof(variables));
+#endif
         
         Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
             StringComparer.Ordinal);
@@ -83,6 +78,24 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         
         return new EnvironmentVariablesBuilder(output);
     }
+    
+    /// <summary>
+    /// Sets multiple environment variables.
+    /// </summary>
+    /// <param name="variables">The environment variables to set.</param>
+    /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
+    [Pure]
+    public IEnvironmentVariablesBuilder Set(IEnumerable<KeyValuePair<string, string>> variables)
+        => SetInternal(variables);
+
+    /// <summary>
+    /// Sets multiple environment variables from a dictionary.
+    /// </summary>
+    /// <param name="variables">The dictionary of environment variables to set.</param>
+    /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
+    [Pure]
+    public IEnvironmentVariablesBuilder Set(IDictionary<string, string> variables)
+        => SetInternal(variables);
 
     /// <summary>
     /// Sets multiple environment variables from a read-only dictionary.
@@ -91,32 +104,18 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     [Pure]
     public IEnvironmentVariablesBuilder Set(IReadOnlyDictionary<string, string> variables)
-    {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(nameof(variables));
-#endif
-        
-        Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
-            StringComparer.Ordinal);
-        output.AddRange(variables);
-
-        return new EnvironmentVariablesBuilder(output);
-    }
+        =>  SetInternal(variables);
 
     /// <summary>
     /// Builds the dictionary of configured environment variables.
     /// </summary>
     /// <returns>A read-only dictionary containing the configured environment variables.</returns>
-    public IReadOnlyDictionary<string, string> Build()
-    {
-        return _environmentVariables;
-    }
+    public IReadOnlyDictionary<string, string> Build() 
+        => _environmentVariables;
 
     /// <summary>
     /// Deletes the environment variable values.
     /// </summary>
-    public void Clear()
-    {
-        _environmentVariables.Clear();
-    }
+    public void Clear() 
+        => _environmentVariables.Clear();
 }

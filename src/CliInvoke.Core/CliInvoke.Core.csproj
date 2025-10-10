@@ -22,15 +22,16 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-beta.3</Version>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 2
-
-### Additions
-* Added ``ProcessCancellationExceptionBehaviour`` enum to enable configuring Cancellation Exception behaviour (i.e. suppressing the exception, allowing it, or allowing the exception if unexpected) - This has been added as a property to ``ProcessExitConfiguration``, with updates to the class to support the addition.
+        <Version>2.0.0-beta.4</Version>
+        <PackageReleaseNotes>### Changes since 2.0.0 Beta 3
+* Re-added .NET Standard 2.0 support
 
 ### Improvements
-* Added some missing xml doc comments
-* Updated ``IProcessExitConfigurationBuilder`` to support ``ProcessCancellationExceptionBehaviour``'s addition to ``ProcessExitConfiguration``</PackageReleaseNotes>
+* Fixed an issue where an invalid Process Timeout Threshold could be provided via ``ProcessTimeoutPolicyBuilder``'s ``WithTimeoutThreshold`` method - This now results in an ``ArgumentOutOfRangeException`` being thrown.
+* Updated Forceful Cancellation to now terminate the process and it's child processes.
+* Updated ``PipedProcessResult`` to implement ``IDisposable`` and dispose of the Stream parameters when Dispose or DisposeAsync is called
+* Changed default value for ``ProcessResourcePolicy``'s ``PriorityBoostEnabled`` value from ``true`` to ``false``
+* Updated builder interfaces</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
@@ -45,21 +46,6 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
-    
-    <ItemGroup>
-      <EmbeddedResource Update="Internal\Resources.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Internal\Resources.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.resx</DependentUpon>
-      </Compile>
-    </ItemGroup>
 
     <ItemGroup>
       <None Include="..\..\.assets\icon.png">
@@ -67,5 +53,20 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Internal\Localizations\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Internal\Localizations\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>
