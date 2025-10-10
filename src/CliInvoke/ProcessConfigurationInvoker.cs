@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -96,14 +97,33 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         try
         {
             process.Start();
+            DateTime startTime;
             
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
+            try
+            {
+                startTime = process.StartTime;
+            }
+            catch
+            {
+                startTime = DateTime.UtcNow;
+            }
+            
+            if (process.HasStarted() && process.HasExited == false)
+            {
+                try
+                {
+                    process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
             
              ProcessResult result = new ProcessResult(process.StartInfo.FileName,
-                 process.ExitCode, process.StartTime, process.ExitTime);
+                 process.ExitCode, startTime, process.ExitTime);
 
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
             {
@@ -175,10 +195,29 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         try
         {
             process.Start();
+            DateTime startTime;
 
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+            try
+            {
+                startTime = process.StartTime;
+            }
+            catch
+            {
+                startTime = DateTime.UtcNow;
+            }
 
+            if (process.HasStarted() && process.HasExited == false)
+            {
+                try
+                {
+                    process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
 
@@ -191,7 +230,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                 process.ExitCode,
                 await standardOut,
                 await standardError,
-                process.StartTime,
+                startTime,
                 process.ExitTime);
             
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
@@ -262,10 +301,29 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         try
         {
             process.Start();
+            DateTime startTime;
 
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+            try
+            {
+                startTime = process.StartTime;
+            }
+            catch
+            {
+                startTime = DateTime.UtcNow;
+            }
 
+            if (process.HasStarted() && process.HasExited == false)
+            {
+                try
+                {
+                    process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            
             Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
 
@@ -274,7 +332,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
             PipedProcessResult result = new PipedProcessResult(process.StartInfo.FileName,
-                process.ExitCode, process.StartTime, process.ExitTime,
+                process.ExitCode, startTime, process.ExitTime,
                 await standardOutput, await standardError);
             
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
