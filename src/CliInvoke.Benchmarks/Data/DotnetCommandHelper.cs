@@ -11,7 +11,8 @@ public class DotnetCommandHelper
     public DotnetCommandHelper()
     {
         IProcessConfigurationInvoker processConfigurationInvoker = CliInvokeHelpers.CreateProcessInvoker();
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
+            RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
         {
             ProcessConfiguration processConfiguration = new ProcessConfiguration("/usr/bin/which",
                 false, true, true,
