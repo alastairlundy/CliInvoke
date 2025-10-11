@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +17,8 @@ using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
+
+using AlastairLundy.CliInvoke.Helpers;
 using AlastairLundy.CliInvoke.Helpers.Processes;
 
 namespace AlastairLundy.CliInvoke;
@@ -76,6 +76,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                     processConfiguration.TargetFilePath));
         }
 
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(false,
                 false),
@@ -89,40 +90,18 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
 
         try
         {
             process.Start();
-            DateTime startTime;
-            
-            try
-            {
-                startTime = process.StartTime;
-            }
-            catch
-            {
-                startTime = DateTime.UtcNow;
-            }
-            
-            if (process.HasStarted() && process.HasExited == false)
-            {
-                try
-                {
-                    process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-                }
-                catch
-                {
-                    // ignored
-                }
-            }
             
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
             
              ProcessResult result = new ProcessResult(process.StartInfo.FileName,
-                 process.ExitCode, startTime, process.ExitTime);
+                 process.ExitCode, process.StartTime, process.ExitTime);
 
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
             {
@@ -173,6 +152,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                     processConfiguration.TargetFilePath));
         }
         
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true,
                 true),
@@ -186,35 +166,13 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
 
         try
         {
             process.Start();
-            DateTime startTime;
-
-            try
-            {
-                startTime = process.StartTime;
-            }
-            catch
-            {
-                startTime = DateTime.UtcNow;
-            }
-
-            if (process.HasStarted() && process.HasExited == false)
-            {
-                try
-                {
-                    process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-                }
-                catch
-                {
-                    // ignored
-                }
-            }
             
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -228,7 +186,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                 process.ExitCode,
                 await standardOut,
                 await standardError,
-                startTime,
+                process.StartTime,
                 process.ExitTime);
             
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
@@ -278,6 +236,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true,
                 true),
@@ -291,36 +250,14 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
         
         try
         {
             process.Start();
-            DateTime startTime;
 
-            try
-            {
-                startTime = process.StartTime;
-            }
-            catch
-            {
-                startTime = DateTime.UtcNow;
-            }
-
-            if (process.HasStarted() && process.HasExited == false)
-            {
-                try
-                {
-                    process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-                }
-                catch
-                {
-                    // ignored
-                }
-            }
-            
             Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
 
@@ -329,7 +266,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
             PipedProcessResult result = new PipedProcessResult(process.StartInfo.FileName,
-                process.ExitCode, startTime, process.ExitTime,
+                process.ExitCode, process.StartTime, process.ExitTime,
                 await standardOutput, await standardError);
             
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
