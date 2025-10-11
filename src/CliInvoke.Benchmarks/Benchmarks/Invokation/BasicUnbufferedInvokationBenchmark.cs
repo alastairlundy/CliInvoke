@@ -21,7 +21,7 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
  Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BasicUnbufferedInvokationBenchmark
 {
-    private readonly IProcessFactory _processFactory;
+    private readonly IProcessInvoker _processInvoker;
     private readonly ICliCommandInvoker _cliCommandInvoker;
     
     private DotnetCommandHelper _dotnetCommandHelper;
@@ -29,7 +29,7 @@ public class BasicUnbufferedInvokationBenchmark
     public BasicUnbufferedInvokationBenchmark()
     {
         _dotnetCommandHelper = new DotnetCommandHelper();
-        _processFactory = CliInvokeHelpers.CreateProcessFactory();
+        _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
         _cliCommandInvoker = CliInvokeHelpers.CreateCliCommandInvoker();
     }
 
@@ -42,9 +42,14 @@ public class BasicUnbufferedInvokationBenchmark
                 commandResultValidation: ProcessResultValidation.ExitCodeZero);
 #pragma warning restore CA1416
 
-        Process process = _processFactory.StartNew(processConfiguration);
-       
-      ProcessResult result = await _processFactory.ContinueWhenExitAsync(process);
+        Process process = new Process()
+        {
+            StartInfo = processConfiguration.ToProcessStartInfo(),
+            EnableRaisingEvents = true,
+        };
+        
+      ProcessResult result  = await _processInvoker.ExecuteProcessAsync(process, 
+          processConfiguration, CancellationToken.None);
       
       return result.ExitCode;
     }

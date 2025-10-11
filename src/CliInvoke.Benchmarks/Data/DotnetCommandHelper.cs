@@ -12,7 +12,7 @@ public class DotnetCommandHelper
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            CommandTask<BufferedCommandResult> task = Cli.Wrap("which")
+            CommandTask<BufferedCommandResult> task = Cli.Wrap("/usr/bin/which")
                 .WithArguments("dotnet")
                 .ExecuteBufferedAsync();
             

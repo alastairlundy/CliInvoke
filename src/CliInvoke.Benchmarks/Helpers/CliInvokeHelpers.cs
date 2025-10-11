@@ -17,6 +17,11 @@ internal class CliInvokeHelpers
         return new ProcessFactory(new FilePathResolver());
     }
 
+    internal static ProcessInvoker CreateProcessInvoker()
+    {
+        return new ProcessInvoker(CreateProcessFactory(), new ProcessPipeHandler());
+    }
+    
     internal static CliCommandInvoker CreateCliCommandInvoker()
     {
         IFilePathResolver filePathResolver = new FilePathResolver();
