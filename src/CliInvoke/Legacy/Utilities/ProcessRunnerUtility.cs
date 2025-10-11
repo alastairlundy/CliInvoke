@@ -166,8 +166,17 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
             process.Start();
         }
 
-        if (processResourcePolicy is not null && process.HasExited == false) 
-            process.SetResourcePolicy(processResourcePolicy);
+        if (processResourcePolicy is not null && process.HasExited == false)
+        {
+            try
+            {
+                process.SetResourcePolicy(processResourcePolicy);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
             
         await process.WaitForExitAsync(cancellationToken);
 
@@ -252,6 +261,8 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
     [Obsolete(DeprecationMessages.ClassDeprecationV2)]
     public BufferedProcessResult GetBufferedResult(Process process, bool disposeOfProcess)
     {
+        DateTime startTime;
+        
         if (process.HasStarted() == false)
         {
             process.StartInfo.RedirectStandardOutput = true;
@@ -267,15 +278,29 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
                 }
                 
                 process.Start();
+                startTime = process.StartTime;
             }
             
+            startTime = process.StartTime;
             process.WaitForExit();
         }
-        
+        else
+        {
+            try
+            {
+                startTime = process.StartTime;
+            }
+            catch
+            {
+                startTime = DateTime.Today;
+            }
+        }
+
+
         BufferedProcessResult processResult = new BufferedProcessResult(
             process.StartInfo.FileName, process.ExitCode,
              process.StandardOutput.ReadToEnd(),  process.StandardError.ReadToEnd(),
-            process.StartTime, process.ExitTime);
+            startTime, process.ExitTime);
 
         if (disposeOfProcess)
         {
@@ -317,7 +342,18 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
             }
         }
         
-        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName, process.ExitCode, process.StartTime,
+        DateTime startTime;
+
+        try
+        {
+            startTime = process.StartTime;
+        }
+        catch
+        {
+            startTime = DateTime.Today;
+        }
+        
+        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName, process.ExitCode, startTime,
             process.ExitTime);
 
         if (disposeOfProcess)
