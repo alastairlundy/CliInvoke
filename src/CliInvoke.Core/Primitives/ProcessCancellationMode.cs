@@ -9,7 +9,7 @@
 
 using System.Threading;
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// 

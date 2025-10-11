@@ -15,12 +15,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using AlastairLundy.CliInvoke.Core;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
-
-using AlastairLundy.CliInvoke.Core.Primitives;
 
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 

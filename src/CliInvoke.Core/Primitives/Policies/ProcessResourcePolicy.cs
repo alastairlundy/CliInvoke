@@ -8,16 +8,15 @@
    */
 
 
-using System.Runtime.Versioning;
-
 using System;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' resource configuration.
@@ -36,17 +35,15 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         nint? minWorkingSet = null, 
         nint? maxWorkingSet = null,
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
-        bool enablePriorityBoost = true)
+        bool enablePriorityBoost = false)
     {
         processorAffinity ??= new IntPtr(0x0001);
-
 
         if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
         {
             MinWorkingSet = minWorkingSet;
             MaxWorkingSet = maxWorkingSet;
         }
-
 
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
         {
@@ -138,10 +135,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         {
             return Equals(policy);
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /// <summary>
@@ -151,7 +146,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        return HashCode.Combine(ProcessorAffinity, (int)PriorityClass, EnablePriorityBoost, MinWorkingSet, MaxWorkingSet);
+        return HashCode.Combine(ProcessorAffinity, (int)PriorityClass,
+            EnablePriorityBoost, MinWorkingSet, MaxWorkingSet);
 #pragma warning restore CA1416
     }
 

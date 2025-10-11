@@ -9,7 +9,9 @@
 
 using System;
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Internal.Localizations;
+
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' Timeout configuration, if any.
@@ -34,6 +36,9 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, 
         ProcessCancellationMode cancellationMode =  ProcessCancellationMode.Graceful)
     {
+        if(timeoutThreshold < TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(timeoutThreshold), string.Format(Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero, nameof(timeoutThreshold)));
+        
         TimeoutThreshold = timeoutThreshold;
         CancellationMode = cancellationMode;
     }

@@ -12,8 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>
@@ -55,7 +53,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="environmentVariables">The environment variables to be configured.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified environment variables.</returns>
-    IProcessConfigurationBuilder WithEnvironmentVariables(IDictionary<string, string> environmentVariables);
+    IProcessConfigurationBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables);
     
     /// <summary>
     /// Sets whether to execute the Process with Administrator Privileges.

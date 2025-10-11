@@ -7,10 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AlastairLundy.CliInvoke.Core.Internal {
-    using System;
-    
-    
+namespace AlastairLundy.CliInvoke.Core.Internal.Localizations {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -126,6 +123,12 @@ namespace AlastairLundy.CliInvoke.Core.Internal {
         internal static string Exceptions_TargetFilePath_NullOrEmpty {
             get {
                 return ResourceManager.GetString("Exceptions.TargetFilePath.NullOrEmpty", resourceCulture);
+            }
+        }
+        
+        internal static string Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero {
+            get {
+                return ResourceManager.GetString("Exceptions.ProcessTimeoutPolicy.Timeout.LessThanZero", resourceCulture);
             }
         }
     }
