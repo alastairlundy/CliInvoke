@@ -4,7 +4,6 @@ This package contains Process Running and handling abstractions as well as commo
 For an implementing package, check out [``CliInvoke``](https://www.nuget.org/packages/AlastairLundy.CliInvoke/).
 
 Key Abstractions:
-* ``IProcessInvoker``
 * ``IProcessConfigurationInvoker``
 
 * Piping:
