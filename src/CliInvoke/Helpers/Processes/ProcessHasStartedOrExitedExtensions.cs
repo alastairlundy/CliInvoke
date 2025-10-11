@@ -1,5 +1,11 @@
-﻿
+﻿/*
+    AlastairLundy.CliInvoke
+    Copyright (C) 2024-2025  Alastair Lundy
 
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+   */
 
 using System;
 using System.Diagnostics;
@@ -38,38 +44,4 @@ internal static class ProcessHasStartedOrExitedExtensions
             return false;
         }
     }
-
-    
-    /*
-     /// <summary>
-       /// Determines if a process has exited.
-       /// </summary>
-       /// <remarks>This extension method exists because accessing the Exited property on a Process can cause an exception to be thrown.</remarks>
-       /// <param name="process">The process to be checked.</param>
-       /// <returns>True if it has exited; false if it is still running.</returns>
-       /// <exception cref="NotSupportedException">Thrown if checking whether a Process has exited on a remote device.</exception>
-      
-     [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
-    internal static bool HasExited(this Process process)
-    {
-        if (process.IsProcessOnRemoteDevice())
-            throw new NotSupportedException(Resources.Exceptions_Processes_NotSupportedOnRemoteProcess);
-        
-        /*try
-        {#1#
-        //return process.ExitTime.ToUniversalTime() <= DateTime.UtcNow;
-
-        /*}
-        catch
-        {
-            return false;
-        }#1#
-    }*/
 }
