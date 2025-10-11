@@ -35,13 +35,12 @@ public class FilePathResolver : IFilePathResolver
             outputFilePath = inputFilePath;
         }
 
-        string fileName = Path.GetFileName(inputFilePath);
+        //   int directoryStart = inputFilePath.IndexOf(Path.DirectorySeparatorChar);
+        int directoryEnd = inputFilePath.LastIndexOf(Path.DirectorySeparatorChar);
         
-        int index = inputFilePath.IndexOf(fileName, StringComparison.InvariantCultureIgnoreCase);
+      //  string fileName = inputFilePath.Substring(inputFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
         
-       inputFilePath = inputFilePath.Remove(index, fileName.Length);
-        
-        string[] directories = Directory.GetDirectories(inputFilePath,
+        string[] directories = Directory.GetDirectories(inputFilePath.Remove(directoryEnd + 1),
             "*",
             SearchOption.AllDirectories);
 
@@ -49,7 +48,7 @@ public class FilePathResolver : IFilePathResolver
         {
             string[] files = Directory.GetFiles(directory);
 
-            if (files.Any(x => Path.GetFileName(inputFilePath).Equals(x)))
+            if (files.Any(x => x == Path.GetFullPath(inputFilePath)))
             {
                 outputFilePath = Path.GetFullPath(files.First(x => Path.GetFileName(inputFilePath).Equals(x)));
             }
