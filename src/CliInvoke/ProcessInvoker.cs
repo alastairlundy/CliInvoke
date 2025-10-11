@@ -132,9 +132,16 @@ public class ProcessInvoker : IProcessInvoker
         }
 
         process.Start();
-        
-        if(processResourcePolicy is not null)
-            process.SetResourcePolicy(processResourcePolicy);
+
+        try
+        {
+            if (processResourcePolicy is not null)
+                process.SetResourcePolicy(processResourcePolicy);
+        }
+        catch
+        {
+            // ignored    
+        }
         
         ProcessResult result =
             await _processFactory.ContinueWhenExitAsync(process,
@@ -157,7 +164,18 @@ public class ProcessInvoker : IProcessInvoker
 
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
+        
+        process.Start();
 
+        try
+        {
+            if (processConfiguration.ResourcePolicy is not null)
+                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+        }
+        catch
+        {
+            // ignored    
+        }
                             
         BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process,
             processConfiguration.ResultValidation,
@@ -197,10 +215,17 @@ public class ProcessInvoker : IProcessInvoker
         process.StartInfo.RedirectStandardError = true;
 
         process.Start();
-        
-        if(processResourcePolicy is not null)
-            process.SetResourcePolicy(processResourcePolicy);
 
+        try
+        {
+            if (processResourcePolicy is not null)
+                process.SetResourcePolicy(processResourcePolicy);
+        }
+        catch
+        {
+            // ignored    
+        }
+        
         BufferedProcessResult result =
             await _processFactory.ContinueWhenExitBufferedAsync(process,
                 processResultValidation,
