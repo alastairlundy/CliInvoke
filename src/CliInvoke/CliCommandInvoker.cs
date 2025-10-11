@@ -35,7 +35,6 @@ using AlastairLundy.CliInvoke.Core.Primitives.Results;
 
 using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal;
-using AlastairLundy.CliInvoke.Internal.Extensions;
 
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -95,16 +94,16 @@ public class CliCommandInvoker : ICliCommandInvoker
         {
             Process process  = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration));   
             
-            if (process.StartInfo.RedirectStandardInput &&
-                commandConfiguration.StandardInput is not null
+            if (process.StartInfo.RedirectStandardInput
                 && commandConfiguration.StandardInput != StreamWriter.Null)
             {
                 await _processPipeHandler.PipeStandardInputAsync(commandConfiguration.StandardInput.BaseStream, process);
             }
 
-            (ProcessResult processResult, Stream? standardOutput, Stream? standardError) result;
-
-            result = await _pipedProcessRunner.ExecuteProcessWithPipingAsync(process, ProcessResultValidation.None,
+            (ProcessResult processResult,
+                Stream? standardOutput,
+                Stream? standardError) result = await _pipedProcessRunner.ExecuteProcessWithPipingAsync(process,
+                    ProcessResultValidation.None,
                         commandConfiguration.ResourcePolicy,
                         cancellationToken);
 
@@ -115,16 +114,14 @@ public class CliCommandInvoker : ICliCommandInvoker
                 throw new CliCommandNotSuccessfulException(result.processResult.ExitCode, commandConfiguration);
             }
 
-            if (_pipedProcessRunner is not null && result.standardOutput is not null && result.standardError is not null)
+            if (result.standardOutput is not null && result.standardError is not null)
             {
-                if (process.StartInfo.RedirectStandardOutput && 
-                    commandConfiguration.StandardOutput is not null)
+                if (process.StartInfo.RedirectStandardOutput)
                 {
                     await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
                         cancellationToken);
                 }
-                if (process.StartInfo.RedirectStandardError &&
-                    commandConfiguration.StandardError is not null)
+                if (process.StartInfo.RedirectStandardError)
                 {
                     await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
                 }
@@ -157,17 +154,17 @@ public class CliCommandInvoker : ICliCommandInvoker
             Process process = _commandProcessFactory.CreateProcess(_commandProcessFactory.ConfigureProcess(commandConfiguration,
                     true, true));
 
-            if (process.StartInfo.RedirectStandardInput &&
-                commandConfiguration.StandardInput is not null
+            if (process.StartInfo.RedirectStandardInput
                 && commandConfiguration.StandardInput != StreamWriter.Null)
             {
                 await _processPipeHandler.PipeStandardInputAsync(commandConfiguration.StandardInput.BaseStream, process);
             }
             
             // PipedProcessRunner runs the Process for us.
-            (BufferedProcessResult processResult, Stream? standardOutput, Stream? standardError) result;
-            
-            result = await _pipedProcessRunner.ExecuteBufferedProcessWithPipingAsync(process, ProcessResultValidation.None, commandConfiguration.ResourcePolicy,
+            (BufferedProcessResult processResult, Stream? standardOutput, Stream? standardError) result =
+                await _pipedProcessRunner.ExecuteBufferedProcessWithPipingAsync(process,
+                    ProcessResultValidation.None,
+                    commandConfiguration.ResourcePolicy,
                     cancellationToken);
             
             // Throw a CommandNotSuccessful exception if required.
@@ -176,17 +173,15 @@ public class CliCommandInvoker : ICliCommandInvoker
                 throw new CliCommandNotSuccessfulException(result.processResult.ExitCode, commandConfiguration);
             }
 
-            if (_pipedProcessRunner is not null && result.standardOutput is not null &&
+            if (result.standardOutput is not null &&
                 result.standardError is not null)
             {
-                if (process.StartInfo.RedirectStandardOutput &&
-                    commandConfiguration.StandardOutput is not null)
+                if (process.StartInfo.RedirectStandardOutput)
                 {
                     await result.standardOutput.CopyToAsync(commandConfiguration.StandardOutput.BaseStream,
                         cancellationToken);
                 }
-                if (process.StartInfo.RedirectStandardError &&
-                    commandConfiguration.StandardError is not null)
+                if (process.StartInfo.RedirectStandardError)
                 {
                     await result.standardError.CopyToAsync(commandConfiguration.StandardError.BaseStream, cancellationToken);
                 }

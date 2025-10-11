@@ -197,7 +197,15 @@ public class ProcessFactory : IProcessFactory
 
         process.Start();
         
-        process.SetResourcePolicy(resourcePolicy);
+        try
+        {
+            process.SetResourcePolicy(resourcePolicy);
+        }
+        catch
+        {
+            // ignored
+        }
+
         
         return process;
     }
@@ -227,8 +235,15 @@ public class ProcessFactory : IProcessFactory
         Process process = From(startInfo, credential);
         
         process.Start();
-        
-        process.SetResourcePolicy(resourcePolicy);
+
+        try
+        {
+            process.SetResourcePolicy(resourcePolicy);
+        }
+        catch
+        {
+            // ignored
+        }
 
         return process;
     }
@@ -252,7 +267,14 @@ public class ProcessFactory : IProcessFactory
 
         if (configuration.ResourcePolicy is not null && process.HasExited() == false)
         {
-            process.SetResourcePolicy(configuration.ResourcePolicy);
+            try
+            {
+                process.SetResourcePolicy(configuration.ResourcePolicy);
+            }
+            catch
+            {
+                // ignored
+            }
         }
         
         return process;
@@ -302,6 +324,11 @@ public class ProcessFactory : IProcessFactory
     public async Task<ProcessResult> ContinueWhenExitAsync(Process process, ProcessResultValidation resultValidation,
         CancellationToken cancellationToken = default)
     {
+        if(process.HasStarted() == false)
+            process.Start();
+
+        DateTime startTime = process.StartTime;
+            
         await process.WaitForExitAsync(cancellationToken);
 
         if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
@@ -309,7 +336,7 @@ public class ProcessFactory : IProcessFactory
             throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
         }
         
-        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName, process.ExitCode, process.StartTime,
+        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName, process.ExitCode, startTime,
             process.ExitTime);
         
         process.Dispose();
@@ -365,6 +392,11 @@ public class ProcessFactory : IProcessFactory
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         
+        if(process.HasExited())
+            process.Start();
+
+        DateTime startTime = process.StartTime;
+        
         await process.WaitForExitAsync(cancellationToken);
         
         if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
@@ -376,7 +408,7 @@ public class ProcessFactory : IProcessFactory
             process.StartInfo.FileName, process.ExitCode,
             await process.StandardOutput.ReadToEndAsync(cancellationToken),
             await process.StandardError.ReadToEndAsync(cancellationToken),
-            process.StartTime, process.ExitTime);
+            startTime, process.ExitTime);
         
         process.Dispose();
         

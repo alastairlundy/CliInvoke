@@ -33,12 +33,11 @@ public class FilePathResolver : IFilePathResolver
         if (File.Exists(inputFilePath))
         {
             outputFilePath = inputFilePath;
+            return;
         }
 
         //   int directoryStart = inputFilePath.IndexOf(Path.DirectorySeparatorChar);
         int directoryEnd = inputFilePath.LastIndexOf(Path.DirectorySeparatorChar);
-        
-      //  string fileName = inputFilePath.Substring(inputFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
         
         string[] directories = Directory.GetDirectories(inputFilePath.Remove(directoryEnd + 1),
             "*",
@@ -48,7 +47,7 @@ public class FilePathResolver : IFilePathResolver
         {
             string[] files = Directory.GetFiles(directory);
 
-            if (files.Any(x => x == Path.GetFullPath(inputFilePath)))
+            if (files.Any(x => Path.GetFullPath(x) == Path.GetFullPath(inputFilePath)))
             {
                 outputFilePath = Path.GetFullPath(files.First(x => Path.GetFileName(inputFilePath).Equals(x)));
             }
