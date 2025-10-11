@@ -21,7 +21,6 @@ namespace AlastairLundy.CliInvoke.Piping;
 /// </summary>
 public class ProcessPipeHandler : IProcessPipeHandler
 {
-   
     /// <summary>
     /// Asynchronously pipes the standard input from a source stream to a specified process.
     /// </summary>
@@ -37,16 +36,18 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<Process> PipeStandardInputAsync(Stream source, Process destination)
+    public async Task<bool> PipeStandardInputAsync(Stream source, Process destination)
     {
-        if (destination.StartInfo.RedirectStandardInput && destination.StandardInput != StreamWriter.Null)
+        if (destination.StartInfo.RedirectStandardInput)
         {
             await destination.StandardInput.FlushAsync();
             destination.StandardInput.BaseStream.Position = 0;
             await source.CopyToAsync(destination.StandardInput.BaseStream); 
+            
+            return source.Equals(destination.StandardInput.BaseStream);
         }
-        
-        return destination;
+
+        return false;
     }
 
     /// <summary>

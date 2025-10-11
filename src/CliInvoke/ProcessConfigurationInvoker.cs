@@ -76,7 +76,6 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                     processConfiguration.TargetFilePath));
         }
 
-        Process process = new Process()
         {
             StartInfo = processConfiguration.ToProcessStartInfo(false,
                 false),
@@ -174,7 +173,6 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                     processConfiguration.TargetFilePath));
         }
         
-        Process process = new Process()
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true,
                 true),
@@ -280,7 +278,6 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        Process process = new Process()
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true,
                 true),
