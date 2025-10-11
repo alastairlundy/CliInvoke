@@ -26,7 +26,7 @@ There's a few different reasons:
 * Helps de-couple the Dependency Injection extension functionality from the main library
 
 ## Licensing
-CliInvoke.Extensions is licensed under the MPL 2.0 license. If you modify any of the package's files then the modified files must remain licensed under the MPL 2.0 .
+CliInvoke.Extensions is licensed under the MPL 2.0 license.
 
 If you use this package in your project please make an exact copy of the contents of the LICENSE.txt file available either in your third party licenses txt file or as a separate txt file.
 

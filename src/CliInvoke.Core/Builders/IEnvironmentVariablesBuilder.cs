@@ -33,6 +33,13 @@ public interface IEnvironmentVariablesBuilder
     IEnvironmentVariablesBuilder Set(IEnumerable<KeyValuePair<string, string>> variables);
 
     /// <summary>
+    /// Sets multiple environment variables from a dictionary.
+    /// </summary>
+    /// <param name="variables">The dictionary of environment variables to set.</param>
+    /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
+    IEnvironmentVariablesBuilder Set(IDictionary<string, string> variables);
+    
+    /// <summary>
     /// Sets multiple environment variables from a read-only dictionary.
     /// </summary>
     /// <param name="variables">The read-only dictionary of environment variables to set.</param>

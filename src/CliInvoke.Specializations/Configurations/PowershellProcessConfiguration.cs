@@ -14,9 +14,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 using System.Runtime.Versioning;
+
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
 
 // ReSharper disable RedundantBoolCompare
 

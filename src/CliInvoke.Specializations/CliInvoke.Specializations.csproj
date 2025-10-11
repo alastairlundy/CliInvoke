@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>AlastairLundy.CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>
@@ -10,19 +10,23 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.3</PackageVersion>
+        <PackageVersion>2.0.0-beta.5</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <LangVersion>13</LangVersion>
-        <PackageReleaseNotes>Updated to CliInvoke 2.0.0 Beta 3</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated to CliInvoke 2.0.0 Beta 5</PackageReleaseNotes>
         <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
     </PropertyGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
+    </ItemGroup>
 
     <ItemGroup>
         <Content Include="..\..\SPECIALIZATIONS_README.md">
@@ -60,6 +64,6 @@
     </ItemGroup>-->
 
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
+      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.5" />
     </ItemGroup>
 </Project>

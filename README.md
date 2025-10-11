@@ -26,7 +26,7 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Features
 * Promotes the single responsibility principle and separation of concerns
-* Supports .NET 8 and newer TFMs, and has few dependencies.
+* Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
 * Dependency Injection extensions to make using CliInvoke a breeze.
 * Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
@@ -35,15 +35,15 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Why use CliInvoke over [CliWrap](https://github.com/Tyrrrz/CliWrap/)?
 * Greater separation of concerns - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
-* Supports Dependency Injection
+* Designed with Dependency Injection in mind
 * Classes and code follow the Single Responsibility Principle
-* No hidden or additional licensing terms are required beyond the source code license.
+* No additional licensing terms are required beyond the source code license.
 * No imported C code - This library is entirely written in C#.
 * No lock in regarding Piping support
-* Uses .NET's built in ``Process`` type.
+* Supports .NET's built in ``ProcessStartInfo`` primitive.
 
-## How to install and use CliInvoke
-CliInvoke is available on Nuget.
+## How to install and use CliInvoke.Core
+CliInvoke.Core is available on [the Nuget Gallery](https://nuget.org) [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Core).
 
 These are the CliInvoke projects:
 * CliInvoke - The main CliInvoke package.
@@ -231,54 +231,7 @@ BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(
 ```
 
 ## How to Build CliInvoke's code
-
-### Requirements
-CliInvoke requires the latest .NET release SDK to be installed to target all supported TFM (Target Framework Moniker) build targets.
-
-Currently, the required .NET SDK is .NET 9. 
-
-The current build targets include: 
-* .NET 8
-* .NET 9
-* .NET Standard 2.0 (for CliInvoke 1.x only)
-
-Any version of the .NET 9 SDK can be used, but using the latest version is preferred.
-
-### Versioning new releases
-CliInvoke aims to follow Semantic versioning with ```[Major].[Minor].[Build]``` for most circumstances and an optional ``.[Revision]`` when only a configuration change is made, or a new build of a preview release is made.
-
-#### Pre-releases
-Pre-release versions should have a suffix of -alpha, -beta, -rc, or -preview followed by a ``.`` and what pre-release version number they are. The number should be incremented by 1 after each release unless it only contains a configuration change, or another packaging, or build change. An example pre-release version may look like 1.1.0-alpha.2 , this version string would indicate it is the 2nd alpha pre-release version of 1.1.0 .
-
-#### Stable Releases
-Stable versions should follow semantic versioning and should only increment the Revision number if a release only contains configuration or build packaging changes, with no change in functionality, features, or even bug or security fixes.
-
-Releases that only implement bug fixes should see the Build version incremented.
-
-Releases that add new non-breaking changes should increment the Minor version. Minor breaking changes may be permitted in Minor version releases where doing so is necessary to maintain compatibility with an existing supported platform, or an existing piece of code that requires a breaking change to continue to function as intended.
-
-Releases that add major breaking changes or significantly affect the API should increment the Major version. Major version releases should not be released with excessive frequency and should be released when there is a genuine need for the API to change significantly for the improvement of the project.
-
-### Building for Testing
-You can build for testing by building the desired project within your IDE or VS Code, or manually by entering the following command: ``dotnet build -c Debug``.
-
-If you encounter any bugs or issues, try running the ``CliInvoke.Tests`` project and setting breakpoints in the affected CliInvoke project's code where appropriate. Failing that, please [report the issue](https://github.com/alastairlundy/CliInvoke/issues/new/) if one doesn't already exist for the bug(s).
-
-### Building for Release
-Before building a release build, ensure you apply the relevant changes to the relevant ``.csproj`` file corresponding to the package you are trying to build:
-* Update the Package Version variable 
-* Update the project file's Changelog
-* Remove/replace the CliInvoke icon if distributing a non-official release build to a wider audience. See [CliInvoke Assets](#CliInvoke-assets) for more details.
-
-You should ensure the project builds under debug settings before producing a release build.
-
-#### Producing Release Builds
-To manually build a project for release, enter ``dotnet build -c Release /p:ContinuousIntegrationBuild=true`` for a release with [SourceLink](https://github.com/dotnet/sourcelink) enabled or just ``dotnet build -c Release`` for a build without SourceLink.
-
-Builds should generally always include Source Link and symbol packages if intended for wider distribution.
-
-**NOTES**: 
-* ``CliInvoke.Specializations`` and ``CliInvoke.Extensions`` both take a dependency on the CliInvoke base package from Nuget - For the respective libraries to use a newer CliInvoke version, that version must be published on Nuget.
+Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
 
 ## How to Contribute to CliInvoke
 Thank you in advance for considering contributing to CliInvoke.
@@ -295,16 +248,14 @@ CliInvoke aims to make working with Commands and external processes easier.
 
 Whilst an initial set of features are available in version 1, there is room for more features, and for modifications of existing features in future updates.
 
-That being said, all stable releases from 1.0 onwards must be stable and should not contain regressions.
-
-Future updates should aim focus on one or more of the following:
+Future updates may focus on one or more of the following:
 * Improved ease of use
 * Improved stability 
 * New features
 * Enhancing existing features
 
 ## License
-CliInvoke is licensed under the MPL 2.0 license. If you modify any of CliInvoke's files then the modified files must be licensed under the MPL 2.0 .
+CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
 If you use CliInvoke in your project please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 

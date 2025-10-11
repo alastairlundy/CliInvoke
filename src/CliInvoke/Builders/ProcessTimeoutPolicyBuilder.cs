@@ -11,9 +11,8 @@
 
 using System;
 using System.Diagnostics.Contracts;
-
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Primitives;
 
 namespace AlastairLundy.CliInvoke.Builders;
 
@@ -46,10 +45,22 @@ public class ProcessTimeoutPolicyBuilder : IProcessTimeoutPolicyBuilder
     /// </summary>
     /// <param name="timeoutThreshold">The TimeSpan that the process is allowed to run before timing out.</param>
     /// <return>This method returns itself allowing for method chaining.</return>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the <see cref="TimeSpan"/> is less than zero milliseconds.</exception>
     [Pure]
-    public IProcessTimeoutPolicyBuilder WithTimeoutThreshold(TimeSpan timeoutThreshold) =>
-        new ProcessTimeoutPolicyBuilder(
-            new ProcessTimeoutPolicy(timeoutThreshold, _policy.CancellationMode));
+    public IProcessTimeoutPolicyBuilder WithTimeoutThreshold(TimeSpan timeoutThreshold)
+    {
+#if NET8_0_OR_GREATER
+        bool lessThanZero = double.IsNegative(timeoutThreshold.TotalMilliseconds);
+#else
+        bool lessThanZero = timeoutThreshold.TotalMilliseconds < double.Parse("0.0");
+#endif        
+
+       if(timeoutThreshold < TimeSpan.Zero || lessThanZero)
+           throw new ArgumentOutOfRangeException(nameof(timeoutThreshold));
+        
+       return new ProcessTimeoutPolicyBuilder(
+           new ProcessTimeoutPolicy(timeoutThreshold, _policy.CancellationMode));
+    }
 
     /// <summary>
     /// Sets the cancellation mode for the process if the timeout is reached.

@@ -10,11 +10,9 @@
 using System.IO;
 
 using AlastairLundy.CliInvoke.Builders;
-
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Extensibility;
-
-using AlastairLundy.CliInvoke.Core.Primitives;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -43,7 +41,7 @@ public class RunnerProcessCreator : IRunnerProcessCreator
     /// <returns>The Process Configuration to be run.</returns>
     public ProcessConfiguration CreateRunnerProcess(ProcessConfiguration inputProcess)
     {
-        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(_commandRunnerConfiguration)
+        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(_commandRunnerConfiguration.TargetFilePath)
             .WithArguments(inputProcess.TargetFilePath + " " + inputProcess.Arguments)
             .WithEnvironmentVariables(inputProcess.EnvironmentVariables)
             .WithProcessResourcePolicy(inputProcess.ResourcePolicy)

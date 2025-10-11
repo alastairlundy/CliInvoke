@@ -10,10 +10,12 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-
-using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Internal.Localizations;
-using AlastairLundy.DotExtensions.Processes;
+
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
 
 // ReSharper disable RedundantBoolCompare
 
@@ -44,8 +46,8 @@ internal static class ProcessSetPolicyExtensions
 
         if (process.HasStarted() == false)
             throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
-
-        if (process.HasStarted() && (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()))
+        
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
         {
             if (resourcePolicy.ProcessorAffinity is not null)
             {

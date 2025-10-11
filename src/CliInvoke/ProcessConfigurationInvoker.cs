@@ -7,26 +7,24 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Piping;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
+
+using AlastairLundy.CliInvoke.Helpers;
 using AlastairLundy.CliInvoke.Helpers.Processes;
-using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of IProcessInvoker, a safer way to execute processes.
+/// The default implementation of <see cref="IProcessConfigurationInvoker"/>, a safer way to execute processes.
 /// </summary>
 public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 {
@@ -78,7 +76,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                     processConfiguration.TargetFilePath));
         }
 
-        Process process = new Process()
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(false,
                 false),
@@ -92,36 +90,31 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
-
-        ProcessResult result;
 
         try
         {
             process.Start();
             
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
             
-             result = new ProcessResult(process.StartInfo.FileName,
-                process.ExitCode, process.StartTime, process.ExitTime);
+             ProcessResult result = new ProcessResult(process.StartInfo.FileName,
+                 process.ExitCode, process.StartTime, process.ExitTime);
 
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
             {
                 throw new ProcessNotSuccessfulException(process: process,
                     exitCode: process.ExitCode);
             }
+            
+            return result;
         }
         finally
         {
             process.Dispose();
         }
-        
-        return result;
     }
     
 
@@ -159,7 +152,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                     processConfiguration.TargetFilePath));
         }
         
-        Process process = new Process()
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true,
                 true),
@@ -173,19 +166,14 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
-
-        BufferedProcessResult result;
 
         try
         {
             process.Start();
-
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
+            
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
 
@@ -193,7 +181,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
             await Task.WhenAll(standardOut, standardError, waitForExit);
 
-            result = new BufferedProcessResult(
+            BufferedProcessResult result = new BufferedProcessResult(
                 process.StartInfo.FileName,
                 process.ExitCode,
                 await standardOut,
@@ -206,13 +194,19 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                 throw new ProcessNotSuccessfulException(process: process,
                     exitCode: process.ExitCode);
             }
+            
+            if(standardOut.IsCompleted)
+                standardOut.Dispose();
+            
+            if(standardError.IsCompleted)
+                standardError.Dispose();
+            
+            return result;
         }
         finally
         {
             process.Dispose();
         }
-        
-        return result;
     }
     
     /// <summary>
@@ -242,7 +236,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        Process process = new Process()
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true,
                 true),
@@ -256,18 +250,13 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
-
-        PipedProcessResult result;
-
+        
         try
         {
             process.Start();
-
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
             Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
@@ -276,21 +265,27 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
-            result = new PipedProcessResult(process.StartInfo.FileName,
-            process.ExitCode, process.StartTime, process.ExitTime,
-            await standardOutput, await standardError);
+            PipedProcessResult result = new PipedProcessResult(process.StartInfo.FileName,
+                process.ExitCode, process.StartTime, process.ExitTime,
+                await standardOutput, await standardError);
             
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
             {
                 throw new ProcessNotSuccessfulException(process: process,
                     exitCode: process.ExitCode);
             }
+            
+            if(standardOutput.IsCompleted)
+                standardOutput.Dispose();
+            
+            if(standardError.IsCompleted)
+                standardError.Dispose();
+            
+            return result;
         }
         finally
         {
             process.Dispose();
         }
-        
-        return result;
     }
 }

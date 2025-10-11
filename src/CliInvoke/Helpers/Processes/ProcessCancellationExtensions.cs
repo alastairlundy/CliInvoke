@@ -13,9 +13,8 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core;
 
-using AlastairLundy.DotExtensions.Processes;
 using AlastairLundy.DotExtensions.Dates;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
@@ -144,9 +143,9 @@ internal static class ProcessCancellationExtensions
             
             await Task.WhenAny(delay, waitForExit);
 
-            if (process.HasExited() == false)
+            if (process.HasExited == false)
             {
-                process.Kill();
+                process.Kill(true);
             }
         }
         catch (Exception)

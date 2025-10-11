@@ -4,7 +4,6 @@ This package contains Process Running and handling abstractions as well as commo
 For an implementing package, check out [``CliInvoke``](https://www.nuget.org/packages/AlastairLundy.CliInvoke/).
 
 Key Abstractions:
-* ``IProcessInvoker``
 * ``IProcessConfigurationInvoker``
 
 * Piping:
@@ -47,7 +46,7 @@ CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your ID
 | AlastairLundy.CliInvoke.Core | [AlastairLundy.CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core) | ``dotnet add package AlastairLundy.CliInvoke.Core`` |
 
 ### Supported Platforms
-CliInvoke.Core can be added to any .NET Standard 2.0, .NET Standard 2.1, .NET 8, or .NET 9 supported project.
+CliInvoke.Core can be added to any .NET Standard 2.0, .NET 8, or .NET 9 or newer supported project.
 
 The following table details which target platforms are supported for running Processes.
 
@@ -85,25 +84,6 @@ They are both equally safe and valid.
 CliInvoke offers safe abstractions around Process Running to avoid accidentally not disposing of Processes,
 along with avoiding other pitfalls.
 
-``IProcessInvoker`` and ``IProcessConfigurationInvoker`` are both equally capable of fulfilling this criterion,
-**however** ``IProcessInvoker`` works with ``ProcessStartInfo`` objects and ``IProcessConfigurationInvoker`` works with ``ProcessConfiguration`` objects.
-
-If you don't want to use CliInvoke's abstractions around Processes, such as ``ProcessConfiguration`` and CliInvoke's other primitives,  then ``IProcessInvoker`` is a better fit.
-
-**Note**: Neither ``IProcessInvoker`` nor ``IProcessConfigurationInvoker`` are dependent upon on the other to work.
-
-#### ``IProcessInvoker``
-``IProcessInvoker`` is an interface for creating, running, and safely disposing of Processes based on ``ProcessStartInfo`` objects.
-
-The ``ExecuteAsync``, ``ExecuteBufferedExitAsync``, ``ExecutePipedExitAsync`` methods provide for:
-1. process creation
-2. safe process running (including process disposal, even in the case of an ``Exception``)
-3. gathering the results of the Process's execution (varies depending on the specific method)
-4. disposing of the Process after it has exited
-5. returning the gathered Process execution results
-
-These examples show how they might be used:
-
 #### Running Programs/Commands
 Because of how much of a minefield the ``Process`` class is and how difficult it can be to configure correctly,
 CliInvoke provides some abstractions to make it easier to configure Programs/Commands to be run.
@@ -111,48 +91,7 @@ CliInvoke provides some abstractions to make it easier to configure Programs/Com
 CliInvoke provides fluent builder interfaces and implementing classes to easily configure ``ProcessConfiguration``.
 ``ProcessConfiguration`` is CliInvoke's main form of Process configuration (hence the name).
 
-The use of ``ProcessConfiguration`` can be avoided if you want to stick with ``ProcessStartInfo`` for configuration, but this
-means ``IProcessInvoker`` is the appropriate interface to use for creating and executing Processes.
-
 ### Approach Examples
-
-#### ``IProcessInvoker``
-
-##### ``ExecuteAsync``
-```csharp
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
-// Using namespaces for Dependency Injection code ommitted for clarity
-
-      // Dependency Injection setup code ommitted for clarity
-
-    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-    
-    // Define processStartInfo here
-    
-    // This process is created, executed, disposed of, and the results returned.
-    ProcessResult process = await _processInvoker.ExecuteAsync(processStartInfo, ProcessResourcePolicy.Default,
-        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
-```
-
-###### ``ExecuteBufferedAsync``
-```csharp
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
-// Using namespaces for Dependency Injection code ommitted for clarity
-
-      // Dependency Injection setup code ommitted for clarity
-
-    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-    
-    // Define processStartInfo here
-    
-    // This process is created, executed, disposed of, and the results returned.
-    BufferedProcessResult process = await _processInvoker.ExecuteBufferedAsync(processStartInfo, ProcessResourcePolicy.Default,
-        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
-```
 
 #### ``IProcessConfigurationInvoker``
 The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
@@ -219,6 +158,9 @@ BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(
 
 ### Command/Program Execution
 
+## How to Build CliInvoke's code
+Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
+
 ## How to Contribute
 Thank you in advance for considering contributing to CliInvoke.
 
@@ -230,7 +172,7 @@ If there is not already a relevant issue filed, please [file one here](https://g
 Thanks.
 
 ## License
-CliInvoke.Core is licensed under the MPL 2.0 license. If you modify any of CliInvoke.Core's files, then the modified files must be licensed under the MPL 2.0.
+CliInvoke.Core is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
 If you use CliInvoke.Core in your project, please make an exact copy of the contents of CliInvoke.Core's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 
@@ -239,5 +181,6 @@ If you use CliInvoke.Core in your project, please make an exact copy of the cont
 ### Projects
 This project would like to thank the following projects for their work:
 * [Microsoft.Bcl.HashCode](https://github.com/dotnet/maintenance-packages) for providing a backport of the HashCode class and static methods to .NET Standard 2.0
+* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying .NET Standard 2.0 support
 
-For more information, please see the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke.Cores/blob/main/THIRD_PARTY_NOTICES.txt).
+For more information, please see the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).

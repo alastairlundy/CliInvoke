@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
@@ -13,26 +13,17 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## 2.0.0 Beta 2
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 4
+### Breaking Changes
+* Changed a return parameter in ``ProcessPipeHandler``
 
-### Core package only
-* Removed dependency on DotExtensions
-* Moved extension methods to CliInvoke main package
-* Deprecated some extension methods and constructors in classes for removal in v2
-* Renamed the existing ``IProcessInvoker`` interface to ``IProcessConfigurationInvoker``
-* Created a new ``IProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
-* Removed ``IProcessFactory``
-
-### Main package only
-* Updated DotExtensions from 8.5.0 to 8.5.1
-* Added some Process related extension methods from DotExtensions back into CliInvoke
-* Renamed the existing ``ProcessInvoker`` interface to ``ProcessConfigurationInvoker``
-* Created a new ``ProcessInvoker`` that deals with ``ProcessStartInfo`` objects rather than ``ProcessConfiguration`` objects
-* Removed ``ProcessFactory``</PackageReleaseNotes>
+### Bug Fixes
+* Fixed an issue that would cause an Exception to be thrown if a Process that runs quickly has a Resource Policy applied to it immediately before or whilst the Process is exiting
+* Fixed several other issues that would cause an Exception to be thrown by the Process class.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.3</PackageVersion>
+        <PackageVersion>2.0.0-beta.5</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -47,6 +38,10 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>AlastairLundy.CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
+    </ItemGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -79,12 +74,12 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
- <!--   <ItemGroup>
+<!--    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>-->
     
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.3" />
-      <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.0" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.5" />
+      <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.2" />
     </ItemGroup>
 </Project>

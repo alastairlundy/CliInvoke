@@ -54,4 +54,7 @@
     <data name="Exceptions.ResourcePolicy.CannotSetToNonStartedProcess" xml:space="preserve">
         <value>Cannot set Resource Policy to a Process that has not already been started.</value>
     </data>
+    <data name="Exceptions.Processes.NotSupportedOnRemoteProcess" xml:space="preserve">
+        <value>This feature or functionality is not supported on remote Processes (e.g. Processes not running on this machine).</value>
+    </data>
 </root>

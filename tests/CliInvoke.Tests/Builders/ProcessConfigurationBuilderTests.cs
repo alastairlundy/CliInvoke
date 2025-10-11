@@ -7,11 +7,10 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 using Xunit;
 
 using System.Runtime.Versioning;
+using AlastairLundy.CliInvoke.Core;
 
 
 namespace AlastairLundy.CliInvoke.Tests.Builders;

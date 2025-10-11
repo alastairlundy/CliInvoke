@@ -9,16 +9,18 @@
 
 using System;
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core.Internal.Localizations;
+
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
-/// 
+/// A class that defines a Process' Timeout configuration, if any.
 /// </summary>
 public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 {
         
     /// <summary>
-    /// 
+    /// Instantiates the <see cref="ProcessTimeoutPolicy"/> with default values.
     /// </summary>
     public ProcessTimeoutPolicy()
     {
@@ -27,21 +29,24 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// 
+    /// Instantiates the <see cref="ProcessTimeoutPolicy"/> with default values unless specified parameters are provided.
     /// </summary>
-    /// <param name="timeoutThreshold"></param>
-    /// <param name="cancellationMode"></param>
-    public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, ProcessCancellationMode cancellationMode)
+    /// <param name="timeoutThreshold">The timespan to wait for the Process timeout before cancelling the Process.</param>
+    /// <param name="cancellationMode">Defaults to Graceful cancellation, otherwise uses the Cancellation Mode specified.</param>
+    public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, 
+        ProcessCancellationMode cancellationMode =  ProcessCancellationMode.Graceful)
     {
+        if(timeoutThreshold < TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(timeoutThreshold), string.Format(Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero, nameof(timeoutThreshold)));
+        
         TimeoutThreshold = timeoutThreshold;
         CancellationMode = cancellationMode;
     }
         
     /// <summary>
-    /// 
+    /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
     /// </summary>
-    public static ProcessTimeoutPolicy Default { get; } = new ProcessTimeoutPolicy(TimeSpan.FromMinutes(30),
-        ProcessCancellationMode.Graceful);
+    public static ProcessTimeoutPolicy Default { get; } = new ProcessTimeoutPolicy(TimeSpan.FromMinutes(30));
         
     /// <summary>
     /// Disables waiting for Process Timeout.
@@ -55,7 +60,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public TimeSpan TimeoutThreshold { get; }
         
     /// <summary>
-    /// 
+    /// The mode to use for cancelling the Process if the timeout threshold is reached.
     /// </summary>
     public ProcessCancellationMode CancellationMode { get; }
 

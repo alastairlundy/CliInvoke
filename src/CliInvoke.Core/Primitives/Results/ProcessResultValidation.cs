@@ -5,14 +5,11 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
-
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// An enum to represent Result Validation states, and whether Result Validation should be performed. 
 /// </summary>
-[Flags]
 public enum ProcessResultValidation
 {
     /// <summary>
