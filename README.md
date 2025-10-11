@@ -35,15 +35,15 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Why use CliInvoke over [CliWrap](https://github.com/Tyrrrz/CliWrap/)?
 * Greater separation of concerns - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
-* Supports and was designed with Dependency Injection in mind
+* Designed with Dependency Injection in mind
 * Classes and code follow the Single Responsibility Principle
 * No additional licensing terms are required beyond the source code license.
 * No imported C code - This library is entirely written in C#.
 * No lock in regarding Piping support
 * Supports .NET's built in ``ProcessStartInfo`` primitive.
 
-## How to install and use CliInvoke
-CliInvoke is available on Nuget.
+## How to install and use CliInvoke.Core
+CliInvoke.Core is available on [the Nuget Gallery](https://nuget.org) [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Core).
 
 These are the CliInvoke projects:
 * CliInvoke - The main CliInvoke package.
@@ -98,6 +98,25 @@ They are both equally safe and valid.
 CliInvoke offers safe abstractions around Process Running to avoid accidentally not disposing of Processes,
 along with avoiding other pitfalls.
 
+``IProcessInvoker`` and ``IProcessConfigurationInvoker`` are both equally capable of fulfilling this criterion,
+**however** ``IProcessInvoker`` works with ``ProcessStartInfo`` objects and ``IProcessConfigurationInvoker`` works with ``ProcessConfiguration`` objects.
+
+If you don't want to use CliInvoke's abstractions around Processes, such as ``ProcessConfiguration`` and CliInvoke's other primitives,  then ``IProcessInvoker`` is a better fit.
+
+**Note**: Neither ``IProcessInvoker`` nor ``IProcessConfigurationInvoker`` are dependent upon on the other to work.
+
+#### ``IProcessInvoker``
+``IProcessInvoker`` is an interface for creating, running, and safely disposing of Processes based on ``ProcessStartInfo`` objects.
+
+The ``ExecuteAsync``, ``ExecuteBufferedExitAsync``, ``ExecutePipedExitAsync`` methods provide for:
+1. process creation
+2. safe process running (including process disposal, even in the case of an ``Exception``)
+3. gathering the results of the Process's execution (varies depending on the specific method)
+4. disposing of the Process after it has exited
+5. returning the gathered Process execution results
+
+These examples show how they might be used:
+
 #### Running Programs/Commands
 Because of how much of a minefield the ``Process`` class is and how difficult it can be to configure correctly,
 CliInvoke provides some abstractions to make it easier to configure Programs/Commands to be run.
@@ -105,7 +124,48 @@ CliInvoke provides some abstractions to make it easier to configure Programs/Com
 CliInvoke provides fluent builder interfaces and implementing classes to easily configure ``ProcessConfiguration``.
 ``ProcessConfiguration`` is CliInvoke's main form of Process configuration (hence the name).
 
+The use of ``ProcessConfiguration`` can be avoided if you want to stick with ``ProcessStartInfo`` for configuration, but this
+means ``IProcessInvoker`` is the appropriate interface to use for creating and executing Processes.
+
 ### Approach Examples
+
+#### ``IProcessInvoker``
+
+##### ``ExecuteAsync``
+```csharp
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+// Using namespaces for Dependency Injection code ommitted for clarity
+
+      // Dependency Injection setup code ommitted for clarity
+
+    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+    
+    // Define processStartInfo here
+    
+    // This process is created, executed, disposed of, and the results returned.
+    ProcessResult process = await _processInvoker.ExecuteAsync(processStartInfo, ProcessResourcePolicy.Default,
+        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
+```
+
+###### ``ExecuteBufferedAsync``
+```csharp
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Primitives;
+
+// Using namespaces for Dependency Injection code ommitted for clarity
+
+      // Dependency Injection setup code ommitted for clarity
+
+    IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+    
+    // Define processStartInfo here
+    
+    // This process is created, executed, disposed of, and the results returned.
+    BufferedProcessResult process = await _processInvoker.ExecuteBufferedAsync(processStartInfo, ProcessResourcePolicy.Default,
+        ProcessTimeoutPolicy.None, ProcessResultValidation.ExitCodeZero);
+```
 
 #### ``IProcessConfigurationInvoker``
 The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
@@ -171,6 +231,7 @@ BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(
 ```
 
 ## How to Build CliInvoke's code
+Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
 
 ## How to Contribute to CliInvoke
 Thank you in advance for considering contributing to CliInvoke.
@@ -187,16 +248,14 @@ CliInvoke aims to make working with Commands and external processes easier.
 
 Whilst an initial set of features are available in version 1, there is room for more features, and for modifications of existing features in future updates.
 
-That being said, all stable releases from 1.0 onwards must be stable and should not contain regressions.
-
-Future updates should aim focus on one or more of the following:
+Future updates may focus on one or more of the following:
 * Improved ease of use
 * Improved stability 
 * New features
 * Enhancing existing features
 
 ## License
-CliInvoke is licensed under the MPL 2.0 license. If you modify any of CliInvoke's files then the modified files must be licensed under the MPL 2.0 .
+CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
 If you use CliInvoke in your project please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 

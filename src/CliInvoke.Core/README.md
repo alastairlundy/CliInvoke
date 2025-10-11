@@ -158,6 +158,9 @@ BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(
 
 ### Command/Program Execution
 
+## How to Build CliInvoke's code
+Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
+
 ## How to Contribute
 Thank you in advance for considering contributing to CliInvoke.
 
@@ -169,7 +172,7 @@ If there is not already a relevant issue filed, please [file one here](https://g
 Thanks.
 
 ## License
-CliInvoke.Core is licensed under the MPL 2.0 license. If you modify any of CliInvoke.Core's files, then the modified files must be licensed under the MPL 2.0.
+CliInvoke.Core is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
 If you use CliInvoke.Core in your project, please make an exact copy of the contents of CliInvoke.Core's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 

@@ -24,7 +24,7 @@ using AlastairLundy.CliInvoke.Helpers.Processes;
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of IProcessInvoker, a safer way to execute processes.
+/// The default implementation of <see cref="IProcessConfigurationInvoker"/>, a safer way to execute processes.
 /// </summary>
 public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 {
