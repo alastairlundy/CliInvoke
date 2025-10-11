@@ -13,20 +13,17 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### Changes since 2.0.0 Beta 3
-* Re-added .NET Standard 2.0 support
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 4
+### Breaking Changes
+* Changed a return parameter in ``ProcessPipeHandler``
 
-### Improvements
-* Fixed an issue where an invalid Process Timeout Threshold could be provided via ``ProcessTimeoutPolicyBuilder``'s ``WithTimeoutThreshold`` method - This now results in an ``ArgumentOutOfRangeException`` being thrown.
-* Updated Forceful Cancellation to now terminate the process and it's child processes.
-* Updated ``PipedProcessResult`` to implement ``IDisposable`` and dispose of the Stream parameters when Dispose or DisposeAsync is called
-* (Main package only) Moved Process extensions from DotExtensions into CliInvoke main package - These are now internal
-* Changed default value for ``ProcessResourcePolicy``'s ``PriorityBoostEnabled`` value from ``true`` to ``false``
-* Updated builder interfaces</PackageReleaseNotes>
+### Bug Fixes
+* Fixed an issue that would cause an Exception to be thrown if a Process that runs quickly has a Resource Policy applied to it immediately before or whilst the Process is exiting
+* Fixed several other issues that would cause an Exception to be thrown by the Process class.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.4</PackageVersion>
+        <PackageVersion>2.0.0-beta.5</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -77,14 +74,12 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-    <ItemGroup>
+<!--    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
+    </ItemGroup>-->
     
     <ItemGroup>
-<!--
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.4" />
--->
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.5" />
       <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.2" />
     </ItemGroup>
 </Project>
