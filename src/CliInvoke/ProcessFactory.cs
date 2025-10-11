@@ -205,7 +205,6 @@ public class ProcessFactory : IProcessFactory
         {
             // ignored
         }
-
         
         return process;
     }
@@ -330,14 +329,17 @@ public class ProcessFactory : IProcessFactory
         DateTime startTime = process.StartTime;
             
         await process.WaitForExitAsync(cancellationToken);
+        DateTime exitTime = process.ExitTime;
 
         if (process.ExitCode != 0 && resultValidation == ProcessResultValidation.ExitCodeZero)
         {
             throw new ProcessNotSuccessfulException(exitCode: process.ExitCode, process: process);
         }
+
+        int exitCode = process.ExitCode;
         
-        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName, process.ExitCode, startTime,
-            process.ExitTime);
+        ProcessResult processResult = new ProcessResult(process.StartInfo.FileName, exitCode, startTime,
+            exitTime);
         
         process.Dispose();
         

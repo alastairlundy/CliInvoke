@@ -80,16 +80,22 @@ public class ProcessInvoker : IProcessInvoker
                 Resources.Exceptions_FileNotFound.Replace("{file}",
                     processConfiguration.TargetFilePath));
         }
+
+        process.Start();
+
+        try
+        {
+            if (processConfiguration.ResourcePolicy is not null)
+                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
+        }
+        catch
+        {
+            // ignored    
+        }
         
         ProcessResult result = await _processFactory.ContinueWhenExitAsync(process,
             processConfiguration.ResultValidation,
             cancellationToken: cancellationToken);
-       
-        if (processConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero && process.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(process: process,
-                exitCode: process.ExitCode);
-        }
 
         return result;
     }
@@ -129,7 +135,6 @@ public class ProcessInvoker : IProcessInvoker
         
         if(processResourcePolicy is not null)
             process.SetResourcePolicy(processResourcePolicy);
-
         
         ProcessResult result =
             await _processFactory.ContinueWhenExitAsync(process,
