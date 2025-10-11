@@ -26,13 +26,15 @@ internal class ProcessWrapper : Process
        ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
     }
     
-    private void OnStarted(object sender, EventArgs e)
+    private void OnStarted(object? sender, EventArgs e)
     {
         if (HasExited == false)
         {
             try
             {
+#pragma warning disable CA1416
                 this.SetResourcePolicy(ResourcePolicy);
+#pragma warning restore CA1416
             }
             catch
             {
@@ -41,7 +43,7 @@ internal class ProcessWrapper : Process
         }
     }
 
-    private void OnExited(object sender, EventArgs e)
+    private void OnExited(object? sender, EventArgs e)
     {
         ExitTime = base.ExitTime;
     }
