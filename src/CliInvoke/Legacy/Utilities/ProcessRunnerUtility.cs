@@ -166,7 +166,7 @@ public class ProcessRunnerUtility : IProcessRunnerUtility
             process.Start();
         }
 
-        if (processResourcePolicy is not null) 
+        if (processResourcePolicy is not null && process.HasExited == false) 
             process.SetResourcePolicy(processResourcePolicy);
             
         await process.WaitForExitAsync(cancellationToken);
