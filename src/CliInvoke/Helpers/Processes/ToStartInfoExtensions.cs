@@ -40,6 +40,8 @@ internal static class ToStartInfoExtensions
                                     processConfiguration.RedirectStandardInput,
             RedirectStandardOutput = redirectStandardOutput,
             RedirectStandardError = redirectStandardError,
+            StandardOutputEncoding = processConfiguration.StandardOutputEncoding,
+            StandardErrorEncoding = processConfiguration.StandardErrorEncoding,
         };
         
         if (string.IsNullOrEmpty(processConfiguration.TargetFilePath))
