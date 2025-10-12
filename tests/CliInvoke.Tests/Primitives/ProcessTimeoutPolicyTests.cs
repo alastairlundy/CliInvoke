@@ -4,25 +4,22 @@ using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using Bogus;
 using Xunit;
+// ReSharper disable NotAccessedVariable
 
 namespace AlastairLundy.CliInvoke.Tests.Builders;
 
-public class ProcessTimeoutPolicyBuilderTests
+public class ProcessTimeoutPolicyTests
 {
     private readonly Faker _faker = new Faker();
 
     [Fact]
-    public void WithTimeoutThreshold_ShouldSetValidTimeout()
+    public void Add_TimeoutThreshold_ShouldSetValidTimeout()
     {
         // Arrange
         TimeSpan timeout = TimeSpan.FromSeconds(_faker.Random.Int(0, 1000));
 
         // Act
-        IProcessTimeoutPolicyBuilder builder
-            = new ProcessTimeoutPolicyBuilder()
-                .WithTimeoutThreshold(timeout);
-
-        ProcessTimeoutPolicy timeoutPolicy = builder.Build();
+        ProcessTimeoutPolicy timeoutPolicy = new ProcessTimeoutPolicy(timeout);
 
         // Assert
         Assert.Equal(timeout, timeoutPolicy.TimeoutThreshold);
@@ -32,32 +29,29 @@ public class ProcessTimeoutPolicyBuilderTests
     [InlineData(-0.001)]
     [InlineData(-0.5)]
     [InlineData(-1)]
-    public void WithTimeoutThreshold_ShouldNotSetNegativeTimeout(double timeoutSpanSeconds)
+    public void Add_TimeoutThreshold_ShouldNotSetNegativeTimeout(double timeoutSpanSeconds)
     {
         // Arrange
         TimeSpan timeout = TimeSpan.FromSeconds(timeoutSpanSeconds);
-
+        
         // Act
+        ProcessTimeoutPolicy processTimeoutPolicy;
+        
         // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => new ProcessTimeoutPolicyBuilder()
-            .WithTimeoutThreshold(timeout));
+        Assert.Throws<ArgumentOutOfRangeException>(()=> processTimeoutPolicy = new ProcessTimeoutPolicy(timeout) );
     }
 
     [Theory]
     [InlineData(ProcessCancellationMode.None)]
     [InlineData(ProcessCancellationMode.Graceful)]
     [InlineData(ProcessCancellationMode.Forceful)]
-    public void WithCancellationMode_ShouldSetValidValue(ProcessCancellationMode mode)
+    public void Add_CancellationMode_ShouldSetValidValue(ProcessCancellationMode mode)
     {
         // Arrange
         ProcessCancellationMode cancellationMode = mode;
         
         // Act
-        IProcessTimeoutPolicyBuilder builder = new
-            ProcessTimeoutPolicyBuilder()
-            .WithCancellationMode(cancellationMode);
-        
-        ProcessTimeoutPolicy policy = builder.Build();
+        ProcessTimeoutPolicy policy = new ProcessTimeoutPolicy(TimeSpan.Zero, cancellationMode);
         
         // Assert
         Assert.Equal(cancellationMode, policy.CancellationMode);
@@ -67,19 +61,14 @@ public class ProcessTimeoutPolicyBuilderTests
     [InlineData(ProcessCancellationMode.None)]
     [InlineData(ProcessCancellationMode.Graceful)]
     [InlineData(ProcessCancellationMode.Forceful)]
-    public void Build_All_ShouldReturnPolicy(ProcessCancellationMode mode)
+    public void FullyConfigured_ShouldEqualPolicy(ProcessCancellationMode mode)
     {
         // Arrange
         ProcessCancellationMode cancellationMode = mode;
         TimeSpan timeoutThreshold = TimeSpan.FromSeconds(_faker.Random.Int(0, 1000));
         
         // Act
-        IProcessTimeoutPolicyBuilder builder = new
-                ProcessTimeoutPolicyBuilder()
-            .WithCancellationMode(cancellationMode)
-            .WithTimeoutThreshold(timeoutThreshold);
-        
-        ProcessTimeoutPolicy policy = builder.Build();
+        ProcessTimeoutPolicy policy = new ProcessTimeoutPolicy(timeoutThreshold, cancellationMode);
         
         // Assert
         Assert.NotNull(policy);
