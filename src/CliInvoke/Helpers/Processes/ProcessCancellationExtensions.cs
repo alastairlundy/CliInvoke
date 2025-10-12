@@ -92,6 +92,9 @@ internal static class ProcessCancellationExtensions
         }
         catch (TaskCanceledException)
         {
+            if (process.HasExited == false)
+                process.Kill();
+                
             DateTime actualExitTime = DateTime.UtcNow;
             
             if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.SuppressException)
