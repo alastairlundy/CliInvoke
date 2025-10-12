@@ -127,6 +127,6 @@ using AlastairLundy.CliInvoke.Specializations;
 ```
 
 ## Licensing
-CliInvoke and CliInvoke Specializations are licensed under the MPL 2.0 license. If you modify any of CliInvoke's or CliInvoke.Specialization's files then the modified files must be licensed under the MPL 2.0 .
+CliInvoke and CliInvoke Specializations are licensed under the MPL 2.0 license.
 
 If you use CliInvoke or CliInvoke.Specializations in your project please make an exact copy of the contents of CliInvoke's LICENSE.txt file available either in your third party licenses txt file or as a separate txt file.

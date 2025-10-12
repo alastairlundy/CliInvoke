@@ -10,8 +10,6 @@
 using System;
 using System.Security;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
@@ -42,7 +40,7 @@ public interface IUserCredentialBuilder : IDisposable
     IUserCredentialBuilder SetPassword(SecureString? password);
 
     /// <summary>
-    /// Specifies whether to load the user profile.
+    /// Specifies whether to load the Windows user profile .
     /// </summary>
     /// <param name="loadUserProfile">True to load the user profile, false otherwise.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated load user profile setting.</returns>

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// A Piped ProcessResult containing a Process's or Command's StandardOutput and StandardError information.

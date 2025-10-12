@@ -116,5 +116,11 @@ namespace AlastairLundy.CliInvoke.Internal.Localizations {
                 return ResourceManager.GetString("Exceptions.ResourcePolicy.CannotSetToNonStartedProcess", resourceCulture);
             }
         }
+        
+        internal static string Exceptions_Processes_NotSupportedOnRemoteProcess {
+            get {
+                return ResourceManager.GetString("Exceptions.Processes.NotSupportedOnRemoteProcess", resourceCulture);
+            }
+        }
     }
 }

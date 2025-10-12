@@ -7,10 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Core.Primitives;
+using AlastairLundy.CliInvoke.Core;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;

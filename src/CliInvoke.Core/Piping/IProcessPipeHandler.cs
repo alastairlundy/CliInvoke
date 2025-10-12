@@ -18,14 +18,13 @@ namespace AlastairLundy.CliInvoke.Core.Piping;
 /// </summary>
 public interface IProcessPipeHandler
 {
-        
     /// <summary>
     /// Asynchronously pipes the standard input from a source stream to a specified process.
     /// </summary>
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
     /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
-    Task<Process> PipeStandardInputAsync(Stream source, Process destination);
+    Task<bool> PipeStandardInputAsync(Stream source, Process destination);
 
     /// <summary>
     /// Asynchronously retrieves the standard output stream from a specified process.

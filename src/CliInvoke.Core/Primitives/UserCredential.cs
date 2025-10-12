@@ -17,12 +17,10 @@
 // ReSharper disable MemberCanBePrivate.Global
 
 using System;
-
 using System.Runtime.Versioning;
-
 using System.Security;
 
-namespace AlastairLundy.CliInvoke.Core.Primitives;
+namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
 /// A class to represent a User Credential to be used with ProcessPrimitives.

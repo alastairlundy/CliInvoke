@@ -7,26 +7,24 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Piping;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
 using AlastairLundy.CliInvoke.Exceptions;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 using System.Runtime.Versioning;
+
+using AlastairLundy.CliInvoke.Helpers;
 using AlastairLundy.CliInvoke.Helpers.Processes;
-using AlastairLundy.DotExtensions.Processes;
 
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of IProcessInvoker, a safer way to execute processes.
+/// The default implementation of <see cref="IProcessConfigurationInvoker"/>, a safer way to execute processes.
 /// </summary>
 public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 {
@@ -78,7 +76,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                     processConfiguration.TargetFilePath));
         }
 
-        Process process = new Process()
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(false,
                 false),
@@ -92,7 +90,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
 
@@ -100,9 +98,6 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         {
             process.Start();
             
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
             
              ProcessResult result = new ProcessResult(process.StartInfo.FileName,
@@ -157,7 +152,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
                     processConfiguration.TargetFilePath));
         }
         
-        Process process = new Process()
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true,
                 true),
@@ -171,17 +166,14 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
 
         try
         {
             process.Start();
-
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
-
+            
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
 
@@ -244,7 +236,7 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        Process process = new Process()
+        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true,
                 true),
@@ -258,16 +250,13 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
 
         if (process.StartInfo.RedirectStandardInput && processConfiguration.StandardInput is not null)
         {
-            process = await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
+            await _processPipeHandler.PipeStandardInputAsync(processConfiguration.StandardInput.BaseStream,
                 process);
         }
         
         try
         {
             process.Start();
-
-            if(process.HasStarted() && process.HasExited() == false)
-                process.SetResourcePolicy(processConfiguration.ResourcePolicy);
 
             Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);

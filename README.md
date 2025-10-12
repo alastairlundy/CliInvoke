@@ -15,13 +15,10 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Installing CliInvoke](#how-to-install-and-use-CliInvoke)
     * [Installing CliInvoke](#installing-CliInvoke)
     * [Supported Platforms](#supported-platforms)
-* [CliInvoke Examples](#using-CliInvoke--examples)
-    * [Running Programs/Commands](#running-programscommands)
-    *  [Safe Process Running](#safe-process-running)
+* [CliInvoke Examples](#examples)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
 * [Roadmap](#cliinvokes-roadmap)
 * [License](#license)
-  * [CliRunner Assets](#cliinvoke-assets)
 * [Acknowledgements](#acknowledgements)
 
 ## Features
@@ -35,15 +32,15 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Why use CliInvoke over [CliWrap](https://github.com/Tyrrrz/CliWrap/)?
 * Greater separation of concerns - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
-* Supports and was designed with Dependency Injection in mind
+* Designed with Dependency Injection in mind
 * Classes and code follow the Single Responsibility Principle
 * No additional licensing terms are required beyond the source code license.
 * No imported C code - This library is entirely written in C#.
 * No lock in regarding Piping support
 * Supports .NET's built in ``ProcessStartInfo`` primitive.
 
-## How to install and use CliInvoke
-CliInvoke is available on Nuget.
+## How to install and use CliInvoke.Core
+CliInvoke.Core is available on [the Nuget Gallery](https://nuget.org) [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Core).
 
 These are the CliInvoke projects:
 * CliInvoke - The main CliInvoke package.
@@ -84,28 +81,12 @@ The following table details which target platforms are supported for executing c
 
 **Note:** This library has not been tested on Android or Tizen.
 
-## Using CliInvoke / Examples
+## Using CliInvoke
 The two main use cases for CliInvoke are intended to be:
-1. [executing Programs/Commands programatically](#running-programscommands) which involves using abstractions to improve the experience of external Program/Command running.
-2. [safe Process Running](#safe-process-running) which involves avoiding the pitfalls of the ``Process`` class whilst still dealing with ``ProcessStartInfo``.
+1. Executing Programs/Commands programatically which involves using abstractions to improve the experience of external Program/Command running.
+2. Safe Process Running which involves avoiding the pitfalls of the ``Process`` class.
 
-CliInvoke provides both options to give developers a choice in the approach they adopt.
-They are both equally safe and valid.
-
-### Approaches
-
-#### Safe Process Running
-CliInvoke offers safe abstractions around Process Running to avoid accidentally not disposing of Processes,
-along with avoiding other pitfalls.
-
-#### Running Programs/Commands
-Because of how much of a minefield the ``Process`` class is and how difficult it can be to configure correctly,
-CliInvoke provides some abstractions to make it easier to configure Programs/Commands to be run.
-
-CliInvoke provides fluent builder interfaces and implementing classes to easily configure ``ProcessConfiguration``.
-``ProcessConfiguration`` is CliInvoke's main form of Process configuration (hence the name).
-
-### Approach Examples
+### Examples
 
 #### ``IProcessConfigurationInvoker``
 The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
@@ -119,8 +100,6 @@ using AlastairLundy.CliInvoke.Core;
 
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-
-using AlastairLundy.CliInvoke.Core.Primitives;
 
   //Namespace and class code ommitted for clarity 
 
@@ -150,8 +129,6 @@ using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 
-using AlastairLundy.CliInvoke.Core.Primitives;
-
   //Namespace and class code ommitted for clarity 
 
   // ServiceProvider and Dependency Injection setup code ommitted for clarity
@@ -171,6 +148,7 @@ BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(
 ```
 
 ## How to Build CliInvoke's code
+Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
 
 ## How to Contribute to CliInvoke
 Thank you in advance for considering contributing to CliInvoke.
@@ -187,16 +165,14 @@ CliInvoke aims to make working with Commands and external processes easier.
 
 Whilst an initial set of features are available in version 1, there is room for more features, and for modifications of existing features in future updates.
 
-That being said, all stable releases from 1.0 onwards must be stable and should not contain regressions.
-
-Future updates should aim focus on one or more of the following:
+Future updates may focus on one or more of the following:
 * Improved ease of use
 * Improved stability 
 * New features
 * Enhancing existing features
 
 ## License
-CliInvoke is licensed under the MPL 2.0 license. If you modify any of CliInvoke's files then the modified files must be licensed under the MPL 2.0 .
+CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
 If you use CliInvoke in your project please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 

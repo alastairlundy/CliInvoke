@@ -7,15 +7,13 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Primitives;
-
-
-
 using System.Runtime.Versioning;
+using AlastairLundy.CliInvoke.Core;
 
 
 namespace AlastairLundy.CliInvoke.Builders;
@@ -66,9 +64,9 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
     /// </summary>
+    /// <remarks>If <see cref="minWorkingSet"/> is higher than the configured maximum working set then the maximum working set will be overriden with the new <see cref="minWorkingSet"/> value.</remarks>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
-
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -78,8 +76,19 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("android")]
     [Pure]
-    public IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet) =>
-        new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+    public IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet)
+    {
+        if(minWorkingSet > _processResourcePolicy.MaxWorkingSet)
+            return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+#pragma warning disable CA1416
+                _processResourcePolicy.ProcessorAffinity,
+#pragma warning restore CA1416
+                minWorkingSet,
+                minWorkingSet,
+                _processResourcePolicy.PriorityClass,
+                _processResourcePolicy.EnablePriorityBoost));
+        
+        return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
 #pragma warning disable CA1416
             _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
@@ -87,12 +96,14 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
             _processResourcePolicy.MaxWorkingSet,
             _processResourcePolicy.PriorityClass,
             _processResourcePolicy.EnablePriorityBoost));
-    
+    }
+
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Maximum Working Set.
     /// </summary>
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the <see cref="maxWorkingSet"/> is less than the min working set value.</exception>
     [Pure]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -102,8 +113,14 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("android")]
-    public IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet) =>
-        new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+    public IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet)
+    {
+        if (maxWorkingSet < _processResourcePolicy.MinWorkingSet)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+        }
+        
+        return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
 #pragma warning disable CA1416
             _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
@@ -111,7 +128,8 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
             maxWorkingSet,
             _processResourcePolicy.PriorityClass,
             _processResourcePolicy.EnablePriorityBoost));
-    
+    }
+
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Process Priority Class.
     /// </summary>
