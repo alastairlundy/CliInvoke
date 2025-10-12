@@ -48,11 +48,19 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if processor affinity is less than 1 or greater than 2x Processor Count.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Pure]
-    public IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity) =>
-        new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+    public IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity)
+    {
+        if(processorAffinity < 1)
+            throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+        
+        if(processorAffinity > 2 * Environment.ProcessorCount)
+            throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+        
+        return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
             processorAffinity,
 #pragma warning disable CA1416
             _processResourcePolicy.MinWorkingSet,
@@ -60,6 +68,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 #pragma warning restore CA1416
             _processResourcePolicy.PriorityClass,
             _processResourcePolicy.EnablePriorityBoost));
+    }
 
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
@@ -67,6 +76,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <remarks>If <see cref="minWorkingSet"/> is higher than the configured maximum working set then the maximum working set will be overriden with the new <see cref="minWorkingSet"/> value.</remarks>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <see cref="minWorkingSet"/> is less than 0.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -78,13 +88,16 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet)
     {
-        if(minWorkingSet > _processResourcePolicy.MaxWorkingSet)
+        if (minWorkingSet < 0)
+            throw new ArgumentOutOfRangeException(nameof(minWorkingSet));
+        
+        if(minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
             return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
-                minWorkingSet,
-                minWorkingSet,
+                minWorkingSet: minWorkingSet,
+                maxWorkingSet: minWorkingSet,
                 _processResourcePolicy.PriorityClass,
                 _processResourcePolicy.EnablePriorityBoost));
         
@@ -92,7 +105,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 #pragma warning disable CA1416
             _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
-            minWorkingSet,
+            minWorkingSet: minWorkingSet,
             _processResourcePolicy.MaxWorkingSet,
             _processResourcePolicy.PriorityClass,
             _processResourcePolicy.EnablePriorityBoost));
@@ -103,7 +116,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// </summary>
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the <see cref="maxWorkingSet"/> is less than the min working set value.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the <see cref="maxWorkingSet"/> is less than the min working set value or less than 1.</exception>
     [Pure]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -115,10 +128,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet)
     {
-        if (maxWorkingSet < _processResourcePolicy.MinWorkingSet)
-        {
+        if (maxWorkingSet < _processResourcePolicy.MinWorkingSet || maxWorkingSet < 1)
             throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-        }
+        
+        if(_processResourcePolicy.MinWorkingSet > maxWorkingSet)
+            throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
         
         return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
 #pragma warning disable CA1416

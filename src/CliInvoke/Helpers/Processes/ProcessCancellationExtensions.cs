@@ -81,33 +81,37 @@ internal static class ProcessCancellationExtensions
             throw new ArgumentOutOfRangeException();
         
         DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+
+        CancellationTokenSource cts = new CancellationTokenSource();
+
+        cts.CancelAfter(timeoutThreshold);
+        
+        if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+        {
+            await process.WaitForExitAsync(cts.Token);
+            return;
+        }
         
         try
-        {  
-            CancellationTokenSource cts = new CancellationTokenSource();
-        
-            cts.CancelAfter(timeoutThreshold);
-            
+        {
             await process.WaitForExitAsync(cts.Token);
         }
         catch (TaskCanceledException)
         {
             DateTime actualExitTime = DateTime.UtcNow;
-            
-            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.SuppressException)
-            {
-                return;
-            }
 
-            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected ||
-                cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
             {
-                if (actualExitTime.Abs(expectedExitTime) > TimeSpan.FromSeconds(10) || 
-                    cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+                if (actualExitTime.Abs(expectedExitTime) > TimeSpan.FromSeconds(10))
                 {
                     throw;
                 }
             }
+        }
+        finally
+        {
+            if (process.HasExited == false)
+                process.Kill();
         }
         
     }

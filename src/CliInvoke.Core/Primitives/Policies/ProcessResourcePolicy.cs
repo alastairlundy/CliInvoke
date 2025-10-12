@@ -37,13 +37,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
         bool enablePriorityBoost = false)
     {
-        processorAffinity ??= new IntPtr(0x0001);
-
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
-        {
-            MinWorkingSet = minWorkingSet;
-            MaxWorkingSet = maxWorkingSet;
-        }
+        
+#pragma warning disable CA1416
+        MinWorkingSet = minWorkingSet;
+        MaxWorkingSet = maxWorkingSet;
+#pragma warning restore CA1416
 
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
         {
