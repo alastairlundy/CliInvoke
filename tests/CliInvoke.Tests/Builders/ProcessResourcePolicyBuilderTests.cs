@@ -4,7 +4,6 @@ using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
-using Bogus;
 using Xunit;
 // ReSharper disable JoinDeclarationAndInitializer
 // ReSharper disable NotAccessedVariable
@@ -13,8 +12,6 @@ namespace AlastairLundy.CliInvoke.Tests.Builders;
 
 public class ProcessResourcePolicyBuilderTests
 {
-    private Faker _faker = new();
-
     
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -114,4 +111,110 @@ public class ProcessResourcePolicyBuilderTests
         Assert.NotNull(resourcePolicy.MinWorkingSet);
         Assert.Equal(minWorkingSet, resourcePolicy.MinWorkingSet);
     }
+
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    [Theory]
+    [InlineData(-1000)]
+    [InlineData(-1)]
+    public void WithMinWorkingSet_Invalid_Fail(nint minWorkingSet)
+    {
+        // Arrange
+        IProcessResourcePolicyBuilder processResourcePolicyBuilder;
+        
+        // Act
+        // and Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder =
+            new ProcessResourcePolicyBuilder()
+                .WithMinWorkingSet(minWorkingSet));
+    }
+
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    [Theory]
+    [InlineData(1024_000, 8192)]
+    [InlineData(8192, 1024)]
+    [InlineData(1024, 0)]
+    [InlineData(1024, 1024)]
+    public void WithMaxWorkingSet_Valid_Success(nint maxWorkingSet, nint minWorkingSet)
+    {
+        // Arrange
+        IProcessResourcePolicyBuilder processResourcePolicyBuilder;
+        
+        // Act
+        processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
+            .WithMinWorkingSet(minWorkingSet)
+            .WithMaxWorkingSet(maxWorkingSet);
+        
+        ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
+        
+        // Assert
+        Assert.NotNull(resourcePolicy.MaxWorkingSet);
+        Assert.Equal(maxWorkingSet, resourcePolicy.MaxWorkingSet);
+    }
+
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    [Theory]
+    [InlineData(8192, 8200)]
+    [InlineData(1024, 2000)]
+    [InlineData(-1, -1)]
+    [InlineData(0, 0)]
+    public void WithMaxWorkingSet_Invalid_Fail(nint maxWorkingSet, nint minWorkingSet)
+    {
+        // Arrange
+        IProcessResourcePolicyBuilder processResourcePolicyBuilder;
+        
+        //Act
+        // and Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder =
+            new ProcessResourcePolicyBuilder()
+                .WithMinWorkingSet(minWorkingSet).WithMaxWorkingSet(maxWorkingSet));
+    }
+
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("linux")]
+    [Theory]
+    [InlineData(2 * 16 - 1,1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]
+    [InlineData(1 * 16 -1, 8192, 1024, false, ProcessPriorityClass.Normal)]
+    [InlineData(1 * 8 - 1, 1024, 0, false,  ProcessPriorityClass.Normal)]
+    [InlineData(2 * 8 - 1, 1024, 1024, true,   ProcessPriorityClass.BelowNormal)]
+    public void Build_Successfully(nint processorAffinity, nint maxWorkingSet, nint minWorkingSet,
+         bool priorityBoostEnabled, ProcessPriorityClass priorityClass)
+    {
+        // Arrange
+        IProcessResourcePolicyBuilder processResourcePolicyBuilder;
+        
+        // Act
+#pragma warning disable CA1416
+        processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
+            .WithProcessorAffinity(processorAffinity)
+#pragma warning restore CA1416
+            .WithPriorityBoost(priorityBoostEnabled)
+            .WithPriorityClass(priorityClass)
+            .WithMinWorkingSet(minWorkingSet)
+            .WithMaxWorkingSet(maxWorkingSet);
+        
+        ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
+        
+#pragma warning disable CA1416
+
+        // Assert
+        Assert.NotNull(resourcePolicy.ProcessorAffinity);
+        Assert.NotNull(resourcePolicy.MinWorkingSet);
+        Assert.NotNull(resourcePolicy.MaxWorkingSet);
+        Assert.Equal(processorAffinity, resourcePolicy.ProcessorAffinity);
+        Assert.Equal(minWorkingSet, resourcePolicy.MinWorkingSet);
+        Assert.Equal(maxWorkingSet, resourcePolicy.MaxWorkingSet);
+        Assert.Equal(priorityBoostEnabled, resourcePolicy.EnablePriorityBoost);
+        Assert.Equal(priorityClass, resourcePolicy.PriorityClass);
+#pragma warning restore CA1416
+
+    }
+    
 }
