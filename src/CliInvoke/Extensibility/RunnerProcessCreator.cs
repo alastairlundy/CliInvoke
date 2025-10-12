@@ -45,9 +45,9 @@ public class RunnerProcessCreator : IRunnerProcessCreator
             .WithArguments(inputProcess.TargetFilePath + " " + inputProcess.Arguments)
             .WithEnvironmentVariables(inputProcess.EnvironmentVariables)
             .WithProcessResourcePolicy(inputProcess.ResourcePolicy)
-            .WithEncoding(inputProcess.StandardInputEncoding,
-                inputProcess.StandardOutputEncoding,
-                inputProcess.StandardErrorEncoding)
+            .WithStandardInputEncoding(inputProcess.StandardInputEncoding)
+            .WithStandardOutputEncoding(inputProcess.StandardOutputEncoding)
+            .WithStandardErrorEncoding(inputProcess.StandardErrorEncoding)
             .WithStandardInputPipe(inputProcess.StandardInput ?? StreamWriter.Null)
             .WithStandardOutputPipe(inputProcess.StandardOutput ?? StreamReader.Null)
             .WithStandardErrorPipe(inputProcess.StandardError ?? StreamReader.Null)
