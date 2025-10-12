@@ -12,9 +12,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Versioning;
 
 using AlastairLundy.CliInvoke.Core;
-using System.Runtime.Versioning;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;

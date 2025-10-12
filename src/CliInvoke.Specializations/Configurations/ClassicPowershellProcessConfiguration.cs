@@ -10,11 +10,11 @@
 
 
 using System.Runtime.Versioning;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+
 using AlastairLundy.CliInvoke.Core;
 
 #if NETSTANDARD2_0
