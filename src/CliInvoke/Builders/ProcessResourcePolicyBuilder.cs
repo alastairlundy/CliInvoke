@@ -48,11 +48,19 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if processor affinity is less than 1 or greater than 2x Processor Count.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Pure]
-    public IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity) =>
-        new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+    public IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity)
+    {
+        if(processorAffinity < 1)
+            throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+        
+        if(processorAffinity > 2 * Environment.ProcessorCount)
+            throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+        
+        return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
             processorAffinity,
 #pragma warning disable CA1416
             _processResourcePolicy.MinWorkingSet,
@@ -60,6 +68,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 #pragma warning restore CA1416
             _processResourcePolicy.PriorityClass,
             _processResourcePolicy.EnablePriorityBoost));
+    }
 
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
