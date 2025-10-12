@@ -9,6 +9,7 @@
 
 using System.Diagnostics;
 using System.Runtime.Versioning;
+
 using AlastairLundy.CliInvoke.Core;
 
 #if NETSTANDARD2_0

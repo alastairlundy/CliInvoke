@@ -10,6 +10,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 

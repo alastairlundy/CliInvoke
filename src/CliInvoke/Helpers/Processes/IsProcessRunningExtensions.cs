@@ -31,6 +31,7 @@ internal static class IsProcessRunningExtensions
     internal static bool IsRunning(this Process process) => 
         DotExtensions.Processes.ProcessHasStartedOrExitedExtensions.HasStarted(process) && DotExtensions.Processes.ProcessHasStartedOrExitedExtensions.HasExited(process) == false;
     
+   
     /// <summary>
     /// Determines whether a process exists on a remote device or locally.
     /// </summary>
