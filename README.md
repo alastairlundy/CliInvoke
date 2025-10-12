@@ -1,18 +1,21 @@
 # CliInvoke
 
-[![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/) 
-[![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
-
-CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
-
-Launch processes, redirect standard input and output streams, await process completion and so much more.
+<!-- Badges -->
+[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
+[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
+![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 <img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
 
+CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
+
+Launch processes, redirect standard input and output streams, await process completion and much more.
+
 ## Table of Contents
 * [Features](#features)
-* [Why CliInvoke?](#why-use-CliInvoke-over-cliwrap)
-* [Installing CliInvoke](#how-to-install-and-use-CliInvoke)
+* [Why CliInvoke?](#why-cliinvoke)
+* [Installing CliInvoke](#installing-cliinvoke)
     * [Installing CliInvoke](#installing-CliInvoke)
     * [Supported Platforms](#supported-platforms)
 * [CliInvoke Examples](#examples)
@@ -22,43 +25,64 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Acknowledgements](#acknowledgements)
 
 ## Features
-* Promotes the single responsibility principle and separation of concerns
+* Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
 * Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
-* Dependency Injection extensions to make using CliInvoke a breeze.
+* Has Dependency Injection extensions to make using it a breeze.
 * Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
-<sup>1</sup> - The Specialization library is distributed separately [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations).
+<sup>1</sup> Specializations library distributed separately.
 
-## Why use CliInvoke over [CliWrap](https://github.com/Tyrrrz/CliWrap/)?
-* Greater separation of concerns - Command Building, Command Running, and Command Pipe handling are moved to separate classes.
-* Designed with Dependency Injection in mind
-* Classes and code follow the Single Responsibility Principle
-* No additional licensing terms are required beyond the source code license.
-* No imported C code - This library is entirely written in C#.
-* No lock in regarding Piping support
-* Supports .NET's built in ``ProcessStartInfo`` primitive.
+## Why CliInvoke?
 
-## How to install and use CliInvoke.Core
-CliInvoke.Core is available on [the Nuget Gallery](https://nuget.org) [here](https://nuget.org/packages/AlastairLundy.CliInvoke.Core).
-
-These are the CliInvoke projects:
-* CliInvoke - The main CliInvoke package.
-* [CliInvoke.Extensions](src/CliInvoke.Extensions/README.md)
-* [CliInvoke.Specializations](SPECIALIZATIONS_README.md)
-
-### Installing CliInvoke
-CliInvoke's packages can be installed via the .NET SDK CLI, Nuget via your IDE or code editor's package interface, or via the Nuget website.
-
-| Package Name                            | Nuget Link                                                                                                          | .NET SDK CLI command                                           |
-|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
-| AlastairLundy.CliInvoke                 | [CliInvoke Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke)                                               | ``dotnet add package AlastairLundy.CliInvoke``                 |
-| AlastairLundy.CliInvoke.Extensions      | [AlastairLundy.CliInvoke.Extensions Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensions)           | ``dotnet add package AlastairLundy.CliInvoke.Extensions``      |
-| AlastairLundy.CliInvoke.Specializations | [AlastairLundy.CliInvoke.Specializations Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations) | ``dotnet add package AlastairLundy.CliInvoke.Specializations`` |
+| Feature                                                                | CliInvoke | CliWrap |                ProcessX                 |
+|------------------------------------------------------------------------|:---------:|:-------:|:---------------------------------------:|
+| Configure and Run External Processes using code written in .NET        |     ✅     |    ✅    | ❌, Uses mixture of .NET and BASH syntax |
+| No Additional Licensing Terms Required for Use                         |     ✅     |    ❌    |                    ✅                    |
+| Uses only managed .NET code                                            |     ✅     |    ❌    |                    ✅                    |
+| Follows Separation of Concerns and the Single Responsibility Principle |     ✅     |    ❌    |                    ❌                    |
+| Allows for alternative Process Runners to be specified and/or used     |     ✅     |    ❌    |                    ❌                    |              
 
 
-### Supported Platforms
-CliInvoke can currently be added to .NET 8, or .NET 9 or newer supported projects.
+## Installing CliInvoke
+CliInvoke is available on [the Nuget Gallery](https://nuget.org) but call be also installed via the ``dotnet`` sdk cli.
+
+The package(s) to install depends on your use case:
+* For use in a .NET library - Install the [Abstractions Package](#abstractions-package), your developer users can install the Implementation and Dependency Injection packages.
+* For use in a .NET app - Install the [Implementation Package](#implementation-package) and the [Dependency Injection Extensions Package](#dependency-injection-extensions)
+
+### Abstractions Package
+[CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core)
+
+```bash
+dotnet add package AlastairLundy.CliInvoke.Core
+```
+
+### Implementation Package
+
+[CliInvoke Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke)
+
+```bash
+dotnet add package AlastairLundy.CliInvoke
+```
+
+### Extensions Package
+
+[CliInvoke.Extensions Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensions)
+
+```bash
+dotnet add package AlastairLundy.CliInvoke.Extensions
+```
+
+### Specializations Package
+[CliInvoke.Specializations Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations)
+
+```bash
+dotnet add package AlastairLundy.CliInvoke.Specializations
+```
+
+## Supported Platforms
+CliInvoke can currently be added to .NET Standard 2.0, .NET 8, or .NET 9 or newer supported projects.
 
 The following table details which target platforms are supported for executing commands via CliInvoke. 
 
@@ -81,12 +105,10 @@ The following table details which target platforms are supported for executing c
 
 **Note:** This library has not been tested on Android or Tizen.
 
-## Using CliInvoke
-The two main use cases for CliInvoke are intended to be:
-1. Executing Programs/Commands programatically which involves using abstractions to improve the experience of external Program/Command running.
-2. Safe Process Running which involves avoiding the pitfalls of the ``Process`` class.
+## Examples
+### Quickstart
 
-### Examples
+### Advanced Configuration with Builders
 
 #### ``IProcessConfigurationInvoker``
 The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
