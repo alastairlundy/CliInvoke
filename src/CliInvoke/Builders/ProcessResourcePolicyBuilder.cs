@@ -76,6 +76,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <remarks>If <see cref="minWorkingSet"/> is higher than the configured maximum working set then the maximum working set will be overriden with the new <see cref="minWorkingSet"/> value.</remarks>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <see cref="minWorkingSet"/> is less than 0.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
