@@ -87,13 +87,13 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet)
     {
-        if(minWorkingSet > _processResourcePolicy.MaxWorkingSet)
+        if(minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
             return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
-                minWorkingSet,
-                minWorkingSet,
+                minWorkingSet: minWorkingSet,
+                maxWorkingSet: minWorkingSet,
                 _processResourcePolicy.PriorityClass,
                 _processResourcePolicy.EnablePriorityBoost));
         
@@ -101,7 +101,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 #pragma warning disable CA1416
             _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
-            minWorkingSet,
+            minWorkingSet: minWorkingSet,
             _processResourcePolicy.MaxWorkingSet,
             _processResourcePolicy.PriorityClass,
             _processResourcePolicy.EnablePriorityBoost));
