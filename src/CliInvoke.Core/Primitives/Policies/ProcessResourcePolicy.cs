@@ -12,10 +12,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
-
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
@@ -37,16 +33,33 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
         bool enablePriorityBoost = false)
     {
+        if(minWorkingSet is not null)
+            if (minWorkingSet < 0)
+                throw new ArgumentOutOfRangeException(nameof(minWorkingSet));
+        
+        if (minWorkingSet is not null && maxWorkingSet is not null)
+        {
+            if (maxWorkingSet < minWorkingSet || maxWorkingSet < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+        
+            if(minWorkingSet > maxWorkingSet)
+                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+        }
+
+        if (processorAffinity is not null)
+        {
+            if(processorAffinity < (nint)1)
+                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+        
+            if(processorAffinity > (nint)2 * Environment.ProcessorCount)
+                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+        }
         
 #pragma warning disable CA1416
         MinWorkingSet = minWorkingSet;
         MaxWorkingSet = maxWorkingSet;
+        ProcessorAffinity = processorAffinity;
 #pragma warning restore CA1416
-
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
-        {
-            ProcessorAffinity = processorAffinity;
-        }
         
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
