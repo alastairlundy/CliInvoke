@@ -149,8 +149,8 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
 
         if (obj is UserCredential other)
             return Equals(other);
-        else
-            return false;
+        
+        return false;
     }
 
     /// <summary>
