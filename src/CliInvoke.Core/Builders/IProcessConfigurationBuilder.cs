@@ -147,15 +147,25 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder WithWindowCreation(bool enableWindowCreation);
 
     /// <summary>
-    /// Sets the Encoding types to be used for Standard Input, Output, and Error.
+    /// Sets the Encoding types to be used for Standard Input.
     /// </summary>
     /// <param name="standardInputEncoding">The encoding type to be used for the Standard Input.</param>
+    /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
+    IProcessConfigurationBuilder WithStandardInputEncoding(Encoding? standardInputEncoding = null);
+    
+    /// <summary>
+    /// Sets the Encoding types to be used for Standard Output.
+    /// </summary>
     /// <param name="standardOutputEncoding">The encoding type to be used for the Standard Output.</param>
+    /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
+    IProcessConfigurationBuilder WithStandardOutputEncoding(Encoding? standardOutputEncoding = null);
+    
+    /// <summary>
+    /// Sets the Encoding types to be used for Standard Error.
+    /// </summary>
     /// <param name="standardErrorEncoding">The encoding type to be used for the Standard Error.</param>
     /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
-    IProcessConfigurationBuilder WithEncoding(Encoding? standardInputEncoding = null,
-        Encoding? standardOutputEncoding = null,
-        Encoding? standardErrorEncoding = null);
+    IProcessConfigurationBuilder WithStandardErrorEncoding(Encoding? standardErrorEncoding = null);
 
     /// <summary>
     /// Builds the Process configuration with the configured parameters.
