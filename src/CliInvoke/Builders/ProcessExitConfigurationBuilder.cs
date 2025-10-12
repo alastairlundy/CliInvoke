@@ -9,6 +9,7 @@
  */
 
 using System.Diagnostics.Contracts;
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 
@@ -22,16 +23,18 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     private readonly ProcessExitConfiguration _processExitConfiguration;
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="ProcessExitConfigurationBuilder"/> class,
+    /// which is used to build and configure a process's exit configuration.
     /// </summary>
-    /// <param name="processExitInfo"></param>
-    protected ProcessExitConfigurationBuilder(ProcessExitConfiguration processExitInfo)
+    /// <param name="processExitConfiguration">A process exit configuration to update.</param>
+    protected ProcessExitConfigurationBuilder(ProcessExitConfiguration processExitConfiguration)
     {
-        _processExitConfiguration = processExitInfo;
+        _processExitConfiguration = processExitConfiguration;
     }
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="ProcessExitConfigurationBuilder"/> class,
+    /// which is used to build and configure a process.
     /// </summary>
     public ProcessExitConfigurationBuilder()
     {
@@ -41,12 +44,12 @@ public class ProcessExitConfigurationBuilder : IProcessExitConfigurationBuilder
     /// <summary>
     /// Sets the Result Validation whether to throw an exception or not if the Process does not execute successfully.
     /// </summary>
-    /// <param name="validation">The result validation behaviour to be used.</param>
+    /// <param name="resultValidation">The result validation behaviour to be used.</param>
     /// <returns>The new ProcessExitInfoBuilder object with the configured Result Validation behaviour.</returns>
     [Pure]
-    public IProcessExitConfigurationBuilder WithValidation(ProcessResultValidation validation) =>
+    public IProcessExitConfigurationBuilder WithValidation(ProcessResultValidation resultValidation) =>
         new ProcessExitConfigurationBuilder(
-            new ProcessExitConfiguration(_processExitConfiguration.TimeoutPolicy, validation,
+            new ProcessExitConfiguration(_processExitConfiguration.TimeoutPolicy, resultValidation,
                 _processExitConfiguration.CancellationExceptionBehavior));
 
     /// <summary>
