@@ -36,8 +36,15 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, 
         ProcessCancellationMode cancellationMode =  ProcessCancellationMode.Graceful)
     {
-        if(timeoutThreshold < TimeSpan.Zero)
+#if NET8_0_OR_GREATER
+        bool lessThanZero = double.IsNegative(timeoutThreshold.TotalMilliseconds);
+#else
+        bool lessThanZero = timeoutThreshold.TotalMilliseconds < double.Parse("0.0");
+#endif        
+
+        if(timeoutThreshold < TimeSpan.Zero || lessThanZero)
             throw new ArgumentOutOfRangeException(nameof(timeoutThreshold), string.Format(Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero, nameof(timeoutThreshold)));
+
         
         TimeoutThreshold = timeoutThreshold;
         CancellationMode = cancellationMode;
