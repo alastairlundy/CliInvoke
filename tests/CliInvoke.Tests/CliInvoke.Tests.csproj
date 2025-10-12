@@ -31,7 +31,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Invokers\" />
+      <Compile Remove="Invokers\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Invokers\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Invokers\**" />
     </ItemGroup>
 
 </Project>
