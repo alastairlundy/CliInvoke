@@ -44,7 +44,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy and exit code zero validation.
     /// </summary>
     public static readonly ProcessExitConfiguration Default = new(ProcessTimeoutPolicy.Default,
-            ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowException);
+            ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected);
     
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy, but suppresses the Exception from cancellation.
