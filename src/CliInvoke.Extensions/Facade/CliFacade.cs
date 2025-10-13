@@ -25,7 +25,7 @@ using AlastairLundy.CliInvoke.Builders;
 namespace AlastairLundy.CliInvoke.Extensions;
 
 /// <summary>
-/// A class providing Syntactic sugar to make simple uses cases super easy with CliInvoke.
+/// A class providing syntactic sugar to make simple uses cases super easy with CliInvoke.
 /// </summary>
 public static class Cli
 {
