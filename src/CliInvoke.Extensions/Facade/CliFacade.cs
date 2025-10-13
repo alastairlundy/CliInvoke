@@ -32,15 +32,15 @@ namespace AlastairLundy.CliInvoke.Extensions;
 public static class Cli
 {
     /// <summary>
-    /// 
+    /// Runs a process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfigurationInvoker"></param>
-    /// <param name="targetFilePath"></param>
-    /// <param name="arguments"></param>
-    /// <param name="workingDirectory"></param>
-    /// <param name="exitConfiguration"></param>
+    /// <param name="processConfigurationInvoker">The process configuration invoker to use to execute the command.</param>
+    /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+    /// <param name="workingDirectory">The working directory to be used.</param>
+    /// <param name="exitConfiguration">The exit configuration to use for the process, or the default exit configuration if null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns></returns>
+    /// <returns>The Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET8_0_OR_GREATER
@@ -73,15 +73,16 @@ public static class Cli
     }
 
     /// <summary>
-    /// 
+    /// Runs a process asynchronously with Standard Output and Standard Error Redirection,
+    /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfigurationInvoker"></param>
-    /// <param name="targetFilePath"></param>
-    /// <param name="arguments"></param>
-    /// <param name="workingDirectory"></param>
-    /// <param name="exitConfiguration"></param>
+    /// <param name="processConfigurationInvoker">The process configuration invoker to use to execute the command.</param>
+    /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+    /// <param name="workingDirectory">The working directory to be used.</param>
+    /// <param name="exitConfiguration">The exit configuration to use for the process, or the default exit configuration if null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns></returns>
+    /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET8_0_OR_GREATER
@@ -117,15 +118,16 @@ public static class Cli
     }
     
     /// <summary>
-    /// 
+    /// Runs a process asynchronously with Standard Output and Standard Error Redirection,
+    /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
-    /// <param name="processConfigurationInvoker"></param>
-    /// <param name="targetFilePath"></param>
-    /// <param name="arguments"></param>
-    /// <param name="workingDirectory"></param>
-    /// <param name="exitConfiguration"></param>
+    /// <param name="processConfigurationInvoker">The process configuration invoker to use to execute the command.</param>
+    /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+    /// <param name="workingDirectory">The working directory to be used.</param>
+    /// <param name="exitConfiguration">The exit configuration to use for the process, or the default exit configuration if null.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns></returns>
+    /// <returns>The Piped Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET8_0_OR_GREATER
