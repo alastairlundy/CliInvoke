@@ -21,11 +21,14 @@ using AlastairLundy.CliInvoke.Exceptions;
 
 namespace AlastairLundy.CliInvoke.Extensions.Invokation;
 
+/// <summary>
+/// 
+/// </summary>
 public static class ConfigurationInvokationExtensions
 {
     
     /// <summary>
-    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
+    /// Runs a process configuration asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processConfigurationInvoker">The process configuration invoker to use to execute the command.</param>
@@ -45,7 +48,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<ProcessResult> ExecuteAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<ProcessResult> InvokeAsync(this ProcessConfiguration processConfiguration,
         IProcessConfigurationInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
@@ -54,7 +57,7 @@ public static class ConfigurationInvokationExtensions
     }
 
     /// <summary>
-    /// Runs a process asynchronously with Standard Output and Standard Error Redirection,
+    /// Runs a process configuration asynchronously with Standard Output and Standard Error Redirection,
     /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
@@ -74,7 +77,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<BufferedProcessResult> ExecuteBufferedAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<BufferedProcessResult> InvokeBufferedAsync(this ProcessConfiguration processConfiguration,
         IProcessConfigurationInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
@@ -83,7 +86,7 @@ public static class ConfigurationInvokationExtensions
     }
 
     /// <summary>
-    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
+    /// Runs a process configuration asynchronously with Standard Output and Standard Error Redirection,
     /// gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
@@ -103,7 +106,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<PipedProcessResult> ExecutePipedAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<PipedProcessResult> InvokePipedAsync(this ProcessConfiguration processConfiguration,
         IProcessConfigurationInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
