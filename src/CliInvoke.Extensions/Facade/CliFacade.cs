@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 #if NET6_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -21,6 +22,7 @@ using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Exceptions;
 
 namespace AlastairLundy.CliInvoke.Extensions;
 
@@ -37,8 +39,10 @@ public static class Cli
     /// <param name="arguments"></param>
     /// <param name="workingDirectory"></param>
     /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns></returns>
+    /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET8_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -86,8 +90,10 @@ public static class Cli
     /// <param name="arguments"></param>
     /// <param name="workingDirectory"></param>
     /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns></returns>
+    /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET8_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -138,8 +144,10 @@ public static class Cli
     /// <param name="arguments"></param>
     /// <param name="workingDirectory"></param>
     /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns></returns>
+    /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
 #if NET8_0_OR_GREATER
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
