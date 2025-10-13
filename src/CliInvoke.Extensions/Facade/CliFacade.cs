@@ -65,18 +65,8 @@ public static class Cli
             .WithWorkingDirectory(workingDirectory ?? Environment.CurrentDirectory);
 
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
-        
-        ProcessExitConfiguration processExitConfiguration;
 
-        if (exitConfiguration is null)
-        {
-            processExitConfiguration = new ProcessExitConfiguration(ProcessTimeoutPolicy.Default,
-                ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected);
-        }
-        else
-        {
-            processExitConfiguration = exitConfiguration;
-        }
+        ProcessExitConfiguration processExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
         
         return await processConfigurationInvoker.ExecuteAsync(configuration, processExitConfiguration,
             cancellationToken: cancellationToken);
@@ -120,17 +110,7 @@ public static class Cli
 
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
 
-        ProcessExitConfiguration processExitConfiguration;
-        
-        if (exitConfiguration is null)
-        {
-            processExitConfiguration = new ProcessExitConfiguration(ProcessTimeoutPolicy.Default,
-                ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected);
-        }
-        else
-        {
-            processExitConfiguration = exitConfiguration;
-        }
+        ProcessExitConfiguration processExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
         
         return await processConfigurationInvoker.ExecuteBufferedAsync(configuration, processExitConfiguration,
             cancellationToken: cancellationToken);
@@ -174,17 +154,7 @@ public static class Cli
 
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
 
-        ProcessExitConfiguration processExitConfiguration;
-        
-        if (exitConfiguration is null)
-        {
-            processExitConfiguration = new ProcessExitConfiguration(ProcessTimeoutPolicy.Default,
-                ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected);
-        }
-        else
-        {
-            processExitConfiguration = exitConfiguration;
-        }
+        ProcessExitConfiguration processExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
         
         return await processConfigurationInvoker.ExecutePipedAsync(configuration, processExitConfiguration,
             cancellationToken: cancellationToken);
