@@ -85,9 +85,8 @@ The following table details which target platforms are supported for executing c
 **Note:** This library has not been tested on Android or Tizen.
 
 ## Using CliInvoke / Examples
-One of the main use cases for CliInvoke is intended to be executing programs programatically, but other valid use cases also exist such as safe Process Running.
 
-### Executing Commands
+### Fluent ``ProcessConfiguration`` building
 CliInvoke enables use of a fluent builder style of syntax to easily configure and run Commands.
 
 The following example shows how to configure and build a Command that returns a BufferedProcessResult which contains redirected StandardOutput and StandardError as strings.
