@@ -48,6 +48,14 @@
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="README.md">
+            <Link>README.md</Link>
+            <PackagePath>README.md</PackagePath>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
     
     <ItemGroup>
       <EmbeddedResource Update="Internal\Localizations\Resources.resx">
