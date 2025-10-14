@@ -14,6 +14,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReleaseNotes>### Changes since 1.6.1
+*Note*: Core package is unchanged and so a new version has not been released for it.
 
 ### Bug Fixes
 * Fixed an issue where ``FilePathResolver`` would fail to correctly resolve a file path
@@ -22,7 +23,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.6.2</PackageVersion>
+        <PackageVersion>1.6.1.1</PackageVersion>
         <PackageTags>shell, cli, process, wrapping, commandline, invoke, processinvoker, processfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
