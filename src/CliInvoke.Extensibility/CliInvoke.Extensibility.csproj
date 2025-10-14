@@ -20,9 +20,9 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>1.6.0</Version>
-        <PackageReleaseNotes>### Changes since 1.5.2
-* Updated to use CliInvoke 1.6.0</PackageReleaseNotes>
+        <Version>1.6.1.1</Version>
+        <PackageReleaseNotes>### Changes since 1.6.1
+* Updated to use CliInvoke 1.6.1.1</PackageReleaseNotes>
         <RootNamespace>AlastairLundy.CliInvoke.Extensibility</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Extensibility</AssemblyName>
     </PropertyGroup>
@@ -45,7 +45,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.6.1" />
+      <PackageReference Include="AlastairLundy.CliInvoke" Version="1.6.1.1" />
       <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="1.6.1" />
     </ItemGroup>
 </Project>
