@@ -11,10 +11,11 @@ using System;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Extensibility;
+using AlastairLundy.CliInvoke.Core.Factories;
 using AlastairLundy.CliInvoke.Core.Piping;
 
 using AlastairLundy.CliInvoke.Extensibility;
-
+using AlastairLundy.CliInvoke.Factories;
 using AlastairLundy.CliInvoke.Piping;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +43,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
                 services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
 
+                services.AddSingleton<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddSingleton<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
 
                 services.AddSingleton<IRunnerProcessCreator, RunnerProcessCreator>();
@@ -50,6 +52,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 
+                services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddScoped<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
                 
                 services.AddScoped<IRunnerProcessCreator, RunnerProcessCreator>();
@@ -58,6 +61,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
                 services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
 
+                services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddTransient<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
                 
                 services.AddTransient<IRunnerProcessCreator, RunnerProcessCreator>();
