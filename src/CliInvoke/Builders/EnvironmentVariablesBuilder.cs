@@ -16,12 +16,9 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
-
-#if NET8_0_OR_GREATER
 using AlastairLundy.DotExtensions.Collections.Dictionaries;
-#else
-using AlastairLundy.DotExtensions.Collections.Generic.Dictionaries;
-#endif
+
+using AlastairLundy.DotExtensions.Collections.Dictionaries;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 
