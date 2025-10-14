@@ -3,8 +3,11 @@ This readme covers the **CliInvoke.Extensions** package. Looking for the [CliInv
 
 This package adds the ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package 
 
-[![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
-[![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
+<!-- Badges -->
+[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
+[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
+![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 ## Usage
 
@@ -24,6 +27,11 @@ There's a few different reasons:
 * Provides extension methods in a 
 * Not everybody necessarily uses Microsoft's Dependency Injection packages.
 * Helps de-couple the Dependency Injection extension functionality from the main library
+
+## Usage Examples
+
+### ``Cli`` helper class
+
 
 ## Licensing
 CliInvoke.Extensions is licensed under the MPL 2.0 license.
