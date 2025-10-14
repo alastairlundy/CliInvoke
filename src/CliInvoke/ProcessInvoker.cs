@@ -35,10 +35,20 @@ namespace AlastairLundy.CliInvoke;
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
-    private readonly IProcessPipeHandler _processPipeHandler;
+    private readonly IProcessPipeHandler? _processPipeHandler;
     
     private readonly IProcessFactory _processFactory;
 
+    /// <summary>  
+    /// Instantiates an invoker for invoking processes, providing a centralized way to execute external commands.
+    /// </summary>
+    /// <param name="processFactory">The process factory to be used to create and run the invoked processes.</param>
+    public ProcessInvoker(IProcessFactory processFactory)
+    {
+        _processFactory = processFactory;
+        _processPipeHandler = null;
+    }
+    
     /// <summary>  
     /// Instantiates an invoker for invoking processes, providing a centralized way to execute external commands.
     /// </summary>
