@@ -13,17 +13,22 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 4
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 5
+
 ### Breaking Changes
-* Changed a return parameter in ``ProcessPipeHandler``
+* Removed ``IProcessTimeoutPolicyBuilder`` and ``ProcessTimeoutPolicyBuilder`` - These builders added hardly any benefit for the complexity they added
+* Removed ``IProcessExitConfigurationBuilder`` and ``ProcessExitConfigurationBuilder`` - These builders also added hardly any benefit for the complexity they added
+
+### Improvements
+* Improved robustness of ``ProcessTimeoutPolicy`` parameter checks during creation
+* [Extensions package] Add syntactic sugar/more ergonomic extensions methods to enhance the experience of using CliInvoke when advanced Process Configuration building isn't required.
 
 ### Bug Fixes
-* Fixed an issue that would cause an Exception to be thrown if a Process that runs quickly has a Resource Policy applied to it immediately before or whilst the Process is exiting
-* Fixed several other issues that would cause an Exception to be thrown by the Process class.</PackageReleaseNotes>
+* Fixed an issue where a process meant for graceful cancellation wouldn't be cancelled gracefully</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.5</PackageVersion>
+        <PackageVersion>2.0.0-beta.6</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -74,14 +79,12 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-    <ItemGroup>
+ <!--   <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
+    </ItemGroup>-->
     
     <ItemGroup>
-<!--
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.5" />
--->
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.6" />
       <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.2" />
     </ItemGroup>
 </Project>
