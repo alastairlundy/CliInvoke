@@ -48,7 +48,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<ProcessResult> InvokeAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<ProcessResult> ExecuteAsync(this ProcessConfiguration processConfiguration,
         IProcessConfigurationInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
@@ -77,7 +77,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<BufferedProcessResult> InvokeBufferedAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<BufferedProcessResult> ExecuteBufferedAsync(this ProcessConfiguration processConfiguration,
         IProcessConfigurationInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
@@ -106,7 +106,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<PipedProcessResult> InvokePipedAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<PipedProcessResult> ExecutePipedAsync(this ProcessConfiguration processConfiguration,
         IProcessConfigurationInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
