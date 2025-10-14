@@ -30,8 +30,8 @@
     
     <ItemGroup>
 
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-beta.6" />
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.6" />
+    <!--    <PackageReference Include="AlastairLundy.CliInvoke" Version="2.0.0-beta.6" />
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.6" />-->
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
     </ItemGroup>
 
@@ -66,8 +66,8 @@
       </Compile>
     </ItemGroup>
 
-<!--    <ItemGroup>
+    <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
       <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
-    </ItemGroup>-->
+    </ItemGroup>
 </Project>
