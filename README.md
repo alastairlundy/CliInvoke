@@ -160,7 +160,9 @@ using AlastairLundy.CliInvoke.Core.Builders;
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
                             .WithArguments(["arg1", "arg2"])
-                            .WithWorkingDirectory("/Path/To/Directory");
+                            .WithWorkingDirectory("/Path/To/Directory")
+                            .RedirectStandardOutput(true)
+                           .RedirectStandardError(true);
   
   // Build it as a ProcessConfiguration object when you're ready to use it.
   ProcessConfiguration config = builder.Build();
