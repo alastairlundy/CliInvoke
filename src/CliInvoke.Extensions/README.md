@@ -17,10 +17,10 @@ CliInvoke.Extensions provides an extension method to make it easier to use CliIn
 The ``AddCliInvoke`` IServiceCollection extension method adds CliInvoke's and ProcessExtensions' interface-able services.
 
 The services injected includes:
-* ``IFilePathResolver``
-* ``IProcessPipeHandler``
-* ``IProcessInvoker``
-* ``IProcessFactory``
+* ``IFilePathResolver`` - Used by ``IProcessInvoker`` to resolve the file path of a ``ProcessConfiguration``'s ``TargetFilePath`` string.
+* ``IProcessPipeHandler`` - Used by ``IProcessInvoker`` to pipe Standard Input, Output, and Error Streams.
+* ``IProcessInvoker`` - Runs a process based on a ``ProcessConfiguration``
+* ``IProcessConfigurationFactory`` - Enables easy ``ProcessConfiguration`` creation.
 
 ## Why a separate package?
 There's a few different reasons:
@@ -30,8 +30,7 @@ There's a few different reasons:
 
 ## Usage Examples
 
-### ``Cli`` helper class
-
+### Dependency Injection
 
 ## Licensing
 CliInvoke.Extensions is licensed under the MPL 2.0 license.
