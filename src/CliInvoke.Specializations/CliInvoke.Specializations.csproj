@@ -10,14 +10,17 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.6</PackageVersion>
+        <PackageVersion>2.0.0-beta.7</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <LangVersion>13</LangVersion>
-        <PackageReleaseNotes>Updated to CliInvoke 2.0.0 Beta 6</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 6
+
+### Specializations Package
+* Updated to support CliInvoke 2.0.0 Beta 7</PackageReleaseNotes>
         <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
@@ -28,6 +31,20 @@
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
     </ItemGroup>
 
+    <PropertyGroup>
+        <!-- default false, CI can set to true -->
+        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
+        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+        <!-- set CliInvokeCoreVersion in the workflow -->
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+    </ItemGroup>
+    
     <ItemGroup>
         <Content Include="..\..\SPECIALIZATIONS_README.md">
             <Link>README.md</Link>
@@ -58,12 +75,4 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
-
-   <!-- <ItemGroup>
-      <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.6" />
-    </ItemGroup>-->
 </Project>

@@ -13,22 +13,14 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 5
-
-### Breaking Changes
-* Removed ``IProcessTimeoutPolicyBuilder`` and ``ProcessTimeoutPolicyBuilder`` - These builders added hardly any benefit for the complexity they added
-* Removed ``IProcessExitConfigurationBuilder`` and ``ProcessExitConfigurationBuilder`` - These builders also added hardly any benefit for the complexity they added
-
-### Improvements
-* Improved robustness of ``ProcessTimeoutPolicy`` parameter checks during creation
-* [Extensions package] Add syntactic sugar/more ergonomic extensions methods to enhance the experience of using CliInvoke when advanced Process Configuration building isn't required.
-
-### Bug Fixes
-* Fixed an issue where a process meant for graceful cancellation wouldn't be cancelled gracefully</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 6
+### Main package
+* Added ``ProcessConfigurationFactory``
+* Renamed ``ProcessConfigurationInvoker`` to ``ProcessInvoker``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.6</PackageVersion>
+        <PackageVersion>2.0.0-beta.7</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -47,6 +39,23 @@
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.2" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <!-- default false, CI can set to true -->
+        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
+        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+        <!-- set CliInvokeCoreVersion in the workflow -->
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -81,12 +90,5 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
-    
-    <ItemGroup>
-<!--
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="2.0.0-beta.6" />
--->
-      <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.2" />
     </ItemGroup>
 </Project>

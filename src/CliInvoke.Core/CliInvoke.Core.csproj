@@ -22,18 +22,10 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-beta.6</Version>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 5
-
-### Breaking Changes
-* Removed ``IProcessTimeoutPolicyBuilder`` and ``ProcessTimeoutPolicyBuilder`` - These builders added hardly any benefit for the complexity they added
-* Removed ``IProcessExitConfigurationBuilder`` and ``ProcessExitConfigurationBuilder`` - These builders also added hardly any benefit for the complexity they added
-
-### Improvements
-* Improved robustness of ``ProcessTimeoutPolicy`` parameter checks during creation
-
-### Bug Fixes
-* Fixed an issue where a process meant for graceful cancellation wouldn't be cancelled gracefully</PackageReleaseNotes>
+        <Version>2.0.0-beta.7</Version>
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 6
+* Added ``IProcessConfigurationFactory``
+* Renamed ``IProcessConfigurationInvoker`` to ``IProcessInvoker``</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
