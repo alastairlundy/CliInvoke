@@ -47,7 +47,7 @@ jobs:
               
           # Push the Core package
       - name: NuGet push
-        run: dotnet nuget push src/CliInvoke.Core/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push src/CliInvoke.Core/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Restore dependencies
         run: dotnet restore
@@ -58,18 +58,18 @@ jobs:
 
           # Push the Specializations package
       - name: NuGet push
-        run: dotnet nuget push src/CliInvoke.Specializations/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push src/CliInvoke.Specializations/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Restore dependencies
         run: dotnet restore
         working-directory: src/CliInvoke
       - name: Create packages
-        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }}
+        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }} 
         working-directory: src/CliInvoke
 
       # Push the Main package
       - name: NuGet push
-        run: dotnet nuget push src/CliInvoke/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push src/CliInvoke/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Restore dependencies
         run: dotnet restore
@@ -80,5 +80,5 @@ jobs:
 
         # Push the Extensions package
       - name: NuGet push
-        run: dotnet nuget push src/CliInvoke.Extensions/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push src/CliInvoke.Extensions/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
