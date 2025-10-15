@@ -9,6 +9,9 @@
 
 namespace AlastairLundy.CliInvoke.Core;
 
+/// <summary>
+/// 
+/// </summary>
 public enum ProcessCancellationExceptionBehavior
 {
     /// <summary>

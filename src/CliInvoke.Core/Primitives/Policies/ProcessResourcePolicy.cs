@@ -48,7 +48,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         if (processorAffinity is not null)
         {
+#if NETSTANDARD2_0
             if(processorAffinity < (nint)1)
+#else
+            if(processorAffinity < 1)
+#endif
                 throw new ArgumentOutOfRangeException(nameof(processorAffinity));
         
             if(processorAffinity > (nint)2 * Environment.ProcessorCount)
