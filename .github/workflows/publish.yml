@@ -53,7 +53,7 @@ jobs:
         run: dotnet restore
         working-directory: src/CliInvoke.Specializations
       - name: Create packages
-        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion={{ inputs.core-version }}
+        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }}
         working-directory: src/CliInvoke.Specializations
 
           # Push the Specializations package
@@ -64,7 +64,7 @@ jobs:
         run: dotnet restore
         working-directory: src/CliInvoke
       - name: Create packages
-        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion={{ inputs.core-version }}
+        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }}
         working-directory: src/CliInvoke
 
       # Push the Main package
@@ -75,7 +75,7 @@ jobs:
         run: dotnet restore
         working-directory: src/CliInvoke.Extensions
       - name: Create packages
-        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion={{ inputs.core-version }} -p:CliInvokeVersion={{ inputs.main-version }}
+        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }} -p:CliInvokeVersion=${{ inputs.main-version }}
         working-directory: src/CliInvoke.Extensions
 
         # Push the Extensions package
