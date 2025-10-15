@@ -2,6 +2,13 @@ name: Publish Core Package to Nuget
 
 on:
   workflow_dispatch:
+     inputs:
+      core-version:
+         type: string
+         required: true
+      main-version:
+        type: string
+        required: true
 
 permissions:
   contents: read
@@ -26,10 +33,10 @@ jobs:
           dotnet-version: 9.0.x
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: src
+        working-directory: src/CliInvoke.Core
       - name: Create packages
         run: dotnet build -c Release
-        working-directory: src
+        working-directory: src/CliInvoke.Core
         
           # Get a short-lived NuGet API key
       - name: NuGet login (OIDC → temp API key)
@@ -38,6 +45,40 @@ jobs:
         with:
             user: ${{ secrets.NUGET_USER }}
               
-          # Push the package
+          # Push the Core package
       - name: NuGet push
         run: dotnet nuget push src/CliInvoke.Core/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: src/CliInvoke.Specializations
+      - name: Create packages
+        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion={{ inputs.core-version }}
+        working-directory: src/CliInvoke.Specializations
+
+          # Push the Specializations package
+      - name: NuGet push
+        run: dotnet nuget push src/CliInvoke.Specializations/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: src/CliInvoke
+      - name: Create packages
+        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion={{ inputs.core-version }}
+        working-directory: src/CliInvoke
+
+      # Push the Main package
+      - name: NuGet push
+        run: dotnet nuget push src/CliInvoke/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: src/CliInvoke.Extensions
+      - name: Create packages
+        run: dotnet build -c Release p:UsePublishedPackages=true -p:CliInvokeCoreVersion={{ inputs.core-version }} -p:CliInvokeVersion={{ inputs.main-version }}
+        working-directory: src/CliInvoke.Extensions
+
+        # Push the Extensions package
+      - name: NuGet push
+        run: dotnet nuget push src/CliInvoke.Extensions/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
