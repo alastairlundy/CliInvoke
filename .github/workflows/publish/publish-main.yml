@@ -1,4 +1,4 @@
-name: Publish to Nuget
+name: Publish Main Package to Nuget
 
 on:
   workflow_dispatch:
