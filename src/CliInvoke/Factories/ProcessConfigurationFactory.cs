@@ -25,7 +25,7 @@ namespace AlastairLundy.CliInvoke.Factories;
 public class ProcessConfigurationFactory : IProcessConfigurationFactory
 {
     /// <summary>
-    /// Creates a Process configuration that can be run by a <see cref="IProcessConfigurationInvoker"/> from specified parameters.
+    /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
@@ -35,7 +35,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         =>  Create(targetFilePath, arguments, null);
 
     /// <summary>
-    /// Creates a Process configuration that can be run by a <see cref="IProcessConfigurationInvoker"/> from specified parameters.
+    /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
@@ -58,7 +58,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     }
 
     /// <summary>
-    /// Creates a Process configuration that can be run by a <see cref="IProcessConfigurationInvoker"/> from specified parameters.
+    /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>

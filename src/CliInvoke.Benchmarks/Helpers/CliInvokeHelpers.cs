@@ -8,10 +8,10 @@ namespace CliInvoke.Benchmarking.Helpers;
 internal class CliInvokeHelpers
 {
 
-    internal static ProcessConfigurationInvoker CreateProcessInvoker()
+    internal static ProcessInvoker CreateProcessInvoker()
     {
         IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        return new ProcessConfigurationInvoker(new FilePathResolver(),
+        return new ProcessInvoker(new FilePathResolver(),
             processPipeHandler);
     }
 }

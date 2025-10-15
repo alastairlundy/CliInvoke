@@ -18,7 +18,7 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
  Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BasicUnbufferedInvokationBenchmark
 {
-    private readonly IProcessConfigurationInvoker _processInvoker;
+    private readonly IProcessInvoker _processInvoker;
     
     private readonly DotnetCommandHelper _dotnetCommandHelper;
     

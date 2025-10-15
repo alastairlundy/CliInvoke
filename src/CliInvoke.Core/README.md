@@ -10,7 +10,7 @@ For an implementing package, check out [CliInvoke](https://www.nuget.org/package
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 Key Abstractions:
-* ``IProcessConfigurationInvoker``
+* ``IProcessConfi Invoker``
 
 * Piping:
   * ``IProcessPipeHandler``
@@ -62,7 +62,7 @@ The following table details which target platforms are supported for running Pro
 
 ### Approach Examples
 
-#### ``IProcessConfigurationInvoker``
+#### ``IProcessInvoker``
 The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
 
 ##### Non-Buffered Execution Example
@@ -81,7 +81,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
   // ServiceProvider and Dependency Injection setup code ommitted for clarity
   
-  IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+  IProcessInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
@@ -111,7 +111,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
 
   // ServiceProvider and Dependency Injection setup code ommitted for clarity
   
-  IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
@@ -122,7 +122,7 @@ using AlastairLundy.CliInvoke.Core.Primitives;
   ProcessConfiguration config = builder.Build();
   
   // Execute the process through ProcessInvoker and get the results.
-BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(config);
+BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
 ```
 
 ### Command/Program Execution

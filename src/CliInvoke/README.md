@@ -61,7 +61,7 @@ For a simpler way to configure ``ProcessConfiguration`` objects, check out [CliI
 
 ### Advanced Configuration with Builders
 
-#### ``IProcessConfigurationInvoker``
+#### ``IProcessInvoker``
 The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
 
 ##### Non-Buffered Execution Example
@@ -78,7 +78,7 @@ using AlastairLundy.CliInvoke.Core.Builders;
 
   // ServiceProvider and Dependency Injection setup code ommitted for clarity
   
-  IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+  IProcessInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
@@ -106,7 +106,7 @@ using AlastairLundy.CliInvoke.Core.Builders;
 
   // ServiceProvider and Dependency Injection setup code ommitted for clarity
   
-  IProcessConfigurationInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
@@ -117,7 +117,7 @@ using AlastairLundy.CliInvoke.Core.Builders;
   ProcessConfiguration config = builder.Build();
   
   // Execute the process through ProcessInvoker and get the results.
-BufferedProcessResult result = await _processConfigInvoker.ExecuteBufferedAsync(config);
+BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
 ```
 
 ## How to Build CliInvoke's code

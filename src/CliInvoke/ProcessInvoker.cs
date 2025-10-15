@@ -24,20 +24,20 @@ using AlastairLundy.CliInvoke.Helpers.Processes;
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of <see cref="IProcessConfigurationInvoker"/>, a safer way to execute processes.
+/// The default implementation of <see cref="IProcessInvoker"/>, a safer way to execute processes.
 /// </summary>
-public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
+public class ProcessInvoker : IProcessInvoker
 {
     private readonly IProcessPipeHandler _processPipeHandler;
     
     private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>  
-    /// Instantiates a <see cref="ProcessConfigurationInvoker"/> for creating and executing processes.
+    /// Instantiates a <see cref="ProcessInvoker"/> for creating and executing processes.
     /// </summary>
     /// <param name="filePathResolver">The file path resolver to be used.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
-    public ProcessConfigurationInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
+    public ProcessInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;

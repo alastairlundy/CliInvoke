@@ -15,7 +15,7 @@ namespace AlastairLundy.CliInvoke.Core;
 /// <summary>
 /// Defines a service that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
 /// </summary>
-public interface IProcessConfigurationInvoker
+public interface IProcessInvoker
 {
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.

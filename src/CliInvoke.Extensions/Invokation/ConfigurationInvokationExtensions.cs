@@ -49,7 +49,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("browser")]
 #endif
     public static async Task<ProcessResult> ExecuteAsync(this ProcessConfiguration processConfiguration,
-        IProcessConfigurationInvoker processConfigurationInvoker,
+        IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
         return await processConfigurationInvoker.ExecuteAsync(processConfiguration, processExitConfiguration,
@@ -78,7 +78,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("browser")]
 #endif
     public static async Task<BufferedProcessResult> ExecuteBufferedAsync(this ProcessConfiguration processConfiguration,
-        IProcessConfigurationInvoker processConfigurationInvoker,
+        IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
         return await processConfigurationInvoker.ExecuteBufferedAsync(processConfiguration, processExitConfiguration,
@@ -107,7 +107,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("browser")]
 #endif
     public static async Task<PipedProcessResult> ExecutePipedAsync(this ProcessConfiguration processConfiguration,
-        IProcessConfigurationInvoker processConfigurationInvoker,
+        IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
         return await processConfigurationInvoker.ExecutePipedAsync(processConfiguration, processExitConfiguration,

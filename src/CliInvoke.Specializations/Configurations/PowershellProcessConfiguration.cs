@@ -39,7 +39,7 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations;
     [UnsupportedOSPlatform("watchos")]
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
-    private readonly IProcessConfigurationInvoker _invoker;
+    private readonly IProcessInvoker _invoker;
 
     /// <summary>
     /// Initializes a new instance of the PowershellCommandConfiguration class.
@@ -59,7 +59,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="processResourcePolicy">The processor resource policy for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
-    public PowershellProcessConfiguration(IProcessConfigurationInvoker processInvoker, string arguments = null,
+    public PowershellProcessConfiguration(IProcessInvoker processInvoker, string arguments = null,
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,

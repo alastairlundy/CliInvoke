@@ -44,7 +44,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
 
                 services.AddSingleton<IProcessConfigurationFactory, ProcessConfigurationFactory>();
-                services.AddSingleton<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
+                services.AddSingleton<IProcessInvoker, ProcessInvoker>();
 
                 services.AddSingleton<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
@@ -53,7 +53,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
-                services.AddScoped<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
+                services.AddScoped<IProcessInvoker, ProcessInvoker>();
                 
                 services.AddScoped<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
@@ -62,7 +62,7 @@ public static class DependencyInjectionExtensions
                 services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
 
                 services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
-                services.AddTransient<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
+                services.AddTransient<IProcessInvoker, ProcessInvoker>();
                 
                 services.AddTransient<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
