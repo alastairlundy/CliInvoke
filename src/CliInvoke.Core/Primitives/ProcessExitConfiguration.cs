@@ -44,7 +44,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy and exit code zero validation.
     /// </summary>
     public static readonly ProcessExitConfiguration Default = new(ProcessTimeoutPolicy.Default,
-            ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowException);
+            ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected);
     
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy, but suppresses the Exception from cancellation.
@@ -94,7 +94,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <returns><c>true</c> if the specified object is equal to the current instance; otherwise, <c>false</c>.</returns>
     public override bool Equals(object? obj)
     {
-        if (obj is null) return false;
+        if (obj is null) 
+            return false;
 
         if (obj is ProcessExitConfiguration exitInfo)
             return Equals(exitInfo);
@@ -127,7 +128,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal using the == operator.
+    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal.
     /// </summary>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
@@ -136,7 +137,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         => Equals(left, right);
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are not equal using the != operator.
+    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are not equal.
     /// </summary>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>

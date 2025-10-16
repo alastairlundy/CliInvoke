@@ -13,7 +13,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
@@ -28,8 +27,7 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// <summary>
 /// Builder class for creating process configurations.
 /// </summary>
-[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
-public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
+public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
 {
     private readonly ProcessConfiguration _configuration;
 
@@ -41,7 +39,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     public ProcessConfigurationBuilder(string targetFilePath)
     {
         _configuration = new ProcessConfiguration(targetFilePath, false,
-            true, true);
+            false, false);
     }
     
     /// <summary>
@@ -305,23 +303,22 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
     {
-        UserCredential credential = _configuration.Credential;
-        
         IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
-            .SetDomain(credential.Domain)
-            .SetPassword(credential.Password)
-            .SetUsername(credential.UserName);
-
+            .SetDomain(_configuration.Credential.Domain)
+            .SetPassword(_configuration.Credential.Password)
+            .SetUsername(_configuration.Credential.UserName)
+            .LoadUserProfile(_configuration.Credential.LoadUserProfile ?? false);
+        
         configure(credentialBuilder);
 
         return WithUserCredential(credentialBuilder.Build());
     }
 
     /// <summary>
-    /// 
+    /// Configures whether the standard input of the process should be redirected.
     /// </summary>
-    /// <param name="redirectStandardInput"></param>
-    /// <returns></returns>
+    /// <param name="redirectStandardInput">A value indicating whether standard input redirection is enabled.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder"/> with the updated configuration.</returns>
     [Pure]
     public IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput) =>
         new ProcessConfigurationBuilder(
@@ -345,10 +342,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 useShellExecution: _configuration.UseShellExecution));
 
     /// <summary>
-    /// 
+    /// Configures whether the standard output of the process should be redirected.
     /// </summary>
-    /// <param name="redirectStandardOutput"></param>
-    /// <returns></returns>
+    /// <param name="redirectStandardOutput">A boolean value indicating whether to redirect the standard output of the process.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder"/> with the updated configuration.</returns>
     [Pure]
     public IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput) =>
         new ProcessConfigurationBuilder(
@@ -372,10 +369,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 useShellExecution: _configuration.UseShellExecution));
 
     /// <summary>
-    /// 
+    /// Configures the process to redirect the standard error stream.
     /// </summary>
-    /// <param name="redirectStandardError"></param>
-    /// <returns></returns>
+    /// <param name="redirectStandardError">Defines whether the standard error stream should be redirected.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder"/> with the updated configuration.</returns>
     [Pure]
     public IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError) =>
         new ProcessConfigurationBuilder(
@@ -589,14 +586,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     /// </summary>
     /// <param name="standardInputEncoding">The encoding scheme to use for standard input.
     /// Uses the Default Encoding if null.</param>
-    /// <param name="standardOutputEncoding">The encoding scheme to use for standard output.
-    /// Uses the Default Encoding if null.</param>
-    /// <param name="standardErrorEncoding">The encoding scheme to use for standard error.
-    /// Uses the Default Encoding if null.</param>
     /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithEncoding(Encoding? standardInputEncoding = null,
-        Encoding? standardOutputEncoding = null, Encoding? standardErrorEncoding = null)
+    public IProcessConfigurationBuilder WithStandardInputEncoding(Encoding? standardInputEncoding = null)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -612,16 +604,87 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 _configuration.StandardOutput,
                 _configuration.StandardError,
                 standardInputEncoding: standardInputEncoding ?? Encoding.Default,
+                _configuration.StandardOutputEncoding,
+                _configuration.StandardErrorEncoding,
+                processResourcePolicy: _configuration.ResourcePolicy,
+                windowCreation: _configuration.WindowCreation,
+                useShellExecution: _configuration.UseShellExecution));
+    }
+    
+    /// <summary>
+    /// Configures the process builder to use specific encoding schemes for Standard output and error streams.
+    /// </summary>
+    /// <param name="standardOutputEncoding">The encoding scheme to use for standard output.
+    /// Uses the Default Encoding if null.</param>
+    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
+    [Pure]
+    public IProcessConfigurationBuilder WithStandardOutputEncoding(Encoding? standardOutputEncoding = null)
+    {
+        return new ProcessConfigurationBuilder(
+            new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
+                _configuration.Arguments,
+                _configuration.WorkingDirectoryPath,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
+                _configuration.StandardError,
+                _configuration.StandardInputEncoding,
                 standardOutputEncoding: standardOutputEncoding ?? Encoding.Default,
+                _configuration.StandardErrorEncoding,
+                processResourcePolicy: _configuration.ResourcePolicy,
+                windowCreation: _configuration.WindowCreation,
+                useShellExecution: _configuration.UseShellExecution));
+    }
+
+        
+    /// <summary>
+    /// Configures the process builder to use specific encoding schemes for Standard Error streams.
+    /// </summary>
+    /// <param name="standardErrorEncoding">The encoding scheme to use for standard error.
+    /// Uses the Default Encoding if null.</param>
+    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
+    [Pure]
+    public IProcessConfigurationBuilder WithStandardErrorEncoding(Encoding? standardErrorEncoding = null)
+    {
+        return new ProcessConfigurationBuilder(
+            new ProcessConfiguration(_configuration.TargetFilePath,
+                _configuration.RedirectStandardInput,
+                _configuration.RedirectStandardOutput,
+                _configuration.RedirectStandardError,
+                _configuration.Arguments,
+                _configuration.WorkingDirectoryPath,
+                _configuration.RequiresAdministrator,
+                _configuration.EnvironmentVariables,
+                _configuration.Credential,
+                _configuration.StandardInput,
+                _configuration.StandardOutput,
+                _configuration.StandardError,
+                _configuration.StandardInputEncoding,
+                _configuration.StandardOutputEncoding,
                 standardErrorEncoding: standardErrorEncoding ?? Encoding.Default,
                 processResourcePolicy: _configuration.ResourcePolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution));
     }
 
+    
     /// <summary>
     /// Builds and returns a ProcessConfiguration object with the specified properties.
     /// </summary>
     /// <returns>The configured ProcessConfiguration object.</returns>
     public ProcessConfiguration Build() => _configuration;
+
+    /// <summary>
+    /// Releases all resources used by the <see cref="ProcessConfigurationBuilder"/> instance.
+    /// This includes disposing of the associated <see cref="ProcessConfiguration"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        _configuration.Dispose();
+    }
 }

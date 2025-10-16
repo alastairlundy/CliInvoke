@@ -24,20 +24,20 @@ using AlastairLundy.CliInvoke.Helpers.Processes;
 namespace AlastairLundy.CliInvoke;
 
 /// <summary>
-/// The default implementation of <see cref="IProcessConfigurationInvoker"/>, a safer way to execute processes.
+/// The default implementation of <see cref="IProcessInvoker"/>, a safer way to execute processes.
 /// </summary>
-public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
+public class ProcessInvoker : IProcessInvoker
 {
     private readonly IProcessPipeHandler _processPipeHandler;
     
     private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>  
-    /// Instantiates a <see cref="ProcessConfigurationInvoker"/> for creating and executing processes.
+    /// Instantiates a <see cref="ProcessInvoker"/> for creating and executing processes.
     /// </summary>
     /// <param name="filePathResolver">The file path resolver to be used.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
-    public ProcessConfigurationInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
+    public ProcessInvoker(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;
@@ -47,7 +47,8 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitConfiguration"></param>
+    /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -62,7 +63,8 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration,
+        ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
@@ -114,6 +116,9 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         finally
         {
             process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
     
@@ -123,7 +128,8 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitConfiguration"></param>
+    /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
@@ -138,7 +144,8 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     [UnsupportedOSPlatform("browser")]
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration,
+        ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
@@ -206,6 +213,9 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         finally
         {
             process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
     
@@ -214,7 +224,8 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     /// gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitConfiguration"></param>
+    /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
@@ -229,7 +240,8 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
     [UnsupportedOSPlatform("browser")]
     public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration,
+        ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
@@ -286,6 +298,9 @@ public class ProcessConfigurationInvoker : IProcessConfigurationInvoker
         finally
         {
             process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
 }

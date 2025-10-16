@@ -15,22 +15,7 @@ namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 internal static class IsProcessRunningExtensions
 {
-    /// <summary>
-    /// Check to see if a specified process is running or not.
-    /// </summary>
-    /// <param name="process">The process to be checked.</param>
-    /// <returns>True if the specified process is running; returns false otherwise.</returns>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
-    internal static bool IsRunning(this Process process) => 
-        DotExtensions.Processes.ProcessHasStartedOrExitedExtensions.HasStarted(process) && DotExtensions.Processes.ProcessHasStartedOrExitedExtensions.HasExited(process) == false;
-    
+   
     /// <summary>
     /// Determines whether a process exists on a remote device or locally.
     /// </summary>

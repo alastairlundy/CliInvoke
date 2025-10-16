@@ -22,7 +22,7 @@ namespace AlastairLundy.CliInvoke.Core;
 /// A Piped ProcessResult containing a Process's or Command's StandardOutput and StandardError information.
 /// </summary>
 public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>, IDisposable
-    #if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
     ,IAsyncDisposable
 #endif
 {
@@ -140,9 +140,10 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
         
         GC.SuppressFinalize(this);
     }
+    
 #if NET8_0_OR_GREATER
     /// <summary>
-    /// 
+    /// Disposes of the <see cref="StandardOutput"/> and <see cref="StandardError"/> streams asynchronously.
     /// </summary>
     public async ValueTask DisposeAsync()
     {

@@ -12,18 +12,6 @@ CliInvoke is a .NET library for interacting with Command Line Interfaces and wra
 
 Launch processes, redirect standard input and output streams, await process completion and much more.
 
-## Table of Contents
-* [Features](#features)
-* [Why CliInvoke?](#why-cliinvoke)
-* [Installing CliInvoke](#installing-cliinvoke)
-    * [Installing CliInvoke](#installing-CliInvoke)
-    * [Supported Platforms](#supported-platforms)
-* [CliInvoke Examples](#examples)
-* [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
-* [Roadmap](#cliinvokes-roadmap)
-* [License](#license)
-* [Acknowledgements](#acknowledgements)
-
 ## Features
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
 * Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
@@ -41,8 +29,7 @@ Launch processes, redirect standard input and output streams, await process comp
 | No Additional Licensing Terms Required for Use                         |     ✅     |    ❌    |                    ✅                    |
 | Uses only managed .NET code                                            |     ✅     |    ❌    |                    ✅                    |
 | Follows Separation of Concerns and the Single Responsibility Principle |     ✅     |    ❌    |                    ❌                    |
-| Allows for alternative Process Runners to be specified and/or used     |     ✅     |    ❌    |                    ❌                    |              
-
+| Allows for alternative Process Runners to be specified and/or used     |     ✅     |    ❌    |                    ❌                    |
 
 ## Installing CliInvoke
 CliInvoke is available on [the Nuget Gallery](https://nuget.org) but call be also installed via the ``dotnet`` sdk cli.
@@ -230,35 +217,10 @@ using Microsoft.Extensions.DependencyInjection;
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
 ```
 
-## How to Build CliInvoke's code
-Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
-
-## How to Contribute to CliInvoke
-Please see the [CONTRIBUTING.md file](CONTRIBUTING.md) for code and localization contributions.
-
-If you want to file a bug report or suggest a potential feature to add, please check out the [GitHub issues page](https://github.com/alastairlundy/CliInvoke/issues/) to see if a similar or identical issue is already open.
-If there isn't already a relevant issue filed, please [file one here](https://github.com/alastairlundy/CliInvoke/issues/new) and follow the respective guidance from the appropriate issue template.
-
-## CliInvoke's Roadmap
-CliInvoke aims to make working with Commands and external processes easier.
-
-Whilst an initial set of features are available in version 1, there is room for more features, and for modifications of existing features in future updates.
-
-Future updates may focus on one or more of the following:
-* Improved ease of use
-* Improved stability 
-* New features
-* Enhancing existing features
-
 ## License
 CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
 If you use CliInvoke in your project please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
-
-### CliInvoke Assets
-CliInvoke's Icon is NOT licensed under the MPL 2.0 license and is licensed under Copyright with all rights reserved to me (Alastair Lundy).
-
-If you fork CliInvoke and re-distribute it, please replace the usage of the icon unless you have prior written agreements from me. 
 
 ## Acknowledgements
 

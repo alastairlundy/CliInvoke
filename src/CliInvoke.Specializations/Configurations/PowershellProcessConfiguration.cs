@@ -12,9 +12,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Versioning;
 
 using AlastairLundy.CliInvoke.Core;
-using System.Runtime.Versioning;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -27,19 +27,19 @@ namespace AlastairLundy.CliInvoke.Specializations.Configurations;
 /// <summary>
 /// A Command configuration to make running commands through cross-platform PowerShell easier.
 /// </summary>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [UnsupportedOSPlatform("browser")]
-    [UnsupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("watchos")]
+[SupportedOSPlatform("windows")]
+[SupportedOSPlatform("macos")]
+[SupportedOSPlatform("maccatalyst")]
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("freebsd")]
+[UnsupportedOSPlatform("browser")]
+[UnsupportedOSPlatform("android")]
+[UnsupportedOSPlatform("ios")]
+[UnsupportedOSPlatform("tvos")]
+[UnsupportedOSPlatform("watchos")]
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
-    private readonly IProcessConfigurationInvoker _invoker;
+    private readonly IProcessInvoker _invoker;
 
     /// <summary>
     /// Initializes a new instance of the PowershellCommandConfiguration class.
@@ -59,35 +59,27 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="processResourcePolicy">The processor resource policy for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
-    public PowershellProcessConfiguration(IProcessConfigurationInvoker processInvoker, string arguments = null,
+    public PowershellProcessConfiguration(IProcessInvoker processInvoker, string arguments = null,
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : base("",
-        false,
-        true,
-        true,
-        arguments,
-        workingDirectoryPath,
-        requiresAdministrator,
-        environmentVariables,
+        false, true, true,
+        arguments, workingDirectoryPath,
+        requiresAdministrator, environmentVariables,
         credentials,
-        standardInput,
-        standardOutput,
-        standardError,
-        standardInputEncoding,
-        standardOutputEncoding,
-        standardErrorEncoding,
-        processResourcePolicy,
+        standardInput, standardOutput, standardError,
+        standardInputEncoding, standardOutputEncoding,
+        standardErrorEncoding, processResourcePolicy,
         windowCreation: useShellExecution,
         useShellExecution: windowCreation)
     {
         base.TargetFilePath = TargetFilePath;
         _invoker = processInvoker;
     }
-        
+
     /// <summary>
     /// The target file path of cross-platform PowerShell.
     /// </summary>
@@ -107,7 +99,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         get
         {
             string filePath = string.Empty;
-                
+
             if (OperatingSystem.IsWindows())
             {
                 filePath = $"{GetWindowsInstallLocation()}{Path.DirectorySeparatorChar}pwsh.exe";
@@ -124,8 +116,9 @@ public class PowershellProcessConfiguration : ProcessConfiguration
 
     private string GetWindowsInstallLocation()
     {
-        string programFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem == true ?
-            Environment.SpecialFolder.ProgramFiles : Environment.SpecialFolder.ProgramFilesX86);
+        string programFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem == true
+            ? Environment.SpecialFolder.ProgramFiles
+            : Environment.SpecialFolder.ProgramFilesX86);
 
         string[] directories = Directory.GetDirectories(
             $"{programFiles}{Path.DirectorySeparatorChar}Powershell");
@@ -135,19 +128,17 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             if (File.Exists($"{directory}{Path.DirectorySeparatorChar}pwsh.exe"))
                 return directory;
         }
-            
+
         throw new FileNotFoundException("Could not find Powershell installation.");
     }
 
     private string GetUnixInstallLocation()
     {
-        ProcessConfiguration configuration = new ProcessConfiguration("/usr/bin/which", 
+        ProcessConfiguration configuration = new ProcessConfiguration("/usr/bin/which",
             false, true, true,
             arguments: "pwsh");
-        
-        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(configuration);
 
-        task.Start();
+        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(configuration);
 
         task.Wait();
         return task.Result.StandardOutput;

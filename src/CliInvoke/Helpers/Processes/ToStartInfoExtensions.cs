@@ -10,6 +10,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
@@ -39,6 +40,8 @@ internal static class ToStartInfoExtensions
                                     processConfiguration.RedirectStandardInput,
             RedirectStandardOutput = redirectStandardOutput,
             RedirectStandardError = redirectStandardError,
+            StandardOutputEncoding = processConfiguration.StandardOutputEncoding,
+            StandardErrorEncoding = processConfiguration.StandardErrorEncoding,
         };
         
         if (string.IsNullOrEmpty(processConfiguration.TargetFilePath))

@@ -11,10 +11,11 @@ using System;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Extensibility;
+using AlastairLundy.CliInvoke.Core.Factories;
 using AlastairLundy.CliInvoke.Core.Piping;
 
 using AlastairLundy.CliInvoke.Extensibility;
-
+using AlastairLundy.CliInvoke.Factories;
 using AlastairLundy.CliInvoke.Piping;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AlastairLundy.CliInvoke.Extensions;
 
+/// <summary>
+/// Provides extension methods for configuring dependency injection for CliInvoke components.
+/// </summary>
 public static class DependencyInjectionExtensions
 {
     /// <summary>
@@ -42,7 +46,8 @@ public static class DependencyInjectionExtensions
                 services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
                 services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
 
-                services.AddSingleton<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
+                services.AddSingleton<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddSingleton<IProcessInvoker, ProcessInvoker>();
 
                 services.AddSingleton<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
@@ -50,7 +55,8 @@ public static class DependencyInjectionExtensions
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 
-                services.AddScoped<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
+                services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddScoped<IProcessInvoker, ProcessInvoker>();
                 
                 services.AddScoped<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;
@@ -58,7 +64,8 @@ public static class DependencyInjectionExtensions
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
                 services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
 
-                services.AddTransient<IProcessConfigurationInvoker, ProcessConfigurationInvoker>();
+                services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddTransient<IProcessInvoker, ProcessInvoker>();
                 
                 services.AddTransient<IRunnerProcessCreator, RunnerProcessCreator>();
                 break;

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Runtime.Versioning;
 
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
@@ -18,7 +19,6 @@ using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
-using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Core;
 
 // ReSharper disable UnusedMember.Global

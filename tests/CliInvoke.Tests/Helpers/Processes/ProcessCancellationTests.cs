@@ -104,7 +104,7 @@ public class ProcessCancellationTests
         int processId = process.Id;
         try
         {
-            await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
+            await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
         
             await Task.Delay(1000, TestContext.Current.CancellationToken);
             

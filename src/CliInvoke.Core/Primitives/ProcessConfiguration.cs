@@ -16,9 +16,6 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Core.Internal.Localizations;
 
-// ReSharper disable RedundantBoolCompare
-// ReSharper disable ClassNeverInstantiated.Global
-
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace AlastairLundy.CliInvoke.Core;
@@ -211,18 +208,17 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public StreamReader? StandardError { get; protected set;  }
 
     /// <summary>
-    /// 
+    /// Whether to redirect the Standard Input.
     /// </summary>
     public bool RedirectStandardInput { get; protected set; }
     
     /// <summary>
-    ///
-    /// 
+    /// Whether to redirect the Standard Output.
     /// </summary>
     public bool RedirectStandardOutput { get; protected set; }
     
     /// <summary>
-    /// 
+    /// Whether to redirect the Standard Error.
     /// </summary>
     public bool RedirectStandardError { get; protected set; }
     
@@ -353,9 +349,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public static bool operator ==(ProcessConfiguration? left, ProcessConfiguration? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
             
         return Equals(left, right);
     }
@@ -369,9 +363,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public static bool operator !=(ProcessConfiguration? left, ProcessConfiguration? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
             
         return Equals(left, right) == false;
     }
@@ -387,8 +379,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardOutput?.Dispose();
         StandardError?.Dispose();
     }
-        
-        
+    
     /// <summary>
     /// Returns a string representation of the Command configuration.
     /// </summary>

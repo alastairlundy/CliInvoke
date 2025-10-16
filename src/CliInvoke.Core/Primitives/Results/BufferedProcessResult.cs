@@ -83,10 +83,10 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         if (obj is null)
             return false;
 
-        if (obj.GetType() != typeof(BufferedProcessResult))
-            return false;
+        if (obj is BufferedProcessResult result)
+            return Equals(result);
             
-        return Equals((BufferedProcessResult)obj);
+        return false;
     }
 
     /// <summary>

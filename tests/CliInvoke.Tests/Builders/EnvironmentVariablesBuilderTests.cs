@@ -8,7 +8,7 @@ public class EnvironmentVariablesBuilderTests
     [Fact]
     public void Constructor_ShouldInstantiate()
     {
-        var builder = new EnvironmentVariablesBuilder();
+        EnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder();
         Assert.NotNull(builder);
     }
 

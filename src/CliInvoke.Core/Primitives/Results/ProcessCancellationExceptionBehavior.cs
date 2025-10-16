@@ -9,6 +9,9 @@
 
 namespace AlastairLundy.CliInvoke.Core;
 
+/// <summary>
+/// Specifies the behaviour for handling exceptions when a process cancellation occurs.
+/// </summary>
 public enum ProcessCancellationExceptionBehavior
 {
     /// <summary>

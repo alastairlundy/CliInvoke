@@ -149,8 +149,8 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
 
         if (obj is UserCredential other)
             return Equals(other);
-        else
-            return false;
+        
+        return false;
     }
 
     /// <summary>
@@ -168,20 +168,20 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     }
 
     /// <summary>
-    /// Determines if a UserCredential is equal to another UserCredential.
+    /// Determines if a <see cref="UserCredential"/> is equal to another <see cref="UserCredential"/>.
     /// </summary>
-    /// <param name="left">A UserCredential to be compared.</param>
-    /// <param name="right">The other UserCredential to be compared.</param>
-    /// <returns>True if both UserCredentials are equal to each other, false otherwise.</returns>
+    /// <param name="left">A <see cref="UserCredential"/> to be compared.</param>
+    /// <param name="right">The other <see cref="UserCredential"/> to be compared.</param>
+    /// <returns>True if both <see cref="UserCredential"/> objects are equal to each other, false otherwise.</returns>
     public static bool operator ==(UserCredential? left, UserCredential? right) 
         => Equals(left, right);
 
     /// <summary>
-    /// Determines if a UserCredential is not equal to another UserCredential.
+    /// Determines if a <see cref="UserCredential"/> is not equal to another <see cref="UserCredential"/>.
     /// </summary>
-    /// <param name="left">A UserCredential to be compared.</param>
-    /// <param name="right">The other UserCredential to be compared.</param>
-    /// <returns>True if both UserCredentials are not equal to each other; false otherwise.</returns>
+    /// <param name="left">A <see cref="UserCredential"/> to be compared.</param>
+    /// <param name="right">The other <see cref="UserCredential"/> to be compared.</param>
+    /// <returns>True if both <see cref="UserCredential"/> objects are not equal to each other; false otherwise.</returns>
     public static bool operator !=(UserCredential? left, UserCredential? right) 
         => Equals(left, right) == false;
 }

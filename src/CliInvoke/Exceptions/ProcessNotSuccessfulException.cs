@@ -19,7 +19,7 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 namespace AlastairLundy.CliInvoke.Exceptions;
 
 /// <summary>
-/// 
+/// An exception thrown if a Process is run unsuccessfully.
 /// </summary>
 public sealed class ProcessNotSuccessfulException : Exception
 {

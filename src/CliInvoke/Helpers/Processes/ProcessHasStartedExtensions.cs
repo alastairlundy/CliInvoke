@@ -15,7 +15,7 @@ using AlastairLundy.CliInvoke.Internal.Localizations;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
-internal static class ProcessHasStartedOrExitedExtensions
+internal static class ProcessHasStartedExtensions
 {
     /// <summary>
     /// Determines if a process has started.

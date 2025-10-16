@@ -19,7 +19,7 @@ public class UserCredentialBuilderTests
     [Fact]
     public void Constructor_ShouldInstantiate()
     {
-        var builder = new UserCredentialBuilder();
+        UserCredentialBuilder builder = new UserCredentialBuilder();
         Assert.NotNull(builder);
     }
 

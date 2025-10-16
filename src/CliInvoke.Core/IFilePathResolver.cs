@@ -20,12 +20,4 @@ public interface IFilePathResolver
     /// <param name="filePathToResolve">The file path to resolve.</param>
     /// <returns>The resolved file path if successful, otherwise throws a FileNotFoundException.</returns>
     string ResolveFilePath(string filePathToResolve);
-    
-    /// <summary>
-    /// Tries to resolve a file path and returns true on success, false on failure. The resolved file path is returned through the out parameter.
-    /// </summary>
-    /// <param name="filePathToResolve">The file path to resolve.</param>
-    /// <param name="resolvedFilePath">The resolved file path, or null if the operation failed.</param>
-    /// <returns>True if the resolution was successful, false otherwise.</returns>
-    bool TryResolveFilePath(string filePathToResolve, out string? resolvedFilePath);
 }

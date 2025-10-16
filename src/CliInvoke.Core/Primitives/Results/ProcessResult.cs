@@ -73,15 +73,17 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// </summary>
     public TimeSpan RuntimeDuration => ExitTime.Subtract(StartTime);
 
-    
+
     /// <summary>
-    /// 
+    /// Determines whether the specified <see cref="ProcessResult"/> instance is equal to the current instance.
     /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
+    /// <param name="other">The <see cref="ProcessResult"/> instance to compare with the current instance.</param>
+    /// <returns>
+    /// <c>True</c> if the specified <see cref="ProcessResult"/> is equal to the current instance; otherwise, <c>false</c>.
+    /// </returns>
     public bool Equals(ProcessResult? other)
     {
-        if(other is null)
+        if (other is null)
             return false;
         
         return ExitCode == other.ExitCode &&
@@ -89,15 +91,15 @@ public class ProcessResult : IEquatable<ProcessResult>
                StartTime == other.StartTime &&
                ExitTime == other.ExitTime;
     }
-    
+
     /// <summary>
-    /// 
+    /// Determines whether this ProcessResult is equal to another object.
     /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
+    /// <param name="obj">The object to compare with this ProcessResult.</param>
+    /// <returns><c>True</c> if the specified object is a ProcessResult and is equal to this instance; otherwise, <c>false</c>.</returns>
     public override bool Equals(object? obj)
     {
-        if(obj is null)
+        if (obj is null)
             return false;
         
         if(obj is ProcessResult other)
@@ -107,42 +109,48 @@ public class ProcessResult : IEquatable<ProcessResult>
     }
 
     /// <summary>
-    /// 
+    /// Returns the hash code for the current ProcessResult.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The hash code for the current ProcessResult.</returns>
     public override int GetHashCode()
     {
         return HashCode.Combine(ExitCode, ExecutedFilePath, StartTime, ExitTime);
     }
 
     /// <summary>
-    /// 
+    /// Determines whether two specified <see cref="ProcessResult"/> instances are equal.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The first <see cref="ProcessResult"/> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessResult"/> instance to compare.</param>
+    /// <returns>
+    /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are equal; otherwise, <c>false</c>.
+    /// </returns>
     public static bool Equals(ProcessResult? left, ProcessResult? right)
     {
-        if(left is null || right is null)
+        if (left is null || right is null)
             return false;
         
         return left.Equals(right);
     }
     
     /// <summary>
-    /// 
+    /// Determines whether two specified <see cref="ProcessResult"/> instances are equal.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The first <see cref="ProcessResult"/> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessResult"/> instance to compare.</param>
+    /// <returns>
+    /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are equal; otherwise, <c>false</c>.
+    /// </returns>
     public static bool operator ==(ProcessResult left, ProcessResult? right) 
         => left.Equals(right);
 
     /// <summary>
-    /// 
+    /// Determines whether two specified <see cref="ProcessResult"/> instances are not equal.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The first <see cref="ProcessResult"/> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessResult"/> instance to compare.</param>
+    /// <returns>
+    /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are not equal; otherwise, <c>false</c>.
+    /// </returns>
     public static bool operator !=(ProcessResult left, ProcessResult? right) => left.Equals(right) == false;
 }

@@ -147,8 +147,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         
         values = values.Where(x => IsValidArgument(x));
         
-        string joinedValues = string.Join(" ",
-            values);
+        string joinedValues = string.Join(" ", values);
         
         return Add(joinedValues, escapeSpecialChars);
     }
@@ -278,18 +277,12 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// Builds the arguments into a string.
     /// </summary>
     /// <returns>The arguments as a string.</returns>
-    public new string ToString()
-    {
-        return _buffer.ToString();
-    }
+    public new string ToString() => _buffer.ToString();
 
     /// <summary>
     /// Clears the provided argument strings.
     /// </summary>
-    public void Clear()
-    {
-        _buffer.Clear();
-    }
+    public void Clear() => _buffer.Clear();
 
     private bool IsValidArgument(string value)
     {
@@ -307,10 +300,6 @@ public class ArgumentsBuilder : IArgumentsBuilder
         return output;
     }
 
-    private bool IsValidArgument(IFormattable value, IFormatProvider provider)
-    {
-        string s = value.ToString(null, provider);
-
-        return IsValidArgument(s);
-    }
+    private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
+        => IsValidArgument(value.ToString(null, provider));
 }

@@ -10,7 +10,7 @@ public class DotnetCommandHelper
     
     public DotnetCommandHelper()
     {
-        IProcessConfigurationInvoker processConfigurationInvoker = CliInvokeHelpers.CreateProcessInvoker();
+        IProcessInvoker processConfigurationInvoker = CliInvokeHelpers.CreateProcessInvoker();
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
             RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
         {

@@ -22,9 +22,10 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-beta.5</Version>
-        <PackageReleaseNotes>### Changes since 2.0.0 Beta 4
-* Changed return parameter in ``IProcessPipeHandler`` interface</PackageReleaseNotes>
+        <Version>2.0.0-beta.7</Version>
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 6
+* Added ``IProcessConfigurationFactory``
+* Renamed ``IProcessConfigurationInvoker`` to ``IProcessInvoker``</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

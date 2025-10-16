@@ -12,10 +12,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
-
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
@@ -37,18 +33,37 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
         bool enablePriorityBoost = false)
     {
-        processorAffinity ??= new IntPtr(0x0001);
-
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+        if(minWorkingSet is not null)
+            if (minWorkingSet < 0)
+                throw new ArgumentOutOfRangeException(nameof(minWorkingSet));
+        
+        if (minWorkingSet is not null && maxWorkingSet is not null)
         {
-            MinWorkingSet = minWorkingSet;
-            MaxWorkingSet = maxWorkingSet;
+            if (maxWorkingSet < minWorkingSet || maxWorkingSet < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+        
+            if(minWorkingSet > maxWorkingSet)
+                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
         }
 
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        if (processorAffinity is not null)
         {
-            ProcessorAffinity = processorAffinity;
+#if NETSTANDARD2_0
+            if(processorAffinity < (nint)1)
+#else
+            if(processorAffinity < 1)
+#endif
+                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+        
+            if(processorAffinity > (nint)2 * Environment.ProcessorCount)
+                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
         }
+        
+#pragma warning disable CA1416
+        MinWorkingSet = minWorkingSet;
+        MaxWorkingSet = maxWorkingSet;
+        ProcessorAffinity = processorAffinity;
+#pragma warning restore CA1416
         
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -95,7 +110,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
-
     public nint? MaxWorkingSet { get; }
     
     /// <summary>

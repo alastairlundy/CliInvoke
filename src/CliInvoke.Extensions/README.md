@@ -3,8 +3,11 @@ This readme covers the **CliInvoke.Extensions** package. Looking for the [CliInv
 
 This package adds the ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package 
 
-[![NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
-[![NuGet](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
+<!-- Badges -->
+[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
+[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Extensions.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Extensions/)
+![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 ## Usage
 
@@ -14,10 +17,10 @@ CliInvoke.Extensions provides an extension method to make it easier to use CliIn
 The ``AddCliInvoke`` IServiceCollection extension method adds CliInvoke's and ProcessExtensions' interface-able services.
 
 The services injected includes:
-* ``IFilePathResolver``
-* ``IProcessPipeHandler``
-* ``IProcessInvoker``
-* ``IProcessFactory``
+* ``IFilePathResolver`` - Used by ``IProcessInvoker`` to resolve the file path of a ``ProcessConfiguration``'s ``TargetFilePath`` string.
+* ``IProcessPipeHandler`` - Used by ``IProcessInvoker`` to pipe Standard Input, Output, and Error Streams.
+* ``IProcessInvoker`` - Runs a process based on a ``ProcessConfiguration``
+* ``IProcessConfigurationFactory`` - Enables easy ``ProcessConfiguration`` creation.
 
 ## Why a separate package?
 There's a few different reasons:
@@ -25,15 +28,14 @@ There's a few different reasons:
 * Not everybody necessarily uses Microsoft's Dependency Injection packages.
 * Helps de-couple the Dependency Injection extension functionality from the main library
 
+## Usage Examples
+
+### Dependency Injection
+
 ## Licensing
 CliInvoke.Extensions is licensed under the MPL 2.0 license.
 
 If you use this package in your project please make an exact copy of the contents of the LICENSE.txt file available either in your third party licenses txt file or as a separate txt file.
-
-### Assets
-CliInvoke's Icon is NOT licensed under the MPL 2.0 license and are licensed under Copyright with all rights reserved to me (Alastair Lundy).
-
-If you fork CliInvoke and re-distribute it, please replace the usage of the icon unless you have prior written agreements from me.
 
 ## Acknowledgements
 This project would like to thank the following projects for their work:

@@ -15,28 +15,32 @@ namespace AlastairLundy.CliInvoke.Core;
 /// <summary>
 /// Defines a service that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
 /// </summary>
-public interface IProcessConfigurationInvoker
+public interface IProcessInvoker
 {
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The process configuration to use.</param>
-    /// <param name="processExitConfiguration">The process exit information to use.</param>
+    /// <param name="processExitConfiguration">The process exiting configuration information to use.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
     Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The process configuration to use.</param>
-    /// <param name="processExitConfiguration">The process exit information to use.</param>
+    /// <param name="processExitConfiguration">The process exiting configuration information to use.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -44,10 +48,12 @@ public interface IProcessConfigurationInvoker
     /// waits for exit, pipes the standard output and error, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitConfiguration">The process exit information to use.</param>
+    /// <param name="processExitConfiguration">The process exiting configuration information to use.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default);
 }
