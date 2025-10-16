@@ -48,6 +48,7 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -63,6 +64,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
@@ -114,6 +116,9 @@ public class ProcessInvoker : IProcessInvoker
         finally
         {
             process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
     
@@ -124,6 +129,7 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
@@ -139,6 +145,7 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
@@ -206,6 +213,9 @@ public class ProcessInvoker : IProcessInvoker
         finally
         {
             process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
     
@@ -215,6 +225,7 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
@@ -230,6 +241,7 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
@@ -286,6 +298,9 @@ public class ProcessInvoker : IProcessInvoker
         finally
         {
             process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
 }

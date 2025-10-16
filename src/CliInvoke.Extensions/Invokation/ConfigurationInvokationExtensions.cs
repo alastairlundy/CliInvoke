@@ -34,6 +34,7 @@ public static class ConfigurationInvokationExtensions
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processConfigurationInvoker">The process configuration invoker to use to execute the command.</param>
     /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
@@ -51,10 +52,12 @@ public static class ConfigurationInvokationExtensions
 #endif
     public static async Task<ProcessResult> ExecuteAsync(this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
-        ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
+        ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
+        CancellationToken cancellationToken = default)
     {
         return await processConfigurationInvoker.ExecuteAsync(processConfiguration, processExitConfiguration,
-            cancellationToken);
+           disposeOfConfig, cancellationToken);
     }
 
     /// <summary>
@@ -64,6 +67,7 @@ public static class ConfigurationInvokationExtensions
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processConfigurationInvoker">The process configuration invoker to use to execute the command.</param>
     /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
@@ -80,10 +84,12 @@ public static class ConfigurationInvokationExtensions
 #endif
     public static async Task<BufferedProcessResult> ExecuteBufferedAsync(this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
-        ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
+        ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
+        CancellationToken cancellationToken = default)
     {
         return await processConfigurationInvoker.ExecuteBufferedAsync(processConfiguration, processExitConfiguration,
-            cancellationToken);
+           disposeOfConfig, cancellationToken);
     }
 
     /// <summary>
@@ -93,6 +99,7 @@ public static class ConfigurationInvokationExtensions
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processConfigurationInvoker">The process configuration invoker to use to execute the command.</param>
     /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
+    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
@@ -109,9 +116,10 @@ public static class ConfigurationInvokationExtensions
 #endif
     public static async Task<PipedProcessResult> ExecutePipedAsync(this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
-        ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
+        ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false, CancellationToken cancellationToken = default)
     {
         return await processConfigurationInvoker.ExecutePipedAsync(processConfiguration, processExitConfiguration,
-            cancellationToken);
+           disposeOfConfig, cancellationToken);
     }
 }
