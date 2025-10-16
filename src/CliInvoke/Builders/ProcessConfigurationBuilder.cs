@@ -678,4 +678,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <returns>The configured ProcessConfiguration object.</returns>
     public ProcessConfiguration Build() => _configuration;
+
+    /// <summary>
+    /// Releases all resources used by the <see cref="ProcessConfigurationBuilder"/> instance.
+    /// This includes disposing of the associated <see cref="ProcessConfiguration"/> object.
+    /// </summary>
+    public void Dispose()
+    {
+        _configuration.Dispose();
+    }
 }
