@@ -137,10 +137,8 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         ProcessConfiguration configuration = new ProcessConfiguration("/usr/bin/which",
             false, true, true,
             arguments: "pwsh");
-        
-        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(configuration);
 
-        task.Start();
+        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(configuration);
 
         task.Wait();
         return task.Result.StandardOutput;
