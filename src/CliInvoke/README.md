@@ -56,15 +56,68 @@ The following table details which target platforms are supported for executing c
 **Note:** This library has not been tested on Android or Tizen.
 
 ## Examples
-### Quickstart
-For a simpler way to configure ``ProcessConfiguration`` objects, check out [CliInvoke.Extensions](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensions)
+
+### Simple ``ProcessConfiguration`` creation with Factory Pattern
+This approach uses the ``IProcessConfigurationFactory`` interface factory to create a ``ProcessConfiguration``. It requires fewer parameters and sets up more defaults for you. 
+
+It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is desired.
+
+#### Non-Buffered Execution Example
+This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
+
+```csharp
+using AlastairLundy.CliInvoke.Core.Factories;
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliIinvoke;
+
+using Microsoft.Extensions.DependencyInjection;
+
+// Dependency Injection setup code ommitted for clarity
+
+// Get IProcessConfigurationFactory 
+IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
+
+// Get IProcessConfigurationInvoker
+IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+
+// Simply create the process configuration.
+ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
+
+// Run the process configuration and get the results.
+ProcessResult result = await _invoker.ExecuteAsync(configuration, CancellationToken.None);
+```
+
+#### Buffered Execution Example
+This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
+
+```csharp
+using AlastairLundy.CliInvoke.Core.Factories;
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliIinvoke;
+
+using Microsoft.Extensions.DependencyInjection;
+
+// Dependency Injection setup code ommitted for clarity
+
+// Get IProcessConfigurationFactory 
+IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
+
+// Get IProcessConfigurationInvoker
+IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+
+// Simply create the process configuration.
+ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
+
+// Run the process configuration and get the results.
+BufferedProcessResult result = await _invoker.ExecuteBufferedAsync(configuration, CancellationToken.None);
+```
+
 
 ### Advanced Configuration with Builders
 
-#### ``IProcessInvoker``
 The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
 
-##### Non-Buffered Execution Example
+#### Non-Buffered Execution Example
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
@@ -74,11 +127,13 @@ using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
 
+using Microsoft.Extensions.DependencyInjection;
+
   //Namespace and class code ommitted for clarity 
 
   // ServiceProvider and Dependency Injection setup code ommitted for clarity
   
-  IProcessInvoker _processConfigInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
@@ -92,15 +147,18 @@ using AlastairLundy.CliInvoke.Core.Builders;
 ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
 ```
 
-##### Buffered Execution Example
+#### Buffered Execution Example
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
 using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Core;
-
 using AlastairLundy.CliInvoke.Builders;
+
+using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
+
+using Microsoft.Extensions.DependencyInjection;
+
 
   //Namespace and class code ommitted for clarity 
 
@@ -111,7 +169,9 @@ using AlastairLundy.CliInvoke.Core.Builders;
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
                             .WithArguments(["arg1", "arg2"])
-                            .WithWorkingDirectory("/Path/To/Directory");
+                            .WithWorkingDirectory("/Path/To/Directory")
+                            .RedirectStandardOutput(true)
+                           .RedirectStandardError(true);
   
   // Build it as a ProcessConfiguration object when you're ready to use it.
   ProcessConfiguration config = builder.Build();
