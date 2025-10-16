@@ -46,12 +46,6 @@ public class ProcessConfigurationBuilderTests
         }
 
         [Fact]
-        public void WithStartInfo_ShouldSetStartInfo()
-        {
-                // TODO: Test WithStartInfo method
-        }
-
-        [Fact]
         public void WithResourcePolicy_ShouldSetResourcePolicy()
         {
                 // TODO: Test WithResourcePolicy method
