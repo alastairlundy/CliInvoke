@@ -20,8 +20,13 @@ public class ProcessConfigurationBuilderTests
         [Fact]
         public void TestDefaultConfiguration()
         {
-                IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
-                var builtCommand = commandBuilder.Build();
+                // Arrange
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
+                
+                // Act
+                ProcessConfiguration builtCommand = processConfigBuilder.Build();
+                
+                // Assert 
                 Assert.Equal("foo", builtCommand.TargetFilePath);
                 Assert.Equal(string.Empty, builtCommand.Arguments);
                 Assert.Equal(Directory.GetCurrentDirectory(), builtCommand.WorkingDirectoryPath);
@@ -61,24 +66,24 @@ public class ProcessConfigurationBuilderTests
         [Fact]
         public void TestIncompatiblePipingOptionsThrowsException()
         {
-                IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
 
                 //Assert
                 Assert.Throws<ArgumentException>(() =>
                 {
-                        commandBuilder.WithShellExecution(true)
+                        processConfigBuilder.WithShellExecution(true)
                                 .WithStandardOutputPipe(new StreamReader(Console.OpenStandardOutput()));
                 });
                 
                 Assert.Throws<ArgumentException>(() =>
                 {
-                        commandBuilder.WithShellExecution(true)
+                        processConfigBuilder.WithShellExecution(true)
                                 .WithStandardErrorPipe(new StreamReader(Console.OpenStandardError()));
                 });
                 
                 Assert.Throws<ArgumentException>(() =>
                 {
-                        commandBuilder.WithShellExecution(true)
+                        processConfigBuilder.WithShellExecution(true)
                                 .WithStandardInputPipe(new StreamWriter(Console.OpenStandardInput()));
                 });
         }
@@ -87,13 +92,13 @@ public class ProcessConfigurationBuilderTests
         public void TestTargetFileReconfigured()
         { 
                 //Arrange
-                IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo");
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
               
                 //Act
-                commandBuilder = commandBuilder.WithTargetFile("bar");
+                processConfigBuilder = processConfigBuilder.WithTargetFile("bar");
               
                 //Assert
-                ProcessConfiguration command = commandBuilder.Build();
+                ProcessConfiguration command = processConfigBuilder.Build();
                 Assert.Equal("bar",
                         command.TargetFilePath);
         }
@@ -102,16 +107,16 @@ public class ProcessConfigurationBuilderTests
         public void TestArgumentsReplaced()
         {
                 //Arrange
-                IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
                         .WithArguments("--arg-value=value");
              
                 //Act
-                var newArguments = commandBuilder.WithArguments("--flag")
+                ProcessConfiguration newArguments = processConfigBuilder.WithArguments("--flag")
                         .Build();
              
                 //Assert
                 Assert.NotEqual(newArguments,
-                        commandBuilder.Build());
+                        processConfigBuilder.Build());
         }
 
 
@@ -127,7 +132,7 @@ public class ProcessConfigurationBuilderTests
                 password.AppendChar('3');
                 password.AppendChar('4');
                 
-                IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
                         .WithUserCredential(new UserCredential("",
                                 "admin",
                                 password,
@@ -145,10 +150,10 @@ public class ProcessConfigurationBuilderTests
                         password2,
                         false);
                 
-                commandBuilder = commandBuilder.WithUserCredential(userCredential);
+                processConfigBuilder = processConfigBuilder.WithUserCredential(userCredential);
                 
                 //Assert
-                ProcessConfiguration command = commandBuilder.Build();
+                ProcessConfiguration command = processConfigBuilder.Build();
                 Assert.Equal(userCredential,
                         command.Credential);
         }
@@ -163,7 +168,7 @@ public class ProcessConfigurationBuilderTests
         public void TestReconfiguredResourcePolicy()
         {
                 //Arrange
-                IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
                         .WithProcessResourcePolicy(ProcessResourcePolicy.Default);
                 
                 
@@ -173,10 +178,10 @@ public class ProcessConfigurationBuilderTests
                         null,
                         ProcessPriorityClass.AboveNormal);
                 
-                commandBuilder = commandBuilder.WithProcessResourcePolicy(resourcePolicy);
+                processConfigBuilder = processConfigBuilder.WithProcessResourcePolicy(resourcePolicy);
                 
                 //Assert
-                ProcessConfiguration command = commandBuilder.Build();
+                ProcessConfiguration command = processConfigBuilder.Build();
                 Assert.Equal(resourcePolicy,
                         command.ResourcePolicy);
         }
@@ -185,14 +190,14 @@ public class ProcessConfigurationBuilderTests
         public void TestReconfiguredAdminPrivileges()
         {
                 //Act
-                IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
                         .WithAdministratorPrivileges(false);
              
                 //Arrange
-                commandBuilder = commandBuilder.WithAdministratorPrivileges(true);
+                processConfigBuilder = processConfigBuilder.WithAdministratorPrivileges(true);
              
                 //Assert
-                ProcessConfiguration command = commandBuilder.Build();
+                ProcessConfiguration command = processConfigBuilder.Build();
                 Assert.True(command.RequiresAdministrator);
         }
 
@@ -200,14 +205,14 @@ public class ProcessConfigurationBuilderTests
         public void TestReconfiguredWorkingDirectory()
         {
                 //Act
-                IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder("foo")
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
                         .WithWorkingDirectory("dir");
                 
                 //Arrange
-                commandBuilder = commandBuilder.WithWorkingDirectory("dir2");
+                processConfigBuilder = processConfigBuilder.WithWorkingDirectory("dir2");
                 
                 //Assert
-                ProcessConfiguration command = commandBuilder.Build();
+                ProcessConfiguration command = processConfigBuilder.Build();
                 Assert.Equal("dir2",
                         command.WorkingDirectoryPath);
         }
