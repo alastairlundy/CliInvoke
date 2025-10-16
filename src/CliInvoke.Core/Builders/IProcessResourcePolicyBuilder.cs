@@ -33,6 +33,12 @@ public interface IProcessResourcePolicyBuilder
     /// </summary>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("linux")]
+    [UnsupportedOSPlatform("android")]
     IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet);
 
     /// <summary>
@@ -40,6 +46,12 @@ public interface IProcessResourcePolicyBuilder
     /// </summary>
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("linux")]
+    [UnsupportedOSPlatform("android")]
     IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet);
 
     /// <summary>
