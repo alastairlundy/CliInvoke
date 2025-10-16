@@ -237,9 +237,7 @@ Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to b
 Please see the [CONTRIBUTING.md file](CONTRIBUTING.md) for code and localization contributions.
 
 If you want to file a bug report or suggest a potential feature to add, please check out the [GitHub issues page](https://github.com/alastairlundy/CliInvoke/issues/) to see if a similar or identical issue is already open.
-If there is not already a relevant issue filed, please [file one here](https://github.com/alastairlundy/CliInvoke/issues/new) and follow the respective guidance from the appropriate issue template.
-
-Thanks.
+If there isn't already a relevant issue filed, please [file one here](https://github.com/alastairlundy/CliInvoke/issues/new) and follow the respective guidance from the appropriate issue template.
 
 ## CliInvoke's Roadmap
 CliInvoke aims to make working with Commands and external processes easier.

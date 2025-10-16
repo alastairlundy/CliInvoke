@@ -31,6 +31,43 @@ Launch processes, redirect standard input and output streams, await process comp
 | Follows Separation of Concerns and the Single Responsibility Principle |     ✅     |    ❌    |                    ❌                    |
 | Allows for alternative Process Runners to be specified and/or used     |     ✅     |    ❌    |                    ❌                    |
 
+## Installing CliInvoke
+CliInvoke is available on [the Nuget Gallery](https://nuget.org) but call be also installed via the ``dotnet`` sdk cli.
+
+The package(s) to install depends on your use case:
+* For use in a .NET library - Install the [Abstractions Package](#abstractions-package), your developer users can install the Implementation and Dependency Injection packages.
+* For use in a .NET app - Install the [Implementation Package](#implementation-package) and the [Dependency Injection Extensions Package](#dependency-injection-extensions)
+
+### Abstractions Package
+[CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core)
+
+```bash
+dotnet add package AlastairLundy.CliInvoke.Core
+```
+
+### Implementation Package
+
+[CliInvoke Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke)
+
+```bash
+dotnet add package AlastairLundy.CliInvoke
+```
+
+### Extensions Package
+
+[CliInvoke.Extensions Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensions)
+
+```bash
+dotnet add package AlastairLundy.CliInvoke.Extensions
+```
+
+### Specializations Package
+[CliInvoke.Specializations Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations)
+
+```bash
+dotnet add package AlastairLundy.CliInvoke.Specializations
+```
+
 ## Supported Platforms
 CliInvoke can currently be added to .NET Standard 2.0, .NET 8, or .NET 9 or newer supported projects.
 
@@ -179,19 +216,6 @@ using Microsoft.Extensions.DependencyInjection;
   // Execute the process through ProcessInvoker and get the results.
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
 ```
-
-## How to Build CliInvoke's code
-Please see [building-cliinvoke.md](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
-
-## How to Contribute to CliInvoke
-Thank you in advance for considering contributing to CliInvoke.
-
-Please see the [CONTRIBUTING.md file](https://github.com/alastairlundy/CliInvoke/blob/main/CONTRIBUTING.md) for code and localization contributions.
-
-If you want to file a bug report or suggest a potential feature to add, please check out the [GitHub issues page](https://github.com/alastairlundy/CliInvoke/issues/) to see if a similar or identical issue is already open.
-If there is not already a relevant issue filed, please [file one here](https://github.com/alastairlundy/CliInvoke/issues/new) and follow the respective guidance from the appropriate issue template.
-
-Thanks.
 
 ## License
 CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
