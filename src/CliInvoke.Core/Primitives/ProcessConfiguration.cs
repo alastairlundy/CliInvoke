@@ -349,9 +349,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public static bool operator ==(ProcessConfiguration? left, ProcessConfiguration? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
             
         return Equals(left, right);
     }
@@ -365,9 +363,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public static bool operator !=(ProcessConfiguration? left, ProcessConfiguration? right)
     {
         if (left is null || right is null)
-        {
             return false;
-        }
             
         return Equals(left, right) == false;
     }
