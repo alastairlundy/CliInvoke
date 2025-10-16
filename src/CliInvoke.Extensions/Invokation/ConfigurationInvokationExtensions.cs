@@ -22,7 +22,8 @@ using AlastairLundy.CliInvoke.Exceptions;
 namespace AlastairLundy.CliInvoke.Extensions.Invokation;
 
 /// <summary>
-/// 
+/// Provides extension methods for executing process configurations using various execution models,
+/// such as standard, buffered, or piped processing.
 /// </summary>
 public static class ConfigurationInvokationExtensions
 {

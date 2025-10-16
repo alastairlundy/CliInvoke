@@ -12,7 +12,7 @@ using System.Threading;
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
-/// 
+/// Specifies the mode for handling process cancellation.
 /// </summary>
 public enum ProcessCancellationMode
 {

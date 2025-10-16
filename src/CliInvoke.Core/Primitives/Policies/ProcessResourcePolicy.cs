@@ -110,7 +110,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
-
     public nint? MaxWorkingSet { get; }
     
     /// <summary>

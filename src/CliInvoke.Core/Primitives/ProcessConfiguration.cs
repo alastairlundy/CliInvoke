@@ -383,8 +383,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardOutput?.Dispose();
         StandardError?.Dispose();
     }
-        
-        
+    
     /// <summary>
     /// Returns a string representation of the Command configuration.
     /// </summary>

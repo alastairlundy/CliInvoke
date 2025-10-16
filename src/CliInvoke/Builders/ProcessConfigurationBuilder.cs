@@ -27,7 +27,7 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// <summary>
 /// Builder class for creating process configurations.
 /// </summary>
-public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
+public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
 {
     private readonly ProcessConfiguration _configuration;
 
@@ -315,10 +315,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
     }
 
     /// <summary>
-    /// 
+    /// Configures whether the standard input of the process should be redirected.
     /// </summary>
-    /// <param name="redirectStandardInput"></param>
-    /// <returns></returns>
+    /// <param name="redirectStandardInput">A value indicating whether standard input redirection is enabled.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder"/> with the updated configuration.</returns>
     [Pure]
     public IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput) =>
         new ProcessConfigurationBuilder(
@@ -342,10 +342,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 useShellExecution: _configuration.UseShellExecution));
 
     /// <summary>
-    /// 
+    /// Configures whether the standard output of the process should be redirected.
     /// </summary>
-    /// <param name="redirectStandardOutput"></param>
-    /// <returns></returns>
+    /// <param name="redirectStandardOutput">A boolean value indicating whether to redirect the standard output of the process.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder"/> with the updated configuration.</returns>
     [Pure]
     public IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput) =>
         new ProcessConfigurationBuilder(
@@ -369,10 +369,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder
                 useShellExecution: _configuration.UseShellExecution));
 
     /// <summary>
-    /// 
+    /// Configures the process to redirect the standard error stream.
     /// </summary>
-    /// <param name="redirectStandardError">Whether to redirect Standard Error.</param>
-    /// <returns></returns>
+    /// <param name="redirectStandardError">Defines whether the standard error stream should be redirected.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder"/> with the updated configuration.</returns>
     [Pure]
     public IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError) =>
         new ProcessConfigurationBuilder(

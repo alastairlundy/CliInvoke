@@ -32,7 +32,7 @@ public interface IProcessInvoker
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The process configuration to use.</param>
-    /// <param name="processExitConfiguration">The process exit information to use.</param>
+    /// <param name="processExitConfiguration">The process exiting configuration information to use.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
@@ -44,7 +44,7 @@ public interface IProcessInvoker
     /// waits for exit, pipes the standard output and error, and safely disposes of the Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitConfiguration">The process exit information to use.</param>
+    /// <param name="processExitConfiguration">The process exiting configuration information to use.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,

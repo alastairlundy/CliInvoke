@@ -128,7 +128,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal using the == operator.
+    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal.
     /// </summary>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
@@ -137,7 +137,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         => Equals(left, right);
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are not equal using the != operator.
+    /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are not equal.
     /// </summary>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>

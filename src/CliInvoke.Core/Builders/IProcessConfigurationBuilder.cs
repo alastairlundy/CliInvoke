@@ -82,28 +82,28 @@ public interface IProcessConfigurationBuilder
     /// <param name="configure">The CredentialsBuilder configuration.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Credentials.</returns>
     IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure);
-    
+
     /// <summary>
-    /// 
+    /// Configures whether the standard input of the process should be redirected.
     /// </summary>
-    /// <param name="redirectStandardInput"></param>
-    /// <returns></returns>
+    /// <param name="redirectStandardInput">A value that specifies whether the standard input of the process should be redirected.</param>
+    /// <returns>The updated IProcessConfigurationBuilder instance with the configured standard input redirection setting.</returns>
     IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput);
-    
+
     /// <summary>
-    /// 
+    /// Configures whether the standard output of the process should be redirected.
     /// </summary>
-    /// <param name="redirectStandardOutput"></param>
-    /// <returns></returns>
+    /// <param name="redirectStandardOutput">A boolean value indicating whether to redirect the standard output.</param>
+    /// <returns>The updated IProcessConfigurationBuilder object with the specified standard output redirection setting.</returns>
     IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput);
-    
+
     /// <summary>
-    /// 
+    /// Configures whether to redirect the standard error stream of the process.
     /// </summary>
-    /// <param name="redirectStandardError"></param>
-    /// <returns></returns>
+    /// <param name="redirectStandardError">A boolean value indicating whether the standard error stream should be redirected.</param>
+    /// <returns>The updated IProcessConfigurationBuilder object with the specified standard error redirection setting.</returns>
     IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError);
-    
+
     /// <summary>
     /// Sets the Standard Input Pipe source.
     /// </summary>

@@ -26,6 +26,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AlastairLundy.CliInvoke.Extensions;
 
+/// <summary>
+/// Provides extension methods for configuring dependency injection for CliInvoke components.
+/// </summary>
 public static class DependencyInjectionExtensions
 {
     /// <summary>
