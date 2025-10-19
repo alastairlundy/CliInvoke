@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.DotExtensions.Collections.Dictionaries;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 // ReSharper disable RedundantExplicitArrayCreation
@@ -28,21 +27,25 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// </summary>
 public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
 {
+    private readonly bool _throwExceptionIfDuplicateKeyFound;
     private readonly Dictionary<string, string> _environmentVariables;
 
     /// <summary>
     /// Initializes a new instance of the EnvironmentVariablesBuilder class.
     /// </summary>
-    public EnvironmentVariablesBuilder()
+    /// <param name="throwExceptionIfDuplicateKeyFound">Whether to throw an exception if a duplicate key is found or suppress the exception and override the previous value.</param>
+    public EnvironmentVariablesBuilder(bool throwExceptionIfDuplicateKeyFound = true)
     {
-      _environmentVariables  = new Dictionary<string, string>(StringComparer.Ordinal);
+        _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
+        _environmentVariables  = new Dictionary<string, string>(StringComparer.Ordinal);
     }
-        
+
     /// <summary>
     /// Initializes a new instance of the EnvironmentVariablesBuilder class.
     /// </summary>
     /// <param name="vars">The initial environment variables to use.</param>
-    protected EnvironmentVariablesBuilder(IDictionary<string, string> vars)
+    /// <param name="throwExceptionIfDuplicateKeyFound"></param>
+    protected EnvironmentVariablesBuilder(IDictionary<string, string> vars, bool throwExceptionIfDuplicateKeyFound)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(nameof(vars));
@@ -50,6 +53,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         
         _environmentVariables = new Dictionary<string, string>(vars,
             StringComparer.Ordinal);
+        _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
     }
         
     /// <summary>
@@ -64,7 +68,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
             StringComparer.Ordinal) { { name, value } };
 
-        return new EnvironmentVariablesBuilder(output);
+        return new EnvironmentVariablesBuilder(output, _throwExceptionIfDuplicateKeyFound);
     }
 
     protected IEnvironmentVariablesBuilder SetInternal(IEnumerable<KeyValuePair<string, string>> variables)
@@ -76,11 +80,24 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
             StringComparer.Ordinal);
         
-        output.TryAddRange(variables);
+        foreach (KeyValuePair<string, string> pair in variables)
+        {
+            if (_throwExceptionIfDuplicateKeyFound)
+            {
+                output.Add(pair.Key, pair.Value);
+            }
+            else
+            {
+                bool result = output.TryAdd(pair.Key, pair.Value);
+
+                if (result == false)
+                    output[pair.Key] = pair.Value;
+            }
+        }
         
-        return new EnvironmentVariablesBuilder(output);
+        return new EnvironmentVariablesBuilder(output, _throwExceptionIfDuplicateKeyFound);
     }
-    
+
     /// <summary>
     /// Sets multiple environment variables.
     /// </summary>
