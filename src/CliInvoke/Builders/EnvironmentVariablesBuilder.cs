@@ -63,7 +63,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <param name="value">The value of the environment variable to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     [Pure]
-    public IEnvironmentVariablesBuilder Set(string name, string value)
+    public IEnvironmentVariablesBuilder SetPair(string name, string value)
     {
         Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
             StringComparer.Ordinal) { { name, value } };
@@ -104,7 +104,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <param name="variables">The environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     [Pure]
-    public IEnvironmentVariablesBuilder Set(IEnumerable<KeyValuePair<string, string>> variables)
+    public IEnvironmentVariablesBuilder SetEnumerable(IEnumerable<KeyValuePair<string, string>> variables)
         => SetInternal(variables);
 
     /// <summary>
@@ -113,7 +113,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <param name="variables">The dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     [Pure]
-    public IEnvironmentVariablesBuilder Set(IDictionary<string, string> variables)
+    public IEnvironmentVariablesBuilder SetDictionary(IDictionary<string, string> variables)
         => SetInternal(variables);
 
     /// <summary>
@@ -122,7 +122,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <param name="variables">The read-only dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     [Pure]
-    public IEnvironmentVariablesBuilder Set(IReadOnlyDictionary<string, string> variables)
+    public IEnvironmentVariablesBuilder SetReadOnlyDictionary(IReadOnlyDictionary<string, string> variables)
         =>  SetInternal(variables);
 
     /// <summary>

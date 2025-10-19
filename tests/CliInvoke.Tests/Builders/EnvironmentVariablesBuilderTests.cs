@@ -28,7 +28,7 @@ public class EnvironmentVariablesBuilderTests
 
         // Act
         IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
-            .Set(key, value);
+            .SetPair(key, value);
 
         IReadOnlyDictionary<string, string> variables = builder.Build();
         
@@ -54,7 +54,7 @@ public class EnvironmentVariablesBuilderTests
         
        // Act
        IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
-           .Set(list);
+           .SetEnumerable(list);
        
        IReadOnlyDictionary<string, string> variables = builder.Build();
        
@@ -63,5 +63,32 @@ public class EnvironmentVariablesBuilderTests
        {
            Assert.Equal(pair.Value, variables[pair.Key]);
        }
+    }
+
+    public void Set_Dictionary_Success()
+    {
+        int number = _faker.Random.Int(1, 20);
+
+        Dictionary<string, string> dictionary = new();
+
+        while (dictionary.Count < number)
+        {
+            string key = _faker.Database.Column();
+            string value = _faker.Random.Word();
+            
+            dictionary.TryAdd(key, value);
+        }
+        
+        // Act
+        IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
+            .SetDictionary(dictionary);
+       
+        IReadOnlyDictionary<string, string> variables = builder.Build();
+       
+        // Assert
+        foreach (KeyValuePair<string, string> pair in dictionary)
+        {
+            Assert.Equal(pair.Value, variables[pair.Key]);
+        }
     }
 }
