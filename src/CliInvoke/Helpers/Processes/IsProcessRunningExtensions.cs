@@ -44,7 +44,7 @@ internal static class IsProcessRunningExtensions
             
             return hasExited;
         }
-        catch (NotSupportedException exception)
+        catch (NotSupportedException)
         {
             return true;
         }
