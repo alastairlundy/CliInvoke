@@ -65,8 +65,19 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     [Pure]
     public IEnvironmentVariablesBuilder SetPair(string name, string value)
     {
-        Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
-            StringComparer.Ordinal) { { name, value } };
+        Dictionary<string, string> output = new(_environmentVariables);
+
+        if (_throwExceptionIfDuplicateKeyFound)
+        {
+            output.Add(name, value);
+        }
+        else
+        {
+           bool result = output.TryAdd(name, value);
+
+           if (result == false)
+               output[name] = value;
+        }
 
         return new EnvironmentVariablesBuilder(output, _throwExceptionIfDuplicateKeyFound);
     }
