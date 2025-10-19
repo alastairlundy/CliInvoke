@@ -24,6 +24,9 @@ using AlastairLundy.CliInvoke.Core;
 
 namespace AlastairLundy.CliInvoke.Builders;
 
+#pragma warning disable CA1416
+
+
 /// <summary>
 /// Builder class for creating process configurations.
 /// </summary>
@@ -74,7 +77,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments, bool escapeArguments)
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(nameof(arguments));
+        ArgumentNullException.ThrowIfNull(arguments, nameof(arguments));
 #endif
         
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
@@ -171,7 +174,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public IProcessConfigurationBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(nameof(environmentVariables));
+        ArgumentNullException.ThrowIfNull(environmentVariables, nameof(environmentVariables));
 #endif
         
         return new ProcessConfigurationBuilder(
@@ -688,3 +691,4 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         _configuration.Dispose();
     }
 }
+#pragma warning restore CA1416
