@@ -27,32 +27,49 @@ namespace AlastairLundy.CliInvoke.Builders;
 /// </summary>
 public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
 {
+    private readonly StringComparer _stringComparer;
     private readonly bool _throwExceptionIfDuplicateKeyFound;
     private readonly Dictionary<string, string> _environmentVariables;
+    
 
     /// <summary>
-    /// Initializes a new instance of the EnvironmentVariablesBuilder class.
+    /// Initializes a new instance of the <see cref="EnvironmentVariablesBuilder"/> class.
     /// </summary>
     /// <param name="throwExceptionIfDuplicateKeyFound">Whether to throw an exception if a duplicate key is found or suppress the exception and override the previous value.</param>
     public EnvironmentVariablesBuilder(bool throwExceptionIfDuplicateKeyFound = true)
     {
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
-        _environmentVariables  = new Dictionary<string, string>(StringComparer.Ordinal);
+        _stringComparer = StringComparer.Ordinal;
+        _environmentVariables  = new Dictionary<string, string>(_stringComparer);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EnvironmentVariablesBuilder"/> class.
+    /// </summary>
+    /// <param name="stringComparer"></param>
+    /// <param name="throwExceptionIfDuplicateKeyFound">Whether to throw an exception if a duplicate key is found or suppress the exception and override the previous value.</param>
+    public EnvironmentVariablesBuilder(StringComparer stringComparer, bool throwExceptionIfDuplicateKeyFound = true)
+    {
+        _stringComparer = stringComparer;
+        _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
+        _environmentVariables  = new Dictionary<string, string>(_stringComparer);
     }
 
     /// <summary>
     /// Initializes a new instance of the EnvironmentVariablesBuilder class.
     /// </summary>
     /// <param name="vars">The initial environment variables to use.</param>
+    /// <param name="stringComparer">The string comparer to use.</param>
     /// <param name="throwExceptionIfDuplicateKeyFound"></param>
-    protected EnvironmentVariablesBuilder(IDictionary<string, string> vars, bool throwExceptionIfDuplicateKeyFound)
+    protected EnvironmentVariablesBuilder(IDictionary<string, string> vars, StringComparer stringComparer, bool throwExceptionIfDuplicateKeyFound)
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(nameof(vars));
+        ArgumentNullException.ThrowIfNull(vars, nameof(vars));
 #endif
         
         _environmentVariables = new Dictionary<string, string>(vars,
-            StringComparer.Ordinal);
+            _stringComparer);
+        _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
     }
         
@@ -79,7 +96,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
                output[name] = value;
         }
 
-        return new EnvironmentVariablesBuilder(output, _throwExceptionIfDuplicateKeyFound);
+        return new EnvironmentVariablesBuilder(output,_stringComparer, _throwExceptionIfDuplicateKeyFound);
     }
 
     protected IEnvironmentVariablesBuilder SetInternal(IEnumerable<KeyValuePair<string, string>> variables)
@@ -106,7 +123,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
             }
         }
         
-        return new EnvironmentVariablesBuilder(output, _throwExceptionIfDuplicateKeyFound);
+        return new EnvironmentVariablesBuilder(output, _stringComparer, _throwExceptionIfDuplicateKeyFound);
     }
 
     /// <summary>
