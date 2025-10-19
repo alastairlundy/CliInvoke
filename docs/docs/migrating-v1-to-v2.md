@@ -1,43 +1,46 @@
-# Migrating CliInvoke v1 to v2
+# CliInvoke v1 to v2 Migration Guide.
 
 CliInvoke v2 contains a number of breaking changes from CliInvoke v1. This document aims to detail alternatives to removed interfaces and classes.
 
-## Invokers
+## v2 Overview
+CliInvoke version 2, hereafter v2, is a redesign of CliInvoke that vastly simplifies the API surface, improves the ergonomic experience of using CliInvoke, and adds support for Process Exit Configuration and additional features.
 
-### ``IProcessFactory`` and ``ProcessFactory``
+Explicit support for .NET Standard 2.1 has been removed and is now provided through .NET Standard 2.0 Support
 
-``IProcessFactory`` and ``ProcessFactory`` have been removed in v2.
+### Supported Target Frameworks
+CliInvoke v2 supports the following target frameworks:
+* .NET Standard 2.0
+* .NET 8
+* .NET 9
+* .NET 10 (temporarily via .NET 9 TFM prior to .NET 10 GA)
 
-They have been removed due to exposing behaviour and functionality that is antithetical to the goals of CliInvoke. Safe process running and avoiding the pitfalls of the ``Process`` class are easily done with other invokers but ``IProcessFactory``'s interface methods made it easier to run into some of these pitfalls.
+## Breaking Changes Summary
 
-The new ``IProcessInvoker`` in v2 should be used instead.
+* [Removals](#removals)
+* [Method Signature Changes](#method-signature-changes)
 
-#### Non Buffered Process Execution
+### Removals
 
+#### ``IProcessFactory`` and ``ProcessFactory``
+**Rationale**:  Removed due to exposing behaviour and functionality that is antithetical to the goals of CliInvoke. Safe process running and avoiding the pitfalls of the ``Process`` class are easily done with other invokers and ``IProcessFactory``'s interface methods made it easier to run into some of these pitfalls.
 
-#### Buffered Process Execution
+**Replacement**: 
+* ``IProcessConfigurationFactory`` and ``ProcessConfigurationFactory`` for simple ``ProcessConfiguration`` creation.
+* ``IProcessInvoker`` and ``ProcessInvoker`` for running ``ProcessConfiguration`` objects.
 
+#### ``ICliCommandInvoker`` and ``CliCommandInvoker``
+**Rationale**: 
 
-### Original ``IProcessInvoker`` and ``ProcessInvoker``
-
-What was originally called ``IProcessInvoker`` in v1 has been effectively split into 2 new interfaces and their respective classes, ``IProcessInvoker`` and ``IProcessConfigurationInvoker``.
-
-The new ``IProcessInvoker`` deals with ``ProcessStartInfo`` whilst ``IProcessConfigurationInvoker`` deals with ``ProcessConfiguration``.
-
-Which interface (and class) to use depends on whether you want to use CliInvoke's primitives or use ``ProcessStartInfo`` for configuring Processes.
-
-| | ``IProcessInvoker`` | ``IProcessConfigurationInvoker`` |
-|-|-|-|
-| Process Configuration Primitive | ``ProcessStartInfo`` | ``ProcessConfiguration`` |
-| Process Standard Input Redirection |  ``StreamWriter?`` | ``StreamWriter? StandardInput`` in ``ProcessConfiguration`` |
-| Process Standard Output and Error Redirection | Supports retrieving them with ``ExecuteBufferedAsync`` and ``ExecutePipedAsync`` methods only. | Can be read to ``StreamReader? StandardOutput`` and ``StreamReader? StandardError`` in ``ProcessConfiguration`` regardless of method choice. Also supports retrieving them with ``ExecuteBufferedAsync`` and ``ExecutePipedAsync`` methods.  | 
-| Process Resource Primitives | ``ProcessResourcePolicy`` | ``ProcessResourcePolicy?`` in ``ProcessConfiguration`` |
-| Process Timeout Primitives | | |
-
-
-### ``ICliCommandInvoker`` and ``CliCommandInvoker``
+**Replacement**: 
+* ``IProcessInvoker`` and ``ProcessInvoker``
 
 
-## Primitives
+####  ``CliCommandConfiguration``
 
-### ``CliCommandConfiguration``
+**Rationale**: 
+
+**Replacement**:
+
+### Method Signature Changes
+
+## Detailed Migration Steps
