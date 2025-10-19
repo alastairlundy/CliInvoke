@@ -82,7 +82,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters)
     {
-        if (IsValidArgument(value) != true)
+        if (IsValidArgument(value) == false)
         {
             return this;
         }
