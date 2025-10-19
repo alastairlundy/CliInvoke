@@ -47,6 +47,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(nameof(vars));
 #endif
+        
         _environmentVariables = new Dictionary<string, string>(vars,
             StringComparer.Ordinal);
     }
@@ -74,7 +75,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         
         Dictionary<string, string> output = new Dictionary<string, string>(_environmentVariables,
             StringComparer.Ordinal);
-        output.AddRange(variables);
+        
+        output.TryAddRange(variables);
         
         return new EnvironmentVariablesBuilder(output);
     }
