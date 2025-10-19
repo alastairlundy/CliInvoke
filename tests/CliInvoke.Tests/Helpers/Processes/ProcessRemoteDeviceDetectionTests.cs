@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Tests.Internal.Constants;
-using AlastairLundy.DotExtensions.Processes;
 
 using Xunit;
 
