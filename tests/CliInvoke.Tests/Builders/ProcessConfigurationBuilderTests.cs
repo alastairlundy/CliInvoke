@@ -21,7 +21,8 @@ public class ProcessConfigurationBuilderTests
         public void TestDefaultConfiguration()
         {
                 // Arrange
-                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
+                IProcessConfigurationBuilder processConfigBuilder = new
+                        ProcessConfigurationBuilder("foo");
                 
                 // Act
                 ProcessConfiguration builtCommand = processConfigBuilder.Build();
@@ -60,7 +61,8 @@ public class ProcessConfigurationBuilderTests
         [Fact]
         public void TestIncompatiblePipingOptionsThrowsException()
         {
-                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
+                IProcessConfigurationBuilder processConfigBuilder =
+                        new ProcessConfigurationBuilder("foo");
 
                 //Assert
                 Assert.Throws<ArgumentException>(() =>
