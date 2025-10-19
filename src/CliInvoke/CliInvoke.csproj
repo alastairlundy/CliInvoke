@@ -18,7 +18,8 @@
 * Clarified OS support for ``IProcessResourcePolicyBuilder`` methods
 * Updated DotExtensions from 8.6.2 to 9.0.0 Preview 1
 * Updated EnvironmentVariablesBuilder to allow enabling/disabling exceptions if duplicate keys are attempted to be added.
-* Renamed ``IEnvironmentVariablesBuilder`` methods to avoid ambiguous method usage</PackageReleaseNotes>
+* Renamed ``IEnvironmentVariablesBuilder`` methods to avoid ambiguous method usage
+* Fixed potential no-op issues with ArgumentNullException in ``EnvironmentVariablesBuilder``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
