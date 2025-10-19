@@ -40,31 +40,26 @@ public class EnvironmentVariablesBuilderTests
     public void Set_KeyValuePairs_Sequence_Success()
     {
         int number = _faker.Random.Int(1, 20);
-        HashSet<string> keys = new HashSet<string>();
+        List<KeyValuePair<string, string>> list = new();
 
-        while (keys.Count < number)
+        while (list.Count < number)
         {
-            keys.Add(_faker.Random.Word().ToLower());
+            string key = _faker.Database.Column();
+            string value = _faker.Random.Word();
+            
+            list.Add(new KeyValuePair<string, string>(key, value));
         }
         
-        List<string> vals = _faker.Make(number + 50, x =>  _faker.Random.Word())
-            .Distinct(StringComparer.InvariantCultureIgnoreCase)
-            .Take(number)
-            .ToList();
-
-        List<KeyValuePair<string, string>> keyValPairs = (from k in keys
-            from v in vals
-            select new KeyValuePair<string, string>(k, v))
-            .ToList();
-       
+        list = list.DistinctBy(x => x.Key).ToList();
+        
        // Act
        IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
-           .Set(keyValPairs);
+           .Set(list);
        
        IReadOnlyDictionary<string, string> variables = builder.Build();
        
        // Assert
-       foreach (KeyValuePair<string, string> pair in keyValPairs)
+       foreach (KeyValuePair<string, string> pair in list)
        {
            Assert.Equal(pair.Value, variables[pair.Key]);
        }
