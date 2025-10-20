@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
-        <LangVersion>13</LangVersion>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
+        <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>AlastairLundy.CliInvoke.Core</AssemblyName>
         <RootNamespace>AlastairLundy.CliInvoke.Core</RootNamespace>
@@ -30,7 +30,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.0.0-beta.22" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
     </ItemGroup>
 

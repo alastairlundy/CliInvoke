@@ -13,8 +13,8 @@ using System.Diagnostics.Contracts;
 
 using AlastairLundy.CliInvoke.Core.Builders;
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Core;
 
+using AlastairLundy.CliInvoke.Core;
 
 namespace AlastairLundy.CliInvoke.Builders;
 

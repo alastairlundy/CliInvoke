@@ -9,8 +9,9 @@
 
 using System;
 using System.IO;
+#if NET8_0_OR_GREATER
 using System.Threading.Tasks;
-
+#endif
 // ReSharper disable RedundantBoolCompare
 
 // ReSharper disable MemberCanBePrivate.Global

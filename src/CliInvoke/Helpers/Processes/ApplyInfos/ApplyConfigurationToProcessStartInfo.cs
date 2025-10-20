@@ -11,12 +11,7 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 
 using AlastairLundy.CliInvoke.Core;
-
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#else
 using System;
-#endif
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
