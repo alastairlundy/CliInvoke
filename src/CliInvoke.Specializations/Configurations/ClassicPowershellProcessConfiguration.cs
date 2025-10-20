@@ -17,10 +17,6 @@ using System.Text;
 
 using AlastairLundy.CliInvoke.Core;
 
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
-
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;

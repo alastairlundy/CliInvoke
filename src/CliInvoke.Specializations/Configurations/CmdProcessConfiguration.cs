@@ -13,10 +13,6 @@ using System.IO;
 using System.Text;
 using System.Runtime.Versioning;
 
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
-
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
 using AlastairLundy.CliInvoke.Core;
