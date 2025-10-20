@@ -309,6 +309,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             
         hashCode.Add(TargetFilePath);
         hashCode.Add(Arguments);
+        hashCode.Add(WorkingDirectoryPath);
         hashCode.Add(EnvironmentVariables);
 
         hashCode.Add(Credential);
