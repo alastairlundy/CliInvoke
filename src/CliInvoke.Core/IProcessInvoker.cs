@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
-/// Defines a service that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
+/// Defines an interface that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
 /// </summary>
 public interface IProcessInvoker
 {
