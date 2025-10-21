@@ -8,16 +8,14 @@
  */
 
 using System.IO;
-
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
-
 using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Extensibility;
+namespace AlastairLundy.CliInvoke.Extensibility.Factories;
 
 /// <summary>
 /// A class to allow creating a ProcessConfiguration that can be run through other Process' ProcessConfiguration.
