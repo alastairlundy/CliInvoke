@@ -20,7 +20,9 @@ namespace AlastairLundy.CliInvoke.Core.Extensibility;
 /// <summary>
 /// An abstract invoker class that runs other Process Configurations through its own Process.
 /// </summary>
-public abstract class RunnerProcessInvoker : IProcessInvoker, IDisposable
+/// <remarks>Users should implement this abstract class when exposing an invoker that is easier to set up with Dependency Injection is desired
+/// </remarks>
+public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
 {
     private readonly IProcessInvoker _processInvoker;
     private readonly IRunnerProcessFactory _runnerProcessFactory;
@@ -36,14 +38,14 @@ public abstract class RunnerProcessInvoker : IProcessInvoker, IDisposable
     /// to invoke other processes with a variety of configurations.
     /// </summary>
     /// <remarks>
-    /// This class provides methods to execute processes in standard, buffered, or piped modes, allowing for extensibility
-    /// and customization through specialized implementations.
+    /// Note to Implementers: Implementing classes don't need to publicly require users to provide their own <paramref name="runnerProcessConfiguration"/> if the class
+    /// provides a <see cref="ProcessConfiguration"/> for the runner process configuration.
     /// </remarks>
     /// <param name="processInvoker">The <see cref="IProcessInvoker"/> to use to invoke the actual runner configuration.</param>
     /// <param name="runnerProcessFactory">The <see cref="IRunnerProcessFactory"/> to use to create the actual runner configuration from the
     /// input process configuration and the runner process configuration.</param>
     /// <param name="runnerProcessConfiguration">The process configuration of the process to run other process configurations through.</param>
-    protected RunnerProcessInvoker(IProcessInvoker processInvoker, IRunnerProcessFactory runnerProcessFactory,
+    protected RunnerProcessInvokerBase(IProcessInvoker processInvoker, IRunnerProcessFactory runnerProcessFactory,
         ProcessConfiguration runnerProcessConfiguration)
     {
         _processInvoker = processInvoker;
