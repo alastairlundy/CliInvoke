@@ -59,14 +59,18 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="processResourcePolicy">The processor resource policy for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
+    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardOutput"></param>
+    /// <param name="redirectStandardError"></param>
     public PowershellProcessConfiguration(IProcessInvoker processInvoker, string arguments,
+        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : base("",
-        false, true, true,
+        redirectStandardInput, redirectStandardOutput, redirectStandardError,
         arguments, workingDirectoryPath,
         requiresAdministrator, environmentVariables,
         credentials,

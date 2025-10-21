@@ -53,7 +53,11 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="processResourcePolicy">The process resource policy for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
+    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardOutput"></param>
+    /// <param name="redirectStandardError"></param>
     public ClassicPowershellProcessConfiguration(string arguments,
+        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string> environmentVariables = null, 
         UserCredential credentials = null,
@@ -61,20 +65,14 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
         Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : base("",
-        false,
-        true,
-        true,
+        redirectStandardInput, redirectStandardOutput, redirectStandardError,
         arguments,
         workingDirectoryPath,
         requiresAdministrator,
         environmentVariables,
         credentials,
-        standardInput,
-        standardOutput,
-        standardError,
-        standardInputEncoding,
-        standardOutputEncoding,
-        standardErrorEncoding,
+        standardInput, standardOutput, standardError,
+        standardInputEncoding, standardOutputEncoding, standardErrorEncoding,
         processResourcePolicy, windowCreation: windowCreation,
         useShellExecution: useShellExecution)
     {
