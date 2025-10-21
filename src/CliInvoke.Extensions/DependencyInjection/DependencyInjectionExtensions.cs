@@ -16,6 +16,7 @@ using AlastairLundy.CliInvoke.Core.Factories;
 using AlastairLundy.CliInvoke.Core.Piping;
 
 using AlastairLundy.CliInvoke.Extensibility;
+using AlastairLundy.CliInvoke.Extensibility.Factories;
 using AlastairLundy.CliInvoke.Factories;
 using AlastairLundy.CliInvoke.Piping;
 
