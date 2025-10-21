@@ -23,28 +23,28 @@ public interface IEnvironmentVariablesBuilder
     /// <param name="name">The name of the environment variable to set.</param>
     /// <param name="value">The value of the environment variable to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    IEnvironmentVariablesBuilder Set(string name, string value);
+    IEnvironmentVariablesBuilder SetPair(string name, string value);
 
     /// <summary>
     /// Sets multiple environment variables.
     /// </summary>
     /// <param name="variables">The environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    IEnvironmentVariablesBuilder Set(IEnumerable<KeyValuePair<string, string>> variables);
+    IEnvironmentVariablesBuilder SetEnumerable(IEnumerable<KeyValuePair<string, string>> variables);
 
     /// <summary>
     /// Sets multiple environment variables from a dictionary.
     /// </summary>
     /// <param name="variables">The dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    IEnvironmentVariablesBuilder Set(IDictionary<string, string> variables);
+    IEnvironmentVariablesBuilder SetDictionary(IDictionary<string, string> variables);
     
     /// <summary>
     /// Sets multiple environment variables from a read-only dictionary.
     /// </summary>
     /// <param name="variables">The read-only dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    IEnvironmentVariablesBuilder Set(IReadOnlyDictionary<string, string> variables);
+    IEnvironmentVariablesBuilder SetReadOnlyDictionary(IReadOnlyDictionary<string, string> variables);
 
     /// <summary>
     /// Builds the dictionary of configured environment variables.

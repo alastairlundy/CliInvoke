@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>AlastairLundy.CliInvoke.Core</AssemblyName>
@@ -22,10 +22,11 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-beta.7</Version>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 6
-* Added ``IProcessConfigurationFactory``
-* Renamed ``IProcessConfigurationInvoker`` to ``IProcessInvoker``</PackageReleaseNotes>
+        <Version>2.0.0-rc.1</Version>
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 7
+* Update ``IProcessInvoker`` to allow specifying ``ProcessConfiguration`` disposal after invoker use
+* Clarified OS support for ``IProcessResourcePolicyBuilder`` methods
+* Renamed ``IEnvironmentVariablesBuilder`` methods to avoid ambiguous method usage</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

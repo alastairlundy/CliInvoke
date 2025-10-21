@@ -6,6 +6,8 @@
 ### 2.0
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.0.0 RC 1 | October 19th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.0.0-rc.1 |
+| 2.0.0 Beta 7 | October 15th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.0.0-beta.7 |
 | 2.0.0 Beta 6 | October 14th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.0.0-beta.6 |
 | 2.0.0 Beta 5 | October 11th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.0.0-beta.5 |
 | 2.0.0 Beta 4 | October 10th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.0.0-beta.4 |

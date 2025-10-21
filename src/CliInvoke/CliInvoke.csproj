@@ -13,14 +13,17 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 6
-### Main package
-* Added ``ProcessConfigurationFactory``
-* Renamed ``ProcessConfigurationInvoker`` to ``ProcessInvoker``</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 2.0.0 Beta 7
+* Update ``ProcessInvoker`` to allow specifying ``ProcessConfiguration`` disposal after invoker use
+* Clarified OS support for ``IProcessResourcePolicyBuilder`` methods
+* Updated DotExtensions from 8.6.2 to 9.0.0 Preview 1
+* Updated EnvironmentVariablesBuilder to allow enabling/disabling exceptions if duplicate keys are attempted to be added.
+* Renamed ``IEnvironmentVariablesBuilder`` methods to avoid ambiguous method usage
+* Fixed potential no-op issues with ArgumentNullException in ``EnvironmentVariablesBuilder``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-beta.7</PackageVersion>
+        <PackageVersion>2.0.0-rc.1</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -41,7 +44,7 @@
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="8.6.2" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="9.0.0-preview.1" />
     </ItemGroup>
 
     <PropertyGroup>

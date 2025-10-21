@@ -48,18 +48,18 @@ jobs:
           # Push the Core package
       - name: NuGet push
         run: dotnet nuget push src/CliInvoke.Core/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-
+      - name: Sleep for 180 seconds
+        run: sleep 180s
+        shell: bash
       - name: Restore dependencies
         run: dotnet restore
         working-directory: src/CliInvoke.Specializations
       - name: Create packages
         run: dotnet build -c Release -p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }}
         working-directory: src/CliInvoke.Specializations
-
-          # Push the Specializations package
+        # Push the Specializations package
       - name: NuGet push
         run: dotnet nuget push src/CliInvoke.Specializations/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-
       - name: Restore dependencies
         run: dotnet restore
         working-directory: src/CliInvoke
@@ -71,6 +71,9 @@ jobs:
       - name: NuGet push
         run: dotnet nuget push src/CliInvoke/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
+      - name: Sleep for 180 seconds
+        run: sleep 180s
+        shell: bash
       - name: Restore dependencies
         run: dotnet restore
         working-directory: src/CliInvoke.Extensions

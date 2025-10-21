@@ -7,13 +7,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace AlastairLundy.CliInvoke.Core;
 
 /// <summary>
-/// Defines a service that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
+/// Defines an interface that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
 /// </summary>
 public interface IProcessInvoker
 {
@@ -25,6 +26,9 @@ public interface IProcessInvoker
     /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("watchos")]
     Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
@@ -38,6 +42,9 @@ public interface IProcessInvoker
     /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("watchos")]
     Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
@@ -52,6 +59,9 @@ public interface IProcessInvoker
     /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("watchos")]
     Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
