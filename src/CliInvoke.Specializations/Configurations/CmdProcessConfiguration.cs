@@ -79,8 +79,8 @@ public class CmdProcessConfiguration : ProcessConfiguration
             standardOutputEncoding,
             standardErrorEncoding,
             processResourcePolicy,
-            windowCreation: useShellExecution,
-            useShellExecution: windowCreation)
+            windowCreation: windowCreation,
+            useShellExecution: useShellExecution)
     {
         base.TargetFilePath = this.TargetFilePath;
     }

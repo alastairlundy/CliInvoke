@@ -75,9 +75,8 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         standardInputEncoding,
         standardOutputEncoding,
         standardErrorEncoding,
-        processResourcePolicy,
-        windowCreation: useShellExecution,
-        useShellExecution: windowCreation)
+        processResourcePolicy, windowCreation: windowCreation,
+        useShellExecution: useShellExecution)
     {
         base.TargetFilePath = TargetFilePath;
     }

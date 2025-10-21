@@ -73,8 +73,8 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         standardInput, standardOutput, standardError,
         standardInputEncoding, standardOutputEncoding,
         standardErrorEncoding, processResourcePolicy,
-        windowCreation: useShellExecution,
-        useShellExecution: windowCreation)
+        windowCreation: windowCreation,
+        useShellExecution: useShellExecution)
     {
         base.TargetFilePath = TargetFilePath;
         _invoker = processInvoker;
