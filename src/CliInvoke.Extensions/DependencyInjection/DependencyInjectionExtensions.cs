@@ -1,5 +1,5 @@
 ﻿/*
-    CliInvoke 
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -55,10 +55,10 @@ public static class DependencyInjectionExtensions
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
-                
+
                 services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
-                
+
                 services.AddScoped<IRunnerProcessFactory, RunnerProcessFactory>();
                 break;
             case ServiceLifetime.Transient:
@@ -67,7 +67,7 @@ public static class DependencyInjectionExtensions
 
                 services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
-                
+
                 services.AddTransient<IRunnerProcessFactory, RunnerProcessFactory>();
                 break;
             default:
