@@ -53,7 +53,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="processResourcePolicy">The process resource policy for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
-    public ClassicPowershellProcessConfiguration(string arguments = null,
+    public ClassicPowershellProcessConfiguration(string arguments,
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string> environmentVariables = null, 
         UserCredential credentials = null,
