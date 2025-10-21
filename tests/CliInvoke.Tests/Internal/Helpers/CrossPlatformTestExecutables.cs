@@ -30,7 +30,7 @@ public class CrossPlatformTestExecutables
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            cmdExePath = new CmdProcessConfiguration().TargetFilePath;
+            cmdExePath = new CmdProcessConfiguration("").TargetFilePath;
             dotnetConfigurationBuilder = new ProcessConfigurationBuilder(cmdExePath)
                 .WithArguments("dotnet --list-sdks");
         }
@@ -69,6 +69,6 @@ public class CrossPlatformTestExecutables
     public static string DotnetExePath => dotnetExePath;
            
     public static string CrossPlatformPowershellExePath =>
-        new PowershellProcessConfiguration(processInvoker).TargetFilePath;
+        new PowershellProcessConfiguration(processInvoker, "").TargetFilePath;
 
 }
