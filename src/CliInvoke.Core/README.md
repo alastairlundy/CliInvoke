@@ -20,9 +20,7 @@ Key Abstractions:
   * ``IArgumentsBuilder`` - An interface to assist with Argument Building and argument escaping.
   * ``IEnvironmentVariablesBuilder`` - An interface to assist with setting Environment variables.
   * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
-  * ``IProcessExitConfigurationBuilder`` - An interface to fluently configure and build ``ProcessExitConfiguration`` objects.
   * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy`` objects.
-  * ``IProcessTimeoutPolicyBuilder``
   * ``IUserCredentialBuilder``
 
 ## Features
