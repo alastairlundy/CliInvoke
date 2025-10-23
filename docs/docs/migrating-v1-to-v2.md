@@ -12,7 +12,8 @@ CliInvoke v2 supports the following target frameworks:
 * .NET Standard 2.0
 * .NET 8
 * .NET 9
-* .NET 10 (temporarily via .NET 9 TFM prior to .NET 10 GA)
+
+There is implicit support for .NET 10 but explicit support will come in a future update.
 
 ## Breaking Changes Summary
 
