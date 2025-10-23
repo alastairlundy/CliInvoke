@@ -22,6 +22,16 @@ There is implicit support for .NET 10 but explicit support will come in a future
 
 ### Removals
 
+#### ``IProcessRunnerUtility`` and ``ProcessRunnerUtility``
+**Rationale**:
+* Although somewhat well intentioned, the interface and classes were badly designed, exposed most of the shortcomings of .NET's ``Process`` class, and were neither helpful to CliInvoke's design nor were they helpful to users.
+
+**Replacement**:
+* There are no direct replacements for the reasons stated in the rationale section. Use ``IProcessInvoker`` and ``ProcessInvoker`` instead.
+
+#### ``IPipedProcessRunner`` and ``PipedProcessRunner``
+
+
 #### ``IProcessFactory`` and ``ProcessFactory``
 **Rationale**:  Removed due to exposing behaviour and functionality that is antithetical to the goals of CliInvoke. Safe process running and avoiding the pitfalls of the ``Process`` class are easily done with other invokers and ``IProcessFactory``'s interface methods made it easier to run into some of these pitfalls.
 
@@ -32,15 +42,18 @@ There is implicit support for .NET 10 but explicit support will come in a future
 #### ``ICliCommandInvoker`` and ``CliCommandInvoker``
 **Rationale**: 
 
+
 **Replacement**: 
-* ``IProcessInvoker`` and ``ProcessInvoker``
+* ``IProcessInvoker`` and ``ProcessInvoker`` respectively
 
 
 ####  ``CliCommandConfiguration``
 
-**Rationale**: 
+**Rationale**:
+* CliInvoke's primary purpose is safe programattic external process running for .NET . The concept of Commands within CliInvoke v1 was an abstraction around Process running functionality. The abstractions around CliInvoke have become less Command centric and more external process centric and as such a name change was warranted. Alongside this, some breaking changes were needed for several features and so ``ProcessCOnfiguration `` was introduced as the successor to ``CliCommandConfiguration``.
 
 **Replacement**:
+* ``ProcessConfiguration``
 
 ### Method Signature Changes
 
