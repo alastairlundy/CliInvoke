@@ -68,7 +68,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     public ProcessConfiguration Create(string targetFilePath, IEnumerable<string> arguments,
         Action<IProcessConfigurationBuilder>? configureBuilder = null)
     {
-        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
+        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder(x => string.IsNullOrEmpty(x) == false)
             .AddEnumerable(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(targetFilePath)
