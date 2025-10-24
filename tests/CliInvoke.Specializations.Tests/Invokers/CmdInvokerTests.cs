@@ -30,7 +30,7 @@ public class CmdInvokerTests : IClassFixture<TestFixture>
         {
             IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
                     (ExecutedCommandHelper.WinCalcExePath)
-                .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
+                .SetWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
                     string.Empty));
             
             ProcessConfiguration commandConfiguration = configurationBuilder.Build();

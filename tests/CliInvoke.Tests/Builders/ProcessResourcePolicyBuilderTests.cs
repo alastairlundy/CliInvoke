@@ -26,7 +26,7 @@ public class ProcessResourcePolicyBuilderTests
         
         // Act
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .WithProcessorAffinity(processorAffinity);
+            .SetProcessorAffinity(processorAffinity);
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         
@@ -46,7 +46,7 @@ public class ProcessResourcePolicyBuilderTests
         
         // Act and Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .WithProcessorAffinity(processorAffinity));
+            .SetProcessorAffinity(processorAffinity));
     }
 
     [Theory]
@@ -59,7 +59,7 @@ public class ProcessResourcePolicyBuilderTests
         
         // Act
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .WithPriorityBoost(enablePriorityBoost);
+            .ConfigurePriorityBoost(enablePriorityBoost);
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         
@@ -81,7 +81,7 @@ public class ProcessResourcePolicyBuilderTests
         
         // Act
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .WithPriorityClass(processPriorityClass);
+            .SetPriorityClass(processPriorityClass);
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         
@@ -103,7 +103,7 @@ public class ProcessResourcePolicyBuilderTests
         
         // Act
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .WithMinWorkingSet(minWorkingSet);
+            .SetMinWorkingSet(minWorkingSet);
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         
@@ -127,7 +127,7 @@ public class ProcessResourcePolicyBuilderTests
         // and Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder =
             new ProcessResourcePolicyBuilder()
-                .WithMinWorkingSet(minWorkingSet));
+                .SetMinWorkingSet(minWorkingSet));
     }
 
     [SupportedOSPlatform("windows")]
@@ -145,8 +145,8 @@ public class ProcessResourcePolicyBuilderTests
         
         // Act
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .WithMinWorkingSet(minWorkingSet)
-            .WithMaxWorkingSet(maxWorkingSet);
+            .SetMinWorkingSet(minWorkingSet)
+            .SetMaxWorkingSet(maxWorkingSet);
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         
@@ -172,7 +172,7 @@ public class ProcessResourcePolicyBuilderTests
         // and Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder =
             new ProcessResourcePolicyBuilder()
-                .WithMinWorkingSet(minWorkingSet).WithMaxWorkingSet(maxWorkingSet));
+                .SetMinWorkingSet(minWorkingSet).SetMaxWorkingSet(maxWorkingSet));
     }
 
     [SupportedOSPlatform("windows")]
@@ -193,12 +193,12 @@ public class ProcessResourcePolicyBuilderTests
         // Act
 #pragma warning disable CA1416
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .WithProcessorAffinity(processorAffinity)
+            .SetProcessorAffinity(processorAffinity)
 #pragma warning restore CA1416
-            .WithPriorityBoost(priorityBoostEnabled)
-            .WithPriorityClass(priorityClass)
-            .WithMinWorkingSet(minWorkingSet)
-            .WithMaxWorkingSet(maxWorkingSet);
+            .ConfigurePriorityBoost(priorityBoostEnabled)
+            .SetPriorityClass(priorityClass)
+            .SetMinWorkingSet(minWorkingSet)
+            .SetMaxWorkingSet(maxWorkingSet);
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         

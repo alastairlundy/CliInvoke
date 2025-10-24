@@ -46,10 +46,10 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         Action<IProcessConfigurationBuilder>? configureBuilder = null)
     {
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(targetFilePath)
-            .WithArguments(arguments)
+            .SetArguments(arguments)
             .RedirectStandardOutput(true)
             .RedirectStandardError(true)
-            .WithWindowCreation(false);
+            .ConfigureWindowCreation(false);
         
         if(configureBuilder is not null)
             configureBuilder.Invoke(processConfigurationBuilder);
@@ -72,10 +72,10 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
             .AddEnumerable(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(targetFilePath)
-            .WithArguments(argumentsBuilder.ToString())
+            .SetArguments(argumentsBuilder.ToString())
             .RedirectStandardOutput(true)
             .RedirectStandardError(true)
-            .WithWindowCreation(false);
+            .ConfigureWindowCreation(false);
         
         if(configureBuilder is not null)
             configureBuilder.Invoke(processConfigurationBuilder);

@@ -32,12 +32,12 @@ public class CrossPlatformTestExecutables
         {
             cmdExePath = new CmdProcessConfiguration("", false, true, true).TargetFilePath;
             dotnetConfigurationBuilder = new ProcessConfigurationBuilder(cmdExePath)
-                .WithArguments("dotnet --list-sdks");
+                .SetArguments("dotnet --list-sdks");
         }
         else
         {
             dotnetConfigurationBuilder = new ProcessConfigurationBuilder("/usr/bin/which")
-                .WithArguments("dotnet --list-sdks");
+                .SetArguments("dotnet --list-sdks");
         }
                 
         ProcessConfiguration dotnetCommandConfiguration = dotnetConfigurationBuilder.Build();    

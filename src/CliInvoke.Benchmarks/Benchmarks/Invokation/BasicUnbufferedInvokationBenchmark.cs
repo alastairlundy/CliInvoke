@@ -33,7 +33,7 @@ public class BasicUnbufferedInvokationBenchmark
     {
         IProcessConfigurationBuilder processConfigurationBuilder = new
                 ProcessConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithArguments(_dotnetCommandHelper.Arguments);
+            .SetArguments(_dotnetCommandHelper.Arguments);
         
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
 

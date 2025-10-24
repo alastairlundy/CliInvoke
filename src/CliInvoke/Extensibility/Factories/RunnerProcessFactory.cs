@@ -33,22 +33,25 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         ProcessConfiguration runnerProcessConfig)
     {
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(runnerProcessConfig.TargetFilePath)
-            .WithArguments(processConfigToBeRun.TargetFilePath + " " + processConfigToBeRun.Arguments)
-            .WithEnvironmentVariables(processConfigToBeRun.EnvironmentVariables)
-            .WithProcessResourcePolicy(processConfigToBeRun.ResourcePolicy)
-            .WithStandardInputEncoding(processConfigToBeRun.StandardInputEncoding)
-            .WithStandardOutputEncoding(processConfigToBeRun.StandardOutputEncoding)
-            .WithStandardErrorEncoding(processConfigToBeRun.StandardErrorEncoding)
-            .WithStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)
-            .WithStandardOutputPipe(processConfigToBeRun.StandardOutput ?? StreamReader.Null)
-            .WithStandardErrorPipe(processConfigToBeRun.StandardError ?? StreamReader.Null)
-            .WithUserCredential(processConfigToBeRun.Credential)
-            .WithAdministratorPrivileges(runnerProcessConfig.RequiresAdministrator)
-            .WithShellExecution(processConfigToBeRun.UseShellExecution)
+            .SetArguments(processConfigToBeRun.TargetFilePath + " " + processConfigToBeRun.Arguments)
+            .SetEnvironmentVariables(processConfigToBeRun.EnvironmentVariables)
+            .SetProcessResourcePolicy(processConfigToBeRun.ResourcePolicy)
+            .SetStandardInputEncoding(processConfigToBeRun.StandardInputEncoding)
+            .SetStandardOutputEncoding(processConfigToBeRun.StandardOutputEncoding)
+            .SetStandardErrorEncoding(processConfigToBeRun.StandardErrorEncoding)
+            .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)
+            .SetStandardOutputPipe(processConfigToBeRun.StandardOutput ?? StreamReader.Null)
+            .SetStandardErrorPipe(processConfigToBeRun.StandardError ?? StreamReader.Null)
+            .SetUserCredential(processConfigToBeRun.Credential)
+            .ConfigureShellExecution(processConfigToBeRun.UseShellExecution)
             .RedirectStandardInput(processConfigToBeRun.RedirectStandardInput)
             .RedirectStandardOutput(processConfigToBeRun.RedirectStandardOutput)
             .RedirectStandardError(processConfigToBeRun.RedirectStandardError)
-            .WithWindowCreation(processConfigToBeRun.WindowCreation);
+            .ConfigureWindowCreation(processConfigToBeRun.WindowCreation);
+
+        if (runnerProcessConfig.RequiresAdministrator)
+            commandBuilder = new ProcessConfigurationBuilder(runnerProcessConfig.TargetFilePath)
+                .RequireAdministratorPrivileges();
         
         return commandBuilder.Build();
     }
