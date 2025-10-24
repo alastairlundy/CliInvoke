@@ -124,10 +124,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="value">The string value to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(string value)
-    {
-        return IsValidArgument(value) == true ? Add(value, false) : this;
-    }
+    public IArgumentsBuilder Add(string value) 
+        => IsValidArgument(value) == true ? Add(value, false) : this;
 
     /// <summary>
     /// Appends a collection of string values to the arguments builder.
@@ -136,7 +134,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IEnumerable<string> values, bool escapeSpecialChars)
+    public IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(values, nameof(values));
@@ -158,8 +156,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="values">The collection of string values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IEnumerable<string> values) 
-        => Add(values, true);
+    public IArgumentsBuilder AddEnumerable(IEnumerable<string> values) 
+        => AddEnumerable(values, true);
 
     /// <summary>
     /// Appends a formattable value to the arguments builder.
@@ -201,7 +199,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IEnumerable<IFormattable> values, IFormatProvider formatProvider,
+    public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values, IFormatProvider formatProvider,
         string? format = null, bool escapeSpecialChars = true)
     {
 #if NET8_0_OR_GREATER
@@ -245,8 +243,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IEnumerable<IFormattable> values, bool escapeSpecialChars) 
-        => Add(values, CultureInfo.CurrentCulture, null, escapeSpecialChars);
+    public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values, bool escapeSpecialChars) 
+        => AddEnumerable(values, CultureInfo.CurrentCulture, null, escapeSpecialChars);
 
     /// <summary>
     /// Appends a collection of formattable values to the arguments builder without specifying a culture and without escaping special characters.
@@ -254,8 +252,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="values">The collection of formattable values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IEnumerable<IFormattable> values) 
-        => Add(values, true);
+    public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values) 
+        => AddEnumerable(values, true);
 
     /// <summary>
     /// Escapes characters in a string.

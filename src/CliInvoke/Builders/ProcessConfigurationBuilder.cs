@@ -78,7 +78,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
 #endif
         
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
-            .Add(arguments,
+            .AddEnumerable(arguments,
                 escapeArguments);
 
         string args = argumentsBuilder.ToString();

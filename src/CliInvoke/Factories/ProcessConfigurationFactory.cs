@@ -69,7 +69,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         Action<IProcessConfigurationBuilder>? configureBuilder = null)
     {
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
-            .Add(arguments);
+            .AddEnumerable(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(targetFilePath)
             .WithArguments(argumentsBuilder.ToString())
