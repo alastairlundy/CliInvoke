@@ -26,7 +26,6 @@ namespace AlastairLundy.CliInvoke.Builders;
 
 #pragma warning disable CA1416
 
-
 /// <summary>
 /// Builder class for creating process configurations.
 /// </summary>
@@ -61,9 +60,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="arguments">The process arguments to be added.</param>
     /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments)
+    public IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments)
     {
-        return WithArguments(arguments,
+        return SetArguments(arguments,
             false);
     }
 
@@ -74,14 +73,14 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="escapeArguments">Whether the arguments should be escaped.</param>
     /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments, bool escapeArguments)
+    public IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments, bool escapeArguments)
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(arguments, nameof(arguments));
+        ArgumentNullException.ThrowIfNull(nameof(arguments));
 #endif
         
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
-            .Add(arguments,
+            .AddEnumerable(arguments,
                 escapeArguments);
 
         string args = argumentsBuilder.ToString();
@@ -113,7 +112,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="arguments">The argument string to be added.</param>
     /// <returns>A reference to this builder with the added string arguments, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithArguments(string arguments)
+    public IProcessConfigurationBuilder SetArguments(string arguments)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -142,7 +141,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="targetFilePath">The file path where the process configuration will be saved.</param>
     /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithTargetFile(string targetFilePath)
+    public IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(targetFilePath,
@@ -171,10 +170,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="environmentVariables">The environment variables to be added to the process configuration.</param>
     /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
+    public IProcessConfigurationBuilder SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(environmentVariables, nameof(environmentVariables));
+        ArgumentNullException.ThrowIfNull(nameof(environmentVariables));
 #endif
         
         return new ProcessConfigurationBuilder(
@@ -201,11 +200,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <summary>
     /// Configures the process to run with administrator privileges.
     /// </summary>
-    /// <param name="runAsAdministrator">Whether the process should be executed as an administrator.</param>
     /// <returns>A reference to this builder with the updated administrator privileges,
     /// allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithAdministratorPrivileges(bool runAsAdministrator)
+    public IProcessConfigurationBuilder RequireAdministratorPrivileges()
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -214,7 +212,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.RedirectStandardError,
                 _configuration.Arguments,
                 _configuration.WorkingDirectoryPath,
-                runAsAdministrator,
+                true,
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
@@ -234,7 +232,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="workingDirectoryPath">The file system path where the process will be executed.</param>
     /// <returns>A reference to this builder, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithWorkingDirectory(string workingDirectoryPath)
+    public IProcessConfigurationBuilder SetWorkingDirectory(string workingDirectoryPath)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -268,7 +266,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
     [Pure]
-    public IProcessConfigurationBuilder WithUserCredential(UserCredential credential)
+    public IProcessConfigurationBuilder SetUserCredential(UserCredential credential)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -304,7 +302,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-    public IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure)
+    public IProcessConfigurationBuilder SetUserCredential(Action<IUserCredentialBuilder> configure)
     {
         IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
             .SetDomain(_configuration.Credential.Domain)
@@ -314,7 +312,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         
         configure(credentialBuilder);
 
-        return WithUserCredential(credentialBuilder.Build());
+        return SetUserCredential(credentialBuilder.Build());
     }
 
     /// <summary>
@@ -407,7 +405,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput"/>
     [Pure]
-    public IProcessConfigurationBuilder WithStandardInputPipe(StreamWriter source)
+    public IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -438,7 +436,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Output will throw an Exception. This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput"/>
     [Pure]
-    public IProcessConfigurationBuilder WithStandardOutputPipe(StreamReader target)
+    public IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -469,7 +467,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Error will throw an Exception. This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror"/>
     [Pure]
-    public IProcessConfigurationBuilder WithStandardErrorPipe(StreamReader target)
+    public IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -499,7 +497,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <returns>A reference to this builder with the updated Process Resource Policy,
     /// allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy)
+    public IProcessConfigurationBuilder SetProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -532,7 +530,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput"/>
     [Pure]
-    public IProcessConfigurationBuilder WithShellExecution(bool useShellExecution)
+    public IProcessConfigurationBuilder ConfigureShellExecution(bool useShellExecution)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -561,7 +559,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="enableWindowCreation">A boolean indicating whether to enable or disable window creation.</param>
     /// <returns>The updated Process Configuration builder with the updated window creation configuration.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithWindowCreation(bool enableWindowCreation)
+    public IProcessConfigurationBuilder ConfigureWindowCreation(bool enableWindowCreation)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -591,7 +589,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// Uses the Default Encoding if null.</param>
     /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithStandardInputEncoding(Encoding? standardInputEncoding = null)
+    public IProcessConfigurationBuilder SetStandardInputEncoding(Encoding? standardInputEncoding = null)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -621,7 +619,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// Uses the Default Encoding if null.</param>
     /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithStandardOutputEncoding(Encoding? standardOutputEncoding = null)
+    public IProcessConfigurationBuilder SetStandardOutputEncoding(Encoding? standardOutputEncoding = null)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -652,7 +650,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// Uses the Default Encoding if null.</param>
     /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
     [Pure]
-    public IProcessConfigurationBuilder WithStandardErrorEncoding(Encoding? standardErrorEncoding = null)
+    public IProcessConfigurationBuilder SetStandardErrorEncoding(Encoding? standardErrorEncoding = null)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(_configuration.TargetFilePath,
@@ -691,4 +689,5 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         _configuration.Dispose();
     }
 }
+
 #pragma warning restore CA1416
