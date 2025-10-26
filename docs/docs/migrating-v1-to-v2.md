@@ -24,7 +24,7 @@ There is implicit support for .NET 10 but explicit support will come in a future
 
 #### ``IProcessRunnerUtility`` and ``ProcessRunnerUtility``
 **Rationale**:
-* Although somewhat well intentioned, the interface and classes were badly designed, exposed most of the shortcomings of .NET's ``Process`` class, and were neither helpful to CliInvoke's design nor were they helpful to users.
+* Although well intentioned, the interface and classes were badly designed, exposed most of the shortcomings of .NET's ``Process`` class, and were neither helpful to CliInvoke's design nor were they helpful to users.
 
 **Replacement**:
 * There are no direct replacements for the reasons stated in the rationale section. Use ``IProcessInvoker`` and ``ProcessInvoker`` instead.
