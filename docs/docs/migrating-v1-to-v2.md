@@ -50,7 +50,7 @@ There is implicit support for .NET 10 but explicit support will come in a future
 ####  ``CliCommandConfiguration``
 
 **Rationale**:
-* CliInvoke's primary purpose is safe programattic external process running for .NET . The concept of Commands within CliInvoke v1 was an abstraction around Process running functionality. The abstractions around CliInvoke have become less Command centric and more external process centric and as such a name change was warranted. Alongside this, some breaking changes were needed for several features and so ``ProcessConfiguration `` was introduced as the successor to ``CliCommandConfiguration``.
+* The abstractions around CliInvoke have become less Command centric and more external process centric and as such a name change was warranted. Alongside this, some breaking changes were needed for several features and so ``ProcessConfiguration `` was introduced as the successor to ``CliCommandConfiguration``.
 
 **Replacement**:
 * ``ProcessConfiguration``
