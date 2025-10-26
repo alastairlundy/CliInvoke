@@ -63,4 +63,18 @@ There is implicit support for .NET 10 but explicit support will come in a future
 
 ### Method Signature Changes
 
-## Detailed Migration Steps
+#### 
+
+## Migration Steps
+For CliInvoke v1 users not using the latest version of v1, update to the latest version of CliInvoke v1.
+
+1. Ensure your project works and builds successfully with CliInvoke v1.
+2. Create a new branch for updating to CliInvoke v2.
+3. Replace ``ICliCommandInvoker`` usage with ``IProcessInvoker`` and ``CliCommandConfiguration`` usage with ``ProcessConfiguration``.
+4. Replace usage of all other deprecated code with newer alternatives or replacements where available.
+5. Update to CliInvoke v2.
+6. Address breaking changes in method signatures and elsewhere.
+7. Resolve all remaining errors.
+8. Update your project's testing code as needed to work with v2.
+8. Test that the project still works and builds successfully (this time with v2).
+9. Merge into your project's main branch if successful.
