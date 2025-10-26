@@ -44,7 +44,7 @@
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="9.0.0-preview.1" />
+        <PackageReference Include="AlastairLundy.DotExtensions" Version="9.0.0-preview.2" />
     </ItemGroup>
 
     <PropertyGroup>
