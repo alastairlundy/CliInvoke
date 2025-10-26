@@ -10,15 +10,16 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-rc.1</PackageVersion>
+        <PackageVersion>2.0.0-rc.2</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <LangVersion>13</LangVersion>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 7
-* Updated to support CliInvoke 2.0.0 RC 1</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 2.0.0 RC 1
+* Updated to support CliInvoke 2.0.0 RC 2
+* Fixed issues regarding parameters in Specialization Configurations being passed incorrectly to the ``ProcessConfiguration`` constructor</PackageReleaseNotes>
         <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>

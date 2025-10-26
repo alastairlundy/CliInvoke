@@ -22,11 +22,11 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-rc.1</Version>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 7
-* Update ``IProcessInvoker`` to allow specifying ``ProcessConfiguration`` disposal after invoker use
-* Clarified OS support for ``IProcessResourcePolicyBuilder`` methods
-* Renamed ``IEnvironmentVariablesBuilder`` methods to avoid ambiguous method usage</PackageReleaseNotes>
+        <Version>2.0.0-rc.2</Version>
+        <PackageReleaseNotes>* Renamed ``IProcessRunnerCreator`` to ``IProcessRunnerFactory``
+* Adjusted ``IProcessRunnerFactory`` method signatures - These contain breaking changes
+* Added abstract class ``RunnerProcessInvokerBase`` that inherits from ``IProcessInvoker`` 
+* Annotated ``IProcessInvoker`` methods to indicate lack of support for IOS and tvOS</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
