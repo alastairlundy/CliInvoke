@@ -30,6 +30,11 @@ There is implicit support for .NET 10 but explicit support will come in a future
 * There are no direct replacements for the reasons stated in the rationale section. Use ``IProcessInvoker`` and ``ProcessInvoker`` instead.
 
 #### ``IPipedProcessRunner`` and ``PipedProcessRunner``
+**Rationale**:  
+* Although well intentioned, the interface and classes were badly designed, and are no longer needed as a middleman between Process Invokers and Process ProcessRunnerUtility. It contributed to a more fragmented and confused API surface and thus removal was necessary to clean up the CliInvoke v2 API Surface.
+
+**Replacement**: 
+* ``IProcessInvoker`` and ``ProcessInvoker`` for running ``ProcessConfiguration`` objects.
 
 
 #### ``IProcessFactory`` and ``ProcessFactory``
