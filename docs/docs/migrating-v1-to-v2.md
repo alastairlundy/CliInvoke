@@ -41,6 +41,7 @@ There is implicit support for .NET 10 but explicit support will come in a future
 
 #### ``ICliCommandInvoker`` and ``CliCommandInvoker``
 **Rationale**: 
+* The abstractions around CliInvoke have become less Command centric and more external process centric and as such a name change was warranted. Alongside this, breaking changes were needed for new features and so ``IProcessInvoker ``and ``ProcessInvoker`` were introduced as the successor to `ICliCommandInvoker`` and ``CliCommandInvoker`` respectively.
 
 
 **Replacement**: 
