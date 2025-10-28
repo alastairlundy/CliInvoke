@@ -15,7 +15,7 @@ namespace AlastairLundy.CliInvoke.Core;
 public interface IFilePathResolver
 {
     /// <summary>
-    /// Resolves a file path by checking if the file path exists, or if it's a directory.
+    /// Resolves a file path by checking if the file path exists or if it's a directory.
     /// </summary>
     /// <param name="filePathToResolve">The file path to resolve.</param>
     /// <returns>The resolved file path if successful, otherwise throws a FileNotFoundException.</returns>
