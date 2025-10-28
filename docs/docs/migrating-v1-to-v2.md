@@ -62,8 +62,8 @@ There is implicit support for .NET 10 but explicit support will come in a future
 * ``ProcessConfiguration``
 
 ### Method Signature Changes
+These cover common use cases and are NOT an exhaustive list of method signature changes.
 
-#### 
 
 ## Migration Steps
 For CliInvoke v1 users not using the latest version of v1, update to the latest version of CliInvoke v1.
