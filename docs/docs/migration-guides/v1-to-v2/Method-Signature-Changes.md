@@ -172,6 +172,27 @@ IProcessConfigurationBuilder WithTargetFilePath(string targetFilePath);
 IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath);
 ```
 
+### Require Administrator Privileges
+**v1 Method Signature**:
+```csharp
+
+```
+
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder RequireAdministratorPrivileges();
+```
+
+### Set Process Resource Policy
+**v1 Method Signature**:
+```csharp
+IProcessConfigurationBuilder WithProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy);
+```
+
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy);
+```
 
 ### Set User Credential
 **v1 Method Signature**:
@@ -193,6 +214,56 @@ IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> c
 **v2 Method Signature**:
 ```csharp
 IProcessConfigurationBuilder SetUserCredential(Action<IUserCredentialBuilder> configure);
+```
+
+### Set Standard Input Pipe
+**v1 Method Signature**:
+```csharp
+
+```
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source);
+```
+
+### Set Standard Output Pipe
+**v1 Method Signature**:
+```csharp
+
+```
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target);
+```
+
+### Set Standard Error Pipe
+**v1 Method Signature**:
+```csharp
+
+```
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target);
+```
+
+### Configure Shell Execution
+**v1 Method Signature**:
+```csharp
+
+```
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder ConfigureShellExecution(bool useShellExecution);
+```
+
+### Configure Window Creation
+**v1 Method Signature**:
+```csharp
+
+```
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder ConfigureWindowCreation(bool enableWindowCreation);
 ```
 
 ## IEnvironmentVariablesBuilder and EnvironmentVariablesBuilder
