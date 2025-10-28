@@ -266,12 +266,43 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public string EscapeCharacters(string argument)
     {
-        return argument.Replace("\\", "\\\\")
-            .Replace("\n", "\\n")
-            .Replace("\t", "\\t")
-            .Replace("\r", "\\r")
-            .Replace("\"", "\\\"")
-            .Replace("'", "\\'");
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(argument, nameof(argument));
+#endif
+        
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        if(argument.StartsWith('"') == false)
+            stringBuilder.Append('"');
+        
+        foreach (char c in argument)
+        {
+            switch (c)
+            {
+                case '\\': stringBuilder.Append(@"\\"); break;
+                case '\"':  stringBuilder.Append("\\\""); break;
+                case '\n': stringBuilder.Append(@"\n");  break;
+                case '\r': stringBuilder.Append(@"\r");  break;
+                case '\t': stringBuilder.Append(@"\t");  break;
+                case '\b': stringBuilder.Append(@"\b");  break;
+                case '\f': stringBuilder.Append(@"\f");  break;
+                case '\v': stringBuilder.Append(@"\v");  break;
+                case '\a': stringBuilder.Append(@"\a");  break;
+                case '\e': stringBuilder.Append(@"\e"); break; 
+                case '\0': stringBuilder.Append(@"\0");  break;
+                default:
+                    if (char.IsControl(c))
+                        stringBuilder.AppendFormat(@"\u{0:X4}", (int)c);
+                    else
+                        stringBuilder.Append(c);
+                    break;
+            }
+        }
+        
+        if(argument.EndsWith('"') == false)
+            stringBuilder.Append('"');
+        
+        return stringBuilder.ToString();
     }
 
     /// <summary>
