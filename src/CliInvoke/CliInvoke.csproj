@@ -5,6 +5,8 @@
         <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
         <Title>CliInvoke</Title>
         <Authors>AlastairLundy</Authors>
         <Description>CliInvoke is a .NET Library for interacting with Command Line Interfaces, CliInvoke is a library for interacting with Command Line Interfaces and wrapping around executables.</Description>
@@ -31,7 +33,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.6.1.1</PackageVersion>
+        <PackageVersion>2.0.0</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,iprocessconfigurationfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -40,6 +42,12 @@
         <PackageId>AlastairLundy.CliInvoke</PackageId>
         <Product>CliInvoke</Product>
     </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>AlastairLundy.CliInvoke.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all" />
@@ -96,12 +104,4 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Legacy\" />
-    </ItemGroup>
-    
-<!--    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>-->
 </Project>
