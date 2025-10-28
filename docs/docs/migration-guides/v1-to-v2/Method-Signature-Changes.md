@@ -157,6 +157,9 @@ IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity);
 ```
 
 **v2 Method Signature**:
+```csharp
+IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity);
+```
 
 ### Setting Minimum Working Set
 **v1 Method Signature**:
@@ -165,6 +168,9 @@ IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet);
 ```
 
 **v2 Method Signature**:
+```csharp
+IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet);
+```
 
 ### Setting Maximum Working Set
 **v1 Method Signature**:
@@ -173,7 +179,9 @@ IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet);
 ```
 
 **v2 Method Signature**:
-
+```csharp
+IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet);
+```
 
 ### Setting Priority Class
 **v1 Method Signature**:
@@ -182,7 +190,9 @@ IProcessResourcePolicyBuilder WithPriorityClass(ProcessPriorityClass processPrio
 ```
 
 **v2 Method Signature**:
-
+```csharp
+IProcessResourcePolicyBuilder SetPriorityClass(ProcessPriorityClass processPriorityClass);
+```
 
 ### Setting Priority Boost
 **v1 Method Signature**:
@@ -191,7 +201,9 @@ IProcessResourcePolicyBuilder WithPriorityBoost(bool enablePriorityBoost);
 ```
 
 **v2 Method Signature**:
-
+```csharp
+IProcessResourcePolicyBuilder ConfigurePriorityBoost(bool enablePriorityBoost);
+```
 
 ## IProcessPipeHandler and ProcessPipeHandler
 
