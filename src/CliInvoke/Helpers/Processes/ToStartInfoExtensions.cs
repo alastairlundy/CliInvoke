@@ -39,9 +39,7 @@ internal static class ToStartInfoExtensions
             RedirectStandardInput = processConfiguration.StandardInput is not null &&
                                     processConfiguration.RedirectStandardInput,
             RedirectStandardOutput = redirectStandardOutput,
-            RedirectStandardError = redirectStandardError,
-            StandardOutputEncoding = processConfiguration.StandardOutputEncoding,
-            StandardErrorEncoding = processConfiguration.StandardErrorEncoding,
+            RedirectStandardError = redirectStandardError
         };
         
         if (string.IsNullOrEmpty(processConfiguration.TargetFilePath))
@@ -61,6 +59,13 @@ internal static class ToStartInfoExtensions
         if (processStartInfo.RedirectStandardInput) 
             processStartInfo.StandardInputEncoding = processConfiguration.StandardInputEncoding;
 #endif
+        
+        if (processStartInfo.RedirectStandardOutput) 
+            processStartInfo.StandardOutputEncoding = processConfiguration.StandardOutputEncoding;
+        
+        if (processStartInfo.RedirectStandardError) 
+            processStartInfo.StandardErrorEncoding = processConfiguration.StandardErrorEncoding;
+
         
         return processStartInfo;
     }
