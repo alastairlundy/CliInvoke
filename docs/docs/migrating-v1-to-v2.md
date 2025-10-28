@@ -53,7 +53,7 @@ There is implicit support for .NET 10 but explicit support will come in a future
 * ``IProcessInvoker`` and ``ProcessInvoker`` respectively
 
 
-####  ``CliCommandConfiguration``
+#### ``CliCommandConfiguration``
 
 **Rationale**:
 * The abstractions around CliInvoke have become less Command centric and more external process centric and as such a name change was warranted. Alongside this, some breaking changes were needed for several features and so ``ProcessConfiguration `` was introduced as the successor to ``CliCommandConfiguration``.
@@ -64,6 +64,107 @@ There is implicit support for .NET 10 but explicit support will come in a future
 ### Method Signature Changes
 These cover common use cases and are NOT an exhaustive list of method signature changes.
 
+#### IProcessInvoker and ProcessInvoker
+
+##### ExecuteAsync
+**v1 Method Signature**:
+```csharp
+
+
+```
+
+**v2 Method Signature**:
+```csharp
+Task<BufferedProcessResult> ExecuteBufferedAsync(
+    ProcessConfiguration processConfiguration,
+    ProcessExitConfiguration? processExitConfiguration = null,
+    bool disposeOfConfig = false,
+    CancellationToken cancellationToken = default);
+```
+
+
+##### ExecuteBufferedAsync
+**v1 Method Signature**:
+```csharp
+
+```
+
+**v2 Method Signature**:
+```csharp
+Task<BufferedProcessResult> ExecuteBufferedAsync(
+    ProcessConfiguration processConfiguration,
+    ProcessExitConfiguration? processExitConfiguration = null,
+    bool disposeOfConfig = false,
+    CancellationToken cancellationToken = default);
+```
+
+**Notes**:
+
+
+**Removed methods**:
+| CliInvoke v1 method signature | Suggested Replacement method signature |
+|-|-|
+| Execute | | 
+
+#### IFilePathResolver and FilePathResolver
+
+##### ResolveFilePath
+
+**v1 Method Signature**
+```csharp
+
+```
+
+**v2 Method Signature**
+```csharp
+string ResolveFilePath(string filePathToResolve);
+```
+
+##### TryResolveFilePath
+
+**v2**
+Removed in CliInvoke v2. Use ``ResolveFilePath`` within a ``try/catch`` if a FileNotFound exception, in case of file path not being resolvable, being thrown is undesirable; otherwise use ``ResolveFilePath``.
+
+#### IArgumentsBuilder and ArgumentsBuilder
+
+#### IProcessConfigurationBuilder and ProcessConfigurationBuilder
+
+#### IEnvironmentVariablesBuilder and EnvironmentVariablesBuilder
+
+#### IProcessResourcePolicyBuilder and ProcessResourcePolicyBuilder
+
+#### IProcessPipeHandler and ProcessPipeHandler
+
+##### PipeStandardInputAsync
+
+**v1 Method Signature**
+
+
+**v2 Method Signature**
+    ```csharp
+    Task<bool> PipeStandardInputAsync(Stream source, Process destination);
+    ```
+
+
+##### PipeStandardOutputAsync
+
+**v1 Method Signature**
+
+
+**v2 Method Signature**
+    ```csharp
+        Task<Stream> PipeStandardOutputAsync(Process source);
+    ```
+
+##### PipeStandardErrorAsync
+
+**v1 Method Signature**
+
+
+**v2 Method Signature**
+    ```csharp
+    Task<Stream> PipeStandardErrorAsync(Process source);
+    ```
 
 ## Migration Steps
 For CliInvoke v1 users not using the latest version of v1, update to the latest version of CliInvoke v1.
