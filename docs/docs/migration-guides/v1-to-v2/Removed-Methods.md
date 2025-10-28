@@ -34,5 +34,3 @@ Task<BufferedProcessResult> ExecuteBufferedAsync(
     bool disposeOfConfig = false,
     CancellationToken cancellationToken = default);
 ```
-
-
