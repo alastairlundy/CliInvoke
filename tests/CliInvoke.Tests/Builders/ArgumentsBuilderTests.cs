@@ -1,4 +1,5 @@
 ﻿using AlastairLundy.CliInvoke.Builders;
+using AlastairLundy.CliInvoke.Core.Abstractions.Builders;
 using Xunit;
 
 namespace AlastairLundy.CliInvoke.Tests.Builders;
@@ -8,7 +9,7 @@ public class ArgumentsBuilderTests
     [Fact]
     public void BuilderChainingTest()
     {
-        ArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
+        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
             .Add("new")
             .Add(["list", "--help"]);
 
