@@ -6,6 +6,7 @@ using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Specializations.Tests.Helpers;
+using Xunit;
 
 namespace AlastairLundy.CliInvoke.Specializations.Tests.Invokers;
 
