@@ -20,7 +20,6 @@ using System.Text;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
-// ReSharper disable RedundantIfElseBlock
 // ReSharper disable ConvertClosureToMethodGroup
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
@@ -171,23 +170,25 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder Add(IFormattable value, IFormatProvider formatProvider, string? format = null,
         bool escapeSpecialChars = true)
     {
-        if (IsValidArgument(value, formatProvider) == true)
-        {
-            string valueActual = value.ToString(format, formatProvider);
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
+        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
+#endif
+        
+        if (IsValidArgument(value, formatProvider) != true)
+            throw new ArgumentNullException(nameof(value));
+        
+        string valueActual = value.ToString(format, formatProvider);
 
-            if (string.IsNullOrWhiteSpace(valueActual))
-            {
-                throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace(
-                    "{x}",
-                    nameof(value)));
-            }
-           
-            return Add(valueActual, escapeSpecialChars);
-        }
-        else
+        if (string.IsNullOrWhiteSpace(valueActual))
         {
-            return this;
+            throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace(
+                "{x}",
+                nameof(value)));
         }
+           
+        return Add(valueActual, escapeSpecialChars);
+
     }
 
     /// <summary>
@@ -204,6 +205,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(values, nameof(values));
+        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
 #endif
         
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
