@@ -18,7 +18,6 @@ Task<ProcessResult> ExecuteAsync(
     CancellationToken cancellationToken = default);
 ```
 
-
 ### ExecuteBufferedAsync
 **v1 Method Signature**:
 ```csharp
@@ -94,9 +93,7 @@ IArgumentsBuilder Add(IFormattable value, IFormatProvider formatProvider, bool e
 
 ## IProcessConfigurationBuilder and ProcessConfigurationBuilder
 
-## IEnvironmentVariablesBuilder and EnvironmentVariablesBuilder
 
-## IProcessResourcePolicyBuilder and ProcessResourcePolicyBuilder
 
 ### Set string pair
 **v1 Method Signature**:
