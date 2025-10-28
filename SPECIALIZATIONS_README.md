@@ -25,7 +25,7 @@ The CmdProcessConfiguration TargetFilePath points to Windows' copy of cmd.exe.
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility;
+using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 using AlastairLundy.CliInvoke.Specializations;
@@ -33,16 +33,19 @@ using AlastairLundy.CliInvoke.Specializations;
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
     IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-  IRunnerProcessFactory _runnerProcessCreator = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
+  IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
   
-  //Build your command fluently
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder(
-          new CmdProcessConfiguration("Your arguments go here"))
-                .WithWorkingDirectory(Environment.SystemDirectory);
+  //Create your runner configuration.
+         ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
+                    // Set standard input, output, and error
+          false, true, true, Environment.SystemDirectory);
   
-  ProcessConfiguration config = builder.Build();
+  // Create your configuration to be run.
+  ProcessConfiguration config = new ProcessConfiguration("Path/To/Exe",
+  false, true, true, "With/Arguments")
   
-  ProcessConfiguration processToRun = _runnerProcessCreator.CreateRunnerProcess(config);
+  // Creates a ProcessConfiguration that will use the runner configuration to run the desired configuration.
+  ProcessConfiguration processToRun = _runnerProcessFactory.CreateRunnerConfiguration(config, runnerConfig);
   
   BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
 ```
@@ -52,7 +55,7 @@ If the result of the command being run is not of concern you can call ``ExecuteA
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility;
+using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 using AlastairLundy.CliInvoke.Specializations;
@@ -60,18 +63,21 @@ using AlastairLundy.CliInvoke.Specializations;
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
     IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-  IRunnerProcessFactory _runnerProcessCreator = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
+  IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
   
-  //Build your command fluently
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder(
-          new CmdProcessConfiguration("Your arguments go here"))
-                .WithWorkingDirectory(Environment.SystemDirectory);
+  //Create your runner configuration.
+         ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
+                    // Set standard input, output, and error
+          false, true, true, Environment.SystemDirectory);
   
-  ProcessConfiguration config = builder.Build();
+  // Create your configuration to be run.
+  ProcessConfiguration config = new ProcessConfiguration("Path/To/Exe",
+  false, true, true, "With/Arguments")
   
-  ProcessConfiguration processToRun = _runnerProcessCreator.CreateRunnerProcess(config);
+  // Creates a ProcessConfiguration that will use the runner configuration to run the desired configuration.
+  ProcessConfiguration processToRun = _runnerProcessFactory.CreateRunnerConfiguration(config, runnerConfig);
   
-  ProcessResult result = await _processConfig.ExecuteAsync(processToRun);
+  ProcessResult result = await _processInvoker.ExecuteAsync(processToRun);
 ```
 
 ### ClassicPowershellProcessConfiguration
@@ -81,7 +87,7 @@ The ClassicPowershellCommand is a specialized Command class with an already conf
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility;
+using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 using AlastairLundy.CliInvoke.Specializations;
@@ -89,16 +95,19 @@ using AlastairLundy.CliInvoke.Specializations;
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
     IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-  IRunnerProcessFactory _runnerProcessCreator = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
+  IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
   
-  //Build your command fluently
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder(
-          new ClassicPowershellProcessConfiguration("Your arguments go here"))
-                .WithWorkingDirectory(Environment.SystemDirectory);
+  //Create your runner configuration.
+         ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
+                    // Set standard input, output, and error
+          false, true, true, Environment.SystemDirectory);
   
-  ProcessConfiguration config = builder.Build();
+  // Create your configuration to be run.
+  ProcessConfiguration config = new ProcessConfiguration("Path/To/Exe",
+  false, true, true, "With/Arguments")
   
-  ProcessConfiguration processToRun = _runnerProcessCreator.CreateRunnerProcess(config);
+  // Creates a ProcessConfiguration that will use the runner configuration to run the desired configuration.
+  ProcessConfiguration processToRun = _runnerProcessFactory.CreateRunnerConfiguration(config, runnerConfig);
   
   BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
 ```
@@ -110,7 +119,7 @@ The PowershellProcessConfiguration's TargetFilePath points to the installed copy
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility;
+using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 
 using AlastairLundy.CliInvoke.Specializations.Configurations;
 using AlastairLundy.CliInvoke.Specializations;
@@ -118,16 +127,19 @@ using AlastairLundy.CliInvoke.Specializations;
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
     IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-  IRunnerProcessFactory _runnerProcessCreator = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
+  IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
   
-  //Build your command fluently
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder(
-          new PowershellProcessConfiguration("Your arguments go here"))
-                .WithWorkingDirectory(Environment.SystemDirectory);
+  //Create your runner configuration.
+         ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
+                    // Set standard input, output, and error
+          false, true, true, Environment.SystemDirectory);
   
-  ProcessConfiguration config = builder.Build();
+  // Create your configuration to be run.
+  ProcessConfiguration config = new ProcessConfiguration("Path/To/Exe",
+  false, true, true, "With/Arguments")
   
-  ProcessConfiguration processToRun = _runnerProcessCreator.CreateRunnerProcess(config);
+  // Creates a ProcessConfiguration that will use the runner configuration to run the desired configuration.
+  ProcessConfiguration processToRun = _runnerProcessFactory.CreateRunnerConfiguration(config, runnerConfig);
   
   BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
 ```
