@@ -81,7 +81,7 @@ IArgumentsBuilder Add(IEnumerable<string> values);
 
 **v2 Method Signature**:
 
-### Add Enumerable with IFormattable
+### Add with IFormattable and IFormatProvider
 
 **v1 Method Signature**:
 ```csharp
