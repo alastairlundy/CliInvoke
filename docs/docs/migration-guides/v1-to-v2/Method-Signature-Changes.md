@@ -88,8 +88,32 @@ IArgumentsBuilder Add(IFormattable value, IFormatProvider formatProvider, bool e
 ```
 
 **v2 Method Signature**:
+```csharp
+IArgumentsBuilder Add(IFormattable value, IFormatProvider formatProvider, string? format = null, bool escapeSpecialChars = true);
+```
 
+### Add Enumerable with IFormattable and IFormatProvider
 
+**v1 Method Signature**:
+```csharp
+IArgumentsBuilder Add(IEnumerable<IFormattable> values, IFormatProvider formatProvider, bool escapeSpecialChars = true);
+```
+
+**v2 Method Signature**:
+```csharp
+IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values, IFormatProvider formatProvider,  string? format = null, bool escapeSpecialChars = true);
+```
+
+### Escape Characters
+**v1 Method Signature**:
+```csharp
+string EscapeSpecialCharacters(string argument);
+```
+
+**v2 Method Signature**:
+```csharp
+string EscapeCharacters(string argument);
+```
 
 ## IProcessConfigurationBuilder and ProcessConfigurationBuilder
 

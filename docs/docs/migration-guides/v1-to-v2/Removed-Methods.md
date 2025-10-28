@@ -34,3 +34,27 @@ Task<BufferedProcessResult> ExecuteBufferedAsync(
     bool disposeOfConfig = false,
     CancellationToken cancellationToken = default);
 ```
+
+## IArgumentsBuilder and ArgumentsBuilder
+
+### Add with Formatable and Format Provider and Culture Info
+**v1 Method Signature**:
+```csharp
+IArgumentsBuilder Add(IFormattable value, CultureInfo cultureInfo, bool escapeSpecialChars);
+```
+
+**v2 Replacements**:
+```csharp
+IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values);
+```
+
+### Add Enumerable with Formatable and Format Provider and Culture Info
+**v1 Method Signature**:
+```csharp
+IArgumentsBuilder Add(IEnumerable<IFormattable> values, CultureInfo cultureInfo, bool escapeSpecialChars);
+```
+
+**v2 Replacements**:
+```csharp
+IArgumentsBuilder Add(IFormattable value);
+```
