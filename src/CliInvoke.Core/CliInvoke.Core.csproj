@@ -22,7 +22,7 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0-rc.2</Version>
+        <Version>2.0.0</Version>
         <PackageReleaseNotes>* Renamed ``IProcessRunnerCreator`` to ``IProcessRunnerFactory``
 * Adjusted ``IProcessRunnerFactory`` method signatures - These contain breaking changes
 * Added abstract class ``RunnerProcessInvokerBase`` that inherits from ``IProcessInvoker`` 
