@@ -175,7 +175,7 @@ IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath);
 ### Require Administrator Privileges
 **v1 Method Signature**:
 ```csharp
-
+IProcessConfigurationBuilder WithAdministratorPrivileges(bool runAsAdministrator);
 ```
 
 **v2 Method Signature**:
@@ -219,7 +219,7 @@ IProcessConfigurationBuilder SetUserCredential(Action<IUserCredentialBuilder> co
 ### Set Standard Input Pipe
 **v1 Method Signature**:
 ```csharp
-
+IProcessConfigurationBuilder WithStandardInputPipe(StreamWriter source);
 ```
 **v2 Method Signature**:
 ```csharp
@@ -229,8 +229,9 @@ IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source);
 ### Set Standard Output Pipe
 **v1 Method Signature**:
 ```csharp
-
+IProcessConfigurationBuilder WithStandardOutputPipe(StreamReader target);
 ```
+
 **v2 Method Signature**:
 ```csharp
 IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target);
@@ -239,7 +240,7 @@ IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target);
 ### Set Standard Error Pipe
 **v1 Method Signature**:
 ```csharp
-
+IProcessConfigurationBuilder WithStandardErrorPipe(StreamReader target);
 ```
 **v2 Method Signature**:
 ```csharp
@@ -249,7 +250,7 @@ IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target);
 ### Configure Shell Execution
 **v1 Method Signature**:
 ```csharp
-
+    IProcessConfigurationBuilder WithShellExecution(bool useShellExecution);
 ```
 **v2 Method Signature**:
 ```csharp
@@ -259,7 +260,7 @@ IProcessConfigurationBuilder ConfigureShellExecution(bool useShellExecution);
 ### Configure Window Creation
 **v1 Method Signature**:
 ```csharp
-
+    IProcessConfigurationBuilder WithWindowCreation(bool enableWindowCreation);
 ```
 **v2 Method Signature**:
 ```csharp
