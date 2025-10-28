@@ -228,7 +228,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
         => Add(value, DefaultFormatProvider, null, escapeSpecialChars);
 
     /// <summary>
-    /// Appends a formattable value to the arguments builder without specifying a culture and without escaping special characters.
+    /// Appends a formattable value to the arguments builder without specifying a culture
+    /// and without escaping special characters.
     /// </summary>
     /// <param name="value">The formattable value to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>

@@ -11,10 +11,10 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 
-using AlastairLundy.CliInvoke.Core.Builders;
-using System.Runtime.Versioning;
 using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Core.Builders;
 
+using System.Runtime.Versioning;
 
 namespace AlastairLundy.CliInvoke.Builders;
 

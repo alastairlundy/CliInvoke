@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Bogus;
 
@@ -11,7 +12,7 @@ using ValidationResult = Spectre.Console.ValidationResult;
 
 namespace CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
 
-public class GenerateFakeTextCommand : ICommand<GenerateFakeTextCommand.Settings>
+public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
 {
     private Faker _faker;
 
@@ -36,8 +37,8 @@ public class GenerateFakeTextCommand : ICommand<GenerateFakeTextCommand.Settings
         
        fakeChars = _faker.Random.Chars(count: 1000);
     }
-    
-    public async Task<int> Execute(CommandContext context, Settings settings)
+
+    public override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -53,13 +54,12 @@ public class GenerateFakeTextCommand : ICommand<GenerateFakeTextCommand.Settings
         }
 
         try
-        {
-            await Console.Out.WriteLineAsync(stringBuilder.ToString());
-            return await new ValueTask<int>(0);
+        { Console.Out.WriteLine(stringBuilder.ToString());
+            return 0;
         }
         catch
         {
-            return await new ValueTask<int>(-1);
+            return -1;
         }
     }
 
@@ -79,17 +79,5 @@ public class GenerateFakeTextCommand : ICommand<GenerateFakeTextCommand.Settings
         }
         
         return settings.Validate();
-    }
-
-    public async Task<int> Execute(CommandContext context, CommandSettings settings)
-    {
-        Settings settingsActual = new Settings()
-        {
-            FakeTextLineLength = 100_000,
-            NumberOfFakeTextLines = 100,
-        };
-        
-        return await Execute(context,
-            settingsActual);
     }
 }

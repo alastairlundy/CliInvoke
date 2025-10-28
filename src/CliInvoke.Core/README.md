@@ -17,17 +17,17 @@ Key Abstractions:
   * ``IProcessPipeHandler``
 
 * Fluent Builders:
-  * ``IArgumentsBuilder`` - An interface to assist with Argument Building and argument escaping.
-  * ``IEnvironmentVariablesBuilder`` - An interface to assist with setting Environment variables.
+  * ``IArgumentsBuilder`` - An interface to help with Argument Building and argument escaping.
+  * ``IEnvironmentVariablesBuilder`` - An interface to help with setting Environment variables.
   * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
   * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy`` objects.
   * ``IUserCredentialBuilder``
 
 ## Features
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
-* Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
+* Supports .NET Standard 2.0, .NET 8, and newer TFMs, and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
-* Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows <sup>1</sup>
+* Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
 <sup>1</sup> Specializations library distributed separately.
@@ -50,7 +50,7 @@ CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your ID
 | AlastairLundy.CliInvoke.Core | [AlastairLundy.CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core) | ``dotnet add package AlastairLundy.CliInvoke.Core`` |
 
 ## Supported Platforms
-CliInvoke.Core can be added to any .NET Standard 2.0, .NET 8, or .NET 9 or newer supported project.
+CliInvoke.Core can be added to any .NET Standard 2.0, .NET 8, or newer supported project.
 
 The following table details which target platforms are supported for running Processes.
 
@@ -67,9 +67,9 @@ The following table details which target platforms are supported for running Pro
 | watchOS                                | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^3                                  |
 | Browser                                | Not Planned :x:                    | Not planned due to Client Side Rendering not being a valid target Platform for executing processes. |
 
-^2 - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
+^2 — See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
-^3 - lack of IOS support implies lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
+^3 — lack of IOS support implies lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 
 **Note:** This library has not been tested on Android or Tizen.
 
@@ -96,7 +96,7 @@ using Microsoft.Extensions.DependencyInjection;
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
 
 // Get IProcessConfigurationInvoker
-IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
@@ -121,7 +121,7 @@ using Microsoft.Extensions.DependencyInjection;
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
 
 // Get IProcessConfigurationInvoker
-IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+IProcessnvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");

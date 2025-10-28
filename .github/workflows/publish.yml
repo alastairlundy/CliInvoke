@@ -48,8 +48,8 @@ jobs:
           # Push the Core package
       - name: NuGet push
         run: dotnet nuget push src/CliInvoke.Core/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-      - name: Sleep for 180 seconds
-        run: sleep 180s
+      - name: Sleep for 240 seconds
+        run: sleep 240s
         shell: bash
       - name: Restore dependencies
         run: dotnet restore
@@ -71,8 +71,8 @@ jobs:
       - name: NuGet push
         run: dotnet nuget push src/CliInvoke/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
-      - name: Sleep for 180 seconds
-        run: sleep 180s
+      - name: Sleep for 240 seconds
+        run: sleep 240s
         shell: bash
       - name: Restore dependencies
         run: dotnet restore
