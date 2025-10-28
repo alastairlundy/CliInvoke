@@ -4,10 +4,9 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Helpers.Processes;
 using AlastairLundy.CliInvoke.Tests.Internal.Constants;
-
 using Xunit;
 
-namespace DotExtensions.Tests.Processes;
+namespace AlastairLundy.CliInvoke.Tests.Helpers.Processes;
 
 public class ProcessRemoteDeviceDetectionTests
 {
