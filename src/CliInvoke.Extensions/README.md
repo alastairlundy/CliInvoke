@@ -12,9 +12,12 @@ This package adds the ``AddCliInvoke`` Dependency Injection extension method to 
 ## Usage
 
 ### DependencyInjection
-CliInvoke.Extensions provides an extension method to make it easier to use CliInvoke with Microsoft.Extensions.DependencyInjection.
+CliInvoke.Extensions provides extension methods to make it easier to use CliInvoke with Microsoft.Extensions.DependencyInjection.
 
-The ``AddCliInvoke`` IServiceCollection extension method adds CliInvoke's and ProcessExtensions' interface-able services.
+The methods added include:
+* ``AddCliInvoke`` extension method to set up CliInvoke's interfaces and implementing classes with Dependency Injection.
+* ``AddDefaultRunnerProcessInvoker`` extension method to set up CliInvoke's ``DefaultRunnerProcessInvoker`` and abstract class ``RunnerProcessInvokerBase`` with Dependency Injection - Only required for running Process Configurations through other Process Configurations.
+* ``AddDerivedRunnerProcessInvoker`` extension method to set up a class that derives from the abstract class ``RunnerProcessInvokerBase`` along with the abstract class itself with Dependency Injection - Only required for running Process Configurations through other Process Configurations where a custom implementation of ``RunnerProcessInvokerBase`` is desired.
 
 The services injected include:
 * ``IFilePathResolver`` - Used by ``IProcessInvoker`` to resolve the file path of a ``ProcessConfiguration``'s ``TargetFilePath`` string.
