@@ -61,6 +61,6 @@
         <value>The provided target file path cannot be null or empty.</value>
     </data>
     <data name="Exceptions.ProcessTimeoutPolicy.Timeout.LessThanZero" xml:space="preserve">
-        <value>{0} must be greater than or equal to zero.</value>
+        <value>Timeout threshold must be greater than or equal to zero. Value was {x}.</value>
     </data>
 </root>
