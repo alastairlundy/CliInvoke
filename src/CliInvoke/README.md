@@ -14,7 +14,7 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Features
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
-* Supports .NET Standard 2.0, .NET 8, and newer TFMs, and has few dependencies.
+* Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
@@ -35,8 +35,8 @@ Launch processes, redirect standard input and output streams, await process comp
 CliInvoke is available on [the Nuget Gallery](https://nuget.org) but call be also installed via the ``dotnet`` sdk cli.
 
 The package(s) to install depends on your use case:
-* For use in a .NET library — Install the [Abstractions Package](#abstractions-package), your developer users can install the Implementation and Dependency Injection packages.
-* For use in a .NET app — Install the [Implementation Package](#implementation-package) and the [Dependency Injection Extensions Package](#extensions-package)
+* For use in a .NET library - Install the [Abstractions Package](#abstractions-package), your developer users can install the Implementation and Dependency Injection packages.
+* For use in a .NET app - Install the [Implementation Package](#implementation-package) and the [Dependency Injection Extensions Package](#extensions-package)
 
 ### Abstractions Package
 [CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core)
@@ -86,9 +86,9 @@ The following table details which target platforms are supported for executing c
 | watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                |
 | Browser          | Not Planned :x:                    | Not supported due to not being a valid target Platform for executing programs or processes. |
 
-<sup>3</sup> — See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
+<sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
 
-<sup>4</sup> — lack of IOS support implies lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
+<sup>4</sup> - lack of IOS support implies Lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 
 **Note:** This library has not been tested on Android or Tizen.
 
@@ -115,7 +115,7 @@ using Microsoft.Extensions.DependencyInjection;
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
 
 // Get IProcessConfigurationInvoker
-IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
+IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
@@ -140,7 +140,7 @@ using Microsoft.Extensions.DependencyInjection;
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
 
 // Get IProcessConfigurationInvoker
-IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
+IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
@@ -220,7 +220,7 @@ BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config
 ## License
 CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
-If you use CliInvoke in your project, please make an exact copy of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
+If you use CliInvoke in your project, please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 
 ## Acknowledgements
 

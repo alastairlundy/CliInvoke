@@ -21,7 +21,6 @@ Key Abstractions:
   * ``IEnvironmentVariablesBuilder`` - An interface to help with setting Environment variables.
   * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
   * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy`` objects.
-  * ``IProcessTimeoutPolicyBuilder``
   * ``IUserCredentialBuilder``
 
 ## Features
