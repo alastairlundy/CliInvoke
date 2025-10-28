@@ -69,14 +69,11 @@ These cover common use cases and are NOT an exhaustive list of method signature 
 ##### ExecuteAsync
 **v1 Method Signature**:
 ```csharp
-
-
 Task<ProcessResult> ExecuteProcessAsync(Process process, ProcessConfiguration processConfiguration,CancellationToken cancellationToken = default);
 ```
 
 **v2 Method Signature**:
 ```csharp
-Task<BufferedProcessResult> ExecuteBufferedAsync(
 Task<ProcessResult> ExecuteAsync(
     ProcessConfiguration processConfiguration,
     ProcessExitConfiguration? processExitConfiguration = null,
@@ -88,6 +85,8 @@ Task<ProcessResult> ExecuteAsync(
 ##### ExecuteBufferedAsync
 **v1 Method Signature**:
 ```csharp
+Task<BufferedProcessResult> ExecuteBufferedProcessAsync(Process process, ProcessConfiguration processConfiguration,CancellationToken cancellationToken = default);
+```
 
 ##### ExecuteBufferedAsync
 **v1 Method Signature**:
@@ -106,13 +105,6 @@ Task<BufferedProcessResult> ExecuteBufferedAsync(
     CancellationToken cancellationToken = default);
 ```
 
-**Notes**:
-
-
-**Removed methods**:
-| CliInvoke v1 method signature | Suggested Replacement method signature |
-|-|-|
-| Execute | | 
 **Removed methods**:
 
 ##### ExecuteProcessAsync
@@ -125,10 +117,8 @@ Task<ProcessResult> ExecuteProcessAsync(Process process, ProcessResultValidation
 **v2 Replacement**:
 ```csharp
 Task<ProcessResult> ExecuteAsync(
-    ProcessConfiguration processConfiguration,
-    ProcessExitConfiguration? processExitConfiguration = null,
-    bool disposeOfConfig = false,
-    CancellationToken cancellationToken = default);
+ProcessConfiguration processConfiguration,
+ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = false,CancellationToken cancellationToken = default);
 ```
 
 ##### ExecuteBufferedProcessAsync
