@@ -50,28 +50,9 @@ CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your ID
 | AlastairLundy.CliInvoke.Core | [AlastairLundy.CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core) | ``dotnet add package AlastairLundy.CliInvoke.Core`` |
 
 ## Supported Platforms
-CliInvoke.Core can be added to any .NET Standard 2.0, .NET 8, or newer supported project.
+CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
 
-The following table details which target platforms are supported for running Processes.
-
-| Operating System/Platform specific TFM | Support Status                     | Notes                                                                                               |
-|----------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------------|
-| Windows                                | Fully Supported :white_check_mark: |                                                                                                     |
-| macOS                                  | Fully Supported :white_check_mark: |                                                                                                     |
-| Mac Catalyst                           | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                        |
-| Linux                                  | Fully Supported :white_check_mark: |                                                                                                     |
-| FreeBSD                                | Fully Supported :white_check_mark: |                                                                                                     |
-| Android                                | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                        |
-| IOS                                    | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. ^2                                     | 
-| tvOS                                   | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS ^2                                     |
-| watchOS                                | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS ^3                                  |
-| Browser                                | Not Planned :x:                    | Not planned due to Client Side Rendering not being a valid target Platform for executing processes. |
-
-^2 — See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
-
-^3 — lack of IOS support implies lack of watchOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
-
-**Note:** This library has not been tested on Android or Tizen.
+For more details see the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/Supported-OperatingSystems.md)
 
 ## Examples
 
