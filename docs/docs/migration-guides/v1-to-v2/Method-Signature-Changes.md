@@ -117,7 +117,85 @@ string EscapeCharacters(string argument);
 
 ## IProcessConfigurationBuilder and ProcessConfigurationBuilder
 
+### Set Arguments string
+**v1 Method Signature**:
+```csharp
+IProcessConfigurationBuilder WithArguments(string arguments);
+```
 
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetArguments(string arguments);
+```
+
+### Set Arguments IEnumerable<string>
+**v1 Method Signature**:
+```csharp
+IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments);
+```
+
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments);
+```
+
+### Set Arguments IEnumerable<string> with Argument Escaping
+**v1 Method Signature**:
+```csharp
+IProcessConfigurationBuilder WithArguments(IEnumerable<string> arguments, bool escapeArguments);
+```
+
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments, bool escapeArguments);
+```
+
+### Set Environment Variables
+**v1 Method Signature**:
+```csharp
+IProcessConfigurationBuilder WithEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables);
+```
+
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables);
+```
+
+### Set Target File Path
+**v1 Method Signature**:
+```csharp
+IProcessConfigurationBuilder WithTargetFilePath(string targetFilePath);
+```
+
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath);
+```
+
+
+### Set User Credential
+**v1 Method Signature**:
+```csharp
+IProcessConfigurationBuilder WithUserCredential(UserCredential credentials);
+```
+
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetUserCredential(UserCredential credentials);
+```
+
+### Set User Credential with Action<IUserCredentialBulder>
+**v1 Method Signature**:
+```csharp
+IProcessConfigurationBuilder WithUserCredential(Action<IUserCredentialBuilder> configure);
+```
+
+**v2 Method Signature**:
+```csharp
+IProcessConfigurationBuilder SetUserCredential(Action<IUserCredentialBuilder> configure);
+```
+
+## IEnvironmentVariablesBuilder and EnvironmentVariablesBuilder
 
 ### Set string pair
 **v1 Method Signature**:
