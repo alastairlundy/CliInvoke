@@ -13,8 +13,8 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessfactory</PackageTags>
-        <Description>Process and Cli program running related abstractions implemented by AlastairLundy.CliInvoke</Description>
+        <PackageTags>shell, pipe, command-line, executable, processconfiguration, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessconfigurationfactory</PackageTags>
+        <Description>External Process and Cli program running related abstractions implemented by CliInvoke</Description>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -23,10 +23,38 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>2.0.0</Version>
-        <PackageReleaseNotes>* Renamed ``IProcessRunnerCreator`` to ``IProcessRunnerFactory``
-* Adjusted ``IProcessRunnerFactory`` method signatures - These contain breaking changes
+        <PackageReleaseNotes>## Changes since 1.6.x
+#### Breaking Changes
+* Removed ``CliCommandConfiguration`` - This has been replaced by ``ProcessConfiguration``
+* Removed ``ICliCommandConfigurationBuilder`` and ``CliCommandConfigurationBuilder`` - These have been replaced by ``IProcessConfigurationBuilder`` and ``ProcessConfigurationBuilder`` respectively
+* Removed ``ICliCommandInvoker`` and ``CliCommandInvoker`` This has been replaced with ``IProcessInvoker``
+* Removed ``StartInfo`` property from ``ProcessConfiguration``
+* Removed Primitives subnamespace
+* Moved ``ProcessConfiguration``'s ``ToProcessStartInfo`` method logic to ``ApplyProcessConfiguration`` internal extension method in ``CliInvoke``
+* Updated ``ProcessResult`` to implement ``IEquatable&lt;ProcessResult&gt;``
+* Updated ``PipedProcessResult`` to implement ``IDisposable`` and dispose of the Stream parameters when Dispose or DisposeAsync is called
+* Removed ``TryApplyUserCredential`` extension method
+* Removed redundant constructor in ``ProcessConfiguration``
+* Restructured ``IProcessInvoker`` interface with methods for ``ExecuteAsync``, ``ExecuteBufferedAsync``, and ``ExecutePipedAsync``
+* Removed ``UserCredential`` ``IsSupportedOnCurrentOs`` extension method
+* Removed ``IProcessFactory``
+* Moved extension methods to ``CliInvoke`` main package
+Changed default value for ``ProcessResourcePolicy``'s ``PriorityBoostEnabled`` value from true to false
+* Added ProcessCancellationExceptionBehaviour enum to enable configuring Cancellation Exception behaviour (i.e. suppressing the exception, allowing it, or allowing the exception if unexpected) - This has been added as a property to ``ProcessExitConfiguration``, with updates to the class to support the addition.
+* Removed ``IProcessTimeoutPolicyBuilder`` and ``ProcessTimeoutPolicyBuilder`` - These builders added hardly any benefit for the complexity they added
+* Renamed ``IEnvironmentVariablesBuilder`` methods to avoid ambiguous method usage
+* Update IProcessInvoker to allow specifying ProcessConfiguration disposal after invoker use
+* Moved ``ProcessTimeoutPolicy`` and ``ProcessResultValidation`` properties from ``ProcessConfiguration`` into a new type ``ProcessExitConfiguration``
+* Removed deprecated code
+* Moved ``IFilePathResolver`` into CliInvoke.Core directly 
+
+#### Non-Breaking Changes
+* Improved robustness of ``ProcessTimeoutPolicy`` parameter checks during creation
+* Added ``IProcessConfigurationFactory``
+* Clarified OS support for ``IProcessResourcePolicyBuilder`` methods
 * Added abstract class ``RunnerProcessInvokerBase`` that inherits from ``IProcessInvoker`` 
-* Annotated ``IProcessInvoker`` methods to indicate lack of support for IOS and tvOS</PackageReleaseNotes>
+* Annotated ``IProcessInvoker`` methods to indicate lack of support for IOS and tvOS
+* Added ``IRunnerProcessFactory`` - An interface for creating Processes that run other processes.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
