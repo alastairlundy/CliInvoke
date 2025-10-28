@@ -19,7 +19,7 @@ CliInvoke.Specializations comes with three specializations as of 1.0.0:
 All Command specialization classes come with an already configured TargetFilePath that points to the relevant executable.
 
 ### CmdProcessConfiguration
-The CmdProcessConfiguration TargetFilePath points to Windows' copy of cmd.exe.
+The CmdProcessConfiguration TargetFilePath points to Windows' copy of cmd.exe. This is only supported on Windows.
 
 ```csharp
 using AlastairLundy.CliInvoke.Core;
@@ -83,6 +83,8 @@ using AlastairLundy.CliInvoke.Specializations;
 ### ClassicPowershellProcessConfiguration
 The ClassicPowershellCommand is a specialized Command class with an already configured TargetFilePath that points to Windows' copy of powershell.exe.
 
+This is only supported on Windows.
+
 ```csharp
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Builders;
@@ -114,6 +116,8 @@ using AlastairLundy.CliInvoke.Specializations;
 
 ### PowershellProcessConfiguration
 The PowershellProcessConfiguration's TargetFilePath points to the installed copy of cross-platform PowerShell if it is installed.
+
+This is only supported on platforms that cross-platform PowerShell supports.
 
 ```csharp
 using AlastairLundy.CliInvoke.Core;
