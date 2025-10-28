@@ -127,7 +127,7 @@ IEnvironmentVariablesBuilder Set(string name, string value);
 
 **v2 Method Signature**:
 ```csharp
-
+IEnvironmentVariablesBuilder SetPair(string name, string value);
 ```
 
 ### Set variables from Enumerable
@@ -137,7 +137,9 @@ IEnvironmentVariablesBuilder Set(IEnumerable<KeyValuePair<string, string>> varia
 ```
 
 **v2 Method Signature**:
-
+```csharp
+IEnvironmentVariablesBuilder SetEnumerable(IEnumerable<KeyValuePair<string, string>> variables);
+```
 
 ### Set variables from IReadOnlyDictionary<string, string>
 **v1 Method Signature**:
@@ -146,7 +148,9 @@ IEnvironmentVariablesBuilder Set(IReadOnlyDictionary<string, string> variables);
 ```
 
 **v2 Method Signature**:
-
+```csharp
+IEnvironmentVariablesBuilder SetReadOnlyDictionary(IReadOnlyDictionary<string, string> variables);
+```
 
 ## IProcessResourcePolicyBuilder and ProcessResourcePolicyBuilder
 
