@@ -14,10 +14,9 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Table of Contents
 * [Features](#features)
-* [Why CliInvoke?](#why-cliinvoke)
+* [Comparison vs Alternatives](#comparison-vs-alternatives)
 * [Installing CliInvoke](#installing-cliinvoke)
-    * [Installing CliInvoke](#installing-CliInvoke)
-    * [Supported Platforms](#supported-platforms)
+   * [Supported Platforms](#supported-platforms)
 * [CliInvoke Examples](#examples)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
 * [Roadmap](#cliinvokes-roadmap)
@@ -33,15 +32,21 @@ Launch processes, redirect standard input and output streams, await process comp
 
 <sup>1</sup> Specializations library distributed separately.
 
-## Why CliInvoke?
+## Comparison vs Alternatives
 
-| Feature                                                                | CliInvoke | CliWrap |                ProcessX                 |
-|------------------------------------------------------------------------|:---------:|:-------:|:---------------------------------------:|
-| Configure and Run External Processes using code written in .NET        |     ✅     |    ✅    | ❌, Uses mixture of .NET and BASH syntax |
-| No Additional Licensing Terms Required for Use                         |     ✅     |    ❌    |                    ✅                    |
-| Uses only managed .NET code                                            |     ✅     |    ❌    |                    ✅                    |
-| Follows Separation of Concerns and the Single Responsibility Principle |     ✅     |    ❌    |                    ❌                    |
-| Allows for alternative Process Runners to be specified and/or used     |     ✅     |    ❌    |                    ❌                    |              
+| Feature / Criterion                                                   | CliInvoke | [CliWrap](https://github.com/Tyrrrz/CliWrap/) | [ProcessX](https://github.com/Cysharp/ProcessX) |
+|------------------------------------------------------------------------|:---------:|:-------:|:--------:|
+| Dedicated builder, model, and invoker types (clear separation of concerns) | ✅        | ❌     | ❌      |
+| Dependency Injection registration extensions                           | ✅        | ❌     | ❌      |
+| Installable via NuGet                                                  | ✅        | ✅     | ✅      |
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)  | ✅        | ✅*    | ❌*     |
+| Buffered and non‑buffered execution modes                              | ✅        | ✅     | ✅      |
+| Small surface area and minimal dependencies                            | ✅        | ✅     | ✅      |
+| Licensing / repository additional terms                                | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) | ✅ (MIT) |
+
+Notes:
+- *Indicates not explicitly advertised for all listed OSes but may work in practice; check each project's docs.
+- The CliWrap repository includes a test project that references a source‑available (non‑permissive) library; that library is used for tests and is not distributed with the runtime package. The repo also contains an informal "Terms of Use" statement — review repository files if legal certainty is required.
 
 
 ## Installing CliInvoke
@@ -105,10 +110,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code ommitted for clarity
 
-// Get IProcessConfigurationFactory 
+// Get services 
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
-
-// Get IProcessConfigurationInvoker
 IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
 
 // Simply create the process configuration.
@@ -124,16 +127,13 @@ This example gets a ``BufferedProcessResult`` which contains redirected Standard
 ```csharp
 using AlastairLundy.CliInvoke.Core.Factories;
 using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code ommitted for clarity
 
-// Get IProcessConfigurationFactory 
+// Get services 
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
-
-// Get IProcessConfigurationInvoker
 IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
 
 // Simply create the process configuration.
