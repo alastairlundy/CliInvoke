@@ -2,31 +2,32 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Title>AlastairLundy.CliInvoke.Specializations</Title>
+        <Title>CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>
         <Copyright>Copyright (c) 2024-2025 Alastair Lundy</Copyright>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0-rc.1</PackageVersion>
+        <PackageVersion>2.0.0</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <LangVersion>14</LangVersion>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 7
-* Updated to support CliInvoke 2.0.0 RC 1</PackageReleaseNotes>
-        <Description>CliRunner Specializations is a library for providing Specializations of CliRunner's Commands.</Description>
+        <LangVersion>13</LangVersion>
+        <PackageReleaseNotes>## Changes since 1.6.x
+* Updated to support CliInvoke 2.0.0
+* Updated Specialization ``ProcessConfiguration`` derived classes to work with the updated ``ProcessConfiguration`` class</PackageReleaseNotes>
+        <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.0.0-beta.22" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>

@@ -67,20 +67,20 @@ public class ProcessConfigurationBuilderTests
                 //Assert
                 Assert.Throws<ArgumentException>(() =>
                 {
-                        processConfigBuilder.WithShellExecution(true)
-                                .WithStandardOutputPipe(new StreamReader(Console.OpenStandardOutput()));
+                        processConfigBuilder.ConfigureShellExecution(true)
+                                .SetStandardOutputPipe(new StreamReader(Console.OpenStandardOutput()));
                 });
                 
                 Assert.Throws<ArgumentException>(() =>
                 {
-                        processConfigBuilder.WithShellExecution(true)
-                                .WithStandardErrorPipe(new StreamReader(Console.OpenStandardError()));
+                        processConfigBuilder.ConfigureShellExecution(true)
+                                .SetStandardErrorPipe(new StreamReader(Console.OpenStandardError()));
                 });
                 
                 Assert.Throws<ArgumentException>(() =>
                 {
-                        processConfigBuilder.WithShellExecution(true)
-                                .WithStandardInputPipe(new StreamWriter(Console.OpenStandardInput()));
+                        processConfigBuilder.ConfigureShellExecution(true)
+                                .SetStandardInputPipe(new StreamWriter(Console.OpenStandardInput()));
                 });
         }
 
@@ -91,7 +91,7 @@ public class ProcessConfigurationBuilderTests
                 IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
               
                 //Act
-                processConfigBuilder = processConfigBuilder.WithTargetFile("bar");
+                processConfigBuilder = processConfigBuilder.SetTargetFilePath("bar");
               
                 //Assert
                 ProcessConfiguration command = processConfigBuilder.Build();
@@ -104,10 +104,10 @@ public class ProcessConfigurationBuilderTests
         {
                 //Arrange
                 IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-                        .WithArguments("--arg-value=value");
+                        .SetArguments("--arg-value=value");
              
                 //Act
-                ProcessConfiguration newArguments = processConfigBuilder.WithArguments("--flag")
+                ProcessConfiguration newArguments = processConfigBuilder.SetArguments("--flag")
                         .Build();
              
                 //Assert
@@ -129,7 +129,7 @@ public class ProcessConfigurationBuilderTests
                 password.AppendChar('4');
                 
                 IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-                        .WithUserCredential(new UserCredential("",
+                        .SetUserCredential(new UserCredential("",
                                 "admin",
                                 password,
                                 false));
@@ -146,7 +146,7 @@ public class ProcessConfigurationBuilderTests
                         password2,
                         false);
                 
-                processConfigBuilder = processConfigBuilder.WithUserCredential(userCredential);
+                processConfigBuilder = processConfigBuilder.SetUserCredential(userCredential);
                 
                 //Assert
                 ProcessConfiguration command = processConfigBuilder.Build();
@@ -165,7 +165,7 @@ public class ProcessConfigurationBuilderTests
         {
                 //Arrange
                 IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-                        .WithProcessResourcePolicy(ProcessResourcePolicy.Default);
+                        .SetProcessResourcePolicy(ProcessResourcePolicy.Default);
                 
                 
                 //Arrange
@@ -174,7 +174,7 @@ public class ProcessConfigurationBuilderTests
                         null,
                         ProcessPriorityClass.AboveNormal);
                 
-                processConfigBuilder = processConfigBuilder.WithProcessResourcePolicy(resourcePolicy);
+                processConfigBuilder = processConfigBuilder.SetProcessResourcePolicy(resourcePolicy);
                 
                 //Assert
                 ProcessConfiguration command = processConfigBuilder.Build();
@@ -186,11 +186,10 @@ public class ProcessConfigurationBuilderTests
         public void TestReconfiguredAdminPrivileges()
         {
                 //Act
-                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-                        .WithAdministratorPrivileges(false);
+                IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
              
                 //Arrange
-                processConfigBuilder = processConfigBuilder.WithAdministratorPrivileges(true);
+                processConfigBuilder = processConfigBuilder.RequireAdministratorPrivileges();
              
                 //Assert
                 ProcessConfiguration command = processConfigBuilder.Build();
@@ -202,10 +201,10 @@ public class ProcessConfigurationBuilderTests
         {
                 //Act
                 IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-                        .WithWorkingDirectory("dir");
+                        .SetWorkingDirectory("dir");
                 
                 //Arrange
-                processConfigBuilder = processConfigBuilder.WithWorkingDirectory("dir2");
+                processConfigBuilder = processConfigBuilder.SetWorkingDirectory("dir2");
                 
                 //Assert
                 ProcessConfiguration command = processConfigBuilder.Build();

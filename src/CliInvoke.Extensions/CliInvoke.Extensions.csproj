@@ -9,15 +9,17 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.0.0-rc.1</Version>
-        <Title>AlastairLundy.CliInvoke.Extensions</Title>
+        <Version>2.0.0</Version>
+        <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 7
-* Updated to support CliInvoke 2.0.0 RC 1</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 1.6.x
+* Updated to support CliInvoke 2.0.0
+* Added ``IProcessConfigurationFactory`` and ``ProcessConfigurationFactory`` dependency injection setup to the ``AddCliInvoke`` extension method
+* Added convenience extension methods that make CliInvoke more ergonomic to use.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

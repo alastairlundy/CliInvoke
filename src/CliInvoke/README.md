@@ -6,8 +6,6 @@
 [![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
-<img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
-
 CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
 
 Launch processes, redirect standard input and output streams, await process completion and much more.
@@ -16,7 +14,7 @@ Launch processes, redirect standard input and output streams, await process comp
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
 * Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
-* Support for specific specializations such as running executables or commands via Windows Powershell or CMD on Windows <sup>1</sup>
+* Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
 <sup>1</sup> Specializations library distributed separately.
@@ -36,7 +34,7 @@ CliInvoke is available on [the Nuget Gallery](https://nuget.org) but call be als
 
 The package(s) to install depends on your use case:
 * For use in a .NET library - Install the [Abstractions Package](#abstractions-package), your developer users can install the Implementation and Dependency Injection packages.
-* For use in a .NET app - Install the [Implementation Package](#implementation-package) and the [Dependency Injection Extensions Package](#dependency-injection-extensions)
+* For use in a .NET app - Install the [Implementation Package](#implementation-package) and the [Dependency Injection Extensions Package](#extensions-package)
 
 ### Abstractions Package
 [CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core)
@@ -69,28 +67,9 @@ dotnet add package AlastairLundy.CliInvoke.Specializations
 ```
 
 ## Supported Platforms
-CliInvoke can currently be added to .NET Standard 2.0, .NET 8, or .NET 9 or newer supported projects.
+CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
 
-The following table details which target platforms are supported for executing commands via CliInvoke. 
-
-| Operating System | Support Status                     | Notes                                                                                       |
-|------------------|------------------------------------|---------------------------------------------------------------------------------------------|
-| Windows          | Fully Supported :white_check_mark: |                                                                                             |
-| macOS            | Fully Supported :white_check_mark: |                                                                                             |
-| Mac Catalyst     | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                |
-| Linux            | Fully Supported :white_check_mark: |                                                                                             |
-| FreeBSD          | Fully Supported :white_check_mark: |                                                                                             |
-| Android          | Untested Platform :warning:        | Support for this platform has not been tested but should theoretically work.                |
-| IOS              | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting IOS. <sup>3</sup>                   | 
-| tvOS             | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting tvOS <sup>3</sup>                   |
-| watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                |
-| Browser          | Not Planned :x:                    | Not supported due to not being a valid target Platform for executing programs or processes. |
-
-<sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
-
-<sup>4</sup> - Lack of watchOS support is implied by lack of IOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
-
-**Note:** This library has not been tested on Android or Tizen.
+For more details see the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/Supported-OperatingSystems.md)
 
 ## Examples
 
@@ -174,8 +153,8 @@ using Microsoft.Extensions.DependencyInjection;
 
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
-                            .WithArguments(["arg1", "arg2"])
-                            .WithWorkingDirectory("/Path/To/Directory");
+                            .SetArguments(["arg1", "arg2"])
+                            .SetWorkingDirectory("/Path/To/Directory");
   
   // Build it as a ProcessConfiguration object when you're ready to use it.
   ProcessConfiguration config = builder.Build();
@@ -205,8 +184,8 @@ using Microsoft.Extensions.DependencyInjection;
 
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
-                            .WithArguments(["arg1", "arg2"])
-                            .WithWorkingDirectory("/Path/To/Directory")
+                            .SetArguments(["arg1", "arg2"])
+                            .SetWorkingDirectory("/Path/To/Directory")
                             .RedirectStandardOutput(true)
                            .RedirectStandardError(true);
   
@@ -220,7 +199,7 @@ BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config
 ## License
 CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
-If you use CliInvoke in your project please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
+If you use CliInvoke in your project, please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses txt file or as a separate txt file.
 
 ## Acknowledgements
 

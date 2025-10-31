@@ -6,6 +6,7 @@ using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Specializations.Tests.Helpers;
+using Xunit;
 
 namespace AlastairLundy.CliInvoke.Specializations.Tests.Invokers;
 
@@ -30,7 +31,7 @@ public class CmdInvokerTests : IClassFixture<TestFixture>
         {
             IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
                     (ExecutedCommandHelper.WinCalcExePath)
-                .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
+                .SetWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
                     string.Empty));
             
             ProcessConfiguration commandConfiguration = configurationBuilder.Build();

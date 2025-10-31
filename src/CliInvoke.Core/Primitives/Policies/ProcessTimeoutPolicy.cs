@@ -40,11 +40,11 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         bool lessThanZero = double.IsNegative(timeoutThreshold.TotalMilliseconds);
 #else
         bool lessThanZero = timeoutThreshold.TotalMilliseconds < double.Parse("0.0");
-#endif        
+#endif
 
-        if(timeoutThreshold < TimeSpan.Zero || lessThanZero)
-            throw new ArgumentOutOfRangeException(nameof(timeoutThreshold), string.Format(Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero, nameof(timeoutThreshold)));
-
+        if (timeoutThreshold < TimeSpan.Zero || lessThanZero)
+            throw new ArgumentOutOfRangeException(nameof(timeoutThreshold),
+                Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero.Replace("{x}", timeoutThreshold.ToString()));
         
         TimeoutThreshold = timeoutThreshold;
         CancellationMode = cancellationMode;

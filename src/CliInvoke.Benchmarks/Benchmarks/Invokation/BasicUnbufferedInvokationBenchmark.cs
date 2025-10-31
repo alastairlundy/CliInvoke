@@ -29,11 +29,13 @@ public class BasicUnbufferedInvokationBenchmark
     }
     
     [Benchmark]
-    public async Task<int> CliInvoke_ProcessConfigInvoker()
+    public async Task<int> CliInvoke_ProcessInvoker()
     {
         IProcessConfigurationBuilder processConfigurationBuilder = new
                 ProcessConfigurationBuilder(_dotnetCommandHelper.DotnetExecutableTargetFilePath)
-            .WithArguments(_dotnetCommandHelper.Arguments);
+            .SetArguments(_dotnetCommandHelper.Arguments)
+            .RedirectStandardOutput(false)
+            .RedirectStandardError(false);
         
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
 

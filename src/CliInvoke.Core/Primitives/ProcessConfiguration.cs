@@ -9,7 +9,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
@@ -96,58 +95,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
         StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
     }
-
-    /// <summary>
-    /// Instantiates the Process Configuration class with a ProcessStartInfo and other optional parameters.
-    /// </summary>
-    /// <param name="processStartInfo"></param>
-    /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
-    /// <param name="credential">The credential to be used (if specified).</param>
-    /// <param name="standardInput">The standard input source to be used (if specified).</param>
-    /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
-    /// <param name="standardError">The standard error destination to be used (if specified).</param>
-    /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("watchos")]
-    [UnsupportedOSPlatform("browser")]
-    public ProcessConfiguration(ProcessStartInfo processStartInfo,
-        IReadOnlyDictionary<string, string>? environmentVariables = null,
-        UserCredential? credential = null,
-        StreamWriter? standardInput = null,
-        StreamReader? standardOutput = null,
-        StreamReader? standardError = null,
-        ProcessResourcePolicy? processResourcePolicy = null)
-    {
-        EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
-                
-        Credential = credential ?? UserCredential.Null;
-            
-        ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
-        
-        StandardInput = standardInput ?? StreamWriter.Null;
-        StandardOutput = standardOutput ?? StreamReader.Null;
-        StandardError = standardError ?? StreamReader.Null;
-        
-        StandardInputEncoding = Encoding.Default;
-        StandardOutputEncoding = Encoding.Default;
-        StandardErrorEncoding = Encoding.Default;
-        
-        RedirectStandardInput = processStartInfo.RedirectStandardInput;
-        RedirectStandardOutput = processStartInfo.RedirectStandardOutput;
-        RedirectStandardError = processStartInfo.RedirectStandardError;
-            
-        TargetFilePath = processStartInfo.FileName;
-        Arguments = processStartInfo.Arguments;
-        WorkingDirectoryPath = processStartInfo.WorkingDirectory;
-    }
-                
+    
     /// <summary>
     /// Whether administrator privileges should be used when executing the Command.
     /// </summary>
@@ -252,7 +200,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public bool Equals(ProcessConfiguration? other)
     {
         if (other is null)
-        { 
+        {
             return false;
         }
         
@@ -309,6 +257,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             
         hashCode.Add(TargetFilePath);
         hashCode.Add(Arguments);
+        hashCode.Add(WorkingDirectoryPath);
         hashCode.Add(EnvironmentVariables);
 
         hashCode.Add(Credential);
