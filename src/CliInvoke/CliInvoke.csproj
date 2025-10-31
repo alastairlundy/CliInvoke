@@ -34,7 +34,7 @@
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>2.0.0</PackageVersion>
-        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,iprocessconfigurationfactory</PackageTags>
+        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
@@ -51,9 +51,6 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
         <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all" />
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="AlastairLundy.DotExtensions" Version="[8.6.3, 9.0.0)" />
     </ItemGroup>
 
     <PropertyGroup>

@@ -15,8 +15,6 @@ using System.Threading.Tasks;
 
 using AlastairLundy.CliInvoke.Core;
 
-using AlastairLundy.DotExtensions.Dates;
-
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 /// <summary>
@@ -99,10 +97,11 @@ internal static class ProcessCancellationExtensions
         catch (TaskCanceledException)
         {
             DateTime actualExitTime = DateTime.UtcNow;
-
+            long elapsedTicks = Math.Abs(actualExitTime.Ticks - expectedExitTime.Ticks);
+            
             if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
             {
-                if (actualExitTime.Abs(expectedExitTime) > TimeSpan.FromSeconds(10))
+                if (TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10))
                 {
                     throw;
                 }
@@ -154,6 +153,8 @@ internal static class ProcessCancellationExtensions
         catch (Exception)
         {
             DateTime actualExitTime = DateTime.UtcNow;
+            long elapsedTicks = Math.Abs(actualExitTime.Ticks - expectedExitTime.Ticks);
+
             
             if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.SuppressException)
             {
@@ -163,7 +164,7 @@ internal static class ProcessCancellationExtensions
             if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected ||
                 cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
             {
-                if (actualExitTime.Abs(expectedExitTime) > TimeSpan.FromSeconds(10) || 
+                if (TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10) || 
                     cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
                 {
                     throw;
