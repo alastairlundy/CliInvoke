@@ -8,12 +8,16 @@
 */
 
 using System;
+#if NET8_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Extensibility;
 using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 using AlastairLundy.CliInvoke.Core.Factories;
 using AlastairLundy.CliInvoke.Core.Piping;
+
 using AlastairLundy.CliInvoke.Extensibility;
 using AlastairLundy.CliInvoke.Extensibility.Factories;
 using AlastairLundy.CliInvoke.Factories;
@@ -137,12 +141,46 @@ public static class DependencyInjectionExtensions
     /// Configures dependency injection to include a derived runner process invoker type.
     /// </summary>
     /// <param name="services">The service collection to add the derived runner process invoker to.</param>
+    /// <param name="lifetime">The service lifetime to use for the derived runner process invoker. The default is Scoped.</param>
+    /// <returns>The updated service collection with the derived runner process invoker configured.</returns>
+    /// <typeparam name="TRunnerType">The type of the derived runner process invoker, which must inherit from <see cref="RunnerProcessInvokerBase"/>.</typeparam>
+    /// <exception cref="ArgumentException">Thrown if the provided type is not a subclass of or assignable from <see cref="RunnerProcessInvokerBase"/>.</exception>
+    public static IServiceCollection AddDerivedRunnerProcessInvoker<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+ #endif
+        TRunnerType>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TRunnerType : RunnerProcessInvokerBase, new()
+    {
+        switch (lifetime)
+        {
+            case ServiceLifetime.Scoped:
+                services.AddScoped<RunnerProcessInvokerBase, TRunnerType>();
+                break;
+            case  ServiceLifetime.Transient:
+                services.AddTransient<RunnerProcessInvokerBase, TRunnerType>();
+                break;
+            case ServiceLifetime.Singleton:
+                services.AddSingleton<RunnerProcessInvokerBase, TRunnerType>();
+                break;
+        }
+        return services;
+    }
+    
+    /// <summary>
+    /// Configures dependency injection to include a derived runner process invoker type.
+    /// </summary>
+    /// <param name="services">The service collection to add the derived runner process invoker to.</param>
     /// <param name="runnerProcessInvokerType">The type of the derived runner process invoker, which must inherit from <see cref="RunnerProcessInvokerBase"/>.</param>
     /// <param name="runnerProcessConfiguration">The process configuration instance to use for the derived runner process invoker.</param>
     /// <param name="lifetime">The service lifetime to use for the derived runner process invoker. The default is Scoped.</param>
     /// <returns>The updated service collection with the derived runner process invoker configured.</returns>
     /// <exception cref="ArgumentException">Thrown if the provided type is not a subclass of or assignable from <see cref="RunnerProcessInvokerBase"/>.</exception>
     public static IServiceCollection AddDerivedRunnerProcessInvoker(this IServiceCollection services,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
         Type runnerProcessInvokerType,
         ProcessConfiguration runnerProcessConfiguration,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
