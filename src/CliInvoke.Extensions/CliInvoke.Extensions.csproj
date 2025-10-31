@@ -25,6 +25,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>shell, cli, process, wrapping, commandline,</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IsAotCompatible>true</IsAotCompatible>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Extensions</RootNamespace>
         <AssemblyName>AlastairLundy.CliInvoke.Extensions</AssemblyName>

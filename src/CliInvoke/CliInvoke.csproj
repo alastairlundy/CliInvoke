@@ -37,6 +37,7 @@
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
+        <IsAotCompatible>true</IsAotCompatible>
         <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
         <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
         <PackageId>AlastairLundy.CliInvoke</PackageId>
