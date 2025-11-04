@@ -18,8 +18,6 @@ using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-
-
 // ReSharper disable UnusedMember.Global
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;

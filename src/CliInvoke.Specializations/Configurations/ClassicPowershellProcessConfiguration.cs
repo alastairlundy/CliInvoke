@@ -18,8 +18,6 @@ using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
-
-
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;
 
 /// <summary>

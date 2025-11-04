@@ -10,7 +10,6 @@
 using System;
 using System.IO;
 using System.Linq;
-
 using AlastairLundy.CliInvoke.Core;
 
 namespace AlastairLundy.CliInvoke;
@@ -32,16 +31,21 @@ public class FilePathResolver : IFilePathResolver
         {
             return filePathToResolve;
         }
-        
+
         string fileName = Path.GetFileName(filePathToResolve);
-        
-        int index = filePathToResolve.IndexOf(fileName, StringComparison.InvariantCultureIgnoreCase);
-        
+
+        int index = filePathToResolve.IndexOf(
+            fileName,
+            StringComparison.InvariantCultureIgnoreCase
+        );
+
         filePathToResolve = filePathToResolve.Remove(index, fileName.Length);
-        
-        string[] directories = Directory.GetDirectories(filePathToResolve,
+
+        string[] directories = Directory.GetDirectories(
+            filePathToResolve,
             "*",
-            SearchOption.AllDirectories);
+            SearchOption.AllDirectories
+        );
 
         foreach (string directory in directories)
         {
@@ -49,10 +53,12 @@ public class FilePathResolver : IFilePathResolver
 
             if (files.Any(x => Path.GetFileName(filePathToResolve).Equals(x)))
             {
-                return Path.GetFullPath(files.First(x => Path.GetFileName(filePathToResolve).Equals(x)));
+                return Path.GetFullPath(
+                    files.First(x => Path.GetFileName(filePathToResolve).Equals(x))
+                );
             }
         }
-        
+
         throw new FileNotFoundException(filePathToResolve);
     }
 }

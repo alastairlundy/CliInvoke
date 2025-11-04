@@ -12,6 +12,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Core", "CliInvoke.Core\CliInvoke.Core.csproj", "{078376F5-4746-49DF-B80A-224CA554FD53}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B495ADF6-7FA6-4DC0-A135-B84C02380072}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7ACFC22E-0481-44EB-BCE8-6A61338013FA}"
 EndProject

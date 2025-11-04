@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke 
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,9 +9,7 @@
 
 using System.Diagnostics;
 using System.Runtime.Versioning;
-
 using AlastairLundy.CliInvoke.Core;
-
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #else
@@ -32,21 +30,27 @@ internal static class ApplyConfigurationToProcessStartInfo
         {
             processStartInfo.Verb = "runas";
         }
-        else if (OperatingSystem.IsLinux() ||
-                 OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
-                 OperatingSystem.IsFreeBSD())
+        else if (
+            OperatingSystem.IsLinux()
+            || OperatingSystem.IsMacOS()
+            || OperatingSystem.IsMacCatalyst()
+            || OperatingSystem.IsFreeBSD()
+        )
         {
             processStartInfo.Verb = "sudo";
         }
     }
-    
+
     /// <summary>
     /// Adds the specified Credential to the current ProcessStartInfo object.
     /// </summary>
     /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
     /// <param name="credential">The credential to be added.</param>
     [SupportedOSPlatform("windows")]
-    internal static void SetUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
+    internal static void SetUserCredential(
+        this ProcessStartInfo processStartInfo,
+        UserCredential credential
+    )
     {
         if (credential.Domain is not null && OperatingSystem.IsWindows())
         {

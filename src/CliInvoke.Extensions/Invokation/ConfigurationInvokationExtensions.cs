@@ -17,8 +17,6 @@ using AlastairLundy.CliInvoke.Exceptions;
 using System.Runtime.Versioning;
 #endif
 
-
-
 namespace AlastairLundy.CliInvoke.Extensions.Invokation;
 
 /// <summary>
