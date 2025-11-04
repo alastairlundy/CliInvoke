@@ -1,77 +1,68 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Title>CliInvoke.Specializations</Title>
-        <Authors>AlastairLundy</Authors>
-        <Copyright>Copyright (c) 2024-2025 Alastair Lundy</Copyright>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0</PackageVersion>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <LangVersion>13</LangVersion>
-        <PackageReleaseNotes>## Changes since 1.6.x
+  <PropertyGroup>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Title>CliInvoke.Specializations</Title>
+    <Authors>AlastairLundy</Authors>
+    <Copyright>Copyright (c) 2024-2025 Alastair Lundy</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageVersion>2.0.0</PackageVersion>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <LangVersion>13</LangVersion>
+    <PackageReleaseNotes>## Changes since 1.6.x
 * Updated to support CliInvoke 2.0.0
 * Updated Specialization ``ProcessConfiguration`` derived classes to work with the updated ``ProcessConfiguration`` class</PackageReleaseNotes>
-        <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
-        <PackageIcon>icon.png</PackageIcon>
-        <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
-        <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
-    </PropertyGroup>
-    
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
-    </ItemGroup>
-
-    <PropertyGroup>
-        <!-- default false, CI can set to true -->
-        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
-    </PropertyGroup>
-
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
-        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
-        <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <Content Include="..\..\SPECIALIZATIONS_README.md">
-            <Link>README.md</Link>
-            <PackagePath>README.md</PackagePath>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Update="Internal\Localizations\Resources.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Internal\Localizations\Resources.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.resx</DependentUpon>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="..\..\.assets\icon.png">
-        <Pack>True</Pack>
-        <PackagePath></PackagePath>
-        <Link>icon.png</Link>
-      </None>
-    </ItemGroup>
+    <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
+    <PackageIcon>icon.png</PackageIcon>
+    <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
+    <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all" />
+  </ItemGroup>
+  <PropertyGroup>
+    <!-- default false, CI can set to true -->
+    <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
+    <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+    <!-- set CliInvokeCoreVersion in the workflow -->
+    <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\SPECIALIZATIONS_README.md">
+      <Link>README.md</Link>
+      <PackagePath>README.md</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Internal\Localizations\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Internal\Localizations\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\.assets\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+      <Link>icon.png</Link>
+    </None>
+  </ItemGroup>
 </Project>
