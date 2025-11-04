@@ -13,7 +13,6 @@ public static class ExecutedCommandHelper
     static ExecutedCommandHelper()
     {
         IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        IFilePathResolver filePathResolver = new FilePathResolver();
     }
         
     public static string WinCalcExePath
