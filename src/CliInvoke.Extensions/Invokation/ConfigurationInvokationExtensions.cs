@@ -8,16 +8,16 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.CliInvoke.Exceptions;
 #if NET8_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif
 
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Exceptions;
 
 namespace AlastairLundy.CliInvoke.Extensions.Invokation;
 
@@ -27,7 +27,6 @@ namespace AlastairLundy.CliInvoke.Extensions.Invokation;
 /// </summary>
 public static class ConfigurationInvokationExtensions
 {
-    
     /// <summary>
     /// Runs a process configuration asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
@@ -50,14 +49,20 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<ProcessResult> ExecuteAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<ProcessResult> ExecuteAsync(
+        this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await processConfigurationInvoker.ExecuteAsync(processConfiguration, processExitConfiguration,
-           disposeOfConfig, cancellationToken);
+        return await processConfigurationInvoker.ExecuteAsync(
+            processConfiguration,
+            processExitConfiguration,
+            disposeOfConfig,
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -82,14 +87,20 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<BufferedProcessResult> ExecuteBufferedAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<BufferedProcessResult> ExecuteBufferedAsync(
+        this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await processConfigurationInvoker.ExecuteBufferedAsync(processConfiguration, processExitConfiguration,
-           disposeOfConfig, cancellationToken);
+        return await processConfigurationInvoker.ExecuteBufferedAsync(
+            processConfiguration,
+            processExitConfiguration,
+            disposeOfConfig,
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -114,12 +125,19 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    public static async Task<PipedProcessResult> ExecutePipedAsync(this ProcessConfiguration processConfiguration,
+    public static async Task<PipedProcessResult> ExecutePipedAsync(
+        this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false, CancellationToken cancellationToken = default)
+        bool disposeOfConfig = false,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await processConfigurationInvoker.ExecutePipedAsync(processConfiguration, processExitConfiguration,
-           disposeOfConfig, cancellationToken);
+        return await processConfigurationInvoker.ExecutePipedAsync(
+            processConfiguration,
+            processExitConfiguration,
+            disposeOfConfig,
+            cancellationToken
+        );
     }
 }
