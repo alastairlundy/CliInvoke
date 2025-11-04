@@ -1,29 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net8.0;net9.0;</TargetFrameworks>
-        <LangVersion>13</LangVersion>
-        <Nullable>enable</Nullable>
-        <AssemblyName>AlastairLundy.CliInvoke.Core</AssemblyName>
-        <RootNamespace>AlastairLundy.CliInvoke.Core</RootNamespace>
-        <PackageId>AlastairLundy.CliInvoke.Core</PackageId>
-        <Title>CliInvoke.Core</Title>
-        <Authors>Alastair Lundy</Authors>
-        <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
-        <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageTags>shell, pipe, command-line, executable, processconfiguration, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessconfigurationfactory</PackageTags>
-        <Description>External Process and Cli program running related abstractions implemented by CliInvoke</Description>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageIcon>icon.png</PackageIcon>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0</Version>
-        <PackageReleaseNotes>## Changes since 1.6.x
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0;</TargetFrameworks>
+    <LangVersion>13</LangVersion>
+    <Nullable>enable</Nullable>
+    <AssemblyName>AlastairLundy.CliInvoke.Core</AssemblyName>
+    <RootNamespace>AlastairLundy.CliInvoke.Core</RootNamespace>
+    <PackageId>AlastairLundy.CliInvoke.Core</PackageId>
+    <Title>CliInvoke.Core</Title>
+    <Authors>Alastair Lundy</Authors>
+    <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
+    <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageTags>shell, pipe, command-line, executable, processconfiguration, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessconfigurationfactory</PackageTags>
+    <Description>External Process and Cli program running related abstractions implemented by CliInvoke</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Version>2.0.0</Version>
+    <PackageReleaseNotes>## Changes since 1.6.x
 #### Breaking Changes
 * Removed ``CliCommandConfiguration`` - This has been replaced by ``ProcessConfiguration``
 * Removed ``ICliCommandConfigurationBuilder`` and ``CliCommandConfigurationBuilder`` - These have been replaced by ``IProcessConfigurationBuilder`` and ``ProcessConfigurationBuilder`` respectively
@@ -55,41 +54,36 @@ Changed default value for ``ProcessResourcePolicy``'s ``PriorityBoostEnabled`` v
 * Added abstract class ``RunnerProcessInvokerBase`` that inherits from ``IProcessInvoker`` 
 * Annotated ``IProcessInvoker`` methods to indicate lack of support for IOS and tvOS
 * Added ``IRunnerProcessFactory`` - An interface for creating Processes that run other processes.</PackageReleaseNotes>
-    </PropertyGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
-        <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="README.md">
-            <Link>README.md</Link>
-            <PackagePath>README.md</PackagePath>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="..\..\.assets\icon.png">
-        <Pack>True</Pack>
-        <PackagePath>icon.png</PackagePath>
-        <Link>icon.png</Link>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Update="Internal\Localizations\Resources.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="Internal\Localizations\Resources.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
-    </ItemGroup>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="README.md">
+      <Link>README.md</Link>
+      <PackagePath>README.md</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\.assets\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>icon.png</PackagePath>
+      <Link>icon.png</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Internal\Localizations\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Internal\Localizations\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
