@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke.Core 
+    AlastairLundy.CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,9 @@ namespace AlastairLundy.CliInvoke.Core;
 /// <summary>
 /// Defines a contract for a service that resolves file paths.
 /// </summary>
-[Obsolete("This interface is deprecated in CliInvoke Core and will be moved to CliInvoke in a future version.")]
+[Obsolete(
+    "This interface is deprecated in CliInvoke Core and will be moved to CliInvoke in a future version."
+)]
 public interface IFilePathResolver
 {
     /// <summary>

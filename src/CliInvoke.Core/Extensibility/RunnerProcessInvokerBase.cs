@@ -12,7 +12,6 @@ using System.Diagnostics.Contracts;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-
 using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 
 namespace AlastairLundy.CliInvoke.Core.Extensibility;
@@ -32,7 +31,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     /// for the runner process.
     /// </summary>
     public ProcessConfiguration RunnerProcessConfiguration { get; }
-    
+
     /// <summary>
     /// Represents an abstract base class for implementing process invokers that leverage their own configuration and execution pipeline
     /// to invoke other processes with a variety of configurations.
@@ -45,8 +44,11 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     /// <param name="runnerProcessFactory">The <see cref="IRunnerProcessFactory"/> to use to create the actual runner configuration from the
     /// input process configuration and the runner process configuration.</param>
     /// <param name="runnerProcessConfiguration">The process configuration of the process to run other process configurations through.</param>
-    protected RunnerProcessInvokerBase(IProcessInvoker processInvoker, IRunnerProcessFactory runnerProcessFactory,
-        ProcessConfiguration runnerProcessConfiguration)
+    protected RunnerProcessInvokerBase(
+        IProcessInvoker processInvoker,
+        IRunnerProcessFactory runnerProcessFactory,
+        ProcessConfiguration runnerProcessConfiguration
+    )
     {
         _processInvoker = processInvoker;
         _runnerProcessFactory = runnerProcessFactory;
@@ -65,14 +67,24 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
-    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
+    public async Task<ProcessResult> ExecuteAsync(
+        ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false, CancellationToken cancellationToken = default)
+        bool disposeOfConfig = false,
+        CancellationToken cancellationToken = default
+    )
     {
-        ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(processConfiguration, 
-            RunnerProcessConfiguration);
+        ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
+            processConfiguration,
+            RunnerProcessConfiguration
+        );
 
-        return await _processInvoker.ExecuteAsync(runnerConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+        return await _processInvoker.ExecuteAsync(
+            runnerConfiguration,
+            processExitConfiguration,
+            disposeOfConfig,
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -87,14 +99,24 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default)
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
+        ProcessConfiguration processConfiguration,
+        ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
+        CancellationToken cancellationToken = default
+    )
     {
-        ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(processConfiguration, 
-            RunnerProcessConfiguration);
-        
-        return await _processInvoker.ExecuteBufferedAsync(runnerConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+        ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
+            processConfiguration,
+            RunnerProcessConfiguration
+        );
+
+        return await _processInvoker.ExecuteBufferedAsync(
+            runnerConfiguration,
+            processExitConfiguration,
+            disposeOfConfig,
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -109,14 +131,24 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
-    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default)
+    public async Task<PipedProcessResult> ExecutePipedAsync(
+        ProcessConfiguration processConfiguration,
+        ProcessExitConfiguration? processExitConfiguration = null,
+        bool disposeOfConfig = false,
+        CancellationToken cancellationToken = default
+    )
     {
-        ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(processConfiguration, 
-            RunnerProcessConfiguration);
-        
-        return await _processInvoker.ExecutePipedAsync(runnerConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+        ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
+            processConfiguration,
+            RunnerProcessConfiguration
+        );
+
+        return await _processInvoker.ExecutePipedAsync(
+            runnerConfiguration,
+            processExitConfiguration,
+            disposeOfConfig,
+            cancellationToken
+        );
     }
 
     /// <summary>

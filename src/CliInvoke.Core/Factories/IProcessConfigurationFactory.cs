@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke.Core 
+    AlastairLundy.CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,7 +9,6 @@
 
 using System;
 using System.Collections.Generic;
-
 using AlastairLundy.CliInvoke.Core.Builders;
 
 namespace AlastairLundy.CliInvoke.Core.Factories;
@@ -26,15 +25,6 @@ public interface IProcessConfigurationFactory
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
     ProcessConfiguration Create(string targetFilePath, params string[] arguments);
-    
-    /// <summary>
-    /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
-    /// </summary>
-    /// <param name="targetFilePath">The target file path of the command to be executed.</param>
-    /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
-    /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
-    /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
-    ProcessConfiguration Create(string targetFilePath, string arguments, Action<IProcessConfigurationBuilder>? configureBuilder = null);
 
     /// <summary>
     /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
@@ -43,6 +33,22 @@ public interface IProcessConfigurationFactory
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
     /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
-    ProcessConfiguration Create(string targetFilePath, IEnumerable<string> arguments,
-        Action<IProcessConfigurationBuilder>? configureBuilder = null);
+    ProcessConfiguration Create(
+        string targetFilePath,
+        string arguments,
+        Action<IProcessConfigurationBuilder>? configureBuilder = null
+    );
+
+    /// <summary>
+    /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
+    /// </summary>
+    /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+    /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
+    /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
+    ProcessConfiguration Create(
+        string targetFilePath,
+        IEnumerable<string> arguments,
+        Action<IProcessConfigurationBuilder>? configureBuilder = null
+    );
 }
