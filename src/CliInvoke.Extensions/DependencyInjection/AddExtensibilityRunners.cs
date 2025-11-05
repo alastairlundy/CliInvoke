@@ -8,6 +8,7 @@
 */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Extensibility;
@@ -20,7 +21,7 @@ namespace AlastairLundy.CliInvoke.Extensions;
 
 public static partial class DependencyInjectionExtensions
 {
-        /// <summary>
+    /// <summary>
     /// Registers a default implementation of the <see cref="DefaultRunnerProcessInvoker"/>
     /// with the specified process configuration and service lifetime to the service collection.
     /// </summary>
@@ -45,8 +46,8 @@ public static partial class DependencyInjectionExtensions
                     sp.GetRequiredService<IRunnerProcessFactory>(),
                     runnerProcessConfiguration
                 ));
-                services.AddScoped<DefaultRunnerProcessInvoker>(
-                    sp => new DefaultRunnerProcessInvoker(
+                services.AddScoped<DefaultRunnerProcessInvoker>(sp =>
+                    new DefaultRunnerProcessInvoker(
                         sp.GetRequiredService<IProcessInvoker>(),
                         sp.GetRequiredService<IRunnerProcessFactory>(),
                         runnerProcessConfiguration
@@ -54,15 +55,15 @@ public static partial class DependencyInjectionExtensions
                 );
                 break;
             case ServiceLifetime.Singleton:
-                services.AddSingleton<RunnerProcessInvokerBase>(
-                    sp => new DefaultRunnerProcessInvoker(
+                services.AddSingleton<RunnerProcessInvokerBase>(sp =>
+                    new DefaultRunnerProcessInvoker(
                         sp.GetRequiredService<IProcessInvoker>(),
                         sp.GetRequiredService<IRunnerProcessFactory>(),
                         runnerProcessConfiguration
                     )
                 );
-                services.AddSingleton<DefaultRunnerProcessInvoker>(
-                    sp => new DefaultRunnerProcessInvoker(
+                services.AddSingleton<DefaultRunnerProcessInvoker>(sp =>
+                    new DefaultRunnerProcessInvoker(
                         sp.GetRequiredService<IProcessInvoker>(),
                         sp.GetRequiredService<IRunnerProcessFactory>(),
                         runnerProcessConfiguration
@@ -70,15 +71,15 @@ public static partial class DependencyInjectionExtensions
                 );
                 break;
             case ServiceLifetime.Transient:
-                services.AddTransient<RunnerProcessInvokerBase>(
-                    sp => new DefaultRunnerProcessInvoker(
+                services.AddTransient<RunnerProcessInvokerBase>(sp =>
+                    new DefaultRunnerProcessInvoker(
                         sp.GetRequiredService<IProcessInvoker>(),
                         sp.GetRequiredService<IRunnerProcessFactory>(),
                         runnerProcessConfiguration
                     )
                 );
-                services.AddTransient<DefaultRunnerProcessInvoker>(
-                    sp => new DefaultRunnerProcessInvoker(
+                services.AddTransient<DefaultRunnerProcessInvoker>(sp =>
+                    new DefaultRunnerProcessInvoker(
                         sp.GetRequiredService<IProcessInvoker>(),
                         sp.GetRequiredService<IRunnerProcessFactory>(),
                         runnerProcessConfiguration
@@ -87,6 +88,39 @@ public static partial class DependencyInjectionExtensions
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
+        }
+
+        return services;
+    }
+
+
+    /// <summary>
+    /// Configures dependency injection to include a derived runner process invoker type.
+    /// </summary>
+    /// <param name="services">The service collection to add the derived runner process invoker to.</param>
+    /// <param name="lifetime">The service lifetime to use for the derived runner process invoker. The default is Scoped.</param>
+    /// <returns>The updated service collection with the derived runner process invoker configured.</returns>
+    /// <typeparam name="TRunnerType">The type of the derived runner process invoker, which must inherit from <see cref="RunnerProcessInvokerBase"/>.</typeparam>
+    /// <exception cref="ArgumentException">Thrown if the provided type is not a subclass of or assignable from <see cref="RunnerProcessInvokerBase"/>.</exception>
+    public static IServiceCollection AddDerivedRunnerProcessInvoker<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        TRunnerType>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TRunnerType : RunnerProcessInvokerBase, new()
+    {
+        switch (lifetime)
+        {
+            case ServiceLifetime.Scoped:
+                services.AddScoped<RunnerProcessInvokerBase, TRunnerType>();
+                break;
+            case ServiceLifetime.Transient:
+                services.AddTransient<RunnerProcessInvokerBase, TRunnerType>();
+                break;
+            case ServiceLifetime.Singleton:
+                services.AddSingleton<RunnerProcessInvokerBase, TRunnerType>();
+                break;
         }
 
         return services;
@@ -103,29 +137,26 @@ public static partial class DependencyInjectionExtensions
     /// <exception cref="ArgumentException">Thrown if the provided type is not a subclass of or assignable from <see cref="RunnerProcessInvokerBase"/>.</exception>
     public static IServiceCollection AddDerivedRunnerProcessInvoker(
         this IServiceCollection services,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
         Type runnerProcessInvokerType,
         ProcessConfiguration runnerProcessConfiguration,
-        ServiceLifetime lifetime = ServiceLifetime.Scoped
-    )
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         bool isSubclass = runnerProcessInvokerType.IsSubclassOf(typeof(RunnerProcessInvokerBase));
 
-        bool isAssignableFrom = typeof(RunnerProcessInvokerBase).IsAssignableFrom(
-            runnerProcessInvokerType
-        );
+        bool isAssignableFrom =
+            typeof(RunnerProcessInvokerBase).IsAssignableFrom(runnerProcessInvokerType);
 
         if (isSubclass == false && isAssignableFrom == false)
             throw new ArgumentException(
-                $"Provided type is not a subclass of or assignable from type {nameof(RunnerProcessInvokerBase)}"
-            );
+                $"Provided type is not a subclass of or assignable from type {nameof(RunnerProcessInvokerBase)}");
 
         // Factory resolves constructor parameters from the service provider and uses extraArgs for remaining parameters.
         object Factory(IServiceProvider provider) =>
-            ActivatorUtilities.CreateInstance(
-                provider,
-                runnerProcessInvokerType,
-                runnerProcessConfiguration
-            );
+            ActivatorUtilities.CreateInstance(provider, runnerProcessInvokerType,
+                runnerProcessConfiguration);
 
         services.Add(new ServiceDescriptor(typeof(RunnerProcessInvokerBase), Factory, lifetime));
 
