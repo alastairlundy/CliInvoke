@@ -8,6 +8,8 @@
 */
 
 using System;
+
+
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 using AlastairLundy.CliInvoke.Core.Factories;
@@ -15,6 +17,7 @@ using AlastairLundy.CliInvoke.Core.Piping;
 using AlastairLundy.CliInvoke.Extensibility.Factories;
 using AlastairLundy.CliInvoke.Factories;
 using AlastairLundy.CliInvoke.Piping;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -34,10 +37,8 @@ public static partial class DependencyInjectionExtensions
     /// <param name="services">The service collection to add to.</param>
     /// <param name="lifetime">The service lifetime to use if specified; Singleton otherwise.</param>
     /// <returns>The updated service collection with the added CliInvoke services set up.</returns>
-    public static IServiceCollection AddCliInvoke(
-        this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Scoped
-    )
+    public static IServiceCollection AddCliInvoke(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         switch (lifetime)
         {
@@ -69,11 +70,11 @@ public static partial class DependencyInjectionExtensions
                 services.AddTransient<IRunnerProcessFactory, RunnerProcessFactory>();
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
+                throw new ArgumentOutOfRangeException(nameof(lifetime),
+                    lifetime,
+                    null);
         }
 
         return services;
     }
-
-    
 }
