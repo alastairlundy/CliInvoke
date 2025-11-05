@@ -7,21 +7,16 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-
-
-using System.Runtime.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
-
 using AlastairLundy.CliInvoke.Core;
-
+using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
-
-using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;
 
@@ -56,29 +51,49 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
-    public ClassicPowershellProcessConfiguration(string arguments,
-        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        string workingDirectoryPath = null, bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null, 
+    public ClassicPowershellProcessConfiguration(
+        string arguments,
+        bool redirectStandardInput,
+        bool redirectStandardOutput,
+        bool redirectStandardError,
+        string workingDirectoryPath = null,
+        bool requiresAdministrator = false,
+        Dictionary<string, string> environmentVariables = null,
         UserCredential credentials = null,
-        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("",
-        redirectStandardInput, redirectStandardOutput, redirectStandardError,
-        arguments,
-        workingDirectoryPath,
-        requiresAdministrator,
-        environmentVariables,
-        credentials,
-        standardInput, standardOutput, standardError,
-        standardInputEncoding, standardOutputEncoding, standardErrorEncoding,
-        processResourcePolicy, windowCreation: windowCreation,
-        useShellExecution: useShellExecution)
+        StreamWriter standardInput = null,
+        StreamReader standardOutput = null,
+        StreamReader standardError = null,
+        Encoding standardInputEncoding = default,
+        Encoding standardOutputEncoding = default,
+        Encoding standardErrorEncoding = default,
+        ProcessResourcePolicy processResourcePolicy = null,
+        bool useShellExecution = false,
+        bool windowCreation = false
+    )
+        : base(
+            "",
+            redirectStandardInput,
+            redirectStandardOutput,
+            redirectStandardError,
+            arguments,
+            workingDirectoryPath,
+            requiresAdministrator,
+            environmentVariables,
+            credentials,
+            standardInput,
+            standardOutput,
+            standardError,
+            standardInputEncoding,
+            standardOutputEncoding,
+            standardErrorEncoding,
+            processResourcePolicy,
+            windowCreation: windowCreation,
+            useShellExecution: useShellExecution
+        )
     {
         base.TargetFilePath = TargetFilePath;
     }
-        
+
     /// <summary>
     /// The target file path of Windows PowerShell.
     /// </summary>
@@ -96,12 +111,13 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         {
             if (OperatingSystem.IsWindows() == false)
             {
-                throw new PlatformNotSupportedException(Resources.Exceptions_ClassicPowershell_OnlySupportedOnWindows);
+                throw new PlatformNotSupportedException(
+                    Resources.Exceptions_ClassicPowershell_OnlySupportedOnWindows
+                );
             }
 
-            return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}" +
-                   $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe";
+            return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}"
+                + $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe";
         }
     }
-        
 }

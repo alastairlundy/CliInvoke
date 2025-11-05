@@ -10,12 +10,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Versioning;
-
 using AlastairLundy.CliInvoke.Core;
-
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
@@ -62,23 +60,46 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
-    public PowershellProcessConfiguration(IProcessInvoker processInvoker, string arguments,
-        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        string workingDirectoryPath = null, bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
-        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("",
-        redirectStandardInput, redirectStandardOutput, redirectStandardError,
-        arguments, workingDirectoryPath,
-        requiresAdministrator, environmentVariables,
-        credentials,
-        standardInput, standardOutput, standardError,
-        standardInputEncoding, standardOutputEncoding,
-        standardErrorEncoding, processResourcePolicy,
-        windowCreation: windowCreation,
-        useShellExecution: useShellExecution)
+    public PowershellProcessConfiguration(
+        IProcessInvoker processInvoker,
+        string arguments,
+        bool redirectStandardInput,
+        bool redirectStandardOutput,
+        bool redirectStandardError,
+        string workingDirectoryPath = null,
+        bool requiresAdministrator = false,
+        Dictionary<string, string> environmentVariables = null,
+        UserCredential credentials = null,
+        StreamWriter standardInput = null,
+        StreamReader standardOutput = null,
+        StreamReader standardError = null,
+        Encoding standardInputEncoding = default,
+        Encoding standardOutputEncoding = default,
+        Encoding standardErrorEncoding = default,
+        ProcessResourcePolicy processResourcePolicy = null,
+        bool useShellExecution = false,
+        bool windowCreation = false
+    )
+        : base(
+            "",
+            redirectStandardInput,
+            redirectStandardOutput,
+            redirectStandardError,
+            arguments,
+            workingDirectoryPath,
+            requiresAdministrator,
+            environmentVariables,
+            credentials,
+            standardInput,
+            standardOutput,
+            standardError,
+            standardInputEncoding,
+            standardOutputEncoding,
+            standardErrorEncoding,
+            processResourcePolicy,
+            windowCreation: windowCreation,
+            useShellExecution: useShellExecution
+        )
     {
         base.TargetFilePath = TargetFilePath;
         _invoker = processInvoker;
@@ -108,8 +129,11 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             {
                 filePath = $"{GetWindowsInstallLocation()}{Path.DirectorySeparatorChar}pwsh.exe";
             }
-            else if (OperatingSystem.IsMacOS() ||
-                     OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
+            else if (
+                OperatingSystem.IsMacOS()
+                || OperatingSystem.IsLinux()
+                || OperatingSystem.IsFreeBSD()
+            )
             {
                 filePath = GetUnixInstallLocation();
             }
@@ -120,12 +144,15 @@ public class PowershellProcessConfiguration : ProcessConfiguration
 
     private string GetWindowsInstallLocation()
     {
-        string programFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem == true
-            ? Environment.SpecialFolder.ProgramFiles
-            : Environment.SpecialFolder.ProgramFilesX86);
+        string programFiles = Environment.GetFolderPath(
+            Environment.Is64BitOperatingSystem == true
+                ? Environment.SpecialFolder.ProgramFiles
+                : Environment.SpecialFolder.ProgramFilesX86
+        );
 
         string[] directories = Directory.GetDirectories(
-            $"{programFiles}{Path.DirectorySeparatorChar}Powershell");
+            $"{programFiles}{Path.DirectorySeparatorChar}Powershell"
+        );
 
         foreach (string directory in directories)
         {
@@ -138,9 +165,13 @@ public class PowershellProcessConfiguration : ProcessConfiguration
 
     private string GetUnixInstallLocation()
     {
-        ProcessConfiguration configuration = new ProcessConfiguration("/usr/bin/which",
-            false, true, true,
-            arguments: "pwsh");
+        ProcessConfiguration configuration = new ProcessConfiguration(
+            "/usr/bin/which",
+            false,
+            true,
+            true,
+            arguments: "pwsh"
+        );
 
         Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(configuration);
 

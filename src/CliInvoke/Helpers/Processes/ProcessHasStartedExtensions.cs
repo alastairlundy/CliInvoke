@@ -10,7 +10,6 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
@@ -33,13 +32,15 @@ internal static class ProcessHasStartedExtensions
     internal static bool HasStarted(this Process process)
     {
         if (process.IsProcessOnRemoteDevice())
-            throw new NotSupportedException(Resources.Exceptions_Processes_NotSupportedOnRemoteProcess);
-        
+            throw new NotSupportedException(
+                Resources.Exceptions_Processes_NotSupportedOnRemoteProcess
+            );
+
         try
         {
             return process.StartTime.ToUniversalTime() <= DateTime.UtcNow;
         }
-        catch(InvalidOperationException)
+        catch (InvalidOperationException)
         {
             return false;
         }

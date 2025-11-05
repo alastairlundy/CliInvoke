@@ -10,7 +10,6 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-
 namespace AlastairLundy.CliInvoke.Core.Builders;
 
 /// <summary>

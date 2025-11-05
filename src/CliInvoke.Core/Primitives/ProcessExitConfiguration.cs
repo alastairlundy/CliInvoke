@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke.Core 
+    AlastairLundy.CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,8 +32,11 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="timeoutPolicy">The timeout policy to apply to the process.</param>
     /// <param name="resultValidation">The result validation strategy to use for the process exit.</param>
     /// <param name="cancellationValidation"></param>
-    public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy, ProcessResultValidation resultValidation,
-        ProcessCancellationExceptionBehavior cancellationValidation)
+    public ProcessExitConfiguration(
+        ProcessTimeoutPolicy timeoutPolicy,
+        ProcessResultValidation resultValidation,
+        ProcessCancellationExceptionBehavior cancellationValidation
+    )
     {
         TimeoutPolicy = timeoutPolicy;
         ResultValidation = resultValidation;
@@ -43,31 +46,40 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy and exit code zero validation.
     /// </summary>
-    public static readonly ProcessExitConfiguration Default = new(ProcessTimeoutPolicy.Default,
-            ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected);
-    
+    public static readonly ProcessExitConfiguration Default = new(
+        ProcessTimeoutPolicy.Default,
+        ProcessResultValidation.ExitCodeZero,
+        ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
+    );
+
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy, but suppresses the Exception from cancellation.
     /// </summary>
-    public static readonly ProcessExitConfiguration DefaultNoException = new(ProcessTimeoutPolicy.Default,
-            ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.SuppressException);
-    
+    public static readonly ProcessExitConfiguration DefaultNoException = new(
+        ProcessTimeoutPolicy.Default,
+        ProcessResultValidation.ExitCodeZero,
+        ProcessCancellationExceptionBehavior.SuppressException
+    );
+
     /// <summary>
     /// A preconfigured <see cref="ProcessExitConfiguration"/> instance with Exit Code Validation and without a Timeout Policy.
     /// </summary>
-    public static readonly ProcessExitConfiguration NoTimeoutDefault = new(ProcessTimeoutPolicy.None,
-        ProcessResultValidation.ExitCodeZero, ProcessCancellationExceptionBehavior.SuppressException);
-    
+    public static readonly ProcessExitConfiguration NoTimeoutDefault = new(
+        ProcessTimeoutPolicy.None,
+        ProcessResultValidation.ExitCodeZero,
+        ProcessCancellationExceptionBehavior.SuppressException
+    );
+
     /// <summary>
     /// Gets the result validation strategy used to determine if the process exited successfully.
     /// </summary>
     public ProcessResultValidation ResultValidation { get; }
-    
+
     /// <summary>
     /// Gets the result validation strategy used to determine if Process cancellation should throw an exception.
     /// </summary>
     public ProcessCancellationExceptionBehavior CancellationExceptionBehavior { get; }
-    
+
     /// <summary>
     /// Gets the timeout policy applied to the process.
     /// </summary>
@@ -80,11 +92,12 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <returns><c>true</c> if the specified object is equal to the current instance; otherwise, <c>false</c>.</returns>
     public bool Equals(ProcessExitConfiguration? other)
     {
-        if (other is null) return false;
+        if (other is null)
+            return false;
 
-        return ResultValidation == other.ResultValidation &&
-               TimeoutPolicy.Equals(other.TimeoutPolicy) &&
-               CancellationExceptionBehavior == other.CancellationExceptionBehavior;
+        return ResultValidation == other.ResultValidation
+            && TimeoutPolicy.Equals(other.TimeoutPolicy)
+            && CancellationExceptionBehavior == other.CancellationExceptionBehavior;
     }
 
     /// <summary>
@@ -94,7 +107,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <returns><c>true</c> if the specified object is equal to the current instance; otherwise, <c>false</c>.</returns>
     public override bool Equals(object? obj)
     {
-        if (obj is null) 
+        if (obj is null)
             return false;
 
         if (obj is ProcessExitConfiguration exitInfo)
@@ -120,12 +133,11 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
     public static bool Equals(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
     {
-        if(left is null || right is null)
+        if (left is null || right is null)
             return false;
 
         return left.Equals(right);
     }
-
 
     /// <summary>
     /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal.
@@ -133,8 +145,10 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
-        => Equals(left, right);
+    public static bool operator ==(
+        ProcessExitConfiguration? left,
+        ProcessExitConfiguration? right
+    ) => Equals(left, right);
 
     /// <summary>
     /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are not equal.

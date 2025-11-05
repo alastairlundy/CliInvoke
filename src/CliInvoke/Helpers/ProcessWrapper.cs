@@ -9,7 +9,6 @@
 
 using System;
 using System.Diagnostics;
-
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Helpers.Processes;
 
@@ -19,13 +18,13 @@ internal class ProcessWrapper : Process
 {
     internal ProcessWrapper(ProcessResourcePolicy? resourcePolicy)
     {
-       Exited += OnExited;
-       Started += OnStarted;
+        Exited += OnExited;
+        Started += OnStarted;
 
-       HasStarted = false;
-       ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
+        HasStarted = false;
+        ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
     }
-    
+
     private void OnStarted(object? sender, EventArgs e)
     {
         if (HasExited == false)
@@ -47,17 +46,17 @@ internal class ProcessWrapper : Process
     {
         ExitTime = base.ExitTime;
     }
-    
+
     internal ProcessResourcePolicy ResourcePolicy { get; set; }
 
     internal bool HasStarted { get; private set; }
 
     internal event EventHandler Started;
-    
+
     internal new DateTime StartTime { get; private set; }
-    
+
     internal new DateTime ExitTime { get; private set; }
-    
+
     public new bool Start()
     {
         bool result = base.Start();
@@ -66,10 +65,10 @@ internal class ProcessWrapper : Process
         {
             HasStarted = true;
             StartTime = DateTime.UtcNow;
-            
+
             Started?.Invoke(this, EventArgs.Empty);
         }
-        
+
         return result;
     }
 }

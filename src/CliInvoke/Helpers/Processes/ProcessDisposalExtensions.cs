@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 /// <summary>
-/// 
+///
 /// </summary>
 public static class ProcessDisposalExtensions
 {

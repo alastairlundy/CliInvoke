@@ -15,7 +15,6 @@ namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 internal static class IsProcessRunningExtensions
 {
-   
     /// <summary>
     /// Determines whether a process exists on a remote device or locally.
     /// </summary>
@@ -41,7 +40,7 @@ internal static class IsProcessRunningExtensions
 
             if (hasExited)
                 return false;
-            
+
             return hasExited;
         }
         catch (NotSupportedException)

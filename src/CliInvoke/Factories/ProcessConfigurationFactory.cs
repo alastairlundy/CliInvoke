@@ -10,9 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-
 using AlastairLundy.CliInvoke.Builders;
-
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Core.Factories;
@@ -31,8 +29,8 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
     [Pure]
-    public ProcessConfiguration Create(string targetFilePath, params string[] arguments)
-        =>  Create(targetFilePath, arguments, null);
+    public ProcessConfiguration Create(string targetFilePath, params string[] arguments) =>
+        Create(targetFilePath, arguments, null);
 
     /// <summary>
     /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
@@ -42,18 +40,23 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
     /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
     [Pure]
-    public ProcessConfiguration Create(string targetFilePath, string arguments,
-        Action<IProcessConfigurationBuilder>? configureBuilder = null)
+    public ProcessConfiguration Create(
+        string targetFilePath,
+        string arguments,
+        Action<IProcessConfigurationBuilder>? configureBuilder = null
+    )
     {
-        IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(targetFilePath)
+        IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
+            targetFilePath
+        )
             .SetArguments(arguments)
             .RedirectStandardOutput(true)
             .RedirectStandardError(true)
             .ConfigureWindowCreation(false);
-        
-        if(configureBuilder is not null)
+
+        if (configureBuilder is not null)
             configureBuilder.Invoke(processConfigurationBuilder);
-        
+
         return processConfigurationBuilder.Build();
     }
 
@@ -65,21 +68,27 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
     /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
     [Pure]
-    public ProcessConfiguration Create(string targetFilePath, IEnumerable<string> arguments,
-        Action<IProcessConfigurationBuilder>? configureBuilder = null)
+    public ProcessConfiguration Create(
+        string targetFilePath,
+        IEnumerable<string> arguments,
+        Action<IProcessConfigurationBuilder>? configureBuilder = null
+    )
     {
-        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder(x => string.IsNullOrEmpty(x) == false)
-            .AddEnumerable(arguments);
+        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder(x =>
+            string.IsNullOrEmpty(x) == false
+        ).AddEnumerable(arguments);
 
-        IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(targetFilePath)
+        IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
+            targetFilePath
+        )
             .SetArguments(argumentsBuilder.ToString())
             .RedirectStandardOutput(true)
             .RedirectStandardError(true)
             .ConfigureWindowCreation(false);
-        
-        if(configureBuilder is not null)
+
+        if (configureBuilder is not null)
             configureBuilder.Invoke(processConfigurationBuilder);
-        
+
         return processConfigurationBuilder.Build();
     }
 }

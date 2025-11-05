@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke 
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,10 +32,12 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <param name="exitCode">The process' exit code.</param>
     /// <param name="startTime">The start time of the process.</param>
     /// <param name="exitTime">The exit time of the process.</param>
-    public ProcessResult(string executableFilePath,
+    public ProcessResult(
+        string executableFilePath,
         int exitCode,
         DateTime startTime,
-        DateTime exitTime)
+        DateTime exitTime
+    )
     {
         ExitCode = exitCode;
         ExecutedFilePath = executableFilePath;
@@ -47,7 +49,7 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// Whether the Command successfully exited.
     /// </summary>
     public bool WasSuccessful => ExitCode == 0;
-        
+
     /// <summary>
     /// The exit code from the Command that was executed.
     /// </summary>
@@ -73,7 +75,6 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// </summary>
     public TimeSpan RuntimeDuration => ExitTime.Subtract(StartTime);
 
-
     /// <summary>
     /// Determines whether the specified <see cref="ProcessResult"/> instance is equal to the current instance.
     /// </summary>
@@ -85,11 +86,11 @@ public class ProcessResult : IEquatable<ProcessResult>
     {
         if (other is null)
             return false;
-        
-        return ExitCode == other.ExitCode &&
-               ExecutedFilePath == other.ExecutedFilePath &&
-               StartTime == other.StartTime &&
-               ExitTime == other.ExitTime;
+
+        return ExitCode == other.ExitCode
+            && ExecutedFilePath == other.ExecutedFilePath
+            && StartTime == other.StartTime
+            && ExitTime == other.ExitTime;
     }
 
     /// <summary>
@@ -101,10 +102,10 @@ public class ProcessResult : IEquatable<ProcessResult>
     {
         if (obj is null)
             return false;
-        
-        if(obj is ProcessResult other)
+
+        if (obj is ProcessResult other)
             return Equals(other);
-        
+
         return false;
     }
 
@@ -129,10 +130,10 @@ public class ProcessResult : IEquatable<ProcessResult>
     {
         if (left is null || right is null)
             return false;
-        
+
         return left.Equals(right);
     }
-    
+
     /// <summary>
     /// Determines whether two specified <see cref="ProcessResult"/> instances are equal.
     /// </summary>
@@ -141,8 +142,7 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <returns>
     /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are equal; otherwise, <c>false</c>.
     /// </returns>
-    public static bool operator ==(ProcessResult left, ProcessResult? right) 
-        => left.Equals(right);
+    public static bool operator ==(ProcessResult left, ProcessResult? right) => left.Equals(right);
 
     /// <summary>
     /// Determines whether two specified <see cref="ProcessResult"/> instances are not equal.
@@ -152,5 +152,6 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <returns>
     /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are not equal; otherwise, <c>false</c>.
     /// </returns>
-    public static bool operator !=(ProcessResult left, ProcessResult? right) => left.Equals(right) == false;
+    public static bool operator !=(ProcessResult left, ProcessResult? right) =>
+        left.Equals(right) == false;
 }

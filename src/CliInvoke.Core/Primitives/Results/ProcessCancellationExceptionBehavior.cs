@@ -18,10 +18,12 @@ public enum ProcessCancellationExceptionBehavior
     /// No validation is performed.
     /// </summary>
     SuppressException = 0,
+
     /// <summary>
     /// Allow .NET to throw the exception if the cancellation succeeds.
     /// </summary>
     AllowException,
+
     /// <summary>
     /// Allows the exception if the cancellation is unexpected.
     /// </summary>
