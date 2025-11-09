@@ -8,11 +8,13 @@
    */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
 
 using AlastairLundy.CliInvoke.Core;
+// ReSharper disable ConvertClosureToMethodGroup
 
 namespace AlastairLundy.CliInvoke;
 
@@ -67,7 +69,7 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    private static bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
+    protected static bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
         out string? resolvedFilePath)
     {
         if (Path.IsPathRooted(filePathToResolve)
@@ -81,60 +83,21 @@ public class FilePathResolver : IFilePathResolver
             return fileExists;
         }
 
-        char pathSeparator;
-        string? pathContentsStr;
-        string[]? pathExtensions;
+        string[] pathExtensions;
+        string[] pathContents;
         
-        if (OperatingSystem.IsWindows())
+        if (GetPathInfo(out string[]? pathExtensionsInfo,
+                out string[]? pathContentsInfo) && pathExtensionsInfo is not null &&
+            pathContentsInfo is not null)
         {
-            pathSeparator = ';';
-            pathContentsStr = Environment.GetEnvironmentVariable("PATH");
-            pathExtensions = Environment.GetEnvironmentVariable("PATHEXT")?
-                .Split(pathSeparator, StringSplitOptions.RemoveEmptyEntries)
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(ext =>
-                {
-                    ext = ext.Trim();
-                    ext = ext.Trim('"');
-
-                    if (ext.StartsWith('.') == false)
-                        ext = ext.Insert(0, ".");
-
-                    return ext;
-                })
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray() ?? [".COM", ".EXE", ".BAT", ".CMD"];
-
-        }
-        else if(!OperatingSystem.IsIOS() && !OperatingSystem.IsBrowser() && !OperatingSystem.IsTvOS())
-        {
-            pathSeparator = ':';
-            pathContentsStr = Environment.GetEnvironmentVariable("PATH");
-            pathExtensions = [".sh", ""];
+            pathContents = pathContentsInfo;
+            pathExtensions = pathExtensionsInfo;
         }
         else
-        {
-            throw new PlatformNotSupportedException();
-        }
-
-        if (pathContentsStr is null)
         {
             resolvedFilePath = null;
             return false;
         }
-
-        string[] pathContents = pathContentsStr
-            .Split(pathSeparator, StringSplitOptions.RemoveEmptyEntries)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Select(p =>
-            {
-                p = p.Trim();
-                p = Environment.ExpandEnvironmentVariables(p);
-                p = p.Trim('"');
-
-                return p;
-            })
-            .ToArray();
 
         bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
 
@@ -170,6 +133,64 @@ public class FilePathResolver : IFilePathResolver
         return false;
     }
 
+    protected static bool GetPathInfo(out string[]? pathExtensions, out string[]? pathContents)
+    {
+        char pathSeparator;
+        string? pathContentsStr;
+        
+        if (OperatingSystem.IsWindows())
+        {
+            pathSeparator = ';';
+            pathContentsStr = Environment.GetEnvironmentVariable("PATH");
+            pathExtensions = Environment.GetEnvironmentVariable("PATHEXT")?
+                .Split(pathSeparator, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(ext =>
+                {
+                    ext = ext.Trim();
+                    ext = ext.Trim('"');
+
+                    if (ext.StartsWith('.') == false)
+                        ext = ext.Insert(0, ".");
+
+                    return ext;
+                })
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray() ?? [".com", ".exe", ".bat", ".cmd"];
+
+        }
+        else if(!OperatingSystem.IsIOS() && !OperatingSystem.IsBrowser() && !OperatingSystem.IsTvOS())
+        {
+            pathSeparator = ':';
+            pathContentsStr = Environment.GetEnvironmentVariable("PATH");
+            pathExtensions = [".sh", ""];
+        }
+        else
+        {
+            throw new PlatformNotSupportedException();
+        }
+
+        if (pathContentsStr is null)
+        {
+            pathContents = null;
+            return false;
+        }
+
+        pathContents = pathContentsStr
+            .Split(pathSeparator, StringSplitOptions.RemoveEmptyEntries)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(p =>
+            {
+                p = p.Trim();
+                p = Environment.ExpandEnvironmentVariables(p);
+                p = p.Trim('"');
+
+                return p;
+            })
+            .ToArray();
+        return true;
+    }
+
     private static string LocateFileFromDirectory(string filePathToResolve)
     {
         string fileName = Path.GetFileName(filePathToResolve);
@@ -179,24 +200,40 @@ public class FilePathResolver : IFilePathResolver
             StringComparison.InvariantCultureIgnoreCase
         );
 
-        filePathToResolve = filePathToResolve.Remove(index, fileName.Length);
+        string directoryPath = Path.GetDirectoryName(filePathToResolve)
+                               ?? filePathToResolve.Remove(index, fileName.Length);
 
-        string[] directories = Directory.GetDirectories(
-            filePathToResolve,
+        IEnumerable<string> directories = Directory.EnumerateDirectories(
+            directoryPath,
             "*",
             SearchOption.AllDirectories
         );
 
-        foreach (string directory in directories)
-        {
-            string[] files = Directory.GetFiles(directory);
-
-            if (files.Any(x => Path.GetFileName(filePathToResolve).Equals(x)))
+        IEnumerable<string> files = directories.SelectMany(x => Directory.EnumerateFiles(x))
+            .Where(f =>
+                Path.GetFileName(f).Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+            .Where(f =>
+                (string.IsNullOrEmpty(Path.GetExtension(f)) && OperatingSystem.IsWindows()) ||
+                !OperatingSystem.IsWindows())
+            .Select(f =>
             {
-                return Path.GetFullPath(
-                    files.First(x => Path.GetFileName(filePathToResolve).Equals(x))
-                );
-            }
+                string extension = Path.GetExtension(f);
+
+                int extensionIndex = f.LastIndexOf(extension, StringComparison.Ordinal);
+
+                if (extensionIndex != -1)
+                {
+                    f = f.Remove(extensionIndex, extension.Length);
+                    f = f.Insert(extensionIndex, extension.ToLower());
+                }
+                
+                return f;
+            });
+       
+        foreach (string file in files)
+        {
+            if (Path.GetFileName(file).Equals(filePathToResolve, StringComparison.InvariantCulture))
+                return file;
         }
 
         throw new FileNotFoundException(filePathToResolve);
