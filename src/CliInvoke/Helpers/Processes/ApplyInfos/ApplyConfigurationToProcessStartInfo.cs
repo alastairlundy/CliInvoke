@@ -15,6 +15,10 @@ using System;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
+
 internal static class ApplyConfigurationToProcessStartInfo
 {
     /// <summary>
