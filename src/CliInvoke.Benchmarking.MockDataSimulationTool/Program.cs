@@ -7,12 +7,12 @@ CommandApp app = new CommandApp();
 
 app.Configure(config =>
 {
-   config.AddCommand<GenerateFakeTextCommand>("generate-fake-text")
-       .WithAlias("gen-fake-text")
-       .WithDescription("Generates fake text that is output to the console.");
+    config
+        .AddCommand<GenerateFakeTextCommand>("generate-fake-text")
+        .WithAlias("gen-fake-text")
+        .WithDescription("Generates fake text that is output to the console.");
 });
 
 app.SetDefaultCommand<GenerateFakeTextCommand>();
-
 
 return await app.RunAsync(args);

@@ -20,12 +20,14 @@ internal static class ProcessSetEnvironmentVariablesExtensions
     /// </summary>
     /// <param name="processStartInfo">The ProcessStartInfo object to set environment variables for.</param>
     /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
-    internal static void SetEnvironmentVariables(this ProcessStartInfo processStartInfo,
-        IReadOnlyDictionary<string, string> environmentVariables)
+    internal static void SetEnvironmentVariables(
+        this ProcessStartInfo processStartInfo,
+        IReadOnlyDictionary<string, string> environmentVariables
+    )
     {
         if (environmentVariables.Any() == false)
             return;
-        
+
         foreach (KeyValuePair<string, string> variable in environmentVariables)
         {
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract

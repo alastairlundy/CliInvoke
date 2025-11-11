@@ -5,9 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Bogus;
-
 using Spectre.Console.Cli;
-
 using ValidationResult = Spectre.Console.ValidationResult;
 
 namespace CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
@@ -17,14 +15,14 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
     private Faker _faker;
 
     private char[] fakeChars;
-    
+
     public class Settings : CommandSettings
     {
         [CommandOption("--line-length|-ll")]
         [DefaultValue(100_000)]
         [Range(1, 1_000_000)]
         public int FakeTextLineLength { get; init; }
-        
+
         [CommandOption("--lines|-ln")]
         [DefaultValue(100)]
         [Range(1, 1000)]
@@ -34,27 +32,31 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
     public GenerateFakeTextCommand()
     {
         _faker = new Faker();
-        
-       fakeChars = _faker.Random.Chars(count: 1000);
+
+        fakeChars = _faker.Random.Chars(count: 1000);
     }
 
-    public override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken)
+    public override int Execute(
+        CommandContext context,
+        Settings settings,
+        CancellationToken cancellationToken
+    )
     {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int line = 0; line < settings.NumberOfFakeTextLines; line++)
         {
-            
             for (int i = 0; i < settings.FakeTextLineLength; i++)
             {
                 stringBuilder.Append(_faker.PickRandom(fakeChars));
             }
-            
+
             stringBuilder.AppendLine();
         }
 
         try
-        { Console.Out.WriteLine(stringBuilder.ToString());
+        {
+            Console.Out.WriteLine(stringBuilder.ToString());
             return 0;
         }
         catch
@@ -67,8 +69,12 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
     {
         if (settings is Settings s)
         {
-            if (s.NumberOfFakeTextLines > 0 && s.NumberOfFakeTextLines < 1001 && s.FakeTextLineLength > 0 &&
-                s.FakeTextLineLength < 1_000_001)
+            if (
+                s.NumberOfFakeTextLines > 0
+                && s.NumberOfFakeTextLines < 1001
+                && s.FakeTextLineLength > 0
+                && s.FakeTextLineLength < 1_000_001
+            )
             {
                 return ValidationResult.Success();
             }
@@ -77,7 +83,7 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
                 return ValidationResult.Error();
             }
         }
-        
+
         return settings.Validate();
     }
 }

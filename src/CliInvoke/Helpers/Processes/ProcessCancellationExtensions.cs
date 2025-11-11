@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke 
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,17 +12,15 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-
 using AlastairLundy.CliInvoke.Core;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 /// <summary>
-/// 
+///
 /// </summary>
 internal static class ProcessCancellationExtensions
 {
-
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -31,8 +29,11 @@ internal static class ProcessCancellationExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    internal static async Task WaitForExitOrTimeoutAsync(this Process process,
-        ProcessExitConfiguration processExitConfiguration, CancellationToken cancellationToken = default)
+    internal static async Task WaitForExitOrTimeoutAsync(
+        this Process process,
+        ProcessExitConfiguration processExitConfiguration,
+        CancellationToken cancellationToken = default
+    )
     {
         switch (processExitConfiguration.TimeoutPolicy.CancellationMode)
         {
@@ -43,13 +44,19 @@ internal static class ProcessCancellationExtensions
             }
             case ProcessCancellationMode.Graceful:
             {
-                await WaitForExitOrGracefulTimeoutAsync(process, processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                    processExitConfiguration.CancellationExceptionBehavior);
+                await WaitForExitOrGracefulTimeoutAsync(
+                    process,
+                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                    processExitConfiguration.CancellationExceptionBehavior
+                );
                 return;
             }
             case ProcessCancellationMode.Forceful:
-                await WaitForExitOrForcefulTimeoutAsync(process, processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                    processExitConfiguration.CancellationExceptionBehavior);
+                await WaitForExitOrForcefulTimeoutAsync(
+                    process,
+                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                    processExitConfiguration.CancellationExceptionBehavior
+                );
                 return;
             default:
                 throw new NotSupportedException();
@@ -72,24 +79,27 @@ internal static class ProcessCancellationExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    private static async Task WaitForExitOrGracefulTimeoutAsync(this Process process,TimeSpan timeoutThreshold, 
-        ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+    private static async Task WaitForExitOrGracefulTimeoutAsync(
+        this Process process,
+        TimeSpan timeoutThreshold,
+        ProcessCancellationExceptionBehavior cancellationExceptionBehavior
+    )
     {
         if (timeoutThreshold < TimeSpan.Zero)
             throw new ArgumentOutOfRangeException();
-        
+
         DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
 
         CancellationTokenSource cts = new CancellationTokenSource();
 
         cts.CancelAfter(timeoutThreshold);
-        
+
         if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
         {
             await process.WaitForExitAsync(cts.Token);
             return;
         }
-        
+
         try
         {
             await process.WaitForExitAsync(cts.Token);
@@ -98,8 +108,11 @@ internal static class ProcessCancellationExtensions
         {
             DateTime actualExitTime = DateTime.UtcNow;
             long elapsedTicks = Math.Abs(actualExitTime.Ticks - expectedExitTime.Ticks);
-            
-            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
+
+            if (
+                cancellationExceptionBehavior
+                == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
+            )
             {
                 if (TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10))
                 {
@@ -113,9 +126,9 @@ internal static class ProcessCancellationExtensions
                 process.Kill();
         }
     }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="process"></param>
     /// <param name="timeoutThreshold"></param>
@@ -129,20 +142,23 @@ internal static class ProcessCancellationExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    private static async Task WaitForExitOrForcefulTimeoutAsync(this Process process,TimeSpan timeoutThreshold, 
-        ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+    private static async Task WaitForExitOrForcefulTimeoutAsync(
+        this Process process,
+        TimeSpan timeoutThreshold,
+        ProcessCancellationExceptionBehavior cancellationExceptionBehavior
+    )
     {
         if (timeoutThreshold < TimeSpan.Zero)
             throw new ArgumentOutOfRangeException();
-        
+
         DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
-        
+
         try
         {
             Task waitForExit = process.WaitForExitAsync();
-            
+
             Task delay = Task.Delay(timeoutThreshold);
-            
+
             await Task.WhenAny(delay, waitForExit);
 
             if (process.HasExited == false)
@@ -155,17 +171,26 @@ internal static class ProcessCancellationExtensions
             DateTime actualExitTime = DateTime.UtcNow;
             long elapsedTicks = Math.Abs(actualExitTime.Ticks - expectedExitTime.Ticks);
 
-            
-            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.SuppressException)
+            if (
+                cancellationExceptionBehavior
+                == ProcessCancellationExceptionBehavior.SuppressException
+            )
             {
                 return;
             }
 
-            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected ||
-                cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+            if (
+                cancellationExceptionBehavior
+                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
+                || cancellationExceptionBehavior
+                    == ProcessCancellationExceptionBehavior.AllowException
+            )
             {
-                if (TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10) || 
-                    cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+                if (
+                    TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10)
+                    || cancellationExceptionBehavior
+                        == ProcessCancellationExceptionBehavior.AllowException
+                )
                 {
                     throw;
                 }

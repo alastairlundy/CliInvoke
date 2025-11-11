@@ -1,5 +1,5 @@
 ﻿/*
-    CliInvoke 
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,7 +16,6 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-
 using AlastairLundy.CliInvoke.Core.Builders;
 using AlastairLundy.CliInvoke.Internal.Localizations;
 
@@ -37,7 +36,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     private readonly StringBuilder _buffer;
 
     private readonly Func<string, bool>? _argumentValidationLogic;
-    
+
     /// <summary>
     /// Initializes the ArgumentsBuilder.
     /// </summary>
@@ -53,12 +52,11 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public ArgumentsBuilder(Func<string, bool> argumentValidationLogic)
     {
         _buffer = new StringBuilder();
-        _argumentValidationLogic = argumentValidationLogic;   
+        _argumentValidationLogic = argumentValidationLogic;
     }
-    
-        
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="buffer"></param>
     protected ArgumentsBuilder(StringBuilder buffer)
@@ -101,15 +99,17 @@ public class ArgumentsBuilder : IArgumentsBuilder
         }
         else
         {
-            throw new InvalidOperationException(Resources
-                .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
-                    int.MaxValue.ToString()));
+            throw new InvalidOperationException(
+                Resources.Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace(
+                    "{x}",
+                    int.MaxValue.ToString()
+                )
+            );
         }
 
         if (_argumentValidationLogic is not null)
         {
-            return new ArgumentsBuilder(_buffer,
-                _argumentValidationLogic);
+            return new ArgumentsBuilder(_buffer, _argumentValidationLogic);
         }
         else
         {
@@ -123,8 +123,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="value">The string value to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(string value) 
-        => IsValidArgument(value) == true ? Add(value, false) : this;
+    public IArgumentsBuilder Add(string value) =>
+        IsValidArgument(value) == true ? Add(value, false) : this;
 
     /// <summary>
     /// Appends a collection of string values to the arguments builder.
@@ -138,14 +138,13 @@ public class ArgumentsBuilder : IArgumentsBuilder
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(values, nameof(values));
 #endif
-        
-        if (escapeSpecialChars) 
+        if (escapeSpecialChars)
             values = values.Select(x => EscapeCharacters(x));
-        
+
         values = values.Where(x => IsValidArgument(x));
-        
+
         string joinedValues = string.Join(" ", values);
-        
+
         return Add(joinedValues, escapeSpecialChars);
     }
 
@@ -155,8 +154,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="values">The collection of string values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder AddEnumerable(IEnumerable<string> values) 
-        => AddEnumerable(values, true);
+    public IArgumentsBuilder AddEnumerable(IEnumerable<string> values) =>
+        AddEnumerable(values, true);
 
     /// <summary>
     /// Appends a formattable value to the arguments builder.
@@ -167,28 +166,33 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IFormattable value, IFormatProvider formatProvider, string? format = null,
-        bool escapeSpecialChars = true)
+    public IArgumentsBuilder Add(
+        IFormattable value,
+        IFormatProvider formatProvider,
+        string? format = null,
+        bool escapeSpecialChars = true
+    )
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(value, nameof(value));
         ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
 #endif
-        
         if (IsValidArgument(value, formatProvider) != true)
             throw new ArgumentNullException(nameof(value));
-        
+
         string valueActual = value.ToString(format, formatProvider);
 
         if (string.IsNullOrWhiteSpace(valueActual))
         {
-            throw new NullReferenceException("IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace(
-                "{x}",
-                nameof(value)));
+            throw new NullReferenceException(
+                "IFormatProvider formated the IFormattable {x} which resulted in a null string.".Replace(
+                    "{x}",
+                    nameof(value)
+                )
+            );
         }
-           
-        return Add(valueActual, escapeSpecialChars);
 
+        return Add(valueActual, escapeSpecialChars);
     }
 
     /// <summary>
@@ -200,14 +204,17 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values, IFormatProvider formatProvider,
-        string? format = null, bool escapeSpecialChars = true)
+    public IArgumentsBuilder AddEnumerable(
+        IEnumerable<IFormattable> values,
+        IFormatProvider formatProvider,
+        string? format = null,
+        bool escapeSpecialChars = true
+    )
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(values, nameof(values));
         ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
 #endif
-        
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
 
 #if NETSTANDARD2_0
@@ -215,10 +222,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
 #else
         string value = string.Join(' ', valuesStrings);
 #endif
-        
         return Add(value, escapeSpecialChars);
     }
-    
+
     /// <summary>
     /// Appends a formattable value to the arguments builder.
     /// </summary>
@@ -226,8 +232,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IFormattable value, bool escapeSpecialChars) 
-        => Add(value, DefaultFormatProvider, null, escapeSpecialChars);
+    public IArgumentsBuilder Add(IFormattable value, bool escapeSpecialChars) =>
+        Add(value, DefaultFormatProvider, null, escapeSpecialChars);
 
     /// <summary>
     /// Appends a formattable value to the arguments builder without specifying a culture
@@ -236,8 +242,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="value">The formattable value to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IFormattable value) 
-        => Add(value, true);
+    public IArgumentsBuilder Add(IFormattable value) => Add(value, true);
 
     /// <summary>
     /// Appends a collection of formattable values to the arguments builder without specifying a culture.
@@ -246,8 +251,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values, bool escapeSpecialChars) 
-        => AddEnumerable(values, CultureInfo.CurrentCulture, null, escapeSpecialChars);
+    public IArgumentsBuilder AddEnumerable(
+        IEnumerable<IFormattable> values,
+        bool escapeSpecialChars
+    ) => AddEnumerable(values, CultureInfo.CurrentCulture, null, escapeSpecialChars);
 
     /// <summary>
     /// Appends a collection of formattable values to the arguments builder without specifying a culture and without escaping special characters.
@@ -255,8 +262,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="values">The collection of formattable values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values) 
-        => AddEnumerable(values, true);
+    public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values) =>
+        AddEnumerable(values, true);
 
     /// <summary>
     /// Escapes characters in a string.
@@ -266,7 +273,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public string EscapeCharacters(string argument)
     {
-        return argument.Replace("\\", "\\\\")
+        return argument
+            .Replace("\\", "\\\\")
             .Replace("\n", "\\n")
             .Replace("\t", "\\t")
             .Replace("\r", "\\r")
@@ -288,7 +296,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     private bool IsValidArgument(string value)
     {
         bool output;
-        
+
         if (_argumentValidationLogic is not null)
         {
             output = _argumentValidationLogic.Invoke(value);
@@ -297,10 +305,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
         {
             output = (string.IsNullOrEmpty(value) == true) == false;
         }
-        
+
         return output;
     }
 
-    private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
-        => IsValidArgument(value.ToString(null, provider));
+    private bool IsValidArgument(IFormattable value, IFormatProvider provider) =>
+        IsValidArgument(value.ToString(null, provider));
 }

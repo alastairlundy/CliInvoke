@@ -22,22 +22,25 @@ namespace AlastairLundy.CliInvoke.Core;
 /// <summary>
 /// A Piped ProcessResult containing a Process's or Command's StandardOutput and StandardError information.
 /// </summary>
-public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>, IDisposable
+public class PipedProcessResult
+    : ProcessResult,
+        IEquatable<PipedProcessResult>,
+        IDisposable
 #if NET8_0_OR_GREATER
-    ,IAsyncDisposable
+        ,
+        IAsyncDisposable
 #endif
 {
-    
     /// <summary>
     /// The Standard Output from a Process or Command represented as a Pipe.
     /// </summary>
     public Stream StandardOutput { get; }
-    
+
     /// <summary>
     /// The Standard Error from a Process or Command represented as a Pipe.
     /// </summary>
     public Stream StandardError { get; }
-    
+
     /// <summary>
     /// Initializes the PipedProcessResult with process information.
     /// </summary>
@@ -47,12 +50,15 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
     /// <param name="exitTime">The exit time of the process.</param>
     /// <param name="standardOutput">The process' standard output.</param>
     /// <param name="standardError">The process' standard error.</param>
-    public PipedProcessResult(string executableFilePath,
+    public PipedProcessResult(
+        string executableFilePath,
         int exitCode,
         DateTime startTime,
         DateTime exitTime,
         Stream standardOutput,
-        Stream standardError) : base(executableFilePath, exitCode, startTime, exitTime)
+        Stream standardError
+    )
+        : base(executableFilePath, exitCode, startTime, exitTime)
     {
         StandardOutput = standardOutput;
         StandardError = standardError;
@@ -68,12 +74,12 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
     {
         if (other is null)
             return false;
-        
-        return StandardOutput.Equals(other.StandardOutput) &&
-               StandardError.Equals(other.StandardError) &&
-               ExitCode.Equals(other.ExitCode) && 
-               StartTime.Equals(other.StartTime) &&
-               ExitTime.Equals(other.ExitTime);
+
+        return StandardOutput.Equals(other.StandardOutput)
+            && StandardError.Equals(other.StandardError)
+            && ExitCode.Equals(other.ExitCode)
+            && StartTime.Equals(other.StartTime)
+            && ExitTime.Equals(other.ExitTime);
     }
 
     /// <summary>
@@ -88,7 +94,7 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
 
         if (obj is PipedProcessResult pipedProcessResult)
             return Equals(pipedProcessResult);
-        
+
         return false;
     }
 
@@ -96,8 +102,7 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
     /// Returns the hash code for the current PipedProcessResult.
     /// </summary>
     /// <returns>The hash code for the current PipedProcessResult.</returns>
-    public override int GetHashCode() 
-        => HashCode.Combine(StandardOutput, StandardError);
+    public override int GetHashCode() => HashCode.Combine(StandardOutput, StandardError);
 
     /// <summary>
     /// Determines whether two PipedProcessResults are equal.
@@ -112,15 +117,15 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
 
         return left.Equals(right);
     }
-    
+
     /// <summary>
     /// Determines if a PipedProcessResult is equal to another PipedProcessResult.
     /// </summary>
     /// <param name="left">A PipedProcessResult to be compared.</param>
     /// <param name="right">The other PipedProcessResult to be compared.</param>
     /// <returns>True if both PipedProcessResults are equal to each other; false otherwise.</returns>
-    public static bool operator ==(PipedProcessResult? left, PipedProcessResult? right) 
-        => Equals(left, right);
+    public static bool operator ==(PipedProcessResult? left, PipedProcessResult? right) =>
+        Equals(left, right);
 
     /// <summary>
     /// Determines if a PipedProcessResult is not equal to another PipedProcessResult.
@@ -128,8 +133,8 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
     /// <param name="left">A PipedProcessResult to be compared.</param>
     /// <param name="right">The other PipedProcessResult to be compared.</param>
     /// <returns>True if both PipedProcessResults are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(PipedProcessResult? left, PipedProcessResult? right) 
-        => Equals(left, right) == false;
+    public static bool operator !=(PipedProcessResult? left, PipedProcessResult? right) =>
+        Equals(left, right) == false;
 
     /// <summary>
     /// Disposes of the <see cref="StandardOutput"/> and <see cref="StandardError"/> streams.
@@ -138,10 +143,10 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
     {
         StandardOutput.Dispose();
         StandardError.Dispose();
-        
+
         GC.SuppressFinalize(this);
     }
-    
+
 #if NET8_0_OR_GREATER
     /// <summary>
     /// Disposes of the <see cref="StandardOutput"/> and <see cref="StandardError"/> streams asynchronously.
@@ -150,7 +155,7 @@ public class PipedProcessResult : ProcessResult, IEquatable<PipedProcessResult>,
     {
         await StandardOutput.DisposeAsync();
         await StandardError.DisposeAsync();
-        
+
         GC.SuppressFinalize(this);
     }
 #endif

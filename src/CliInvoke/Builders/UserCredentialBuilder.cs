@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke  
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,7 +12,6 @@
 
 using System.Diagnostics.Contracts;
 using System.Security;
-
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
 
@@ -37,14 +36,14 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="credential"></param>
     protected UserCredentialBuilder(UserCredential credential)
     {
         _userCredential = credential;
     }
-    
+
     /// <summary>
     /// Sets the domain for the credential to be created.
     /// </summary>
@@ -53,13 +52,15 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetDomain(string? domain) =>
         new UserCredentialBuilder(
-            new UserCredential(domain,
-                    _userCredential.UserName,
+            new UserCredential(
+                domain,
+                _userCredential.UserName,
 #pragma warning disable CA1416
-                    _userCredential.Password,
-                    _userCredential.LoadUserProfile)
+                _userCredential.Password,
+                _userCredential.LoadUserProfile
+            )
 #pragma warning restore CA1416
-            );
+        );
 
     /// <summary>
     /// Sets the username for the credential to be created.
@@ -68,13 +69,14 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// <returns>A new instance of the CredentialsBuilder with the updated username.</returns>
     [Pure]
     public IUserCredentialBuilder SetUsername(string? username) =>
-        new UserCredentialBuilder
-        (
+        new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(_userCredential.Domain,
+            new UserCredential(
+                _userCredential.Domain,
                 username,
                 _userCredential.Password,
-                _userCredential.LoadUserProfile)
+                _userCredential.LoadUserProfile
+            )
 #pragma warning restore CA1416
         );
 
@@ -85,16 +87,17 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// <returns>A new instance of the CredentialsBuilder with the updated password.</returns>
     [Pure]
     public IUserCredentialBuilder SetPassword(SecureString? password) =>
-        new UserCredentialBuilder
-        (
+        new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(_userCredential.Domain,
+            new UserCredential(
+                _userCredential.Domain,
                 _userCredential.UserName,
                 password,
-                _userCredential.LoadUserProfile)
+                _userCredential.LoadUserProfile
+            )
 #pragma warning restore CA1416
         );
-        
+
     /// <summary>
     /// Specifies whether to load the user profile.
     /// </summary>
@@ -102,13 +105,14 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// <returns>A new instance of the CredentialsBuilder with the updated load user profile setting.</returns>
     [Pure]
     public IUserCredentialBuilder LoadUserProfile(bool loadUserProfile) =>
-        new UserCredentialBuilder
-        (
+        new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(_userCredential.Domain,
+            new UserCredential(
+                _userCredential.Domain,
                 _userCredential.UserName,
                 _userCredential.Password,
-                loadUserProfile)
+                loadUserProfile
+            )
 #pragma warning restore CA1416
         );
 
@@ -119,12 +123,14 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public UserCredential Build() =>
 #pragma warning disable CA1416
-        new UserCredential(_userCredential.Domain,
+        new UserCredential(
+            _userCredential.Domain,
             _userCredential.UserName,
             _userCredential.Password,
-            _userCredential.LoadUserProfile);
+            _userCredential.LoadUserProfile
+        );
 #pragma warning restore CA1416
-        
+
     /// <summary>
     /// Disposes of the provided settings.
     /// </summary>

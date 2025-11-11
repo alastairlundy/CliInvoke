@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke 
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,16 +10,18 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Internal.Localizations;
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
 
 // ReSharper disable RedundantBoolCompare
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 /// <summary>
-/// 
+///
 /// </summary>
 internal static class ProcessSetPolicyExtensions
 {
@@ -37,13 +39,18 @@ internal static class ProcessSetPolicyExtensions
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("android")]
-    internal static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
+    internal static void SetResourcePolicy(
+        this Process process,
+        ProcessResourcePolicy? resourcePolicy
+    )
     {
         resourcePolicy ??= ProcessResourcePolicy.Default;
 
         if (process.HasStarted() == false)
-            throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
-        
+            throw new InvalidOperationException(
+                Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
+            );
+
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
         {
             if (resourcePolicy.ProcessorAffinity is not null)
@@ -52,10 +59,12 @@ internal static class ProcessSetPolicyExtensions
             }
         }
 
-        if (OperatingSystem.IsMacOS() ||
-            OperatingSystem.IsMacCatalyst() ||
-            OperatingSystem.IsFreeBSD() ||
-            OperatingSystem.IsWindows())
+        if (
+            OperatingSystem.IsMacOS()
+            || OperatingSystem.IsMacCatalyst()
+            || OperatingSystem.IsFreeBSD()
+            || OperatingSystem.IsWindows()
+        )
         {
             if (resourcePolicy.MinWorkingSet is not null)
             {
@@ -67,7 +76,7 @@ internal static class ProcessSetPolicyExtensions
                 process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
             }
         }
-        
+
         process.PriorityClass = resourcePolicy.PriorityClass;
         process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
     }
