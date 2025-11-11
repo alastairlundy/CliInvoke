@@ -17,6 +17,10 @@ using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
 
 using AlastairLundy.CliInvoke.Core;
 
+#if NETSTANDARD2_0
+using OperatingSystem = Polyfills.OperatingSystemPolyfill;
+#endif
+
 // ReSharper disable UnusedMember.Global
 
 namespace AlastairLundy.CliInvoke.Specializations.Configurations;
