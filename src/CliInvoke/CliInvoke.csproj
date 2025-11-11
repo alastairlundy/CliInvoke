@@ -3,7 +3,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <LangVersion>13</LangVersion>
+    <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <Title>CliInvoke</Title>

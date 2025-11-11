@@ -21,6 +21,7 @@ namespace AlastairLundy.CliInvoke.Helpers.Processes;
 /// </summary>
 internal static class ProcessCancellationExtensions
 {
+    
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [SupportedOSPlatform("maccatalyst")]

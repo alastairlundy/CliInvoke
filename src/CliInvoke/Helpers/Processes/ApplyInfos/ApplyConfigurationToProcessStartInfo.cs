@@ -21,55 +21,61 @@ namespace AlastairLundy.CliInvoke.Helpers.Processes;
 internal static class ApplyConfigurationToProcessStartInfo
 {
     /// <summary>
-    /// Applies a requirement to run the process start info as an administrator.
-    /// </summary>
-    /// <param name="processStartInfo"></param>
-    internal static void RunAsAdministrator(this ProcessStartInfo processStartInfo)
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            processStartInfo.Verb = "runas";
-        }
-        else if (
-            OperatingSystem.IsLinux()
-            || OperatingSystem.IsMacOS()
-            || OperatingSystem.IsMacCatalyst()
-            || OperatingSystem.IsFreeBSD()
-        )
-        {
-            processStartInfo.Verb = "sudo";
-        }
-    }
-
-    /// <summary>
-    /// Adds the specified Credential to the current ProcessStartInfo object.
+    /// 
     /// </summary>
     /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
-    /// <param name="credential">The credential to be added.</param>
-    [SupportedOSPlatform("windows")]
-    internal static void SetUserCredential(
-        this ProcessStartInfo processStartInfo,
-        UserCredential credential
-    )
+    extension(ProcessStartInfo processStartInfo)
     {
-        if (credential.Domain is not null && OperatingSystem.IsWindows())
+            
+        /// <summary>
+        /// Applies a requirement to run the process start info as an administrator.
+        /// </summary>
+        internal void RunAsAdministrator()
         {
-            processStartInfo.Domain = credential.Domain;
+            if (OperatingSystem.IsWindows())
+            {
+                processStartInfo.Verb = "runas";
+            }
+            else if (
+                OperatingSystem.IsLinux()
+                || OperatingSystem.IsMacOS()
+                || OperatingSystem.IsMacCatalyst()
+                || OperatingSystem.IsFreeBSD()
+            )
+            {
+                processStartInfo.Verb = "sudo";
+            }
         }
 
-        if (credential.UserName is not null)
+        /// <summary>
+        /// Adds the specified Credential to the current ProcessStartInfo object.
+        /// </summary>
+        /// <param name="credential">The credential to be added.</param>
+        [SupportedOSPlatform("windows")]
+        internal void SetUserCredential(
+            UserCredential credential
+        )
         {
-            processStartInfo.UserName = credential.UserName;
-        }
+            if (credential.Domain is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.Domain = credential.Domain;
+            }
 
-        if (credential.Password is not null && OperatingSystem.IsWindows())
-        {
-            processStartInfo.Password = credential.Password;
-        }
+            if (credential.UserName is not null)
+            {
+                processStartInfo.UserName = credential.UserName;
+            }
 
-        if (credential.LoadUserProfile is not null && OperatingSystem.IsWindows())
-        {
-            processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+            if (credential.Password is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.Password = credential.Password;
+            }
+
+            if (credential.LoadUserProfile is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+            }
         }
     }
+
 }

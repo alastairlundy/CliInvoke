@@ -17,29 +17,31 @@ namespace AlastairLundy.CliInvoke.Extensions;
 
 public static class FilePathResolverRegistration
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="serviceLifetime"></param>
-    /// <typeparam name="TResolver"></typeparam>
-    /// <returns></returns>
-    public static IServiceCollection UseFilePathResolver<TResolver>(this IServiceCollection services, ServiceLifetime serviceLifetime)
-        where TResolver : class, IFilePathResolver
+    extension(IServiceCollection services)
     {
-        switch (serviceLifetime)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceLifetime"></param>
+        /// <typeparam name="TResolver"></typeparam>
+        /// <returns></returns>
+        public IServiceCollection UseCustomFilePathResolver<TResolver>(ServiceLifetime serviceLifetime)
+            where TResolver : class, IFilePathResolver
         {
-            case ServiceLifetime.Singleton:
-                services.AddSingleton<IFilePathResolver, TResolver>();
-                return services;
-            case ServiceLifetime.Scoped:
-                services.AddScoped<IFilePathResolver, TResolver>();
-                return services;
-            case ServiceLifetime.Transient:
-                services.AddTransient<IFilePathResolver, TResolver>();
-                return services;
-            default:
-                throw new NotSupportedException();
+            switch (serviceLifetime)
+            {
+                case ServiceLifetime.Singleton:
+                    services.AddSingleton<IFilePathResolver, TResolver>();
+                    return services;
+                case ServiceLifetime.Scoped:
+                    services.AddScoped<IFilePathResolver, TResolver>();
+                    return services;
+                case ServiceLifetime.Transient:
+                    services.AddTransient<IFilePathResolver, TResolver>();
+                    return services;
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }
