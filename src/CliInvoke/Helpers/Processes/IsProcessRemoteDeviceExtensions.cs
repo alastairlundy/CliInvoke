@@ -13,7 +13,7 @@ using System.Runtime.Versioning;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
-internal static class IsProcessRunningExtensions
+internal static class IsProcessRemoteDeviceExtensions
 {
     /// <summary>
     /// Determines whether a process exists on a remote device or locally.
