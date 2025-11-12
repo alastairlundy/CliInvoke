@@ -214,6 +214,7 @@ public class FilePathResolver : IFilePathResolver
 
                 int extensionIndex = f.LastIndexOf(extension, StringComparison.Ordinal);
 
+                // ReSharper disable once InvertIf
                 if (extensionIndex != -1)
                 {
                     f = f.Remove(extensionIndex, extension.Length);
