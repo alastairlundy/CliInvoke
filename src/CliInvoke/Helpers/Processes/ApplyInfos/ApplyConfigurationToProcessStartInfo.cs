@@ -12,56 +12,80 @@ using System.Runtime.Versioning;
 
 using AlastairLundy.CliInvoke.Core;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
 
 internal static class ApplyConfigurationToProcessStartInfo
 {
-    /// <summary>
-    /// Applies a requirement to run the process start info as an administrator.
-    /// </summary>
     /// <param name="processStartInfo"></param>
-    internal static void RunAsAdministrator(this ProcessStartInfo processStartInfo)
+    extension(ProcessStartInfo processStartInfo)
     {
-        if (OperatingSystem.IsWindows())
+        /// <summary>
+        /// Applies a requirement to run the process start info as an administrator.
+        /// </summary>
+        internal void RunAsAdministrator()
         {
-            processStartInfo.Verb = "runas";
-        }
-        else if (OperatingSystem.IsLinux() ||
-                 OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
-                 OperatingSystem.IsFreeBSD())
-        {
-            processStartInfo.Verb = "sudo";
-        }
-    }
-    
-    /// <summary>
-    /// Adds the specified Credential to the current ProcessStartInfo object.
-    /// </summary>
-    /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
-    /// <param name="credential">The credential to be added.</param>
-    [SupportedOSPlatform("windows")]
-    internal static void SetUserCredential(this ProcessStartInfo processStartInfo, UserCredential credential)
-    {
-        if (credential.Domain is not null && OperatingSystem.IsWindows())
-        {
-            processStartInfo.Domain = credential.Domain;
+            if (OperatingSystem.IsWindows())
+            {
+                processStartInfo.Verb = "runas";
+            }
+            else if (OperatingSystem.IsLinux() ||
+                     OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
+                     OperatingSystem.IsFreeBSD())
+            {
+                processStartInfo.Verb = "sudo";
+            }
         }
 
-        if (credential.UserName is not null)
+        /// <summary>
+        /// Adds the specified Credential to the current ProcessStartInfo object.
+        /// </summary>
+        /// <param name="credential">The credential to be added.</param>
+        [SupportedOSPlatform("windows")]
+        internal void SetUserCredential(UserCredential credential)
         {
-            processStartInfo.UserName = credential.UserName;
-        }
+            if (credential.Domain is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.Domain = credential.Domain;
+            }
 
-        if (credential.Password is not null && OperatingSystem.IsWindows())
-        {
-            processStartInfo.Password = credential.Password;
-        }
+            if (credential.UserName is not null)
+            {
+                processStartInfo.UserName = credential.UserName;
+            }
 
-        if (credential.LoadUserProfile is not null && OperatingSystem.IsWindows())
+            if (credential.Password is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.Password = credential.Password;
+            }
+
+            if (credential.LoadUserProfile is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+            }
+        }
+        
+        /// <summary>
+        /// Sets environment variables for a specified ProcessStartInfo object.
+        /// </summary>
+        /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
+        internal void SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables
+        )
         {
-            processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+            if (environmentVariables.Any() == false)
+                return;
+
+            foreach (KeyValuePair<string, string> variable in environmentVariables)
+            {
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                if (variable.Value is not null)
+                {
+                    processStartInfo.Environment[variable.Key] = variable.Value;
+                }
+            }
         }
     }
 }
