@@ -44,14 +44,12 @@ public class FilePathResolver : IFilePathResolver
         ArgumentException.ThrowIfNullOrEmpty(filePathToResolve,  nameof(filePathToResolve));
         #endif
         
-        if (File.Exists(filePathToResolve))
-        {
+        if (Path.IsPathRooted(filePathToResolve))
             return filePathToResolve;
-        }
         
-        bool resolveFromFilePath = ResolveFromPathEnvironmentVariable(filePathToResolve, out string? filePath);
+        bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out string? filePath);
 
-        if (resolveFromFilePath && filePath is not null)
+        if (resolveFromPath && filePath is not null)
             return filePath;
         
         return LocateFileFromDirectory(filePathToResolve);
@@ -68,8 +66,7 @@ public class FilePathResolver : IFilePathResolver
     protected static bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
         out string? resolvedFilePath)
     {
-        if (Path.IsPathRooted(filePathToResolve)
-            || filePathToResolve.Contains(Path.DirectorySeparatorChar)
+        if (filePathToResolve.Contains(Path.DirectorySeparatorChar)
             || filePathToResolve.Contains(Path.AltDirectorySeparatorChar))
         {
             
