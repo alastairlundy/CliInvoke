@@ -215,13 +215,11 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(values, nameof(values));
         ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
 #endif
+        
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
 
-#if NETSTANDARD2_0
-        string value = StringPolyfill.Join(' ', valuesStrings);
-#else
         string value = string.Join(' ', valuesStrings);
-#endif
+
         return Add(value, escapeSpecialChars);
     }
 
