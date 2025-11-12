@@ -1,20 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <LangVersion>14</LangVersion>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Title>CliInvoke</Title>
-    <Authors>AlastairLundy</Authors>
-    <Description>CliInvoke is a .NET Library for interacting with Command Line Interfaces, CliInvoke is a library for interacting with Command Line Interfaces and wrapping around executables.</Description>
-    <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
-    <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageReleaseNotes>## Changes since 1.6.x
+
+    <PropertyGroup>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Title>CliInvoke</Title>
+        <Authors>AlastairLundy</Authors>
+        <Description>CliInvoke is a .NET Library for interacting with Command Line Interfaces, CliInvoke is a library for interacting with Command Line Interfaces and wrapping around executables.</Description>
+        <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
+        <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReleaseNotes>## Changes since 1.6.x
 * Moved Builder implementations from ``CliInvoke`` to ``CliInvoke.Core`` - https://github.com/alastairlundy/CliInvoke/pull/46
 * Reworked ``ProcessInvoker`` implementation to not require ``IProcessFactory`` @alastairlundy (https://github.com/alastairlundy/CliInvoke/pull/80)
 * Removed ``ProcessFactory``
@@ -29,66 +30,77 @@
 * Added ``DefaultProcessRunnerInvoker`` - The default implementation of RunnerProcessInvokerBase
 * Added ``RunnerProcessCreator`` - A class implementation of ``IRunnerProcessCreator`` for creating Processes that run other processes.
 * Stability improvements</PackageReleaseNotes>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageVersion>2.0.0</PackageVersion>
-    <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <PackageIcon>icon.png</PackageIcon>
-    <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
-    <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
-    <PackageId>AlastairLundy.CliInvoke</PackageId>
-    <Product>CliInvoke</Product>
-  </PropertyGroup>
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>AlastairLundy.CliInvoke.Tests</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all" />
-  </ItemGroup>
-  <PropertyGroup>
-    <!-- default false, CI can set to true -->
-    <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
-    <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
-    <!-- set CliInvokeCoreVersion in the workflow -->
-    <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\README.md">
-      <Link>README.md</Link>
-      <PackagePath>README.md</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="..\..\THIRD_PARTY_NOTICES.txt">
-      <Link>THIRD_PARTY_NOTICES.txt</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Internal\Localizations\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Internal\Localizations\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\.assets\icon.png">
-      <Pack>True</Pack>
-      <PackagePath>icon.png</PackagePath>
-      <Link>icon.png</Link>
-    </None>
-  </ItemGroup>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageVersion>2.0.0</PackageVersion>
+        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PackageIcon>icon.png</PackageIcon>
+        <IsTrimmable>true</IsTrimmable>
+        <IsAotCompatible>true</IsAotCompatible>
+        <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
+        <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
+        <PackageId>AlastairLundy.CliInvoke</PackageId>
+        <Product>CliInvoke</Product>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>AlastairLundy.CliInvoke.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
+        <PackageReference Include="Polyfill" Version="9.0.1" PrivateAssets="all" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <!-- default false, CI can set to true -->
+        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
+        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+        <!-- set CliInvokeCoreVersion in the workflow -->
+        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Content Include="..\..\README.md">
+        <Link>README.md</Link>
+          <PackagePath>README.md</PackagePath>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Include="..\..\THIRD_PARTY_NOTICES.txt">
+        <Link>THIRD_PARTY_NOTICES.txt</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <EmbeddedResource Update="Internal\Localizations\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Update="Internal\Localizations\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Include="..\..\.assets\icon.png">
+        <Pack>True</Pack>
+        <PackagePath>icon.png</PackagePath>
+        <Link>icon.png</Link>
+      </None>
+    </ItemGroup>
 </Project>

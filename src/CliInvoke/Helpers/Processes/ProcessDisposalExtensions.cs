@@ -14,17 +14,13 @@ namespace AlastairLundy.CliInvoke.Helpers.Processes;
 /// <summary>
 ///
 /// </summary>
-internal static class ProcessDisposalExtensions
+public static class ProcessDisposalExtensions
 {
-    
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="process">The process to check if the process has been disposed of.</param>
     extension(Process process)
     {
         /// <summary>
-        /// Determines if a process has been disposed of.
+        /// Determines if a process has been disposed.
         /// </summary>
         /// <returns>True if the process has been disposed of, false otherwise.</returns>
         internal bool IsDisposed()

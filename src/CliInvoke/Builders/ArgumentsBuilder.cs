@@ -79,10 +79,12 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
+#endif
+
         if (IsValidArgument(value) == false)
-        {
-            return this;
-        }
+            throw new ArgumentNullException(nameof(value));
 
         if (_buffer.Length is > 0 and < int.MaxValue)
         {
@@ -177,6 +179,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(value, nameof(value));
         ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
 #endif
+        
         if (IsValidArgument(value, formatProvider) != true)
             throw new ArgumentNullException(nameof(value));
 
@@ -215,13 +218,11 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(values, nameof(values));
         ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
 #endif
+        
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
 
-#if NETSTANDARD2_0
-        string value = StringPolyfill.Join(' ', valuesStrings);
-#else
         string value = string.Join(' ', valuesStrings);
-#endif
+
         return Add(value, escapeSpecialChars);
     }
 
@@ -275,10 +276,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         return argument
             .Replace("\\", "\\\\")
+            .Replace("\"", "\\\"")
             .Replace("\n", "\\n")
             .Replace("\t", "\\t")
             .Replace("\r", "\\r")
-            .Replace("\"", "\\\"")
             .Replace("'", "\\'");
     }
 
@@ -303,7 +304,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         }
         else
         {
-            output = (string.IsNullOrEmpty(value) == true) == false;
+            output = string.IsNullOrEmpty(value) == false;
         }
 
         return output;

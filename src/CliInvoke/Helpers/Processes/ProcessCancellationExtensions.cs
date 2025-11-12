@@ -21,179 +21,174 @@ namespace AlastairLundy.CliInvoke.Helpers.Processes;
 /// </summary>
 internal static class ProcessCancellationExtensions
 {
-    
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
-    internal static async Task WaitForExitOrTimeoutAsync(
-        this Process process,
-        ProcessExitConfiguration processExitConfiguration,
-        CancellationToken cancellationToken = default
-    )
-    {
-        switch (processExitConfiguration.TimeoutPolicy.CancellationMode)
-        {
-            case ProcessCancellationMode.None:
-            {
-                await process.WaitForExitAsync(cancellationToken);
-                return;
-            }
-            case ProcessCancellationMode.Graceful:
-            {
-                await WaitForExitOrGracefulTimeoutAsync(
-                    process,
-                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                    processExitConfiguration.CancellationExceptionBehavior
-                );
-                return;
-            }
-            case ProcessCancellationMode.Forceful:
-                await WaitForExitOrForcefulTimeoutAsync(
-                    process,
-                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                    processExitConfiguration.CancellationExceptionBehavior
-                );
-                return;
-            default:
-                throw new NotSupportedException();
-        }
-    }
-
-    /// <summary>
-    /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
-    /// </summary>
     /// <param name="process">The process to cancel.</param>
-    /// <param name="timeoutThreshold">The delay to wait before requesting cancellation.</param>
-    /// <param name="cancellationExceptionBehavior"></param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the timeout threshold is less than 0.</exception>
-    /// <exception cref="NotSupportedException">Thrown if run on a remote computer or device.</exception>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
-    private static async Task WaitForExitOrGracefulTimeoutAsync(
-        this Process process,
-        TimeSpan timeoutThreshold,
-        ProcessCancellationExceptionBehavior cancellationExceptionBehavior
-    )
+    extension(Process process)
     {
-        if (timeoutThreshold < TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException();
-
-        DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
-
-        CancellationTokenSource cts = new CancellationTokenSource();
-
-        cts.CancelAfter(timeoutThreshold);
-
-        if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("android")]
+        internal async Task WaitForExitOrTimeoutAsync(ProcessExitConfiguration processExitConfiguration,
+            CancellationToken cancellationToken = default
+        )
         {
-            await process.WaitForExitAsync(cts.Token);
-            return;
-        }
-
-        try
-        {
-            await process.WaitForExitAsync(cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            DateTime actualExitTime = DateTime.UtcNow;
-            long elapsedTicks = Math.Abs(actualExitTime.Ticks - expectedExitTime.Ticks);
-
-            if (
-                cancellationExceptionBehavior
-                == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
-            )
+            switch (processExitConfiguration.TimeoutPolicy.CancellationMode)
             {
-                if (TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10))
+                case ProcessCancellationMode.None:
                 {
-                    throw;
+                    await process.WaitForExitAsync(cancellationToken);
+                    return;
                 }
+                case ProcessCancellationMode.Graceful:
+                {
+                    await WaitForExitOrGracefulTimeoutAsync(
+                        process,
+                        processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                        processExitConfiguration.CancellationExceptionBehavior
+                    );
+                    return;
+                }
+                case ProcessCancellationMode.Forceful:
+                    await WaitForExitOrForcefulTimeoutAsync(
+                        process,
+                        processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                        processExitConfiguration.CancellationExceptionBehavior
+                    );
+                    return;
+                default:
+                    throw new NotSupportedException();
             }
         }
-        finally
+
+        /// <summary>
+        /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
+        /// </summary>
+        /// <param name="timeoutThreshold">The delay to wait before requesting cancellation.</param>
+        /// <param name="cancellationExceptionBehavior"></param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the timeout threshold is less than 0.</exception>
+        /// <exception cref="NotSupportedException">Thrown if run on a remote computer or device.</exception>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("android")]
+        private async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior
+        )
         {
-            if (process.HasExited == false)
-                process.Kill();
-        }
-    }
+            if (timeoutThreshold < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException();
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="process"></param>
-    /// <param name="timeoutThreshold"></param>
-    /// <param name="cancellationExceptionBehavior"></param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
-    private static async Task WaitForExitOrForcefulTimeoutAsync(
-        this Process process,
-        TimeSpan timeoutThreshold,
-        ProcessCancellationExceptionBehavior cancellationExceptionBehavior
-    )
-    {
-        if (timeoutThreshold < TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException();
+            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
 
-        DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+            CancellationTokenSource cts = new CancellationTokenSource();
 
-        try
-        {
-            Task waitForExit = process.WaitForExitAsync();
+            cts.CancelAfter(timeoutThreshold);
 
-            Task delay = Task.Delay(timeoutThreshold);
-
-            await Task.WhenAny(delay, waitForExit);
-
-            if (process.HasExited == false)
+            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
             {
-                process.Kill(true);
-            }
-        }
-        catch (Exception)
-        {
-            DateTime actualExitTime = DateTime.UtcNow;
-            long elapsedTicks = Math.Abs(actualExitTime.Ticks - expectedExitTime.Ticks);
-
-            if (
-                cancellationExceptionBehavior
-                == ProcessCancellationExceptionBehavior.SuppressException
-            )
-            {
+                await process.WaitForExitAsync(cts.Token);
                 return;
             }
 
-            if (
-                cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
-                || cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.AllowException
-            )
+            try
             {
+                await process.WaitForExitAsync(cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                DateTime actualExitTime = DateTime.UtcNow;
+                long elapsedTicks = Math.Abs(actualExitTime.Ticks - expectedExitTime.Ticks);
+
                 if (
-                    TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10)
-                    || cancellationExceptionBehavior
-                        == ProcessCancellationExceptionBehavior.AllowException
+                    cancellationExceptionBehavior
+                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
                 )
                 {
-                    throw;
+                    if (TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10))
+                    {
+                        throw;
+                    }
+                }
+            }
+            finally
+            {
+                if (!process.HasExited)
+                    process.Kill();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeoutThreshold"></param>
+        /// <param name="cancellationExceptionBehavior"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("android")]
+        private async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior
+        )
+        {
+            if (timeoutThreshold < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException();
+
+            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+
+            try
+            {
+                Task waitForExit = process.WaitForExitAsync();
+
+                Task delay = Task.Delay(timeoutThreshold);
+
+                await Task.WhenAny(delay, waitForExit);
+
+                if (!process.HasExited)
+                {
+                    process.Kill(true);
+                }
+            }
+            catch (Exception)
+            {
+                DateTime actualExitTime = DateTime.UtcNow;
+                long elapsedTicks = Math.Abs(actualExitTime.Ticks - expectedExitTime.Ticks);
+
+                if (
+                    cancellationExceptionBehavior
+                    == ProcessCancellationExceptionBehavior.SuppressException
+                )
+                {
+                    return;
+                }
+
+                if (
+                    cancellationExceptionBehavior
+                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
+                    || cancellationExceptionBehavior
+                    == ProcessCancellationExceptionBehavior.AllowException
+                )
+                {
+                    if (
+                        TimeSpan.FromTicks(elapsedTicks) > TimeSpan.FromSeconds(10)
+                        || cancellationExceptionBehavior
+                        == ProcessCancellationExceptionBehavior.AllowException
+                    )
+                    {
+                        throw;
+                    }
                 }
             }
         }
