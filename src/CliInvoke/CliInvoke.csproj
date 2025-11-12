@@ -4,7 +4,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <LangVersion>13</LangVersion>
+        <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <Title>CliInvoke</Title>
@@ -52,7 +52,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="8.9.1" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.0.1" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
