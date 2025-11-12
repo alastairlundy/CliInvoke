@@ -100,7 +100,7 @@ public partial class ArgumentsBuilderTests
         NullReturningFormattable nullFormattable = new NullReturningFormattable();
 
         // When IFormattable.ToString returns null or whitespace, Add should throw NullReferenceException
-        Assert.Throws<NullReferenceException>(() => builder.Add(nullFormattable, CultureInfo.InvariantCulture));
+        Assert.Throws<ArgumentNullException>(() => builder.Add(nullFormattable, CultureInfo.InvariantCulture));
     }
 
     [Fact]

@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke
+    AlastairLundy.CliInvoke 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,67 +9,83 @@
 
 using System.Diagnostics;
 using System.Runtime.Versioning;
+
 using AlastairLundy.CliInvoke.Core;
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#else
 using System;
-#endif
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
+
 internal static class ApplyConfigurationToProcessStartInfo
 {
-    /// <summary>
-    /// Applies a requirement to run the process start info as an administrator.
-    /// </summary>
     /// <param name="processStartInfo"></param>
-    internal static void RunAsAdministrator(this ProcessStartInfo processStartInfo)
+    extension(ProcessStartInfo processStartInfo)
     {
-        if (OperatingSystem.IsWindows())
+        /// <summary>
+        /// Applies a requirement to run the process start info as an administrator.
+        /// </summary>
+        internal void RunAsAdministrator()
         {
-            processStartInfo.Verb = "runas";
+            if (OperatingSystem.IsWindows())
+            {
+                processStartInfo.Verb = "runas";
+            }
+            else if (OperatingSystem.IsLinux() ||
+                     OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
+                     OperatingSystem.IsFreeBSD())
+            {
+                processStartInfo.Verb = "sudo";
+            }
         }
-        else if (
-            OperatingSystem.IsLinux()
-            || OperatingSystem.IsMacOS()
-            || OperatingSystem.IsMacCatalyst()
-            || OperatingSystem.IsFreeBSD()
+
+        /// <summary>
+        /// Adds the specified Credential to the current ProcessStartInfo object.
+        /// </summary>
+        /// <param name="credential">The credential to be added.</param>
+        [SupportedOSPlatform("windows")]
+        internal void SetUserCredential(UserCredential credential)
+        {
+            if (credential.Domain is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.Domain = credential.Domain;
+            }
+
+            if (credential.UserName is not null)
+            {
+                processStartInfo.UserName = credential.UserName;
+            }
+
+            if (credential.Password is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.Password = credential.Password;
+            }
+
+            if (credential.LoadUserProfile is not null && OperatingSystem.IsWindows())
+            {
+                processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+            }
+        }
+        
+        /// <summary>
+        /// Sets environment variables for a specified ProcessStartInfo object.
+        /// </summary>
+        /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
+        internal void SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables
         )
         {
-            processStartInfo.Verb = "sudo";
-        }
-    }
+            if (environmentVariables.Any() == false)
+                return;
 
-    /// <summary>
-    /// Adds the specified Credential to the current ProcessStartInfo object.
-    /// </summary>
-    /// <param name="processStartInfo">The current ProcessStartInfo object.</param>
-    /// <param name="credential">The credential to be added.</param>
-    [SupportedOSPlatform("windows")]
-    internal static void SetUserCredential(
-        this ProcessStartInfo processStartInfo,
-        UserCredential credential
-    )
-    {
-        if (credential.Domain is not null && OperatingSystem.IsWindows())
-        {
-            processStartInfo.Domain = credential.Domain;
-        }
-
-        if (credential.UserName is not null)
-        {
-            processStartInfo.UserName = credential.UserName;
-        }
-
-        if (credential.Password is not null && OperatingSystem.IsWindows())
-        {
-            processStartInfo.Password = credential.Password;
-        }
-
-        if (credential.LoadUserProfile is not null && OperatingSystem.IsWindows())
-        {
-            processStartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+            foreach (KeyValuePair<string, string> variable in environmentVariables)
+            {
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                if (variable.Value is not null)
+                {
+                    processStartInfo.Environment[variable.Key] = variable.Value;
+                }
+            }
         }
     }
 }

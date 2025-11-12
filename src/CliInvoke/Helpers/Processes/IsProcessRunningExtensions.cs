@@ -31,9 +31,6 @@ internal static class IsProcessRunningExtensions
     [SupportedOSPlatform("android")]
     internal static bool IsProcessOnRemoteDevice(this Process process)
     {
-        if (process.IsDisposed())
-            throw new InvalidOperationException();
-
         try
         {
             bool hasExited = process.HasExited;
