@@ -18,10 +18,6 @@ using AlastairLundy.CliInvoke.Core;
 
 namespace AlastairLundy.CliInvoke;
 
-#if NETSTANDARD2_0
-using OperatingSystem = OperatingSystemPolyfill;
-#endif
-
 /// <summary>
 /// An implementation of IFilePathResolver, a service that resolves file paths.
 /// </summary>
