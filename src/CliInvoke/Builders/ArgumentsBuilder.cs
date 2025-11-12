@@ -274,10 +274,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public string EscapeCharacters(string argument)
     {
-        IEnumerable<char> chars = "\\".Append('"');
-        
         return argument
-            .Replace("\"", string.Join("", chars))
+            .Replace("\\", "\\\\")
+            .Replace("\"", "\\\"")
             .Replace("\n", "\\n")
             .Replace("\t", "\\t")
             .Replace("\r", "\\r")

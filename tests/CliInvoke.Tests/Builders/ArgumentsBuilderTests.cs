@@ -79,10 +79,12 @@ public partial class ArgumentsBuilderTests
         IArgumentsBuilder builder = new ArgumentsBuilder();
         string[] values = new[] { "a\nb", "c\"d" };
 
+        string expected = "a\\\\nb c\\\\\\\"d";
+        
         IArgumentsBuilder result = builder.AddEnumerable(values, true);
 
         // a\nb becomes a\\nb and c"d becomes c\"d, joined with a space
-        Assert.Equal("a\\nb c\\\"d", result.ToString());
+        Assert.Equal(expected, result.ToString());
     }
 
     [Fact]
