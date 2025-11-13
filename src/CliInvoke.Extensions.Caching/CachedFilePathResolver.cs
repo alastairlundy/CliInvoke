@@ -1,5 +1,15 @@
+/*
+    AlastairLundy.CliInvoke
+    Copyright (C) 2024-2025  Alastair Lundy
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+   */
+
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 
 using AlastairLundy.CliInvoke;
 
@@ -8,7 +18,8 @@ using Microsoft.Extensions.Caching.Memory;
 namespace CliInvoke.Extensions.Caching;
 
 /// <summary>
-/// 
+/// Provides a mechanism for resolving file paths with caching support to optimize repeated file searches.
+/// Extends the functionality of <see cref="FilePathResolver"/> by adding caching layers for performance improvements.
 /// </summary>
 public class CachedFilePathResolver : FilePathResolver
 {
@@ -29,19 +40,39 @@ public class CachedFilePathResolver : FilePathResolver
         TimeSpan? defaultPathExtCacheLifespan = null)
     {
         _cache = cache;
-        
+
         if(defaultPathExtCacheLifespan.HasValue)
             PathExtCacheLifespan = defaultPathExtCacheLifespan.Value;
         
         if(defaultPathCacheLifespan.HasValue)
             PathCacheLifespan = defaultPathCacheLifespan.Value;
     }
-    
+
     /// <summary>
-    /// 
+    /// Resolves the full file path for a given file name or relative path. If the file path is not
+    /// already absolute, it attempts to resolve it using a cached PATH environment variable
+    /// lookup for improved performance.
     /// </summary>
-    /// <param name="filePathToResolve"></param>
-    /// <returns></returns>
+    /// <param name="filePathToResolve">
+    /// The name or relative path of the file to resolve. Must not be null or empty.
+    /// </param>
+    /// <returns>
+    /// The fully resolved absolute path to the file if it can be located.
+    /// </returns>
+    /// <exception cref="FileNotFoundException">
+    /// Thrown if the file cannot be located using the available directories or PATH environment variable.
+    /// </exception>
+    /// <exception cref="PlatformNotSupportedException">
+    /// Thrown if the method is invoked on an unsupported platform.
+    /// </exception>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
     public new string ResolveFilePath(string filePathToResolve)
     {
 #if NET8_0_OR_GREATER
