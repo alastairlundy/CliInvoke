@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Bogus;
+
+using Spectre.Console;
 using Spectre.Console.Cli;
 using ValidationResult = Spectre.Console.ValidationResult;
 
@@ -44,23 +46,23 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
     {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int line = 0; line < settings.NumberOfFakeTextLines; line++)
-        {
-            for (int i = 0; i < settings.FakeTextLineLength; i++)
-            {
-                stringBuilder.Append(_faker.PickRandom(fakeChars));
-            }
-
-            stringBuilder.AppendLine();
-        }
-
         try
         {
-            Console.Out.WriteLine(stringBuilder.ToString());
+            for (int line = 0; line < settings.NumberOfFakeTextLines; line++)
+            {
+                for (int i = 0; i < settings.FakeTextLineLength; i++)
+                {
+                    stringBuilder.Append(_faker.PickRandom(fakeChars));
+                }
+
+                Console.WriteLine(stringBuilder.ToString());
+                stringBuilder.Clear();
+            }
             return 0;
         }
-        catch
+        catch(Exception exception)
         {
+            AnsiConsole.WriteException(exception);
             return -1;
         }
     }
