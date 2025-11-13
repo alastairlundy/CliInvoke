@@ -19,15 +19,14 @@ public class CachedFilePathResolver : FilePathResolver
     
     private TimeSpan PathExtCacheLifespan { get; set; } = TimeSpan.FromHours(1.0);
     private TimeSpan PathCacheLifespan { get; set; } = TimeSpan.FromMinutes(3.0);
-    
+
     /// <summary>
-    /// 
+    /// Provides a mechanism for resolving file paths with enhanced performance by using
+    /// an in-memory cache. This class extends the functionality of <see cref="FilePathResolver"/>
+    /// and allows customizable cache lifespans for PATH contents and PATH environment variable extensions.
     /// </summary>
-    /// <param name="cache"></param>
-    /// <param name="defaultPathExtCacheLifespan"></param>
-    /// <param name="defaultPathCacheLifespan"></param>
-    public CachedFilePathResolver(IMemoryCache cache, TimeSpan? defaultPathExtCacheLifespan = null,
-        TimeSpan? defaultPathCacheLifespan = null)
+    public CachedFilePathResolver(IMemoryCache cache, TimeSpan? defaultPathCacheLifespan = null,
+        TimeSpan? defaultPathExtCacheLifespan = null)
     {
         _cache = cache;
         
