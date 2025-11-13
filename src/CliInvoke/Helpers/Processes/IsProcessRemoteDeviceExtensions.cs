@@ -13,7 +13,7 @@ using System.Runtime.Versioning;
 
 namespace AlastairLundy.CliInvoke.Helpers.Processes;
 
-internal static class IsProcessRunningExtensions
+internal static class IsProcessRemoteDeviceExtensions
 {
     /// <summary>
     /// Determines whether a process exists on a remote device or locally.
@@ -31,9 +31,6 @@ internal static class IsProcessRunningExtensions
     [SupportedOSPlatform("android")]
     internal static bool IsProcessOnRemoteDevice(this Process process)
     {
-        if (process.IsDisposed())
-            throw new InvalidOperationException();
-
         try
         {
             bool hasExited = process.HasExited;

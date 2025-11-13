@@ -16,20 +16,23 @@ namespace AlastairLundy.CliInvoke.Helpers.Processes;
 /// </summary>
 public static class ProcessDisposalExtensions
 {
-    /// <summary>
-    /// Determines if a process has been disposed.
-    /// </summary>
     /// <param name="process">The process to check if the process has been disposed of.</param>
-    /// <returns>True if the process has been disposed of, false otherwise.</returns>
-    internal static bool IsDisposed(this Process process)
+    extension(Process process)
     {
-        try
+        /// <summary>
+        /// Determines if a process has been disposed.
+        /// </summary>
+        /// <returns>True if the process has been disposed of, false otherwise.</returns>
+        internal bool IsDisposed()
         {
-            return string.IsNullOrEmpty(process.Id.ToString());
-        }
-        catch
-        {
-            return true;
+            try
+            {
+                return string.IsNullOrEmpty(process.Id.ToString());
+            }
+            catch
+            {
+                return true;
+            }
         }
     }
 }

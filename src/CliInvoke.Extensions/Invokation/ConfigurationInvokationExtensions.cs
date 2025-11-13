@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Exceptions;
+
 #if NET8_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif

@@ -10,10 +10,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
-using AlastairLundy.CliInvoke.Core;
+using System.Runtime.Versioning;
+
 using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
+
+using AlastairLundy.CliInvoke.Core;
+
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
@@ -56,48 +59,27 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
-    public CmdProcessConfiguration(
-        string arguments,
-        bool redirectStandardInput,
-        bool redirectStandardOutput,
-        bool redirectStandardError,
-        string workingDirectoryPath = null,
-        bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null,
-        UserCredential credentials = null,
-        StreamWriter standardInput = null,
-        StreamReader standardOutput = null,
-        StreamReader standardError = null,
-        Encoding standardInputEncoding = default,
-        Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default,
-        ProcessResourcePolicy processResourcePolicy = null,
-        bool useShellExecution = false,
-        bool windowCreation = false
-    )
-        : base(
-            "",
-            redirectStandardInput,
-            redirectStandardOutput,
-            redirectStandardError,
-            arguments,
-            workingDirectoryPath,
-            requiresAdministrator,
-            environmentVariables,
-            credentials,
-            standardInput,
-            standardOutput,
-            standardError,
-            standardInputEncoding,
-            standardOutputEncoding,
-            standardErrorEncoding,
+    public CmdProcessConfiguration(string arguments,
+        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
+        string workingDirectoryPath = null, bool requiresAdministrator = false,
+        Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
+        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
+        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
+        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        bool useShellExecution = false, bool windowCreation = false) : 
+        base("",
+            redirectStandardInput, redirectStandardOutput, redirectStandardError,
+            arguments, workingDirectoryPath,
+            requiresAdministrator, environmentVariables, credentials,
+            standardInput, standardOutput, standardError,
+            standardInputEncoding, standardOutputEncoding, standardErrorEncoding,
             processResourcePolicy,
             windowCreation: windowCreation,
-            useShellExecution: useShellExecution
-        )
+            useShellExecution: useShellExecution)
     {
         base.TargetFilePath = this.TargetFilePath;
     }
+
 
     /// <summary>
     /// The target file path of Cmd.
@@ -110,9 +92,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
         {
             if (OperatingSystem.IsWindows() == false)
             {
-                throw new PlatformNotSupportedException(
-                    Resources.Exceptions_Cmd_OnlySupportedOnWindows
-                );
+                throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
             }
 
             return Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe";
