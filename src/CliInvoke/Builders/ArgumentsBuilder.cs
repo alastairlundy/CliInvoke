@@ -81,6 +81,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(value, nameof(value));
+#else
+       value = Ensure.NotNull(value);
 #endif
 
         if (IsValidArgument(value) == false)
@@ -113,10 +115,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
         {
             return new ArgumentsBuilder(_buffer, _argumentValidationLogic);
         }
-        else
-        {
-            return new ArgumentsBuilder(_buffer);
-        }
+
+        return new ArgumentsBuilder(_buffer);
     }
 
     /// <summary>
@@ -139,7 +139,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(values, nameof(values));
+#else
+       values = Ensure.NotNull(values);
 #endif
+        
         if (escapeSpecialChars)
             values = values.Select(x => EscapeCharacters(x));
 
@@ -178,6 +181,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(value, nameof(value));
         ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
+#else
+        value = Ensure.NotNull(value);
+        formatProvider = Ensure.NotNull(formatProvider);
 #endif
         
         if (IsValidArgument(value, formatProvider) != true)
@@ -217,6 +223,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(values, nameof(values));
         ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
+#else
+        values = Ensure.NotNull(values);
+        formatProvider = Ensure.NotNull(formatProvider);
 #endif
         
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
