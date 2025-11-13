@@ -93,6 +93,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
         ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet, nameof(minWorkingSet));
         #else
         #endif
+        
         if (minWorkingSet < 0)
             throw new ArgumentOutOfRangeException(nameof(minWorkingSet));
 
