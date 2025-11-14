@@ -1,7 +1,7 @@
 # Getting Started
 
 ## Installing CliInvoke
-The main way to install CliInvoke is using [nuget](https://www.nuget.org/packages/AlastairLundy.CliInvoke/) directly or through your IDE or Code Editor of choice.
+The main way to install CliInvoke is using [nuget](https://www.nuget.org/packages/CliInvoke/) directly or through your IDE or Code Editor of choice.
 
 ### Versions
 
@@ -13,27 +13,20 @@ Versions starting with ``0.`` or ending with ``-alpha.``. ``-beta.``, or ``-rc.`
 
 When configuring Nuget setup in your ``.csproj`` file, staying within a major version of CliInvoke is recommended.
 
-The following tweaks to your ``.csproj`` file can stop version 2.0 from being installed until you are ready to migrate to it:
-```csharp
-<ItemGroup>
-    <PackageReference Include="AlastairLundy.CliInvoke" Version="[1.0.0, 2.0.0)"/>
-</ItemGroup>
-```
-
 ## Setting up CliInvoke
 
 ### Dependency Injection 
-There's 2 main ways of setting up CliInvoke with dependency injection: manually, and using CliInvoke's ``AddCliInvoke`` configuration extension methods with the ``AlastairLundy.CliInvoke.Extensions`` nuget package.
+There's 2 main ways of setting up CliInvoke with dependency injection: manually, and using CliInvoke's ``AddCliInvoke`` configuration extension methods with the ``CliInvoke.Extensions`` nuget package.
 
 #### Using ``AddCliInvoke``
-For this approach you'll need the ``AlastairLundy.CliInvoke.Extensions`` nuget package.
+For this approach you'll need the ``CliInvoke.Extensions`` nuget package.
 
 If your project doesn't already use Dependency Injection, you can set it up as follows:
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 
-using AlastairLundy.CliInvoke.Extensions;
+using CliInvoke.Extensions;
 
 namespace MyApp;
 
@@ -76,14 +69,14 @@ Configuring a custom class that implements ``RunnerProcessInvokerBase`` to be us
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Piping;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Piping;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
-using AlastairLundy.CliInvoke.Core.Extensibility;
-using AlastairLundy.CliInvoke.Extensibility.Factories;
-using AlastairLundy.CliInvoke.Extensibility;
+using CliInvoke;
+using CliInvoke.Piping;
+using CliInvoke.Core;
+using CliInvoke.Core.Piping;
+using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core.Extensibility;
+using CliInvoke.Extensibility.Factories;
+using CliInvoke.Extensibility;
 
 
 namespace MyApp;
@@ -128,10 +121,10 @@ namespace MyApp;
 Here's an example of a simple usage of creating a CliInvoke command. For more detailed examples, see the wiki page.
 
 ```csharp
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Abstractions;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Builders.Abstractions;
+using CliInvoke;
+using CliInvoke.Abstractions;
+using CliInvoke.Builders;
+using CliInvoke.Builders.Abstractions;
 
 ICliCommandInvoker commandRunner = serviceProvider.GetRequiredService<ICliCommandInvoker>();
 
