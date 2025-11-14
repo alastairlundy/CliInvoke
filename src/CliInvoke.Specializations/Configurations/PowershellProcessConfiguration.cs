@@ -15,9 +15,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using CliInvoke.Core;
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
 
 // ReSharper disable RedundantBoolCompare
 

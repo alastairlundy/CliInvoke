@@ -16,9 +16,6 @@ using System.Text;
 
 using CliInvoke.Core;
 using CliInvoke.Specializations.Internal.Localizations;
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
 
 namespace CliInvoke.Specializations.Configurations;
 
@@ -91,7 +88,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     {
         get
         {
-            if (OperatingSystem.IsWindows() == false)
+            if (!OperatingSystem.IsWindows())
             {
                 throw new PlatformNotSupportedException(Resources.Exceptions_ClassicPowershell_OnlySupportedOnWindows);
             }
