@@ -10,7 +10,7 @@
 using System;
 using System.Security;
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace CliInvoke.Core.Builders;
 
 /// <summary>
 /// A fluent builder interface for configuring and building a UserCredential.

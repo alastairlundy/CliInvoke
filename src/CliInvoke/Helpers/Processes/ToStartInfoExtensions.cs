@@ -10,10 +10,11 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke.Helpers.Processes;
+using CliInvoke.Core;
+using CliInvoke.Internal.Localizations;
+
+namespace CliInvoke.Helpers.Processes;
 
 internal static class ToStartInfoExtensions
 {

@@ -9,10 +9,11 @@
 
 using System;
 using System.Diagnostics;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Helpers.Processes;
 
-namespace AlastairLundy.CliInvoke.Helpers;
+using CliInvoke.Core;
+using CliInvoke.Helpers.Processes;
+
+namespace CliInvoke.Helpers;
 
 internal class ProcessWrapper : Process
 {

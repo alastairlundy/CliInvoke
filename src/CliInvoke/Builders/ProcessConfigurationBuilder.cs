@@ -17,10 +17,11 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
 
-namespace AlastairLundy.CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+
+namespace CliInvoke.Builders;
 
 #pragma warning disable CA1416
 

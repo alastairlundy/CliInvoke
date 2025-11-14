@@ -11,7 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-namespace AlastairLundy.CliInvoke.Helpers.Processes;
+namespace CliInvoke.Helpers.Processes;
 
 internal static class ProcessHasStartedExtensions
 {

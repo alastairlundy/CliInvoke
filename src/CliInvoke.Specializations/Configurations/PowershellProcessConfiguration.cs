@@ -10,19 +10,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Versioning;
 
-using AlastairLundy.CliInvoke.Core;
-
+using CliInvoke.Core;
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
 // ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Specializations.Configurations;
+namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
 /// A Command configuration to make running commands through cross-platform PowerShell easier.

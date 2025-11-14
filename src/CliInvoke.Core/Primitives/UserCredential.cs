@@ -20,7 +20,7 @@ using System;
 using System.Runtime.Versioning;
 using System.Security;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A class to represent a User Credential to be used with ProcessPrimitives.

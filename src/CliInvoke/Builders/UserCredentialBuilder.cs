@@ -13,13 +13,14 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Security;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
+
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
 // ReSharper disable PossibleInvalidOperationException
 
-namespace AlastairLundy.CliInvoke.Builders;
+namespace CliInvoke.Builders;
 
 /// <summary>
 /// A class that provides builder methods for constructing UserCredentials.
