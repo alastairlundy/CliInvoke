@@ -11,7 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' resource configuration.

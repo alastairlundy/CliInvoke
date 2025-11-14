@@ -8,9 +8,10 @@
    */
 
 using System;
-using AlastairLundy.CliInvoke.Core.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core.Internal.Localizations;
+
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' Timeout configuration, if any.

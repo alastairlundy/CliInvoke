@@ -12,11 +12,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
-using AlastairLundy.CliInvoke.Core.Internal.Localizations;
+
+using CliInvoke.Core.Internal.Localizations;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A class to store Process configuration information.

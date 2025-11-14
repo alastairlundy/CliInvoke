@@ -4,12 +4,12 @@ using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Helpers.Processes;
-using AlastairLundy.CliInvoke.Tests.Internal.Helpers;
+using CliInvoke.Core;
+using CliInvoke.Helpers.Processes;
+using CliInvoke.Tests.Internal.Helpers;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Helpers.Processes;
+namespace CliInvoke.Tests.Helpers.Processes;
 
 public class ProcessCancellationTests
 {

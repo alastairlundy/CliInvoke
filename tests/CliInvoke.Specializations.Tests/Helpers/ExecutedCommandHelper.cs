@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Piping;
-using AlastairLundy.CliInvoke.Piping;
+using CliInvoke.Core.Piping;
+using CliInvoke.Piping;
 
-namespace AlastairLundy.CliInvoke.Specializations.Tests.Helpers;
+namespace CliInvoke.Specializations.Tests.Helpers;
 
 public static class ExecutedCommandHelper
 {

@@ -8,8 +8,8 @@
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
         <TargetFrameworks>net8.0;net9.0;net10.0;</TargetFrameworks>
-        <RootNamespace>AlastairLundy.CliInvoke.Tests</RootNamespace>
-        <AssemblyName>AlastairLundy.CliInvoke.Tests</AssemblyName>
+        <PackageId>CliInvoke.Tests</PackageId>
+        <Authors>CliInvoke.Tests</Authors>
     </PropertyGroup>
 
     <ItemGroup>

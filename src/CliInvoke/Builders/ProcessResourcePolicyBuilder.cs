@@ -11,10 +11,11 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
 
-namespace AlastairLundy.CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+
+namespace CliInvoke.Builders;
 
 /// <summary>
 /// A class to fluently configure and build ProcessResourcePolicy objects.

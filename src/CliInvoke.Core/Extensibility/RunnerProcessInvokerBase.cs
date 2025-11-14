@@ -12,9 +12,10 @@ using System.Diagnostics.Contracts;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 
-namespace AlastairLundy.CliInvoke.Core.Extensibility;
+using CliInvoke.Core.Extensibility.Factories;
+
+namespace CliInvoke.Core.Extensibility;
 
 /// <summary>
 /// An abstract invoker class that runs other Process Configurations through its own Process.

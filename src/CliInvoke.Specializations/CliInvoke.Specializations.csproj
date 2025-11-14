@@ -24,8 +24,8 @@
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>
         <IsTrimmable>true</IsTrimmable>
-        <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
-        <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
+        <PackageId>CliInvoke.Specializations</PackageId>
+        <Product>CliInvoke.Specializations</Product>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

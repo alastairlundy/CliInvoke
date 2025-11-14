@@ -9,13 +9,14 @@
 
 using System;
 using System.Diagnostics;
-using AlastairLundy.CliInvoke.Internal.Localizations;
+
+using CliInvoke.Internal.Localizations;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Exceptions;
+namespace CliInvoke.Exceptions;
 
 /// <summary>
 /// An exception thrown if a Process is run unsuccessfully.
