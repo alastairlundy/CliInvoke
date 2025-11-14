@@ -17,17 +17,16 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <LangVersion>13</LangVersion>
-        <PackageReleaseNotes>## Changes since 1.6.x
-* Updated to support CliInvoke 2.0.0
-* Updated Specialization ``ProcessConfiguration`` derived classes to work with the updated ``ProcessConfiguration`` class</PackageReleaseNotes>
+        <PackageReleaseNotes>Re-release of CliInvoke 2.0 under new Package Id</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
-        <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
+        <PackageId>CliInvoke.Specializations</PackageId>
+        <Product>CliInvoke.Specializations</Product>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="[8.9.1, 9.0.0)" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>

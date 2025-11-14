@@ -1,12 +1,12 @@
 # CliInvoke.Core
 This package contains Process Running and handling abstractions as well as common types used by implementing classes.
 
-For an implementing package, check out [CliInvoke](https://www.nuget.org/packages/AlastairLundy.CliInvoke/).
+For an implementing package, check out [CliInvoke](https://www.nuget.org/packages/CliInvoke/).
 
 <!-- Badges -->
-[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
-[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
-[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
+[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.Core.svg)](https://www.nuget.org/packages/CliInvoke.Core/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.Core.svg)](https://www.nuget.org/packages/CliInvoke.Core/)
+[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.Core.svg)](https://www.nuget.org/packages/CliInvoke.Core/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 Key Abstractions:
@@ -47,7 +47,7 @@ CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your ID
 
 | Package Name                 | Nuget Link                                                                                    | .NET SDK CLI command                                |
 |------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| AlastairLundy.CliInvoke.Core | [AlastairLundy.CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core) | ``dotnet add package AlastairLundy.CliInvoke.Core`` |
+| CliInvoke.Core | [CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core) | ``dotnet add package CliInvoke.Core`` |
 
 ## Supported Platforms
 CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.

@@ -15,21 +15,7 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 1.6.x
-* Moved Builder implementations from ``CliInvoke`` to ``CliInvoke.Core`` - https://github.com/alastairlundy/CliInvoke/pull/46
-* Reworked ``ProcessInvoker`` implementation to not require ``IProcessFactory`` @alastairlundy (https://github.com/alastairlundy/CliInvoke/pull/80)
-* Removed ``ProcessFactory``
-* Added support for Graceful Cancellation after specified Timeout
-* Added support for Forceful Cancellation after specified Timeout
-* Updated ``EnvironmentVariablesBuilder`` to allow enabling/disabling exceptions if duplicate keys are attempted to be added.
-* Renamed ``EnvironmentVariablesBuilder`` methods to avoid ambiguous method usage
-* Removed deprecated code
-* Moved ``FilePathResolver`` into CliInvoke.Core directly 
-
-#### Non Breaking Changes
-* Added ``DefaultProcessRunnerInvoker`` - The default implementation of RunnerProcessInvokerBase
-* Added ``RunnerProcessCreator`` - A class implementation of ``IRunnerProcessCreator`` for creating Processes that run other processes.
-* Stability improvements</PackageReleaseNotes>
+        <PackageReleaseNotes>Re-release of CliInvoke 2.0 under new Package Id</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -37,9 +23,8 @@
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,iprocessconfigurationfactory</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
-        <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
         <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
-        <PackageId>AlastairLundy.CliInvoke</PackageId>
+        <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
     </PropertyGroup>
 
@@ -50,7 +35,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="8.9.0" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="[8.9.1, 9.0.0)" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AlastairLundy.DotExtensions" Version="[8.6.3, 9.0.0)" />

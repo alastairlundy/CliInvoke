@@ -5,9 +5,9 @@ Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/bl
 
 
 <!-- Badges -->
-[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Specializations.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Specializations/)
-[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.Specializations.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Specializations/)
-[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Specializations.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Specializations/)
+[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.Specializations.svg)](https://www.nuget.org/packages/CliInvoke.Specializations/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.Specializations.svg)](https://www.nuget.org/packages/CliInvoke.Specializations/)
+[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.Specializations.svg)](https://www.nuget.org/packages/CliInvoke.Specializations/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 ## Usage

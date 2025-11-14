@@ -58,16 +58,16 @@ The package(s) to install depends on your use case:
 
 | Project type / Need                                                         | Packages to install (dotnet add package ...)                                                                 | Notes |
 |------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|-------|
-| Library author (provide abstractions only)                                   | `AlastairLundy.CliInvoke.Core`                                                                                | Only the Core (abstractions) package — consumers can choose implementations. |
-| Library or app that needs concrete builders / implementations                | `AlastairLundy.CliInvoke.Core`, `AlastairLundy.CliInvoke`                                                      | Implementation package plus Core for models/abstractions. |
-| Desktop or Console application (common case — use DI & convenience helpers)  | `AlastairLundy.CliInvoke.Core`, `AlastairLundy.CliInvoke`, `AlastairLundy.CliInvoke.Extensions`                | Includes DI registration and convenience extensions for easy setup. |
-| Any project that needs platform‑specific or shell specializations (optional) | `AlastairLundy.CliInvoke.Specializations` (install in addition to the packages above as needed)               | Adds Cmd/PowerShell and other specializations; include only when required. |
+| Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                                | Only the Core (abstractions) package — consumers can choose implementations. |
+| Library or app that needs concrete builders / implementations                | `CliInvoke.Core`, `CliInvoke`                                                      | Implementation package plus Core for models/abstractions. |
+| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions`                | Includes DI registration and convenience extensions for easy setup. |
+| Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed)               | Adds Cmd/PowerShell and other specializations; include only when required. |
 
 ### Links to packages
-[CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core)
-[CliInvoke Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke)
-[CliInvoke.Extensions Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensions)
-[CliInvoke.Specializations Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations)
+[CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core)
+[CliInvoke Nuget](https://nuget.org/packages/CliInvoke)
+[CliInvoke.Extensions Nuget](https://nuget.org/packages/CliInvoke.Extensions)
+[CliInvoke.Specializations Nuget](https://nuget.org/packages/CliInvoke.Specializations)
 
 ## Supported Platforms
 CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
@@ -79,8 +79,8 @@ For more details see the [list of supported platforms](docs/docs/Supported-Opera
 Install the packages you need (example: implementation + DI extensions):
 
 ```bash
-dotnet add package AlastairLundy.CliInvoke
-dotnet add package AlastairLundy.CliInvoke.Extensions
+dotnet add package CliInvoke
+dotnet add package CliInvoke.Extensions
 ```
 
 Minimal Program.cs (console app) — registers services, builds a simple process configuration, and runs it buffered:
@@ -99,7 +99,7 @@ class Program
     static async Task Main()
     {
         var services = new ServiceCollection();
-        services.AddCliInvoke(); // from AlastairLundy.CliInvoke.Extensions
+        services.AddCliInvoke(); // from CliInvoke.Extensions
         var provider = services.BuildServiceProvider();
 
         var factory = provider.GetRequiredService<IProcessConfigurationFactory>();
