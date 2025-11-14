@@ -15,11 +15,22 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes></PackageReleaseNotes>
+        <PackageReleaseNotes>
+### All Packages
+* Added .NET 10  TFM and switched to C# language version 14
+* Added Trimming Support and AoT support (#146 )
+* Renamed namespaces to start with ``CliInvoke`` instead of ``AlastairLundy.CliInvoke``
+
+### Main Package
+* Improved ``FilePathResolver`` resolving logic
+* Updated ``UserCredentialBuilder`` to not accept null strings
+* Add .NET Standard 2.0 fallback for null checks using Polyfill's ``Ensure`` static methods
+* Updated internal Polyfill version from 8.9.1 to 9.0.3
+* Removed dependency on DotExtensions</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0</PackageVersion>
+        <PackageVersion>2.1.0</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
