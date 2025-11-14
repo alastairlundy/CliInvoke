@@ -15,9 +15,7 @@ using System.Text;
 
 using CliInvoke.Core;
 using CliInvoke.Specializations.Internal.Localizations;
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
+
 
 // ReSharper disable UnusedMember.Global
 
