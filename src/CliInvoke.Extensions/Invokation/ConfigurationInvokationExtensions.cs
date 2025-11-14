@@ -9,16 +9,13 @@
  */
 
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Exceptions;
 
-#if NET8_0_OR_GREATER
-using System.Runtime.Versioning;
-#endif
+using CliInvoke.Core;
 
-namespace AlastairLundy.CliInvoke.Extensions.Invokation;
+namespace CliInvoke.Extensions.Invokation;
 
 /// <summary>
 /// Provides extension methods for executing process configurations using various execution models,

@@ -9,7 +9,7 @@
 
 using System.Diagnostics;
 
-namespace AlastairLundy.CliInvoke.Helpers.Processes;
+namespace CliInvoke.Helpers.Processes;
 
 /// <summary>
 ///

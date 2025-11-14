@@ -10,20 +10,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Runtime.Versioning;
+using System.Text;
 
-using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-
-using AlastairLundy.CliInvoke.Core;
-
+using CliInvoke.Core;
+using CliInvoke.Specializations.Internal.Localizations;
 #if NETSTANDARD2_0
 using OperatingSystem = Polyfills.OperatingSystemPolyfill;
 #endif
 
 // ReSharper disable UnusedMember.Global
 
-namespace AlastairLundy.CliInvoke.Specializations.Configurations;
+namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
 /// A Command configuration to make running commands through Windows CMD easier.

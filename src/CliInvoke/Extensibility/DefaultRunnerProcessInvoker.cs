@@ -8,11 +8,12 @@
  */
 
 using System;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Extensibility;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
 
-namespace AlastairLundy.CliInvoke.Extensibility;
+using CliInvoke.Core;
+using CliInvoke.Core.Extensibility;
+using CliInvoke.Core.Extensibility.Factories;
+
+namespace CliInvoke.Extensibility;
 
 /// <summary>
 /// The default implementation of <see cref="RunnerProcessInvokerBase"/>.

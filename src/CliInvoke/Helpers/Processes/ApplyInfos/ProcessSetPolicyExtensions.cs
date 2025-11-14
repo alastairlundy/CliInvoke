@@ -10,12 +10,13 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Internal.Localizations;
+
+using CliInvoke.Core;
+using CliInvoke.Internal.Localizations;
 
 // ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Helpers.Processes;
+namespace CliInvoke.Helpers.Processes;
 
 /// <summary>
 ///

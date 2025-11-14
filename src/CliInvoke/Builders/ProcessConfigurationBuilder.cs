@@ -17,10 +17,11 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
 
-namespace AlastairLundy.CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+
+namespace CliInvoke.Builders;
 
 #pragma warning disable CA1416
 
@@ -76,6 +77,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(arguments, nameof(arguments));
+#else
+        arguments = Ensure.NotNull(arguments);
 #endif
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder().AddEnumerable(
             arguments,
@@ -116,6 +119,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetArguments(string arguments)
     {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrEmpty(arguments, nameof(arguments));
+#else
+        arguments = Ensure.NotNullOrEmpty(arguments);
+#endif
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
                 _configuration.TargetFilePath,
@@ -148,6 +157,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath)
     {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath, nameof(targetFilePath));
+#else
+        targetFilePath = Ensure.NotNullOrEmpty(targetFilePath);
+#endif
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
                 targetFilePath,
@@ -184,6 +199,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(environmentVariables, nameof(environmentVariables));
+#else
+        environmentVariables = Ensure.NotNull(environmentVariables);
 #endif
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
@@ -249,6 +266,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetWorkingDirectory(string workingDirectoryPath)
     {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrEmpty(workingDirectoryPath, nameof(workingDirectoryPath));
+#else
+        workingDirectoryPath = Ensure.NotNullOrEmpty(workingDirectoryPath);
+#endif
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
                 _configuration.TargetFilePath,

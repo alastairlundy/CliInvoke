@@ -11,9 +11,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core.Piping;
 
-namespace AlastairLundy.CliInvoke.Piping;
+using CliInvoke.Core.Piping;
+
+namespace CliInvoke.Piping;
 
 /// <summary>
 /// An implementation of IProcessPipeHandler. Pipes Process Standard Input, Output, and Error as required.

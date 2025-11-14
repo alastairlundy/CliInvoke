@@ -24,12 +24,12 @@
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>
         <IsTrimmable>true</IsTrimmable>
-        <RootNamespace>AlastairLundy.CliInvoke.Specializations</RootNamespace>
-        <AssemblyName>AlastairLundy.CliInvoke.Specializations</AssemblyName>
+        <PackageId>CliInvoke.Specializations</PackageId>
+        <Product>CliInvoke.Specializations</Product>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="8.9.1" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.0.2" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>

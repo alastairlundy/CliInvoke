@@ -9,11 +9,11 @@
 
 using System;
 
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AlastairLundy.CliInvoke.Extensions;
+namespace CliInvoke.Extensions;
 
 public static class FilePathResolverRegistration
 {

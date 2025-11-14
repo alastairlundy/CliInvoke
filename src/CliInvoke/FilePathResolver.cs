@@ -13,10 +13,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
 
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core;
+
 // ReSharper disable ConvertClosureToMethodGroup
 
-namespace AlastairLundy.CliInvoke;
+namespace CliInvoke;
 
 /// <summary>
 /// An implementation of IFilePathResolver, a service that resolves file paths.
