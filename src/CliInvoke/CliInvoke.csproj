@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
@@ -15,21 +15,7 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 1.6.x
-* Moved Builder implementations from ``CliInvoke`` to ``CliInvoke.Core`` - https://github.com/alastairlundy/CliInvoke/pull/46
-* Reworked ``ProcessInvoker`` implementation to not require ``IProcessFactory`` @alastairlundy (https://github.com/alastairlundy/CliInvoke/pull/80)
-* Removed ``ProcessFactory``
-* Added support for Graceful Cancellation after specified Timeout
-* Added support for Forceful Cancellation after specified Timeout
-* Updated ``EnvironmentVariablesBuilder`` to allow enabling/disabling exceptions if duplicate keys are attempted to be added.
-* Renamed ``EnvironmentVariablesBuilder`` methods to avoid ambiguous method usage
-* Removed deprecated code
-* Moved ``FilePathResolver`` into CliInvoke.Core directly 
-
-#### Non Breaking Changes
-* Added ``DefaultProcessRunnerInvoker`` - The default implementation of RunnerProcessInvokerBase
-* Added ``RunnerProcessCreator`` - A class implementation of ``IRunnerProcessCreator`` for creating Processes that run other processes.
-* Stability improvements</PackageReleaseNotes>
+        <PackageReleaseNotes></PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -39,15 +25,14 @@
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <IsAotCompatible>true</IsAotCompatible>
-        <AssemblyName>AlastairLundy.CliInvoke</AssemblyName>
-        <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
-        <PackageId>AlastairLundy.CliInvoke</PackageId>
+        <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
+        <PolyEnsure>true</PolyEnsure>
     </PropertyGroup>
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>AlastairLundy.CliInvoke.Tests</_Parameter1>
+            <_Parameter1>CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 
