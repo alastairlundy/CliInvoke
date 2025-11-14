@@ -4,7 +4,7 @@ using AlastairLundy.CliInvoke.Piping;
 
 namespace CliInvoke.Benchmarking.Helpers;
 
-internal class CliInvokeHelpers
+internal static class CliInvokeHelpers
 {
     internal static ProcessInvoker CreateProcessInvoker()
     {

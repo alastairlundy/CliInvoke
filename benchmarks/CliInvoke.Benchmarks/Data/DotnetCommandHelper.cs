@@ -1,4 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using AlastairLundy.CliInvoke.Core;
 using CliInvoke.Benchmarking.Helpers;
 

@@ -1,4 +1,5 @@
-﻿using AlastairLundy.CliInvoke;
+﻿using System.Threading.Tasks;
+using AlastairLundy.CliInvoke;
 using AlastairLundy.CliInvoke.Builders;
 using AlastairLundy.CliInvoke.Core;
 using AlastairLundy.CliInvoke.Core.Builders;
