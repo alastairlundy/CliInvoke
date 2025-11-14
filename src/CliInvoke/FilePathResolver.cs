@@ -97,7 +97,7 @@ public class FilePathResolver : IFilePathResolver
 
         foreach (string pathEntry in pathContents)
         {
-            if (fileHasExtension == false)
+            if (!fileHasExtension)
             {
                 foreach (string pathExtension in pathExtensions)
                 {
@@ -157,7 +157,7 @@ public class FilePathResolver : IFilePathResolver
         {
             pathSeparator = ':';
             pathContentsStr = Environment.GetEnvironmentVariable("PATH");
-            pathExtensions = [".sh", ""];
+            pathExtensions = ["", ".sh"];
         }
         else
         {
