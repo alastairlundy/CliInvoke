@@ -11,7 +11,7 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// Defines an interface that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.

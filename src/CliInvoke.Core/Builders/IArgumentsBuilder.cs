@@ -13,7 +13,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace CliInvoke.Core.Builders;
 
 /// <summary>
 /// An interface that defines the fluent builder methods for building arguments and escaping them (as needed).

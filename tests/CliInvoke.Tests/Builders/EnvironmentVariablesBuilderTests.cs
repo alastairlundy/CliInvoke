@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
 using Bogus;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Builders;
 
 public class EnvironmentVariablesBuilderTests
 {

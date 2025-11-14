@@ -9,14 +9,13 @@
 
 using System;
 
-
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
-using AlastairLundy.CliInvoke.Core.Factories;
-using AlastairLundy.CliInvoke.Core.Piping;
-using AlastairLundy.CliInvoke.Extensibility.Factories;
-using AlastairLundy.CliInvoke.Factories;
-using AlastairLundy.CliInvoke.Piping;
+using CliInvoke.Core;
+using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core.Piping;
+using CliInvoke.Extensibility.Factories;
+using CliInvoke.Factories;
+using CliInvoke.Piping;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -24,7 +23,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 // ReSharper disable RedundantAssignment
 // ReSharper disable UnusedMember.Global
 
-namespace AlastairLundy.CliInvoke.Extensions;
+namespace CliInvoke.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring dependency injection for CliInvoke components.

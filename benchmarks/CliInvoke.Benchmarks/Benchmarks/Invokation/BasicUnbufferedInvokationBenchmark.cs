@@ -1,12 +1,12 @@
-﻿using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using CliInvoke.Benchmarking.Data;
 using CliInvoke.Benchmarking.Helpers;
+using CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+
 using CliWrap;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;

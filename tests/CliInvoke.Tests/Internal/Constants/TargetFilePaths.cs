@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace AlastairLundy.CliInvoke.Tests.Internal.Constants;
+namespace CliInvoke.Tests.Internal.Constants;
 
 public static class TargetFilePaths
 {

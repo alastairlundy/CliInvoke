@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+using CliInvoke.Specializations.Tests.Helpers;
 
-using AlastairLundy.CliInvoke.Builders;
-
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Specializations.Tests.Helpers;
-using Xunit;
-
-namespace AlastairLundy.CliInvoke.Specializations.Tests.Invokers;
+namespace CliInvoke.Specializations.Tests.Invokers;
 
 public class CmdInvokerTests : IClassFixture<TestFixture>
 {

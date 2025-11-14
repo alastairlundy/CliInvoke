@@ -1,7 +1,7 @@
-using AlastairLundy.CliInvoke.Piping;
+using CliInvoke.Piping;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Piping;
+namespace CliInvoke.Tests.Piping;
 
 public class ProcessPipeHandlerTests
 {
