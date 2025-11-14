@@ -4,6 +4,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
         <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>

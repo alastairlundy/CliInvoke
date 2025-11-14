@@ -59,8 +59,8 @@ public class CmdProcessConfiguration : ProcessConfiguration
         string workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
         StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        Encoding? standardInputEncoding = default, Encoding standardOutputEncoding = default,
+        Encoding? standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
         base("",
             redirectStandardInput, redirectStandardOutput, redirectStandardError,
