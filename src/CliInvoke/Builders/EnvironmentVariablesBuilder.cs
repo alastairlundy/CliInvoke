@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+
 using AlastairLundy.CliInvoke.Core.Builders;
 
 // ReSharper disable ArrangeObjectCreationWhenTypeEvident
@@ -51,6 +52,12 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         bool throwExceptionIfDuplicateKeyFound = true
     )
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stringComparer, nameof(stringComparer));
+#else
+        stringComparer = Ensure.NotNull(stringComparer);
+#endif
+        
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
         _environmentVariables = new Dictionary<string, string>(_stringComparer);
@@ -70,6 +77,10 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(vars, nameof(vars));
+        ArgumentNullException.ThrowIfNull(stringComparer, nameof(stringComparer));
+#else
+        vars = Ensure.NotNull(vars);
+        stringComparer = Ensure.NotNull(stringComparer);
 #endif
         _environmentVariables = new Dictionary<string, string>(vars, _stringComparer);
         _stringComparer = stringComparer;
@@ -85,6 +96,14 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     [Pure]
     public IEnvironmentVariablesBuilder SetPair(string name, string value)
     {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(value);
+#else
+        name = Ensure.NotNullOrEmpty(name);
+        value = Ensure.NotNullOrWhiteSpace(value);
+#endif
+        
         Dictionary<string, string> output = new(_environmentVariables);
 
         if (_throwExceptionIfDuplicateKeyFound)
@@ -95,7 +114,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         {
             bool result = output.TryAdd(name, value);
 
-            if (result == false)
+            if (!result)
                 output[name] = value;
         }
 
@@ -112,6 +131,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(variables, nameof(variables));
+#else
+        variables = Ensure.NotNull(variables);
 #endif
         Dictionary<string, string> output = new Dictionary<string, string>(
             _environmentVariables,
@@ -128,7 +149,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
             {
                 bool result = output.TryAdd(pair.Key, pair.Value);
 
-                if (result == false)
+                if (!result)
                     output[pair.Key] = pair.Value;
             }
         }

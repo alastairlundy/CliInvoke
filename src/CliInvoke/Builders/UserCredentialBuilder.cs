@@ -10,6 +10,7 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
+using System;
 using System.Diagnostics.Contracts;
 using System.Security;
 using AlastairLundy.CliInvoke.Core;
@@ -50,8 +51,15 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// <param name="domain">The domain to set.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated domain.</returns>
     [Pure]
-    public IUserCredentialBuilder SetDomain(string? domain) =>
-        new UserCredentialBuilder(
+    public IUserCredentialBuilder SetDomain(string domain)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrEmpty(domain, nameof(domain));
+#else
+        domain = Ensure.NotNullOrEmpty(domain);
+#endif
+        
+        return new UserCredentialBuilder(
             new UserCredential(
                 domain,
                 _userCredential.UserName,
@@ -61,6 +69,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
             )
 #pragma warning restore CA1416
         );
+    }
 
     /// <summary>
     /// Sets the username for the credential to be created.
@@ -68,8 +77,15 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// <param name="username">The username to set.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated username.</returns>
     [Pure]
-    public IUserCredentialBuilder SetUsername(string? username) =>
-        new UserCredentialBuilder(
+    public IUserCredentialBuilder SetUsername(string username)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrEmpty(username, nameof(username));
+#else
+        username = Ensure.NotNullOrEmpty(username);
+#endif
+        
+        return new UserCredentialBuilder(
 #pragma warning disable CA1416
             new UserCredential(
                 _userCredential.Domain,
@@ -79,6 +95,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
             )
 #pragma warning restore CA1416
         );
+    }
 
     /// <summary>
     /// Sets the password for the credential to be created.
@@ -86,8 +103,19 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// <param name="password">The password to set, as a SecureString.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated password.</returns>
     [Pure]
-    public IUserCredentialBuilder SetPassword(SecureString? password) =>
-        new UserCredentialBuilder(
+    public IUserCredentialBuilder SetPassword(SecureString password)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(password, nameof(password));
+#else
+        password = Ensure.NotNull(password);
+#endif
+        if (password.Length > 1)
+        {
+            
+        }
+        
+        return new UserCredentialBuilder(
 #pragma warning disable CA1416
             new UserCredential(
                 _userCredential.Domain,
@@ -97,6 +125,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
             )
 #pragma warning restore CA1416
         );
+    }
 
     /// <summary>
     /// Specifies whether to load the user profile.
