@@ -43,6 +43,7 @@
         <RootNamespace>AlastairLundy.CliInvoke</RootNamespace>
         <PackageId>AlastairLundy.CliInvoke</PackageId>
         <Product>CliInvoke</Product>
+        <PolyEnsure>true</PolyEnsure>
     </PropertyGroup>
 
     <ItemGroup>
@@ -52,7 +53,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.0.1" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.0.3" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>

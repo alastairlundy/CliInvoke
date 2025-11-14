@@ -89,9 +89,12 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
-        if (minWorkingSet < 0)
-            throw new ArgumentOutOfRangeException(nameof(minWorkingSet));
-
+        #if NET8_0_OR_GREATER
+        ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet, nameof(minWorkingSet));
+        #else
+        minWorkingSet = Ensure.NotNegative(minWorkingSet);
+        #endif
+        
         if (minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
             return new ProcessResourcePolicyBuilder(
                 new ProcessResourcePolicy(
@@ -135,6 +138,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
+     //TODO: Migrate to Ensure and ArgumentOutOfRange exception static methods once fixed in Polyfill   
         if (maxWorkingSet < _processResourcePolicy.MinWorkingSet || maxWorkingSet < 1)
             throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
 
