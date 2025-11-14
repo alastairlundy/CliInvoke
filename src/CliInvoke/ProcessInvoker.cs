@@ -11,14 +11,15 @@ using System.IO;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Piping;
-using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Helpers;
-using AlastairLundy.CliInvoke.Helpers.Processes;
-using AlastairLundy.CliInvoke.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke;
+using CliInvoke.Core;
+using CliInvoke.Core.Piping;
+using CliInvoke.Exceptions;
+using CliInvoke.Helpers;
+using CliInvoke.Helpers.Processes;
+using CliInvoke.Internal.Localizations;
+
+namespace CliInvoke;
 
 /// <summary>
 /// The default implementation of <see cref="IProcessInvoker"/>, a safer way to execute processes.

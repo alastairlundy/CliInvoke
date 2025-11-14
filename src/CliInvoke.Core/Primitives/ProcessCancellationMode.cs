@@ -9,7 +9,7 @@
 
 using System.Threading;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// Specifies the mode for handling process cancellation.

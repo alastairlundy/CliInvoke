@@ -12,9 +12,10 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core;
 
-namespace AlastairLundy.CliInvoke.Helpers.Processes;
+using CliInvoke.Core;
+
+namespace CliInvoke.Helpers.Processes;
 
 /// <summary>
 ///

@@ -10,12 +10,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Factories;
 
-namespace AlastairLundy.CliInvoke.Factories;
+using CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+using CliInvoke.Core.Factories;
+
+namespace CliInvoke.Factories;
 
 /// <summary>
 /// A Dependency Injection supporting factory class to enable easier <see cref="ProcessConfiguration"/> creation.

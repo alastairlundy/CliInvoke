@@ -1,14 +1,15 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
+using CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
 using Xunit;
+
 // ReSharper disable JoinDeclarationAndInitializer
 // ReSharper disable NotAccessedVariable
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Builders;
 
 public class ProcessResourcePolicyBuilderTests
 {

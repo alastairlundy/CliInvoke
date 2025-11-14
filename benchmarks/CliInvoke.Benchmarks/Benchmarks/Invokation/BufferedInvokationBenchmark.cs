@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
-using AlastairLundy.CliInvoke.Core;
+
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using CliInvoke.Benchmarking.Data;
 using CliInvoke.Benchmarking.Helpers;
+using CliInvoke.Core;
+
 using CliWrap;
 using CliWrap.Buffered;
 using Cysharp.Diagnostics;

@@ -14,7 +14,7 @@
     <PackageReference Include="SimpleExec" Version="12.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-    <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
+    <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />
+    <ProjectReference Include="..\..\src\CliInvoke\CliInvoke.csproj" />
   </ItemGroup>
 </Project>

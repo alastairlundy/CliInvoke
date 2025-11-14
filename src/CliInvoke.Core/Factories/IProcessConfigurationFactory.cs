@@ -9,9 +9,10 @@
 
 using System;
 using System.Collections.Generic;
-using AlastairLundy.CliInvoke.Core.Builders;
 
-namespace AlastairLundy.CliInvoke.Core.Factories;
+using CliInvoke.Core.Builders;
+
+namespace CliInvoke.Core.Factories;
 
 /// <summary>
 /// A factory interface to enable easier <see cref="ProcessConfiguration"/> creation.

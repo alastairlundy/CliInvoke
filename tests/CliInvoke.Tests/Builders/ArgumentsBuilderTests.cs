@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Tests.Helpers;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
+using CliInvoke.Tests.Helpers;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Builders;
 
 public partial class ArgumentsBuilderTests
 {

@@ -10,7 +10,7 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace CliInvoke.Core.Builders;
 
 /// <summary>
 /// A fluent builder interface for configuring and building a Process Resource Policy.

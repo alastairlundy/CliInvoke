@@ -7,8 +7,8 @@
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <LangVersion>14</LangVersion>
-        <AssemblyName>AlastairLundy.CliInvoke.Specializations.Tests</AssemblyName>
-        <RootNamespace>AlastairLundy.CliInvoke.Specializations.Tests</RootNamespace>
+        <PackageId>CliInvoke.Specializations.Tests</PackageId>
+        <Authors>CliInvoke.Specializations.Tests</Authors>
     </PropertyGroup>
 
     <ItemGroup>
