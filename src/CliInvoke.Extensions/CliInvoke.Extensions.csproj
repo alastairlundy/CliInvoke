@@ -50,8 +50,8 @@
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
         <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="$(CliInvokeVersion)" />
+        <PackageReference Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+        <PackageReference Include="CliInvoke" Version="$(CliInvokeVersion)" />
     </ItemGroup>
 
     <ItemGroup>
