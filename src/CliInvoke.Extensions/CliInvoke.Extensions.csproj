@@ -9,14 +9,15 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.0.0</Version>
+        <Version>2.0.1</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>Re-release of CliInvoke 2.0 under new Package Id</PackageReleaseNotes>
+        <PackageReleaseNotes>* Update Core and Main to 2.0.1
+* Update Microsoft.Extensions.DependencyInjection.Abstractions from 9.0.10 to 9.0.11</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

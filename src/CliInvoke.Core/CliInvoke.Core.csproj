@@ -22,8 +22,14 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0</Version>
-        <PackageReleaseNotes>Re-release of CliInvoke 2.0 under new Package Id</PackageReleaseNotes>
+        <Version>2.0.1</Version>
+        <PackageReleaseNotes>## Changes since 2.0.0
+### Core package
+* Update internal Polyfill version from 8.9.1 to 9.1.0
+
+### Main package
+* Updated DotExtensions from 8.6.3 to 9.0.0
+* Update internal Polyfill version from 8.9.1 to 9.1.0</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
