@@ -12,20 +12,14 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.1.0</PackageVersion>
+        <PackageVersion>2.1.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>### All Packages
-* Added .NET 10  TFM and switched to C# language version 14
-* Added Trimming Support and AoT support (#146 )
-* Renamed namespaces to start with ``CliInvoke`` instead of ``AlastairLundy.CliInvoke``
-
-### Specializations Package
-* Updated to use CliInvoke Core 2.1.0
-* Updated internal Polyfill version from 8.9.1 to 9.0.3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Update to internal Polyfill version 9.1.0 from 9.0.3
+* Fixed nullability inconsistency issues</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>

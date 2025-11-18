@@ -23,15 +23,8 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.1.0</Version>
-        <PackageReleaseNotes>### All Packages
-* Added .NET 10  TFM and switched to C# language version 14
-* Added Trimming Support and AoT support (#146 )
-* Renamed namespaces to start with ``CliInvoke`` instead of ``AlastairLundy.CliInvoke``
-
-### Core Package
-* Updated ``IUserCredentialBuilder`` to not accept null strings
-* Updated internal Polyfill version from 8.9.1 to 9.0.3</PackageReleaseNotes>
+        <Version>2.1.1</Version>
+        <PackageReleaseNotes>* Update to internal Polyfill version 9.1.0 from 9.0.3</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
