@@ -34,7 +34,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.0.3" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.1.0" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>

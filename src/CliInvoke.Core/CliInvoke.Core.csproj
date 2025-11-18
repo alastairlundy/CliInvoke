@@ -20,6 +20,7 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <IsTrimmable>true</IsTrimmable>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>2.1.0</Version>
@@ -33,9 +34,9 @@
 * Updated internal Polyfill version from 8.9.1 to 9.0.3</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
-
+    
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.0.3" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.1.0" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
     </ItemGroup>
 
