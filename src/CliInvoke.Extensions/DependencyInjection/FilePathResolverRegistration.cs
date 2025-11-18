@@ -8,6 +8,7 @@
 */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using CliInvoke.Core;
 
@@ -35,7 +36,11 @@ public static class FilePathResolverRegistration
         /// </param>
         /// <returns>The modified <see cref="IServiceCollection"/> instance for further configuration.</returns>
         /// <exception cref="NotSupportedException">Thrown if an unsupported <see cref="ServiceLifetime"/> is specified.</exception>
-        public IServiceCollection UseCustomFilePathResolver<TResolver>(
+        public IServiceCollection UseCustomFilePathResolver<
+#if NET8_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            TResolver>(
             ServiceLifetime serviceLifetime)
             where TResolver : class, IFilePathResolver
         {
