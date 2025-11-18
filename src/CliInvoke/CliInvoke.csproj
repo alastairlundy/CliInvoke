@@ -2,9 +2,9 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <LangVersion>13</LangVersion>
+        <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <Title>CliInvoke</Title>
@@ -35,7 +35,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="[8.9.1, 9.0.0)" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.1.0" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AlastairLundy.DotExtensions" Version="[8.6.3, 9.0.0)" />
