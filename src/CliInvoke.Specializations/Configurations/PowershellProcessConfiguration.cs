@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
@@ -102,7 +103,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
 
             if (OperatingSystem.IsWindows())
             {
-                filePath = $"{GetWindowsInstallLocation()}{Path.DirectorySeparatorChar}pwsh.exe";
+                filePath = $"{GetInstallLocationOnWindows()}";
             }
             else if (OperatingSystem.IsMacOS() ||
                      OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
@@ -114,19 +115,23 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         }
     }
 
-    private string GetWindowsInstallLocation()
+    private static string GetInstallLocationOnWindows()
     {
         string programFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem == true
             ? Environment.SpecialFolder.ProgramFiles
             : Environment.SpecialFolder.ProgramFilesX86);
 
-        string[] directories = Directory.GetDirectories(
-            $"{programFiles}{Path.DirectorySeparatorChar}Powershell");
+        IEnumerable<string> directories = Directory.EnumerateDirectories(
+            $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
+            .Where(d => Regex.IsMatch(d, @"v\d+"))
+            .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));;
 
         foreach (string directory in directories)
         {
-            if (File.Exists($"{directory}{Path.DirectorySeparatorChar}pwsh.exe"))
-                return directory;
+            string expectedFilePath = $"{directory}{Path.DirectorySeparatorChar}pwsh.exe";
+            
+            if (File.Exists(expectedFilePath))
+                return expectedFilePath;
         }
 
         throw new FileNotFoundException("Could not find Powershell installation.");
