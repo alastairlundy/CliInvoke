@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 using CliInvoke.Core;
 
@@ -36,12 +36,12 @@ namespace CliInvoke.Specializations.Configurations;
 [UnsupportedOSPlatform("watchos")]
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
-    private readonly IProcessInvoker _invoker;
+    private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>
     /// Initializes a new instance of the PowershellCommandConfiguration class.
     /// </summary>
-    /// <param name="processInvoker"></param>
+    /// <param name="filePathResolver"></param>
     /// <param name="arguments">The arguments to be passed to the command.</param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator">Indicates whether the command requires administrator privileges.</param>
@@ -59,7 +59,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
-    public PowershellProcessConfiguration(IProcessInvoker processInvoker, string arguments,
+    public PowershellProcessConfiguration(IFilePathResolver filePathResolver, string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
@@ -78,7 +78,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         useShellExecution: useShellExecution)
     {
         base.TargetFilePath = TargetFilePath;
-        _invoker = processInvoker;
+        _filePathResolver = filePathResolver;
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             else if (OperatingSystem.IsMacOS() ||
                      OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
             {
-                filePath = GetUnixInstallLocation();
+                filePath = _filePathResolver.ResolveFilePath("pwsh");
             }
 
             return filePath;
@@ -135,17 +135,5 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         }
 
         throw new FileNotFoundException("Could not find Powershell installation.");
-    }
-
-    private string GetUnixInstallLocation()
-    {
-        ProcessConfiguration configuration = new ProcessConfiguration("/usr/bin/which",
-            false, true, true,
-            arguments: "pwsh");
-
-        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(configuration);
-
-        task.Wait();
-        return task.Result.StandardOutput;
     }
 }
