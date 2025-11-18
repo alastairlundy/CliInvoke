@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+
+    <!-- Enable AOT for this test project -->
+    <PublishAot>true</PublishAot>
+
+    <!-- Specify a RID for AOT publishes in CI; adjust as needed for target -->
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference the workspace projects so the test validates local sources -->
+    <ProjectReference Include="../../src/CliInvoke/CliInvoke.csproj" />
+    <ProjectReference Include="../../src/CliInvoke.Extensions/CliInvoke.Extensions.csproj" />
+  </ItemGroup>
+
+  <!-- Add host package so IHost/Host APIs are available -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+  </ItemGroup>
+</Project>
