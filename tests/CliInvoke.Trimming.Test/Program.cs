@@ -25,8 +25,9 @@ IProcessInvoker invoker = scopes.ServiceProvider.GetRequiredService<IProcessInvo
 int randomNumber = Random.Shared.Next();
 
 using ProcessConfiguration procConfig = factory.Create("echo", [randomNumber.ToString()]);
+
 BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procConfig);
 
 Console.WriteLine($"Standard Output was: {processResult.StandardOutput}");
 
-return 0;
+return processResult.ExitCode;
