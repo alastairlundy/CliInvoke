@@ -16,6 +16,7 @@ using System.Text;
 
 using CliInvoke.Core;
 using CliInvoke.Specializations.Internal.Localizations;
+// ReSharper disable MemberCanBeMadeStatic.Global
 
 namespace CliInvoke.Specializations.Configurations;
 
@@ -52,12 +53,12 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardError"></param>
     public ClassicPowershellProcessConfiguration(string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        string workingDirectoryPath = null, bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null, 
-        UserCredential credentials = null,
-        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        string? workingDirectoryPath = null, bool requiresAdministrator = false,
+        Dictionary<string, string>? environmentVariables = null, 
+        UserCredential? credentials = null,
+        StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
+        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : base("",
         redirectStandardInput, redirectStandardOutput, redirectStandardError,
         arguments,
@@ -89,9 +90,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         get
         {
             if (!OperatingSystem.IsWindows())
-            {
                 throw new PlatformNotSupportedException(Resources.Exceptions_ClassicPowershell_OnlySupportedOnWindows);
-            }
 
             return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}" +
                    $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe";
