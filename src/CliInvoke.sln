@@ -28,7 +28,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Benchmarking", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Benchmarking.MockDataSimulationTool", "..\benchmarks\CliInvoke.Benchmarking.MockDataSimulationTool\CliInvoke.Benchmarking.MockDataSimulationTool.csproj", "{E617CD14-FE0F-4BFB-B40A-98D79023CD31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrimmingTest", "..\tests\TrimmingTest\TrimmingTest.csproj", "{D141465B-15B5-4405-A84A-8575624FA3F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Trimming.Test", "..\tests\CliInvoke.Trimming.Test\CliInvoke.Trimming.Test.csproj", "{D141465B-15B5-4405-A84A-8575624FA3F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

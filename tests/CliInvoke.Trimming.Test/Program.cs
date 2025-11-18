@@ -29,4 +29,4 @@ BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procCon
 
 Console.WriteLine($"Standard Output was: {processResult.StandardOutput}");
 
-return 0;
+return processResult.ExitCode;
