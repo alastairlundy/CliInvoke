@@ -16,6 +16,7 @@ using System.Text;
 
 using CliInvoke.Core;
 using CliInvoke.Specializations.Internal.Localizations;
+// ReSharper disable MemberCanBeMadeStatic.Global
 
 namespace CliInvoke.Specializations.Configurations;
 
@@ -89,9 +90,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         get
         {
             if (!OperatingSystem.IsWindows())
-            {
                 throw new PlatformNotSupportedException(Resources.Exceptions_ClassicPowershell_OnlySupportedOnWindows);
-            }
 
             return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}" +
                    $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe";

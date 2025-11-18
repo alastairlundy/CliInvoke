@@ -86,12 +86,10 @@ public class CmdProcessConfiguration : ProcessConfiguration
     {
         get
         {
-            if (OperatingSystem.IsWindows() == false)
-            {
+            if (!OperatingSystem.IsWindows())
                 throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
-            }
 
-            return Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe";
+            return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe";
         }
     }
 }
