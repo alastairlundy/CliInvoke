@@ -1,17 +1,17 @@
 using System;
+using CliInvoke.Core;
+using CliInvoke.Core.Factories;
 using Microsoft.Extensions.Hosting;
 using CliInvoke.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using CliInvoke.Core;
-using CliInvoke.Core.Factories;
 // ReSharper disable LocalizableElement
 
-Console.WriteLine("TrimmingTest starting");
+Console.WriteLine("CliInvoke.Aot.Test starting");
 
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-        // This call ensures the AddCliInvoke extension is registered (survives trimming)
+        // Ensure the extension method is registered and compatible with AOT publishing
         services.AddCliInvoke();
     })
     .Build();
@@ -26,7 +26,7 @@ int randomNumber = Random.Shared.Next();
 
 Console.WriteLine($"Random number is {randomNumber}");
 
-using ProcessConfiguration procConfig = factory.Create("echo", [randomNumber.ToString()]);
+using ProcessConfiguration procConfig = factory.Create("echo", randomNumber.ToString());
 
 BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procConfig);
 
