@@ -15,6 +15,7 @@ using System.Text;
 
 using CliInvoke.Core;
 using CliInvoke.Specializations.Internal.Localizations;
+// ReSharper disable MemberCanBeMadeStatic.Global
 
 // ReSharper disable UnusedMember.Global
 
@@ -56,11 +57,11 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardError"></param>
     public CmdProcessConfiguration(string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        string workingDirectoryPath = null, bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
-        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding? standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding? standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        string? workingDirectoryPath = null, bool requiresAdministrator = false,
+        Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
+        StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
+        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
         base("",
             redirectStandardInput, redirectStandardOutput, redirectStandardError,
