@@ -102,7 +102,7 @@ internal static class ProcessCancellationExtensions
 
             if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
             {
-                if (actualExitTime.Abs(expectedExitTime) > TimeSpan.FromSeconds(10))
+                if (actualExitTime.Difference(expectedExitTime) > TimeSpan.FromSeconds(10))
                 {
                     throw;
                 }
@@ -163,7 +163,7 @@ internal static class ProcessCancellationExtensions
             if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected ||
                 cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
             {
-                if (actualExitTime.Abs(expectedExitTime) > TimeSpan.FromSeconds(10) || 
+                if (actualExitTime.Difference(expectedExitTime) > TimeSpan.FromSeconds(10) || 
                     cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
                 {
                     throw;
