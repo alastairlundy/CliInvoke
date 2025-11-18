@@ -8,6 +8,7 @@
 */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using CliInvoke.Core;
 
@@ -17,15 +18,30 @@ namespace CliInvoke.Extensions;
 
 public static class FilePathResolverRegistration
 {
+    /// <param name="services">The <see cref="IServiceCollection"/> to register the implementation with.</param>
     extension(IServiceCollection services)
     {
         /// <summary>
-        /// 
+        /// Registers a custom implementation of the <see cref="IFilePathResolver"/> interface
+        /// with the specified service lifetime in the dependency injection container.
         /// </summary>
-        /// <param name="serviceLifetime"></param>
-        /// <typeparam name="TResolver"></typeparam>
-        /// <returns></returns>
-        public IServiceCollection UseCustomFilePathResolver<TResolver>(ServiceLifetime serviceLifetime)
+        /// <typeparam name="TResolver">
+        /// The type of the custom implementation for <see cref="IFilePathResolver"/>.
+        /// This type must be a class and implement the <see cref="IFilePathResolver"/> interface.
+        /// </typeparam>
+        /// <param name="serviceLifetime">
+        /// The <see cref="ServiceLifetime"/> defining the lifetime of the registered service.
+        /// Supported lifetimes are <see cref="ServiceLifetime.Singleton"/>, <see cref="ServiceLifetime.Scoped"/>,
+        /// and <see cref="ServiceLifetime.Transient"/>.
+        /// </param>
+        /// <returns>The modified <see cref="IServiceCollection"/> instance for further configuration.</returns>
+        /// <exception cref="NotSupportedException">Thrown if an unsupported <see cref="ServiceLifetime"/> is specified.</exception>
+        public IServiceCollection UseCustomFilePathResolver<
+#if NET8_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            TResolver>(
+            ServiceLifetime serviceLifetime)
             where TResolver : class, IFilePathResolver
         {
             switch (serviceLifetime)

@@ -151,7 +151,7 @@ public static partial class DependencyInjectionExtensions
         bool isAssignableFrom =
             typeof(RunnerProcessInvokerBase).IsAssignableFrom(runnerProcessInvokerType);
 
-        if (isSubclass == false && isAssignableFrom == false)
+        if (!isSubclass && !isAssignableFrom)
             throw new ArgumentException(
                 $"Provided type is not a subclass of or assignable from type {nameof(RunnerProcessInvokerBase)}");
 

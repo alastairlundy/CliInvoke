@@ -5,9 +5,9 @@ Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/bl
 
 
 <!-- Badges -->
-[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Specializations.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Specializations/)
-[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.Specializations.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Specializations/)
-[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Specializations.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Specializations/)
+[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.Specializations.svg)](https://www.nuget.org/packages/CliInvoke.Specializations/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.Specializations.svg)](https://www.nuget.org/packages/CliInvoke.Specializations/)
+[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.Specializations.svg)](https://www.nuget.org/packages/CliInvoke.Specializations/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 ## Usage
@@ -22,13 +22,13 @@ All Command specialization classes come with an already configured TargetFilePat
 The CmdProcessConfiguration TargetFilePath points to Windows' copy of cmd.exe. This is only supported on Windows.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
+using CliInvoke.Core.Extensibility.Factories;
 
-using AlastairLundy.CliInvoke.Specializations.Configurations;
-using AlastairLundy.CliInvoke.Specializations;
+using CliInvoke.Specializations.Configurations;
+using CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
@@ -52,13 +52,13 @@ using AlastairLundy.CliInvoke.Specializations;
 
 If the result of the command being run is not of concern you can call ``ExecuteAsync()`` instead of ``ExecuteBufferedAsync()`` and ignore the returned ProcessResult like so:
 ```csharp
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
+using CliInvoke.Core.Extensibility.Factories;
 
-using AlastairLundy.CliInvoke.Specializations.Configurations;
-using AlastairLundy.CliInvoke.Specializations;
+using CliInvoke.Specializations.Configurations;
+using CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
@@ -86,13 +86,13 @@ The ClassicPowershellCommand is a specialized Command class with an already conf
 This is only supported on Windows.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
+using CliInvoke.Core.Extensibility.Factories;
 
-using AlastairLundy.CliInvoke.Specializations.Configurations;
-using AlastairLundy.CliInvoke.Specializations;
+using CliInvoke.Specializations.Configurations;
+using CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
@@ -120,13 +120,13 @@ The PowershellProcessConfiguration's TargetFilePath points to the installed copy
 This is only supported on platforms that cross-platform PowerShell supports.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
+using CliInvoke.Core.Extensibility.Factories;
 
-using AlastairLundy.CliInvoke.Specializations.Configurations;
-using AlastairLundy.CliInvoke.Specializations;
+using CliInvoke.Specializations.Configurations;
+using CliInvoke.Specializations;
 
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
