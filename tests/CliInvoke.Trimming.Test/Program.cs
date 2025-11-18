@@ -24,6 +24,8 @@ IProcessInvoker invoker = scopes.ServiceProvider.GetRequiredService<IProcessInvo
 
 int randomNumber = Random.Shared.Next();
 
+Console.WriteLine($"Random number is {randomNumber}");
+
 using ProcessConfiguration procConfig = factory.Create("echo", [randomNumber.ToString()]);
 
 BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procConfig);
