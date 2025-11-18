@@ -14,10 +14,10 @@
     <OutputType>Exe</OutputType>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+</PropertyGroup>
 
   <ItemGroup>
-
       <ProjectReference Include="../../src/CliInvoke.Extensions/CliInvoke.Extensions.csproj" />
       <ProjectReference Include="../../src/CliInvoke/CliInvoke.csproj" />
       <!-- Reference local projects so the test uses the workspace sources -->
