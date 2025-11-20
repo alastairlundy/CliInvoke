@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 
 namespace CliInvoke.Internal.Localizations {
+    using System;
+    
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -25,7 +28,7 @@ namespace CliInvoke.Internal.Localizations {
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("AlastairLundy.CliInvoke.Internal.Localizations.Resources", typeof(Resources).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("CliInvoke.Internal.Localizations.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -117,6 +120,12 @@ namespace CliInvoke.Internal.Localizations {
         internal static string Exceptions_Processes_NotSupportedOnRemoteProcess {
             get {
                 return ResourceManager.GetString("Exceptions.Processes.NotSupportedOnRemoteProcess", resourceCulture);
+            }
+        }
+        
+        internal static string Exceptions_TargtFile_NotExecutable {
+            get {
+                return ResourceManager.GetString("Exceptions.TargtFile.NotExecutable", resourceCulture);
             }
         }
     }
