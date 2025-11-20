@@ -271,15 +271,20 @@ Future updates may focus on one or more of the following:
 * New features
 * Enhancing existing features
 
+## New vs Old Package and Namespace
+CliInvoke changed it's Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has since been published directly under the ``CliInvoke`` package Id prefix and namespace.
+
+The previous packages Ids are marked as deprecated and will not receive future updates.
+
 ## License
 CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
 If you use CliInvoke in your project please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses TXT file or as a separate TXT file in the project's repository.
 
 ### CliInvoke Assets
-CliInvoke's Icon is proprietary with all rights reserved to me (Alastair Lundy).
+CliInvoke's Icon is owned by and has all rights reserved to me (Alastair Lundy).
 
-If you fork CliInvoke and re-distribute it, please replace the usage of the icon unless you have prior written approval from me. 
+If you fork CliInvoke and re-distribute it, please replace the icon unless you have prior written approval from me. 
 
 ## Acknowledgements
 
