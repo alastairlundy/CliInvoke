@@ -27,7 +27,7 @@ The services injected include:
 
 ## Why a separate package?
 There's a few different reasons:
-* Provides extension methods in a 
+* Provides DI extension methods for end user applications - Not all users of the CliInvoke implementation package may want/need Dependency Injection)
 * Not everybody necessarily uses Microsoft's Dependency Injection packages.
 * Helps de-couple the Dependency Injection extension functionality from the main library
 
