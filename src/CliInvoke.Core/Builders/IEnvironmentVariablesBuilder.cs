@@ -7,10 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-
 using System.Collections.Generic;
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace CliInvoke.Core.Builders;
 
 /// <summary>
 /// An interface that defines the fluent builder methods for configuring environment variables for a Process or ProcessConfiguration.
@@ -38,13 +37,15 @@ public interface IEnvironmentVariablesBuilder
     /// <param name="variables">The dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     IEnvironmentVariablesBuilder SetDictionary(IDictionary<string, string> variables);
-    
+
     /// <summary>
     /// Sets multiple environment variables from a read-only dictionary.
     /// </summary>
     /// <param name="variables">The read-only dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    IEnvironmentVariablesBuilder SetReadOnlyDictionary(IReadOnlyDictionary<string, string> variables);
+    IEnvironmentVariablesBuilder SetReadOnlyDictionary(
+        IReadOnlyDictionary<string, string> variables
+    );
 
     /// <summary>
     /// Builds the dictionary of configured environment variables.

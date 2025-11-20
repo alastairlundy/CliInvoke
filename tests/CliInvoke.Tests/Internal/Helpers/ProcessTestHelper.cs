@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
-using AlastairLundy.CliInvoke.Tests.Internal.Constants;
+using CliInvoke.Tests.Internal.Constants;
 
-namespace AlastairLundy.CliInvoke.Tests.Internal.Helpers;
+namespace CliInvoke.Tests.Internal.Helpers;
 
 public class ProcessTestHelper
 {

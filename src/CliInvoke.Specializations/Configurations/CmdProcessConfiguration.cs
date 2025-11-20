@@ -10,20 +10,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Runtime.Versioning;
+using System.Text;
 
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
-
-using AlastairLundy.CliInvoke.Specializations.Internal.Localizations;
-
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core;
+using CliInvoke.Specializations.Internal.Localizations;
+// ReSharper disable MemberCanBeMadeStatic.Global
 
 // ReSharper disable UnusedMember.Global
 
-namespace AlastairLundy.CliInvoke.Specializations.Configurations;
+namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
 /// A Command configuration to make running commands through Windows CMD easier.
@@ -61,11 +57,11 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardError"></param>
     public CmdProcessConfiguration(string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        string workingDirectoryPath = null, bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
-        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        string? workingDirectoryPath = null, bool requiresAdministrator = false,
+        Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
+        StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
+        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
         base("",
             redirectStandardInput, redirectStandardOutput, redirectStandardError,
@@ -90,12 +86,10 @@ public class CmdProcessConfiguration : ProcessConfiguration
     {
         get
         {
-            if (OperatingSystem.IsWindows() == false)
-            {
+            if (!OperatingSystem.IsWindows())
                 throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
-            }
 
-            return Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe";
+            return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe";
         }
     }
 }

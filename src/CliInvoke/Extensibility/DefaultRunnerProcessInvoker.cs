@@ -9,11 +9,11 @@
 
 using System;
 
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Extensibility;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core;
+using CliInvoke.Core.Extensibility;
+using CliInvoke.Core.Extensibility.Factories;
 
-namespace AlastairLundy.CliInvoke.Extensibility;
+namespace CliInvoke.Extensibility;
 
 /// <summary>
 /// The default implementation of <see cref="RunnerProcessInvokerBase"/>.
@@ -27,11 +27,15 @@ public class DefaultRunnerProcessInvoker : RunnerProcessInvokerBase
     /// <param name="processInvoker"></param>
     /// <param name="runnerProcessFactory"></param>
     /// <param name="runnerProcessConfiguration"></param>
-    public DefaultRunnerProcessInvoker(IProcessInvoker processInvoker, IRunnerProcessFactory runnerProcessFactory,
-        ProcessConfiguration runnerProcessConfiguration) : base(processInvoker, runnerProcessFactory, runnerProcessConfiguration)
+    public DefaultRunnerProcessInvoker(
+        IProcessInvoker processInvoker,
+        IRunnerProcessFactory runnerProcessFactory,
+        ProcessConfiguration runnerProcessConfiguration
+    )
+        : base(processInvoker, runnerProcessFactory, runnerProcessConfiguration)
     {
-        #if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(runnerProcessConfiguration);
-        #endif
+#endif
     }
 }

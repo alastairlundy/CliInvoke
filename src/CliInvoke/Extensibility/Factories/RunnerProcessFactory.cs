@@ -8,32 +8,38 @@
  */
 
 using System.IO;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
+
+using CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+using CliInvoke.Core.Extensibility.Factories;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace AlastairLundy.CliInvoke.Extensibility.Factories;
+namespace CliInvoke.Extensibility.Factories;
 
 /// <summary>
 /// A class to allow creating a ProcessConfiguration that can be run through other Process' ProcessConfiguration.
 /// </summary>
 public class RunnerProcessFactory : IRunnerProcessFactory
 {
-
     /// <summary>
     /// Create the command to be run from the Command runner configuration and an input command.
     /// </summary>
     /// <param name="processConfigToBeRun">The command to be run by the Command Runner command.</param>
     /// <param name="runnerProcessConfig"></param>
     /// <returns></returns>
-    public ProcessConfiguration CreateRunnerConfiguration(ProcessConfiguration processConfigToBeRun,
-        ProcessConfiguration runnerProcessConfig)
+    public ProcessConfiguration CreateRunnerConfiguration(
+        ProcessConfiguration processConfigToBeRun,
+        ProcessConfiguration runnerProcessConfig
+    )
     {
-        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(runnerProcessConfig.TargetFilePath)
-            .SetArguments(processConfigToBeRun.TargetFilePath + " " + processConfigToBeRun.Arguments)
+        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
+            runnerProcessConfig.TargetFilePath
+        )
+            .SetArguments(
+                processConfigToBeRun.TargetFilePath + " " + processConfigToBeRun.Arguments
+            )
             .SetEnvironmentVariables(processConfigToBeRun.EnvironmentVariables)
             .SetProcessResourcePolicy(processConfigToBeRun.ResourcePolicy)
             .SetStandardInputEncoding(processConfigToBeRun.StandardInputEncoding)
@@ -50,9 +56,10 @@ public class RunnerProcessFactory : IRunnerProcessFactory
             .ConfigureWindowCreation(processConfigToBeRun.WindowCreation);
 
         if (runnerProcessConfig.RequiresAdministrator)
-            commandBuilder = new ProcessConfigurationBuilder(runnerProcessConfig.TargetFilePath)
-                .RequireAdministratorPrivileges();
-        
+            commandBuilder = new ProcessConfigurationBuilder(
+                runnerProcessConfig.TargetFilePath
+            ).RequireAdministratorPrivileges();
+
         return commandBuilder.Build();
     }
 }

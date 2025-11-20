@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.DotPrimitives 
+    AlastairLundy.DotPrimitives
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,16 +9,15 @@
 
 using System;
 
-using AlastairLundy.CliInvoke.Core.Internal.Localizations;
+using CliInvoke.Core.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' Timeout configuration, if any.
 /// </summary>
 public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 {
-        
     /// <summary>
     /// Instantiates the <see cref="ProcessTimeoutPolicy"/> with default values.
     /// </summary>
@@ -33,8 +32,10 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// </summary>
     /// <param name="timeoutThreshold">The timespan to wait for the Process timeout before cancelling the Process.</param>
     /// <param name="cancellationMode">Defaults to Graceful cancellation, otherwise uses the Cancellation Mode specified.</param>
-    public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, 
-        ProcessCancellationMode cancellationMode =  ProcessCancellationMode.Graceful)
+    public ProcessTimeoutPolicy(
+        TimeSpan timeoutThreshold,
+        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful
+    )
     {
 #if NET8_0_OR_GREATER
         bool lessThanZero = double.IsNegative(timeoutThreshold.TotalMilliseconds);
@@ -43,29 +44,35 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 #endif
 
         if (timeoutThreshold < TimeSpan.Zero || lessThanZero)
-            throw new ArgumentOutOfRangeException(nameof(timeoutThreshold),
-                Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero.Replace("{x}", timeoutThreshold.ToString()));
-        
+            throw new ArgumentOutOfRangeException(
+                nameof(timeoutThreshold),
+                Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero.Replace(
+                    "{x}",
+                    timeoutThreshold.ToString()
+                )
+            );
+
         TimeoutThreshold = timeoutThreshold;
         CancellationMode = cancellationMode;
     }
-        
+
     /// <summary>
     /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
     /// </summary>
-    public static ProcessTimeoutPolicy Default { get; } = new ProcessTimeoutPolicy(TimeSpan.FromMinutes(30));
-        
+    public static ProcessTimeoutPolicy Default { get; } =
+        new ProcessTimeoutPolicy(TimeSpan.FromMinutes(30));
+
     /// <summary>
     /// Disables waiting for Process Timeout.
     /// </summary>
-    public static ProcessTimeoutPolicy None { get; } = new ProcessTimeoutPolicy(TimeSpan.FromSeconds(0),
-        ProcessCancellationMode.None);
-        
+    public static ProcessTimeoutPolicy None { get; } =
+        new ProcessTimeoutPolicy(TimeSpan.FromSeconds(0), ProcessCancellationMode.None);
+
     /// <summary>
     /// The timespan after which a Process should no longer be allowed to continue waiting to exit.
     /// </summary>
     public TimeSpan TimeoutThreshold { get; }
-        
+
     /// <summary>
     /// The mode to use for cancelling the Process if the timeout threshold is reached.
     /// </summary>
@@ -80,9 +87,9 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     {
         if (other is null)
             return false;
-            
+
         return TimeoutThreshold.Equals(other.TimeoutThreshold)
-               && CancellationMode == other.CancellationMode;
+            && CancellationMode == other.CancellationMode;
     }
 
     /// <summary>
@@ -94,7 +101,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     {
         if (obj is null)
             return false;
-            
+
         if (obj is ProcessTimeoutPolicy policy)
             return Equals(policy);
 
@@ -120,7 +127,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     {
         if (left is null || right is null)
             return false;
-            
+
         return left.Equals(right);
     }
 
@@ -135,9 +142,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         return Equals(left, right);
     }
 
-
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -146,9 +152,9 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     {
         return Equals(left, right) == false;
     }
-        
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -162,7 +168,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -172,8 +178,10 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         if (left is null || right is null)
             return false;
 
-        if (left.CancellationMode == ProcessCancellationMode.None &&
-            right.CancellationMode != ProcessCancellationMode.None)
+        if (
+            left.CancellationMode == ProcessCancellationMode.None
+            && right.CancellationMode != ProcessCancellationMode.None
+        )
             return false;
 
         return left.TimeoutThreshold < right.TimeoutThreshold;
@@ -193,19 +201,23 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         if (left is null || right is null)
             return false;
 
-        if (left.CancellationMode == ProcessCancellationMode.None &&
-            right.CancellationMode != ProcessCancellationMode.None)
+        if (
+            left.CancellationMode == ProcessCancellationMode.None
+            && right.CancellationMode != ProcessCancellationMode.None
+        )
             return false;
-        
-        if (right.CancellationMode == ProcessCancellationMode.None &&
-            left.CancellationMode != ProcessCancellationMode.None)
+
+        if (
+            right.CancellationMode == ProcessCancellationMode.None
+            && left.CancellationMode != ProcessCancellationMode.None
+        )
             return true;
-        
+
         return left.TimeoutThreshold >= right.TimeoutThreshold;
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -215,14 +227,18 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         if (left is null || right is null)
             return false;
 
-        if (left.CancellationMode == ProcessCancellationMode.None &&
-            right.CancellationMode != ProcessCancellationMode.None)
+        if (
+            left.CancellationMode == ProcessCancellationMode.None
+            && right.CancellationMode != ProcessCancellationMode.None
+        )
             return true;
-        
-        if (right.CancellationMode == ProcessCancellationMode.None &&
-            left.CancellationMode != ProcessCancellationMode.None)
+
+        if (
+            right.CancellationMode == ProcessCancellationMode.None
+            && left.CancellationMode != ProcessCancellationMode.None
+        )
             return false;
-            
+
         return left.TimeoutThreshold <= right.TimeoutThreshold;
     }
 }

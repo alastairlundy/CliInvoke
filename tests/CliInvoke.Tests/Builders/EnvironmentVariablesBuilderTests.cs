@@ -1,12 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
 using Bogus;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Builders;
 
 public class EnvironmentVariablesBuilderTests
 {
@@ -100,14 +102,22 @@ public class EnvironmentVariablesBuilderTests
 
         Dictionary<string, string> dictionary = new();
 
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
         while (dictionary.Count < number)
         {
+            if (stopwatch.ElapsedMilliseconds / 1000 > 10)
+                throw new Exception("Took to long to generate test data");
+            
             string key = _faker.Database.Column();
             string value = _faker.Random.Word();
             
             dictionary.TryAdd(key, value);
         }
-
+        
+        stopwatch.Stop();
+        
         ReadOnlyDictionary<string, string> readOnlyDictionary = new ReadOnlyDictionary<string, string>(dictionary);
         
         // Act

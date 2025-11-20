@@ -5,10 +5,10 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
-/// An enum to represent Result Validation states, and whether Result Validation should be performed. 
+/// An enum to represent Result Validation states, and whether Result Validation should be performed.
 /// </summary>
 public enum ProcessResultValidation
 {
@@ -16,6 +16,7 @@ public enum ProcessResultValidation
     /// No validation is performed.
     /// </summary>
     None = 0b0,
+
     /// <summary>
     /// Throws an exception if the Process's Exit code is not zero.
     /// </summary>

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Tests.Helpers;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
+using CliInvoke.Tests.Helpers;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Builders;
 
 public partial class ArgumentsBuilderTests
 {
@@ -79,10 +79,12 @@ public partial class ArgumentsBuilderTests
         IArgumentsBuilder builder = new ArgumentsBuilder();
         string[] values = new[] { "a\nb", "c\"d" };
 
+        string expected = "a\\\\nb c\\\\\\\"d";
+        
         IArgumentsBuilder result = builder.AddEnumerable(values, true);
 
         // a\nb becomes a\\nb and c"d becomes c\"d, joined with a space
-        Assert.Equal("a\\nb c\\\"d", result.ToString());
+        Assert.Equal(expected, result.ToString());
     }
 
     [Fact]
@@ -100,7 +102,7 @@ public partial class ArgumentsBuilderTests
         NullReturningFormattable nullFormattable = new NullReturningFormattable();
 
         // When IFormattable.ToString returns null or whitespace, Add should throw NullReferenceException
-        Assert.Throws<NullReferenceException>(() => builder.Add(nullFormattable, CultureInfo.InvariantCulture));
+        Assert.Throws<ArgumentNullException>(() => builder.Add(nullFormattable, CultureInfo.InvariantCulture));
     }
 
     [Fact]

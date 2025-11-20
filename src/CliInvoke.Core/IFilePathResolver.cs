@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke.Core 
+    AlastairLundy.CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,11 +7,15 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// Defines a contract for a service that resolves file paths.
 /// </summary>
+/// <remarks>
+///  <para> Consumers should not depend on concrete implementations. </para>
+///  <para><b>Note for Implementers:</b> Implementations should return a valid file path or throw <see cref="System.IO.FileNotFoundException"/> if resolution fails.</para>
+/// </remarks>
 public interface IFilePathResolver
 {
     /// <summary>

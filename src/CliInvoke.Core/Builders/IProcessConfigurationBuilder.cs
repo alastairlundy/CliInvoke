@@ -12,10 +12,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace CliInvoke.Core.Builders;
 
 /// <summary>
-/// An interface that defines fluent builder methods for configuring a Process Configuration. 
+/// An interface that defines fluent builder methods for configuring a Process Configuration.
 /// </summary>
 public interface IProcessConfigurationBuilder
 {
@@ -25,7 +25,7 @@ public interface IProcessConfigurationBuilder
     /// <param name="arguments">The arguments to pass to the Process.</param>
     /// <returns>The updated IProcessConfigurationBuilder object with the specified arguments.</returns>
     IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments);
-    
+
     /// <summary>
     /// Sets the arguments to pass to the executable.
     /// </summary>
@@ -40,7 +40,7 @@ public interface IProcessConfigurationBuilder
     /// <param name="arguments">The arguments to pass to the executable.</param>
     /// <returns>The new IProcessConfigurationBuilder object with the specified arguments.</returns>
     IProcessConfigurationBuilder SetArguments(string arguments);
-    
+
     /// <summary>
     /// Sets the Target File Path of the Process Executable.
     /// </summary>
@@ -53,8 +53,10 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="environmentVariables">The environment variables to be configured.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified environment variables.</returns>
-    IProcessConfigurationBuilder SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables);
-    
+    IProcessConfigurationBuilder SetEnvironmentVariables(
+        IReadOnlyDictionary<string, string> environmentVariables
+    );
+
     /// <summary>
     /// Enables using Administrator Privileges.
     /// </summary>
@@ -67,7 +69,7 @@ public interface IProcessConfigurationBuilder
     /// <param name="workingDirectoryPath">The working directory to be used.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified working directory.</returns>
     IProcessConfigurationBuilder SetWorkingDirectory(string workingDirectoryPath);
-    
+
     /// <summary>
     /// Sets the specified Credentials to be used.
     /// </summary>
@@ -109,27 +111,29 @@ public interface IProcessConfigurationBuilder
     /// <param name="source">The source to use for the Standard Input pipe.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Standard Input pipe source.</returns>
     IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source);
-    
+
     /// <summary>
     /// Sets the Standard Output Pipe target.
     /// </summary>
     /// <param name="target">The target to send the Standard Output to.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Standard Output Pipe Target.</returns>
     IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target);
-    
+
     /// <summary>
     /// Sets the Standard Error Pipe target.
     /// </summary>
     /// <param name="target">The target to send the Standard Error to.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Standard Error Pipe Target.</returns>
     IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target);
-    
+
     /// <summary>
     /// Sets the Process Resource Policy to be used for this Process.
     /// </summary>
     /// <param name="processResourcePolicy">The process resource policy to use.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Process Resource Policy.</returns>
-    IProcessConfigurationBuilder SetProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy);
+    IProcessConfigurationBuilder SetProcessResourcePolicy(
+        ProcessResourcePolicy processResourcePolicy
+    );
 
     /// <summary>
     /// Enables or disables Process execution via Shell Execution.
@@ -137,7 +141,7 @@ public interface IProcessConfigurationBuilder
     /// <param name="useShellExecution">Whether to enable or disable shell execution.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified shell execution behaviour.</returns>
     IProcessConfigurationBuilder ConfigureShellExecution(bool useShellExecution);
-    
+
     /// <summary>
     /// Enables or disables Window creation for the wrapped executable.
     /// </summary>
@@ -151,14 +155,14 @@ public interface IProcessConfigurationBuilder
     /// <param name="standardInputEncoding">The encoding type to be used for the Standard Input.</param>
     /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
     IProcessConfigurationBuilder SetStandardInputEncoding(Encoding? standardInputEncoding = null);
-    
+
     /// <summary>
     /// Sets the Encoding types to be used for Standard Output.
     /// </summary>
     /// <param name="standardOutputEncoding">The encoding type to be used for the Standard Output.</param>
     /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
     IProcessConfigurationBuilder SetStandardOutputEncoding(Encoding? standardOutputEncoding = null);
-    
+
     /// <summary>
     /// Sets the Encoding types to be used for Standard Error.
     /// </summary>

@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke  
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,13 +10,12 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
-
 using System.Runtime.Versioning;
 
-namespace AlastairLundy.CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+
+namespace CliInvoke.Builders;
 
 /// <summary>
 /// A class to fluently configure and build ProcessResourcePolicy objects.
@@ -54,20 +53,23 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity)
     {
-        if(processorAffinity < 1)
+        if (processorAffinity < 1)
             throw new ArgumentOutOfRangeException(nameof(processorAffinity));
-        
-        if(processorAffinity > 2 * Environment.ProcessorCount)
+
+        if (processorAffinity > 2 * Environment.ProcessorCount)
             throw new ArgumentOutOfRangeException(nameof(processorAffinity));
-        
-        return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
-            processorAffinity,
+
+        return new ProcessResourcePolicyBuilder(
+            new ProcessResourcePolicy(
+                processorAffinity,
 #pragma warning disable CA1416
-            _processResourcePolicy.MinWorkingSet,
-            _processResourcePolicy.MaxWorkingSet,
+                _processResourcePolicy.MinWorkingSet,
+                _processResourcePolicy.MaxWorkingSet,
 #pragma warning restore CA1416
-            _processResourcePolicy.PriorityClass,
-            _processResourcePolicy.EnablePriorityBoost));
+                _processResourcePolicy.PriorityClass,
+                _processResourcePolicy.EnablePriorityBoost
+            )
+        );
     }
 
     /// <summary>
@@ -88,27 +90,36 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
-        if (minWorkingSet < 0)
-            throw new ArgumentOutOfRangeException(nameof(minWorkingSet));
+        #if NET8_0_OR_GREATER
+        ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet, nameof(minWorkingSet));
+        #else
+        minWorkingSet = Ensure.NotNegative(minWorkingSet);
+        #endif
         
-        if(minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
-            return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+        if (minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
+            return new ProcessResourcePolicyBuilder(
+                new ProcessResourcePolicy(
+#pragma warning disable CA1416
+                    _processResourcePolicy.ProcessorAffinity,
+#pragma warning restore CA1416
+                    minWorkingSet: minWorkingSet,
+                    maxWorkingSet: minWorkingSet,
+                    _processResourcePolicy.PriorityClass,
+                    _processResourcePolicy.EnablePriorityBoost
+                )
+            );
+
+        return new ProcessResourcePolicyBuilder(
+            new ProcessResourcePolicy(
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
                 minWorkingSet: minWorkingSet,
-                maxWorkingSet: minWorkingSet,
+                _processResourcePolicy.MaxWorkingSet,
                 _processResourcePolicy.PriorityClass,
-                _processResourcePolicy.EnablePriorityBoost));
-        
-        return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
-#pragma warning disable CA1416
-            _processResourcePolicy.ProcessorAffinity,
-#pragma warning restore CA1416
-            minWorkingSet: minWorkingSet,
-            _processResourcePolicy.MaxWorkingSet,
-            _processResourcePolicy.PriorityClass,
-            _processResourcePolicy.EnablePriorityBoost));
+                _processResourcePolicy.EnablePriorityBoost
+            )
+        );
     }
 
     /// <summary>
@@ -128,20 +139,24 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
+     //TODO: Migrate to Ensure and ArgumentOutOfRange exception static methods once fixed in Polyfill   
         if (maxWorkingSet < _processResourcePolicy.MinWorkingSet || maxWorkingSet < 1)
             throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-        
-        if(_processResourcePolicy.MinWorkingSet > maxWorkingSet)
+
+        if (_processResourcePolicy.MinWorkingSet > maxWorkingSet)
             throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-        
-        return new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+
+        return new ProcessResourcePolicyBuilder(
+            new ProcessResourcePolicy(
 #pragma warning disable CA1416
-            _processResourcePolicy.ProcessorAffinity,
+                _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
-            _processResourcePolicy.MinWorkingSet,
-            maxWorkingSet,
-            _processResourcePolicy.PriorityClass,
-            _processResourcePolicy.EnablePriorityBoost));
+                _processResourcePolicy.MinWorkingSet,
+                maxWorkingSet,
+                _processResourcePolicy.PriorityClass,
+                _processResourcePolicy.EnablePriorityBoost
+            )
+        );
     }
 
     /// <summary>
@@ -150,16 +165,21 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="processPriorityClass">The Process Priority Class to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated Process Priority Class.</returns>
     [Pure]
-    public IProcessResourcePolicyBuilder SetPriorityClass(ProcessPriorityClass processPriorityClass) =>
-        new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+    public IProcessResourcePolicyBuilder SetPriorityClass(
+        ProcessPriorityClass processPriorityClass
+    ) =>
+        new ProcessResourcePolicyBuilder(
+            new ProcessResourcePolicy(
 #pragma warning disable CA1416
-            _processResourcePolicy.ProcessorAffinity,
-            _processResourcePolicy.MinWorkingSet,
-            _processResourcePolicy.MaxWorkingSet,
+                _processResourcePolicy.ProcessorAffinity,
+                _processResourcePolicy.MinWorkingSet,
+                _processResourcePolicy.MaxWorkingSet,
 #pragma warning restore CA1416
-            processPriorityClass,
-            _processResourcePolicy.EnablePriorityBoost));
-    
+                processPriorityClass,
+                _processResourcePolicy.EnablePriorityBoost
+            )
+        );
+
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Priority Boost behaviour.
     /// </summary>
@@ -167,15 +187,18 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated priority boost behaviour.</returns>
     [Pure]
     public IProcessResourcePolicyBuilder ConfigurePriorityBoost(bool enablePriorityBoost) =>
-        new ProcessResourcePolicyBuilder(new ProcessResourcePolicy(
+        new ProcessResourcePolicyBuilder(
+            new ProcessResourcePolicy(
 #pragma warning disable CA1416
-            _processResourcePolicy.ProcessorAffinity,
-            _processResourcePolicy.MinWorkingSet,
-            _processResourcePolicy.MaxWorkingSet,
+                _processResourcePolicy.ProcessorAffinity,
+                _processResourcePolicy.MinWorkingSet,
+                _processResourcePolicy.MaxWorkingSet,
 #pragma warning restore CA1416
-            _processResourcePolicy.PriorityClass,
-            enablePriorityBoost));
-    
+                _processResourcePolicy.PriorityClass,
+                enablePriorityBoost
+            )
+        );
+
     /// <summary>
     /// Builds the configured ProcessResourcePolicy
     /// </summary>

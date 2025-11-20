@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke 
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,68 +11,71 @@ using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Internal.Localizations;
-
-#if NETSTANDARD2_0
-using OperatingSystem = Polyfills.OperatingSystemPolyfill;
-#endif
+using CliInvoke.Core;
+using CliInvoke.Internal.Localizations;
 
 // ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Helpers.Processes;
+namespace CliInvoke.Helpers.Processes;
 
 /// <summary>
-/// 
+///
 /// </summary>
 internal static class ProcessSetPolicyExtensions
 {
-    /// <summary>
-    /// Applies a ProcessResourcePolicy to a Process.
-    /// </summary>
     /// <param name="process">The process to apply the policy to.</param>
-    /// <param name="resourcePolicy">The process resource policy to be applied.</param>
-    /// <exception cref="InvalidOperationException"></exception>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
-    internal static void SetResourcePolicy(this Process process, ProcessResourcePolicy? resourcePolicy)
+    extension(Process process)
     {
-        resourcePolicy ??= ProcessResourcePolicy.Default;
-
-        if (process.HasStarted() == false)
-            throw new InvalidOperationException(Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
-        
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        /// <summary>
+        /// Applies a ProcessResourcePolicy to a Process.
+        /// </summary>
+        /// <param name="resourcePolicy">The process resource policy to be applied.</param>
+        /// <exception cref="InvalidOperationException"></exception>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("android")]
+        internal void SetResourcePolicy(ProcessResourcePolicy? resourcePolicy)
         {
-            if (resourcePolicy.ProcessorAffinity is not null)
-            {
-                process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
-            }
-        }
+            resourcePolicy ??= ProcessResourcePolicy.Default;
 
-        if (OperatingSystem.IsMacOS() ||
-            OperatingSystem.IsMacCatalyst() ||
-            OperatingSystem.IsFreeBSD() ||
-            OperatingSystem.IsWindows())
-        {
-            if (resourcePolicy.MinWorkingSet is not null)
+            if (process.HasStarted() == false)
+                throw new InvalidOperationException(
+                    Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
+                );
+
+            if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
             {
-                process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
+                if (resourcePolicy.ProcessorAffinity is not null)
+                {
+                    process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
+                }
             }
 
-            if (resourcePolicy.MaxWorkingSet is not null)
+            if (
+                OperatingSystem.IsMacOS()
+                || OperatingSystem.IsMacCatalyst()
+                || OperatingSystem.IsFreeBSD()
+                || OperatingSystem.IsWindows()
+            )
             {
-                process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
+                if (resourcePolicy.MinWorkingSet is not null)
+                {
+                    process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
+                }
+
+                if (resourcePolicy.MaxWorkingSet is not null)
+                {
+                    process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
+                }
             }
+
+            process.PriorityClass = resourcePolicy.PriorityClass;
+            process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
         }
-        
-        process.PriorityClass = resourcePolicy.PriorityClass;
-        process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
     }
 }

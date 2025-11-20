@@ -1,15 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Security;
-
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
-
 using Bogus;
+using CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
 using Xunit;
+
 // ReSharper disable JoinDeclarationAndInitializer
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Builders;
 
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class UserCredentialBuilderTests

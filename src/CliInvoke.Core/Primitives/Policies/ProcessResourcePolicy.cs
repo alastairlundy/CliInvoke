@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.DotPrimitives 
+    AlastairLundy.DotPrimitives
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,12 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A class that defines a Process' resource configuration.
@@ -27,44 +26,46 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="maxWorkingSet">The Maximum Working Set Size for the Process.</param>
     /// <param name="priorityClass">The priority class to assign to the Process.</param>
     /// <param name="enablePriorityBoost">Whether to enable Priority Boost if the process window enters focus.</param>
-    public ProcessResourcePolicy(IntPtr? processorAffinity = null,
-        nint? minWorkingSet = null, 
+    public ProcessResourcePolicy(
+        IntPtr? processorAffinity = null,
+        nint? minWorkingSet = null,
         nint? maxWorkingSet = null,
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
-        bool enablePriorityBoost = false)
+        bool enablePriorityBoost = false
+    )
     {
-        if(minWorkingSet is not null)
+        if (minWorkingSet is not null)
             if (minWorkingSet < 0)
                 throw new ArgumentOutOfRangeException(nameof(minWorkingSet));
-        
+
         if (minWorkingSet is not null && maxWorkingSet is not null)
         {
             if (maxWorkingSet < minWorkingSet || maxWorkingSet < 1)
                 throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-        
-            if(minWorkingSet > maxWorkingSet)
+
+            if (minWorkingSet > maxWorkingSet)
                 throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
         }
 
         if (processorAffinity is not null)
         {
 #if NETSTANDARD2_0
-            if(processorAffinity < (nint)1)
+            if (processorAffinity < (nint)1)
 #else
-            if(processorAffinity < 1)
+            if (processorAffinity < 1)
 #endif
                 throw new ArgumentOutOfRangeException(nameof(processorAffinity));
-        
-            if(processorAffinity > (nint)2 * Environment.ProcessorCount)
+
+            if (processorAffinity > (nint)2 * Environment.ProcessorCount)
                 throw new ArgumentOutOfRangeException(nameof(processorAffinity));
         }
-        
+
 #pragma warning disable CA1416
         MinWorkingSet = minWorkingSet;
         MaxWorkingSet = maxWorkingSet;
         ProcessorAffinity = processorAffinity;
 #pragma warning restore CA1416
-        
+
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
     }
@@ -76,7 +77,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     public IntPtr? ProcessorAffinity { get; }
-    
+
     /// <summary>
     /// The priority class to assign to the Process.
     /// </summary>
@@ -86,7 +87,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// Whether to enable Priority Boost if/when the main window of the Process enters focus.
     /// </summary>
     public bool EnablePriorityBoost { get; }
-    
+
     /// <summary>
     /// The Minimum Working Set size to be used for the Process.
     /// </summary>
@@ -98,12 +99,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
     public nint? MinWorkingSet { get; }
-    
+
     /// <summary>
     /// Maximum Working Set size to be used for the Process.
     /// </summary>
     /// <remarks>This property is not supported on Linux-based operating systems.</remarks>
-
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -111,7 +111,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
     public nint? MaxWorkingSet { get; }
-    
+
     /// <summary>
     /// Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
@@ -126,11 +126,13 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     {
         if (other is null)
             return false;
-            
+
 #pragma warning disable CA1416
-        return ProcessorAffinity == other.ProcessorAffinity && PriorityClass == other.PriorityClass &&
-               EnablePriorityBoost == other.EnablePriorityBoost && MinWorkingSet == other.MinWorkingSet &&
-               MaxWorkingSet == other.MaxWorkingSet;
+        return ProcessorAffinity == other.ProcessorAffinity
+            && PriorityClass == other.PriorityClass
+            && EnablePriorityBoost == other.EnablePriorityBoost
+            && MinWorkingSet == other.MinWorkingSet
+            && MaxWorkingSet == other.MaxWorkingSet;
 #pragma warning restore CA1416
     }
 
@@ -160,8 +162,13 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        return HashCode.Combine(ProcessorAffinity, (int)PriorityClass,
-            EnablePriorityBoost, MinWorkingSet, MaxWorkingSet);
+        return HashCode.Combine(
+            ProcessorAffinity,
+            (int)PriorityClass,
+            EnablePriorityBoost,
+            MinWorkingSet,
+            MaxWorkingSet
+        );
 #pragma warning restore CA1416
     }
 
@@ -175,7 +182,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     {
         if (left is null || right is null)
             return false;
-            
+
         return left.Equals(right);
     }
 
@@ -185,8 +192,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="left">A Process Resource Policy to be compared.</param>
     /// <param name="right">The other  Process Resource Policy to be compared.</param>
     /// <returns>True if both  Process Resource Policies are equal to each other; false otherwise.</returns>
-    public static bool operator ==(ProcessResourcePolicy? left, ProcessResourcePolicy? right) 
-        => Equals(left, right);
+    public static bool operator ==(ProcessResourcePolicy? left, ProcessResourcePolicy? right) =>
+        Equals(left, right);
 
     /// <summary>
     /// Determines if a Process Resource Policy is not equal to another Process Resource Policy.
@@ -194,6 +201,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="left">A Process Resource Policy to be compared.</param>
     /// <param name="right">The other Process Resource Policy to be compared.</param>
     /// <returns>True if both Process Resource Policies are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right) 
-        => Equals(left, right) == false;
+    public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right) =>
+        Equals(left, right) == false;
 }

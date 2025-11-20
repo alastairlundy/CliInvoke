@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// Specifies the behaviour for handling exceptions when a process cancellation occurs.
@@ -18,10 +18,12 @@ public enum ProcessCancellationExceptionBehavior
     /// No validation is performed.
     /// </summary>
     SuppressException = 0,
+
     /// <summary>
     /// Allow .NET to throw the exception if the cancellation succeeds.
     /// </summary>
     AllowException,
+
     /// <summary>
     /// Allows the exception if the cancellation is unexpected.
     /// </summary>

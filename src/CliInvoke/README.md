@@ -6,8 +6,6 @@
 [![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
-<img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
-
 CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
 
 Launch processes, redirect standard input and output streams, await process completion and much more.
