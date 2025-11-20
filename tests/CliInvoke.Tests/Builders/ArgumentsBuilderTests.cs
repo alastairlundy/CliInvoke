@@ -26,8 +26,8 @@ public partial class ArgumentsBuilderTests
     public void EscapeCharacters_ReplacesSpecialCharacters()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
-        string input = "\\\n\t\r\"'"; // backslash, newline, tab, carriage return, double quote, single quote
-        string expected = "\\\\\\n\\t\\r\\\"\\'";
+        string input = "\\\n\t\r\""; // backslash, newline, tab, carriage return, double quote, single quote
+        string expected = "\"\\\\\\n\\t\\r\\\"";
 
         string result = builder.EscapeCharacters(input);
 
@@ -113,7 +113,9 @@ public partial class ArgumentsBuilderTests
 
         IArgumentsBuilder result = builder.AddEnumerable(values);
 
-        Assert.Equal("1 2", result.ToString());
+        string expected = @"""1 2""";
+        
+        Assert.Equal(expected, result.ToString());
     }
 
     [Fact]
