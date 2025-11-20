@@ -47,7 +47,7 @@ Launch processes, redirect standard input and output streams, await process comp
 
 Notes:
 - *Indicates not explicitly advertised for all listed OSes but may work in practice; check each project's docs.
-- The CliWrap repository includes a test project that references a source‑available (non‑permissive) library; that library is used for tests and is not distributed with the runtime package. The repo also contains an informal "Terms of Use" statement — review repository files if legal certainty is required.
+- The CliWrap repository includes a test project that references a source‑available (non‑open source) library; that library is used for tests and is not distributed with the runtime package. The repo also contains an informal "Terms of Use" statement — review repository files if legal certainty is required.
 
 
 ## Installing CliInvoke
