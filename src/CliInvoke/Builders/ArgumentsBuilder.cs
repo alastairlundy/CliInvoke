@@ -17,15 +17,15 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Internal.Localizations;
+using CliInvoke.Core.Builders;
+using CliInvoke.Internal.Localizations;
 
 // ReSharper disable ConvertClosureToMethodGroup
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Builders;
+namespace CliInvoke.Builders;
 
 /// <summary>
 /// A class that provides a fluent interface style builder for constructing Arguments to provide to a program.
@@ -209,12 +209,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
 #endif
         
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
-
-#if NETSTANDARD2_0
-        string value = StringPolyfill.Join(' ', valuesStrings);
-#else
+        
         string value = string.Join(' ', valuesStrings);
-#endif
         
         return Add(value, escapeSpecialChars);
     }
