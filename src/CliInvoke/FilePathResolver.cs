@@ -97,8 +97,8 @@ public class FilePathResolver : IFilePathResolver
             return fileExists;
         }
 
-        string[] pathExtensions = PathVariable.GetPathFileExtensions();
-        string[]? pathContents = PathVariable.GetContents();
+        string[] pathExtensions = PathEnvironmentVariable.GetPathFileExtensions();
+        string[]? pathContents = PathEnvironmentVariable.GetDirectories();
         
         if(pathContents is null)
         {
