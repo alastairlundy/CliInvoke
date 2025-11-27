@@ -79,7 +79,7 @@ public partial class ArgumentsBuilderTests
         IArgumentsBuilder builder = new ArgumentsBuilder();
         string[] values = new[] { "a\nb", "c\"d" };
 
-        string expected = "a\\\\nb c\\\\\\\"d";
+        string expected = "\\\"a\\\\nbc\\\\\\\"d\\\"";
         
         IArgumentsBuilder result = builder.AddEnumerable(values, true);
 
