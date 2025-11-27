@@ -54,11 +54,14 @@ public class FilePathResolver : IFilePathResolver
         if (Path.IsPathRooted(filePathToResolve))
         {
             filePath = filePathToResolve;
+            
+            if(ExecutableFileCheck(filePathToResolve))
+                return filePath;
         }
         
         bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out filePath);
 
-        if (filePath is not null)
+        if (filePath is not null && resolveFromPath)
         {
             bool isExecutable = ExecutableFileCheck(filePathToResolve);
 
