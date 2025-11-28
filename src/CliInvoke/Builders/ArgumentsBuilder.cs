@@ -80,11 +80,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-#else
-        value = Ensure.NotNull(value);
-#endif
+        ArgumentNullException.ThrowIfNull(value);
 
         if (IsValidArgument(value) == false)
             throw new ArgumentNullException(nameof(value));
@@ -135,11 +131,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(values, nameof(values));
-#else
-        values = Ensure.NotNull(values);
-#endif
+        ArgumentNullException.ThrowIfNull(values);
         
         if (escapeSpecialChars)
             values = values.Select(x => EscapeCharacters(x));
@@ -176,13 +168,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
         bool escapeSpecialChars = true
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
-#else
-        value = Ensure.NotNull(value);
-        formatProvider = Ensure.NotNull(formatProvider);
-#endif
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(formatProvider);
         
         if (IsValidArgument(value, formatProvider) != true)
             throw new ArgumentNullException(nameof(value));
@@ -218,13 +205,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
         bool escapeSpecialChars = true
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(values, nameof(values));
-        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
-#else
-        values = Ensure.NotNull(values);
-        formatProvider = Ensure.NotNull(formatProvider);
-#endif
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(formatProvider);
         
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
 

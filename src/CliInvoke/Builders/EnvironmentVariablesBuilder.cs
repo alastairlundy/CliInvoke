@@ -52,12 +52,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         bool throwExceptionIfDuplicateKeyFound = true
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(stringComparer, nameof(stringComparer));
-#else
-        stringComparer = Ensure.NotNull(stringComparer);
-#endif
-        
+        ArgumentNullException.ThrowIfNull(stringComparer);
+
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
         _environmentVariables = new Dictionary<string, string>(_stringComparer);
@@ -75,13 +71,9 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         bool throwExceptionIfDuplicateKeyFound
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(vars, nameof(vars));
-        ArgumentNullException.ThrowIfNull(stringComparer, nameof(stringComparer));
-#else
-        vars = Ensure.NotNull(vars);
-        stringComparer = Ensure.NotNull(stringComparer);
-#endif
+        ArgumentNullException.ThrowIfNull(vars);
+        ArgumentNullException.ThrowIfNull(stringComparer);
+
         _environmentVariables = new Dictionary<string, string>(vars, _stringComparer);
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
@@ -96,13 +88,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     [Pure]
     public IEnvironmentVariablesBuilder SetPair(string name, string value)
     {
-#if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentException.ThrowIfNullOrEmpty(value);
-#else
-        name = Ensure.NotNullOrEmpty(name);
-        value = Ensure.NotNullOrWhiteSpace(value);
-#endif
         
         Dictionary<string, string> output = new(_environmentVariables);
 
@@ -129,11 +116,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         IEnumerable<KeyValuePair<string, string>> variables
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(variables, nameof(variables));
-#else
-        variables = Ensure.NotNull(variables);
-#endif
+        ArgumentNullException.ThrowIfNull(variables);
+
         Dictionary<string, string> output = new Dictionary<string, string>(
             _environmentVariables,
             StringComparer.Ordinal
