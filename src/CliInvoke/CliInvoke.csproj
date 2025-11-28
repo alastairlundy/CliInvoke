@@ -99,4 +99,9 @@
         <Link>icon.png</Link>
       </None>
     </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="AlastairLundy.DotExtensions" Version="9.1.0" />
+      <PackageReference Include="AlastairLundy.DotPrimitives" Version="4.0.0" />
+    </ItemGroup>
 </Project>
