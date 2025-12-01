@@ -88,7 +88,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <summary>
     /// A null UserCredential instance.
     /// </summary>
-    public static UserCredential Null { get; } = new UserCredential();
+    public static UserCredential Null { get; } = new(null, null, null, null);
 
     /// <summary>
     /// Disposes of the Password SecureString and other UserCredential values.
@@ -189,5 +189,5 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <param name="right">The other <see cref="UserCredential"/> to be compared.</param>
     /// <returns>True if both <see cref="UserCredential"/> objects are not equal to each other; false otherwise.</returns>
     public static bool operator !=(UserCredential? left, UserCredential? right) =>
-        Equals(left, right) == false;
+        !Equals(left, right);
 }

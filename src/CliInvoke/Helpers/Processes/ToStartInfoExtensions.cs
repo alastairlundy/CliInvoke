@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Linq;
 
 using CliInvoke.Core;
-using CliInvoke.Internal.Localizations;
 
 namespace CliInvoke.Helpers.Processes;
 
@@ -32,6 +31,8 @@ internal static class ToStartInfoExtensions
         bool redirectStandardError
     )
     {
+        ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath);
+
         ProcessStartInfo processStartInfo = new ProcessStartInfo()
         {
             FileName = processConfiguration.TargetFilePath,
@@ -40,17 +41,14 @@ internal static class ToStartInfoExtensions
                 : processConfiguration.Arguments,
             WorkingDirectory = processConfiguration.WorkingDirectoryPath,
             UseShellExecute = processConfiguration.UseShellExecution,
-            CreateNoWindow = processConfiguration.WindowCreation == false,
+            CreateNoWindow = !processConfiguration.WindowCreation,
             RedirectStandardInput =
                 processConfiguration.StandardInput is not null
                 && processConfiguration.RedirectStandardInput,
             RedirectStandardOutput = redirectStandardOutput,
             RedirectStandardError = redirectStandardError,
         };
-
-        if (string.IsNullOrEmpty(processConfiguration.TargetFilePath))
-            throw new ArgumentException(Resources.Exceptions_TargetFile_NullOrEmpty);
-
+        
         if (processConfiguration.RequiresAdministrator)
             processStartInfo.RunAsAdministrator();
 

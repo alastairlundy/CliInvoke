@@ -34,21 +34,21 @@ Key Abstractions:
 
 ## Comparison vs Alternatives
 
-| Feature / Criterion                                                   | CliInvoke | [CliWrap](https://github.com/Tyrrrz/CliWrap/) | [ProcessX](https://github.com/Cysharp/ProcessX) |
-|------------------------------------------------------------------------|:---------:|:-------:|:--------:|
-| Dedicated builder, model, and invoker types (clear separation of concerns) | ✅        | ❌     | ❌      |
-| Dependency Injection registration extensions                           | ✅        | ❌     | ❌      |
-| Installable via NuGet                                                  | ✅        | ✅     | ✅      |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)  | ✅        | ✅*    | ❌*     |
-| Buffered and non‑buffered execution modes                              | ✅        | ✅     | ✅      |
-| Small surface area and minimal dependencies                            | ✅        | ✅     | ✅      |
-| Licensing / repository additional terms                                | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) | ✅ (MIT) |
+| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   | [ProcessX](https://github.com/Cysharp/ProcessX) |
+|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------:|
+| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                        ❌                        |
+| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                         |                        ❌                        |
+| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                        ✅                        |
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                       ❌*                        |
+| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                        ✅                        |
+| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                        ✅                        |
+| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |
 
 ## Installing CliInvoke.Core
 CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your IDE or code editor's package interface, or via the Nuget website.
 
-| Package Name                 | Nuget Link                                                                                    | .NET SDK CLI command                                |
-|------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| Package Name   | Nuget Link                                                        | .NET SDK CLI command                  |
+|----------------|-------------------------------------------------------------------|---------------------------------------|
 | CliInvoke.Core | [CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core) | ``dotnet add package CliInvoke.Core`` |
 
 ## Supported Platforms
@@ -69,7 +69,6 @@ This example gets a non buffered ``ProcessResult`` that contains basic process e
 ```csharp
 using CliInvoke.Core.Factories;
 using CliInvoke.Core;
-using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -94,7 +93,6 @@ This example gets a ``BufferedProcessResult`` which contains redirected Standard
 ```csharp
 using CliInvoke.Core.Factories;
 using CliInvoke.Core;
-using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
 

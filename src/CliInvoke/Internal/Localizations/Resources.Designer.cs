@@ -123,9 +123,9 @@ namespace CliInvoke.Internal.Localizations {
             }
         }
         
-        internal static string Exceptions_TargtFile_NotExecutable {
+        internal static string Exceptions_TargetFile_NotExecutable {
             get {
-                return ResourceManager.GetString("Exceptions.TargtFile.NotExecutable", resourceCulture);
+                return ResourceManager.GetString("Exceptions.TargetFile.NotExecutable", resourceCulture);
             }
         }
     }
