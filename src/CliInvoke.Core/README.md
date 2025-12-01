@@ -1,12 +1,12 @@
 # CliInvoke.Core
 This package contains Process Running and handling abstractions as well as common types used by implementing classes.
 
-For an implementing package, check out [CliInvoke](https://www.nuget.org/packages/AlastairLundy.CliInvoke/).
+For an implementing package, check out [CliInvoke](https://www.nuget.org/packages/CliInvoke/).
 
 <!-- Badges -->
-[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
-[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
-[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.Core.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke.Core/)
+[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.Core.svg)](https://www.nuget.org/packages/CliInvoke.Core/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.Core.svg)](https://www.nuget.org/packages/CliInvoke.Core/)
+[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.Core.svg)](https://www.nuget.org/packages/CliInvoke.Core/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 Key Abstractions:
@@ -32,22 +32,24 @@ Key Abstractions:
 
 <sup>1</sup> Specializations library distributed separately.
 
-## Why CliInvoke?
+## Comparison vs Alternatives
 
-| Feature                                                                | CliInvoke | CliWrap |                ProcessX                 |
-|------------------------------------------------------------------------|:---------:|:-------:|:---------------------------------------:|
-| Configure and Run External Processes using code written in .NET        |     ✅     |    ✅    | ❌, Uses mixture of .NET and BASH syntax |
-| No Additional Licensing Terms Required for Use                         |     ✅     |    ❌    |                    ✅                    |
-| Uses only managed .NET code                                            |     ✅     |    ❌    |                    ✅                    |
-| Follows Separation of Concerns and the Single Responsibility Principle |     ✅     |    ❌    |                    ❌                    |
-| Allows for alternative Process Runners to be specified and/or used     |     ✅     |    ❌    |                    ❌                    |
+| Feature / Criterion                                                   | CliInvoke | [CliWrap](https://github.com/Tyrrrz/CliWrap/) | [ProcessX](https://github.com/Cysharp/ProcessX) |
+|------------------------------------------------------------------------|:---------:|:-------:|:--------:|
+| Dedicated builder, model, and invoker types (clear separation of concerns) | ✅        | ❌     | ❌      |
+| Dependency Injection registration extensions                           | ✅        | ❌     | ❌      |
+| Installable via NuGet                                                  | ✅        | ✅     | ✅      |
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)  | ✅        | ✅*    | ❌*     |
+| Buffered and non‑buffered execution modes                              | ✅        | ✅     | ✅      |
+| Small surface area and minimal dependencies                            | ✅        | ✅     | ✅      |
+| Licensing / repository additional terms                                | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) | ✅ (MIT) |
 
 ## Installing CliInvoke.Core
 CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your IDE or code editor's package interface, or via the Nuget website.
 
 | Package Name                 | Nuget Link                                                                                    | .NET SDK CLI command                                |
 |------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| AlastairLundy.CliInvoke.Core | [AlastairLundy.CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core) | ``dotnet add package AlastairLundy.CliInvoke.Core`` |
+| CliInvoke.Core | [CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core) | ``dotnet add package CliInvoke.Core`` |
 
 ## Supported Platforms
 CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
@@ -65,8 +67,8 @@ It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` opt
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core.Factories;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core;
 using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -90,8 +92,8 @@ ProcessResult result = await _invoker.ExecuteAsync(configuration, CancellationTo
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core.Factories;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core;
 using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -120,11 +122,11 @@ The following examples shows how to configure and build a ``ProcessConfiguration
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke;
+using CliInvoke.Core;
 
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -150,11 +152,11 @@ ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Builders;
+using CliInvoke;
+using CliInvoke.Builders;
 
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
 
 using Microsoft.Extensions.DependencyInjection;
 

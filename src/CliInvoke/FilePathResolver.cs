@@ -13,10 +13,15 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
 
-using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.DotExtensions.IO.Permissions;
+using AlastairLundy.DotPrimitives.IO.Paths;
+
+using CliInvoke.Core;
+using CliInvoke.Internal.Localizations;
+
 // ReSharper disable ConvertClosureToMethodGroup
 
-namespace AlastairLundy.CliInvoke;
+namespace CliInvoke;
 
 /// <summary>
 /// An implementation of IFilePathResolver, a service that resolves file paths.
@@ -43,16 +48,35 @@ public class FilePathResolver : IFilePathResolver
         #if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrEmpty(filePathToResolve,  nameof(filePathToResolve));
         #endif
-        
-        if (Path.IsPathRooted(filePathToResolve))
-            return filePathToResolve;
-        
-        bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out string? filePath);
 
-        if (resolveFromPath && filePath is not null)
-            return filePath;
+        string? filePath;
+
+        if (Path.IsPathRooted(filePathToResolve))
+        {
+            filePath = filePathToResolve;
+            
+            if(ExecutableFileCheck(filePathToResolve))
+                return filePath;
+        }
+        
+        bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out filePath);
+
+        if (filePath is not null && resolveFromPath)
+        {
+            bool isExecutable = ExecutableFileCheck(filePathToResolve);
+
+            if (isExecutable)
+                return filePath;
+        }
         
         return LocateFileFromDirectory(filePathToResolve);
+    }
+
+    private bool ExecutableFileCheck(string fileName)
+    {
+        FileInfo file =  new FileInfo(fileName);
+
+        return file.HasExecutePermission() ? true : throw new ArgumentException(Resources.Exceptions_TargtFile_NotExecutable);
     }
 
     [SupportedOSPlatform("windows")]
@@ -76,17 +100,10 @@ public class FilePathResolver : IFilePathResolver
             return fileExists;
         }
 
-        string[] pathExtensions;
-        string[] pathContents;
+        string[] pathExtensions = PathEnvironmentVariable.GetPathFileExtensions();
+        string[]? pathContents = PathEnvironmentVariable.GetDirectories();
         
-        if (GetPathInfo(out string[]? pathExtensionsInfo,
-                out string[]? pathContentsInfo) && pathExtensionsInfo is not null &&
-            pathContentsInfo is not null)
-        {
-            pathContents = pathContentsInfo;
-            pathExtensions = pathExtensionsInfo;
-        }
-        else
+        if(pathContents is null)
         {
             resolvedFilePath = null;
             return false;
@@ -124,64 +141,6 @@ public class FilePathResolver : IFilePathResolver
         
         resolvedFilePath = null;
         return false;
-    }
-
-    protected static bool GetPathInfo(out string[]? pathExtensions, out string[]? pathContents)
-    {
-        char pathSeparator;
-        string? pathContentsStr;
-        
-        if (OperatingSystem.IsWindows())
-        {
-            pathSeparator = ';';
-            pathContentsStr = Environment.GetEnvironmentVariable("PATH");
-            pathExtensions = Environment.GetEnvironmentVariable("PATHEXT")?
-                .Split(pathSeparator, StringSplitOptions.RemoveEmptyEntries)
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(ext =>
-                {
-                    ext = ext.Trim();
-                    ext = ext.Trim('"');
-
-                    if (ext.StartsWith('.') == false)
-                        ext = ext.Insert(0, ".");
-
-                    return ext;
-                })
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray() ?? [".com", ".exe", ".bat", ".cmd"];
-
-        }
-        else if(!OperatingSystem.IsIOS() && !OperatingSystem.IsBrowser() && !OperatingSystem.IsTvOS())
-        {
-            pathSeparator = ':';
-            pathContentsStr = Environment.GetEnvironmentVariable("PATH");
-            pathExtensions = ["", ".sh"];
-        }
-        else
-        {
-            throw new PlatformNotSupportedException();
-        }
-
-        if (pathContentsStr is null)
-        {
-            pathContents = null;
-            return false;
-        }
-
-        pathContents = pathContentsStr
-            .Split(pathSeparator, StringSplitOptions.RemoveEmptyEntries)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Select(p =>
-            {
-                p = p.Trim();
-                p = Environment.ExpandEnvironmentVariables(p);
-                p = p.Trim('"');
-
-                return p;
-            })
-            .ToArray();
-        return true;
     }
 
     private static string LocateFileFromDirectory(string filePathToResolve)
@@ -226,8 +185,16 @@ public class FilePathResolver : IFilePathResolver
        
         foreach (string file in files)
         {
-            if (Path.GetFileName(file).Equals(filePathToResolve, StringComparison.InvariantCulture))
-                return file;
+            if (Path.GetFileName(file).Equals(filePathToResolve,
+                    StringComparison.InvariantCulture))
+            {
+                FileInfo fileInfo = new FileInfo(file);
+                
+                if(fileInfo.HasExecutePermission())
+                    return file;
+                
+                throw new ArgumentException(Resources.Exceptions_TargtFile_NotExecutable);
+            }
         }
 
         throw new FileNotFoundException(filePathToResolve);

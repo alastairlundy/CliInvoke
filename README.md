@@ -1,9 +1,9 @@
 # CliInvoke
 
 <!-- Badges -->
-[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
-[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
-[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
+[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
+[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 <img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
@@ -47,7 +47,7 @@ Launch processes, redirect standard input and output streams, await process comp
 
 Notes:
 - *Indicates not explicitly advertised for all listed OSes but may work in practice; check each project's docs.
-- The CliWrap repository includes a test project that references a source‑available (non‑permissive) library; that library is used for tests and is not distributed with the runtime package. The repo also contains an informal "Terms of Use" statement — review repository files if legal certainty is required.
+- The CliWrap repository includes a test project that references a source‑available (non‑open source) library; that library is used for tests and is not distributed with the runtime package. The repo also contains an informal "Terms of Use" statement — review repository files if legal certainty is required.
 
 
 ## Installing CliInvoke
@@ -59,16 +59,16 @@ The package(s) to install depends on your use case:
 
 | Project type / Need                                                         | Packages to install (dotnet add package ...)                                                                 | Notes |
 |------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|-------|
-| Library author (provide abstractions only)                                   | `AlastairLundy.CliInvoke.Core`                                                                                | Only the Core (abstractions) package — consumers can choose implementations. |
-| Library or app that needs concrete builders / implementations                | `AlastairLundy.CliInvoke.Core`, `AlastairLundy.CliInvoke`                                                      | Implementation package plus Core for models/abstractions. |
-| Desktop or Console application (common case — use DI & convenience helpers)  | `AlastairLundy.CliInvoke.Core`, `AlastairLundy.CliInvoke`, `AlastairLundy.CliInvoke.Extensions`                | Includes DI registration and convenience extensions for easy setup. |
-| Any project that needs platform‑specific or shell specializations (optional) | `AlastairLundy.CliInvoke.Specializations` (install in addition to the packages above as needed)               | Adds Cmd/PowerShell and other specializations; include only when required. |
+| Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                                | Only the Core (abstractions) package — consumers can choose implementations. |
+| Library or app that needs concrete builders / implementations                | `CliInvoke.Core`, `CliInvoke`                                                      | Implementation package plus Core for models/abstractions. |
+| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions`                | Includes DI registration and convenience extensions for easy setup. |
+| Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed)               | Adds Cmd/PowerShell and other specializations; include only when required. |
 
 ### Links to packages
-[CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core)
-[CliInvoke Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke)
-[CliInvoke.Extensions Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensions)
-[CliInvoke.Specializations Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations)
+[CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core)
+[CliInvoke Nuget](https://nuget.org/packages/CliInvoke)
+[CliInvoke.Extensions Nuget](https://nuget.org/packages/CliInvoke.Extensions)
+[CliInvoke.Specializations Nuget](https://nuget.org/packages/CliInvoke.Specializations)
 
 ## Supported Platforms
 CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
@@ -80,8 +80,8 @@ For more details see the [list of supported platforms](docs/docs/Supported-Opera
 Install the packages you need (example: implementation + DI extensions):
 
 ```bash
-dotnet add package AlastairLundy.CliInvoke
-dotnet add package AlastairLundy.CliInvoke.Extensions
+dotnet add package CliInvoke
+dotnet add package CliInvoke.Extensions
 ```
 
 Minimal Program.cs (console app) — registers services, builds a simple process configuration, and runs it buffered:
@@ -91,16 +91,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Factories;
+using CliInvoke;
+using CliInvoke.Core;
+using CliInvoke.Core.Factories;
 
 class Program
 {
     static async Task Main()
     {
         var services = new ServiceCollection();
-        services.AddCliInvoke(); // from AlastairLundy.CliInvoke.Extensions
+        services.AddCliInvoke(); // from CliInvoke.Extensions
         var provider = services.BuildServiceProvider();
 
         var factory = provider.GetRequiredService<IProcessConfigurationFactory>();
@@ -136,8 +136,8 @@ It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` opt
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, Id, and other information.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core.Factories;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core;
 using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -159,8 +159,8 @@ ProcessResult result = await _invoker.ExecuteAsync(configuration, CancellationTo
 This example gets a ``BufferedProcessResult`` which contains redirected Standard Output and Standard Error as strings.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core.Factories;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -186,11 +186,11 @@ The following examples show how to configure and build a ``ProcessConfiguration`
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke;
+using CliInvoke.Core;
 
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -216,11 +216,11 @@ ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Builders;
+using CliInvoke;
+using CliInvoke.Builders;
 
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -271,15 +271,20 @@ Future updates may focus on one or more of the following:
 * New features
 * Enhancing existing features
 
+## New vs Old Package and Namespace
+CliInvoke changed it's Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has since been published directly under the ``CliInvoke`` package Id prefix and namespace.
+
+The previous packages Ids are marked as deprecated and will not receive future updates.
+
 ## License
 CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
 If you use CliInvoke in your project please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses TXT file or as a separate TXT file in the project's repository.
 
 ### CliInvoke Assets
-CliInvoke's Icon is proprietary with all rights reserved to me (Alastair Lundy).
+CliInvoke's Icon is owned by and has all rights reserved to me (Alastair Lundy).
 
-If you fork CliInvoke and re-distribute it, please replace the usage of the icon unless you have prior written approval from me. 
+If you fork CliInvoke and re-distribute it, please replace the icon unless you have prior written approval from me. 
 
 ## Acknowledgements
 

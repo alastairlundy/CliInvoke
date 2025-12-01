@@ -1,15 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.WhatExecLib.Detectors;
-using AlastairLundy.WhatExecLib.Locators;
+﻿using System.Diagnostics;
+
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using CliInvoke.Benchmarking.Data;
 using CliInvoke.Benchmarking.Helpers;
+using CliInvoke.Core;
+
 using CliWrap;
 using CliWrap.Buffered;
 using Cysharp.Diagnostics;
@@ -20,59 +16,58 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 public class BufferedInvokationBenchmark
 {
     private readonly IProcessInvoker _processInvoker;
-    
-    private string _mockDataSimFilePath;
 
-    private const string MockDataSimArguments = "gen-fake-data";
-    
+    private BufferedTestHelper _bufferedTestHelper;
+
     public BufferedInvokationBenchmark()
     {
+        _bufferedTestHelper = new BufferedTestHelper();
         _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
     }
 
-    [GlobalSetup]
-    public void Setup()
+    /*[Benchmark]
+    public async Task<(string standardOutput, string standardError)> CliInvoke_ProcessFactory()
     {
-        CommandTask<CommandResult> buildBenchmarkMockDataSim = Cli
-            .Wrap(new DotnetCommandHelper().DotnetExecutableTargetFilePath)
-            .WithWorkingDirectory("../CliInvoke.Benchmarking.MockDataSimulationTool/")
-            .WithArguments("build -c Release")
-            .ExecuteAsync();
+        ProcessConfiguration processConfiguration =
+#pragma warning disable CA1416
+            new ProcessConfiguration(_bufferedTestHelper.TargetFilePath, _bufferedTestHelper.Arguments,
+                commandResultValidation: ProcessResultValidation.ExitCodeZero);
+#pragma warning restore CA1416
 
-        buildBenchmarkMockDataSim.Task.Wait();
-
-        _mockDataSimFilePath = "../CliInvoke.Benchmarking.MockDataSimulationTool/bin/Release/CliInvokeMockDataSimTool";
-
-       var fileLocator = new ExecutableFileInstancesLocator(new ExecutableFileDetector());
-
-        if (OperatingSystem.IsWindows())
-        {
-            _mockDataSimFilePath += ".exe";
-        }
-    }
-
-    [Benchmark]
-    public async Task<(string standardOutput, string standardError)> CliInvoke_ProcessInvoker()
-    {
-        IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
-               _mockDataSimFilePath
-            )
-            .SetArguments(MockDataSimArguments)
-            .RedirectStandardOutput(true)
-            .RedirectStandardError(true);
+#pragma warning disable CA1416
+        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo();
+#pragma warning restore CA1416
         
-        ProcessConfiguration configuration = processConfigurationBuilder.Build();
-        
-        BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(configuration, disposeOfConfig:true);
+        startInfo.RedirectStandardOutput = true;
+        startInfo.RedirectStandardError = true;
+
+        Process process = _processFactory.StartNew(startInfo);
+       
+        BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process);
       
+        return (result.StandardOutput, result.StandardError);
+    }
+    
+    [Benchmark(Baseline = true)]
+    public async Task<(string standardOutput, string standardError)> CliInvoke_CliCommandInvoker()
+    {
+        ICliCommandConfigurationBuilder commandConfigurationBuilder = new
+                CliCommandConfigurationBuilder(_bufferedTestHelper.TargetFilePath)
+            .WithArguments(_bufferedTestHelper.Arguments)
+            .WithValidation(ProcessResultValidation.ExitCodeZero);
+        
+        CliCommandConfiguration configuration = commandConfigurationBuilder.Build();
+
+        BufferedProcessResult result = await _cliCommandInvoker.ExecuteBufferedAsync(configuration);
+
         return (result.StandardOutput, result.StandardError);
     }
     
     [Benchmark]
     public async Task<(string standardOutput, string standardError)> CliWrap()
     {
-        BufferedCommandResult result = await Cli.Wrap(_mockDataSimFilePath)
-            .WithArguments("gen-fake-data")
+        BufferedCommandResult result = await Cli.Wrap(_bufferedTestHelper.TargetFilePath)
+            .WithArguments(_bufferedTestHelper.Arguments)
             .WithValidation(global::CliWrap.CommandResultValidation.ZeroExitCode)
             .ExecuteBufferedAsync();
       
@@ -82,7 +77,7 @@ public class BufferedInvokationBenchmark
     [Benchmark]
     public async Task<(string standardOutput, string standardError)> MedallionShell()
     {
-        Medallion.Shell.CommandResult result = await Medallion.Shell.Command.Run(_mockDataSimFilePath, MockDataSimArguments).Task;
+        Medallion.Shell.CommandResult result = await Medallion.Shell.Command.Run(_bufferedTestHelper.TargetFilePath, _bufferedTestHelper.Arguments).Task;
         
         return (result.StandardOutput, result.StandardError);
     }
@@ -93,7 +88,7 @@ public class BufferedInvokationBenchmark
         (Process process,
             ProcessAsyncEnumerable stdOut,
             ProcessAsyncEnumerable stdError) result =
-            Cysharp.Diagnostics.ProcessX.GetDualAsyncEnumerable($"{_mockDataSimFilePath} {MockDataSimArguments}");
+            Cysharp.Diagnostics.ProcessX.GetDualAsyncEnumerable($"{_bufferedTestHelper.TargetFilePath} {_bufferedTestHelper.Arguments}");
 
         Task<string[]> standardOutTask = result.stdOut.ToTask();
         Task<string[]> standardErrorTask = result.stdError.ToTask();
@@ -104,5 +99,5 @@ public class BufferedInvokationBenchmark
         string standardError = string.Join(Environment.NewLine, standardErrorTask.Result);
         
         return (standardOut, standardError);
-    }
+    }*/
 }

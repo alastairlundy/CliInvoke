@@ -17,7 +17,7 @@ using System;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A class that represents the results from an executed Process or Command.

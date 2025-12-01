@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// Specifies the behaviour for handling exceptions when a process cancellation occurs.

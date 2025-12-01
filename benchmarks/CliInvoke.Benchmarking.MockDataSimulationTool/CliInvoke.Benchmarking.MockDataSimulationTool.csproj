@@ -20,6 +20,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />
-    <PackageReference Include="Spectre.Console.Cli" Version="0.53.0" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.53.1" />
   </ItemGroup>
 </Project>

@@ -16,15 +16,16 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Internal.Localizations;
+
+using CliInvoke.Core.Builders;
+using CliInvoke.Internal.Localizations;
 
 // ReSharper disable ConvertClosureToMethodGroup
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable RedundantBoolCompare
 
-namespace AlastairLundy.CliInvoke.Builders;
+namespace CliInvoke.Builders;
 
 /// <summary>
 /// A class that provides a fluent interface style builder for constructing Arguments to provide to a program.
@@ -79,9 +80,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-#endif
+        ArgumentNullException.ThrowIfNull(value);
 
         if (IsValidArgument(value) == false)
             throw new ArgumentNullException(nameof(value));
@@ -109,14 +108,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
             );
         }
 
-        if (_argumentValidationLogic is not null)
-        {
-            return new ArgumentsBuilder(_buffer, _argumentValidationLogic);
-        }
-        else
-        {
-            return new ArgumentsBuilder(_buffer);
-        }
+        return _argumentValidationLogic is not null
+            ? new ArgumentsBuilder(_buffer, _argumentValidationLogic)
+            : new ArgumentsBuilder(_buffer);
     }
 
     /// <summary>
@@ -125,8 +119,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="value">The string value to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(string value) =>
-        IsValidArgument(value) == true ? Add(value, false) : this;
+    public IArgumentsBuilder Add(string value)
+        => Add(value, false);
 
     /// <summary>
     /// Appends a collection of string values to the arguments builder.
@@ -137,9 +131,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(values, nameof(values));
-#endif
+        ArgumentNullException.ThrowIfNull(values);
+        
         if (escapeSpecialChars)
             values = values.Select(x => EscapeCharacters(x));
 
@@ -175,10 +168,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
         bool escapeSpecialChars = true
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
-#endif
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(formatProvider);
         
         if (IsValidArgument(value, formatProvider) != true)
             throw new ArgumentNullException(nameof(value));
@@ -214,10 +205,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
         bool escapeSpecialChars = true
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(values, nameof(values));
-        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
-#endif
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(formatProvider);
         
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
 

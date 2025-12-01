@@ -1,3 +1,3 @@
-﻿namespace AlastairLundy.CliInvoke.Core.Internal;
+﻿namespace CliInvoke.Core.Internal;
 
 internal static class DeprecationMessages { }

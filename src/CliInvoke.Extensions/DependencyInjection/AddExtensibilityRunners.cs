@@ -8,18 +8,18 @@
 */
 
 using System;
-#if NET8_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
-#endif
 
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Extensibility;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
-using AlastairLundy.CliInvoke.Extensibility;
+using CliInvoke.Core;
+using CliInvoke.Core.Extensibility;
+using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Extensibility;
 
 using Microsoft.Extensions.DependencyInjection;
+#if NET8_0_OR_GREATER
+#endif
 
-namespace AlastairLundy.CliInvoke.Extensions;
+namespace CliInvoke.Extensions;
 
 public static partial class DependencyInjectionExtensions
 {
@@ -151,7 +151,7 @@ public static partial class DependencyInjectionExtensions
         bool isAssignableFrom =
             typeof(RunnerProcessInvokerBase).IsAssignableFrom(runnerProcessInvokerType);
 
-        if (isSubclass == false && isAssignableFrom == false)
+        if (!isSubclass && !isAssignableFrom)
             throw new ArgumentException(
                 $"Provided type is not a subclass of or assignable from type {nameof(RunnerProcessInvokerBase)}");
 

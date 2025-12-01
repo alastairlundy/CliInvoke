@@ -7,18 +7,22 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Piping;
-using AlastairLundy.CliInvoke.Exceptions;
-using AlastairLundy.CliInvoke.Helpers;
-using AlastairLundy.CliInvoke.Helpers.Processes;
-using AlastairLundy.CliInvoke.Internal.Localizations;
 
-namespace AlastairLundy.CliInvoke;
+using AlastairLundy.DotExtensions.Exceptions;
+
+using CliInvoke.Core;
+using CliInvoke.Core.Piping;
+using CliInvoke.Exceptions;
+using CliInvoke.Helpers;
+using CliInvoke.Helpers.Processes;
+using CliInvoke.Internal.Localizations;
+
+namespace CliInvoke;
 
 /// <summary>
 /// The default implementation of <see cref="IProcessInvoker"/>, a safer way to execute processes.
@@ -69,13 +73,17 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        PlatformNotSupportedException.ThrowIfIOS();
+        PlatformNotSupportedException.ThrowIfTvOS();
+        PlatformNotSupportedException.ThrowIfBrowser();
+        
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        if (!File.Exists(processConfiguration.TargetFilePath))
         {
             throw new FileNotFoundException(
                 Resources.Exceptions_FileNotFound.Replace(
@@ -171,6 +179,10 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        PlatformNotSupportedException.ThrowIfIOS();
+        PlatformNotSupportedException.ThrowIfTvOS();
+        PlatformNotSupportedException.ThrowIfBrowser();
+        
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
@@ -289,6 +301,10 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        PlatformNotSupportedException.ThrowIfIOS();
+        PlatformNotSupportedException.ThrowIfTvOS();
+        PlatformNotSupportedException.ThrowIfBrowser();
+        
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
