@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -70,6 +71,8 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        ArgumentNullException.ThrowIfNull(processConfiguration);
+
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
@@ -172,6 +175,8 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        ArgumentNullException.ThrowIfNull(processConfiguration);
+
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
@@ -290,6 +295,8 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        ArgumentNullException.ThrowIfNull(processConfiguration);
+
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );

@@ -46,7 +46,7 @@ public class FilePathResolver : IFilePathResolver
     public string ResolveFilePath(string filePathToResolve)
     {
         #if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(filePathToResolve,  nameof(filePathToResolve));
+        ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
         #endif
 
         string? filePath;
@@ -197,6 +197,11 @@ public class FilePathResolver : IFilePathResolver
             }
         }
 
-        throw new FileNotFoundException(filePathToResolve);
+        throw new FileNotFoundException(
+            Resources.Exceptions_FileNotFound.Replace(
+                "{file}",
+                filePathToResolve
+            )
+        );
     }
 }
