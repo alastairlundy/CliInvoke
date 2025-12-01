@@ -57,7 +57,7 @@
     <data name="Exceptions.Processes.NotSupportedOnRemoteProcess" xml:space="preserve">
         <value>This feature or functionality is not supported on remote Processes (e.g. Processes not running on this machine).</value>
     </data>
-    <data name="Exceptions.TargtFile.NotExecutable" xml:space="preserve">
         <value>The resolved file is not an executable file or did not have exexecutable permissions.</value>
+    <data name="Exceptions.TargetFile.NotExecutable" xml:space="preserve">
     </data>
 </root>

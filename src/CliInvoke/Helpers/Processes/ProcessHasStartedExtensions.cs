@@ -32,7 +32,6 @@ internal static class ProcessHasStartedExtensions
         [SupportedOSPlatform("android")]
         internal bool HasStarted()
         {
-        
             try
             {
                 return process.StartTime.ToUniversalTime() <= DateTime.UtcNow;

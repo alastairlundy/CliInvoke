@@ -178,7 +178,7 @@ public class ProcessInvoker : IProcessInvoker
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        if (!File.Exists(processConfiguration.TargetFilePath))
         {
             throw new FileNotFoundException(
                 Resources.Exceptions_FileNotFound.Replace(

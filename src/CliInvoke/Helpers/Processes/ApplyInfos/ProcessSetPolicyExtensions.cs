@@ -50,28 +50,21 @@ internal static class ProcessSetPolicyExtensions
 
             if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
             {
-                if (resourcePolicy.ProcessorAffinity is not null)
-                {
+                if (resourcePolicy.ProcessorAffinity is not null) 
                     process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
-                }
             }
 
-            if (
-                OperatingSystem.IsMacOS()
+            if (OperatingSystem.IsMacOS()
                 || OperatingSystem.IsMacCatalyst()
                 || OperatingSystem.IsFreeBSD()
                 || OperatingSystem.IsWindows()
             )
             {
-                if (resourcePolicy.MinWorkingSet is not null)
-                {
+                if (resourcePolicy.MinWorkingSet is not null) 
                     process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
-                }
 
-                if (resourcePolicy.MaxWorkingSet is not null)
-                {
+                if (resourcePolicy.MaxWorkingSet is not null) 
                     process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
-                }
             }
 
             process.PriorityClass = resourcePolicy.PriorityClass;

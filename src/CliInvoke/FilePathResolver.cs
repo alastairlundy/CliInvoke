@@ -76,7 +76,7 @@ public class FilePathResolver : IFilePathResolver
     {
         FileInfo file =  new FileInfo(fileName);
 
-        return file.HasExecutePermission() ? true : throw new ArgumentException(Resources.Exceptions_TargtFile_NotExecutable);
+        return file.HasExecutePermission() ? true : throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
     }
 
     [SupportedOSPlatform("windows")]
@@ -193,7 +193,7 @@ public class FilePathResolver : IFilePathResolver
                 if(fileInfo.HasExecutePermission())
                     return file;
                 
-                throw new ArgumentException(Resources.Exceptions_TargtFile_NotExecutable);
+                throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
             }
         }
 

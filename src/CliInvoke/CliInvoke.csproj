@@ -39,6 +39,7 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
+        <PolyArgumentExceptions>true</PolyArgumentExceptions>
     </PropertyGroup>
     
     <ItemGroup>
