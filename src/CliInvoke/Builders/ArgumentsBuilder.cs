@@ -81,7 +81,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters)
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
 #else
         value = Ensure.NotNull(value);
 #endif
@@ -136,7 +136,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars)
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(values, nameof(values));
+        ArgumentNullException.ThrowIfNull(values);
 #else
         values = Ensure.NotNull(values);
 #endif
@@ -177,8 +177,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     )
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(formatProvider);
 #else
         value = Ensure.NotNull(value);
         formatProvider = Ensure.NotNull(formatProvider);
@@ -219,8 +219,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     )
     {
 #if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(values, nameof(values));
-        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(formatProvider);
 #else
         values = Ensure.NotNull(values);
         formatProvider = Ensure.NotNull(formatProvider);
