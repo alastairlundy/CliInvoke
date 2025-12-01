@@ -10,7 +10,7 @@
 
 CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
 
-Launch processes, redirect standard input and output streams, await process completion and much more.
+Launch processes, redirect standard input and output streams, await process completion, and much more.
 
 ## Table of Contents
 * [Features](#features)
@@ -26,7 +26,7 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Features
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
-* Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
+* Supports .NET Standard 2.0, .NET 8, and newer TFMs, and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
@@ -35,15 +35,15 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Comparison vs Alternatives
 
-| Feature / Criterion                                                   | CliInvoke | [CliWrap](https://github.com/Tyrrrz/CliWrap/) | [ProcessX](https://github.com/Cysharp/ProcessX) |
-|------------------------------------------------------------------------|:---------:|:-------:|:--------:|
-| Dedicated builder, model, and invoker types (clear separation of concerns) | ✅        | ❌     | ❌      |
-| Dependency Injection registration extensions                           | ✅        | ❌     | ❌      |
-| Installable via NuGet                                                  | ✅        | ✅     | ✅      |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)  | ✅        | ✅*    | ❌*     |
-| Buffered and non‑buffered execution modes                              | ✅        | ✅     | ✅      |
-| Small surface area and minimal dependencies                            | ✅        | ✅     | ✅      |
-| Licensing / repository additional terms                                | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) | ✅ (MIT) |
+| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   | [ProcessX](https://github.com/Cysharp/ProcessX) |
+|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------:|
+| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                        ❌                        |
+| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                         |                        ❌                        |
+| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                        ✅                        |
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                       ❌*                        |
+| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                        ✅                        |
+| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                        ✅                        |
+| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |
 
 Notes:
 - *Indicates not explicitly advertised for all listed OSes but may work in practice; check each project's docs.
@@ -54,15 +54,15 @@ Notes:
 CliInvoke is available on [the NuGet Gallery](https://nuget.org) but call be also installed via the ``dotnet`` SDK CLI.
 
 The package(s) to install depends on your use case:
-* For use in a .NET library - Install the [Abstractions Package](#abstractions-package), your developer users can install the Implementation and Dependency Injection packages.
-* For use in a .NET app - Install the [Implementation Package](#implementation-package) and the [Dependency Injection Extensions Package](#dependency-injection-extensions)
+* For use in a .NET library - Install the abstractions package, your developer users can install the Implementation and Dependency Injection packages.
+* For use in a .NET app - Install the implementation package and the Dependency Injection Extensions Package
 
-| Project type / Need                                                         | Packages to install (dotnet add package ...)                                                                 | Notes |
-|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|-------|
-| Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                                | Only the Core (abstractions) package — consumers can choose implementations. |
-| Library or app that needs concrete builders / implementations                | `CliInvoke.Core`, `CliInvoke`                                                      | Implementation package plus Core for models/abstractions. |
-| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions`                | Includes DI registration and convenience extensions for easy setup. |
-| Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed)               | Adds Cmd/PowerShell and other specializations; include only when required. |
+| Project type / Need                                                          | Packages to install (dotnet add package ...)                                      | Notes                                                                        |
+|------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                  | Only the Core (abstractions) package — consumers can choose implementations. |
+| Library or app that needs concrete builders / implementations                | `CliInvoke.Core`, `CliInvoke`                                                     | Implementation package plus Core for models/abstractions.                    |
+| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions`                             | Includes DI registration and convenience extensions for easy setup.          |
+| Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed) | Adds Cmd/PowerShell and other specializations; include only when required.   |
 
 ### Links to packages
 [CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core)
@@ -77,7 +77,7 @@ For more details see the [list of supported platforms](docs/docs/Supported-Opera
 
 ## Getting started
 
-Install the packages you need (example: implementation + DI extensions):
+Install the packages you need (example: implementation and DI extensions):
 
 ```bash
 dotnet add package CliInvoke
@@ -133,12 +133,11 @@ This approach uses the ``IProcessConfigurationFactory`` interface factory to cre
 It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is desired.
 
 #### Non-Buffered Execution Example
-This example gets a non buffered ``ProcessResult`` that contains basic process exit code, Id, and other information.
+This example gets a non buffered ``ProcessResult`` that contains basic process exit code, ID, and other information.
 
 ```csharp
 using CliInvoke.Core.Factories;
 using CliInvoke.Core;
-using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -263,7 +262,7 @@ Want your project added to this list? [Open an issue](https://github.com/alastai
 ## CliInvoke's Roadmap
 CliInvoke aims to make working with Commands and external processes easier.
 
-Whilst an initial set of features are available in version 1, there is room for more features, and for modifications of existing features in future updates.
+Whilst an initial set of features are available in version 1, there is room for more features and for modifications of existing features in future updates.
 
 Future updates may focus on one or more of the following:
 * Improved ease of use
@@ -272,14 +271,14 @@ Future updates may focus on one or more of the following:
 * Enhancing existing features
 
 ## New vs Old Package and Namespace
-CliInvoke changed it's Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has since been published directly under the ``CliInvoke`` package Id prefix and namespace.
+CliInvoke changed it's Nuget package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has since been published directly under the ``CliInvoke`` package ID prefix and namespace.
 
 The previous packages Ids are marked as deprecated and will not receive future updates.
 
 ## License
 CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
-If you use CliInvoke in your project please make an exact copy of the contents of CliInvoke's [LICENSE.txt file](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt) available either in your third party licenses TXT file or as a separate TXT file in the project's repository.
+Should your project incorporate CliInvoke, ensure that the full text of CliInvoke's LICENSE.txt is either incorporated into your third-party licenses TXT file or provided as a distinct TXT file within your project's repository.
 
 ### CliInvoke Assets
 CliInvoke's Icon is owned by and has all rights reserved to me (Alastair Lundy).

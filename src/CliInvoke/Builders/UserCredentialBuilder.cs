@@ -14,6 +14,8 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Security;
 
+using AlastairLundy.DotExtensions.Exceptions;
+
 using CliInvoke.Core;
 using CliInvoke.Core.Builders;
 
@@ -54,11 +56,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetDomain(string domain)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(domain, nameof(domain));
-#else
-        domain = Ensure.NotNullOrEmpty(domain);
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(domain);
         
         return new UserCredentialBuilder(
             new UserCredential(
@@ -80,11 +78,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetUsername(string username)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(username, nameof(username));
-#else
-        username = Ensure.NotNullOrEmpty(username);
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(username);
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
@@ -106,15 +100,8 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetPassword(SecureString password)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(password, nameof(password));
-#else
-        password = Ensure.NotNull(password);
-#endif
-        if (password.Length > 1)
-        {
-            
-        }
+        ArgumentNullException.ThrowIfNull(password);
+        ArgumentException.ThrowIfNullOrEmpty(password);
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416

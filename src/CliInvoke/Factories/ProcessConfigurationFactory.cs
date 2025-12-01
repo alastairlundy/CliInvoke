@@ -47,6 +47,9 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         Action<IProcessConfigurationBuilder>? configureBuilder = null
     )
     {
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
+        ArgumentNullException.ThrowIfNull(arguments);
+
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
             targetFilePath
         )
@@ -75,6 +78,9 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         Action<IProcessConfigurationBuilder>? configureBuilder = null
     )
     {
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
+        ArgumentNullException.ThrowIfNull(arguments);
+        
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder(x =>
             string.IsNullOrEmpty(x) == false
         ).AddEnumerable(arguments);

@@ -91,7 +91,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
         #if NET8_0_OR_GREATER
-        ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet, nameof(minWorkingSet));
+        ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet);
         #else
         minWorkingSet = Ensure.NotNegative(minWorkingSet);
         #endif
@@ -167,8 +167,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetPriorityClass(
         ProcessPriorityClass processPriorityClass
-    ) =>
-        new ProcessResourcePolicyBuilder(
+    )
+    {
+        ArgumentNullException.ThrowIfNull(processPriorityClass);
+        
+        return new ProcessResourcePolicyBuilder(
             new ProcessResourcePolicy(
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
@@ -179,6 +182,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
                 _processResourcePolicy.EnablePriorityBoost
             )
         );
+    }
 
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Priority Boost behaviour.

@@ -34,8 +34,6 @@ public class DefaultRunnerProcessInvoker : RunnerProcessInvokerBase
     )
         : base(processInvoker, runnerProcessFactory, runnerProcessConfiguration)
     {
-#if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(runnerProcessConfiguration);
-#endif
     }
 }

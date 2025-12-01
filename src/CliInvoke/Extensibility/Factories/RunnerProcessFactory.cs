@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System;
 using System.IO;
 
 using CliInvoke.Builders;
@@ -34,6 +35,9 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         ProcessConfiguration runnerProcessConfig
     )
     {
+        ArgumentNullException.ThrowIfNull(processConfigToBeRun);
+        ArgumentNullException.ThrowIfNull(runnerProcessConfig);
+        
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
             runnerProcessConfig.TargetFilePath
         )
