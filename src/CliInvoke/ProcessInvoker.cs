@@ -13,6 +13,8 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AlastairLundy.DotExtensions.Exceptions;
+
 using CliInvoke.Core;
 using CliInvoke.Core.Piping;
 using CliInvoke.Exceptions;
@@ -79,7 +81,7 @@ public class ProcessInvoker : IProcessInvoker
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        if (!File.Exists(processConfiguration.TargetFilePath))
         {
             throw new FileNotFoundException(
                 Resources.Exceptions_FileNotFound.Replace(

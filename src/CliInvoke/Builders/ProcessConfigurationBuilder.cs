@@ -40,7 +40,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public ProcessConfigurationBuilder(string targetFilePath)
     {
         _configuration = new ProcessConfiguration(targetFilePath,
-            false, false, false);
+            false, false,
+            false);
     }
 
     /// <summary>

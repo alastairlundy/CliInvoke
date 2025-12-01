@@ -53,7 +53,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     )
     {
         ArgumentNullException.ThrowIfNull(stringComparer);
-        
+
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
         _environmentVariables = new Dictionary<string, string>(_stringComparer);
