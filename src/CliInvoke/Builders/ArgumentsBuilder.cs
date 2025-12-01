@@ -81,6 +81,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters)
     {
+        ArgumentNullException.ThrowIfNull(value);
+
         if (IsValidArgument(value) == false)
         {
             return this;
@@ -135,9 +137,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(values, nameof(values));
-#endif
+        ArgumentNullException.ThrowIfNull(values);
         
         if (escapeSpecialChars) 
             values = values.Select(x => EscapeCharacters(x));
@@ -170,10 +170,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder Add(IFormattable value, IFormatProvider formatProvider, string? format = null,
         bool escapeSpecialChars = true)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
-#endif
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(formatProvider);
         
         if (IsValidArgument(value, formatProvider) != true)
             throw new ArgumentNullException(nameof(value));
@@ -203,10 +201,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values, IFormatProvider formatProvider,
         string? format = null, bool escapeSpecialChars = true)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(values, nameof(values));
-        ArgumentNullException.ThrowIfNull(formatProvider, nameof(formatProvider));
-#endif
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(formatProvider);
         
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(format, formatProvider));
         

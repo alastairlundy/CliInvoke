@@ -39,6 +39,7 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
+        <PolyArgumentExceptions>true</PolyArgumentExceptions>
     </PropertyGroup>
     
     <ItemGroup>
@@ -48,7 +49,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.1.0" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.3.0" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -98,5 +99,10 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="AlastairLundy.DotExtensions" Version="9.1.0" />
+      <PackageReference Include="AlastairLundy.DotPrimitives" Version="4.0.0" />
     </ItemGroup>
 </Project>

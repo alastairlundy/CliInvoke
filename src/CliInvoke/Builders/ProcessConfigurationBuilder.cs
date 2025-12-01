@@ -39,7 +39,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
     public ProcessConfigurationBuilder(string targetFilePath)
     {
-        _configuration = new ProcessConfiguration(targetFilePath, false, false, false);
+        _configuration = new ProcessConfiguration(targetFilePath,
+            false, false,
+            false);
     }
 
     /// <summary>
@@ -75,11 +77,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         bool escapeArguments
     )
     {
-#if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(arguments, nameof(arguments));
-#else
-        arguments = Ensure.NotNull(arguments);
-#endif
+
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder().AddEnumerable(
             arguments,
             escapeArguments
@@ -119,11 +118,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetArguments(string arguments)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(arguments, nameof(arguments));
-#else
-        arguments = Ensure.NotNullOrEmpty(arguments);
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(arguments);
         
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(

@@ -7,10 +7,13 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+
+using AlastairLundy.DotExtensions.Exceptions;
 
 using CliInvoke.Core;
 using CliInvoke.Core.Piping;
@@ -70,13 +73,17 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        PlatformNotSupportedException.ThrowIfIOS();
+        PlatformNotSupportedException.ThrowIfTvOS();
+        PlatformNotSupportedException.ThrowIfBrowser();
+        
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        if (!File.Exists(processConfiguration.TargetFilePath))
         {
             throw new FileNotFoundException(
                 Resources.Exceptions_FileNotFound.Replace(
@@ -172,6 +179,10 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        PlatformNotSupportedException.ThrowIfIOS();
+        PlatformNotSupportedException.ThrowIfTvOS();
+        PlatformNotSupportedException.ThrowIfBrowser();
+        
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
@@ -290,6 +301,10 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
+        PlatformNotSupportedException.ThrowIfIOS();
+        PlatformNotSupportedException.ThrowIfTvOS();
+        PlatformNotSupportedException.ThrowIfBrowser();
+        
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
