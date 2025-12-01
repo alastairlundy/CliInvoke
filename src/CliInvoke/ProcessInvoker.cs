@@ -73,10 +73,8 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        PlatformNotSupportedException.ThrowIfIOS();
-        PlatformNotSupportedException.ThrowIfTvOS();
-        PlatformNotSupportedException.ThrowIfBrowser();
-        
+        ArgumentNullException.ThrowIfNull(processConfiguration);
+
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
@@ -179,17 +177,15 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        PlatformNotSupportedException.ThrowIfIOS();
-        PlatformNotSupportedException.ThrowIfTvOS();
-        PlatformNotSupportedException.ThrowIfBrowser();
-        
+        ArgumentNullException.ThrowIfNull(processConfiguration);
+
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        if (!File.Exists(processConfiguration.TargetFilePath))
         {
             throw new FileNotFoundException(
                 Resources.Exceptions_FileNotFound.Replace(
@@ -301,10 +297,8 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        PlatformNotSupportedException.ThrowIfIOS();
-        PlatformNotSupportedException.ThrowIfTvOS();
-        PlatformNotSupportedException.ThrowIfBrowser();
-        
+        ArgumentNullException.ThrowIfNull(processConfiguration);
+
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
             processConfiguration.TargetFilePath
         );

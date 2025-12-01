@@ -19,10 +19,10 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="Exceptions.CommandNotSuccessful.Generic" xml:space="preserve">
-        <value>The executed command was not succesful and returned an exit code of {x}.</value>
+        <value>The executed command was not successful and returned an exit code of {x}.</value>
     </data>
     <data name="Exceptions.CommandNotSuccessful.Specific" xml:space="preserve">
-        <value>The executed command, with executable name of {x}, was not succesful and returned an exit code of {y}.</value>
+        <value>The executed command, with executable name of {x}, was not successful and returned an exit code of {y}.</value>
     </data>
     <data name="Exceptions.FileNotFound" xml:space="preserve">
         <value>The file {file} does not exist in the specified path.</value>
@@ -46,10 +46,10 @@
         <value>The provided target file path cannot be null or empty.</value>
     </data>
     <data name="Exceptions.ProcessNotSuccessful.Generic" xml:space="preserve">
-        <value>The executed process was not succesful and returned an exit code of {x}.</value>
+        <value>The executed process was not successful and returned an exit code of {x}.</value>
     </data>
     <data name="Exceptions.ProcessNotSuccessful.Specific" xml:space="preserve">
-        <value>The executed process, with executable name of {x}, was not succesful and returned an exit code of {y}.</value>
+        <value>The executed process, with executable name of {x}, was not successful and returned an exit code of {y}.</value>
     </data>
     <data name="Exceptions.ResourcePolicy.CannotSetToNonStartedProcess" xml:space="preserve">
         <value>Cannot set Resource Policy to a Process that has not already been started.</value>
@@ -57,7 +57,7 @@
     <data name="Exceptions.Processes.NotSupportedOnRemoteProcess" xml:space="preserve">
         <value>This feature or functionality is not supported on remote Processes (e.g. Processes not running on this machine).</value>
     </data>
-    <data name="Exceptions.TargtFile.NotExecutable" xml:space="preserve">
-        <value>The resolved file is not an executable file or did not have exexecutable permissions.</value>
+    <data name="Exceptions.TargetFile.NotExecutable" xml:space="preserve">
+        <value>The resolved file is not an executable file or did not have executable permissions.</value>
     </data>
 </root>

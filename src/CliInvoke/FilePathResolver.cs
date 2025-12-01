@@ -46,7 +46,7 @@ public class FilePathResolver : IFilePathResolver
     public string ResolveFilePath(string filePathToResolve)
     {
         #if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(filePathToResolve,  nameof(filePathToResolve));
+        ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
         #endif
 
         string? filePath;
@@ -76,7 +76,7 @@ public class FilePathResolver : IFilePathResolver
     {
         FileInfo file =  new FileInfo(fileName);
 
-        return file.HasExecutePermission() ? true : throw new ArgumentException(Resources.Exceptions_TargtFile_NotExecutable);
+        return file.HasExecutePermission() ? true : throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
     }
 
     [SupportedOSPlatform("windows")]
@@ -193,10 +193,15 @@ public class FilePathResolver : IFilePathResolver
                 if(fileInfo.HasExecutePermission())
                     return file;
                 
-                throw new ArgumentException(Resources.Exceptions_TargtFile_NotExecutable);
+                throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
             }
         }
 
-        throw new FileNotFoundException(filePathToResolve);
+        throw new FileNotFoundException(
+            Resources.Exceptions_FileNotFound.Replace(
+                "{file}",
+                filePathToResolve
+            )
+        );
     }
 }

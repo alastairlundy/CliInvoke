@@ -75,7 +75,7 @@ internal static class ApplyConfigurationToProcessStartInfo
         internal void SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables
         )
         {
-            if (environmentVariables.Any() == false)
+            if (!environmentVariables.Any())
                 return;
 
             foreach (KeyValuePair<string, string> variable in environmentVariables)

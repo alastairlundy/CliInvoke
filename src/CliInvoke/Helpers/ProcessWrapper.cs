@@ -28,7 +28,7 @@ internal class ProcessWrapper : Process
 
     private void OnStarted(object? sender, EventArgs e)
     {
-        if (HasExited == false)
+        if (!HasExited)
         {
             try
             {

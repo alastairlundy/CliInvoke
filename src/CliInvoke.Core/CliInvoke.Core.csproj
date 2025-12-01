@@ -23,6 +23,7 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <Version>2.1.0</Version>
         <PackageReleaseNotes>### All Packages
 * Added .NET 10  TFM and switched to C# language version 14
