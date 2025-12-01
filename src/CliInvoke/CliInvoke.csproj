@@ -15,22 +15,19 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>
-### All Packages
-* Added .NET 10  TFM and switched to C# language version 14
-* Added Trimming Support and AoT support (#146 )
-* Renamed namespaces to start with ``CliInvoke`` instead of ``AlastairLundy.CliInvoke``
+        <PackageReleaseNotes>## Changes since 2.1
 
-### Main Package
-* Improved ``FilePathResolver`` resolving logic
-* Updated ``UserCredentialBuilder`` to not accept null strings
-* Add .NET Standard 2.0 fallback for null checks using Polyfill's ``Ensure`` static methods
-* Updated internal Polyfill version from 8.9.1 to 9.0.3
-* Removed dependency on DotExtensions</PackageReleaseNotes>
+### Main package
+* Updated internal Polyfill version from 9.1.0 to 9.3.0
+* Update ``FilePathResolver`` file resolving code to ensure Target File Path is an Executable File and throw an Exception if it is not (#208 )
+* Updated ``FilePathResolver`` to use DotPrimitives to assist with Path Environment Variable Resolving code (#208)
+* Updated code to use Argument Exception throwing polyfills (#210) and address nullability warnings 
+* Removed some no longer needed internal Helper code
+* Fixed typos in Localized Excestrings</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.1.0</PackageVersion>
+        <PackageVersion>2.2.0-alpha.1</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
