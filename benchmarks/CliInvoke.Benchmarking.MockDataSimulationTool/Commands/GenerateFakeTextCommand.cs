@@ -14,9 +14,9 @@ namespace CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
 
 public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
 {
-    private Faker _faker;
+    private readonly Faker _faker;
 
-    private char[] fakeChars;
+    private readonly char[] _fakeChars;
 
     public class Settings : CommandSettings
     {
@@ -35,7 +35,7 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
     {
         _faker = new Faker();
 
-        fakeChars = _faker.Random.Chars(count: 1000);
+        _fakeChars = _faker.Random.Chars(count: 1000);
     }
 
     public override int Execute(
@@ -52,7 +52,7 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
             {
                 for (int i = 0; i < settings.FakeTextLineLength; i++)
                 {
-                    stringBuilder.Append(_faker.PickRandom(fakeChars));
+                    stringBuilder.Append(_faker.PickRandom(_fakeChars));
                 }
 
                 Console.WriteLine(stringBuilder.ToString());

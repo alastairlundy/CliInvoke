@@ -1,12 +1,23 @@
-﻿namespace CliInvoke.Benchmarking.Data;
+﻿using AlastairLundy.WhatExecLib;
+using AlastairLundy.WhatExecLib.Detectors;
+using AlastairLundy.WhatExecLib.Locators;
+
+namespace CliInvoke.Benchmarking.Data;
 
 public class BufferedTestHelper
 {
-    private readonly string _filePath;
+    public BufferedTestHelper()
+    {
+        ExecutableFileDetector executableFileDetector = new();
 
-    public BufferedTestHelper() { }
+        WhatExecutableResolver filePathResolver = new(new PathExecutableResolver(executableFileDetector),
+            new ExecutableFileInstancesLocator(executableFileDetector));
 
-    public string TargetFilePath => _filePath;
+        TargetFilePath = filePathResolver.ResolveExecutableFilePath("CliInvokeMockDataSimTool").FullName;
+        
+    }
+
+    public string TargetFilePath { get; }
 
     public string Arguments => "gen-fake-text";
 }
