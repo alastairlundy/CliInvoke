@@ -1,9 +1,9 @@
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Extensibility;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
-using AlastairLundy.CliInvoke.Specializations.Configurations;
+using CliInvoke.Core;
+using CliInvoke.Core.Extensibility;
+using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Specializations.Configurations;
 
-namespace AlastairLundy.CliInvoke.Specializations;
+namespace CliInvoke.Specializations;
 
 /// <summary>
 /// 
