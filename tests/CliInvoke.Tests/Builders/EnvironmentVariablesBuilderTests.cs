@@ -75,7 +75,7 @@ public class EnvironmentVariablesBuilderTests
 
         while (dictionary.Count < number)
         {
-            string key = _faker.Database.Column();
+            string key = _faker.Phone.PhoneNumber(null);
             string value = _faker.Random.Word();
             
             dictionary.TryAdd(key, value);

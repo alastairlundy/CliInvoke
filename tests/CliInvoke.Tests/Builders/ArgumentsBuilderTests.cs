@@ -40,7 +40,7 @@ public partial class ArgumentsBuilderTests
         IArgumentsBuilder builder = new ArgumentsBuilder();
         IArgumentsBuilder returned = builder.Add("hello");
 
-        // buffer is shared with returned instance
+        // buffer is shared with the returned instance
         Assert.Equal("hello", builder.ToString());
         Assert.Equal("hello", returned.ToString());
 
@@ -77,13 +77,13 @@ public partial class ArgumentsBuilderTests
     public void AddEnumerable_Strings_EscapesAndJoinsValues()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
-        string[] values = new[] { "a\nb", "c\"d" };
+        string[] values = ["a\nb", "c\"d"];
 
-        string expected = "\\\"a\\\\nbc\\\\\\\"d\\\"";
+        // Expect the two escaped values to be joined with a space and wrapped in quotes:
+        string expected = "\"a\\nb c\\\"d\"";
         
         IArgumentsBuilder result = builder.AddEnumerable(values, true);
 
-        // a\nb becomes a\\nb and c"d becomes c\"d, joined with a space
         Assert.Equal(expected, result.ToString());
     }
 
