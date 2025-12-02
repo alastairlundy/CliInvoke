@@ -23,14 +23,14 @@ jobs:
         
       steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        uses: step-security/harden-runner@df199fb7be9f65074067a9eb93f12bb4c5547cf2 # v2.13.3
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/setup-dotnet@2016bd2012dba4e32de620c46fe006a3ac9f0602 # v5.0.1
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 10.0.x
       - name: Restore dependencies
         run: dotnet restore
         working-directory: src/CliInvoke.Core
@@ -48,8 +48,8 @@ jobs:
           # Push the Core package
       - name: NuGet push
         run: dotnet nuget push src/CliInvoke.Core/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-      - name: Sleep for 180 seconds
-        run: sleep 180s
+      - name: Sleep for 240 seconds
+        run: sleep 240s
         shell: bash
       - name: Restore dependencies
         run: dotnet restore
@@ -71,8 +71,8 @@ jobs:
       - name: NuGet push
         run: dotnet nuget push src/CliInvoke/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
-      - name: Sleep for 180 seconds
-        run: sleep 180s
+      - name: Sleep for 240 seconds
+        run: sleep 240s
         shell: bash
       - name: Restore dependencies
         run: dotnet restore

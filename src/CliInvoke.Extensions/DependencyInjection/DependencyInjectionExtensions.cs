@@ -1,5 +1,5 @@
 ﻿/*
-    CliInvoke 
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,16 +9,13 @@
 
 using System;
 
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Extensibility;
-using AlastairLundy.CliInvoke.Core.Extensibility.Factories;
-using AlastairLundy.CliInvoke.Core.Factories;
-using AlastairLundy.CliInvoke.Core.Piping;
-
-using AlastairLundy.CliInvoke.Extensibility;
-using AlastairLundy.CliInvoke.Extensibility.Factories;
-using AlastairLundy.CliInvoke.Factories;
-using AlastairLundy.CliInvoke.Piping;
+using CliInvoke.Core;
+using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core.Piping;
+using CliInvoke.Extensibility.Factories;
+using CliInvoke.Factories;
+using CliInvoke.Piping;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -26,12 +23,12 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 // ReSharper disable RedundantAssignment
 // ReSharper disable UnusedMember.Global
 
-namespace AlastairLundy.CliInvoke.Extensions;
+namespace CliInvoke.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring dependency injection for CliInvoke components.
 /// </summary>
-public static class DependencyInjectionExtensions
+public static partial class DependencyInjectionExtensions
 {
     /// <summary>
     /// Sets up Dependency Injection for CliInvoke's main interface-able types.
@@ -56,10 +53,10 @@ public static class DependencyInjectionExtensions
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
-                
+
                 services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
-                
+
                 services.AddScoped<IRunnerProcessFactory, RunnerProcessFactory>();
                 break;
             case ServiceLifetime.Transient:
@@ -68,7 +65,7 @@ public static class DependencyInjectionExtensions
 
                 services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
-                
+
                 services.AddTransient<IRunnerProcessFactory, RunnerProcessFactory>();
                 break;
             default:
@@ -76,7 +73,7 @@ public static class DependencyInjectionExtensions
                     lifetime,
                     null);
         }
-        
+
         return services;
     }
 }

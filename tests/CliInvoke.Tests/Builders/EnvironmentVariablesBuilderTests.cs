@@ -1,12 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
 using Bogus;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Builders;
 
 public class EnvironmentVariablesBuilderTests
 {
@@ -73,7 +75,7 @@ public class EnvironmentVariablesBuilderTests
 
         while (dictionary.Count < number)
         {
-            string key = _faker.Database.Column();
+            string key = _faker.Phone.PhoneNumber(null);
             string value = _faker.Random.Word();
             
             dictionary.TryAdd(key, value);
@@ -100,14 +102,29 @@ public class EnvironmentVariablesBuilderTests
 
         Dictionary<string, string> dictionary = new();
 
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        IList<string> keys = _faker.MakeLazy(number * 4, () => _faker.Internet.Ip())
+        .Distinct(StringComparer.InvariantCulture)
+        .Take(number)
+        .ToList();
+
+        int keyIndex = 0;
+        
         while (dictionary.Count < number)
         {
-            string key = _faker.Database.Column();
+            if (stopwatch.ElapsedMilliseconds / 1000 > 10)
+                throw new Exception("Took to long to generate test data");
+
             string value = _faker.Random.Word();
             
-            dictionary.TryAdd(key, value);
+            dictionary.Add(keys[keyIndex], value);
+            keyIndex++;
         }
-
+        
+        stopwatch.Stop();
+        
         ReadOnlyDictionary<string, string> readOnlyDictionary = new ReadOnlyDictionary<string, string>(dictionary);
         
         // Act

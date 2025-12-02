@@ -4,12 +4,12 @@ using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Helpers.Processes;
-using AlastairLundy.CliInvoke.Tests.Internal.Helpers;
+using CliInvoke.Core;
+using CliInvoke.Helpers.Processes;
+using CliInvoke.Tests.Internal.Helpers;
 using Xunit;
 
-namespace AlastairLundy.CliInvoke.Tests.Helpers.Processes;
+namespace CliInvoke.Tests.Helpers.Processes;
 
 public class ProcessCancellationTests
 {
@@ -94,8 +94,7 @@ public class ProcessCancellationTests
         string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "120" : "/T 120 /NOBREAK";
         Process process = ProcessTestHelper.CreateProcess(filePath, args);
         
-        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30),
-            ProcessCancellationMode.Graceful), ProcessResultValidation.None,
+        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30)), ProcessResultValidation.None,
             ProcessCancellationExceptionBehavior.SuppressException);
         
         //Act

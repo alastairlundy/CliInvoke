@@ -8,9 +8,11 @@ Where multiple major versions are supported, only the latest minor release may b
 ### Currently Supported Versions
 Versions that are currently supported with Bug Fixes and/or Security Fixes.
 
-| Version series | Launch Version | Latest version | Supported with Bug Fixes | Supported with Security Fixes |
+| Version series | Supported with Bug Fixes | Supported with Security Fixes |
 |--| --|--|--|--|
-| 1.x | 1.0.0 | 1.6.1.1 | Until 2.0 | Until 2.1 |
+| 2.1 | Until 2.3 | Until 2.4 |
+| 2.0 | Until 2.2 | Until 2.3 |
+| < 2.0 | :x:, Ended October 28th 2025 | :x:, Ended November 14th 2025 |
 
 ## Reporting a Security Vulnerability
 
@@ -21,4 +23,4 @@ I will then investigate the issue further and decide whether or not to accept th
 
 If the vulnerability is accepted please do not publish the details of the vulnerability until at least 1 Business Day after the updates patching the security vulnerability have been released .
 
-If the vulnerability is rejected please do not refer to it as a vulnerability and do not publish correspondence without prior written permission.
+If the vulnerability is rejected please do not refer to it as a vulnerability and do not publish private correspondence without prior written permission.

@@ -1,35 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
-        <LangVersion>13</LangVersion>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
+        <LangVersion>14</LangVersion>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.0.0-rc.1</Version>
-        <Title>AlastairLundy.CliInvoke.Extensions</Title>
+        <Version>2.2.0-alpha.1</Version>
+        <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>## Changes since 2.0.0 Beta 7
-* Updated to support CliInvoke 2.0.0 RC 1</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke Core 2.2.0 Alpha 1 and CliInvoke 2.2.0 Alpha 1</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>shell, cli, process, wrapping, commandline,</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
-        <RootNamespace>AlastairLundy.CliInvoke.Extensions</RootNamespace>
-        <AssemblyName>AlastairLundy.CliInvoke.Extensions</AssemblyName>
+        <PackageId>CliInvoke.Extensions</PackageId>
+        <Product>CliInvoke.Extensions</Product>
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -44,8 +43,8 @@
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
         <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
-        <PackageReference Include="AlastairLundy.CliInvoke" Version="$(CliInvokeVersion)" />
+        <PackageReference Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+        <PackageReference Include="CliInvoke" Version="$(CliInvokeVersion)" />
     </ItemGroup>
 
     <ItemGroup>

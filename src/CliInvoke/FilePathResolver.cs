@@ -8,12 +8,20 @@
    */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 
-using AlastairLundy.CliInvoke.Core;
+using AlastairLundy.DotExtensions.IO.Permissions;
+using AlastairLundy.DotPrimitives.IO.Paths;
 
-namespace AlastairLundy.CliInvoke;
+using CliInvoke.Core;
+using CliInvoke.Internal.Localizations;
+
+// ReSharper disable ConvertClosureToMethodGroup
+
+namespace CliInvoke;
 
 /// <summary>
 /// An implementation of IFilePathResolver, a service that resolves file paths.
@@ -26,33 +34,190 @@ public class FilePathResolver : IFilePathResolver
     /// <param name="filePathToResolve">The file path to resolve.</param>
     /// <returns>The resolved file path if successful, otherwise throws a FileNotFoundException.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file path does not exist or cannot be located.</exception>
+    /// <exception cref="PlatformNotSupportedException">Thrown if run on an unsupported platform.</exception>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
     public string ResolveFilePath(string filePathToResolve)
     {
-        if (File.Exists(filePathToResolve))
+        #if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
+        #endif
+
+        string? filePath;
+
+        if (Path.IsPathRooted(filePathToResolve))
         {
-            return filePathToResolve;
+            filePath = filePathToResolve;
+            
+            if(ExecutableFileCheck(filePathToResolve))
+                return filePath;
         }
         
-        string fileName = Path.GetFileName(filePathToResolve);
-        
-        int index = filePathToResolve.IndexOf(fileName, StringComparison.InvariantCultureIgnoreCase);
-        
-        filePathToResolve = filePathToResolve.Remove(index, fileName.Length);
-        
-        string[] directories = Directory.GetDirectories(filePathToResolve,
-            "*",
-            SearchOption.AllDirectories);
+        bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out filePath);
 
-        foreach (string directory in directories)
+        if (filePath is not null && resolveFromPath)
         {
-            string[] files = Directory.GetFiles(directory);
+            bool isExecutable = ExecutableFileCheck(filePathToResolve);
 
-            if (files.Any(x => Path.GetFileName(filePathToResolve).Equals(x)))
+            if (isExecutable)
+                return filePath;
+        }
+        
+        return LocateFileFromDirectory(filePathToResolve);
+    }
+
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    private bool ExecutableFileCheck(string fileName)
+    {
+        FileInfo file =  new FileInfo(fileName);
+
+        return file.HasExecutePermission() ? true : throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
+    }
+
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    protected static bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
+        out string? resolvedFilePath)
+    {
+        if (filePathToResolve.Contains(Path.DirectorySeparatorChar)
+            || filePathToResolve.Contains(Path.AltDirectorySeparatorChar))
+        {
+            
+            bool fileExists =  File.Exists(filePathToResolve);
+
+            resolvedFilePath = fileExists ? filePathToResolve : null;
+            return fileExists;
+        }
+
+        string[] pathExtensions = PathEnvironmentVariable.GetPathFileExtensions();
+        string[]? pathContents = PathEnvironmentVariable.GetDirectories();
+        
+        if(pathContents is null)
+        {
+            resolvedFilePath = null;
+            return false;
+        }
+
+        bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
+
+        foreach (string pathEntry in pathContents)
+        {
+            if (!fileHasExtension)
             {
-                return Path.GetFullPath(files.First(x => Path.GetFileName(filePathToResolve).Equals(x)));
+                foreach (string pathExtension in pathExtensions)
+                {
+                    string filePath =
+                        Path.Combine(pathEntry, $"{filePathToResolve}{pathExtension}");
+
+                    if (File.Exists(filePath))
+                    {
+                        resolvedFilePath = filePath;
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                string filePath = Path.Combine(pathEntry, filePathToResolve);
+
+                if (File.Exists(filePath))
+                {
+                    resolvedFilePath = filePath;
+                    return true;
+                }
             }
         }
         
-        throw new FileNotFoundException(filePathToResolve);
+        resolvedFilePath = null;
+        return false;
+    }
+
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("android")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    private static string LocateFileFromDirectory(string filePathToResolve)
+    {
+        string fileName = Path.GetFileName(filePathToResolve);
+
+        int index = filePathToResolve.IndexOf(
+            fileName,
+            StringComparison.InvariantCultureIgnoreCase
+        );
+
+        string directoryPath = Path.GetDirectoryName(filePathToResolve)
+                               ?? filePathToResolve.Remove(index, fileName.Length);
+
+        IEnumerable<string> directories = Directory.EnumerateDirectories(
+            directoryPath,
+            "*",
+            SearchOption.AllDirectories
+        );
+
+        IEnumerable<string> files = directories.SelectMany(x => Directory.EnumerateFiles(x))
+            .Where(f =>
+                Path.GetFileName(f).Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+            .Where(f =>
+                (string.IsNullOrEmpty(Path.GetExtension(f)) && OperatingSystem.IsWindows()) ||
+                !OperatingSystem.IsWindows())
+            .Select(f =>
+            {
+                string extension = Path.GetExtension(f);
+
+                int extensionIndex = f.LastIndexOf(extension, StringComparison.Ordinal);
+
+                // ReSharper disable once InvertIf
+                if (extensionIndex != -1)
+                {
+                    f = f.Remove(extensionIndex, extension.Length);
+                    f = f.Insert(extensionIndex, extension.ToLower());
+                }
+                
+                return f;
+            });
+       
+        foreach (string file in files)
+        {
+            if (Path.GetFileName(file).Equals(filePathToResolve,
+                    StringComparison.InvariantCulture))
+            {
+                FileInfo fileInfo = new FileInfo(file);
+                
+                if(fileInfo.HasExecutePermission())
+                    return file;
+                
+                throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
+            }
+        }
+
+        throw new FileNotFoundException(
+            Resources.Exceptions_FileNotFound.Replace(
+                "{file}",
+                filePathToResolve
+            )
+        );
     }
 }

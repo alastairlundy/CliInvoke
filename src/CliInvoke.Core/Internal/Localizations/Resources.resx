@@ -18,15 +18,6 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="Exceptions.ResourcePolicy.CannotSetToNonStartedProcess" xml:space="preserve">
-        <value>Cannot set Resource Policy to a Process that has not already been started.</value>
-    </data>
-    <data name="Exceptions.ProcessNotSuccessful.Specific" xml:space="preserve">
-        <value>The executed process, with executable name of {x}, was not succesful and returned an exit code of {y}.</value>
-    </data>
-    <data name="Exceptions.ProcessNotSuccessful.Generic" xml:space="preserve">
-        <value>The executed process was not succesful and returned an exit code of {x}.</value>
-    </data>
     <data name="Command.ToString.WorkingDirectory" xml:space="preserve">
         <value>Working Directory</value>
     </data>
@@ -35,9 +26,6 @@
     </data>
     <data name="Command.ToString.ShellExecution" xml:space="preserve">
         <value>(Uses Shell Execution)</value>
-    </data>
-    <data name="Exceptions.ArgumentBuilder.Buffer.MaximumSize" xml:space="preserve">
-        <value>ArgumentBuilder buffer size cannot be added to as it is the maximum size of {x}</value>
     </data>
     <data name="CommandBuilder.ArgumentConflict.ShellExecution.Output" xml:space="preserve">
         <value>UseShellExecution value of true conflicts with setting of Standard Output to a non-null value. See https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput</value>
@@ -61,6 +49,6 @@
         <value>The provided target file path cannot be null or empty.</value>
     </data>
     <data name="Exceptions.ProcessTimeoutPolicy.Timeout.LessThanZero" xml:space="preserve">
-        <value>{0} must be greater than or equal to zero.</value>
+        <value>Timeout threshold must be greater than or equal to zero. Value was {x}.</value>
     </data>
 </root>

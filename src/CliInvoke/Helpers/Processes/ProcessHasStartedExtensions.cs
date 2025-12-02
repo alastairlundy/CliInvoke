@@ -11,37 +11,35 @@ using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-using AlastairLundy.CliInvoke.Internal.Localizations;
-
-namespace AlastairLundy.CliInvoke.Helpers.Processes;
+namespace CliInvoke.Helpers.Processes;
 
 internal static class ProcessHasStartedExtensions
 {
-    /// <summary>
-    /// Determines if a process has started.
-    /// </summary>
     /// <param name="process">The process to be checked.</param>
-    /// <returns>True if it has started; false otherwise.</returns>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
-    internal static bool HasStarted(this Process process)
+    extension(Process process)
     {
-        if (process.IsProcessOnRemoteDevice())
-            throw new NotSupportedException(Resources.Exceptions_Processes_NotSupportedOnRemoteProcess);
-        
-        try
+        /// <summary>
+        /// Determines if a process has started.
+        /// </summary>
+        /// <returns>True if it has started; false otherwise.</returns>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("android")]
+        internal bool HasStarted()
         {
-            return process.StartTime.ToUniversalTime() <= DateTime.UtcNow;
-        }
-        catch(InvalidOperationException)
-        {
-            return false;
+            try
+            {
+                return process.StartTime.ToUniversalTime() <= DateTime.UtcNow;
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
         }
     }
 }

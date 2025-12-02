@@ -10,8 +10,7 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 
-
-namespace AlastairLundy.CliInvoke.Core.Builders;
+namespace CliInvoke.Core.Builders;
 
 /// <summary>
 /// A fluent builder interface for configuring and building a Process Resource Policy.
@@ -26,7 +25,7 @@ public interface IProcessResourcePolicyBuilder
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-    IProcessResourcePolicyBuilder WithProcessorAffinity(nint processorAffinity);
+    IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity);
 
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
@@ -39,7 +38,7 @@ public interface IProcessResourcePolicyBuilder
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
-    IProcessResourcePolicyBuilder WithMinWorkingSet(nint minWorkingSet);
+    IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet);
 
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Maximum Working Set.
@@ -52,21 +51,21 @@ public interface IProcessResourcePolicyBuilder
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
-    IProcessResourcePolicyBuilder WithMaxWorkingSet(nint maxWorkingSet);
+    IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet);
 
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Process Priority Class.
     /// </summary>
     /// <param name="processPriorityClass">The Process Priority Class to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated Process Priority Class.</returns>
-    IProcessResourcePolicyBuilder WithPriorityClass(ProcessPriorityClass processPriorityClass);
+    IProcessResourcePolicyBuilder SetPriorityClass(ProcessPriorityClass processPriorityClass);
 
     /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified Priority Boost behaviour.
     /// </summary>
     /// <param name="enablePriorityBoost">The priority boost behaviour to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated priority boost behaviour.</returns>
-    IProcessResourcePolicyBuilder WithPriorityBoost(bool enablePriorityBoost);
+    IProcessResourcePolicyBuilder ConfigurePriorityBoost(bool enablePriorityBoost);
 
     /// <summary>
     /// Builds the configured ProcessResourcePolicy

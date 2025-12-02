@@ -11,7 +11,7 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// Defines an interface that creates and runs Processes from <see cref="ProcessConfiguration"/> objects.
@@ -29,11 +29,13 @@ public interface IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
-    Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
+    Task<ProcessResult> ExecuteAsync(
+        ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
     /// </summary>
@@ -45,10 +47,12 @@ public interface IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
-    Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
+    Task<BufferedProcessResult> ExecuteBufferedAsync(
+        ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Pipes the Standard Input, runs the process asynchronously,
@@ -62,8 +66,10 @@ public interface IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
-    Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
+    Task<PipedProcessResult> ExecutePipedAsync(
+        ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+using CliInvoke.Specializations.Tests.Helpers;
 
-using AlastairLundy.CliInvoke.Builders;
-
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
-using AlastairLundy.CliInvoke.Specializations.Tests.Helpers;
-
-namespace AlastairLundy.CliInvoke.Specializations.Tests.Invokers;
+namespace CliInvoke.Specializations.Tests.Invokers;
 
 public class CmdInvokerTests : IClassFixture<TestFixture>
 {
@@ -30,7 +28,7 @@ public class CmdInvokerTests : IClassFixture<TestFixture>
         {
             IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
                     (ExecutedCommandHelper.WinCalcExePath)
-                .WithWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
+                .SetWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe",
                     string.Empty));
             
             ProcessConfiguration commandConfiguration = configurationBuilder.Build();

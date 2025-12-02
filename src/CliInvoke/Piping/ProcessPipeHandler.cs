@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke  
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,9 +12,9 @@ using System.IO;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
-using AlastairLundy.CliInvoke.Core.Piping;
+using CliInvoke.Core.Piping;
 
-namespace AlastairLundy.CliInvoke.Piping;
+namespace CliInvoke.Piping;
 
 /// <summary>
 /// An implementation of IProcessPipeHandler. Pipes Process Standard Input, Output, and Error as required.
@@ -42,8 +42,8 @@ public class ProcessPipeHandler : IProcessPipeHandler
         {
             await destination.StandardInput.FlushAsync();
             destination.StandardInput.BaseStream.Position = 0;
-            await source.CopyToAsync(destination.StandardInput.BaseStream); 
-            
+            await source.CopyToAsync(destination.StandardInput.BaseStream);
+
             return source.Equals(destination.StandardInput.BaseStream);
         }
 
@@ -67,7 +67,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     public async Task<Stream> PipeStandardOutputAsync(Process source)
     {
         Stream destination = new MemoryStream();
-        
+
         if (source.StartInfo.RedirectStandardOutput)
         {
             if (source.StandardOutput != StreamReader.Null)
@@ -75,7 +75,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
                 await source.StandardOutput.BaseStream.CopyToAsync(destination);
             }
         }
-        
+
         return destination;
     }
 
@@ -96,7 +96,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     public async Task<Stream> PipeStandardErrorAsync(Process source)
     {
         Stream destination = new MemoryStream();
-        
+
         if (source.StartInfo.RedirectStandardError)
         {
             if (source.StandardError != StreamReader.Null)
@@ -104,7 +104,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
                 await source.StandardError.BaseStream.CopyToAsync(destination);
             }
         }
-        
+
         return destination;
     }
 }

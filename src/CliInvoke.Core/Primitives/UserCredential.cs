@@ -20,7 +20,7 @@ using System;
 using System.Runtime.Versioning;
 using System.Security;
 
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A class to represent a User Credential to be used with ProcessPrimitives.
@@ -47,7 +47,12 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <param name="username">The username to be used.</param>
     /// <param name="password">The password to be used.</param>
     /// <param name="loadUserProfile">Whether to load the user profile during Process creation.</param>
-    public UserCredential(string? domain, string? username, SecureString? password, bool? loadUserProfile)
+    public UserCredential(
+        string? domain,
+        string? username,
+        SecureString? password,
+        bool? loadUserProfile
+    )
     {
 #pragma warning disable CA1416
         Domain = domain;
@@ -56,34 +61,34 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
         LoadUserProfile = loadUserProfile;
 #pragma warning restore CA1416
     }
-        
+
     /// <summary>
     /// The domain to be used.
     /// </summary>
     [SupportedOSPlatform("windows")]
     public string? Domain { get; private set; }
-        
+
     /// <summary>
     /// The username to be used.
     /// </summary>
     public string? UserName { get; private set; }
-        
+
     /// <summary>
     /// The password to be used.
     /// </summary>
     [SupportedOSPlatform("windows")]
     public SecureString? Password { get; private set; }
-        
+
     /// <summary>
     /// Whether to load the Windows User Profile.
     /// </summary>
     [SupportedOSPlatform("windows")]
     public bool? LoadUserProfile { get; private set; }
-        
+
     /// <summary>
     /// A null UserCredential instance.
     /// </summary>
-    public static UserCredential Null { get; } = new UserCredential();
+    public static UserCredential Null { get; } = new(null, null, null, null);
 
     /// <summary>
     /// Disposes of the Password SecureString and other UserCredential values.
@@ -109,18 +114,22 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
         if (other is null)
             return false;
 
-        if (other.UserName is null || other.Domain is null || other.Password is null ||
-            other.LoadUserProfile is null)
+        if (
+            other.UserName is null
+            || other.Domain is null
+            || other.Password is null
+            || other.LoadUserProfile is null
+        )
             return false;
-            
-        return Domain == other.Domain &&
-               UserName == other.UserName &&
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-               Password.Equals(other.Password)
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-               && LoadUserProfile == other.LoadUserProfile;
-#pragma warning restore CA1416
 
+        return Domain == other.Domain
+            && UserName == other.UserName
+            &&
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            Password.Equals(other.Password)
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            && LoadUserProfile == other.LoadUserProfile;
+#pragma warning restore CA1416
     }
 
     /// <summary>
@@ -133,10 +142,10 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     {
         if (left is null || right is null)
             return false;
-            
+
         return left.Equals(right);
     }
-        
+
     /// <summary>
     /// Determines whether the specified object is equal to the current user credential.
     /// </summary>
@@ -149,7 +158,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
 
         if (obj is UserCredential other)
             return Equals(other);
-        
+
         return false;
     }
 
@@ -160,10 +169,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        return HashCode.Combine(Domain,
-            UserName,
-            Password,
-            LoadUserProfile);
+        return HashCode.Combine(Domain, UserName, Password, LoadUserProfile);
 #pragma warning restore CA1416
     }
 
@@ -173,8 +179,8 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <param name="left">A <see cref="UserCredential"/> to be compared.</param>
     /// <param name="right">The other <see cref="UserCredential"/> to be compared.</param>
     /// <returns>True if both <see cref="UserCredential"/> objects are equal to each other, false otherwise.</returns>
-    public static bool operator ==(UserCredential? left, UserCredential? right) 
-        => Equals(left, right);
+    public static bool operator ==(UserCredential? left, UserCredential? right) =>
+        Equals(left, right);
 
     /// <summary>
     /// Determines if a <see cref="UserCredential"/> is not equal to another <see cref="UserCredential"/>.
@@ -182,6 +188,6 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <param name="left">A <see cref="UserCredential"/> to be compared.</param>
     /// <param name="right">The other <see cref="UserCredential"/> to be compared.</param>
     /// <returns>True if both <see cref="UserCredential"/> objects are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(UserCredential? left, UserCredential? right) 
-        => Equals(left, right) == false;
+    public static bool operator !=(UserCredential? left, UserCredential? right) =>
+        !Equals(left, right);
 }

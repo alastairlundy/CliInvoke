@@ -1,12 +1,11 @@
 using System;
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
 using Bogus;
+using CliInvoke.Core;
 using Xunit;
+
 // ReSharper disable NotAccessedVariable
 
-namespace AlastairLundy.CliInvoke.Tests.Builders;
+namespace CliInvoke.Tests.Primitives;
 
 public class ProcessTimeoutPolicyTests
 {

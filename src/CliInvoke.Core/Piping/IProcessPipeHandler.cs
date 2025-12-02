@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke.Core  
+    AlastairLundy.CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace AlastairLundy.CliInvoke.Core.Piping;
+namespace CliInvoke.Core.Piping;
 
 /// <summary>
 /// An interface to allow for a standardized way of Process pipe handling.

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AlastairLundy.CliInvoke.Internal.Localizations {
+namespace CliInvoke.Internal.Localizations {
     using System;
     
     
@@ -28,7 +28,7 @@ namespace AlastairLundy.CliInvoke.Internal.Localizations {
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("AlastairLundy.CliInvoke.Internal.Localizations.Resources", typeof(Resources).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("CliInvoke.Internal.Localizations.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,12 +60,6 @@ namespace AlastairLundy.CliInvoke.Internal.Localizations {
         internal static string Exceptions_FileNotFound {
             get {
                 return ResourceManager.GetString("Exceptions.FileNotFound", resourceCulture);
-            }
-        }
-        
-        internal static string Process_FileName_Empty {
-            get {
-                return ResourceManager.GetString("Process.FileName.Empty", resourceCulture);
             }
         }
         
@@ -120,6 +114,12 @@ namespace AlastairLundy.CliInvoke.Internal.Localizations {
         internal static string Exceptions_Processes_NotSupportedOnRemoteProcess {
             get {
                 return ResourceManager.GetString("Exceptions.Processes.NotSupportedOnRemoteProcess", resourceCulture);
+            }
+        }
+        
+        internal static string Exceptions_TargetFile_NotExecutable {
+            get {
+                return ResourceManager.GetString("Exceptions.TargetFile.NotExecutable", resourceCulture);
             }
         }
     }

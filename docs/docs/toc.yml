@@ -1,2 +1,7 @@
 - name: Getting Started
   href: getting-started.md
+
+- name: Migrating CliInvoke v1 to v2
+  href: migrating-v1-to-v2.md
+
+  

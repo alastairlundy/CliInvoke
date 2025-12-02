@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke 
+    AlastairLundy.CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,15 +17,13 @@ using System;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-
-namespace AlastairLundy.CliInvoke.Core;
+namespace CliInvoke.Core;
 
 /// <summary>
 /// A buffered ProcessResult containing a Process's or Command's StandardOutput and StandardError information.
 /// </summary>
 public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessResult>
 {
-
     /// <summary>
     /// Initializes the BufferedProcessResult with process information.
     /// </summary>
@@ -35,13 +33,21 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="standardError">The process' standard error as a string.</param>
     /// <param name="startTime">The start time of the process.</param>
     /// <param name="exitTime">The exit time of the process.</param>
-    public BufferedProcessResult(string executableFilePath,
+    public BufferedProcessResult(
+        string executableFilePath,
         int exitCode,
         string standardOutput,
         string standardError,
         DateTime startTime,
-        DateTime exitTime) : base(executableFilePath, exitCode, startTime, exitTime)
+        DateTime exitTime
+    )
+        : base(executableFilePath, exitCode, startTime, exitTime)
     {
+        ArgumentException.ThrowIfNullOrEmpty(standardOutput);
+        
+        ArgumentNullException.ThrowIfNull(standardOutput);
+        ArgumentNullException.ThrowIfNull(standardError);
+        
         StandardOutput = standardOutput;
         StandardError = standardError;
     }
@@ -56,7 +62,6 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// </summary>
     public string StandardError { get; }
 
-        
     /// <summary>
     /// Determines whether this BufferedProcessResult is equal to another BufferedProcessResult object.
     /// </summary>
@@ -67,10 +72,11 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     {
         if (other is null)
             return false;
-            
-        return StandardOutput == other.StandardOutput &&
-               StandardError == other.StandardError &&
-               ExitCode == other.ExitCode;
+
+        return ExecutedFilePath == other.ExecutedFilePath &&
+               StandardOutput == other.StandardOutput
+            && StandardError == other.StandardError
+            && ExitCode == other.ExitCode;
     }
 
     /// <summary>
@@ -85,7 +91,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
 
         if (obj is BufferedProcessResult result)
             return Equals(result);
-            
+
         return false;
     }
 
@@ -93,8 +99,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// Returns the hash code for the current BufferedProcessResult.
     /// </summary>
     /// <returns>The hash code for the current BufferedProcessResult.</returns>
-    public override int GetHashCode() 
-        => HashCode.Combine(StandardOutput, StandardError, ExitCode);
+    public override int GetHashCode() => HashCode.Combine(ExecutedFilePath, StandardOutput, StandardError, ExitCode, StartTime, ExitTime);
 
     /// <summary>
     /// Determines whether two BufferedProcessResults are equal.
@@ -102,8 +107,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">The first BufferedProcessResult to compare.</param>
     /// <param name="right">The second BufferedProcessResult to compare.</param>
     /// <returns>True if the two BufferedProcessResult objects are equal; false otherwise.</returns>
-    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right) 
-        => left.Equals(right);
+    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right) =>
+        left.Equals(right);
 
     /// <summary>
     /// Determines if a BufferedProcessResult is equal to another BufferedProcessResult.
@@ -111,8 +116,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are equal to each other; false otherwise.</returns>
-    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right) 
-        => Equals(left, right);
+    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right) =>
+        Equals(left, right);
 
     /// <summary>
     /// Determines if a BufferedProcessResult is not equal to another BufferedProcessResult.
@@ -120,6 +125,6 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right) 
-        => Equals(left, right) == false;
+    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right) =>
+        !Equals(left, right);
 }

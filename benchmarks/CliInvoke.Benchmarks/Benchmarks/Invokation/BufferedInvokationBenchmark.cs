@@ -1,12 +1,10 @@
 ﻿using System.Diagnostics;
 
-using AlastairLundy.CliInvoke.Core;
-
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-
 using CliInvoke.Benchmarking.Data;
 using CliInvoke.Benchmarking.Helpers;
+using CliInvoke.Core;
 
 using CliWrap;
 using CliWrap.Buffered;
@@ -14,12 +12,11 @@ using Cysharp.Diagnostics;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
-[MemoryDiagnoser(true),
- Orderer(SummaryOrderPolicy.FastestToSlowest)]
+[MemoryDiagnoser(true), Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BufferedInvokationBenchmark
 {
     private readonly IProcessInvoker _processInvoker;
-    
+
     private BufferedTestHelper _bufferedTestHelper;
 
     public BufferedInvokationBenchmark()
@@ -27,13 +24,13 @@ public class BufferedInvokationBenchmark
         _bufferedTestHelper = new BufferedTestHelper();
         _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
     }
-    
+
     /*[Benchmark]
     public async Task<(string standardOutput, string standardError)> CliInvoke_ProcessFactory()
     {
         ProcessConfiguration processConfiguration =
 #pragma warning disable CA1416
-            new ProcessConfiguration(_bufferedTestHelper.TargetFilePath, _bufferedTestHelper.Arguments, 
+            new ProcessConfiguration(_bufferedTestHelper.TargetFilePath, _bufferedTestHelper.Arguments,
                 commandResultValidation: ProcessResultValidation.ExitCodeZero);
 #pragma warning restore CA1416
 
