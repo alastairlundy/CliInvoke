@@ -12,20 +12,15 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.1.0</PackageVersion>
+        <PackageVersion>2.2.0-alpha.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>### All Packages
-* Added .NET 10  TFM and switched to C# language version 14
-* Added Trimming Support and AoT support (#146 )
-* Renamed namespaces to start with ``CliInvoke`` instead of ``AlastairLundy.CliInvoke``
-
-### Specializations Package
-* Updated to use CliInvoke Core 2.1.0
-* Updated internal Polyfill version from 8.9.1 to 9.0.3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke Core 2.2.0 Alpha 1
+* Updated internal Polyfill version from 9.1.0 to 9.3.0
+* Improved Unix Powershell install location detection (https://github.com/alastairlundy/CliInvoke/pull/192 ) - This introduces a minor breaking change in the PowershellCommmandConfiguration class</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>
@@ -35,7 +30,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.3.0" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.3.1" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>
