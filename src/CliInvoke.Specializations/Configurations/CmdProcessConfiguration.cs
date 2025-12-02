@@ -73,7 +73,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
             windowCreation: windowCreation,
             useShellExecution: useShellExecution)
     {
-        base.TargetFilePath = this.TargetFilePath;
+        base.TargetFilePath = TargetFilePath;
     }
 
 
