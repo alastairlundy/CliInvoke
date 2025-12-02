@@ -85,16 +85,10 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
     // ReSharper disable once MemberCanBePrivate.Global
-    public new string TargetFilePath
-    {
-        get
-        {
-            if (!OperatingSystem.IsWindows())
-                throw new PlatformNotSupportedException(Resources.Exceptions_ClassicPowershell_OnlySupportedOnWindows);
-
-            return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}" +
-                   $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe";
-        }
-    }
-        
+    public new string TargetFilePath =>
+        OperatingSystem.IsWindows()
+            ? $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}" +
+              $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe" 
+            : throw new PlatformNotSupportedException(Resources
+                .Exceptions_ClassicPowershell_OnlySupportedOnWindows);
 }
