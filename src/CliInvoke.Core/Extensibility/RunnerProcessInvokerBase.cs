@@ -68,10 +68,10 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
-    public async Task<ProcessResult> ExecuteAsync(
+    public virtual async Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
+        bool disposeOfConfig = true,
         CancellationToken cancellationToken = default
     )
     {
@@ -100,10 +100,10 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
+    public virtual async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
+        bool disposeOfConfig = true,
         CancellationToken cancellationToken = default
     )
     {
@@ -132,10 +132,10 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
-    public async Task<PipedProcessResult> ExecutePipedAsync(
+    public virtual async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
+        bool disposeOfConfig = true,
         CancellationToken cancellationToken = default
     )
     {
