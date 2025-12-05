@@ -15,6 +15,7 @@ using System.Runtime.Versioning;
 using System.Text;
 
 using CliInvoke.Core;
+using CliInvoke.Specializations.Internal;
 using CliInvoke.Specializations.Internal.Localizations;
 // ReSharper disable MemberCanBeMadeStatic.Global
 
@@ -29,6 +30,7 @@ namespace CliInvoke.Specializations.Configurations;
 [UnsupportedOSPlatform("linux")]
 [UnsupportedOSPlatform("freebsd")]
 [UnsupportedOSPlatform("android")]
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class ClassicPowershellProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
@@ -51,6 +53,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public ClassicPowershellProcessConfiguration(string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
