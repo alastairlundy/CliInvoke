@@ -169,8 +169,6 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
         ProcessPriorityClass processPriorityClass
     )
     {
-        ArgumentNullException.ThrowIfNull(processPriorityClass);
-        
         return new ProcessResourcePolicyBuilder(
             new ProcessResourcePolicy(
 #pragma warning disable CA1416

@@ -63,12 +63,6 @@ namespace CliInvoke.Internal.Localizations {
             }
         }
         
-        internal static string Process_FileName_Empty {
-            get {
-                return ResourceManager.GetString("Process.FileName.Empty", resourceCulture);
-            }
-        }
-        
         internal static string CommandBuilder_ArgumentConflict_ShellExecution_Input {
             get {
                 return ResourceManager.GetString("CommandBuilder.ArgumentConflict.ShellExecution.Input", resourceCulture);

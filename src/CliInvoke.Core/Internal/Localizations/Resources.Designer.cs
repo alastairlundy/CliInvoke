@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 
 namespace CliInvoke.Core.Internal.Localizations {
+    using System;
+    
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -25,7 +28,7 @@ namespace CliInvoke.Core.Internal.Localizations {
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("AlastairLundy.CliInvoke.Core.Internal.Localizations.Resources", typeof(Resources).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("CliInvoke.Core.Internal.Localizations.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -39,24 +42,6 @@ namespace CliInvoke.Core.Internal.Localizations {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        internal static string Exceptions_ResourcePolicy_CannotSetToNonStartedProcess {
-            get {
-                return ResourceManager.GetString("Exceptions.ResourcePolicy.CannotSetToNonStartedProcess", resourceCulture);
-            }
-        }
-        
-        internal static string Exceptions_ProcessNotSuccessful_Specific {
-            get {
-                return ResourceManager.GetString("Exceptions.ProcessNotSuccessful.Specific", resourceCulture);
-            }
-        }
-        
-        internal static string Exceptions_ProcessNotSuccessful_Generic {
-            get {
-                return ResourceManager.GetString("Exceptions.ProcessNotSuccessful.Generic", resourceCulture);
             }
         }
         
@@ -75,12 +60,6 @@ namespace CliInvoke.Core.Internal.Localizations {
         internal static string Command_ToString_ShellExecution {
             get {
                 return ResourceManager.GetString("Command.ToString.ShellExecution", resourceCulture);
-            }
-        }
-        
-        internal static string Exceptions_ArgumentBuilder_Buffer_MaximumSize {
-            get {
-                return ResourceManager.GetString("Exceptions.ArgumentBuilder.Buffer.MaximumSize", resourceCulture);
             }
         }
         

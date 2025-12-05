@@ -24,20 +24,18 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.1.0</Version>
-        <PackageReleaseNotes>### All Packages
-* Added .NET 10  TFM and switched to C# language version 14
-* Added Trimming Support and AoT support (#146 )
-* Renamed namespaces to start with ``CliInvoke`` instead of ``AlastairLundy.CliInvoke``
+        <Version>2.2.0-alpha.1</Version>
+        <PackageReleaseNotes>## Changes since 2.1
 
-### Core Package
-* Updated ``IUserCredentialBuilder`` to not accept null strings
-* Updated internal Polyfill version from 8.9.1 to 9.0.3</PackageReleaseNotes>
+### Core package
+* Updated internal Polyfill version from 9.1.0 to 9.3.0
+* Updated code to use Argument Exception throwing polyfills (#210) and address nullability warnings 
+* Added the ``NoValidation`` static instance property to the ``ProcessExitConfiguration`` class - This provides a static helper instance property with no exit code validation, no timeout validation, and suppresses exceptions where possible.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.3.0" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.3.1" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
     </ItemGroup>
 
