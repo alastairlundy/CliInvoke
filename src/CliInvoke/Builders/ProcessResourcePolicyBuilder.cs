@@ -133,7 +133,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
-     //TODO: Migrate to Ensure and ArgumentOutOfRange exception static methods once fixed in Polyfill   
+        //TODO: Migrate to Ensure and ArgumentOutOfRange exception static methods once fixed in Polyfill   
         if (maxWorkingSet < _processResourcePolicy.MinWorkingSet || maxWorkingSet < 1)
             throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
 
