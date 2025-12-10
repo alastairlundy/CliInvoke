@@ -11,14 +11,8 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-
-using CliInvoke.Core.Builders;
-
-// ReSharper disable ArrangeObjectCreationWhenTypeEvident
-// ReSharper disable RedundantExplicitArrayCreation
 
 namespace CliInvoke.Builders;
 

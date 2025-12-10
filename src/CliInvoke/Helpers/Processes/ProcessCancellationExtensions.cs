@@ -7,15 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Diagnostics;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AlastairLundy.DotExtensions.Dates;
-
-using CliInvoke.Core;
 
 namespace CliInvoke.Helpers.Processes;
 

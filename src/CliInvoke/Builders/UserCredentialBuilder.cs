@@ -10,17 +10,10 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
 using System.Diagnostics.Contracts;
 using System.Security;
 
 using AlastairLundy.DotExtensions.Exceptions;
-
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
-
-// ReSharper disable ArrangeObjectCreationWhenTypeEvident
-// ReSharper disable PossibleInvalidOperationException
 
 namespace CliInvoke.Builders;
 

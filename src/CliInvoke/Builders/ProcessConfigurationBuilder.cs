@@ -11,15 +11,9 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
-
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
 
 namespace CliInvoke.Builders;
 

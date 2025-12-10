@@ -7,12 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.IO;
 #if NET8_0_OR_GREATER
 using System.Threading.Tasks;
 #endif
-
 
 namespace CliInvoke.Core;
 
@@ -78,11 +75,11 @@ public class PipedProcessResult
             return false;
 
         return ExecutedFilePath == other.ExecutedFilePath &&
-            StandardOutput.Equals(other.StandardOutput)
-            && StandardError.Equals(other.StandardError)
-            && ExitCode.Equals(other.ExitCode)
-            && StartTime.Equals(other.StartTime)
-            && ExitTime.Equals(other.ExitTime);
+               StandardOutput.Equals(other.StandardOutput)
+               && StandardError.Equals(other.StandardError)
+               && ExitCode.Equals(other.ExitCode)
+               && StartTime.Equals(other.StartTime)
+               && ExitTime.Equals(other.ExitTime);
     }
 
     /// <summary>

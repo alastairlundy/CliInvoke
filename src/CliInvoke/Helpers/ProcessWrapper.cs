@@ -7,10 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Diagnostics;
-
-using CliInvoke.Core;
 using CliInvoke.Helpers.Processes;
 
 namespace CliInvoke.Helpers;
@@ -62,11 +58,11 @@ internal class ProcessWrapper : Process
     {
         bool result = base.Start();
 
+        HasStarted = result;
+        
         if (result)
         {
-            HasStarted = true;
             StartTime = DateTime.UtcNow;
-
             Started?.Invoke(this, EventArgs.Empty);
         }
 

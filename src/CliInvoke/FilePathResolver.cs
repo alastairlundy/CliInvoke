@@ -7,17 +7,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Versioning;
 
+using AlastairLundy.DotExtensions.IO.Directories;
 using AlastairLundy.DotExtensions.IO.Permissions;
 using AlastairLundy.DotPrimitives.IO.Paths;
-
-using CliInvoke.Core;
-using CliInvoke.Internal.Localizations;
 
 // ReSharper disable ConvertClosureToMethodGroup
 
@@ -94,7 +89,6 @@ public class FilePathResolver : IFilePathResolver
         if (filePathToResolve.Contains(Path.DirectorySeparatorChar)
             || filePathToResolve.Contains(Path.AltDirectorySeparatorChar))
         {
-            
             bool fileExists =  File.Exists(filePathToResolve);
 
             resolvedFilePath = fileExists ? new FileInfo(filePathToResolve) : null;
@@ -166,7 +160,7 @@ public class FilePathResolver : IFilePathResolver
 
         DirectoryInfo directory = new(directoryPath);
 
-        FileInfo? file = directory.EnumerateFiles("*", SearchOption.AllDirectories)
+        FileInfo? file = directory.SafelyEnumerateFiles("*", SearchOption.AllDirectories)
             .Where(f => f.Exists)
             .Select(f =>
             {
@@ -194,11 +188,11 @@ public class FilePathResolver : IFilePathResolver
             {
                 if (OperatingSystem.IsWindows())
                 {
-                    return Path.GetFileName(f.FullName).Equals(fileName,
+                    return f.Name.Equals(fileName,
                         StringComparison.InvariantCultureIgnoreCase);
                 }
 
-                return Path.GetFileName(f.FullName).Equals(filePathToResolve,
+                return f.Name.Equals(filePathToResolve,
                     StringComparison.InvariantCulture);
             })
             .FirstOrDefault(f => f.HasExecutePermission());

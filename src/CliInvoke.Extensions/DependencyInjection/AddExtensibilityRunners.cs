@@ -7,17 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-using CliInvoke.Core;
-using CliInvoke.Core.Extensibility;
-using CliInvoke.Core.Extensibility.Factories;
 using CliInvoke.Extensibility;
-
-using Microsoft.Extensions.DependencyInjection;
-#if NET8_0_OR_GREATER
-#endif
 
 namespace CliInvoke.Extensions;
 

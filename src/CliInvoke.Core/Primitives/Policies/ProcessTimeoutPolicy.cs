@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -75,7 +73,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
             return false;
 
         return TimeoutThreshold.Equals(other.TimeoutThreshold)
-            && CancellationMode == other.CancellationMode;
+               && CancellationMode == other.CancellationMode;
     }
 
     /// <summary>

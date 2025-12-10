@@ -13,7 +13,6 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CliInvoke.Core;
 using CliInvoke.Exceptions;
 
 namespace CliInvoke.Extensions.Invokation;

@@ -10,20 +10,15 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using CliInvoke.Core.Builders;
-using CliInvoke.Internal.Localizations;
-
 // ReSharper disable ConvertClosureToMethodGroup
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
-// ReSharper disable RedundantBoolCompare
 
 namespace CliInvoke.Builders;
 
@@ -83,7 +78,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        if (IsValidArgument(value) == false)
+        if (!IsValidArgument(value))
         {
             return this;
         }
@@ -172,7 +167,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(value);
         ArgumentNullException.ThrowIfNull(formatProvider);
         
-        if (IsValidArgument(value, formatProvider) != true)
+        if (!IsValidArgument(value, formatProvider))
             throw new ArgumentNullException(nameof(value));
         
         string valueActual = value.ToString(format, formatProvider);
@@ -256,13 +251,11 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public string EscapeCharacters(string argument)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(argument, nameof(argument));
-#endif
+        ArgumentNullException.ThrowIfNull(argument);
         
         StringBuilder stringBuilder = new StringBuilder();
         
-        if(argument.StartsWith('"') == false)
+        if(!argument.StartsWith('"'))
             stringBuilder.Append('"');
         
         foreach (char c in argument)
@@ -289,7 +282,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
             }
         }
         
-        if(argument.EndsWith('"') == false)
+        if(!argument.EndsWith('"'))
             stringBuilder.Append('"');
         
         return stringBuilder.ToString();
@@ -316,7 +309,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         }
         else
         {
-            output = (string.IsNullOrEmpty(value) == true) == false;
+            output = !(string.IsNullOrEmpty(value) == true);
         }
         
         return output;

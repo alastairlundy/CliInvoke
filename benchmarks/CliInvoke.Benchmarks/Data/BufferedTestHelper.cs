@@ -8,16 +8,15 @@ public class BufferedTestHelper
 {
     public BufferedTestHelper()
     {
-        ExecutableFileDetector executableFileDetector = new();
-
-        WhatExecutableResolver filePathResolver = new(new PathExecutableResolver(executableFileDetector),
-            new ExecutableFileInstancesLocator(executableFileDetector));
-
-        TargetFilePath = filePathResolver.ResolveExecutableFilePath("CliInvokeMockDataSimTool").FullName;
+        TargetFilePath = "";
         
     }
 
-    public string TargetFilePath { get; }
+    public string TargetFilePath
+    {
+        get;
+        private set => field = value;
+    }
 
     public string Arguments => "gen-fake-text";
 }

@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using CliInvoke.Core;
+using CliInvoke.Specializations.Internal.Localizations;
 
 // ReSharper disable RedundantBoolCompare
 
@@ -37,7 +38,7 @@ namespace CliInvoke.Specializations.Configurations;
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
     private readonly IFilePathResolver _filePathResolver;
-
+    
     /// <summary>
     /// Initializes a new instance of the PowershellCommandConfiguration class.
     /// </summary>
@@ -77,8 +78,33 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         windowCreation: windowCreation,
         useShellExecution: useShellExecution)
     {
-        base.TargetFilePath = TargetFilePath;
         _filePathResolver = filePathResolver;
+        
+        string filePath;
+
+        if (OperatingSystem.IsWindows())
+        {
+            try
+            {
+                filePath = _filePathResolver.ResolveFilePath("pwsh.exe");
+            }
+            catch
+            {
+                filePath = $"{GetInstallLocationOnWindows()}";
+            }
+        }
+        else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
+                 OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
+        {
+            filePath = _filePathResolver.ResolveFilePath("pwsh");
+        }
+        else
+        {
+            throw new PlatformNotSupportedException(Resources.Exceptions_Powershell_OnlySupportedOnDesktop);
+        }
+
+        TargetFilePath = filePath;
+        base.TargetFilePath = TargetFilePath;
     }
 
     /// <summary>
@@ -97,22 +123,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     [UnsupportedOSPlatform("watchos")]
     public new string TargetFilePath
     {
-        get
-        {
-            string filePath = string.Empty;
-
-            if (OperatingSystem.IsWindows())
-            {
-                filePath = $"{GetInstallLocationOnWindows()}";
-            }
-            else if (OperatingSystem.IsMacOS() ||
-                     OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
-            {
-                filePath = _filePathResolver.ResolveFilePath("pwsh");
-            }
-
-            return filePath;
-        }
+        get; private set;
     }
 
     private static string GetInstallLocationOnWindows()
@@ -124,7 +135,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         IEnumerable<string> directories = Directory.EnumerateDirectories(
             $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
             .Where(d => Regex.IsMatch(d, @"v\d+"))
-            .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));;
+            .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));
 
         foreach (string directory in directories)
         {
@@ -134,6 +145,6 @@ public class PowershellProcessConfiguration : ProcessConfiguration
                 return expectedFilePath;
         }
 
-        throw new FileNotFoundException("Could not find Powershell installation.");
+        throw new FileNotFoundException(Resources.Exceptions_Powershell_NotInstalled);
     }
 }

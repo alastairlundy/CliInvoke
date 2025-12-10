@@ -7,13 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
-
-using CliInvoke.Core.Internal.Localizations;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
@@ -212,22 +207,22 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
         return TargetFilePath.Equals(other.TargetFilePath)
-            && EnvironmentVariables.Equals(other.EnvironmentVariables)
-            && Arguments.Equals(other.Arguments)
-            && ResourcePolicy.Equals(other.ResourcePolicy)
-            && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
-            && UseShellExecution.Equals(other.UseShellExecution)
-            && Credential.Equals(other.Credential)
-            && ResourcePolicy.Equals(other.ResourcePolicy)
-            && StandardInput.Equals(other.StandardInput)
-            && StandardOutput.Equals(other.StandardOutput)
-            && StandardError.Equals(other.StandardError)
-            && RedirectStandardInput.Equals(other.RedirectStandardInput)
-            && RedirectStandardOutput.Equals(other.RedirectStandardOutput)
-            && RedirectStandardError.Equals(other.RedirectStandardError)
-            && StandardInputEncoding.Equals(other.StandardInputEncoding)
-            && StandardOutputEncoding.Equals(other.StandardOutputEncoding)
-            && StandardErrorEncoding.Equals(other.StandardErrorEncoding);
+               && EnvironmentVariables.Equals(other.EnvironmentVariables)
+               && Arguments.Equals(other.Arguments)
+               && ResourcePolicy.Equals(other.ResourcePolicy)
+               && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
+               && UseShellExecution.Equals(other.UseShellExecution)
+               && Credential.Equals(other.Credential)
+               && ResourcePolicy.Equals(other.ResourcePolicy)
+               && StandardInput.Equals(other.StandardInput)
+               && StandardOutput.Equals(other.StandardOutput)
+               && StandardError.Equals(other.StandardError)
+               && RedirectStandardInput.Equals(other.RedirectStandardInput)
+               && RedirectStandardOutput.Equals(other.RedirectStandardOutput)
+               && RedirectStandardError.Equals(other.RedirectStandardError)
+               && StandardInputEncoding.Equals(other.StandardInputEncoding)
+               && StandardOutputEncoding.Equals(other.StandardOutputEncoding)
+               && StandardErrorEncoding.Equals(other.StandardErrorEncoding);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
     }
 
@@ -343,14 +338,14 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         string workingDirectory = string.IsNullOrEmpty(WorkingDirectoryPath)
             ? ""
             : $" ({Resources
-            .Labels_ProcessConfiguration_ToString_WorkingDirectory}: {WorkingDirectoryPath})";
+                .Labels_ProcessConfiguration_ToString_WorkingDirectory}: {WorkingDirectoryPath})";
         string adminPrivileges = RequiresAdministrator
             ? $"{Environment.NewLine} {Resources
-            .Labels_ProcessConfiguration_ToString_RequiresAdmin}"
+                .Labels_ProcessConfiguration_ToString_RequiresAdmin}"
             : "";
         string shellExecution = UseShellExecution
             ? $"{Environment.NewLine} {Resources
-            .Labels_ProcessConfiguration_ToString_ShellExecution}"
+                .Labels_ProcessConfiguration_ToString_ShellExecution}"
             : "";
 
         return $"{commandString}{workingDirectory}{adminPrivileges}{shellExecution}";

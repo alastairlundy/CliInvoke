@@ -7,13 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Runtime.Versioning;
-
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
 
 namespace CliInvoke.Builders;
 
@@ -90,11 +84,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
-        #if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet);
-        #else
+#else
         minWorkingSet = Ensure.NotNegative(minWorkingSet);
-        #endif
+#endif
         
         if (minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
             return new ProcessResourcePolicyBuilder(
@@ -139,7 +133,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
-     //TODO: Migrate to Ensure and ArgumentOutOfRange exception static methods once fixed in Polyfill   
+        //TODO: Migrate to Ensure and ArgumentOutOfRange exception static methods once fixed in Polyfill   
         if (maxWorkingSet < _processResourcePolicy.MinWorkingSet || maxWorkingSet < 1)
             throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
 

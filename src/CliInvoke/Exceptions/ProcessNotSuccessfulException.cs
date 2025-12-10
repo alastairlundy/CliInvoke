@@ -7,13 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System;
-using System.Diagnostics;
-
-using CliInvoke.Internal.Localizations;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace CliInvoke.Exceptions;
@@ -26,7 +21,7 @@ public sealed class ProcessNotSuccessfulException : Exception
     /// <summary>
     /// The command that was executed.
     /// </summary>
-    public Process? ExecutedProcess { get; private set; }
+    public Process? ExecutedProcess { get; }
 
     /// <summary>
     /// The exit code of the Command that was executed.
