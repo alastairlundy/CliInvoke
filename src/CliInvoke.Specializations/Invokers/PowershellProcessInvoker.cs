@@ -9,6 +9,7 @@
 
 
 using System;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,6 +30,9 @@ namespace CliInvoke.Specializations;
 /// underlying process invoker functionality. It is designed for scenarios where PowerShell-specific process
 /// handling and configurations are required, such as redirecting outputs or managing window creation.
 /// </remarks>
+[SupportedOSPlatform("windows")]
+[SupportedOSPlatform("macos")]
+[SupportedOSPlatform("linux")]
 public class PowershellProcessInvoker : RunnerProcessInvokerBase
 {
     
@@ -40,6 +44,9 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     /// <param name="filePathResolver"></param>
     /// <param name="windowCreation"></param>
     /// <param name="redirectOutputs"></param>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
     public PowershellProcessInvoker(IProcessInvoker processInvoker,
         IRunnerProcessFactory runnerProcessFactory, IFilePathResolver filePathResolver,
         bool windowCreation = true, bool redirectOutputs = true)
@@ -59,6 +66,9 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     /// <param name="cancellationToken">A token to cancel the asynchronous operation. Defaults to CancellationToken.None.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ProcessResult"/> object with the details of the process execution outcome.</returns>
     /// <exception cref="PlatformNotSupportedException">Thrown when the execution is attempted on an unsupported platform such as Android, iOS, tvOS, or a browser environment.</exception>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
     public new Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
@@ -79,6 +89,9 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     /// <param name="cancellationToken">A token to cancel the asynchronous operation. Defaults to CancellationToken.None.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="BufferedProcessResult"/> object with the details of the process execution outcome.</returns>
     /// <exception cref="PlatformNotSupportedException">Thrown when the execution is attempted on an unsupported platform such as Android, iOS, tvOS, or a browser environment.</exception>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
     public new Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
@@ -100,6 +113,9 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     /// <param name="cancellationToken">A token to cancel the asynchronous operation. Defaults to CancellationToken.None.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="PipedProcessResult"/> object with the details of the process execution outcome.</returns>
     /// <exception cref="PlatformNotSupportedException">Thrown when the execution is attempted on an unsupported platform such as Android, iOS, tvOS, or a browser environment.</exception>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
     public new Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
