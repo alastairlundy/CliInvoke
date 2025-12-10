@@ -10,6 +10,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using AlastairLundy.DotExtensions.IO.Directories;
 using AlastairLundy.DotExtensions.IO.Permissions;
 using AlastairLundy.DotPrimitives.IO.Paths;
 
@@ -159,7 +160,7 @@ public class FilePathResolver : IFilePathResolver
 
         DirectoryInfo directory = new(directoryPath);
 
-        FileInfo? file = directory.EnumerateFiles("*", SearchOption.AllDirectories)
+        FileInfo? file = directory.SafelyEnumerateFiles("*", SearchOption.AllDirectories)
             .Where(f => f.Exists)
             .Select(f =>
             {
@@ -187,11 +188,11 @@ public class FilePathResolver : IFilePathResolver
             {
                 if (OperatingSystem.IsWindows())
                 {
-                    return Path.GetFileName(f.FullName).Equals(fileName,
+                    return f.Name.Equals(fileName,
                         StringComparison.InvariantCultureIgnoreCase);
                 }
 
-                return Path.GetFileName(f.FullName).Equals(filePathToResolve,
+                return f.Name.Equals(filePathToResolve,
                     StringComparison.InvariantCulture);
             })
             .FirstOrDefault(f => f.HasExecutePermission());
