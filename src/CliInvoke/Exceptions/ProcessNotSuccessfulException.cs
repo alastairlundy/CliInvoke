@@ -7,13 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System;
-using System.Diagnostics;
-
-using CliInvoke.Internal.Localizations;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace CliInvoke.Exceptions;

@@ -10,20 +10,15 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using CliInvoke.Core.Builders;
-using CliInvoke.Internal.Localizations;
-
 // ReSharper disable ConvertClosureToMethodGroup
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
-// ReSharper disable RedundantBoolCompare
 
 namespace CliInvoke.Builders;
 

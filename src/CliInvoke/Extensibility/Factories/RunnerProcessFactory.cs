@@ -7,15 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System;
-using System.IO;
-
 using CliInvoke.Builders;
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
 using CliInvoke.Core.Extensibility.Factories;
-
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace CliInvoke.Extensibility.Factories;
 

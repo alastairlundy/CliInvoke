@@ -7,20 +7,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.IO;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AlastairLundy.DotExtensions.Exceptions;
-
-using CliInvoke.Core;
 using CliInvoke.Core.Piping;
-using CliInvoke.Exceptions;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
-using CliInvoke.Internal.Localizations;
 
 namespace CliInvoke;
 
