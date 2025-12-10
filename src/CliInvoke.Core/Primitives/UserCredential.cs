@@ -16,8 +16,6 @@
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable MemberCanBePrivate.Global
 
-using System;
-using System.Runtime.Versioning;
 using System.Security;
 
 namespace CliInvoke.Core;
@@ -123,12 +121,12 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
             return false;
 
         return Domain == other.Domain
-            && UserName == other.UserName
-            &&
+               && UserName == other.UserName
+               &&
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-            Password.Equals(other.Password)
+               Password.Equals(other.Password)
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
-            && LoadUserProfile == other.LoadUserProfile;
+               && LoadUserProfile == other.LoadUserProfile;
 #pragma warning restore CA1416
     }
 

@@ -7,9 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System;
-using System.Diagnostics.Contracts;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 

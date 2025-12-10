@@ -8,7 +8,6 @@
    */
 
 using System.Diagnostics;
-using System.Runtime.Versioning;
 
 namespace CliInvoke.Core.Builders;
 

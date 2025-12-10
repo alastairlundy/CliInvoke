@@ -10,7 +10,7 @@
 namespace CliInvoke.Core.Extensibility.Factories;
 
 /// <summary>
-/// An interface to allow creating a ProcessConfiguration that can be run through other Process' ProcessConfiguration.
+/// An interface to allow creating a ProcessConfiguration that can be run through another Process' ProcessConfiguration.
 /// </summary>
 public interface IRunnerProcessFactory
 {

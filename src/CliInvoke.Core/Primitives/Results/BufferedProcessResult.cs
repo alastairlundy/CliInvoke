@@ -13,10 +13,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
-
-// ReSharper disable MemberCanBePrivate.Global
-
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -75,8 +71,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
 
         return ExecutedFilePath == other.ExecutedFilePath &&
                StandardOutput == other.StandardOutput
-            && StandardError == other.StandardError
-            && ExitCode == other.ExitCode;
+               && StandardError == other.StandardError
+               && ExitCode == other.ExitCode;
     }
 
     /// <summary>
