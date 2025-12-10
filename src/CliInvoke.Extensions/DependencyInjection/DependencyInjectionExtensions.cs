@@ -7,17 +7,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
-
-using CliInvoke.Core;
-using CliInvoke.Core.Extensibility.Factories;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Piping;
 using CliInvoke.Extensibility.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 // ReSharper disable RedundantAssignment
