@@ -84,11 +84,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
-        #if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet);
-        #else
+#else
         minWorkingSet = Ensure.NotNegative(minWorkingSet);
-        #endif
+#endif
         
         if (minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
             return new ProcessResourcePolicyBuilder(

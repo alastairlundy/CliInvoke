@@ -88,7 +88,6 @@ public class FilePathResolver : IFilePathResolver
         if (filePathToResolve.Contains(Path.DirectorySeparatorChar)
             || filePathToResolve.Contains(Path.AltDirectorySeparatorChar))
         {
-            
             bool fileExists =  File.Exists(filePathToResolve);
 
             resolvedFilePath = fileExists ? new FileInfo(filePathToResolve) : null;

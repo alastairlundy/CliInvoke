@@ -13,7 +13,7 @@ using CliInvoke.Core.Extensibility.Factories;
 namespace CliInvoke.Extensibility.Factories;
 
 /// <summary>
-/// A class to allow creating a ProcessConfiguration that can be run through other Process' ProcessConfiguration.
+/// A class to allow creating a ProcessConfiguration that can be run through another Process' ProcessConfiguration.
 /// </summary>
 public class RunnerProcessFactory : IRunnerProcessFactory
 {
@@ -32,8 +32,8 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
         
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
-            runnerProcessConfig.TargetFilePath
-        )
+                runnerProcessConfig.TargetFilePath
+            )
             .SetArguments(
                 processConfigToBeRun.TargetFilePath + " " + processConfigToBeRun.Arguments
             )

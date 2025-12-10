@@ -21,7 +21,7 @@ public sealed class ProcessNotSuccessfulException : Exception
     /// <summary>
     /// The command that was executed.
     /// </summary>
-    public Process? ExecutedProcess { get; private set; }
+    public Process? ExecutedProcess { get; }
 
     /// <summary>
     /// The exit code of the Command that was executed.

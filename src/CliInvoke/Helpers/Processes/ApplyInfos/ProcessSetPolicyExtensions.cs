@@ -53,7 +53,7 @@ internal static class ProcessSetPolicyExtensions
                 || OperatingSystem.IsMacCatalyst()
                 || OperatingSystem.IsFreeBSD()
                 || OperatingSystem.IsWindows()
-            )
+               )
             {
                 if (resourcePolicy.MinWorkingSet is not null) 
                     process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;

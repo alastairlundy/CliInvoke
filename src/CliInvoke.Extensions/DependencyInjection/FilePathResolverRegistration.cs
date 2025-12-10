@@ -7,13 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-using CliInvoke.Core;
-
-using Microsoft.Extensions.DependencyInjection;
-
 namespace CliInvoke.Extensions;
 
 public static class FilePathResolverRegistration

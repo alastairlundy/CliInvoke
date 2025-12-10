@@ -190,7 +190,7 @@ public class ProcessInvoker : IProcessInvoker
         ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true, true),
-            EnableRaisingEvents = true,
+            EnableRaisingEvents = true
         };
 
         if (
