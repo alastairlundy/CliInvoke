@@ -6,8 +6,8 @@
 ## 2.2
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.2.0 Alpha 2 | December 11th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.2.0-alpha.2 |
 | 2.2.0 Alpha 1 | December 1st 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.2.0-alpha.1 |
-
 
 ## 2.1
 | Version | Release Date | Changelog |
