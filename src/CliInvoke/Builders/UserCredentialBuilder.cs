@@ -12,8 +12,6 @@
 
 using System.Security;
 
-using AlastairLundy.DotExtensions.Exceptions;
-
 namespace CliInvoke.Builders;
 
 /// <summary>

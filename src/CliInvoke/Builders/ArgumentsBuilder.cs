@@ -17,8 +17,6 @@ using System.Text;
 
 // ReSharper disable ConvertClosureToMethodGroup
 
-// ReSharper disable SuggestVarOrType_BuiltInTypes
-
 namespace CliInvoke.Builders;
 
 /// <summary>
@@ -120,7 +118,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
     public IArgumentsBuilder Add(string value) 
-        => IsValidArgument(value) == true ? Add(value, false) : this;
+        => IsValidArgument(value) ? Add(value, false) : this;
 
     /// <summary>
     /// Appends a collection of string values to the arguments builder.
@@ -308,7 +306,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         }
         else
         {
-            output = !(string.IsNullOrEmpty(value) == true);
+            output = !string.IsNullOrEmpty(value);
         }
         
         return output;

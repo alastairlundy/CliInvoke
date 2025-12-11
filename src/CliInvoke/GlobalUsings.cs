@@ -6,6 +6,8 @@ global using System.Diagnostics.Contracts;
 global using System.IO;
 global using System.Runtime.Versioning;
 
+global using AlastairLundy.DotExtensions.Exceptions;
+
 global using CliInvoke.Core;
 global using CliInvoke.Core.Builders;
 global using CliInvoke.Exceptions;
