@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Collections.Generic;
 using System.Linq;
 
 using AlastairLundy.DotExtensions.IO.Directories;
@@ -69,7 +68,7 @@ public class FilePathResolver : IFilePathResolver
     [UnsupportedOSPlatform("tvos")]
     private static bool ExecutableFileCheck(string fileName)
     {
-        FileInfo file =  new FileInfo(fileName);
+        FileInfo file =  new(fileName);
 
         return file.HasExecutePermission() ? true :
             throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
@@ -117,7 +116,7 @@ public class FilePathResolver : IFilePathResolver
 
                     if (File.Exists(filePath))
                     {
-                        resolvedFilePath = new FileInfo(filePath);
+                        resolvedFilePath = new(filePath);
                         return true;
                     }
                 }
@@ -128,7 +127,7 @@ public class FilePathResolver : IFilePathResolver
 
                 if (File.Exists(filePath))
                 {
-                    resolvedFilePath = new FileInfo(filePath);
+                    resolvedFilePath = new(filePath);
                     return true;
                 }
             }
@@ -178,7 +177,7 @@ public class FilePathResolver : IFilePathResolver
                         tempF = tempF.Remove(extensionIndex, extension.Length);
                         tempF = tempF.Insert(extensionIndex, extension.ToLower());
 
-                        f = new FileInfo(tempF);
+                        f = new(tempF);
                     }
                 }
 

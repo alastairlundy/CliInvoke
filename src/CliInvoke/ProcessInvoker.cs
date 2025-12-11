@@ -83,7 +83,7 @@ public class ProcessInvoker : IProcessInvoker
             );
         }
 
-        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
+        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(false, false),
             EnableRaisingEvents = true,
@@ -114,7 +114,7 @@ public class ProcessInvoker : IProcessInvoker
 
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
 
-            ProcessResult result = new ProcessResult(
+            ProcessResult result = new(
                 process.StartInfo.FileName,
                 process.ExitCode,
                 process.StartTime,
@@ -187,7 +187,7 @@ public class ProcessInvoker : IProcessInvoker
             );
         }
 
-        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
+        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true, true),
             EnableRaisingEvents = true
@@ -226,7 +226,7 @@ public class ProcessInvoker : IProcessInvoker
 
             await Task.WhenAll(standardOut, standardError, waitForExit);
 
-            BufferedProcessResult result = new BufferedProcessResult(
+            BufferedProcessResult result = new(
                 process.StartInfo.FileName,
                 process.ExitCode,
                 await standardOut,
@@ -297,7 +297,7 @@ public class ProcessInvoker : IProcessInvoker
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
+        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true, true),
             EnableRaisingEvents = true,
@@ -336,7 +336,7 @@ public class ProcessInvoker : IProcessInvoker
 
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
-            PipedProcessResult result = new PipedProcessResult(
+            PipedProcessResult result = new(
                 process.StartInfo.FileName,
                 process.ExitCode,
                 process.StartTime,

@@ -10,15 +10,11 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 
 // ReSharper disable ConvertClosureToMethodGroup
-
-// ReSharper disable SuggestVarOrType_BuiltInTypes
 
 namespace CliInvoke.Builders;
 
@@ -38,7 +34,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// </summary>
     public ArgumentsBuilder()
     {
-        _buffer = new StringBuilder();
+        _buffer = new();
     }
 
     /// <summary>
@@ -47,7 +43,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="argumentValidationLogic">The argument validation logic to use to decide whether to allow Arguments passed to the builder.</param>
     public ArgumentsBuilder(Func<string, bool> argumentValidationLogic)
     {
-        _buffer = new StringBuilder();
+        _buffer = new();
         _argumentValidationLogic = argumentValidationLogic;   
     }
     
@@ -121,7 +117,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
     public IArgumentsBuilder Add(string value) 
-        => IsValidArgument(value) == true ? Add(value, false) : this;
+        => IsValidArgument(value) ? Add(value, false) : this;
 
     /// <summary>
     /// Appends a collection of string values to the arguments builder.
@@ -253,7 +249,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(argument);
         
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
         
         if(!argument.StartsWith('"'))
             stringBuilder.Append('"');
@@ -309,7 +305,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         }
         else
         {
-            output = !(string.IsNullOrEmpty(value) == true);
+            output = !string.IsNullOrEmpty(value);
         }
         
         return output;

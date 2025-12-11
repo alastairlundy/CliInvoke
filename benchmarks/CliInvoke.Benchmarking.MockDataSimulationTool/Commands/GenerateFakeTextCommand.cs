@@ -38,7 +38,7 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
         _fakeChars = _faker.Random.Chars(count: 1000);
     }
 
-    public override int Execute(
+    protected override int Execute(
         CommandContext context,
         Settings settings,
         CancellationToken cancellationToken
@@ -73,17 +73,13 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
         {
             if (
                 s.NumberOfFakeTextLines > 0
-                && s.NumberOfFakeTextLines < 1001
-                && s.FakeTextLineLength > 0
-                && s.FakeTextLineLength < 1_000_001
+                && s is { NumberOfFakeTextLines: < 1001, FakeTextLineLength: > 0 and < 1_000_001 }
             )
             {
                 return ValidationResult.Success();
             }
-            else
-            {
-                return ValidationResult.Error();
-            }
+
+            return ValidationResult.Error();
         }
 
         return settings.Validate();

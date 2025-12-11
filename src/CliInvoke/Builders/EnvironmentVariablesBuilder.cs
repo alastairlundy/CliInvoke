@@ -11,9 +11,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-
 namespace CliInvoke.Builders;
 
 /// <summary>
@@ -33,7 +30,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     {
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
         _stringComparer = StringComparer.Ordinal;
-        _environmentVariables = new Dictionary<string, string>(_stringComparer);
+        _environmentVariables = new(_stringComparer);
     }
 
     /// <summary>
@@ -50,7 +47,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
 
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
-        _environmentVariables = new Dictionary<string, string>(_stringComparer);
+        _environmentVariables = new(_stringComparer);
     }
 
     /// <summary>
@@ -68,7 +65,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         ArgumentNullException.ThrowIfNull(vars);
         ArgumentNullException.ThrowIfNull(stringComparer);
 
-        _environmentVariables = new Dictionary<string, string>(vars, _stringComparer);
+        _environmentVariables = new(vars, _stringComparer);
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
     }
@@ -112,7 +109,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     {
         ArgumentNullException.ThrowIfNull(variables);
 
-        Dictionary<string, string> output = new Dictionary<string, string>(
+        Dictionary<string, string> output = new(
             _environmentVariables,
             StringComparer.Ordinal
         );

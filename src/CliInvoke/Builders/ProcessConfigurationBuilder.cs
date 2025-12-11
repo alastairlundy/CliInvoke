@@ -11,8 +11,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Text;
 
 namespace CliInvoke.Builders;
@@ -33,7 +31,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
     public ProcessConfigurationBuilder(string targetFilePath)
     {
-        _configuration = new ProcessConfiguration(targetFilePath,
+        _configuration = new(targetFilePath,
             false, false,
             false);
     }

@@ -7,16 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
-
-using CliInvoke.Core;
-using CliInvoke.Specializations.Internal.Localizations;
 
 // ReSharper disable RedundantBoolCompare
 
@@ -37,8 +32,6 @@ namespace CliInvoke.Specializations.Configurations;
 [UnsupportedOSPlatform("watchos")]
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
-    private readonly IFilePathResolver _filePathResolver;
-    
     /// <summary>
     /// Initializes a new instance of the PowershellCommandConfiguration class.
     /// </summary>
@@ -78,15 +71,13 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         windowCreation: windowCreation,
         useShellExecution: useShellExecution)
     {
-        _filePathResolver = filePathResolver;
-        
         string filePath;
 
         if (OperatingSystem.IsWindows())
         {
             try
             {
-                filePath = _filePathResolver.ResolveFilePath("pwsh.exe");
+                filePath = filePathResolver.ResolveFilePath("pwsh.exe");
             }
             catch
             {
@@ -96,7 +87,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
                  OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
         {
-            filePath = _filePathResolver.ResolveFilePath("pwsh");
+            filePath = filePathResolver.ResolveFilePath("pwsh");
         }
         else
         {
@@ -133,7 +124,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             : Environment.SpecialFolder.ProgramFilesX86);
 
         IEnumerable<string> directories = Directory.EnumerateDirectories(
-            $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
+                $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
             .Where(d => Regex.IsMatch(d, @"v\d+"))
             .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));
 

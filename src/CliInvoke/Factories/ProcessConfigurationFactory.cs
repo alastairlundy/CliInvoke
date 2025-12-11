@@ -7,9 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-
 using CliInvoke.Builders;
 using CliInvoke.Core.Factories;
 

@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Diagnostics.Contracts;
-
 namespace CliInvoke.Builders;
 
 /// <summary>
@@ -47,6 +45,8 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity)
     {
+//        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, (nint)1);
+        
         if (processorAffinity < 1)
             throw new ArgumentOutOfRangeException(nameof(processorAffinity));
 
@@ -54,7 +54,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
             throw new ArgumentOutOfRangeException(nameof(processorAffinity));
 
         return new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
+            new(
                 processorAffinity,
 #pragma warning disable CA1416
                 _processResourcePolicy.MinWorkingSet,
@@ -84,15 +84,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
-#if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet);
-#else
-        minWorkingSet = Ensure.NotNegative(minWorkingSet);
-#endif
         
         if (minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
             return new ProcessResourcePolicyBuilder(
-                new ProcessResourcePolicy(
+                new(
 #pragma warning disable CA1416
                     _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
@@ -104,7 +100,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
             );
 
         return new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
+            new(
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
@@ -141,7 +137,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
             throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
 
         return new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
+            new(
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
@@ -164,7 +160,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     )
     {
         return new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
+            new(
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
                 _processResourcePolicy.MinWorkingSet,
@@ -184,7 +180,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder ConfigurePriorityBoost(bool enablePriorityBoost) =>
         new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
+            new(
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
                 _processResourcePolicy.MinWorkingSet,

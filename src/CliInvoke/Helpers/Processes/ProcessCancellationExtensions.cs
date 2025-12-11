@@ -86,7 +86,7 @@ internal static class ProcessCancellationExtensions
 
             DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
 
-            CancellationTokenSource cts = new CancellationTokenSource();
+            CancellationTokenSource cts = new();
 
             cts.CancelAfter(timeoutThreshold);
 

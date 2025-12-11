@@ -8,15 +8,12 @@
 */
 
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
 
-using CliInvoke.Core;
 using CliInvoke.Specializations.Internal;
-using CliInvoke.Specializations.Internal.Localizations;
+
 // ReSharper disable MemberCanBeMadeStatic.Global
 
 namespace CliInvoke.Specializations.Configurations;
