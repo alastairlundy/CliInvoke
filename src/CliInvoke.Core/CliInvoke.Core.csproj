@@ -24,13 +24,10 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.2.0-alpha.1</Version>
-        <PackageReleaseNotes>## Changes since 2.1
-
-### Core package
-* Updated internal Polyfill version from 9.1.0 to 9.3.0
-* Updated code to use Argument Exception throwing polyfills (#210) and address nullability warnings 
-* Added the ``NoValidation`` static instance property to the ``ProcessExitConfiguration`` class - This provides a static helper instance property with no exit code validation, no timeout validation, and suppresses exceptions where possible.</PackageReleaseNotes>
+        <Version>2.2.0-alpha.2</Version>
+        <PackageReleaseNotes>### Core Package
+* Updated internal Polyfill version from 9.3.0 to 9.3.4
+* Updated ``RunnerProcessInvokerBase`` methods to be virtual</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
