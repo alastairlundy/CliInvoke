@@ -45,6 +45,8 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity)
     {
+//        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, (nint)1);
+        
         if (processorAffinity < 1)
             throw new ArgumentOutOfRangeException(nameof(processorAffinity));
 
@@ -82,11 +84,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
-#if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet);
-#else
-        minWorkingSet = Ensure.NotNegative(minWorkingSet);
-#endif
         
         if (minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
             return new ProcessResourcePolicyBuilder(
