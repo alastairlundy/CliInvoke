@@ -10,7 +10,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System.Diagnostics.Contracts;
 using System.Security;
 
 using AlastairLundy.DotExtensions.Exceptions;
@@ -29,7 +28,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// </summary>
     public UserCredentialBuilder()
     {
-        _userCredential = new UserCredential();
+        _userCredential = new();
     }
 
     /// <summary>
@@ -52,7 +51,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         ArgumentException.ThrowIfNullOrEmpty(domain);
         
         return new UserCredentialBuilder(
-            new UserCredential(
+            new(
                 domain,
                 _userCredential.UserName,
 #pragma warning disable CA1416
@@ -75,7 +74,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(
+            new(
                 _userCredential.Domain,
                 username,
                 _userCredential.Password,
@@ -98,7 +97,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(
+            new(
                 _userCredential.Domain,
                 _userCredential.UserName,
                 password,
@@ -117,7 +116,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public IUserCredentialBuilder LoadUserProfile(bool loadUserProfile) =>
         new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(
+            new(
                 _userCredential.Domain,
                 _userCredential.UserName,
                 _userCredential.Password,
@@ -133,7 +132,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public UserCredential Build() =>
 #pragma warning disable CA1416
-        new UserCredential(
+        new(
             _userCredential.Domain,
             _userCredential.UserName,
             _userCredential.Password,

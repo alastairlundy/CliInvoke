@@ -11,7 +11,6 @@
  */
 
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -38,7 +37,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// </summary>
     public ArgumentsBuilder()
     {
-        _buffer = new StringBuilder();
+        _buffer = new();
     }
 
     /// <summary>
@@ -47,7 +46,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="argumentValidationLogic">The argument validation logic to use to decide whether to allow Arguments passed to the builder.</param>
     public ArgumentsBuilder(Func<string, bool> argumentValidationLogic)
     {
-        _buffer = new StringBuilder();
+        _buffer = new();
         _argumentValidationLogic = argumentValidationLogic;   
     }
     
@@ -253,7 +252,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(argument);
         
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
         
         if(!argument.StartsWith('"'))
             stringBuilder.Append('"');

@@ -29,7 +29,7 @@ internal static class ToStartInfoExtensions
     {
         ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath);
 
-        ProcessStartInfo processStartInfo = new ProcessStartInfo()
+        ProcessStartInfo processStartInfo = new()
         {
             FileName = processConfiguration.TargetFilePath,
             Arguments = string.IsNullOrEmpty(processConfiguration.Arguments)
