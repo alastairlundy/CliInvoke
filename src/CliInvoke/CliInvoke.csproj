@@ -99,7 +99,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.DotExtensions" Version="9.2.0-preview.2" />
+      <PackageReference Include="AlastairLundy.DotExtensions" Version="9.2.0" />
       <PackageReference Include="AlastairLundy.DotPrimitives" Version="4.0.0" />
     </ItemGroup>
 </Project>
