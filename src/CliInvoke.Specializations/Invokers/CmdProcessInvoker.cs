@@ -7,17 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CliInvoke.Core;
-using CliInvoke.Core.Extensibility;
-using CliInvoke.Core.Extensibility.Factories;
-
 using CliInvoke.Specializations.Configurations;
-using CliInvoke.Specializations.Internal.Localizations;
 
 namespace CliInvoke.Specializations;
 
@@ -49,7 +42,6 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
         base(processInvoker, runnerProcessFactory, new CmdProcessConfiguration("", false,
             redirectOutputs, redirectOutputs, windowCreation: windowCreation))
     {
-        
     }
 
     /// <summary>

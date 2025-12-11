@@ -8,16 +8,10 @@
 */
 
 
-using System;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CliInvoke.Core;
-using CliInvoke.Core.Extensibility;
-using CliInvoke.Core.Extensibility.Factories;
 using CliInvoke.Specializations.Configurations;
-using CliInvoke.Specializations.Internal.Localizations;
 
 namespace CliInvoke.Specializations;
 
@@ -35,7 +29,6 @@ namespace CliInvoke.Specializations;
 [SupportedOSPlatform("linux")]
 public class PowershellProcessInvoker : RunnerProcessInvokerBase
 {
-    
     /// <summary>
     /// 
     /// </summary>
