@@ -9,7 +9,7 @@ Where multiple major versions are supported, only the latest minor release may b
 Versions that are currently supported with Bug Fixes and/or Security Fixes.
 
 | Version series | Supported with Bug Fixes | Supported with Security Fixes |
-|--| --|--|--|--|
+|--| --|--|--|
 | 2.1 | Until 2.3 | Until 2.4 |
 | 2.0 | Until 2.2 | Until 2.3 |
 | < 2.0 | :x:, Ended October 28th 2025 | :x:, Ended November 14th 2025 |
