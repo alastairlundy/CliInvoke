@@ -1,4 +1,8 @@
-﻿namespace CliInvoke.Benchmarking.Data;
+﻿using AlastairLundy.WhatExecLib;
+using AlastairLundy.WhatExecLib.Detectors;
+using AlastairLundy.WhatExecLib.Locators;
+
+namespace CliInvoke.Benchmarking.Data;
 
 public class BufferedTestHelper
 {
