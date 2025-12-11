@@ -11,8 +11,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System.Collections.Generic;
-
 namespace CliInvoke.Builders;
 
 /// <summary>
