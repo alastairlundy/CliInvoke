@@ -38,7 +38,7 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
         fakeChars = _faker.Random.Chars(count: 1000);
     }
 
-    public override int Execute(
+    protected override int Execute(
         CommandContext context,
         Settings settings,
         CancellationToken cancellationToken

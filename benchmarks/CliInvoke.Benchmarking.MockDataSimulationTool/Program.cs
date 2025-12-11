@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
+﻿using CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
 using Spectre.Console.Cli;
 
 CommandApp app = new CommandApp();
