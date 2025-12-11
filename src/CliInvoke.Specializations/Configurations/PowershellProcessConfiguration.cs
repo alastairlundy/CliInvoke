@@ -32,8 +32,6 @@ namespace CliInvoke.Specializations.Configurations;
 [UnsupportedOSPlatform("watchos")]
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
-    private readonly IFilePathResolver _filePathResolver;
-    
     /// <summary>
     /// Initializes a new instance of the PowershellCommandConfiguration class.
     /// </summary>
@@ -73,15 +71,13 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         windowCreation: windowCreation,
         useShellExecution: useShellExecution)
     {
-        _filePathResolver = filePathResolver;
-        
         string filePath;
 
         if (OperatingSystem.IsWindows())
         {
             try
             {
-                filePath = _filePathResolver.ResolveFilePath("pwsh.exe");
+                filePath = filePathResolver.ResolveFilePath("pwsh.exe");
             }
             catch
             {
@@ -91,7 +87,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
                  OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
         {
-            filePath = _filePathResolver.ResolveFilePath("pwsh");
+            filePath = filePathResolver.ResolveFilePath("pwsh");
         }
         else
         {
