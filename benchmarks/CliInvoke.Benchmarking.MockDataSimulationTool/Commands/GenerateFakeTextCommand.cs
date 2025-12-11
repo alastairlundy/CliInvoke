@@ -14,9 +14,9 @@ namespace CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
 
 public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
 {
-    private Faker _faker;
+    private readonly Faker _faker;
 
-    private char[] fakeChars;
+    private readonly char[] _fakeChars;
 
     public class Settings : CommandSettings
     {
@@ -35,10 +35,10 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
     {
         _faker = new Faker();
 
-        fakeChars = _faker.Random.Chars(count: 1000);
+        _fakeChars = _faker.Random.Chars(count: 1000);
     }
 
-    public override int Execute(
+    protected override int Execute(
         CommandContext context,
         Settings settings,
         CancellationToken cancellationToken
@@ -52,7 +52,7 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
             {
                 for (int i = 0; i < settings.FakeTextLineLength; i++)
                 {
-                    stringBuilder.Append(_faker.PickRandom(fakeChars));
+                    stringBuilder.Append(_faker.PickRandom(_fakeChars));
                 }
 
                 Console.WriteLine(stringBuilder.ToString());
@@ -73,17 +73,13 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
         {
             if (
                 s.NumberOfFakeTextLines > 0
-                && s.NumberOfFakeTextLines < 1001
-                && s.FakeTextLineLength > 0
-                && s.FakeTextLineLength < 1_000_001
+                && s is { NumberOfFakeTextLines: < 1001, FakeTextLineLength: > 0 and < 1_000_001 }
             )
             {
                 return ValidationResult.Success();
             }
-            else
-            {
-                return ValidationResult.Error();
-            }
+
+            return ValidationResult.Error();
         }
 
         return settings.Validate();
