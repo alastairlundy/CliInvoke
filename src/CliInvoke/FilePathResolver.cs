@@ -51,7 +51,7 @@ public class FilePathResolver : IFilePathResolver
 
         if (filePath is not null && resolveFromPath)
         {
-            if (ExecutableFileCheck(filePathToResolve))
+            if (ExecutableFileCheck(filePath.FullName))
                 return filePath.FullName;
         }
         
@@ -107,7 +107,7 @@ public class FilePathResolver : IFilePathResolver
 
         foreach (string pathEntry in pathContents)
         {
-            if (!fileHasExtension)
+            if (fileHasExtension)
             {
                 foreach (string pathExtension in pathExtensions)
                 {
