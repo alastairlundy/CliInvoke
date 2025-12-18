@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AlastairLundy.DotPrimitives.IO.Paths;
 using CliInvoke.Core;
@@ -25,7 +26,7 @@ public class FilePathResolverTests
 
         if (OperatingSystem.IsWindows())
         {
-            var winExpected = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            string? winExpected = Environment.GetEnvironmentVariable("DOTNET_ROOT");
             
             if(winExpected is not null)
                 expected = winExpected;
@@ -38,7 +39,7 @@ public class FilePathResolverTests
 
                 BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration, cancellationToken: TestContext.Current.CancellationToken);
 
-                expected = task.StandardOutput;
+                expected = task.StandardOutput.Split(Environment.NewLine).First();
             }
         }
         else
