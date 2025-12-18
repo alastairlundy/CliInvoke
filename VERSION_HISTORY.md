@@ -12,6 +12,7 @@
 ## 2.1
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.1.3 | December 18th 2025 |  https://github.com/alastairlundy/CliInvoke/releases/2.1.3 |
 | 2.1.2 | December 11th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.1.2 |
 | 2.1.1 | November 18th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.1.1 |
 | 2.1.0 | November 14th 2025 | https://github.com/alastairlundy/CliInvoke/releases/2.1.0 |
