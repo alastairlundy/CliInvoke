@@ -97,7 +97,7 @@ public class FilePathResolver : IFilePathResolver
 
         foreach (string pathEntry in pathContents)
         {
-            if (!fileHasExtension)
+            if (fileHasExtension)
             {
                 foreach (string pathExtension in pathExtensions)
                 {
