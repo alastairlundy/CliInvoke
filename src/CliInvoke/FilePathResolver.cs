@@ -11,7 +11,7 @@ using System.Linq;
 
 using AlastairLundy.DotExtensions.IO.Directories;
 using AlastairLundy.DotExtensions.IO.Permissions;
-using AlastairLundy.DotPrimitives.IO.Paths;
+using DotPrimitives.IO.Paths;
 
 // ReSharper disable ConvertClosureToMethodGroup
 
