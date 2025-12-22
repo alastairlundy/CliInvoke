@@ -6,6 +6,7 @@ global using System.Diagnostics;
 global using System.Diagnostics.Contracts;
 global using System.IO;
 global using System.Runtime.Versioning;
+global using System.Threading.Tasks;
 
 global using AlastairLundy.DotExtensions.Exceptions;
 

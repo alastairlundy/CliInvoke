@@ -8,7 +8,6 @@
    */
 
 using System.Threading;
-using System.Threading.Tasks;
 
 using CliInvoke.Core.Piping;
 using CliInvoke.Helpers;
