@@ -24,10 +24,8 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.2.0-alpha.2</Version>
-        <PackageReleaseNotes>### Core Package
-* Updated internal Polyfill version from 9.3.0 to 9.3.4
-* Updated ``RunnerProcessInvokerBase`` methods to be virtual</PackageReleaseNotes>
+        <Version>2.2.0-beta.1</Version>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.3.4 to 9.4.1</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     

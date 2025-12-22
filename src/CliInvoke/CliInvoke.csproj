@@ -15,14 +15,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 9.3.0 to 9.3.4
-* Updated DotExtensions version from 9.1.0 to 9.2.0
-* Fixed argument escaping issues with the reworked Argument Escaping logic
-* Updated ``FilePathResolver`` logic to use enumerated Path directories method for potential performance improvements</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.3.4 to 9.4.1
+* Updated DotExtensions version from 9.2.0 to 9.2.1
+* Fixed a bug where FilePathResolver's implementation of Path Environment Variable Resolving would lead to incorrect file path evaluation due to an incorrect if statement evaluation.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.2.0-alpha.2</PackageVersion>
+        <PackageVersion>2.2.0-beta.1</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
