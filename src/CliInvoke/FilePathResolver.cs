@@ -13,7 +13,6 @@ using AlastairLundy.DotExtensions.IO.Directories;
 using AlastairLundy.DotExtensions.IO.Permissions;
 using DotPrimitives.IO.Paths;
 
-// ReSharper disable ConvertClosureToMethodGroup
 
 namespace CliInvoke;
 
