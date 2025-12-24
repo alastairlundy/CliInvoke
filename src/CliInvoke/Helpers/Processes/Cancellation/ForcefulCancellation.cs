@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Threading;
 
 using DotExtensions.Dates;
 
@@ -22,6 +23,7 @@ internal static class ForcefulCancellation
         /// </summary>
         /// <param name="timeoutThreshold"></param>
         /// <param name="cancellationExceptionBehavior"></param>
+        /// <param name="cancellationToken"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
@@ -32,7 +34,7 @@ internal static class ForcefulCancellation
         [SupportedOSPlatform("freebsd")]
         [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
         {
             if (timeoutThreshold < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException();
@@ -41,9 +43,9 @@ internal static class ForcefulCancellation
 
             try
             {
-                Task waitForExit = process.WaitForExitAsync();
+                Task waitForExit = process.WaitForExitAsync(cancellationToken);
 
-                Task delay = Task.Delay(timeoutThreshold);
+                Task delay = Task.Delay(timeoutThreshold, cancellationToken);
 
                 await Task.WhenAny(delay, waitForExit);
 
