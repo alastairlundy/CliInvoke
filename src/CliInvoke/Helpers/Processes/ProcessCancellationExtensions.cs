@@ -11,8 +11,6 @@ using System.Threading;
 
 using CliInvoke.Helpers.Processes.Cancellation;
 
-using DotExtensions.Dates;
-
 namespace CliInvoke.Helpers.Processes;
 
 /// <summary>
@@ -32,8 +30,7 @@ internal static class ProcessCancellationExtensions
         [SupportedOSPlatform("freebsd")]
         [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrTimeoutAsync(ProcessExitConfiguration processExitConfiguration,
-            CancellationToken cancellationToken = default
-        )
+            CancellationToken cancellationToken = default)
         {
             switch (processExitConfiguration.TimeoutPolicy.CancellationMode)
             {
@@ -44,85 +41,17 @@ internal static class ProcessCancellationExtensions
                 }
                 case ProcessCancellationMode.Graceful:
                 {
-                    await WaitForExitOrGracefulTimeoutAsync(
-                        process,
-                        processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                        processExitConfiguration.CancellationExceptionBehavior
-                    );
+                    await process.WaitForExitOrGracefulTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                        processExitConfiguration.CancellationExceptionBehavior, cancellationToken);
                     return;
                 }
                 case ProcessCancellationMode.Forceful:
-                    await WaitForExitOrForcefulTimeoutAsync(
-                        process,
-                        processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                        processExitConfiguration.CancellationExceptionBehavior
-                    );
+                    await process.WaitForExitOrForcefulTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                        processExitConfiguration.CancellationExceptionBehavior, cancellationToken);
                     return;
                 default:
                     throw new NotSupportedException();
             }
         }
-
-        /// <summary>
-        /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
-        /// </summary>
-        /// <param name="timeoutThreshold">The delay to wait before requesting cancellation.</param>
-        /// <param name="cancellationExceptionBehavior"></param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the timeout threshold is less than 0.</exception>
-        /// <exception cref="NotSupportedException">Thrown if run on a remote computer or device.</exception>
-        [UnsupportedOSPlatform("ios")]
-        [UnsupportedOSPlatform("tvos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("android")]
-        private async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior
-        )
-        {
-            if (timeoutThreshold < TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException();
-
-            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
-
-            CancellationTokenSource cts = new();
-
-            cts.CancelAfter(timeoutThreshold);
-
-            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
-            {
-                await process.WaitForExitAsync(cts.Token);
-                return;
-            }
-
-            try
-            {
-                await process.WaitForExitAsync(cts.Token);
-            }
-            catch (TaskCanceledException)
-            {
-                DateTime actualExitTime = DateTime.UtcNow;
-                TimeSpan difference = expectedExitTime.Difference(actualExitTime);
-
-                if (
-                    cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
-                )
-                {
-                    if (difference > TimeSpan.FromSeconds(10))
-                    {
-                        throw;
-                    }
-                }
-            }
-            finally
-            {
-                if (!process.HasExited)
-                    process.Kill();
-            }
-        }
-
     }
 }

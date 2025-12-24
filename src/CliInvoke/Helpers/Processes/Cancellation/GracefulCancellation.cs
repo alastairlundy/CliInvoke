@@ -1,0 +1,104 @@
+/*
+    CliInvoke
+    Copyright (C) 2024-2025  Alastair Lundy
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+   */
+
+using System.Threading;
+
+using DotExtensions.Dates;
+
+namespace CliInvoke.Helpers.Processes.Cancellation;
+
+internal static partial class GracefulCancellation
+{
+    internal const int GracefulTimeoutWaitSeconds = 30;
+    
+    extension(Process process)
+    {
+        /// <summary>
+        /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
+        /// </summary>
+        /// <param name="timeoutThreshold">The delay to wait before requesting cancellation.</param>
+        /// <param name="cancellationExceptionBehavior"></param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the timeout threshold is less than 0.</exception>
+        /// <exception cref="NotSupportedException">Thrown if run on a remote computer or device.</exception>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("android")]
+        internal async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
+        {
+            if (timeoutThreshold < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException();
+            
+            Task gracefulInterruptCancellation = OperatingSystem.IsWindows()
+                ? process.CancelWithInterruptOnWindows(timeoutThreshold, cancellationExceptionBehavior, cancellationToken)
+                : process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
+            
+            await Task.WhenAny([
+                process.WaitForExitAsync(cancellationToken),
+                gracefulInterruptCancellation,
+                process.GracefulCancellationWithCancelToken(
+                    timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                    cancellationExceptionBehavior)
+            ]);
+
+            if (!process.HasExited)
+            {
+                await process.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero, cancellationExceptionBehavior, cancellationToken);
+            }
+        }
+
+        private async Task GracefulCancellationWithCancelToken(TimeSpan timeoutThreshold,
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+        {
+            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+
+            CancellationTokenSource cts = new();
+
+            cts.CancelAfter(timeoutThreshold);
+
+            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+            {
+                await process.WaitForExitAsync(cts.Token);
+                return;
+            }
+
+            try
+            {
+                await process.WaitForExitAsync(cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                DateTime actualExitTime = DateTime.UtcNow;
+                TimeSpan difference = expectedExitTime.Difference(actualExitTime);
+
+                if (
+                    cancellationExceptionBehavior
+                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
+                )
+                {
+                    if (difference > TimeSpan.FromSeconds(10))
+                    {
+                        throw;
+                    }
+                }
+            }
+            finally
+            {
+                if (!process.HasExited)
+                    process.Kill();
+            }
+        }
+    }
+}
