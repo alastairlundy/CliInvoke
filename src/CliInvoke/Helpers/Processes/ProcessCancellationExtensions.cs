@@ -9,7 +9,9 @@
 
 using System.Threading;
 
-using AlastairLundy.DotExtensions.Dates;
+using CliInvoke.Helpers.Processes.Cancellation;
+
+using DotExtensions.Dates;
 
 namespace CliInvoke.Helpers.Processes;
 

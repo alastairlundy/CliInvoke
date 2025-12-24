@@ -9,10 +9,10 @@
 
 using System.Linq;
 
-using AlastairLundy.DotExtensions.IO.Directories;
-using AlastairLundy.DotExtensions.IO.Permissions;
-using DotPrimitives.IO.Paths;
+using DotExtensions.IO.Directories;
+using DotExtensions.IO.Permissions;
 
+using DotPrimitives.IO.Paths;
 
 namespace CliInvoke;
 
