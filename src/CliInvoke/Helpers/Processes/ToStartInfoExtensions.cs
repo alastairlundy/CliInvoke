@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
