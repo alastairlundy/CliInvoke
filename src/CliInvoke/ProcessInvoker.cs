@@ -96,20 +96,20 @@ public class ProcessInvoker : IProcessInvoker
             process.StartInfo.RedirectStandardInput = true;
         }
 
-        if (
-            process.StartInfo.RedirectStandardInput
-            && processConfiguration.StandardInput is not null
-        )
-        {
-            await _processPipeHandler.PipeStandardInputAsync(
-                processConfiguration.StandardInput.BaseStream,
-                process
-            );
-        }
-
         try
         {
             process.Start();
+            
+            if (
+                process.StartInfo.RedirectStandardInput
+                && processConfiguration.StandardInput is not null
+            )
+            {
+                await _processPipeHandler.PipeStandardInputAsync(
+                    processConfiguration.StandardInput.BaseStream,
+                    process
+                );
+            }
 
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
 
@@ -200,20 +200,20 @@ public class ProcessInvoker : IProcessInvoker
             process.StartInfo.RedirectStandardInput = true;
         }
 
-        if (
-            process.StartInfo.RedirectStandardInput
-            && processConfiguration.StandardInput is not null
-        )
-        {
-            await _processPipeHandler.PipeStandardInputAsync(
-                processConfiguration.StandardInput.BaseStream,
-                process
-            );
-        }
-
         try
         {
             process.Start();
+            
+            if (
+                process.StartInfo.RedirectStandardInput
+                && processConfiguration.StandardInput is not null
+            )
+            {
+                await _processPipeHandler.PipeStandardInputAsync(
+                    processConfiguration.StandardInput.BaseStream,
+                    process
+                );
+            }
 
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
