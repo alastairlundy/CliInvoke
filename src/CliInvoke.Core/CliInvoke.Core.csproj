@@ -23,8 +23,8 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.1.2</Version>
-        <PackageReleaseNotes>* Updated to internal Polyfill verion 9.3.4 from 9.1.0</PackageReleaseNotes>
+        <Version>2.1.4</Version>
+        <PackageReleaseNotes>* Update internal Polyfill version from 9.3.4 to 9.5.0</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
