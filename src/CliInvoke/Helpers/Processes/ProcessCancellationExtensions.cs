@@ -33,11 +33,17 @@ internal static class ProcessCancellationExtensions
             CancellationToken cancellationToken = default
         )
         {
+            if (processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero)
+            {
+                await process.WaitForExitNoTimeoutAsync(processExitConfiguration.CancellationExceptionBehavior, cancellationToken);
+                return;
+            }
+            
             switch (processExitConfiguration.TimeoutPolicy.CancellationMode)
             {
                 case ProcessCancellationMode.None:
                 {
-                    await process.WaitForExitAsync(cancellationToken);
+                    await process.WaitForExitNoTimeoutAsync(processExitConfiguration.CancellationExceptionBehavior, cancellationToken);
                     return;
                 }
                 case ProcessCancellationMode.Graceful:
@@ -58,6 +64,32 @@ internal static class ProcessCancellationExtensions
                     return;
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        private async Task WaitForExitNoTimeoutAsync(ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await process.WaitForExitAsync(cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+                {
+                    throw;
+                }
+            }
+            catch (Exception)
+            {
+                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
+                {
+                    throw;
+                }
+            }
+            finally
+            {
+                //Add graceful SIGINT/SIGTERM signal sending here.
             }
         }
 
