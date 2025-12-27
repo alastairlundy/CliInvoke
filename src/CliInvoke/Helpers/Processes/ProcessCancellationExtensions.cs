@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Helpers.Processes.Cancellation;
-
 using DotExtensions.Dates;
 
 namespace CliInvoke.Helpers.Processes;
@@ -42,17 +40,13 @@ internal static class ProcessCancellationExtensions
                 }
                 case ProcessCancellationMode.Graceful:
                 {
-                    await WaitForExitOrGracefulTimeoutAsync(
-                        process,
-                        processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                    await process.WaitForExitOrGracefulTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
                         processExitConfiguration.CancellationExceptionBehavior
                     );
                     return;
                 }
                 case ProcessCancellationMode.Forceful:
-                    await WaitForExitOrForcefulTimeoutAsync(
-                        process,
-                        processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                    await process.WaitForExitOrForcefulTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
                         processExitConfiguration.CancellationExceptionBehavior
                     );
                     return;
