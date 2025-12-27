@@ -1,9 +1,9 @@
 # CliInvoke
 
 <!-- Badges -->
-[![Latest NuGet](https://img.shields.io/nuget/v/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
-[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
-[![Downloads](https://img.shields.io/nuget/dt/AlastairLundy.CliInvoke.svg)](https://www.nuget.org/packages/AlastairLundy.CliInvoke/)
+[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
+[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
@@ -37,33 +37,33 @@ The package(s) to install depends on your use case:
 * For use in a .NET app - Install the [Implementation Package](#implementation-package) and the [Dependency Injection Extensions Package](#extensions-package)
 
 ### Abstractions Package
-[CliInvoke.Core Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Core)
+[CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core)
 
 ```bash
-dotnet add package AlastairLundy.CliInvoke.Core
+dotnet add package CliInvoke.Core
 ```
 
 ### Implementation Package
 
-[CliInvoke Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke)
+[CliInvoke Nuget](https://nuget.org/packages/CliInvoke)
 
 ```bash
-dotnet add package AlastairLundy.CliInvoke
+dotnet add package CliInvoke
 ```
 
 ### Extensions Package
 
-[CliInvoke.Extensions Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Extensions)
+[CliInvoke.Extensions Nuget](https://nuget.org/packages/CliInvoke.Extensions)
 
 ```bash
-dotnet add package AlastairLundy.CliInvoke.Extensions
+dotnet add package CliInvoke.Extensions
 ```
 
 ### Specializations Package
-[CliInvoke.Specializations Nuget](https://nuget.org/packages/AlastairLundy.CliInvoke.Specializations)
+[CliInvoke.Specializations Nuget](https://nuget.org/packages/CliInvoke.Specializations)
 
 ```bash
-dotnet add package AlastairLundy.CliInvoke.Specializations
+dotnet add package CliInvoke.Specializations
 ```
 
 ## Supported Platforms
@@ -82,8 +82,8 @@ It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` opt
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core.Factories;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core;
 using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -107,8 +107,8 @@ ProcessResult result = await _invoker.ExecuteAsync(configuration, CancellationTo
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
-using AlastairLundy.CliInvoke.Core.Factories;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core;
 using AlastairLundy.CliIinvoke;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -137,11 +137,11 @@ The following examples shows how to configure and build a ``ProcessConfiguration
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Core;
+using CliInvoke;
+using CliInvoke.Core;
 
-using AlastairLundy.CliInvoke.Builders;
-using AlastairLundy.CliInvoke.Core.Builders;
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -167,11 +167,11 @@ ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
-using AlastairLundy.CliInvoke;
-using AlastairLundy.CliInvoke.Builders;
+using CliInvoke;
+using CliInvoke.Builders;
 
-using AlastairLundy.CliInvoke.Core;
-using AlastairLundy.CliInvoke.Core.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
 
 using Microsoft.Extensions.DependencyInjection;
 
