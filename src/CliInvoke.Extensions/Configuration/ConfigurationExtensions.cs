@@ -20,20 +20,25 @@ using CliInvoke.Core.Builders;
 namespace CliInvoke.Extensions;
 
 /// <summary>
-/// 
+/// Provides extension methods for working with configuration settings in the application,
+/// enhancing functionality and simplifying common configuration-related tasks.
 /// </summary>
 public static class ConfigurationExtensions
 {
     /// <summary>
-    /// 
+    /// Provides extension methods for configuring and transforming process-related settings
+    /// to create reusable and standardized process configurations.
     /// </summary>
     extension(ProcessConfiguration)
     {
         /// <summary>
-        /// 
+        /// Converts a <see cref="ProcessStartInfo"/> instance to a <see cref="ProcessConfiguration"/> instance,
+        /// applying all relevant configurations such as environment variables, execution settings,
+        /// user credentials, and other process-related parameters.
         /// </summary>
-        /// <param name="processStartInfo"></param>
-        /// <returns></returns>
+        /// <param name="processStartInfo">The <see cref="ProcessStartInfo"/> containing the process start configuration.</param>
+        /// <returns>An instance of <see cref="ProcessConfiguration"/> with the configuration applied from
+        /// the provided <see cref="ProcessStartInfo"/>.</returns>
         [Pure]
         public static ProcessConfiguration FromStartInfo(ProcessStartInfo processStartInfo)
         {
