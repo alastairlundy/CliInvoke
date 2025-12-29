@@ -123,7 +123,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             : Environment.SpecialFolder.ProgramFilesX86);
 
         IEnumerable<string> directories = Directory.EnumerateDirectories(
-            $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
+                $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
             .Where(d => Regex.IsMatch(d, @"v\d+"))
             .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));
 
@@ -135,7 +135,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
                 return expectedFilePath;
         }
 
-        throw new FileNotFoundException("Could not find Powershell installation.");
+        throw new FileNotFoundException("Could not find PowerShell installation.");
     }
 
     private string GetUnixInstallLocation()
