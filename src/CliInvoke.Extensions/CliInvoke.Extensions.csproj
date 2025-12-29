@@ -9,7 +9,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.2.0-rc.1</Version>
+        <Version>2.2.0</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
@@ -17,7 +17,7 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageReleaseNotes>* Added ``ProcessConfiguration`` static C# 14 extension member method ``FromStartInfo`` - This method converts a ProcessStartInfo object to a ``ProcessConfiguration``.
-* Updated to CliInvoke 2.2.0 Beta 2</PackageReleaseNotes>
+* Updated to CliInvoke 2.2.0</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
