@@ -62,11 +62,11 @@ internal class ProcessWrapper : Process
     {
         bool result = base.Start();
 
+        HasStarted = result;
+        
         if (result)
         {
-            HasStarted = true;
             StartTime = DateTime.UtcNow;
-
             Started?.Invoke(this, EventArgs.Empty);
         }
 
