@@ -24,8 +24,9 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.2.0-beta.1</Version>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 9.3.4 to 9.4.1</PackageReleaseNotes>
+        <Version>2.2.0-rc.1</Version>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.3.4 to 9.5.0
+* Fixed an incorrect copyright notice header showing Copyright DotPrimitives instead of CliInvoke</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     

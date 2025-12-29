@@ -15,13 +15,14 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 9.3.4 to 9.4.1
-* Updated DotExtensions version from 9.2.0 to 9.2.1
-* Fixed a bug where FilePathResolver's implementation of Path Environment Variable Resolving would lead to incorrect file path evaluation due to an incorrect if statement evaluation.</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.3.4 to 9.5.0
+* Fixed an issue with Standard Input incorrectly being applied to ``ProcessWrapper`` (CliInvoke's internal Process wrapper class) in ``ProcessInvoker`` (Backported to 2.1.4)
+* Fixed an issue where Cancellation Token is ignored in some circumstances (Fix not yet released for for 2.1.x)
+* Fixed an issue where ``ProcessWrapper`` could attempt to apply a Resource Policy to a Process even if the Process hasn't started successfully. (Fix not yet released for for 2.1.x)</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.2.0-beta.1</PackageVersion>
+        <PackageVersion>2.2.0-rc.1</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
