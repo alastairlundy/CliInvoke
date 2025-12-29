@@ -96,7 +96,7 @@ public class ProcessInvoker : IProcessInvoker
 
         try
         {
-            process.Start();
+            bool processWasNew = process.Start();
             
             if (
                 process.StartInfo.RedirectStandardInput
@@ -124,8 +124,11 @@ public class ProcessInvoker : IProcessInvoker
             )
             {
                 throw new ProcessNotSuccessfulException(
-                    process: process,
-                    exitCode: process.ExitCode
+                    exitCode: process.ExitCode,
+                    new ProcessExceptionInfo(result, process.StartInfo, process.Id, process.ProcessName,
+                        processWasNew, process.ResourcePolicy,
+                        new UserCredential((string?)process.StartInfo.Domain, (string?)process.StartInfo.UserName, 
+                            process.StartInfo.Password, process.StartInfo.LoadUserProfile))
                 );
             }
 
@@ -200,7 +203,7 @@ public class ProcessInvoker : IProcessInvoker
 
         try
         {
-            process.Start();
+            bool processWasNew = process.Start();
             
             if (
                 process.StartInfo.RedirectStandardInput
@@ -238,8 +241,11 @@ public class ProcessInvoker : IProcessInvoker
             )
             {
                 throw new ProcessNotSuccessfulException(
-                    process: process,
-                    exitCode: process.ExitCode
+                    exitCode: process.ExitCode,
+                    new ProcessExceptionInfo(result, process.StartInfo, process.Id, process.ProcessName,
+                        processWasNew, process.ResourcePolicy, 
+                        new UserCredential((string?)process.StartInfo.Domain, (string?)process.StartInfo.UserName, 
+                            process.StartInfo.Password, process.StartInfo.LoadUserProfile))
                 );
             }
 
@@ -321,7 +327,7 @@ public class ProcessInvoker : IProcessInvoker
 
         try
         {
-            process.Start();
+            bool processWasNew = process.Start();
 
             Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
             Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
@@ -348,8 +354,11 @@ public class ProcessInvoker : IProcessInvoker
             )
             {
                 throw new ProcessNotSuccessfulException(
-                    process: process,
-                    exitCode: process.ExitCode
+                    exitCode: process.ExitCode,
+                    new ProcessExceptionInfo(result, process.StartInfo, process.Id, process.ProcessName,
+                        processWasNew, process.ResourcePolicy,
+                        new UserCredential((string?)process.StartInfo.Domain, (string?)process.StartInfo.UserName, 
+                            process.StartInfo.Password, process.StartInfo.LoadUserProfile))
                 );
             }
 
