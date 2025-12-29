@@ -125,7 +125,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         IEnumerable<string> directories = Directory.EnumerateDirectories(
             $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
             .Where(d => Regex.IsMatch(d, @"v\d+"))
-            .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));;
+            .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));
 
         foreach (string directory in directories)
         {
