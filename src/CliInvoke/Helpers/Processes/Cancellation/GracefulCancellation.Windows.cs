@@ -31,11 +31,24 @@ internal static partial class GracefulCancellation
                 throw new PlatformNotSupportedException();
 
             await Task.Delay(timeoutThreshold, cancellationToken);
-
-            if()
             
-            await SendSignal(process.Id);
+            bool canCancelGracefully = await CanBeTerminatedGracefullyAsync(process);
+
+            if (canCancelGracefully)
+            {
+                await SendSignal(process.Id);
+            }
+            else
+            {
+                await process.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero,
+                    cancellationExceptionBehavior, cancellationToken);
+            }
         }
+    }
+
+    private static Task<bool> CanBeTerminatedGracefullyAsync(Process process)
+    {
+        
     }
     
     private static Task SendSignal(int processId)
