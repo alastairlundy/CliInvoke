@@ -29,8 +29,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessInvoker(
         IFilePathResolver filePathResolver,
-        IProcessPipeHandler processPipeHandler
-    )
+        IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;
