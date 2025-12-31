@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,11 +9,10 @@
 
 using System.Linq;
 
-using AlastairLundy.DotExtensions.IO.Directories;
-using AlastairLundy.DotExtensions.IO.Permissions;
-using AlastairLundy.DotPrimitives.IO.Paths;
+using DotExtensions.IO.Directories;
+using DotExtensions.IO.Permissions;
 
-// ReSharper disable ConvertClosureToMethodGroup
+using DotPrimitives.IO.Paths;
 
 namespace CliInvoke;
 
@@ -51,7 +50,7 @@ public class FilePathResolver : IFilePathResolver
 
         if (filePath is not null && resolveFromPath)
         {
-            if (ExecutableFileCheck(filePathToResolve))
+            if (ExecutableFileCheck(filePath.FullName))
                 return filePath.FullName;
         }
         
@@ -107,7 +106,7 @@ public class FilePathResolver : IFilePathResolver
 
         foreach (string pathEntry in pathContents)
         {
-            if (!fileHasExtension)
+            if (fileHasExtension)
             {
                 foreach (string pathExtension in pathExtensions)
                 {

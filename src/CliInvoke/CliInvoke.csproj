@@ -15,14 +15,16 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 9.3.0 to 9.3.4
-* Updated DotExtensions version from 9.1.0 to 9.2.0
-* Fixed argument escaping issues with the reworked Argument Escaping logic
-* Updated ``FilePathResolver`` logic to use enumerated Path directories method for potential performance improvements</PackageReleaseNotes>
+        <PackageReleaseNotes>* Update ``FilePathResolver`` file resolving code to ensure Target File Path is an Executable File and throw an Exception if it is not (#208 )
+* Updated ``FilePathResolver`` to use DotPrimitives to assist with Path Environment Variable Resolving code (#208)
+* Updated ``FilePathResolver`` logic to use enumerated Path directories method for potential performance improvements
+* Updated code to use Argument Exception throwing polyfills (#210) and address nullability warnings 
+* Removed some no longer needed internal Helper code
+* Fixed typos in Localized Exception strings</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.2.0-alpha.2</PackageVersion>
+        <PackageVersion>2.2.0</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -41,7 +43,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.3.4" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.5.0" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -94,7 +96,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="AlastairLundy.DotExtensions" Version="9.2.0" />
-      <PackageReference Include="AlastairLundy.DotPrimitives" Version="4.0.0" />
+      <PackageReference Include="DotExtensions" Version="9.3.0" />
+      <PackageReference Include="DotPrimitives" Version="4.1.0" />
     </ItemGroup>
 </Project>

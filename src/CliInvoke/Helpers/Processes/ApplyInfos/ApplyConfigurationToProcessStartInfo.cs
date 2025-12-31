@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke 
+    CliInvoke 
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -65,8 +65,7 @@ internal static class ApplyConfigurationToProcessStartInfo
         /// Sets environment variables for a specified ProcessStartInfo object.
         /// </summary>
         /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
-        internal void SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables
-        )
+        internal void SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
         {
             if (!environmentVariables.Any())
                 return;

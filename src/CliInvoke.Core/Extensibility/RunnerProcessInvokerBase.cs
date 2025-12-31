@@ -7,9 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Threading;
-using System.Threading.Tasks;
-
 using CliInvoke.Core.Extensibility.Factories;
 
 namespace CliInvoke.Core.Extensibility;

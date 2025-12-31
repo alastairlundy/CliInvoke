@@ -12,15 +12,15 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.2.0-alpha.2</PackageVersion>
+        <PackageVersion>2.2.0</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Added ``PowershellProcessInvoker`` and ``CmdProcessInvoker`` as specialized instances of ``RunnerProcessInvokerBase``
-* Updated internal Polyfill version from 9.3.0 to 9.3.4
-* Deprecated ``ClassicPowershellConfiguration`` for removal in CliInvoke Specializations version 3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Improved Unix Powershell install location detection (https://github.com/alastairlundy/CliInvoke/pull/192 ) - This introduces a minor breaking change in the PowershellCommmandConfiguration class
+* Deprecated ``ClassicPowershellConfiguration`` for removal in CliInvoke Specializations version 3
+* Added ``PowershellProcessInvoker`` and ``CmdProcessInvoker`` as specialized instances of ``RunnerProcessInvokerBase``</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>
@@ -30,7 +30,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.3.4" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.5.0" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>

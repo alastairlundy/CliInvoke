@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,7 +24,7 @@ internal class ProcessWrapper : Process
 
     private void OnStarted(object? sender, EventArgs e)
     {
-        if (!HasExited)
+        if (!HasExited && HasStarted)
         {
             try
             {
