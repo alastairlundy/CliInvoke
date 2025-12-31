@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke.Extensions
+    CliInvoke.Extensions
      
     Copyright (C) 2024-2025  Alastair Lundy
 
