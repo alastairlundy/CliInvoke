@@ -40,18 +40,28 @@ internal static partial class GracefulCancellation
         {
             if (timeoutThreshold < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException();
+
+            if (!OperatingSystem.IsWindows())
+            {
+                Task gracefulInterruptCancellation = process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
             
-            Task gracefulInterruptCancellation = OperatingSystem.IsWindows()
-                ? process.CancelWithInterruptOnWindows(timeoutThreshold, cancellationExceptionBehavior, cancellationToken)
-                : process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
-            
-            await Task.WhenAny([
-                process.WaitForExitAsync(cancellationToken),
-                gracefulInterruptCancellation,
-                process.GracefulCancellationWithCancelToken(
-                    timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                    cancellationExceptionBehavior)
-            ]);
+                await Task.WhenAny([
+                    process.WaitForExitAsync(cancellationToken),
+                    gracefulInterruptCancellation,
+                    process.GracefulCancellationWithCancelToken(
+                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                        cancellationExceptionBehavior)
+                ]);
+            }
+            else
+            {
+                await Task.WhenAny([
+                    process.WaitForExitAsync(cancellationToken),
+                    process.GracefulCancellationWithCancelToken(
+                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                        cancellationExceptionBehavior)
+                ]);
+            }
 
             if (!process.HasExited)
             {
