@@ -82,7 +82,20 @@ internal static class ProcessCancellationExtensions
             }
             finally
             {
-                //Add graceful SIGINT/SIGTERM signal sending here.
+                // Graceful SIGINT/SIGTERM signal sending here.
+
+                Task cancelTask = OperatingSystem.IsWindows() ? process.CancelWithInterruptOnWindows(TimeSpan.Zero, cancellationExceptionBehavior,
+                        cancellationToken) 
+                    : process.CancelWithInterruptOnUnix(TimeSpan.Zero, cancellationExceptionBehavior, cancellationToken);
+                
+                await Task.WhenAny([cancelTask, Task.Delay(5000, cancellationToken)]);
+                
+                if (!process.HasExited)
+                {
+                    await Task.Delay(100, cancellationToken);
+
+                    await process.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero,cancellationExceptionBehavior, cancellationToken);   
+                }
             }
         }
     }
