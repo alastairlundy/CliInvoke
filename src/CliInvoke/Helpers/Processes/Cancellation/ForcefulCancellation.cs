@@ -18,37 +18,11 @@ internal static class ForcefulCancellation
     /// <param name="process"></param>
     extension(Process process)
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="timeoutThreshold"></param>
-        /// <param name="cancellationExceptionBehavior"></param>
-        /// <param name="cancellationToken"></param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        [UnsupportedOSPlatform("ios")]
-        [UnsupportedOSPlatform("tvos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("android")]
-        internal async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
+        internal void ForcefulExit(ProcessCancellationExceptionBehavior cancellationExceptionBehavior,
+            DateTime expectedExitTime)
         {
-            if (timeoutThreshold < TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException();
-
-            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
-
             try
             {
-                Task waitForExit = process.WaitForExitAsync(cancellationToken);
-
-                Task delay = Task.Delay(timeoutThreshold, cancellationToken);
-
-                await Task.WhenAny(delay, waitForExit);
-
                 if (!process.HasExited)
                 {
                     process.Kill(true);
@@ -79,6 +53,38 @@ internal static class ForcefulCancellation
                     }
                 }
             }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeoutThreshold"></param>
+        /// <param name="cancellationExceptionBehavior"></param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [SupportedOSPlatform("android")]
+        internal async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
+        {
+            if (timeoutThreshold < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException();
+
+            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+
+            Task waitForExit = process.WaitForExitAsync(cancellationToken);
+
+            Task delay = Task.Delay(timeoutThreshold, cancellationToken);
+
+            await Task.WhenAny(delay, waitForExit);
+
+            process.ForcefulExit(cancellationExceptionBehavior, expectedExitTime);
         }
     }
 }
