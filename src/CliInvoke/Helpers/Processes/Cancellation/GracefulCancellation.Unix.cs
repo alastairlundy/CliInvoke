@@ -48,7 +48,7 @@ internal static partial class GracefulCancellation
             }, CancellationToken.None), Task.Run(() =>
             {
                 process.WaitForExit();
-                return false;
+                return true;
             }, CancellationToken.None)});
 
             return task.Result;
