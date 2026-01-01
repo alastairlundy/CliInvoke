@@ -63,9 +63,11 @@ internal static partial class GracefulCancellation
                 ]);
             }
 
+            await Task.WhenAny([Task.Delay(500, cancellationToken), process.WaitForExitAsync(cancellationToken)]);
+            
             if (!process.HasExited && fallbackToForceful)
             {
-                process.ForcefulExit(cancellationExceptionBehavior, expectedExitTime);
+                process.ForcefulExit(cancellationExceptionBehavior);
             }
         }
 
@@ -103,7 +105,7 @@ internal static partial class GracefulCancellation
             finally
             {
                 if (!process.HasExited)
-                    process.ForcefulExit(cancellationExceptionBehavior, expectedExitTime);
+                    process.ForcefulExit(cancellationExceptionBehavior);
             }
         }
     }
