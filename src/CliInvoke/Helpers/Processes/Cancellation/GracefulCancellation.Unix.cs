@@ -30,7 +30,7 @@ internal static partial class GracefulCancellation
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
         [UnsupportedOSPlatform("windows")]
-        internal async Task CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
+        internal async Task<bool> CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
             ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
         {
             if(OperatingSystem.IsWindows())
@@ -38,8 +38,20 @@ internal static partial class GracefulCancellation
             
             await Task.Delay(timeoutThreshold, cancellationToken);
 
-            SendSignal(process.Id,Sigint);
+            SendSignal(process.Id, Sigint);
             SendSignal(process.Id,Sigterm);
+
+            Task<bool> task = await Task.WhenAny(new[]{Task.Run(() =>
+            {
+                Task.Delay(100, CancellationToken.None);
+                return false;
+            }, CancellationToken.None), Task.Run(() =>
+            {
+                process.WaitForExit();
+                return false;
+            }, CancellationToken.None)});
+
+            return task.Result;
         }
     }
 
@@ -56,7 +68,7 @@ internal static partial class GracefulCancellation
     {
         if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
         {
-            kill_macos(processId, signalId);       
+            kill_macos(processId, signalId);
         }
         else if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux() && !OperatingSystem.IsIOS())
         {
