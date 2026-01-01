@@ -15,46 +15,20 @@ namespace CliInvoke.Helpers.Processes.Cancellation;
 
 internal static class ForcefulCancellation
 {
-    /// <param name="process"></param>
     extension(Process process)
     {
-        internal void ForcefulExit(ProcessCancellationExceptionBehavior cancellationExceptionBehavior,
-            DateTime expectedExitTime)
+        internal void ForcefulExit(ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
         {
             try
             {
-                if (!process.HasExited)
-                {
-                    process.Kill(true);
-                }
+                process.Kill(true);
             }
-            catch (Exception)
+            catch
             {
-                DateTime actualExitTime = DateTime.UtcNow;
-                TimeSpan difference = expectedExitTime.Difference(actualExitTime);
-
-                if (cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.SuppressException)
-                {
-                    return;
-                }
-                if (cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
-                    || cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.AllowException)
-                {
-                    if (
-                        difference > TimeSpan.FromSeconds(10)
-                        || cancellationExceptionBehavior
-                        == ProcessCancellationExceptionBehavior.AllowException
-                    )
-                    {
-                        throw;
-                    }
-                }
+                process.Kill(false);
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -71,20 +45,51 @@ internal static class ForcefulCancellation
         [SupportedOSPlatform("freebsd")]
         [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior,
+            CancellationToken cancellationToken)
         {
-            if (timeoutThreshold < TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException();
+            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
             DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
 
-            Task waitForExit = process.WaitForExitAsync(cancellationToken);
+            try
+            {
+                Task waitForExit = process.WaitForExitAsync(cancellationToken);
+                Task delay = Task.Delay(timeoutThreshold, cancellationToken);
 
-            Task delay = Task.Delay(timeoutThreshold, cancellationToken);
+                await Task.WhenAny(delay, waitForExit);
+            }
+            catch (TaskCanceledException)
+            {
+                DateTime actualExitTime = DateTime.UtcNow;
+                TimeSpan difference = expectedExitTime.Difference(actualExitTime);
 
-            await Task.WhenAny(delay, waitForExit);
+                if (cancellationExceptionBehavior ==
+                    ProcessCancellationExceptionBehavior.AllowException)
+                {
+                    throw;
+                }
 
-            process.ForcefulExit(cancellationExceptionBehavior, expectedExitTime);
+                if (cancellationExceptionBehavior ==
+                    ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected && difference > TimeSpan.FromSeconds(30))
+                {
+                    throw;
+                }
+            }
+            catch (Exception)
+            {
+                if (cancellationExceptionBehavior ==
+                    ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected ||
+                    cancellationExceptionBehavior ==
+                    ProcessCancellationExceptionBehavior.AllowException)
+                {
+                    throw;
+                }
+            }
+            finally
+            {
+                process.ForcefulExit(cancellationExceptionBehavior);
+            }
         }
     }
 }
