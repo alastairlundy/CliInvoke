@@ -8,7 +8,6 @@
    */
 
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
@@ -36,22 +35,16 @@ internal static partial class GracefulCancellation
             if(OperatingSystem.IsWindows())
                 throw new PlatformNotSupportedException();
             
-            await Task.Delay(timeoutThreshold, cancellationToken);
+            await Task.Delay(timeoutThreshold, CancellationToken.None);
 
-            SendSignal(process.Id, Sigint);
-            SendSignal(process.Id,Sigterm);
+            bool sigTermSuccess =  SendSignal(process.Id, Sigterm);
 
-            Task<bool> task = await Task.WhenAny(new[]{Task.Run(() =>
-            {
-                Task.Delay(100, CancellationToken.None);
-                return false;
-            }, CancellationToken.None), Task.Run(() =>
-            {
-                process.WaitForExit();
+            await Task.Delay(millisecondsDelay: 500, CancellationToken.None);
+
+            if (sigTermSuccess)
                 return true;
-            }, CancellationToken.None)});
 
-            return task.Result;
+            return SendSignal(process.Id, Sigint);
         }
     }
 
@@ -64,21 +57,19 @@ internal static partial class GracefulCancellation
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("browser")]
-    private static void SendSignal(int processId, int signalId)
+    private static bool SendSignal(int processId, int signalId)
     {
         if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
         {
-            kill_macos(processId, signalId);
+            return kill_mac(processId, signalId) == 0;
         }
-        else if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux() && !OperatingSystem.IsIOS())
-        {
-            kill_linux(processId, signalId);
-        }
+
+        return kill_linux(processId, signalId) == 0;
     }
     
     [DllImport("libc", SetLastError = true, EntryPoint = "kill")]
     private static extern int kill_linux(int processid, int signal);
 
     [DllImport("libSystem", SetLastError = true, EntryPoint = "kill")]
-    private static extern int kill_macos(int processId, int signal);
+    private static extern int kill_mac(int processId, int signal);
 }
