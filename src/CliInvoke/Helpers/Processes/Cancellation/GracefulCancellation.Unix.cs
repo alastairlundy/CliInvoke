@@ -34,19 +34,41 @@ internal static partial class GracefulCancellation
         internal async Task<bool> CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
             ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
         {
-            if(OperatingSystem.IsWindows())
-                throw new PlatformNotSupportedException();
+            bool sigIntSuccess = false;
+
+            try
+            {
+                if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS())
+                    throw new PlatformNotSupportedException();
+
+                await Task.Delay(timeoutThreshold, cancellationToken);
+
+                bool sigTermSuccess = SendSignal(process.Id, Sigterm);
+
+                await Task.Delay(millisecondsDelay: DelayBeforeSigintMilliseconds,
+                    cancellationToken);
+
+                if (sigTermSuccess)
+                    return true;
+
+                sigIntSuccess = SendSignal(process.Id, Sigint);
+            }
+            catch (TaskCanceledException)
+            {
+                if (cancellationExceptionBehavior ==
+                    ProcessCancellationExceptionBehavior.AllowException)
+                    throw;
+            }
+            catch (Exception)
+            {
+                if (cancellationExceptionBehavior ==
+                    ProcessCancellationExceptionBehavior.AllowException ||
+                    cancellationExceptionBehavior == ProcessCancellationExceptionBehavior
+                        .AllowExceptionIfUnexpected)
+                    throw;
+            }
             
-            await Task.Delay(timeoutThreshold, CancellationToken.None);
-
-            bool sigTermSuccess =  SendSignal(process.Id, Sigterm);
-
-            await Task.Delay(millisecondsDelay: DelayBeforeSigintMilliseconds, CancellationToken.None);
-
-            if (sigTermSuccess)
-                return true;
-
-            return SendSignal(process.Id, Sigint);
+            return sigIntSuccess;
         }
     }
 
