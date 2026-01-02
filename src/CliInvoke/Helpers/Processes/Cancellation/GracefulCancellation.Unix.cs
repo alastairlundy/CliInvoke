@@ -15,6 +15,8 @@ internal static partial class GracefulCancellation
 {
     private const int Sigint = 2;
     private const int Sigterm = 15;
+
+    private const int DelayBeforeSigintMilliseconds = 3000;
     
     extension(Process process)
     {
@@ -39,7 +41,7 @@ internal static partial class GracefulCancellation
 
             bool sigTermSuccess =  SendSignal(process.Id, Sigterm);
 
-            await Task.Delay(millisecondsDelay: 500, CancellationToken.None);
+            await Task.Delay(millisecondsDelay: DelayBeforeSigintMilliseconds, CancellationToken.None);
 
             if (sigTermSuccess)
                 return true;
