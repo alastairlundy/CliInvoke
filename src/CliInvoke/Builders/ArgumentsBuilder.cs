@@ -80,12 +80,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     [Pure]
     public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-#else
-        value = Ensure.NotNull(value);
-#endif
-
+        ArgumentNullException.ThrowIfNull(value);
+        
         if (IsValidArgument(value) == false)
             throw new ArgumentNullException(nameof(value));
 
