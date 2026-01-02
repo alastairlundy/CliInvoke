@@ -301,18 +301,18 @@ public class ProcessInvoker : IProcessInvoker
             StartInfo = processConfiguration.ToProcessStartInfo(true, true),
             EnableRaisingEvents = true,
         };
-
-        if (
-            processConfiguration.StandardInput is not null
-            && processConfiguration.StandardInput != StreamWriter.Null
-        )
-        {
-            process.StartInfo.RedirectStandardInput = true;
-        }
-
+        
         try
         {
             process.Start();
+            
+            if (
+                processConfiguration.StandardInput is not null
+                && processConfiguration.StandardInput != StreamWriter.Null
+            )
+            {
+                process.StartInfo.RedirectStandardInput = true;
+            }
             
             if (
                 process.StartInfo.RedirectStandardInput
