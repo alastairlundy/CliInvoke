@@ -54,10 +54,9 @@ public partial class ArgumentsBuilderTests
     public void Add_WithValidationLogic_InvalidReturnsSameInstanceAndDoesNotAppend()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder(s => s != "bad");
-
-        IArgumentsBuilder result = builder.Add("bad");
-
-        Assert.True(object.ReferenceEquals(builder, result));
+        
+        Assert.Throws<ArgumentNullException>(() => builder.Add("bad"));
+        
         Assert.Equal(string.Empty, builder.ToString());
     }
 
