@@ -61,17 +61,9 @@ internal static partial class GracefulCancellation
     [UnsupportedOSPlatform("browser")]
     private static bool SendSignal(int processId, int signalId)
     {
-        if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
-        {
-            return kill_mac(processId, signalId) == 0;
-        }
-
-        return kill_linux(processId, signalId) == 0;
+        return kill_libc(processId, signalId) == 0;
     }
     
     [DllImport("libc", SetLastError = true, EntryPoint = "kill")]
-    private static extern int kill_linux(int processid, int signal);
-
-    [DllImport("libSystem", SetLastError = true, EntryPoint = "kill")]
-    private static extern int kill_mac(int processId, int signal);
+    private static extern int kill_libc(int processid, int signal);
 }
