@@ -76,7 +76,7 @@ public partial class ArgumentsBuilderTests
     public void AddEnumerable_Strings_EscapesAndJoinsValues()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
-        string[] values = new[] { "a\nb", "c\"d" };
+        string[] values = ["a\nb", "c\"d"];
 
         string expected = "a\\\\nb c\\\\\\\"d";
         
