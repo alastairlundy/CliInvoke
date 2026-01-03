@@ -146,6 +146,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath)
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetFilePath);
         
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(

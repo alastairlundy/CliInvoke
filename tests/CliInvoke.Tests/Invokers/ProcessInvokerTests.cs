@@ -45,7 +45,7 @@ public class ProcessInvokerTests
     [Fact]
     public async Task Invoker_InvalidFilePath_ShouldThrow()
     {
-        using ProcessConfiguration config = configFactory.Create("FAKE/PATH/");
+        using ProcessConfiguration config = configFactory.Create("FAKE.FILE");
 
         await Assert.ThrowsAsync<FileNotFoundException>(() => processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.DefaultNoException));

@@ -39,6 +39,7 @@ public class FilePathResolver : IFilePathResolver
     public string ResolveFilePath(string filePathToResolve)
     {
         ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
         
         if (Path.IsPathRooted(filePathToResolve))
         {
@@ -126,7 +127,7 @@ public class FilePathResolver : IFilePathResolver
 
                 if (File.Exists(filePath))
                 {
-                    resolvedFilePath = new(filePath);
+                    resolvedFilePath = new FileInfo(filePath);
                     return true;
                 }
             }
@@ -152,7 +153,7 @@ public class FilePathResolver : IFilePathResolver
             fileName,
             StringComparison.InvariantCultureIgnoreCase
         );
-
+        
         string directoryPath = Path.GetDirectoryName(filePathToResolve)
                                ?? filePathToResolve.Remove(index, fileName.Length);
 
