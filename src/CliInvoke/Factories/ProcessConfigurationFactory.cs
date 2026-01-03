@@ -76,7 +76,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         ArgumentNullException.ThrowIfNull(arguments);
         
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder(x =>
-            string.IsNullOrEmpty(x) == false
+            !string.IsNullOrEmpty(x)
         ).AddEnumerable(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
