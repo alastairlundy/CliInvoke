@@ -110,7 +110,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetArguments(string arguments)
     {
-        ArgumentException.ThrowIfNullOrEmpty(arguments);
+        ArgumentNullException.ThrowIfNull(arguments);
         
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
