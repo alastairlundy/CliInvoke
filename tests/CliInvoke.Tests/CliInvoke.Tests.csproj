@@ -31,7 +31,6 @@
 
     <ItemGroup>
       <Folder Include="Factories\" />
-      <Folder Include="Invokers\" />
     </ItemGroup>
 
 </Project>
