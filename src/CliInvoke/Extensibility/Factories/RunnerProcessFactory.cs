@@ -7,19 +7,13 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.IO;
-
 using CliInvoke.Builders;
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
 using CliInvoke.Core.Extensibility.Factories;
-
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace CliInvoke.Extensibility.Factories;
 
 /// <summary>
-/// A class to allow creating a ProcessConfiguration that can be run through other Process' ProcessConfiguration.
+/// A class to allow creating a ProcessConfiguration that can be run through another Process' ProcessConfiguration.
 /// </summary>
 public class RunnerProcessFactory : IRunnerProcessFactory
 {
@@ -34,9 +28,12 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         ProcessConfiguration runnerProcessConfig
     )
     {
+        ArgumentNullException.ThrowIfNull(processConfigToBeRun);
+        ArgumentNullException.ThrowIfNull(runnerProcessConfig);
+        
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
-            runnerProcessConfig.TargetFilePath
-        )
+                runnerProcessConfig.TargetFilePath
+            )
             .SetArguments(
                 processConfigToBeRun.TargetFilePath + " " + processConfigToBeRun.Arguments
             )

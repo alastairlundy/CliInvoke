@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,9 +13,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
-
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace CliInvoke.Core;
 
@@ -87,9 +84,9 @@ public class ProcessResult : IEquatable<ProcessResult>
             return false;
 
         return ExitCode == other.ExitCode
-            && ExecutedFilePath == other.ExecutedFilePath
-            && StartTime == other.StartTime
-            && ExitTime == other.ExitTime;
+               && ExecutedFilePath == other.ExecutedFilePath
+               && StartTime == other.StartTime
+               && ExitTime == other.ExitTime;
     }
 
     /// <summary>

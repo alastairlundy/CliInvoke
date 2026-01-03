@@ -7,10 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-
-using CliInvoke.Core.Internal.Localizations;
-
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -37,20 +33,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful
     )
     {
-#if NET8_0_OR_GREATER
-        bool lessThanZero = double.IsNegative(timeoutThreshold.TotalMilliseconds);
-#else
-        bool lessThanZero = timeoutThreshold.TotalMilliseconds < double.Parse("0.0");
-#endif
-
-        if (timeoutThreshold < TimeSpan.Zero || lessThanZero)
-            throw new ArgumentOutOfRangeException(
-                nameof(timeoutThreshold),
-                Resources.Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero.Replace(
-                    "{x}",
-                    timeoutThreshold.ToString()
-                )
-            );
+        ArgumentOutOfRangeException.ThrowIfNegative(timeoutThreshold.TotalMilliseconds);
+        ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
         TimeoutThreshold = timeoutThreshold;
         CancellationMode = cancellationMode;
@@ -89,7 +73,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
             return false;
 
         return TimeoutThreshold.Equals(other.TimeoutThreshold)
-            && CancellationMode == other.CancellationMode;
+               && CancellationMode == other.CancellationMode;
     }
 
     /// <summary>

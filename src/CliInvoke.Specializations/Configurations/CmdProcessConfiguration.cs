@@ -7,15 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
 
-using CliInvoke.Core;
-using CliInvoke.Specializations.Internal.Localizations;
-
+// ReSharper disable MemberCanBeMadeStatic.Global
 
 // ReSharper disable UnusedMember.Global
 
@@ -57,11 +53,11 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardError"></param>
     public CmdProcessConfiguration(string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        string workingDirectoryPath = null, bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
-        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        string? workingDirectoryPath = null, bool requiresAdministrator = false,
+        Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
+        StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
+        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
         base("",
             redirectStandardInput, redirectStandardOutput, redirectStandardError,
@@ -73,7 +69,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
             windowCreation: windowCreation,
             useShellExecution: useShellExecution)
     {
-        base.TargetFilePath = this.TargetFilePath;
+        base.TargetFilePath = TargetFilePath;
     }
 
 
@@ -82,16 +78,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// </summary>
     /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Windows-based operating system.</exception>
     [SupportedOSPlatform("windows")]
-    public new string TargetFilePath
-    {
-        get
-        {
-            if (OperatingSystem.IsWindows() == false)
-            {
-                throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
-            }
-
-            return Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe";
-        }
-    }
+    public new string TargetFilePath =>
+        OperatingSystem.IsWindows() ?
+            $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe" : throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
 }

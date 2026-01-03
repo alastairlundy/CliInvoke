@@ -8,7 +8,6 @@ namespace CliInvoke.Specializations.Tests.Helpers;
 
 public static class ExecutedCommandHelper
 {
-        
     static ExecutedCommandHelper()
     {
         IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();

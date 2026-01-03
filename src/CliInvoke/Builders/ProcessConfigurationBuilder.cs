@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke
+    CliInvoke
      
     Copyright (C) 2024-2025  Alastair Lundy
 
@@ -11,15 +11,7 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
-
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
 
 namespace CliInvoke.Builders;
 
@@ -39,7 +31,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
     public ProcessConfigurationBuilder(string targetFilePath)
     {
-        _configuration = new ProcessConfiguration(targetFilePath, false, false, false);
+        _configuration = new(targetFilePath,
+            false, false,
+            false);
     }
 
     /// <summary>
@@ -58,10 +52,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="arguments">The process arguments to be added.</param>
     /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
     [Pure]
-    public IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments)
-    {
-        return SetArguments(arguments, false);
-    }
+    public IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments) 
+        => SetArguments(arguments, false);
 
     /// <summary>
     /// Adds process arguments to the Process Configuration builder.
@@ -69,17 +61,15 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="arguments">The process arguments to be added or updated.</param>
     /// <param name="escapeArguments">Whether the arguments should be escaped.</param>
     /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref cref="arguments"/> is null.</exception>
     [Pure]
     public IProcessConfigurationBuilder SetArguments(
         IEnumerable<string> arguments,
         bool escapeArguments
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(arguments, nameof(arguments));
-#else
-        arguments = Ensure.NotNull(arguments);
-#endif
+        ArgumentNullException.ThrowIfNull(arguments);
+
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder().AddEnumerable(
             arguments,
             escapeArguments
@@ -116,14 +106,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="arguments">The argument string to be added.</param>
     /// <returns>A reference to this builder with the added string arguments, allowing method chaining.</returns>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="arguments"/> is null or empty.</exception>
     [Pure]
     public IProcessConfigurationBuilder SetArguments(string arguments)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(arguments, nameof(arguments));
-#else
-        arguments = Ensure.NotNullOrEmpty(arguments);
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(arguments);
         
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
@@ -154,14 +141,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="targetFilePath">The file path where the process configuration will be saved.</param>
     /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
+    /// <exception cref="ArgumentException">Thrown if the <paramref name="targetFilePath"/> is null or empty.</exception>
     [Pure]
     public IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(targetFilePath, nameof(targetFilePath));
-#else
-        targetFilePath = Ensure.NotNullOrEmpty(targetFilePath);
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
@@ -192,16 +176,14 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="environmentVariables">The environment variables to be added to the process configuration.</param>
     /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="environmentVariables"/> is null.</exception>
     [Pure]
     public IProcessConfigurationBuilder SetEnvironmentVariables(
         IReadOnlyDictionary<string, string> environmentVariables
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(environmentVariables, nameof(environmentVariables));
-#else
-        environmentVariables = Ensure.NotNull(environmentVariables);
-#endif
+        ArgumentNullException.ThrowIfNull(environmentVariables);
+
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
                 _configuration.TargetFilePath,
@@ -266,11 +248,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetWorkingDirectory(string workingDirectoryPath)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(workingDirectoryPath, nameof(workingDirectoryPath));
-#else
-        workingDirectoryPath = Ensure.NotNullOrEmpty(workingDirectoryPath);
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(workingDirectoryPath);
         
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
@@ -339,6 +317,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="configure">The CredentialsBuilder configuration.</param>
     /// <returns>The new CommandBuilder with the specified Credentials.</returns>
     /// <remarks>Credentials are only supported with the Process class on Windows. This is a limitation of .NET's Process class.</remarks>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="configure"/> is null.</exception>
     [Pure]
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
@@ -347,11 +326,20 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [UnsupportedOSPlatform("android")]
     public IProcessConfigurationBuilder SetUserCredential(Action<IUserCredentialBuilder> configure)
     {
-        IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder()
-            .SetDomain(_configuration.Credential.Domain)
-            .SetPassword(_configuration.Credential.Password)
-            .SetUsername(_configuration.Credential.UserName)
-            .LoadUserProfile(_configuration.Credential.LoadUserProfile ?? false);
+        ArgumentNullException.ThrowIfNull(configure);
+        
+        IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder();
+        
+        if (_configuration.Credential.Domain is not null) 
+            credentialBuilder.SetDomain(_configuration.Credential.Domain);
+
+        if (_configuration.Credential.Password is not null)
+            credentialBuilder.SetPassword(_configuration.Credential.Password);
+                
+        if(_configuration.Credential.UserName is not null)
+                credentialBuilder.SetUsername(_configuration.Credential.UserName);
+        
+        credentialBuilder.LoadUserProfile(_configuration.Credential.LoadUserProfile ?? false);
 
         configure(credentialBuilder);
 
@@ -459,6 +447,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source)
     {
+        ArgumentNullException.ThrowIfNull(source);
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
                 _configuration.TargetFilePath,
@@ -493,6 +483,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target)
     {
+        ArgumentNullException.ThrowIfNull(target);
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
                 _configuration.TargetFilePath,
@@ -527,6 +519,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target)
     {
+        ArgumentNullException.ThrowIfNull(target);
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
                 _configuration.TargetFilePath,
@@ -562,6 +556,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         ProcessResourcePolicy processResourcePolicy
     )
     {
+        ArgumentNullException.ThrowIfNull(processResourcePolicy);
+        
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
                 _configuration.TargetFilePath,

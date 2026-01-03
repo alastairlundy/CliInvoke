@@ -8,14 +8,13 @@
 */
 
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
 
-using CliInvoke.Core;
-using CliInvoke.Specializations.Internal.Localizations;
+using CliInvoke.Specializations.Internal;
+
+// ReSharper disable MemberCanBeMadeStatic.Global
 
 namespace CliInvoke.Specializations.Configurations;
 
@@ -28,6 +27,7 @@ namespace CliInvoke.Specializations.Configurations;
 [UnsupportedOSPlatform("linux")]
 [UnsupportedOSPlatform("freebsd")]
 [UnsupportedOSPlatform("android")]
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class ClassicPowershellProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
@@ -50,14 +50,15 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public ClassicPowershellProcessConfiguration(string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        string workingDirectoryPath = null, bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null, 
-        UserCredential credentials = null,
-        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        string? workingDirectoryPath = null, bool requiresAdministrator = false,
+        Dictionary<string, string>? environmentVariables = null, 
+        UserCredential? credentials = null,
+        StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
+        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : base("",
         redirectStandardInput, redirectStandardOutput, redirectStandardError,
         arguments,
@@ -84,18 +85,10 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
     // ReSharper disable once MemberCanBePrivate.Global
-    public new string TargetFilePath
-    {
-        get
-        {
-            if (OperatingSystem.IsWindows() == false)
-            {
-                throw new PlatformNotSupportedException(Resources.Exceptions_ClassicPowershell_OnlySupportedOnWindows);
-            }
-
-            return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}" +
-                   $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe";
-        }
-    }
-        
+    public new string TargetFilePath =>
+        OperatingSystem.IsWindows()
+            ? $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}" +
+              $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe" 
+            : throw new PlatformNotSupportedException(Resources
+                .Exceptions_ClassicPowershell_OnlySupportedOnWindows);
 }

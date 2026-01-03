@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,15 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.IO;
 #if NET8_0_OR_GREATER
-using System.Threading.Tasks;
 #endif
-// ReSharper disable RedundantBoolCompare
-
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace CliInvoke.Core;
 
@@ -60,6 +53,11 @@ public class PipedProcessResult
     )
         : base(executableFilePath, exitCode, startTime, exitTime)
     {
+        ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
+        
+        ArgumentNullException.ThrowIfNull(standardOutput);
+        ArgumentNullException.ThrowIfNull(standardError);
+        
         StandardOutput = standardOutput;
         StandardError = standardError;
     }
@@ -75,11 +73,12 @@ public class PipedProcessResult
         if (other is null)
             return false;
 
-        return StandardOutput.Equals(other.StandardOutput)
-            && StandardError.Equals(other.StandardError)
-            && ExitCode.Equals(other.ExitCode)
-            && StartTime.Equals(other.StartTime)
-            && ExitTime.Equals(other.ExitTime);
+        return ExecutedFilePath == other.ExecutedFilePath &&
+               StandardOutput.Equals(other.StandardOutput)
+               && StandardError.Equals(other.StandardError)
+               && ExitCode.Equals(other.ExitCode)
+               && StartTime.Equals(other.StartTime)
+               && ExitTime.Equals(other.ExitTime);
     }
 
     /// <summary>
@@ -102,7 +101,7 @@ public class PipedProcessResult
     /// Returns the hash code for the current PipedProcessResult.
     /// </summary>
     /// <returns>The hash code for the current PipedProcessResult.</returns>
-    public override int GetHashCode() => HashCode.Combine(StandardOutput, StandardError);
+    public override int GetHashCode() => HashCode.Combine(ExecutedFilePath, ExitCode, StartTime, ExitTime, StandardOutput, StandardError);
 
     /// <summary>
     /// Determines whether two PipedProcessResults are equal.

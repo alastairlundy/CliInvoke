@@ -1,13 +1,11 @@
 /*
-    AlastairLundy.CliInvoke.Core
+    CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
-
-using System;
 
 namespace CliInvoke.Core;
 
@@ -71,6 +69,14 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     );
 
     /// <summary>
+    /// Represents a <see cref="ProcessExitConfiguration"/> that applies no validation
+    /// or constraints, using no timeout, no result validation, and suppression of exceptions.
+    /// </summary>
+    public static readonly ProcessExitConfiguration NoValidation = new(ProcessTimeoutPolicy.None,
+        ProcessResultValidation.None,
+        ProcessCancellationExceptionBehavior.SuppressException);
+
+    /// <summary>
     /// Gets the result validation strategy used to determine if the process exited successfully.
     /// </summary>
     public ProcessResultValidation ResultValidation { get; }
@@ -96,8 +102,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
             return false;
 
         return ResultValidation == other.ResultValidation
-            && TimeoutPolicy.Equals(other.TimeoutPolicy)
-            && CancellationExceptionBehavior == other.CancellationExceptionBehavior;
+               && TimeoutPolicy.Equals(other.TimeoutPolicy)
+               && CancellationExceptionBehavior == other.CancellationExceptionBehavior;
     }
 
     /// <summary>

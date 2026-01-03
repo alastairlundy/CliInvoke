@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,10 +12,6 @@
      Constructor signature and field declarations from CliWrap licensed under the MIT License except where considered Copyright Fair Use by law.
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
-
-using System;
-
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace CliInvoke.Core;
 
@@ -43,6 +39,11 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     )
         : base(executableFilePath, exitCode, startTime, exitTime)
     {
+        ArgumentException.ThrowIfNullOrEmpty(standardOutput);
+        
+        ArgumentNullException.ThrowIfNull(standardOutput);
+        ArgumentNullException.ThrowIfNull(standardError);
+        
         StandardOutput = standardOutput;
         StandardError = standardError;
     }
@@ -68,9 +69,10 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         if (other is null)
             return false;
 
-        return StandardOutput == other.StandardOutput
-            && StandardError == other.StandardError
-            && ExitCode == other.ExitCode;
+        return ExecutedFilePath == other.ExecutedFilePath &&
+               StandardOutput == other.StandardOutput
+               && StandardError == other.StandardError
+               && ExitCode == other.ExitCode;
     }
 
     /// <summary>
@@ -93,7 +95,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// Returns the hash code for the current BufferedProcessResult.
     /// </summary>
     /// <returns>The hash code for the current BufferedProcessResult.</returns>
-    public override int GetHashCode() => HashCode.Combine(StandardOutput, StandardError, ExitCode);
+    public override int GetHashCode() => HashCode.Combine(ExecutedFilePath, StandardOutput, StandardError, ExitCode, StartTime, ExitTime);
 
     /// <summary>
     /// Determines whether two BufferedProcessResults are equal.
@@ -120,5 +122,5 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are not equal to each other; false otherwise.</returns>
     public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right) =>
-        Equals(left, right) == false;
+        !Equals(left, right);
 }

@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,15 +10,7 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
-using System.Diagnostics.Contracts;
 using System.Security;
-
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
-
-// ReSharper disable ArrangeObjectCreationWhenTypeEvident
-// ReSharper disable PossibleInvalidOperationException
 
 namespace CliInvoke.Builders;
 
@@ -34,7 +26,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// </summary>
     public UserCredentialBuilder()
     {
-        _userCredential = new UserCredential();
+        _userCredential = new();
     }
 
     /// <summary>
@@ -54,14 +46,10 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetDomain(string domain)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(domain, nameof(domain));
-#else
-        domain = Ensure.NotNullOrEmpty(domain);
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(domain);
         
         return new UserCredentialBuilder(
-            new UserCredential(
+            new(
                 domain,
                 _userCredential.UserName,
 #pragma warning disable CA1416
@@ -80,15 +68,11 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetUsername(string username)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(username, nameof(username));
-#else
-        username = Ensure.NotNullOrEmpty(username);
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(username);
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(
+            new(
                 _userCredential.Domain,
                 username,
                 _userCredential.Password,
@@ -106,19 +90,12 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public IUserCredentialBuilder SetPassword(SecureString password)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(password, nameof(password));
-#else
-        password = Ensure.NotNull(password);
-#endif
-        if (password.Length > 1)
-        {
-            
-        }
+        ArgumentNullException.ThrowIfNull(password);
+        ArgumentException.ThrowIfNullOrEmpty(password);
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(
+            new(
                 _userCredential.Domain,
                 _userCredential.UserName,
                 password,
@@ -137,7 +114,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public IUserCredentialBuilder LoadUserProfile(bool loadUserProfile) =>
         new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new UserCredential(
+            new(
                 _userCredential.Domain,
                 _userCredential.UserName,
                 _userCredential.Password,
@@ -153,7 +130,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     [Pure]
     public UserCredential Build() =>
 #pragma warning disable CA1416
-        new UserCredential(
+        new(
             _userCredential.Domain,
             _userCredential.UserName,
             _userCredential.Password,

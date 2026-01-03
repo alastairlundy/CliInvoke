@@ -2,11 +2,17 @@
 
 public class BufferedTestHelper
 {
-    private readonly string _filePath;
+    public BufferedTestHelper()
+    {
+        TargetFilePath = "";
+        
+    }
 
-    public BufferedTestHelper() { }
-
-    public string TargetFilePath => _filePath;
+    public string TargetFilePath
+    {
+        get;
+        private set => field = value;
+    }
 
     public string Arguments => "gen-fake-text";
 }

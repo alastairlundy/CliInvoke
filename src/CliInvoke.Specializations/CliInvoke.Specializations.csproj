@@ -4,6 +4,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
         <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>
@@ -11,15 +12,15 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0</PackageVersion>
+        <PackageVersion>2.2.0</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>## Changes since 1.6.x
-* Updated to support CliInvoke 2.0.0
-* Updated Specialization ``ProcessConfiguration`` derived classes to work with the updated ``ProcessConfiguration`` class</PackageReleaseNotes>
+        <PackageReleaseNotes>* Improved Unix Powershell install location detection (https://github.com/alastairlundy/CliInvoke/pull/192 ) - This introduces a minor breaking change in the PowershellCommmandConfiguration class
+* Deprecated ``ClassicPowershellConfiguration`` for removal in CliInvoke Specializations version 3
+* Added ``PowershellProcessInvoker`` and ``CmdProcessInvoker`` as specialized instances of ``RunnerProcessInvokerBase``</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>
@@ -29,7 +30,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.0.2" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.5.0" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>
@@ -43,7 +44,7 @@
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
         <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+        <PackageReference Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
     </ItemGroup>
     
     <ItemGroup>

@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke.Extensions
+    CliInvoke.Extensions
      
     Copyright (C) 2024-2025  Alastair Lundy
 
@@ -9,11 +9,8 @@
  */
 
 using System.IO;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-
-using CliInvoke.Core;
 
 namespace CliInvoke.Extensions.Invokation;
 

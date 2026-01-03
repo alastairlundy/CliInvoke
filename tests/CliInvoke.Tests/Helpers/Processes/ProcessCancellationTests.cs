@@ -94,8 +94,7 @@ public class ProcessCancellationTests
         string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "120" : "/T 120 /NOBREAK";
         Process process = ProcessTestHelper.CreateProcess(filePath, args);
         
-        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30),
-            ProcessCancellationMode.Graceful), ProcessResultValidation.None,
+        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30)), ProcessResultValidation.None,
             ProcessCancellationExceptionBehavior.SuppressException);
         
         //Act

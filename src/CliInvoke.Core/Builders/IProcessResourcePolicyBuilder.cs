@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke.Core
+    CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,7 +8,6 @@
    */
 
 using System.Diagnostics;
-using System.Runtime.Versioning;
 
 namespace CliInvoke.Core.Builders;
 

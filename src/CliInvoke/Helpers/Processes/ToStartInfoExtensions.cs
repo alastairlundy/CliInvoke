@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,12 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Diagnostics;
 using System.Linq;
-
-using CliInvoke.Core;
-using CliInvoke.Internal.Localizations;
 
 namespace CliInvoke.Helpers.Processes;
 
@@ -32,7 +27,9 @@ internal static class ToStartInfoExtensions
         bool redirectStandardError
     )
     {
-        ProcessStartInfo processStartInfo = new ProcessStartInfo()
+        ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath);
+
+        ProcessStartInfo processStartInfo = new()
         {
             FileName = processConfiguration.TargetFilePath,
             Arguments = string.IsNullOrEmpty(processConfiguration.Arguments)
@@ -40,17 +37,14 @@ internal static class ToStartInfoExtensions
                 : processConfiguration.Arguments,
             WorkingDirectory = processConfiguration.WorkingDirectoryPath,
             UseShellExecute = processConfiguration.UseShellExecution,
-            CreateNoWindow = processConfiguration.WindowCreation == false,
+            CreateNoWindow = !processConfiguration.WindowCreation,
             RedirectStandardInput =
                 processConfiguration.StandardInput is not null
                 && processConfiguration.RedirectStandardInput,
             RedirectStandardOutput = redirectStandardOutput,
             RedirectStandardError = redirectStandardError,
         };
-
-        if (string.IsNullOrEmpty(processConfiguration.TargetFilePath))
-            throw new ArgumentException(Resources.Exceptions_TargetFile_NullOrEmpty);
-
+        
         if (processConfiguration.RequiresAdministrator)
             processStartInfo.RunAsAdministrator();
 

@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,12 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Diagnostics;
-using System.Runtime.Versioning;
 
-using CliInvoke.Core;
-using CliInvoke.Internal.Localizations;
 
 // ReSharper disable RedundantBoolCompare
 
@@ -50,28 +45,21 @@ internal static class ProcessSetPolicyExtensions
 
             if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
             {
-                if (resourcePolicy.ProcessorAffinity is not null)
-                {
+                if (resourcePolicy.ProcessorAffinity is not null) 
                     process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
-                }
             }
 
-            if (
-                OperatingSystem.IsMacOS()
+            if (OperatingSystem.IsMacOS()
                 || OperatingSystem.IsMacCatalyst()
                 || OperatingSystem.IsFreeBSD()
                 || OperatingSystem.IsWindows()
-            )
+               )
             {
-                if (resourcePolicy.MinWorkingSet is not null)
-                {
+                if (resourcePolicy.MinWorkingSet is not null) 
                     process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
-                }
 
-                if (resourcePolicy.MaxWorkingSet is not null)
-                {
+                if (resourcePolicy.MaxWorkingSet is not null) 
                     process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
-                }
             }
 
             process.PriorityClass = resourcePolicy.PriorityClass;

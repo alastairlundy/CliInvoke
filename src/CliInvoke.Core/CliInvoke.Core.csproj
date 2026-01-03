@@ -20,15 +20,21 @@
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <IsTrimmable>true</IsTrimmable>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>2.0.0</Version>
-        <PackageReleaseNotes></PackageReleaseNotes>
+        <PolyArgumentExceptions>true</PolyArgumentExceptions>
+        <Version>2.2.0</Version>
+        <PackageReleaseNotes>* Updated code to use Argument Exception throwing polyfills (#210) and address nullability warnings 
+* Added the ``NoValidation`` static instance property to the ``ProcessExitConfiguration`` class - This provides a static helper instance property with no exit code validation, no timeout validation, and suppresses exceptions where possible.
+* Updated ``RunnerProcessInvokerBase`` methods to be virtual
+* Updated ``ProcessNotSuccessfulException`` Process code to use new ProcessExceptionInfo`` class instead of ``Process`` class
+* Fixed an incorrect copyright notice header showing Copyright DotPrimitives instead of CliInvoke</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
-
+    
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.0.2" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.5.0" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
     </ItemGroup>
 

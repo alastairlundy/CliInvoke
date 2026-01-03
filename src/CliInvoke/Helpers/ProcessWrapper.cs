@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,10 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Diagnostics;
-
-using CliInvoke.Core;
 using CliInvoke.Helpers.Processes;
 
 namespace CliInvoke.Helpers;
@@ -28,7 +24,7 @@ internal class ProcessWrapper : Process
 
     private void OnStarted(object? sender, EventArgs e)
     {
-        if (HasExited == false)
+        if (!HasExited && HasStarted)
         {
             try
             {
@@ -62,11 +58,11 @@ internal class ProcessWrapper : Process
     {
         bool result = base.Start();
 
+        HasStarted = result;
+        
         if (result)
         {
-            HasStarted = true;
             StartTime = DateTime.UtcNow;
-
             Started?.Invoke(this, EventArgs.Empty);
         }
 

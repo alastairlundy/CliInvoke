@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke
+    CliInvoke
      
     Copyright (C) 2024-2025  Alastair Lundy
 
@@ -10,15 +10,6 @@
      Method signatures and field declarations from CliWrap licensed under the MIT License except where considered Copyright Fair Use by law.
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-
-using CliInvoke.Core.Builders;
-
-// ReSharper disable ArrangeObjectCreationWhenTypeEvident
-// ReSharper disable RedundantExplicitArrayCreation
 
 namespace CliInvoke.Builders;
 
@@ -39,7 +30,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     {
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
         _stringComparer = StringComparer.Ordinal;
-        _environmentVariables = new Dictionary<string, string>(_stringComparer);
+        _environmentVariables = new(_stringComparer);
     }
 
     /// <summary>
@@ -52,15 +43,11 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         bool throwExceptionIfDuplicateKeyFound = true
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(stringComparer, nameof(stringComparer));
-#else
-        stringComparer = Ensure.NotNull(stringComparer);
-#endif
-        
+        ArgumentNullException.ThrowIfNull(stringComparer);
+
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
-        _environmentVariables = new Dictionary<string, string>(_stringComparer);
+        _environmentVariables = new(_stringComparer);
     }
 
     /// <summary>
@@ -75,14 +62,10 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         bool throwExceptionIfDuplicateKeyFound
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(vars, nameof(vars));
-        ArgumentNullException.ThrowIfNull(stringComparer, nameof(stringComparer));
-#else
-        vars = Ensure.NotNull(vars);
-        stringComparer = Ensure.NotNull(stringComparer);
-#endif
-        _environmentVariables = new Dictionary<string, string>(vars, _stringComparer);
+        ArgumentNullException.ThrowIfNull(vars);
+        ArgumentNullException.ThrowIfNull(stringComparer);
+
+        _environmentVariables = new(vars, _stringComparer);
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
     }
@@ -96,13 +79,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     [Pure]
     public IEnvironmentVariablesBuilder SetPair(string name, string value)
     {
-#if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentException.ThrowIfNullOrEmpty(value);
-#else
-        name = Ensure.NotNullOrEmpty(name);
-        value = Ensure.NotNullOrWhiteSpace(value);
-#endif
         
         Dictionary<string, string> output = new(_environmentVariables);
 
@@ -129,12 +107,9 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         IEnumerable<KeyValuePair<string, string>> variables
     )
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(variables, nameof(variables));
-#else
-        variables = Ensure.NotNull(variables);
-#endif
-        Dictionary<string, string> output = new Dictionary<string, string>(
+        ArgumentNullException.ThrowIfNull(variables);
+
+        Dictionary<string, string> output = new(
             _environmentVariables,
             StringComparer.Ordinal
         );

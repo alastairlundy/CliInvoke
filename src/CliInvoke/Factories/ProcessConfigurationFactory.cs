@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,13 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-
 using CliInvoke.Builders;
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
 using CliInvoke.Core.Factories;
 
 namespace CliInvoke.Factories;
@@ -47,6 +41,9 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         Action<IProcessConfigurationBuilder>? configureBuilder = null
     )
     {
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
+        ArgumentNullException.ThrowIfNull(arguments);
+
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
             targetFilePath
         )
@@ -75,6 +72,9 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         Action<IProcessConfigurationBuilder>? configureBuilder = null
     )
     {
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
+        ArgumentNullException.ThrowIfNull(arguments);
+        
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder(x =>
             string.IsNullOrEmpty(x) == false
         ).AddEnumerable(arguments);

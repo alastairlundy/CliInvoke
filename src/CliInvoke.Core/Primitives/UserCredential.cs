@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke.COre
+    CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,8 +16,6 @@
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable MemberCanBePrivate.Global
 
-using System;
-using System.Runtime.Versioning;
 using System.Security;
 
 namespace CliInvoke.Core;
@@ -88,7 +86,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <summary>
     /// A null UserCredential instance.
     /// </summary>
-    public static UserCredential Null { get; } = new UserCredential();
+    public static UserCredential Null { get; } = new(null, null, null, null);
 
     /// <summary>
     /// Disposes of the Password SecureString and other UserCredential values.
@@ -123,12 +121,12 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
             return false;
 
         return Domain == other.Domain
-            && UserName == other.UserName
-            &&
+               && UserName == other.UserName
+               &&
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-            Password.Equals(other.Password)
+               Password.Equals(other.Password)
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
-            && LoadUserProfile == other.LoadUserProfile;
+               && LoadUserProfile == other.LoadUserProfile;
 #pragma warning restore CA1416
     }
 
@@ -189,5 +187,5 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <param name="right">The other <see cref="UserCredential"/> to be compared.</param>
     /// <returns>True if both <see cref="UserCredential"/> objects are not equal to each other; false otherwise.</returns>
     public static bool operator !=(UserCredential? left, UserCredential? right) =>
-        Equals(left, right) == false;
+        !Equals(left, right);
 }

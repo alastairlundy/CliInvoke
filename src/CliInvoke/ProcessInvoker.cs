@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,17 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.IO;
-using System.Runtime.Versioning;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CliInvoke.Core;
 using CliInvoke.Core.Piping;
-using CliInvoke.Exceptions;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
-using CliInvoke.Internal.Localizations;
 
 namespace CliInvoke;
 
@@ -37,8 +29,7 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessInvoker(
         IFilePathResolver filePathResolver,
-        IProcessPipeHandler processPipeHandler
-    )
+        IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;
@@ -67,57 +58,32 @@ public class ProcessInvoker : IProcessInvoker
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
-        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            processConfiguration.TargetFilePath
-        );
+        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
 
-        processExitConfiguration ??= ProcessExitConfiguration.Default;
-
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
         {
-            throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace(
-                    "{file}",
-                    processConfiguration.TargetFilePath
-                )
-            );
-        }
-
-        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
-        {
-            StartInfo = processConfiguration.ToProcessStartInfo(false, false),
+            StartInfo = processConfiguration.ToProcessStartInfo(false,
+                false),
             EnableRaisingEvents = true,
         };
 
-        if (
-            processConfiguration.StandardInput is not null
-            && processConfiguration.StandardInput != StreamWriter.Null
-        )
+        if (processConfiguration.StandardInput is not null
+            && processConfiguration.StandardInput != StreamWriter.Null)
         {
             process.StartInfo.RedirectStandardInput = true;
         }
 
-        if (
-            process.StartInfo.RedirectStandardInput
-            && processConfiguration.StandardInput is not null
-        )
-        {
-            await _processPipeHandler.PipeStandardInputAsync(
-                processConfiguration.StandardInput.BaseStream,
-                process
-            );
-        }
-
         try
         {
-            process.Start();
+            bool processWasNew = process.Start();
+
+            await PipeStandardInputAsync(processConfiguration, process);
 
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
 
-            ProcessResult result = new ProcessResult(
+            ProcessResult result = new(
                 process.StartInfo.FileName,
                 process.ExitCode,
                 process.StartTime,
@@ -129,20 +95,14 @@ public class ProcessInvoker : IProcessInvoker
                 && process.ExitCode != 0
             )
             {
-                throw new ProcessNotSuccessfulException(
-                    process: process,
-                    exitCode: process.ExitCode
-                );
+                ThrowProcessNotSuccessfulException(result, process, processWasNew);
             }
 
             return result;
         }
         finally
         {
-            process.Dispose();
-
-            if (disposeOfConfig)
-                processConfiguration.Dispose();
+            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
         }
     }
 
@@ -172,26 +132,13 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            processConfiguration.TargetFilePath
-        );
+        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
 
-        processExitConfiguration ??= ProcessExitConfiguration.Default;
-
-        if (File.Exists(processConfiguration.TargetFilePath) == false)
+        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
         {
-            throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace(
-                    "{file}",
-                    processConfiguration.TargetFilePath
-                )
-            );
-        }
-
-        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
-        {
-            StartInfo = processConfiguration.ToProcessStartInfo(true, true),
-            EnableRaisingEvents = true,
+            StartInfo = processConfiguration.ToProcessStartInfo(true, 
+                true),
+            EnableRaisingEvents = true
         };
 
         if (
@@ -202,20 +149,11 @@ public class ProcessInvoker : IProcessInvoker
             process.StartInfo.RedirectStandardInput = true;
         }
 
-        if (
-            process.StartInfo.RedirectStandardInput
-            && processConfiguration.StandardInput is not null
-        )
-        {
-            await _processPipeHandler.PipeStandardInputAsync(
-                processConfiguration.StandardInput.BaseStream,
-                process
-            );
-        }
-
         try
         {
-            process.Start();
+            bool processWasNew = process.Start();
+            
+            await PipeStandardInputAsync(processConfiguration, process);
 
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -227,7 +165,7 @@ public class ProcessInvoker : IProcessInvoker
 
             await Task.WhenAll(standardOut, standardError, waitForExit);
 
-            BufferedProcessResult result = new BufferedProcessResult(
+            BufferedProcessResult result = new(
                 process.StartInfo.FileName,
                 process.ExitCode,
                 await standardOut,
@@ -241,26 +179,16 @@ public class ProcessInvoker : IProcessInvoker
                 && process.ExitCode != 0
             )
             {
-                throw new ProcessNotSuccessfulException(
-                    process: process,
-                    exitCode: process.ExitCode
-                );
+                ThrowProcessNotSuccessfulException(result, process, processWasNew);
             }
 
-            if (standardOut.IsCompleted)
-                standardOut.Dispose();
-
-            if (standardError.IsCompleted)
-                standardError.Dispose();
+            DisposeCompletedStreams(standardOut, standardError);
 
             return result;
         }
         finally
         {
-            process.Dispose();
-
-            if (disposeOfConfig)
-                processConfiguration.Dispose();
+            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
         }
     }
 
@@ -290,18 +218,91 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            processConfiguration.TargetFilePath
-        );
-
-        processExitConfiguration ??= ProcessExitConfiguration.Default;
-
-        ProcessWrapper process = new ProcessWrapper(processConfiguration.ResourcePolicy)
+        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
+        
+        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
         {
             StartInfo = processConfiguration.ToProcessStartInfo(true, true),
             EnableRaisingEvents = true,
         };
 
+        try
+        {
+            bool processWasNew = process.Start();
+            
+            await PipeStandardInputAsync(processConfiguration, process);
+
+            Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
+            Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
+
+            Task waitForExit = process.WaitForExitOrTimeoutAsync(
+                processExitConfiguration,
+                cancellationToken
+            );
+
+            await Task.WhenAll(standardOutput, standardError, waitForExit);
+
+            PipedProcessResult result = new(
+                process.StartInfo.FileName,
+                process.ExitCode,
+                process.StartTime,
+                process.ExitTime,
+                await standardOutput,
+                await standardError
+            );
+
+            if (
+                processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
+                && process.ExitCode != 0
+            )
+            {
+                ThrowProcessNotSuccessfulException(result, process, processWasNew);
+            }
+            
+            DisposeCompletedStreams(standardOutput, standardError);
+
+            return result;
+        }
+        finally
+        {
+            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
+        }
+    }
+
+    #region Class private helpers
+    private static void DisposeCompletedStreams(Task<string> standardOut, Task<string> standardError)
+    {
+        if (standardOut.IsCompleted)
+            standardOut.Dispose();
+
+        if (standardError.IsCompleted)
+            standardError.Dispose();
+    }
+    
+    private void DisposeCompletedStreams(Task<Stream> standardOutput, Task<Stream> standardError)
+    {
+        if (standardOutput.IsCompleted)
+            standardOutput.Dispose();
+
+        if (standardError.IsCompleted)
+            standardError.Dispose();
+    }
+
+    private static void ThrowProcessNotSuccessfulException(ProcessResult result,
+        ProcessWrapper process,
+        bool processWasNew)
+    {
+        throw new ProcessNotSuccessfulException(
+            new ProcessExceptionInfo(result, process.StartInfo, process.Id, process.ProcessName,
+                processWasNew, process.ResourcePolicy,
+                new UserCredential((string?)process.StartInfo.Domain, (string?)process.StartInfo.UserName, 
+                    process.StartInfo.Password, process.StartInfo.LoadUserProfile))
+        );
+    }
+
+    private async Task PipeStandardInputAsync(ProcessConfiguration processConfiguration,
+        ProcessWrapper process)
+    {
         if (
             processConfiguration.StandardInput is not null
             && processConfiguration.StandardInput != StreamWriter.Null
@@ -320,55 +321,44 @@ public class ProcessInvoker : IProcessInvoker
                 process
             );
         }
+    }
+    
+    private ProcessExitConfiguration ValidateConfigurations(ProcessConfiguration processConfiguration,
+        ProcessExitConfiguration? processExitConfiguration)
+    {
+        ArgumentNullException.ThrowIfNull(processConfiguration);
+        
+        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
+            processConfiguration.TargetFilePath
+        );
 
-        try
+        processExitConfiguration ??= ProcessExitConfiguration.Default;
+
+        ThrowFileNotFoundException(processConfiguration);
+        return processExitConfiguration;
+    }
+
+    private void ThrowFileNotFoundException(ProcessConfiguration processConfiguration)
+    {
+        if (!File.Exists(processConfiguration.TargetFilePath))
         {
-            process.Start();
-
-            Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
-            Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
-
-            Task waitForExit = process.WaitForExitOrTimeoutAsync(
-                processExitConfiguration,
-                cancellationToken
+            throw new FileNotFoundException(
+                Resources.Exceptions_FileNotFound.Replace(
+                    "{file}",
+                    processConfiguration.TargetFilePath
+                )
             );
-
-            await Task.WhenAll(standardOutput, standardError, waitForExit);
-
-            PipedProcessResult result = new PipedProcessResult(
-                process.StartInfo.FileName,
-                process.ExitCode,
-                process.StartTime,
-                process.ExitTime,
-                await standardOutput,
-                await standardError
-            );
-
-            if (
-                processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0
-            )
-            {
-                throw new ProcessNotSuccessfulException(
-                    process: process,
-                    exitCode: process.ExitCode
-                );
-            }
-
-            if (standardOutput.IsCompleted)
-                standardOutput.Dispose();
-
-            if (standardError.IsCompleted)
-                standardError.Dispose();
-
-            return result;
-        }
-        finally
-        {
-            process.Dispose();
-
-            if (disposeOfConfig)
-                processConfiguration.Dispose();
         }
     }
+    
+    private static void DisposeProcessAndConfig(ProcessConfiguration processConfiguration,
+        bool disposeOfConfig,
+        ProcessWrapper process)
+    {
+        process.Dispose();
+
+        if (disposeOfConfig)
+            processConfiguration.Dispose();
+    }
+    #endregion
 }

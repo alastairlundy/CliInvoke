@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.CliInvoke.Core
+    CliInvoke.Core
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
 using System.Security;
 
 namespace CliInvoke.Core.Builders;
@@ -39,7 +38,7 @@ public interface IUserCredentialBuilder : IDisposable
     IUserCredentialBuilder SetPassword(SecureString password);
 
     /// <summary>
-    /// Specifies whether to load the Windows user profile .
+    /// Specifies whether to load the Windows user profile.
     /// </summary>
     /// <param name="loadUserProfile">True to load the user profile, false otherwise.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated load user profile setting.</returns>

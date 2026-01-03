@@ -7,14 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Versioning;
+using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
-using CliInvoke.Core;
+using System.Text.RegularExpressions;
 
 // ReSharper disable RedundantBoolCompare
 
@@ -35,12 +32,10 @@ namespace CliInvoke.Specializations.Configurations;
 [UnsupportedOSPlatform("watchos")]
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
-    private readonly IProcessInvoker _invoker;
-
     /// <summary>
     /// Initializes a new instance of the PowershellCommandConfiguration class.
     /// </summary>
-    /// <param name="processInvoker"></param>
+    /// <param name="filePathResolver"></param>
     /// <param name="arguments">The arguments to be passed to the command.</param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator">Indicates whether the command requires administrator privileges.</param>
@@ -58,13 +53,13 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
-    public PowershellProcessConfiguration(IProcessInvoker processInvoker, string arguments,
+    public PowershellProcessConfiguration(IFilePathResolver filePathResolver, string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
-        string workingDirectoryPath = null, bool requiresAdministrator = false,
-        Dictionary<string, string> environmentVariables = null, UserCredential credentials = null,
-        StreamWriter standardInput = null, StreamReader standardOutput = null, StreamReader standardError = null,
-        Encoding standardInputEncoding = default, Encoding standardOutputEncoding = default,
-        Encoding standardErrorEncoding = default, ProcessResourcePolicy processResourcePolicy = null,
+        string? workingDirectoryPath = null, bool requiresAdministrator = false,
+        Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
+        StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
+        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : base("",
         redirectStandardInput, redirectStandardOutput, redirectStandardError,
         arguments, workingDirectoryPath,
@@ -76,8 +71,31 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         windowCreation: windowCreation,
         useShellExecution: useShellExecution)
     {
+        string filePath;
+
+        if (OperatingSystem.IsWindows())
+        {
+            try
+            {
+                filePath = filePathResolver.ResolveFilePath("pwsh.exe");
+            }
+            catch
+            {
+                filePath = $"{GetInstallLocationOnWindows()}";
+            }
+        }
+        else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
+                 OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
+        {
+            filePath = filePathResolver.ResolveFilePath("pwsh");
+        }
+        else
+        {
+            throw new PlatformNotSupportedException(Resources.Exceptions_Powershell_OnlySupportedOnDesktop);
+        }
+
+        TargetFilePath = filePath;
         base.TargetFilePath = TargetFilePath;
-        _invoker = processInvoker;
     }
 
     /// <summary>
@@ -96,51 +114,28 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     [UnsupportedOSPlatform("watchos")]
     public new string TargetFilePath
     {
-        get
-        {
-            string filePath = string.Empty;
-
-            if (OperatingSystem.IsWindows())
-            {
-                filePath = $"{GetWindowsInstallLocation()}{Path.DirectorySeparatorChar}pwsh.exe";
-            }
-            else if (OperatingSystem.IsMacOS() ||
-                     OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
-            {
-                filePath = GetUnixInstallLocation();
-            }
-
-            return filePath;
-        }
+        get; private set;
     }
 
-    private string GetWindowsInstallLocation()
+    private static string GetInstallLocationOnWindows()
     {
         string programFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem == true
             ? Environment.SpecialFolder.ProgramFiles
             : Environment.SpecialFolder.ProgramFilesX86);
 
-        string[] directories = Directory.GetDirectories(
-            $"{programFiles}{Path.DirectorySeparatorChar}Powershell");
+        IEnumerable<string> directories = Directory.EnumerateDirectories(
+                $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
+            .Where(d => Regex.IsMatch(d, @"v\d+"))
+            .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));
 
         foreach (string directory in directories)
         {
-            if (File.Exists($"{directory}{Path.DirectorySeparatorChar}pwsh.exe"))
-                return directory;
+            string expectedFilePath = $"{directory}{Path.DirectorySeparatorChar}pwsh.exe";
+            
+            if (File.Exists(expectedFilePath))
+                return expectedFilePath;
         }
 
-        throw new FileNotFoundException("Could not find Powershell installation.");
-    }
-
-    private string GetUnixInstallLocation()
-    {
-        ProcessConfiguration configuration = new ProcessConfiguration("/usr/bin/which",
-            false, true, true,
-            arguments: "pwsh");
-
-        Task<BufferedProcessResult> task = _invoker.ExecuteBufferedAsync(configuration);
-
-        task.Wait();
-        return task.Result.StandardOutput;
+        throw new FileNotFoundException(Resources.Exceptions_Powershell_NotInstalled);
     }
 }

@@ -75,7 +75,7 @@ public class EnvironmentVariablesBuilderTests
 
         while (dictionary.Count < number)
         {
-            string key = _faker.Database.Column();
+            string key = _faker.Phone.PhoneNumber(null);
             string value = _faker.Random.Word();
             
             dictionary.TryAdd(key, value);
@@ -104,16 +104,23 @@ public class EnvironmentVariablesBuilderTests
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
+
+        IList<string> keys = _faker.MakeLazy(number * 4, () => _faker.Internet.Ip())
+        .Distinct(StringComparer.InvariantCulture)
+        .Take(number)
+        .ToList();
+
+        int keyIndex = 0;
         
         while (dictionary.Count < number)
         {
             if (stopwatch.ElapsedMilliseconds / 1000 > 10)
                 throw new Exception("Took to long to generate test data");
-            
-            string key = _faker.Database.Column();
+
             string value = _faker.Random.Word();
             
-            dictionary.TryAdd(key, value);
+            dictionary.Add(keys[keyIndex], value);
+            keyIndex++;
         }
         
         stopwatch.Stop();

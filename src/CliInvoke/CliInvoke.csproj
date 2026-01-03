@@ -15,11 +15,16 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes></PackageReleaseNotes>
+        <PackageReleaseNotes>* Update ``FilePathResolver`` file resolving code to ensure Target File Path is an Executable File and throw an Exception if it is not (#208 )
+* Updated ``FilePathResolver`` to use DotPrimitives to assist with Path Environment Variable Resolving code (#208)
+* Updated ``FilePathResolver`` logic to use enumerated Path directories method for potential performance improvements
+* Updated code to use Argument Exception throwing polyfills (#210) and address nullability warnings 
+* Removed some no longer needed internal Helper code
+* Fixed typos in Localized Exception strings</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.0.0</PackageVersion>
+        <PackageVersion>2.2.0</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -28,8 +33,9 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
+        <PolyArgumentExceptions>true</PolyArgumentExceptions>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>CliInvoke.Tests</_Parameter1>
@@ -37,7 +43,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.0.3" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.5.0" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -51,7 +57,7 @@
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
         <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="AlastairLundy.CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+        <PackageReference Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
     </ItemGroup>
     
     <ItemGroup>
@@ -87,5 +93,10 @@
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="DotExtensions" Version="9.3.0" />
+      <PackageReference Include="DotPrimitives" Version="4.1.0" />
     </ItemGroup>
 </Project>
