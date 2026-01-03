@@ -7,7 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using DotExtensions.Dates;
+using System.Threading;
+
+using CliInvoke.Helpers.Processes.Cancellation;
 
 namespace CliInvoke.Helpers.Processes;
 
@@ -28,8 +30,7 @@ internal static class ProcessCancellationExtensions
         [SupportedOSPlatform("freebsd")]
         [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrTimeoutAsync(ProcessExitConfiguration processExitConfiguration,
-            CancellationToken cancellationToken = default
-        )
+            CancellationToken cancellationToken = default)
         {
             if (processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero)
             {
@@ -47,18 +48,15 @@ internal static class ProcessCancellationExtensions
                 case ProcessCancellationMode.Graceful:
                 {
                     await process.WaitForExitOrGracefulTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                        processExitConfiguration.CancellationExceptionBehavior, cancellationToken
-                    );
+                        processExitConfiguration.CancellationExceptionBehavior, cancellationToken);
                     return;
                 }
                 case ProcessCancellationMode.Forceful:
+                {
                     await process.WaitForExitOrForcefulTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                        processExitConfiguration.CancellationExceptionBehavior,
-                        cancellationToken
-                    );
+                        processExitConfiguration.CancellationExceptionBehavior, cancellationToken);
                     return;
-                default:
-                    throw new NotSupportedException();
+                }
             }
         }
 
@@ -84,124 +82,20 @@ internal static class ProcessCancellationExtensions
             }
             finally
             {
-                //Add graceful SIGINT/SIGTERM signal sending here.
-            }
-        }
+                // Graceful SIGINT/SIGTERM signal sending here.
 
-        /// <summary>
-        /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
-        /// </summary>
-        /// <param name="timeoutThreshold">The delay to wait before requesting cancellation.</param>
-        /// <param name="cancellationExceptionBehavior"></param>
-        /// <param name="cancellationToken"></param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the timeout threshold is less than 0.</exception>
-        /// <exception cref="NotSupportedException">Thrown if run on a remote computer or device.</exception>
-        [UnsupportedOSPlatform("ios")]
-        [UnsupportedOSPlatform("tvos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("android")]
-        private async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
-        {
-            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
-
-            CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            cts.CancelAfter(timeoutThreshold);
-
-            try
-            {
-                await process.WaitForExitAsync(cts.Token);
-            }
-            catch (TaskCanceledException)
-            {
-                DateTime actualExitTime = DateTime.UtcNow;
-                TimeSpan difference = expectedExitTime.Difference(actualExitTime);
-
-                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
+                if (!OperatingSystem.IsWindows())
                 {
-                    throw;
-                }
-                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
-                {
-                    if (difference > TimeSpan.FromSeconds(10))
+                    Task cancelTask = process.CancelWithInterruptOnUnix(TimeSpan.Zero, cancellationExceptionBehavior, cancellationToken);
+                
+                    await Task.WhenAny([cancelTask, Task.Delay(5000, cancellationToken)]);
+                
+                    if (!process.HasExited)
                     {
-                        throw;
+                        await Task.Delay(100, cancellationToken);
+
+                        await process.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero,cancellationExceptionBehavior, cancellationToken);   
                     }
-                }
-            }
-            catch (Exception)
-            {
-                if (cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                if (!process.HasExited)
-                    process.Kill();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="timeoutThreshold"></param>
-        /// <param name="cancellationExceptionBehavior"></param>
-        /// <param name="cancellationToken"></param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        [UnsupportedOSPlatform("ios")]
-        [UnsupportedOSPlatform("tvos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("android")]
-        private async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior,
-            CancellationToken cancellationToken)
-        {
-            try
-            {
-                Task waitForExit = process.WaitForExitAsync(cancellationToken);
-
-                Task delay = Task.Delay(timeoutThreshold, cancellationToken);
-
-                await Task.WhenAny(delay, waitForExit);
-
-                if (!process.HasExited)
-                {
-                    process.Kill(true);
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                if (cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowException)
-                {
-                    throw;
-                }
-            }
-            catch (Exception)
-            {
-                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
-                    || cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                if (!process.HasExited)
-                {
-                    process.Kill();
                 }
             }
         }

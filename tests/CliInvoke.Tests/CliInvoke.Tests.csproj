@@ -31,7 +31,7 @@
 
     <ItemGroup>
       <Folder Include="Factories\" />
-      <Folder Include="Invokers\" />
+      <Folder Include="Invokers\Cancellation\" />
     </ItemGroup>
 
 </Project>
