@@ -45,8 +45,8 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         ArgumentNullException.ThrowIfNull(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
-            targetFilePath
-        )
+                targetFilePath
+            )
             .SetArguments(arguments)
             .RedirectStandardOutput(true)
             .RedirectStandardError(true)
@@ -80,8 +80,8 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         ).AddEnumerable(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
-            targetFilePath
-        )
+                targetFilePath
+            )
             .SetArguments(argumentsBuilder.ToString())
             .RedirectStandardOutput(true)
             .RedirectStandardError(true)
