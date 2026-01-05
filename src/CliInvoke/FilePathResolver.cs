@@ -65,7 +65,7 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    private static bool ExecutableFileCheck(string fileName)
+    private bool ExecutableFileCheck(string fileName)
     {
         FileInfo file =  new(fileName);
 
@@ -81,7 +81,7 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    protected static bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
+    protected bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
         out FileInfo? resolvedFilePath)
     {
         if (filePathToResolve.Contains(Path.DirectorySeparatorChar)
@@ -144,7 +144,7 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    private static FileInfo LocateFileFromDirectory(string filePathToResolve)
+    protected FileInfo LocateFileFromDirectory(string filePathToResolve)
     {
         string fileName = Path.GetFileName(filePathToResolve);
 
