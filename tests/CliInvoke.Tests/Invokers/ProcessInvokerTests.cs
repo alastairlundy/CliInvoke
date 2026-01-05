@@ -4,23 +4,26 @@ using System.Threading.Tasks;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
+using CliInvoke.Tests.TestData;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Tests.Invokers;
 
-public class ProcessInvokerTests
+public class ProcessInvokerTests : IClassFixture<TestFixture>
 {
-    private readonly IProcessInvoker processInvoker;
-    private readonly IProcessConfigurationFactory configFactory;
+    private readonly TestFixture _testFixture;
     
-    public ProcessInvokerTests()
+    public ProcessInvokerTests(TestFixture testFixture)
     {
-        processInvoker = new ProcessInvoker(new FilePathResolver(), new ProcessPipeHandler());
-        configFactory = new ProcessConfigurationFactory();
+        _testFixture = testFixture;
     }
 
     [Fact]
     public async Task Invoker_WhiteSpaceFilePath_ShouldThrow()
     {
+        IProcessConfigurationFactory configFactory = _testFixture.ServiceProvider.GetRequiredService<IProcessConfigurationFactory>();
+        IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
+        
         using ProcessConfiguration config = configFactory.Create("  ");
 
         await Assert.ThrowsAsync<ArgumentException>(() => processInvoker.ExecuteBufferedAsync(config,
@@ -30,6 +33,9 @@ public class ProcessInvokerTests
     [Fact]
     public async Task Invoker_EmptyFilePath_ShouldThrow()
     {
+        IProcessConfigurationFactory configFactory = _testFixture.ServiceProvider.GetRequiredService<IProcessConfigurationFactory>();
+        IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
+
         using ProcessConfiguration config = configFactory.Create("FAKE/PATH");
         
         config.TargetFilePath = string.Empty;
@@ -40,7 +46,10 @@ public class ProcessInvokerTests
     
     [Fact]
     public async Task Invoker_InvalidFilePath_ShouldThrow()
-    {
+    {        
+        IProcessConfigurationFactory configFactory = _testFixture.ServiceProvider.GetRequiredService<IProcessConfigurationFactory>();
+        IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
+        
         using ProcessConfiguration config = configFactory.Create("FAKE.FILE");
 
         await Assert.ThrowsAsync<FileNotFoundException>(() => processInvoker.ExecuteBufferedAsync(config,
