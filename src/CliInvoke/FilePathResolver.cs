@@ -109,8 +109,10 @@ public class FilePathResolver : IFilePathResolver
             return false;
         }
 
-        bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
-
+        string fileName = Path.GetFileNameWithoutExtension(filePathToResolve);
+        
+        bool fileHasExtension = Path.GetExtension(fileName) != string.Empty;
+        
         foreach (string pathEntry in pathContents)
         {
             if (fileHasExtension)
@@ -118,7 +120,7 @@ public class FilePathResolver : IFilePathResolver
                 foreach (string pathExtension in pathExtensions)
                 {
                     string filePath =
-                        Path.Combine(pathEntry, $"{filePathToResolve}{pathExtension}");
+                        Path.Combine(pathEntry, $"{fileName}{pathExtension}");
 
                     if (File.Exists(filePath))
                     {
@@ -129,7 +131,7 @@ public class FilePathResolver : IFilePathResolver
             }
             else
             {
-                string filePath = Path.Combine(pathEntry, filePathToResolve);
+                string filePath = Path.Combine(pathEntry, fileName);
 
                 if (File.Exists(filePath))
                 {
