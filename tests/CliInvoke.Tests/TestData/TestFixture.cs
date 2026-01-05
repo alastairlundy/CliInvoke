@@ -10,14 +10,11 @@ public class TestFixture
 
     public TestFixture()
     {
-        IHost hostBuilder = Host.CreateDefaultBuilder()
-            .ConfigureServices(serviceCollection=>
-            {
-                serviceCollection = serviceCollection.AddCliInvoke()
-                    .AddMemoryCache();
-            })
-            .Build();
-            
-        ServiceProvider = hostBuilder.Services; 
+        IServiceCollection serviceCollection = new ServiceCollection();
+
+        serviceCollection = serviceCollection.AddMemoryCache()
+            .AddCliInvoke();
+
+        ServiceProvider = serviceCollection.BuildServiceProvider();
     }
 }

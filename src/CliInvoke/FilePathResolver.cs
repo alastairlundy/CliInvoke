@@ -40,6 +40,7 @@ public class FilePathResolver : IFilePathResolver
     public string ResolveFilePath(string filePathToResolve)
     {
         ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
         
         if (Path.IsPathRooted(filePathToResolve))
         {
@@ -109,8 +110,10 @@ public class FilePathResolver : IFilePathResolver
             return false;
         }
 
-        bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
-
+        string fileName = Path.GetFileNameWithoutExtension(filePathToResolve);
+        
+        bool fileHasExtension = Path.GetExtension(fileName) != string.Empty;
+        
         foreach (string pathEntry in pathContents)
         {
             if (fileHasExtension)
@@ -118,7 +121,7 @@ public class FilePathResolver : IFilePathResolver
                 foreach (string pathExtension in pathExtensions)
                 {
                     string filePath =
-                        Path.Combine(pathEntry, $"{filePathToResolve}{pathExtension}");
+                        Path.Combine(pathEntry, $"{fileName}{pathExtension}");
 
                     if (File.Exists(filePath))
                     {
@@ -129,7 +132,7 @@ public class FilePathResolver : IFilePathResolver
             }
             else
             {
-                string filePath = Path.Combine(pathEntry, filePathToResolve);
+                string filePath = Path.Combine(pathEntry, fileName);
 
                 if (File.Exists(filePath))
                 {
@@ -155,12 +158,23 @@ public class FilePathResolver : IFilePathResolver
     {
         string fileName = Path.GetFileName(filePathToResolve);
 
-        int index = filePathToResolve.IndexOf(
-            fileName, StringComparison.InvariantCultureIgnoreCase);
+        int index = filePathToResolve.LastIndexOf(fileName, StringComparison.InvariantCultureIgnoreCase);
 
-        string directoryPath = Path.GetDirectoryName(filePathToResolve)
-                               ?? filePathToResolve.Remove(index, fileName.Length);
+        string directoryPath;
+        
+        try
+        {
+            directoryPath = Path.GetDirectoryName(filePathToResolve) ??
+                            filePathToResolve.Remove(index, fileName.Length);
 
+            if (directoryPath.Length == 0)
+                throw new Exception();
+        }
+        catch
+        {
+            directoryPath = Environment.CurrentDirectory;
+        }
+        
         DirectoryInfo directory = new(directoryPath);
 
         FileInfo? file = directory.SafelyEnumerateFiles("*", SearchOption.AllDirectories)

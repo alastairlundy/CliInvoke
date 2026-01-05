@@ -36,7 +36,7 @@ public class ProcessCancellationTests
        
        await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
 
-      await Task.Delay(1000, TestContext.Current.CancellationToken);
+       await Task.Delay(1000, TestContext.Current.CancellationToken);
 
        bool actual = Process.GetProcesses().Any(x => x.Id == processId);
 

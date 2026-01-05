@@ -24,7 +24,9 @@ public class CachedFilePathResolverTests : IClassFixture<TestFixture>
     {
         string executable = OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet";
 
-        CachedFilePathResolver cachedFilePathResolver = new(_testFixture.ServiceProvider.GetRequiredService<IMemoryCache>());
+        IMemoryCache cache = _testFixture.ServiceProvider.GetRequiredService<IMemoryCache>();
+        
+        CachedFilePathResolver cachedFilePathResolver = new(cache);
         
         string beforeActual = cachedFilePathResolver.ResolveFilePath(executable);
 
@@ -67,7 +69,7 @@ public class CachedFilePathResolverTests : IClassFixture<TestFixture>
         string executable = OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet";
 
         IMemoryCache cache = _testFixture.ServiceProvider.GetRequiredService<IMemoryCache>();
-        ;
+        
         CachedFilePathResolver cachedFilePathResolver = new(cache, TimeSpan.FromMinutes(1));
         
         string beforeActual = cachedFilePathResolver.ResolveFilePath(executable);
