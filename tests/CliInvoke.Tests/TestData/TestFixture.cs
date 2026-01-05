@@ -1,5 +1,5 @@
-﻿using System;
-using CliInvoke.Extensions;
+﻿using CliInvoke.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace CliInvoke.Tests.TestData;
@@ -13,7 +13,8 @@ public class TestFixture
         IHost hostBuilder = Host.CreateDefaultBuilder()
             .ConfigureServices(serviceCollection=>
             {
-               serviceCollection = serviceCollection.AddCliInvoke();
+                serviceCollection = serviceCollection.AddCliInvoke()
+                    .AddMemoryCache();
             })
             .Build();
             
