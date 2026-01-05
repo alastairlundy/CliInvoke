@@ -155,12 +155,23 @@ public class FilePathResolver : IFilePathResolver
     {
         string fileName = Path.GetFileName(filePathToResolve);
 
-        int index = filePathToResolve.IndexOf(
-            fileName, StringComparison.InvariantCultureIgnoreCase);
+        int index = filePathToResolve.LastIndexOf(fileName, StringComparison.InvariantCultureIgnoreCase);
 
-        string directoryPath = Path.GetDirectoryName(filePathToResolve)
-                               ?? filePathToResolve.Remove(index, fileName.Length);
+        string directoryPath;
+        
+        try
+        {
+            directoryPath = Path.GetDirectoryName(filePathToResolve) ??
+                            filePathToResolve.Remove(index, fileName.Length);
 
+            if (directoryPath.Length == 0)
+                throw new Exception();
+        }
+        catch
+        {
+            directoryPath = Environment.CurrentDirectory;
+        }
+        
         DirectoryInfo directory = new(directoryPath);
 
         FileInfo? file = directory.SafelyEnumerateFiles("*", SearchOption.AllDirectories)
