@@ -8,6 +8,7 @@
    */
 
 using System.Linq;
+using System.Text;
 
 using DotExtensions.IO.Directories;
 using DotExtensions.IO.Permissions;
@@ -155,9 +156,7 @@ public class FilePathResolver : IFilePathResolver
         string fileName = Path.GetFileName(filePathToResolve);
 
         int index = filePathToResolve.IndexOf(
-            fileName,
-            StringComparison.InvariantCultureIgnoreCase
-        );
+            fileName, StringComparison.InvariantCultureIgnoreCase);
 
         string directoryPath = Path.GetDirectoryName(filePathToResolve)
                                ?? filePathToResolve.Remove(index, fileName.Length);
@@ -172,40 +171,37 @@ public class FilePathResolver : IFilePathResolver
                 {
                     string extension = Path.GetExtension(f.FullName);
 
-                    int extensionIndex =
-                        f.FullName.LastIndexOf(extension, StringComparison.Ordinal);
+                    int extensionIndex = f.FullName.LastIndexOf(extension, StringComparison.Ordinal);
 
                     // ReSharper disable once InvertIf
                     if (extensionIndex != -1)
                     {
-                        string tempF = f.FullName;
-                        tempF = tempF.Remove(extensionIndex, extension.Length);
-                        tempF = tempF.Insert(extensionIndex, extension.ToLower());
+                        StringBuilder sb = new StringBuilder(f.FullName);
 
-                        f = new(tempF);
+                        string lowerCasedExtension = extension.ToLower();
+
+                        for (int i = 0; i < extension.Length; i++)
+                        {
+                            sb[extensionIndex + i] = lowerCasedExtension[i];
+                        }
+                        
+                        f = new FileInfo(sb.ToString());
                     }
                 }
 
                 return f;
             })
-            .Where(f =>
+            .FirstOrDefault(f =>
             {
-                if (OperatingSystem.IsWindows())
-                {
-                    return f.Name.Equals(fileName,
-                        StringComparison.InvariantCultureIgnoreCase);
-                }
+                bool sameName = OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.InvariantCultureIgnoreCase) 
+                    : f.Name.Equals(filePathToResolve, StringComparison.InvariantCulture);
 
-                return f.Name.Equals(filePathToResolve,
-                    StringComparison.InvariantCulture);
-            })
-            .FirstOrDefault(f => f.HasExecutePermission());
+                return sameName && f.HasExecutePermission();
+            });
 
         return file ?? throw new FileNotFoundException(
             Resources.Exceptions_FileNotFound.Replace(
                 "{file}",
-                filePathToResolve
-            )
-        );
+                filePathToResolve));
     }
 }
