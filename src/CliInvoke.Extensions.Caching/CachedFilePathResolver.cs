@@ -1,5 +1,5 @@
 /*
-    AlastairLundy.CliInvoke
+    CliInvoke
     Copyright (C) 2024-2025  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,13 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
 using System.IO;
 using System.Runtime.Versioning;
-
-using AlastairLundy.CliInvoke;
-
-using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CliInvoke.Extensions.Caching;
 
@@ -28,8 +25,8 @@ public class CachedFilePathResolver : FilePathResolver
     private const string PathExtCacheName = "PathExtData";
     private const string PathCacheName = "PathCacheData";
     
-    private TimeSpan PathExtCacheLifespan { get; set; } = TimeSpan.FromHours(1.0);
-    private TimeSpan PathCacheLifespan { get; set; } = TimeSpan.FromMinutes(3.0);
+    private TimeSpan PathExtCacheLifespan { get; } = TimeSpan.FromHours(1.0);
+    private TimeSpan PathCacheLifespan { get; } = TimeSpan.FromMinutes(3.0);
 
     /// <summary>
     /// Provides a mechanism for resolving file paths with enhanced performance by using
@@ -75,68 +72,46 @@ public class CachedFilePathResolver : FilePathResolver
     [UnsupportedOSPlatform("tvos")]
     public new string ResolveFilePath(string filePathToResolve)
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrEmpty(filePathToResolve,  nameof(filePathToResolve));
-#endif
+        ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
 
         if (Path.IsPathRooted(filePathToResolve))
             return filePathToResolve;
-
-        GetCombinedPathInfo(out string[]? pathContents, out string[] pathExtensions);
         
         bool resolveFromPath =
-            ResolveFromPathEnvironmentVariable(filePathToResolve, pathContents, pathExtensions,
-                out string? filePath);
+            ResolveFromPathEnvironmentVariable(filePathToResolve,
+                out FileInfo? filePath);
 
         if (resolveFromPath && filePath is not null)
-            return filePath;
+            return filePath.FullName;
 
-        return LocateFileFromDirectory(filePathToResolve);
-    }
-
-    protected new bool GetCombinedPathInfo(out string[]? pathContents, out string[] pathExtensions)
-    {
-        bool foundPathExtensions = GetPathExtensionsInfo(out pathExtensions);
-        bool foundPath = GetPathInfo(out pathContents);
-
-        return foundPath && foundPathExtensions;
+        return LocateFileFromDirectory(filePathToResolve).FullName;
     }
     
-    protected new bool GetPathExtensionsInfo(out string[] pathExtensions)
+    protected new string[] GetPathExtensionsInfo()
     {
-        bool extensionsCached =
-            _cache.TryGetValue<string[]>(PathExtCacheName, out string[]? extensions);
+        bool extensionsCached = _cache.TryGetValue<string[]>(PathExtCacheName, out string[]? extensions);
 
         if (extensionsCached && extensions is not null)
-        {
-            pathExtensions = extensions;
-            return true;
-        }
+            return extensions;
 
-        bool result = base.GetPathExtensionsInfo(out pathExtensions);
+        string[] output = base.GetPathExtensionsInfo();
     
-        if(result)
-            _cache.Set(PathExtCacheName, pathExtensions, PathExtCacheLifespan);
+        _cache.Set(PathExtCacheName, output, PathExtCacheLifespan);
 
-        return result;
+        return output;
     }
 
-    protected new bool GetPathInfo(out string[]? pathContents)
+    protected new IEnumerable<string>? GetPathInfo()
     {
-        bool pathCached =
-            _cache.TryGetValue<string[]>(PathCacheName, out string[]? path);
+        bool pathCached = _cache.TryGetValue<string[]>(PathCacheName, out string[]? path);
 
         if (pathCached)
-        {
-            pathContents = path;
-            return true;
-        }
+            return path;
         
-        bool result = base.GetPathInfo(out pathContents);
+        string[]? output = base.GetPathInfo()?.ToArray();
         
-        if(result)
-            _cache.Set(PathCacheName, pathContents, PathCacheLifespan);
+        _cache.Set(PathCacheName, output, PathCacheLifespan);
 
-        return result;
+        return output;
     }
 }
