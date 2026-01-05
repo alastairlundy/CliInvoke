@@ -7,11 +7,22 @@
         <Nullable>enable</Nullable>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.0.0</Version>
+        <Version>2.3.0</Version>
         <Title>CliInvoke.Extensions.Caching</Title>
         <Authors>AlastairLundy</Authors>
-        <PackageReleaseNotes>Initial release of caching extension. Released as version 2.0 to match with CliInvoke</PackageReleaseNotes>
+        <PackageReleaseNotes>Initial release of caching extension. Released as version 2.3 to match with CliInvoke</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <Copyright>Copyright (c) Alastair Lundy 2025</Copyright>
+        <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
+        <PackageIcon>icon.png</PackageIcon>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <IsTrimmable>true</IsTrimmable>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,8 +32,28 @@
                           Version="9.6.0" PrivateAssets="all"/>
 </ItemGroup>
 
+
+    <PropertyGroup>
+        <!-- default false, CI can set to true -->
+        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
+    </PropertyGroup>
+    
     <ItemGroup>
-      <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
-      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
+        <None Include="..\..\.assets\icon.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+            <Link>icon.png</Link>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
+        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+        <ProjectReference Include="..\CliInvoke\CliInvoke.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+        <!-- set CliInvokeCoreVersion in the workflow -->
+        <PackageReference Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+        <PackageReference Include="CliInvoke" Version="$(CliInvokeVersion)" />
     </ItemGroup>
 </Project>
