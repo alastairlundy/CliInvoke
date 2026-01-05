@@ -73,6 +73,12 @@ public class FilePathResolver : IFilePathResolver
             throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
     }
 
+    protected IEnumerable<string>? GetPathInfo()
+        => PathEnvironmentVariable.EnumerateDirectories();
+    
+    protected string[] GetPathExtensionsInfo()
+        => PathEnvironmentVariable.GetPathFileExtensions();
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -93,8 +99,8 @@ public class FilePathResolver : IFilePathResolver
             return fileExists;
         }
 
-        string[] pathExtensions = PathEnvironmentVariable.GetPathFileExtensions();
-        IEnumerable<string>? pathContents = PathEnvironmentVariable.EnumerateDirectories();
+        string[] pathExtensions = GetPathExtensionsInfo();
+        IEnumerable<string>? pathContents = GetPathInfo();
         
         if(pathContents is null)
         {
