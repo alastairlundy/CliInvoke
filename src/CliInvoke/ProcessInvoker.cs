@@ -327,8 +327,7 @@ public class ProcessInvoker : IProcessInvoker
         ArgumentNullException.ThrowIfNull(processConfiguration);
         
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            processConfiguration.TargetFilePath
-        );
+            processConfiguration.TargetFilePath);
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
