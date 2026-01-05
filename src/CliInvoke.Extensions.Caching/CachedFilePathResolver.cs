@@ -78,8 +78,7 @@ public class CachedFilePathResolver : FilePathResolver
             return filePathToResolve;
         
         bool resolveFromPath =
-            ResolveFromPathEnvironmentVariable(filePathToResolve,
-                out FileInfo? filePath);
+            ResolveFromPathEnvironmentVariable(filePathToResolve, out FileInfo? filePath);
 
         if (resolveFromPath && filePath is not null)
             return filePath.FullName;
