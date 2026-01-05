@@ -5,6 +5,7 @@ using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
+using CliInvoke.Tests.Internal.Constants;
 using CliInvoke.Tests.Internal.Helpers;
 using Xunit;
 
@@ -52,11 +53,11 @@ public class FilePathResolverTests
     [Fact]
     public void Resolve_CrossPlatform_PathEnv_Executable()
     {
-        string expected = ProcessTestHelper.GetTargetFilePath();
+        string expected = OperatingSystem.IsWindows() ? TargetFilePaths.CmdFilePath : TargetFilePaths.LinuxEchoFilePath;
         
         IFilePathResolver filePathResolver = new FilePathResolver();
 
-        string actual = filePathResolver.ResolveFilePath(expected);
+        string actual = filePathResolver.ResolveFilePath(ProcessTestHelper.GetTargetFilePath());
         
         Assert.Equal(expected, actual);
     }
