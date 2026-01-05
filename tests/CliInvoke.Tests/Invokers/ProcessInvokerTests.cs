@@ -1,13 +1,9 @@
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Bogus;
-using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
-using Xunit;
 
 namespace CliInvoke.Tests.Invokers;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using CliInvoke.Extensions;
+﻿using CliInvoke.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace CliInvoke.Tests.TestData;
