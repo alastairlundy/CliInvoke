@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using CliInvoke.Builders;
-using CliInvoke.Core.Builders;
-using CliInvoke.Tests.Helpers;
-using Xunit;
 
 namespace CliInvoke.Tests.Builders;
 

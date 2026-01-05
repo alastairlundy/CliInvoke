@@ -1,5 +1,4 @@
 using CliInvoke.Piping;
-using Xunit;
 
 namespace CliInvoke.Tests.Piping;
 
