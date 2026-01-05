@@ -38,15 +38,13 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     public ProcessConfiguration Create(
         string targetFilePath,
         string arguments,
-        Action<IProcessConfigurationBuilder>? configureBuilder = null
-    )
+        Action<IProcessConfigurationBuilder>? configureBuilder = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
-                targetFilePath
-            )
+                targetFilePath)
             .SetArguments(arguments)
             .RedirectStandardOutput(true)
             .RedirectStandardError(true)
@@ -69,19 +67,16 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     public ProcessConfiguration Create(
         string targetFilePath,
         IEnumerable<string> arguments,
-        Action<IProcessConfigurationBuilder>? configureBuilder = null
-    )
+        Action<IProcessConfigurationBuilder>? configureBuilder = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
         
-        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder(x =>
-            !string.IsNullOrEmpty(x)
-        ).AddEnumerable(arguments);
+        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
+            .AddEnumerable(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
-                targetFilePath
-            )
+                targetFilePath)
             .SetArguments(argumentsBuilder.ToString())
             .RedirectStandardOutput(true)
             .RedirectStandardError(true)
