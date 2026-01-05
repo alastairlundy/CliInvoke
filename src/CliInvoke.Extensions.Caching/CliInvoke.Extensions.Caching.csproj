@@ -5,7 +5,6 @@
         <LangVersion>14</LangVersion>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Version>2.3.0</Version>
         <Title>CliInvoke.Extensions.Caching</Title>
@@ -24,6 +23,7 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <IsAotCompatible>true</IsAotCompatible>
+        <PolyArgumentExceptions>true</PolyArgumentExceptions>
     </PropertyGroup>
 
     <ItemGroup>
