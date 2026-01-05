@@ -1,13 +1,9 @@
-using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using CliInvoke.Core;
 using CliInvoke.Helpers.Processes;
-using CliInvoke.Tests.Internal.Helpers;
-using Xunit;
 
 namespace CliInvoke.Tests.Helpers.Processes;
 

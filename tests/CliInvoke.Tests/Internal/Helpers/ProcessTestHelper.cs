@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using CliInvoke.Tests.Internal.Constants;
 

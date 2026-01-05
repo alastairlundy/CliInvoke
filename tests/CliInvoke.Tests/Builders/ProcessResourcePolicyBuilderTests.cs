@@ -1,10 +1,6 @@
-using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using CliInvoke.Builders;
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
-using Xunit;
 
 // ReSharper disable JoinDeclarationAndInitializer
 // ReSharper disable NotAccessedVariable

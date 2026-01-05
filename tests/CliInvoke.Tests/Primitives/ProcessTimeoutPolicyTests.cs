@@ -1,7 +1,4 @@
-using System;
-using Bogus;
-using CliInvoke.Core;
-using Xunit;
+
 
 // ReSharper disable NotAccessedVariable
 
