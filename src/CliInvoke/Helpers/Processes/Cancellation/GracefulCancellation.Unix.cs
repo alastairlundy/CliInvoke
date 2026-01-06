@@ -8,7 +8,6 @@
    */
 
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
@@ -16,6 +15,8 @@ internal static partial class GracefulCancellation
 {
     private const int Sigint = 2;
     private const int Sigterm = 15;
+
+    private const int DelayBeforeSigintMilliseconds = 3000;
     
     extension(Process process)
     {
@@ -30,16 +31,44 @@ internal static partial class GracefulCancellation
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
         [UnsupportedOSPlatform("windows")]
-        internal async Task CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
+        internal async Task<bool> CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
             ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
         {
-            if(OperatingSystem.IsWindows())
-                throw new PlatformNotSupportedException();
-            
-            await Task.Delay(timeoutThreshold, cancellationToken);
+            bool sigIntSuccess = false;
 
-            SendSignal(process.Id,Sigint);
-            SendSignal(process.Id,Sigterm);
+            try
+            {
+                if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS())
+                    throw new PlatformNotSupportedException();
+
+                await Task.Delay(timeoutThreshold, cancellationToken);
+
+                bool sigTermSuccess = SendSignal(process.Id, Sigterm);
+
+                await Task.Delay(millisecondsDelay: DelayBeforeSigintMilliseconds,
+                    cancellationToken);
+
+                if (sigTermSuccess)
+                    return true;
+
+                sigIntSuccess = SendSignal(process.Id, Sigint);
+            }
+            catch (TaskCanceledException)
+            {
+                if (cancellationExceptionBehavior ==
+                    ProcessCancellationExceptionBehavior.AllowException)
+                    throw;
+            }
+            catch (Exception)
+            {
+                if (cancellationExceptionBehavior ==
+                    ProcessCancellationExceptionBehavior.AllowException ||
+                    cancellationExceptionBehavior == ProcessCancellationExceptionBehavior
+                        .AllowExceptionIfUnexpected)
+                    throw;
+            }
+            
+            return sigIntSuccess;
         }
     }
 
@@ -52,21 +81,11 @@ internal static partial class GracefulCancellation
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("browser")]
-    private static void SendSignal(int processId, int signalId)
+    private static bool SendSignal(int processId, int signalId)
     {
-        if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
-        {
-            kill_macos(processId, signalId);       
-        }
-        else if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux() && !OperatingSystem.IsIOS())
-        {
-            kill_linux(processId, signalId);
-        }
+        return kill_libc(processId, signalId) == 0;
     }
     
     [DllImport("libc", SetLastError = true, EntryPoint = "kill")]
-    private static extern int kill_linux(int processid, int signal);
-
-    [DllImport("libSystem", SetLastError = true, EntryPoint = "kill")]
-    private static extern int kill_macos(int processId, int signal);
+    private static extern int kill_libc(int processid, int signal);
 }

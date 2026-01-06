@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using CliInvoke.Tests.Internal.Constants;
 
@@ -41,7 +40,7 @@ public class ProcessTestHelper
             CreateNoWindow = true,
         };
         
-        Process process = new Process()
+        Process process = new Process
         {
             StartInfo = startInfo,
             EnableRaisingEvents = true,

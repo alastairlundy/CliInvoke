@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Threading;
-
 using DotExtensions.Dates;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
@@ -25,6 +23,7 @@ internal static partial class GracefulCancellation
         /// <param name="timeoutThreshold">The delay to wait before requesting cancellation.</param>
         /// <param name="cancellationExceptionBehavior"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="fallbackToForceful"></param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the timeout threshold is less than 0.</exception>
         /// <exception cref="NotSupportedException">Thrown if run on a remote computer or device.</exception>
         [UnsupportedOSPlatform("ios")]
@@ -36,34 +35,45 @@ internal static partial class GracefulCancellation
         [SupportedOSPlatform("freebsd")]
         [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken, bool fallbackToForceful = true)
         {
-            if (timeoutThreshold < TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException();
+            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
             
-            Task gracefulInterruptCancellation = OperatingSystem.IsWindows()
-                ? process.CancelWithInterruptOnWindows(timeoutThreshold, cancellationExceptionBehavior, cancellationToken)
-                : process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
+            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero); 
             
-            await Task.WhenAny([
-                process.WaitForExitAsync(cancellationToken),
-                gracefulInterruptCancellation,
-                process.GracefulCancellationWithCancelToken(
-                    timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                    cancellationExceptionBehavior)
-            ]);
-
-            if (!process.HasExited)
+            if (!OperatingSystem.IsWindows())
             {
-                await process.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero, cancellationExceptionBehavior, cancellationToken);
+                Task gracefulInterruptCancellation = process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
+            
+                await Task.WhenAny([
+                    process.WaitForExitAsync(cancellationToken),
+                    gracefulInterruptCancellation,
+                    process.GracefulCancellationWithCancelToken(
+                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                        cancellationExceptionBehavior, expectedExitTime)
+                ]);
+            }
+            else
+            {
+                await Task.WhenAny([
+                    process.WaitForExitAsync(cancellationToken),
+                    process.GracefulCancellationWithCancelToken(
+                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                        cancellationExceptionBehavior, expectedExitTime)
+                ]);
+            }
+
+            await Task.WhenAny([Task.Delay(500, cancellationToken), process.WaitForExitAsync(cancellationToken)]);
+            
+            if (!process.HasExited && fallbackToForceful)
+            {
+                process.ForcefulExit(cancellationExceptionBehavior);
             }
         }
 
         private async Task GracefulCancellationWithCancelToken(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, DateTime expectedExitTime)
         {
-            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
-
             CancellationTokenSource cts = new();
 
             cts.CancelAfter(timeoutThreshold);
@@ -83,10 +93,8 @@ internal static partial class GracefulCancellation
                 DateTime actualExitTime = DateTime.UtcNow;
                 TimeSpan difference = expectedExitTime.Difference(actualExitTime);
 
-                if (
-                    cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
-                )
+                if (cancellationExceptionBehavior
+                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
                 {
                     if (difference > TimeSpan.FromSeconds(10))
                     {
@@ -97,7 +105,7 @@ internal static partial class GracefulCancellation
             finally
             {
                 if (!process.HasExited)
-                    process.Kill();
+                    process.ForcefulExit(cancellationExceptionBehavior);
             }
         }
     }

@@ -12,3 +12,4 @@ global using CliInvoke.Core.Piping;
 global using CliInvoke.Exceptions;
 
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;

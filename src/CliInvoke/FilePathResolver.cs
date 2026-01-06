@@ -8,6 +8,7 @@
    */
 
 using System.Linq;
+using System.Text;
 
 using DotExtensions.IO.Directories;
 using DotExtensions.IO.Permissions;
@@ -39,6 +40,7 @@ public class FilePathResolver : IFilePathResolver
     public string ResolveFilePath(string filePathToResolve)
     {
         ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
         
         if (Path.IsPathRooted(filePathToResolve))
         {
@@ -65,13 +67,19 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    private static bool ExecutableFileCheck(string fileName)
+    private bool ExecutableFileCheck(string fileName)
     {
         FileInfo file =  new(fileName);
 
         return file.HasExecutePermission() ? true :
             throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
     }
+
+    protected IEnumerable<string>? GetPathInfo()
+        => PathEnvironmentVariable.EnumerateDirectories();
+    
+    protected string[] GetPathExtensionsInfo()
+        => PathEnvironmentVariable.GetPathFileExtensions();
 
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -81,7 +89,7 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    protected static bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
+    protected bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
         out FileInfo? resolvedFilePath)
     {
         if (filePathToResolve.Contains(Path.DirectorySeparatorChar)
@@ -93,8 +101,8 @@ public class FilePathResolver : IFilePathResolver
             return fileExists;
         }
 
-        string[] pathExtensions = PathEnvironmentVariable.GetPathFileExtensions();
-        IEnumerable<string>? pathContents = PathEnvironmentVariable.EnumerateDirectories();
+        string[] pathExtensions = GetPathExtensionsInfo();
+        IEnumerable<string>? pathContents = GetPathInfo();
         
         if(pathContents is null)
         {
@@ -102,8 +110,10 @@ public class FilePathResolver : IFilePathResolver
             return false;
         }
 
-        bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
-
+        string fileName = Path.GetFileNameWithoutExtension(filePathToResolve);
+        
+        bool fileHasExtension = Path.GetExtension(fileName) != string.Empty;
+        
         foreach (string pathEntry in pathContents)
         {
             if (fileHasExtension)
@@ -111,7 +121,7 @@ public class FilePathResolver : IFilePathResolver
                 foreach (string pathExtension in pathExtensions)
                 {
                     string filePath =
-                        Path.Combine(pathEntry, $"{filePathToResolve}{pathExtension}");
+                        Path.Combine(pathEntry, $"{fileName}{pathExtension}");
 
                     if (File.Exists(filePath))
                     {
@@ -122,7 +132,7 @@ public class FilePathResolver : IFilePathResolver
             }
             else
             {
-                string filePath = Path.Combine(pathEntry, filePathToResolve);
+                string filePath = Path.Combine(pathEntry, fileName);
 
                 if (File.Exists(filePath))
                 {
@@ -144,18 +154,27 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    private static FileInfo LocateFileFromDirectory(string filePathToResolve)
+    protected FileInfo LocateFileFromDirectory(string filePathToResolve)
     {
         string fileName = Path.GetFileName(filePathToResolve);
 
-        int index = filePathToResolve.IndexOf(
-            fileName,
-            StringComparison.InvariantCultureIgnoreCase
-        );
+        int index = filePathToResolve.LastIndexOf(fileName, StringComparison.InvariantCultureIgnoreCase);
 
-        string directoryPath = Path.GetDirectoryName(filePathToResolve)
-                               ?? filePathToResolve.Remove(index, fileName.Length);
+        string directoryPath;
+        
+        try
+        {
+            directoryPath = Path.GetDirectoryName(filePathToResolve) ??
+                            filePathToResolve.Remove(index, fileName.Length);
 
+            if (directoryPath.Length == 0)
+                throw new Exception();
+        }
+        catch
+        {
+            directoryPath = Environment.CurrentDirectory;
+        }
+        
         DirectoryInfo directory = new(directoryPath);
 
         FileInfo? file = directory.SafelyEnumerateFiles("*", SearchOption.AllDirectories)
@@ -166,40 +185,37 @@ public class FilePathResolver : IFilePathResolver
                 {
                     string extension = Path.GetExtension(f.FullName);
 
-                    int extensionIndex =
-                        f.FullName.LastIndexOf(extension, StringComparison.Ordinal);
+                    int extensionIndex = f.FullName.LastIndexOf(extension, StringComparison.Ordinal);
 
                     // ReSharper disable once InvertIf
                     if (extensionIndex != -1)
                     {
-                        string tempF = f.FullName;
-                        tempF = tempF.Remove(extensionIndex, extension.Length);
-                        tempF = tempF.Insert(extensionIndex, extension.ToLower());
+                        StringBuilder sb = new StringBuilder(f.FullName);
 
-                        f = new(tempF);
+                        string lowerCasedExtension = extension.ToLower();
+
+                        for (int i = 0; i < extension.Length; i++)
+                        {
+                            sb[extensionIndex + i] = lowerCasedExtension[i];
+                        }
+                        
+                        f = new FileInfo(sb.ToString());
                     }
                 }
 
                 return f;
             })
-            .Where(f =>
+            .FirstOrDefault(f =>
             {
-                if (OperatingSystem.IsWindows())
-                {
-                    return f.Name.Equals(fileName,
-                        StringComparison.InvariantCultureIgnoreCase);
-                }
+                bool sameName = OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.InvariantCultureIgnoreCase) 
+                    : f.Name.Equals(filePathToResolve, StringComparison.InvariantCulture);
 
-                return f.Name.Equals(filePathToResolve,
-                    StringComparison.InvariantCulture);
-            })
-            .FirstOrDefault(f => f.HasExecutePermission());
+                return sameName && f.HasExecutePermission();
+            });
 
         return file ?? throw new FileNotFoundException(
             Resources.Exceptions_FileNotFound.Replace(
                 "{file}",
-                filePathToResolve
-            )
-        );
+                filePathToResolve));
     }
 }

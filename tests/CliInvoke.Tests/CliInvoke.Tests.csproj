@@ -25,13 +25,14 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />
+      <ProjectReference Include="..\..\src\CliInvoke.Extensions.Caching\CliInvoke.Extensions.Caching.csproj" />
       <ProjectReference Include="..\..\src\CliInvoke.Extensions\CliInvoke.Extensions.csproj" />
       <ProjectReference Include="..\..\src\CliInvoke\CliInvoke.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Factories\" />
-      <Folder Include="Invokers\" />
+      <Folder Include="Invokers\Cancellation\" />
     </ItemGroup>
 
 </Project>

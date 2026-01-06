@@ -16,9 +16,9 @@ public enum ProcessResultValidation
     /// No validation is performed.
     /// </summary>
     None = 0b0,
-
+    
     /// <summary>
     /// Throws an exception if the Process's Exit code is not zero.
     /// </summary>
-    ExitCodeZero = 0b1,
+    ExitCodeZero = 0b1
 }

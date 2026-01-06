@@ -311,10 +311,8 @@ public class ProcessInvoker : IProcessInvoker
             process.StartInfo.RedirectStandardInput = true;
         }
 
-        if (
-            process.StartInfo.RedirectStandardInput
-            && processConfiguration.StandardInput is not null
-        )
+        if (process.StartInfo.RedirectStandardInput
+            && processConfiguration.StandardInput is not null)
         {
             await _processPipeHandler.PipeStandardInputAsync(
                 processConfiguration.StandardInput.BaseStream,
@@ -329,8 +327,7 @@ public class ProcessInvoker : IProcessInvoker
         ArgumentNullException.ThrowIfNull(processConfiguration);
         
         processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            processConfiguration.TargetFilePath
-        );
+            processConfiguration.TargetFilePath);
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
