@@ -1,10 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Security;
-using Bogus;
 using CliInvoke.Builders;
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
-using Xunit;
 
 // ReSharper disable JoinDeclarationAndInitializer
 

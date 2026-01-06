@@ -1,12 +1,8 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
-using CliInvoke.Tests.Internal.Helpers;
-using Xunit;
 
 namespace CliInvoke.Tests.Resolvers;
 

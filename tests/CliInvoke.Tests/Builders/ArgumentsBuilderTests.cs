@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using CliInvoke.Builders;
-using CliInvoke.Core.Builders;
-using CliInvoke.Tests.Helpers;
-using Xunit;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -80,7 +76,7 @@ public partial class ArgumentsBuilderTests
         string[] values = ["a\nb", "c\"d"];
 
         // Expect the two escaped values to be joined with a space and wrapped in quotes:
-        string expected = "\"a\\nb c\\\"d\"";
+        const string expected = "\"a\\nb c\\\"d\"";
         
         IArgumentsBuilder result = builder.AddEnumerable(values, true);
 

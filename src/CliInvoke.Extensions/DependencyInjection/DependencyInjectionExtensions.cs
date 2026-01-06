@@ -11,8 +11,6 @@ using CliInvoke.Extensibility.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
 
-using Microsoft.Extensions.DependencyInjection.Extensions;
-
 // ReSharper disable RedundantAssignment
 
 namespace CliInvoke.Extensions;
