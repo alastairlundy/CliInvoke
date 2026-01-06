@@ -71,6 +71,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     )
     {
         TargetFilePath = targetFilePath;
+        
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetFilePath);
+        
         RequiresAdministrator = requiresAdministrator;
         Arguments = arguments ?? string.Empty;
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();

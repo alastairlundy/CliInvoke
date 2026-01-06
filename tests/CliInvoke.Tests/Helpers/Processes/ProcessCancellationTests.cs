@@ -1,13 +1,9 @@
-using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using CliInvoke.Core;
 using CliInvoke.Helpers.Processes;
-using CliInvoke.Tests.Internal.Helpers;
-using Xunit;
 
 namespace CliInvoke.Tests.Helpers.Processes;
 
@@ -40,7 +36,7 @@ public class ProcessCancellationTests
        
        await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
 
-      await Task.Delay(1000, TestContext.Current.CancellationToken);
+       await Task.Delay(1000, TestContext.Current.CancellationToken);
 
        bool actual = Process.GetProcesses().Any(x => x.Id == processId);
 

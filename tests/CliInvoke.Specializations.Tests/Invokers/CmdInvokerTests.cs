@@ -1,9 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliInvoke.Builders;
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
-using CliInvoke.Specializations.Tests.Helpers;
 
 namespace CliInvoke.Specializations.Tests.Invokers;
 
