@@ -34,16 +34,14 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     {
         if(minWorkingSet is not null)
             ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
-
+        
+        if(maxWorkingSet is not null)
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero((nint)maxWorkingSet);
 
         if (minWorkingSet is not null && maxWorkingSet is not null)
         {
-            if (maxWorkingSet < minWorkingSet || maxWorkingSet < 1)
-                ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)minWorkingSet, (nint)minWorkingSet);
-            throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-
-            if (minWorkingSet > maxWorkingSet)
-                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)minWorkingSet, (nint)minWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, minWorkingSet);
         }
 
         if (processorAffinity is not null)
