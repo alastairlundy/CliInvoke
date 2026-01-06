@@ -20,12 +20,7 @@ internal static class ProcessHasStartedExtensions
         /// <returns>True if it has started; false otherwise.</returns>
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("android")]
+        [UnsupportedOSPlatform("watchos")]
         internal bool HasStarted()
         {
             try
