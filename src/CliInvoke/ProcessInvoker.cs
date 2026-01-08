@@ -62,12 +62,7 @@ public class ProcessInvoker : IProcessInvoker
     {
         processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
 
-        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
-        {
-            StartInfo = processConfiguration.ToProcessStartInfo(false,
-                false),
-            EnableRaisingEvents = true,
-        };
+        ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
         if (processConfiguration.StandardInput is not null
             && processConfiguration.StandardInput != StreamWriter.Null)
@@ -134,12 +129,7 @@ public class ProcessInvoker : IProcessInvoker
     {
         processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
 
-        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
-        {
-            StartInfo = processConfiguration.ToProcessStartInfo(true, 
-                true),
-            EnableRaisingEvents = true
-        };
+        ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
         if (
             processConfiguration.StandardInput is not null
@@ -219,13 +209,8 @@ public class ProcessInvoker : IProcessInvoker
     )
     {
         processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
-        
-        ProcessWrapper process = new(processConfiguration.ResourcePolicy)
-        {
-            StartInfo = processConfiguration.ToProcessStartInfo(true, true),
-            EnableRaisingEvents = true,
-        };
 
+        ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
         try
         {
             bool processWasNew = process.Start();

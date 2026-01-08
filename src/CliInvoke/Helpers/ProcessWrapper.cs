@@ -13,12 +13,15 @@ namespace CliInvoke.Helpers;
 
 internal class ProcessWrapper : Process
 {
-    internal ProcessWrapper(ProcessResourcePolicy? resourcePolicy)
+    internal ProcessWrapper(ProcessConfiguration configuration, ProcessResourcePolicy? resourcePolicy)
     {
         Exited += OnExited;
         Started += OnStarted;
 
         HasStarted = false;
+        StartInfo = configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
+            configuration.RedirectStandardError);
+        EnableRaisingEvents = true;
         ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
     }
 

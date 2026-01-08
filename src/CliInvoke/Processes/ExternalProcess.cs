@@ -24,9 +24,9 @@ public class ExternalProcess : IDisposable
         _processPipeHandler = new ProcessPipeHandler();
         _filePathResolver = new FilePathResolver();
         
-        _processWrapper = new ProcessWrapper(ProcessResourcePolicy.Default);
         Configuration = new ProcessConfiguration(targetFilePath,
             false, true, true);
+        _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
         ExitConfiguration = ProcessExitConfiguration.Default;
     }
     
@@ -35,9 +35,9 @@ public class ExternalProcess : IDisposable
         _processPipeHandler = processPipeHandler;
         _filePathResolver = filePathResolver;
         
-        _processWrapper = new ProcessWrapper(ProcessResourcePolicy.Default);
         Configuration = new ProcessConfiguration(targetFilePath,
             false, true, true);
+        _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
         ExitConfiguration = ProcessExitConfiguration.Default;
     }
 
@@ -51,7 +51,7 @@ public class ExternalProcess : IDisposable
         _processPipeHandler = new ProcessPipeHandler();
         _filePathResolver = new FilePathResolver();
         
-        _processWrapper = new ProcessWrapper(configuration.ResourcePolicy);
+        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
     }
@@ -62,7 +62,7 @@ public class ExternalProcess : IDisposable
         _processPipeHandler = processPipeHandler;
         _filePathResolver = filePathResolver;
         
-        _processWrapper = new ProcessWrapper(configuration.ResourcePolicy);
+        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
     }
@@ -100,13 +100,8 @@ public class ExternalProcess : IDisposable
     {
         Configuration.TargetFilePath = _filePathResolver.ResolveFilePath(
             Configuration.TargetFilePath);
-        
-        _processWrapper = new ProcessWrapper(configuration.ResourcePolicy)
-        {
-            StartInfo = configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
-                configuration.RedirectStandardError),
-            EnableRaisingEvents = true,
-        };
+
+        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         
         if (configuration.StandardInput is not null
             && configuration.StandardInput != StreamWriter.Null)
