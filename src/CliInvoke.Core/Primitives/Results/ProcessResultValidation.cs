@@ -5,18 +5,20 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core;
 
 /// <summary>
 /// An enum to represent Result Validation states, and whether Result Validation should be performed.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public enum ProcessResultValidation
 {
     /// <summary>
     /// No validation is performed.
     /// </summary>
     None = 0b0,
-    
     /// <summary>
     /// Throws an exception if the Process's Exit code is not zero.
     /// </summary>
