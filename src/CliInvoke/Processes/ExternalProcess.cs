@@ -16,7 +16,7 @@ public class ExternalProcess : IDisposable
     private readonly IProcessPipeHandler _processPipeHandler;
     private readonly IFilePathResolver _filePathResolver;
     
-    public ExternalProcess(string targetFilePath, IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
+    public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler, string targetFilePath)
     {
         _processPipeHandler = processPipeHandler;
         _filePathResolver = filePathResolver;
@@ -27,8 +27,8 @@ public class ExternalProcess : IDisposable
         ExitConfiguration = ProcessExitConfiguration.Default;
     }
     
-    public ExternalProcess(ProcessConfiguration configuration, IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler,
-        ProcessExitConfiguration? exitConfiguration = null)
+    public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler,
+        ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null)
     {
         _processPipeHandler = processPipeHandler;
         _filePathResolver = filePathResolver;
