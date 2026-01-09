@@ -68,4 +68,8 @@
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Primitives\Results\Validation\" />
+    </ItemGroup>
 </Project>
