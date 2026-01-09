@@ -103,15 +103,6 @@ public class ExternalProcess : IDisposable
                 standardOutputStream,
                 standardErrorStream
             ]);
-
-            if (Configuration.StandardOutput is not null)
-            {
-                await standardOutputStream.Result.CopyToAsync(Configuration.StandardOutput.BaseStream, cancellationToken);
-            }
-            if (Configuration.StandardError is not null)
-            {
-                await standardErrorStream.Result.CopyToAsync(Configuration.StandardError.BaseStream, cancellationToken);
-            }
             
             ProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
