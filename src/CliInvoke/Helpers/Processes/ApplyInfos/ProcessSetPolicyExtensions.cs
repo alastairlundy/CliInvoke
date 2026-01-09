@@ -19,7 +19,7 @@ namespace CliInvoke.Helpers.Processes;
 internal static class ProcessSetPolicyExtensions
 {
     /// <param name="process">The process to apply the policy to.</param>
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         /// <summary>
         /// Applies a ProcessResourcePolicy to a Process.
@@ -38,7 +38,7 @@ internal static class ProcessSetPolicyExtensions
         {
             resourcePolicy ??= ProcessResourcePolicy.Default;
 
-            if (process.HasStarted() == false)
+            if (process.HasStarted == false)
                 throw new InvalidOperationException(
                     Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
                 );
