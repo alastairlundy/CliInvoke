@@ -1,6 +1,7 @@
 ﻿using CliInvoke.Core.Piping;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
+using CliInvoke.Helpers.Processes.Cancellation;
 using CliInvoke.Piping;
 
 namespace CliInvoke.Processes;
