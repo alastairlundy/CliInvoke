@@ -218,9 +218,24 @@ public class ExternalProcess : IDisposable
         }
     }
     
-    public void Kill()
+    public async Task Kill()
     {
-        _processWrapper.Kill();
+        switch (ExitConfiguration.TimeoutPolicy.CancellationMode)
+        {
+            case ProcessCancellationMode.Forceful:
+                await _processWrapper.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero,
+                    ExitConfiguration.CancellationExceptionBehavior, CancellationToken.None);
+                break;
+            case ProcessCancellationMode.Graceful:
+                await _processWrapper.WaitForExitOrGracefulTimeoutAsync(TimeSpan.Zero,
+                    ExitConfiguration.CancellationExceptionBehavior, CancellationToken.None);
+                break;
+            case ProcessCancellationMode.None:
+                _processWrapper.Kill();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public void Dispose()
