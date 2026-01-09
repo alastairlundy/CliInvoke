@@ -38,7 +38,8 @@ internal static partial class GracefulCancellation
 
             try
             {
-                if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS())
+                if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS() ||
+                    OperatingSystem.IsTvOS())
                     throw new PlatformNotSupportedException();
 
                 await Task.Delay(timeoutThreshold, cancellationToken);
