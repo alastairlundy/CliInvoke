@@ -15,21 +15,6 @@ public class ExternalProcess : IDisposable
     private readonly IProcessPipeHandler _processPipeHandler;
     private readonly IFilePathResolver _filePathResolver;
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="targetFilePath"></param>
-    public ExternalProcess(string targetFilePath)
-    {
-        _processPipeHandler = new ProcessPipeHandler();
-        _filePathResolver = new FilePathResolver();
-        
-        Configuration = new ProcessConfiguration(targetFilePath,
-            false, true, true);
-        _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
-        ExitConfiguration = ProcessExitConfiguration.Default;
-    }
-    
     public ExternalProcess(string targetFilePath, IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _processPipeHandler = processPipeHandler;
@@ -39,21 +24,6 @@ public class ExternalProcess : IDisposable
             false, true, true);
         _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
         ExitConfiguration = ProcessExitConfiguration.Default;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="exitConfiguration"></param>
-    public ExternalProcess(ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null)
-    {
-        _processPipeHandler = new ProcessPipeHandler();
-        _filePathResolver = new FilePathResolver();
-        
-        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
-        Configuration = configuration;
-        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
     }
     
     public ExternalProcess(ProcessConfiguration configuration, IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler,
