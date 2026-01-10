@@ -156,15 +156,13 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <returns>The hash code for the current ProcessResourcePolicy.</returns>
     public override int GetHashCode()
     {
-#pragma warning disable CA1416
         return HashCode.Combine(
-            ProcessorAffinity,
+            ProcessorAffinity ?? Default.ProcessorAffinity,
             (int)PriorityClass,
             EnablePriorityBoost,
-            MinWorkingSet,
-            MaxWorkingSet
+            MinWorkingSet ?? Default.MinWorkingSet,
+            MaxWorkingSet ?? Default.MaxWorkingSet
         );
-#pragma warning restore CA1416
     }
 
     /// <summary>
