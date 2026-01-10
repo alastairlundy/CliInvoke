@@ -57,11 +57,9 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
             }
         }
 
-#pragma warning disable CA1416
-        MinWorkingSet = minWorkingSet;
-        MaxWorkingSet = maxWorkingSet;
-        ProcessorAffinity = processorAffinity;
-#pragma warning restore CA1416
+        MinWorkingSet = minWorkingSet ?? Default.MinWorkingSet;
+        MaxWorkingSet = maxWorkingSet ?? Default.MaxWorkingSet; 
+        ProcessorAffinity = processorAffinity ?? Default.ProcessorAffinity;
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
