@@ -32,16 +32,19 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         bool enablePriorityBoost = false
     )
     {
-        if(minWorkingSet is not null)
+        if (minWorkingSet is not null)
             ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
         
         if(maxWorkingSet is not null)
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero((nint)maxWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfNegative((nint)maxWorkingSet);
 
         if (minWorkingSet is not null && maxWorkingSet is not null)
         {
-            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)minWorkingSet, (nint)minWorkingSet);
-            ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, minWorkingSet);
+            if (maxWorkingSet < minWorkingSet || maxWorkingSet < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+
+            if (minWorkingSet > maxWorkingSet)
+                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
         }
 
         if (processorAffinity is not null)

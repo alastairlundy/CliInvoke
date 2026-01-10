@@ -40,7 +40,7 @@ public class ProcessTestHelper
             CreateNoWindow = true,
         };
         
-        Process process = new Process()
+        Process process = new Process
         {
             StartInfo = startInfo,
             EnableRaisingEvents = true,
