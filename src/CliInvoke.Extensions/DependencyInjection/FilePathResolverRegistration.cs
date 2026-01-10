@@ -40,13 +40,13 @@ public static class FilePathResolverRegistration
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Singleton:
-                    services.AddSingleton<IFilePathResolver, TResolver>();
+                    services.TryAddSingleton<IFilePathResolver, TResolver>();
                     return services;
                 case ServiceLifetime.Scoped:
-                    services.AddScoped<IFilePathResolver, TResolver>();
+                    services.TryAddScoped<IFilePathResolver, TResolver>();
                     return services;
                 case ServiceLifetime.Transient:
-                    services.AddTransient<IFilePathResolver, TResolver>();
+                    services.TryAddTransient<IFilePathResolver, TResolver>();
                     return services;
                 default:
                     throw new NotSupportedException();

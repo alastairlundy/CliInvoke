@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using Bogus;
 using CliInvoke.Builders;
-using CliInvoke.Core.Builders;
-using Xunit;
 
 namespace CliInvoke.Tests.Builders;
 

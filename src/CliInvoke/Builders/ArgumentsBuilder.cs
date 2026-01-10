@@ -305,7 +305,15 @@ public class ArgumentsBuilder : IArgumentsBuilder
         }
         else
         {
-            output = !string.IsNullOrEmpty(value);
+            try
+            {
+                ArgumentNullException.ThrowIfNull(value);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
         
         return output;

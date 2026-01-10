@@ -33,36 +33,33 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     )
     {
         if (minWorkingSet is not null)
-            if (minWorkingSet < 0)
-                throw new ArgumentOutOfRangeException(nameof(minWorkingSet));
+            ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
 
+        if (maxWorkingSet is not null)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative((nint)maxWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfZero((nint)maxWorkingSet);
+        }
+        
         if (minWorkingSet is not null && maxWorkingSet is not null)
         {
-            if (maxWorkingSet < minWorkingSet || maxWorkingSet < 1)
-                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-
-            if (minWorkingSet > maxWorkingSet)
-                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+            ArgumentOutOfRangeException.ThrowIfLessThan((nint)maxWorkingSet, (nint)minWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)minWorkingSet, (nint)maxWorkingSet);
         }
 
         if (processorAffinity is not null)
         {
-#if NETSTANDARD2_0
-            if (processorAffinity < (nint)1)
-#else
-            if (processorAffinity < 1)
-#endif
-                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
-
-            if (processorAffinity > (nint)2 * Environment.ProcessorCount)
-                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+            if ((nint)processorAffinity < 1)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThanOrEqual((nint)processorAffinity, 1);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, 
+                    (nint)2 * Environment.ProcessorCount);
+            }
         }
 
-#pragma warning disable CA1416
-        MinWorkingSet = minWorkingSet;
-        MaxWorkingSet = maxWorkingSet;
-        ProcessorAffinity = processorAffinity;
-#pragma warning restore CA1416
+        MinWorkingSet = minWorkingSet ?? Default.MinWorkingSet;
+        MaxWorkingSet = maxWorkingSet ?? Default.MaxWorkingSet; 
+        ProcessorAffinity = processorAffinity ?? Default.ProcessorAffinity;
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -146,9 +143,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
             return false;
 
         if (obj is ProcessResourcePolicy policy)
-        {
             return Equals(policy);
-        }
 
         return false;
     }
@@ -159,15 +154,13 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <returns>The hash code for the current ProcessResourcePolicy.</returns>
     public override int GetHashCode()
     {
-#pragma warning disable CA1416
         return HashCode.Combine(
-            ProcessorAffinity,
+            ProcessorAffinity ?? Default.ProcessorAffinity,
             (int)PriorityClass,
             EnablePriorityBoost,
-            MinWorkingSet,
-            MaxWorkingSet
+            MinWorkingSet ?? Default.MinWorkingSet,
+            MaxWorkingSet ?? Default.MaxWorkingSet
         );
-#pragma warning restore CA1416
     }
 
     /// <summary>
