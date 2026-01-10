@@ -18,12 +18,10 @@ public enum ProcessCancellationMode
     /// Forcefully terminates the Process along with all child processes.
     /// </summary>
     Forceful,
-
     /// <summary>
     /// Gracefully cancels the Process using a new <see cref="CancellationTokenSource"/>.
     /// </summary>
     Graceful,
-
     /// <summary>
     /// No cancellation is desired, Process will run until exit.
     /// </summary>

@@ -9,6 +9,8 @@
 
 using System.Text;
 
+using CliInvoke.Core.Internal;
+
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace CliInvoke.Core;
@@ -150,11 +152,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The Standard Output target to redirect Standard Output to if configured.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public StreamReader? StandardOutput { get; protected set; }
 
     /// <summary>
     /// The Standard Error target to redirect Standard Output to if configured.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public StreamReader? StandardError { get; protected set; }
 
     /// <summary>
@@ -324,7 +328,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public void Dispose()
     {
         Credential.Dispose();
-
         StandardInput?.Dispose();
         StandardOutput?.Dispose();
         StandardError?.Dispose();

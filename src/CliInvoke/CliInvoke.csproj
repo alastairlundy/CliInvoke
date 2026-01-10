@@ -15,16 +15,19 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Update ``FilePathResolver`` file resolving code to ensure Target File Path is an Executable File and throw an Exception if it is not (#208 )
-* Updated ``FilePathResolver`` to use DotPrimitives to assist with Path Environment Variable Resolving code (#208)
-* Updated ``FilePathResolver`` logic to use enumerated Path directories method for potential performance improvements
-* Updated code to use Argument Exception throwing polyfills (#210) and address nullability warnings 
-* Removed some no longer needed internal Helper code
-* Fixed typos in Localized Exception strings</PackageReleaseNotes>
+        <PackageReleaseNotes>* Reduced code duplication in ``ProcessInvoker`` implementation class
+* Added support for Graceful Cancellation via Interrupt Signals on Unix (#236) ,addressing #231 
+* Updated ``ProcessConfigurationFactory`` to use default ``ArgumentsBuilder`` validation
+* Updated ``ArgumentsBuilder`` logic to allow setting empty arguments
+* Removed unnecessary Process ``HasStarted`` internal helper method - ``ProcessWrapper``'s ``HasStarted`` property is used instead
+* Moved more ``ProcessWrapper`` configuration logic into ``ProcessWrapper`` from ``ProcessInvoker``
+* Replaced manual ``ArgumentOutOfRangeException`` instantiation and throwing with cleaner Throw method calls
+* Updated internal Polyfill version from 9.5.0 to 9.7.0
+* Updated DotExtensions version from 9.3.0 to 9.3.1</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.2.0</PackageVersion>
+        <PackageVersion>2.3.0-alpha.1</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -43,7 +46,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.6.0" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.7.0" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -96,7 +99,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="DotExtensions" Version="9.3.0" />
+      <PackageReference Include="DotExtensions" Version="9.3.1" />
       <PackageReference Include="DotPrimitives" Version="4.1.0" />
     </ItemGroup>
 </Project>

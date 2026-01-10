@@ -30,8 +30,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <param name="cancellationMode">Defaults to Graceful cancellation, otherwise uses the Cancellation Mode specified.</param>
     public ProcessTimeoutPolicy(
         TimeSpan timeoutThreshold,
-        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful
-    )
+        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(timeoutThreshold.TotalMilliseconds);
         ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
@@ -44,13 +43,13 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
     /// </summary>
     public static ProcessTimeoutPolicy Default { get; } =
-        new ProcessTimeoutPolicy(TimeSpan.FromMinutes(30));
+        new(TimeSpan.FromMinutes(30));
 
     /// <summary>
     /// Disables waiting for Process Timeout.
     /// </summary>
     public static ProcessTimeoutPolicy None { get; } =
-        new ProcessTimeoutPolicy(TimeSpan.FromSeconds(0), ProcessCancellationMode.None);
+        new(TimeSpan.FromSeconds(0), ProcessCancellationMode.None);
 
     /// <summary>
     /// The timespan after which a Process should no longer be allowed to continue waiting to exit.
@@ -134,7 +133,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <returns></returns>
     public static bool operator !=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
-        return Equals(left, right) == false;
+        return !Equals(left, right);
     }
 
     /// <summary>

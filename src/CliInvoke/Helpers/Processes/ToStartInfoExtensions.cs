@@ -59,6 +59,7 @@ internal static class ToStartInfoExtensions
         if (processStartInfo.RedirectStandardInput)
             processStartInfo.StandardInputEncoding = processConfiguration.StandardInputEncoding;
 #endif
+        
         if (processStartInfo.RedirectStandardOutput)
             processStartInfo.StandardOutputEncoding = processConfiguration.StandardOutputEncoding;
 

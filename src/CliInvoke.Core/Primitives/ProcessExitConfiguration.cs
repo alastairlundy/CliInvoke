@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -79,6 +81,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <summary>
     /// Gets the result validation strategy used to determine if the process exited successfully.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public ProcessResultValidation ResultValidation { get; }
 
     /// <summary>
