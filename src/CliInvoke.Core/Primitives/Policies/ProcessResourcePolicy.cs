@@ -145,9 +145,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
             return false;
 
         if (obj is ProcessResourcePolicy policy)
-        {
             return Equals(policy);
-        }
 
         return false;
     }
