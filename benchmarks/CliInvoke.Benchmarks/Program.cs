@@ -5,4 +5,4 @@ using CliInvoke.Benchmarking.Benchmarks.Invokation;
 //BenchmarkRunner.Run<BasicUnbufferedInvokationBenchmark>();
 //BenchmarkRunner.Run(Assembly.GetExecutingAssembly());
 
-BenchmarkRunner.Run<BufferedInvokationBenchmark>();
+BenchmarkRunner.Run<BasicUnbufferedInvokationBenchmark>();
