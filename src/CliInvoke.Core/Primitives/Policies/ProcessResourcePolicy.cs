@@ -34,30 +34,27 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     {
         if (minWorkingSet is not null)
             ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
-        
-        if(maxWorkingSet is not null)
-            ArgumentOutOfRangeException.ThrowIfNegative((nint)maxWorkingSet);
 
+        if (maxWorkingSet is not null)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative((nint)maxWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfZero((nint)maxWorkingSet);
+        }
+        
         if (minWorkingSet is not null && maxWorkingSet is not null)
         {
-            if (maxWorkingSet < minWorkingSet || maxWorkingSet < 1)
-                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-
-            if (minWorkingSet > maxWorkingSet)
-                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+            ArgumentOutOfRangeException.ThrowIfLessThan((nint)maxWorkingSet, (nint)minWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)minWorkingSet, (nint)maxWorkingSet);
         }
 
         if (processorAffinity is not null)
         {
-#if NETSTANDARD2_0
-            if (processorAffinity < (nint)1)
-#else
-            if (processorAffinity < 1)
-#endif
-                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
-
-            if (processorAffinity > (nint)2 * Environment.ProcessorCount)
-                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+            if ((nint)processorAffinity < 1)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThanOrEqual((nint)processorAffinity, 1);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, 
+                    (nint)2 * Environment.ProcessorCount);
+            }
         }
 
 #pragma warning disable CA1416
