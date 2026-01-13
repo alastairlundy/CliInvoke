@@ -1,11 +1,12 @@
 using System.Diagnostics;
+using CliInvoke.Helpers;
 using CliInvoke.Tests.Internal.Constants;
 
 namespace CliInvoke.Tests.Internal.Helpers;
 
-public class ProcessTestHelper
+internal class ProcessTestHelper
 {
-    public static string GetTargetFilePath()
+    internal static string GetTargetFilePath()
     {
         string filePath;
         if (OperatingSystem.IsWindows())
@@ -28,23 +29,12 @@ public class ProcessTestHelper
         return filePath;
     }
 
-    public static Process CreateProcess(string targetFilePath, string arguments)
+    internal static ProcessWrapper CreateProcess(string targetFilePath, string arguments)
     {
-        ProcessStartInfo startInfo = new ProcessStartInfo
-        {
-            FileName = targetFilePath,
-            Arguments = arguments,
-            RedirectStandardInput = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-        };
-        
-        Process process = new Process
-        {
-            StartInfo = startInfo,
-            EnableRaisingEvents = true,
-        };
+        ProcessConfiguration configuration = new ProcessConfiguration(targetFilePath, false, true,
+            true, arguments, windowCreation: false);
+
+        ProcessWrapper process = new ProcessWrapper(configuration, configuration.ResourcePolicy);
 
         return process;
     }

@@ -49,17 +49,20 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         if (processorAffinity is not null)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual((nint)processorAffinity, 1);
+
             if ((nint)processorAffinity < 1)
             {
-                ArgumentOutOfRangeException.ThrowIfLessThanOrEqual((nint)processorAffinity, 1);
                 ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, 
                     (nint)2 * Environment.ProcessorCount);
             }
         }
 
-        MinWorkingSet = minWorkingSet ?? Default.MinWorkingSet;
-        MaxWorkingSet = maxWorkingSet ?? Default.MaxWorkingSet; 
-        ProcessorAffinity = processorAffinity ?? Default.ProcessorAffinity;
+        if (maxWorkingSet is not null)
+            MaxWorkingSet = maxWorkingSet;
+        
+        MinWorkingSet = minWorkingSet ?? 1;
+        ProcessorAffinity = processorAffinity ?? (nint)Environment.ProcessorCount;
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;

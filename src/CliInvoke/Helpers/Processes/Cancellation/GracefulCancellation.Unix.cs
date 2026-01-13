@@ -62,9 +62,8 @@ internal static partial class GracefulCancellation
             }
             catch (Exception)
             {
-                if (cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowException ||
-                    cancellationExceptionBehavior == ProcessCancellationExceptionBehavior
+                if (cancellationExceptionBehavior is ProcessCancellationExceptionBehavior.AllowException
+                    or ProcessCancellationExceptionBehavior
                         .AllowExceptionIfUnexpected)
                     throw;
             }
