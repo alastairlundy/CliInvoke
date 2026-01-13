@@ -32,7 +32,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Factories\" />
       <Folder Include="Invokers\Cancellation\" />
     </ItemGroup>
 
