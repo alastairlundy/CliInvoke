@@ -33,7 +33,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     )
     {
         if (minWorkingSet is not null)
+        {
             ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
+
+            MinWorkingSet = minWorkingSet;
+        }
 
         if (maxWorkingSet is not null)
         {
@@ -61,7 +65,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         if (maxWorkingSet is not null)
             MaxWorkingSet = maxWorkingSet;
         
-        MinWorkingSet = minWorkingSet ?? 1;
         ProcessorAffinity = processorAffinity ?? (nint)Environment.ProcessorCount;
 
         PriorityClass = priorityClass;
