@@ -35,7 +35,8 @@ internal static partial class GracefulCancellation
         [SupportedOSPlatform("freebsd")]
         [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken, bool fallbackToForceful = true)
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken,
+            bool fallbackToForceful = true)
         {
             DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
             
