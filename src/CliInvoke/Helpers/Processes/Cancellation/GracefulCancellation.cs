@@ -38,9 +38,9 @@ internal static partial class GracefulCancellation
             ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken,
             bool fallbackToForceful = true)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
+
             DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
-            
-            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero); 
             
             if (!OperatingSystem.IsWindows())
             {
