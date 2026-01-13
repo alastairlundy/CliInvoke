@@ -149,5 +149,5 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are not equal; otherwise, <c>false</c>.
     /// </returns>
     public static bool operator !=(ProcessResult left, ProcessResult? right) =>
-        left.Equals(right) == false;
+        !left.Equals(right);
 }
