@@ -15,19 +15,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Reduced code duplication in ``ProcessInvoker`` implementation class
-* Added support for Graceful Cancellation via Interrupt Signals on Unix (#236) ,addressing #231 
-* Updated ``ProcessConfigurationFactory`` to use default ``ArgumentsBuilder`` validation
-* Updated ``ArgumentsBuilder`` logic to allow setting empty arguments
-* Removed unnecessary Process ``HasStarted`` internal helper method - ``ProcessWrapper``'s ``HasStarted`` property is used instead
-* Moved more ``ProcessWrapper`` configuration logic into ``ProcessWrapper`` from ``ProcessInvoker``
-* Replaced manual ``ArgumentOutOfRangeException`` instantiation and throwing with cleaner Throw method calls
-* Updated internal Polyfill version from 9.5.0 to 9.7.0
-* Updated DotExtensions version from 9.3.0 to 9.3.1</PackageReleaseNotes>
+        <PackageReleaseNotes>* Added Graceful Cancellation via Signals on Windows (#243 )
+* Updated internal Polyfill version from 9.7.0 to 9.7.2
+* Minor updates to helper code</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.3.0-alpha.1</PackageVersion>
+        <PackageVersion>2.3.0-alpha.2</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>

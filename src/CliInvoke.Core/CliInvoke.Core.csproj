@@ -24,12 +24,9 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.3.0-alpha.1</Version>
-        <PackageReleaseNotes>* Deprecated ``ProcessConfiguration``'s ``StandardOutput`` and ``StandardError`` properties - These will be removed in CliInvoke.Core v3
-* Deprecated ``ProcessResultValidation`` enum - This will be replaced with a new Result Validation system in CliInvoke.Core v3
-* Deprecated ``ResultValidation`` property in ``ProcessExitConfiguration`` - This will be replaced in CliInvoke.Core v3
-* Replaced manual ``ArgumentOutOfRangeException`` instantiation and throwing with cleaner Throw method calls
-* Updated internal Polyfill version from 9.5.0 to 9.7.0</PackageReleaseNotes>
+        <Version>2.3.0-alpha.2</Version>
+        <PackageReleaseNotes>* Fixed an issue with ``ProcessResourcePolicy`` throwing an NullReferenceException in its constructor.
+* Updated internal Polyfill version from 9.7.0 to 9.7.2</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
