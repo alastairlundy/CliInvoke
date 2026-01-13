@@ -65,7 +65,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         if (maxWorkingSet is not null)
             MaxWorkingSet = maxWorkingSet;
         
-        ProcessorAffinity = processorAffinity ?? (nint)Environment.ProcessorCount;
+        ProcessorAffinity = processorAffinity ??
+#if NETSTANDARD2_0
+                            (nint)
+#endif
+                            2 * Environment.ProcessorCount - 1;
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -116,7 +120,12 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <summary>
     /// Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
-    public static ProcessResourcePolicy Default { get; } = new ProcessResourcePolicy();
+    public static ProcessResourcePolicy Default { get; } = new(
+#if NETSTANDARD2_0
+        (nint)
+#endif
+        2 * Environment.ProcessorCount - 1
+    );
 
     /// <summary>
     /// Determines whether this ProcessResourcePolicy is equal to another ProcessResourcePolicy.
