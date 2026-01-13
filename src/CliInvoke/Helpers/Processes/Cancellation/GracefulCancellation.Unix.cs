@@ -18,7 +18,7 @@ internal static partial class GracefulCancellation
 
     private const int DelayBeforeSigintMilliseconds = 3000;
     
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         /// <summary>
         /// 
