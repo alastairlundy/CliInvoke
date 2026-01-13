@@ -17,7 +17,7 @@ namespace CliInvoke.Helpers.Processes;
 internal static class ProcessCancellationExtensions
 {
     /// <param name="process">The process to cancel.</param>
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]

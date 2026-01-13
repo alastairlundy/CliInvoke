@@ -15,7 +15,7 @@ internal static partial class GracefulCancellation
 {
     internal const int GracefulTimeoutWaitSeconds = 30;
     
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         /// <summary>
         /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
