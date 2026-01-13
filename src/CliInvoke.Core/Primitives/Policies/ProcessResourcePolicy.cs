@@ -196,5 +196,5 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="right">The other Process Resource Policy to be compared.</param>
     /// <returns>True if both Process Resource Policies are not equal to each other; false otherwise.</returns>
     public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right) =>
-        Equals(left, right) == false;
+        !Equals(left, right);
 }
