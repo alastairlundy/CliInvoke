@@ -42,27 +42,17 @@ internal static partial class GracefulCancellation
 
             DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
             
-            if (!OperatingSystem.IsWindows())
-            {
-                Task gracefulInterruptCancellation = process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
+            Task<bool> gracefulInterruptCancellation = !OperatingSystem.IsWindows()
+                ? process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken)
+                : process.CancelWithInterruptOnWindows(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
             
-                await Task.WhenAny([
-                    process.WaitForExitAsync(cancellationToken),
-                    gracefulInterruptCancellation,
-                    process.GracefulCancellationWithCancelToken(
-                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                        cancellationExceptionBehavior, expectedExitTime)
-                ]);
-            }
-            else
-            {
-                await Task.WhenAny([
-                    process.WaitForExitAsync(cancellationToken),
-                    process.GracefulCancellationWithCancelToken(
-                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                        cancellationExceptionBehavior, expectedExitTime)
-                ]);
-            }
+            await Task.WhenAny([
+                process.WaitForExitAsync(cancellationToken),
+                gracefulInterruptCancellation,
+                process.GracefulCancellationWithCancelToken(
+                    timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                    cancellationExceptionBehavior, expectedExitTime)
+            ]);
 
             await Task.WhenAny([Task.Delay(500, cancellationToken), process.WaitForExitAsync(cancellationToken)]);
             
