@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Linq;
-
 namespace CliInvoke.Helpers.Processes;
 
 internal static class ToStartInfoExtensions
@@ -56,12 +54,12 @@ internal static class ToStartInfoExtensions
             processStartInfo.SetUserCredential(processConfiguration.Credential);
 #pragma warning restore CA1416
 
-            if (processConfiguration.EnvironmentVariables.Any())
+            if (processConfiguration.EnvironmentVariables.Count > 0)
                 processStartInfo.SetEnvironmentVariables(processConfiguration.EnvironmentVariables);
 
 #if NET8_0_OR_GREATER
-        if (processStartInfo.RedirectStandardInput)
-            processStartInfo.StandardInputEncoding = processConfiguration.StandardInputEncoding;
+            if (processStartInfo.RedirectStandardInput)
+                processStartInfo.StandardInputEncoding = processConfiguration.StandardInputEncoding;
 #endif
         
             if (processStartInfo.RedirectStandardOutput)
@@ -73,6 +71,4 @@ internal static class ToStartInfoExtensions
             return processStartInfo;
         }
     }
-    
-    
 }
