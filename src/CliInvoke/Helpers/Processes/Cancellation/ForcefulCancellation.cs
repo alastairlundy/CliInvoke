@@ -15,7 +15,7 @@ namespace CliInvoke.Helpers.Processes.Cancellation;
 
 internal static class ForcefulCancellation
 {
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         internal void ForcefulExit(ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
         {
