@@ -12,7 +12,7 @@ using CliInvoke.Core.Internal;
 namespace CliInvoke.Core;
 
 /// <summary>
-/// Represents configuration information about the exit behavior of a process, including timeout policy and result validation.
+/// Represents configuration information about the exit behaviour of a process, including timeout policy and result validation.
 /// </summary>
 public class ProcessExitConfiguration<TProcessResult> : ProcessExitConfiguration, IEquatable<ProcessExitConfiguration<TProcessResult>>
 where TProcessResult : ProcessResult
@@ -54,7 +54,7 @@ where TProcessResult : ProcessResult
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy and exit code zero validation.
     /// </summary>
-    public static readonly ProcessExitConfiguration<TProcessResult> Default = new(
+    public new static readonly ProcessExitConfiguration<TProcessResult> Default = new(
         ProcessTimeoutPolicy.Default,
         ProcessResultValidation.ExitCodeZero,
         [(result => result.ExitCode == 0),
@@ -66,7 +66,7 @@ where TProcessResult : ProcessResult
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy, but suppresses the Exception from cancellation.
     /// </summary>
-    public static readonly ProcessExitConfiguration<TProcessResult> DefaultNoException = new(
+    public new static readonly ProcessExitConfiguration<TProcessResult> DefaultNoException = new(
         ProcessTimeoutPolicy.Default,
         ProcessResultValidation.ExitCodeZero,
         [(result => result.ExitCode == 0),
@@ -78,7 +78,7 @@ where TProcessResult : ProcessResult
     /// <summary>
     /// A preconfigured <see cref="ProcessExitConfiguration"/> instance with Exit Code Validation and without a Timeout Policy.
     /// </summary>
-    public static readonly ProcessExitConfiguration<TProcessResult> NoTimeoutDefault = new(
+    public new static readonly ProcessExitConfiguration<TProcessResult> NoTimeoutDefault = new(
         ProcessTimeoutPolicy.None,
         ProcessResultValidation.ExitCodeZero,
         [(result => result.ExitCode == 0),
