@@ -33,35 +33,43 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     )
     {
         if (minWorkingSet is not null)
+        {
             ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
+
+            MinWorkingSet = minWorkingSet;
+        }
+
+        if (maxWorkingSet is not null)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative((nint)maxWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfZero((nint)maxWorkingSet);
+        }
         
         if (minWorkingSet is not null && maxWorkingSet is not null)
         {
-            if (maxWorkingSet < minWorkingSet || maxWorkingSet < 1)
-                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-
-            if (minWorkingSet > maxWorkingSet)
-                throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
+            ArgumentOutOfRangeException.ThrowIfLessThan((nint)maxWorkingSet, (nint)minWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)minWorkingSet, (nint)maxWorkingSet);
         }
 
         if (processorAffinity is not null)
         {
-#if NETSTANDARD2_0
-            if (processorAffinity < (nint)1)
-#else
-            if (processorAffinity < 1)
-#endif
-                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual((nint)processorAffinity, 1);
 
-            if (processorAffinity > (nint)2 * Environment.ProcessorCount)
-                throw new ArgumentOutOfRangeException(nameof(processorAffinity));
+            if ((nint)processorAffinity < 1)
+            {
+                ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, 
+                    (nint)2 * Environment.ProcessorCount);
+            }
         }
 
-#pragma warning disable CA1416
-        MinWorkingSet = minWorkingSet;
-        MaxWorkingSet = maxWorkingSet;
-        ProcessorAffinity = processorAffinity;
-#pragma warning restore CA1416
+        if (maxWorkingSet is not null)
+            MaxWorkingSet = maxWorkingSet;
+        
+        ProcessorAffinity = processorAffinity ??
+#if NETSTANDARD2_0
+                            (nint)
+#endif
+                            2 * Environment.ProcessorCount - 1;
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -112,7 +120,12 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <summary>
     /// Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
-    public static ProcessResourcePolicy Default { get; } = new ProcessResourcePolicy();
+    public static ProcessResourcePolicy Default { get; } = new(
+#if NETSTANDARD2_0
+        (nint)
+#endif
+        2 * Environment.ProcessorCount - 1
+    );
 
     /// <summary>
     /// Determines whether this ProcessResourcePolicy is equal to another ProcessResourcePolicy.
@@ -145,9 +158,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
             return false;
 
         if (obj is ProcessResourcePolicy policy)
-        {
             return Equals(policy);
-        }
 
         return false;
     }
@@ -158,15 +169,13 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <returns>The hash code for the current ProcessResourcePolicy.</returns>
     public override int GetHashCode()
     {
-#pragma warning disable CA1416
         return HashCode.Combine(
-            ProcessorAffinity,
+            ProcessorAffinity ?? Default.ProcessorAffinity,
             (int)PriorityClass,
             EnablePriorityBoost,
-            MinWorkingSet,
-            MaxWorkingSet
+            MinWorkingSet ?? Default.MinWorkingSet,
+            MaxWorkingSet ?? Default.MaxWorkingSet
         );
-#pragma warning restore CA1416
     }
 
     /// <summary>
@@ -199,5 +208,5 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="right">The other Process Resource Policy to be compared.</param>
     /// <returns>True if both Process Resource Policies are not equal to each other; false otherwise.</returns>
     public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right) =>
-        Equals(left, right) == false;
+        !Equals(left, right);
 }

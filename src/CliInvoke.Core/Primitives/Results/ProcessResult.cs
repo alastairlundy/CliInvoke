@@ -14,6 +14,8 @@
  */
 
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -44,6 +46,7 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <summary>
     /// Whether the Command successfully exited.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public bool WasSuccessful => ExitCode == 0;
 
     /// <summary>
@@ -149,5 +152,5 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are not equal; otherwise, <c>false</c>.
     /// </returns>
     public static bool operator !=(ProcessResult left, ProcessResult? right) =>
-        left.Equals(right) == false;
+        !left.Equals(right);
 }

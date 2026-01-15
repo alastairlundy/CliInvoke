@@ -15,16 +15,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Update ``FilePathResolver`` file resolving code to ensure Target File Path is an Executable File and throw an Exception if it is not (#208 )
-* Updated ``FilePathResolver`` to use DotPrimitives to assist with Path Environment Variable Resolving code (#208)
-* Updated ``FilePathResolver`` logic to use enumerated Path directories method for potential performance improvements
-* Updated code to use Argument Exception throwing polyfills (#210) and address nullability warnings 
-* Removed some no longer needed internal Helper code
-* Fixed typos in Localized Exception strings</PackageReleaseNotes>
+        <PackageReleaseNotes>* Added Graceful Cancellation via Signals on Windows (#243 )
+* Updated internal Polyfill version from 9.7.0 to 9.7.2
+* Minor updates to helper code</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.2.0</PackageVersion>
+        <PackageVersion>2.3.0-alpha.2</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -43,7 +40,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.6.0" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.7.2" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -96,7 +93,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="DotExtensions" Version="9.3.0" />
+      <PackageReference Include="DotExtensions" Version="9.3.1" />
       <PackageReference Include="DotPrimitives" Version="4.1.0" />
     </ItemGroup>
 </Project>

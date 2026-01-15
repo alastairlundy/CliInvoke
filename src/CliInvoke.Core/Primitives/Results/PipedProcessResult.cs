@@ -133,7 +133,7 @@ public class PipedProcessResult
     /// <param name="right">The other PipedProcessResult to be compared.</param>
     /// <returns>True if both PipedProcessResults are not equal to each other; false otherwise.</returns>
     public static bool operator !=(PipedProcessResult? left, PipedProcessResult? right) =>
-        Equals(left, right) == false;
+        !Equals(left, right);
 
     /// <summary>
     /// Disposes of the <see cref="StandardOutput"/> and <see cref="StandardError"/> streams.
