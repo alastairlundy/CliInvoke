@@ -319,7 +319,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         if (left is null || right is null)
             return false;
 
-        return Equals(left, right) == false;
+        return !Equals(left, right);
     }
 
     /// <summary>

@@ -67,7 +67,7 @@ internal static class ApplyConfigurationToProcessStartInfo
         /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
         internal void SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
         {
-            if (!environmentVariables.Any())
+            if (environmentVariables.Count == 0)
                 return;
 
             foreach (KeyValuePair<string, string> variable in environmentVariables)

@@ -167,6 +167,6 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <returns><c>true</c> if both instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
     {
-        return Equals(left, right) == false;
+        return !Equals(left, right);
     }
 }

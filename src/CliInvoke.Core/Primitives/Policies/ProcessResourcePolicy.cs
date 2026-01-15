@@ -33,7 +33,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     )
     {
         if (minWorkingSet is not null)
+        {
             ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
+
+            MinWorkingSet = minWorkingSet;
+        }
 
         if (maxWorkingSet is not null)
         {
@@ -49,17 +53,23 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         if (processorAffinity is not null)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual((nint)processorAffinity, 1);
+
             if ((nint)processorAffinity < 1)
             {
-                ArgumentOutOfRangeException.ThrowIfLessThanOrEqual((nint)processorAffinity, 1);
                 ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, 
                     (nint)2 * Environment.ProcessorCount);
             }
         }
 
-        MinWorkingSet = minWorkingSet ?? Default.MinWorkingSet;
-        MaxWorkingSet = maxWorkingSet ?? Default.MaxWorkingSet; 
-        ProcessorAffinity = processorAffinity ?? Default.ProcessorAffinity;
+        if (maxWorkingSet is not null)
+            MaxWorkingSet = maxWorkingSet;
+        
+        ProcessorAffinity = processorAffinity ??
+#if NETSTANDARD2_0
+                            (nint)
+#endif
+                            2 * Environment.ProcessorCount - 1;
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -110,7 +120,12 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <summary>
     /// Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
-    public static ProcessResourcePolicy Default { get; } = new ProcessResourcePolicy();
+    public static ProcessResourcePolicy Default { get; } = new(
+#if NETSTANDARD2_0
+        (nint)
+#endif
+        2 * Environment.ProcessorCount - 1
+    );
 
     /// <summary>
     /// Determines whether this ProcessResourcePolicy is equal to another ProcessResourcePolicy.
@@ -193,5 +208,5 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="right">The other Process Resource Policy to be compared.</param>
     /// <returns>True if both Process Resource Policies are not equal to each other; false otherwise.</returns>
     public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right) =>
-        Equals(left, right) == false;
+        !Equals(left, right);
 }

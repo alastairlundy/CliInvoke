@@ -15,7 +15,7 @@ internal static partial class GracefulCancellation
 {
     internal const int GracefulTimeoutWaitSeconds = 30;
     
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         /// <summary>
         /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
@@ -35,33 +35,24 @@ internal static partial class GracefulCancellation
         [SupportedOSPlatform("freebsd")]
         [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken, bool fallbackToForceful = true)
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken,
+            bool fallbackToForceful = true)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
+
             DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
             
-            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero); 
+            Task<bool> gracefulInterruptCancellation = !OperatingSystem.IsWindows()
+                ? process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken)
+                : process.CancelWithInterruptOnWindows(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
             
-            if (!OperatingSystem.IsWindows())
-            {
-                Task gracefulInterruptCancellation = process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
-            
-                await Task.WhenAny([
-                    process.WaitForExitAsync(cancellationToken),
-                    gracefulInterruptCancellation,
-                    process.GracefulCancellationWithCancelToken(
-                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                        cancellationExceptionBehavior, expectedExitTime)
-                ]);
-            }
-            else
-            {
-                await Task.WhenAny([
-                    process.WaitForExitAsync(cancellationToken),
-                    process.GracefulCancellationWithCancelToken(
-                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                        cancellationExceptionBehavior, expectedExitTime)
-                ]);
-            }
+            await Task.WhenAny([
+                process.WaitForExitAsync(cancellationToken),
+                gracefulInterruptCancellation,
+                process.GracefulCancellationWithCancelToken(
+                    timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                    cancellationExceptionBehavior, expectedExitTime)
+            ]);
 
             await Task.WhenAny([Task.Delay(500, cancellationToken), process.WaitForExitAsync(cancellationToken)]);
             
