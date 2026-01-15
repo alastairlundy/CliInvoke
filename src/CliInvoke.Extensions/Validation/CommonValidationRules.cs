@@ -20,7 +20,7 @@ namespace CliInvoke.Extensions.Validation;
 /// <typeparam name="TProcessResult">
 /// The type of the process result being validated, constrained to derive from <see cref="ProcessResult"/>.
 /// </typeparam>
-public static class ValidationRules<TProcessResult>
+public static class CommonValidationRules<TProcessResult>
     where TProcessResult : ProcessResult
 {
     /// <summary>
