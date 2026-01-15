@@ -74,7 +74,7 @@ public class ProcessInvoker : IProcessInvoker
         {
             bool processWasNew = process.Start();
 
-            await PipeStandardInputAsync(processConfiguration, process);
+            await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
 
@@ -143,7 +143,7 @@ public class ProcessInvoker : IProcessInvoker
         {
             bool processWasNew = process.Start();
             
-            await PipeStandardInputAsync(processConfiguration, process);
+            await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -216,10 +216,10 @@ public class ProcessInvoker : IProcessInvoker
         {
             bool processWasNew = process.Start();
             
-            await PipeStandardInputAsync(processConfiguration, process);
+            await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
-            Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process);
-            Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process);
+            Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process, cancellationToken);
+            Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process, cancellationToken);
 
             Task waitForExit = process.WaitForExitOrTimeoutAsync(
                 processExitConfiguration,
@@ -287,7 +287,7 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     private async Task PipeStandardInputAsync(ProcessConfiguration processConfiguration,
-        ProcessWrapper process)
+        ProcessWrapper process, CancellationToken cancellationToken)
     {
         if (
             processConfiguration.StandardInput is not null
@@ -302,8 +302,7 @@ public class ProcessInvoker : IProcessInvoker
         {
             await _processPipeHandler.PipeStandardInputAsync(
                 processConfiguration.StandardInput.BaseStream,
-                process
-            );
+                process, cancellationToken);
         }
     }
     
