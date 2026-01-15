@@ -237,10 +237,8 @@ public class ProcessInvoker : IProcessInvoker
                 await standardError
             );
 
-            if (
-                processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0
-            )
+            if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
+                && process.ExitCode != 0)
             {
                 ThrowProcessNotSuccessfulException(result, process, processWasNew);
             }
