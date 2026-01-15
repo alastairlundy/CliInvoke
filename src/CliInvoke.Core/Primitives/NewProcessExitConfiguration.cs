@@ -14,7 +14,7 @@ namespace CliInvoke.Core;
 /// <summary>
 /// Represents configuration information about the exit behavior of a process, including timeout policy and result validation.
 /// </summary>
-public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
+public class ProcessExitConfiguration<TProcessResult> : ProcessExitConfiguration, IEquatable<ProcessExitConfiguration<TProcessResult>>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ProcessExitConfiguration"/> class with default timeout policy and result validation.
@@ -83,7 +83,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// </summary>
     [Obsolete(DeprecationMessages.DeprecationV3)]
     public ProcessResultValidation ResultValidation { get; }
-    
+
     /// <summary>
     /// Gets the result validation strategy used to determine if Process cancellation should throw an exception.
     /// </summary>
@@ -140,8 +140,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool Equals(ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right)
+    public static bool Equals(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
     {
         if (left is null || right is null)
             return false;
@@ -166,8 +165,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are not equal; otherwise, <c>false</c>.</returns>
-    public static bool operator !=(ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right)
+    public static bool operator !=(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
     {
         return !Equals(left, right);
     }
