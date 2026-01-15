@@ -120,10 +120,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <param name="left">The first <see cref="ProcessTimeoutPolicy"/> instance to compare.</param>
     /// <param name="right">The second <see cref="ProcessTimeoutPolicy"/> instance to compare.</param>
     /// <returns><c>true</c> if the two <see cref="ProcessTimeoutPolicy"/> instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right) 
+        => Equals(left, right);
 
     /// <summary>
     ///
@@ -131,10 +129,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool operator !=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
-    {
-        return !Equals(left, right);
-    }
+    public static bool operator !=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right) 
+        => !Equals(left, right);
 
     /// <summary>
     ///
