@@ -13,9 +13,9 @@ using System.Linq;
 namespace CliInvoke.Core.Validation;
 
 /// <summary>
-/// Provides a set of predefined validation rules for processing results.
+/// Provides a set of predefined common validation rules for processing Process results.
 /// These rules validate instances of <typeparamref name="TProcessResult"/>,
-/// which must inherit from <see cref="TProcessResult"/>.
+/// which must inherit from <see cref="ProcessResult"/>.
 /// </summary>
 /// <typeparam name="TProcessResult">
 /// The type of the process result being validated, constrained to derive from <see cref="ProcessResult"/>.
@@ -45,7 +45,7 @@ public static class CommonValidationRules<TProcessResult>
         => (result => result.ExitCode == exitCode);
 
     /// <summary>
-    /// A validation rule that checks whether the process result's exit code is one of the specified allowed codes.
+    /// A validation rule that checks whether the process result's exit code is one of the specified allowed exit codes.
     /// </summary>
     /// <param name="exitCodes">
     /// The collection of allowed exit codes that the process result can match for the validation to succeed.
