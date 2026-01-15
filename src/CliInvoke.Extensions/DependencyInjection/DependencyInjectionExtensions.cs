@@ -7,9 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
+using CliInvoke.Validation;
 
 // ReSharper disable RedundantAssignment
 
@@ -34,16 +36,24 @@ public static partial class DependencyInjectionExtensions
             case ServiceLifetime.Singleton:
                 services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
                 services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
-
+                
+                services.TryAddSingleton<IProcessResultValidator<ProcessResult>, ProcessResultValidator<ProcessResult>>();
+                services.TryAddSingleton<IProcessResultValidator<BufferedProcessResult>, ProcessResultValidator<BufferedProcessResult>>();
+                services.TryAddSingleton<IProcessResultValidator<PipedProcessResult>, ProcessResultValidator<PipedProcessResult>>();
+                
                 services.AddSingleton<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddSingleton<IProcessInvoker, ProcessInvoker>();
-
+                
                 services.AddSingleton<IRunnerProcessFactory, RunnerProcessFactory>();
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
-
+                
+                services.TryAddScoped<IProcessResultValidator<ProcessResult>, ProcessResultValidator<ProcessResult>>();
+                services.TryAddScoped<IProcessResultValidator<BufferedProcessResult>, ProcessResultValidator<BufferedProcessResult>>();
+                services.TryAddScoped<IProcessResultValidator<PipedProcessResult>, ProcessResultValidator<PipedProcessResult>>();
+                
                 services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
 
@@ -53,6 +63,64 @@ public static partial class DependencyInjectionExtensions
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
                 services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
 
+                services.TryAddTransient<IProcessResultValidator<ProcessResult>, ProcessResultValidator<ProcessResult>>();
+                services.TryAddTransient<IProcessResultValidator<BufferedProcessResult>, ProcessResultValidator<BufferedProcessResult>>();
+                services.TryAddTransient<IProcessResultValidator<PipedProcessResult>, ProcessResultValidator<PipedProcessResult>>();
+                
+                services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddTransient<IProcessInvoker, ProcessInvoker>();
+
+                services.AddTransient<IRunnerProcessFactory, RunnerProcessFactory>();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(lifetime),
+                    lifetime,
+                    null);
+        }
+
+        return services;
+    }
+
+
+    /// <summary>
+    /// Configures Dependency Injection for CliInvoke's main services with the specified lifetime and result type.
+    /// </summary>
+    /// <param name="services">The service collection to which the services will be added.</param>
+    /// <param name="lifetime">The desired service lifetime to use. Defaults to Scoped.</param>
+    /// <typeparam name="TProcessResult">The type of process result to be validated and returned by the associated services.</typeparam>
+    /// <returns>The service collection with the CliInvoke services configured.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if an invalid service lifetime is provided.</exception>
+    public static IServiceCollection AddCliInvoke<TProcessResult>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where TProcessResult : ProcessResult
+    {
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
+                services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
+                services.TryAddSingleton<IProcessResultValidator<TProcessResult>, ProcessResultValidator<TProcessResult>>();
+                services.AddSingleton<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddSingleton<IProcessInvoker, ProcessInvoker>();
+                
+                services.AddSingleton<IRunnerProcessFactory, RunnerProcessFactory>();
+                break;
+            case ServiceLifetime.Scoped:
+                services.TryAddScoped<IFilePathResolver, FilePathResolver>();
+                services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
+                services.TryAddScoped<IProcessResultValidator<TProcessResult>, ProcessResultValidator<TProcessResult>>();
+
+                services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddScoped<IProcessInvoker, ProcessInvoker>();
+
+                services.AddScoped<IRunnerProcessFactory, RunnerProcessFactory>();
+                break;
+            case ServiceLifetime.Transient:
+                services.TryAddTransient<IFilePathResolver, FilePathResolver>();
+                services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
+                services.TryAddTransient<IProcessResultValidator<TProcessResult>, ProcessResultValidator<TProcessResult>>();
+
+                
                 services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
 
