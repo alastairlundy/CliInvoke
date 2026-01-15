@@ -1,5 +1,5 @@
 /*
-    CliInvoke.Extensions
+    CliInvoke.Core
      
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -10,12 +10,12 @@
 
 using System.Linq;
 
-namespace CliInvoke.Extensions.Validation;
+namespace CliInvoke.Core.Validation;
 
 /// <summary>
 /// Provides a set of predefined validation rules for processing results.
 /// These rules validate instances of <typeparamref name="TProcessResult"/>,
-/// which must inherit from <see cref="ProcessResult"/>.
+/// which must inherit from <see cref="TProcessResult"/>.
 /// </summary>
 /// <typeparam name="TProcessResult">
 /// The type of the process result being validated, constrained to derive from <see cref="ProcessResult"/>.
