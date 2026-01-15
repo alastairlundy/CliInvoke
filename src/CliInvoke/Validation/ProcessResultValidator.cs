@@ -33,7 +33,6 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
     /// </summary>
     public Func<TProcessResult, bool>[] ValidationRules { get; }
     
-    
     /// <summary>
     /// 
     /// </summary>
