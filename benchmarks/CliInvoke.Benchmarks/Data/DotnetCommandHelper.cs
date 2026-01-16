@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
-
+using AlastairLundy.WhatExecLib;
+using AlastairLundy.WhatExecLib.Detectors;
 using CliInvoke.Benchmarking.Helpers;
 using CliInvoke.Core;
 
@@ -11,34 +12,9 @@ public class DotnetCommandHelper
 
     public DotnetCommandHelper()
     {
-        IProcessInvoker processConfigurationInvoker = CliInvokeHelpers.CreateProcessInvoker();
-        if (
-            RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-            || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-            || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)
-        )
-        {
-            ProcessConfiguration processConfiguration = new ProcessConfiguration(
-                "/usr/bin/which",
-                false,
-                true,
-                true,
-                "dotnet"
-            );
+        PathExecutableResolver filePathResolver = new(new ExecutableFileDetector());
 
-            Task<BufferedProcessResult> task = processConfigurationInvoker.ExecuteBufferedAsync(
-                processConfiguration
-            );
-
-            task.Wait();
-
-            _dotnetFilePath = task.Result.StandardOutput.Split(Environment.NewLine).First();
-        }
-        else
-        {
-            _dotnetFilePath =
-                $"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}{Path.DirectorySeparatorChar}dotnet{Path.DirectorySeparatorChar}dotnet.exe";
-        }
+        _dotnetFilePath = filePathResolver.ResolvePathEnvironmentExecutableFile("dotnet").FullName;
     }
 
     public string DotnetExecutableTargetFilePath => _dotnetFilePath;
