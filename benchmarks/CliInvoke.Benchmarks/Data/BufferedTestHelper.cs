@@ -1,8 +1,6 @@
 ﻿using DotExtensions.IO.Directories;
 using DotPrimitives.IO.Drives;
 
-#nullable enable
-
 namespace CliInvoke.Benchmarking.Data;
 
 public class BufferedTestHelper
@@ -16,14 +14,14 @@ public class BufferedTestHelper
 
     private string GetMockDataSimExePath()
     {
-        string mockDataToolExe = OperatingSystem.IsWindows() ? "CliInvokeMockDataSimTool.exe" : "CliInvokeMockDataSimTool";
+        string mockDataToolExe = OperatingSystem.IsWindows() ? "CliInvokeBenchMockData.exe" : "CliInvokeBenchMockData";
         
-        FileInfo? executable = StorageDrives.Shared.EnumeratePhysicalDrives()
+        FileInfo? executable = StorageDrives.Shared.EnumerateLogicalDrives()
             .Where(d => d.IsReady)
             .Select(d => d.RootDirectory)
             .SelectMany(d =>
-                d.SafelyEnumerateFiles(mockDataToolExe, SearchOption.AllDirectories))
-            .FirstOrDefault();
+                d.SafelyEnumerateFiles("*", SearchOption.AllDirectories))
+            .FirstOrDefault(f => f.Name.Equals(mockDataToolExe, StringComparison.InvariantCultureIgnoreCase));
 
         if (executable is not null)
             return executable.FullName;
