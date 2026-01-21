@@ -50,8 +50,9 @@ public sealed class ProcessNotSuccessfulException : Exception
     public ProcessNotSuccessfulException(ProcessExceptionInfo process)
         : base(
             Resources.Exceptions_ProcessNotSuccessful_Specific.Replace(
-                "{x}",
-                process.Result.ExecutedFilePath)
+                    "{x}",
+                    process.Result.ExecutedFilePath)
+                .Replace("{y}", process.Result.ExitCode.ToString())
         )
     {
         ExecutedProcess = process;
