@@ -8,14 +8,11 @@ namespace CliInvoke.Benchmarking.Data;
 
 public class BufferedTestHelper
 {
-    private DotnetCommandHelper _dotnetCommandHelper;
-    
     public BufferedTestHelper()
     {
         TargetFilePath = ""; 
         
         TargetFilePath = GetMockDataSimExePath();
-        _dotnetCommandHelper = new DotnetCommandHelper();
     }
 
     private string GetMockDataSimExePath()
