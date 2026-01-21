@@ -90,7 +90,7 @@ public class ProcessInvoker : IProcessInvoker
                 && process.ExitCode != 0
             )
             {
-                ThrowProcessNotSuccessfulException(result, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
             }
 
             return result;
@@ -169,7 +169,7 @@ public class ProcessInvoker : IProcessInvoker
                 && process.ExitCode != 0
             )
             {
-                ThrowProcessNotSuccessfulException(result, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
             }
 
             DisposeCompletedStreams(standardOut, standardError);
@@ -240,7 +240,7 @@ public class ProcessInvoker : IProcessInvoker
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
                 && process.ExitCode != 0)
             {
-                ThrowProcessNotSuccessfulException(result, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
             }
             
             DisposeCompletedStreams(standardOutput, standardError);
@@ -273,11 +273,13 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     private static void ThrowProcessNotSuccessfulException(ProcessResult result,
+        ProcessConfiguration configuration,
         ProcessWrapper process,
         bool processWasNew)
     {
         throw new ProcessNotSuccessfulException(
-            new ProcessExceptionInfo(result, process.StartInfo, process.Id, process.ProcessName,
+            new ProcessExceptionInfo(result, configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
+                    configuration.RedirectStandardError), process.Id, process.ProcessName,
                 processWasNew, process.ResourcePolicy,
                 new UserCredential((string?)process.StartInfo.Domain, (string?)process.StartInfo.UserName, 
                     process.StartInfo.Password, process.StartInfo.LoadUserProfile))
