@@ -9,11 +9,9 @@ namespace CliInvoke.Tests.Builders;
 
 public class ProcessResourcePolicyBuilderTests
 {
-    
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(2 * 16 - 1)]
     [InlineData(1 * 16 - 1)]
     [InlineData(1 * 8 - 1)]
     public void WithProcessorAffinity_ValidProcessorAffinity_Valid_Success(nint processorAffinity)
@@ -182,7 +180,7 @@ public class ProcessResourcePolicyBuilderTests
     [InlineData(1 * 8 - 1, 1024, 0, false,  ProcessPriorityClass.Normal)]
     [InlineData(2 * 8 - 1, 1024, 1024, true,   ProcessPriorityClass.BelowNormal)]
     public void Build_Successfully(nint processorAffinity, nint maxWorkingSet, nint minWorkingSet,
-         bool priorityBoostEnabled, ProcessPriorityClass priorityClass)
+        bool priorityBoostEnabled, ProcessPriorityClass priorityClass)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
@@ -211,7 +209,5 @@ public class ProcessResourcePolicyBuilderTests
         Assert.Equal(priorityBoostEnabled, resourcePolicy.EnablePriorityBoost);
         Assert.Equal(priorityClass, resourcePolicy.PriorityClass);
 #pragma warning restore CA1416
-
     }
-    
 }

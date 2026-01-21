@@ -130,7 +130,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
                              (nint)ProcessResourcePolicy.Default.MinWorkingSet;
 #pragma warning restore CS8629
         
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(maxWorkingSet, 
+        ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 
             minWorkingSet);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet, maxWorkingSet);
         ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 1);
