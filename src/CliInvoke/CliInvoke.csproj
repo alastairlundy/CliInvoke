@@ -15,13 +15,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Added Graceful Cancellation via Signals on Windows (#243 )
-* Updated internal Polyfill version from 9.7.0 to 9.7.2
-* Minor updates to helper code</PackageReleaseNotes>
+        <PackageReleaseNotes>* Added ``ProcessResultValidator&lt;TProcessResult&gt;`` implementation
+* Added CancellationToken support to ``ProcessPipeHandler``
+* Updated internal Polyfill version from 9.7.2 to 9.7.3</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.3.0-alpha.2</PackageVersion>
+        <PackageVersion>2.3.0-alpha.3</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -40,7 +40,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.7.2" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.7.3" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -93,7 +93,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="DotExtensions" Version="9.3.1" />
-      <PackageReference Include="DotPrimitives" Version="4.1.0" />
+      <PackageReference Include="DotExtensions" Version="9.4.0" />
+      <PackageReference Include="DotPrimitives" Version="4.2.0" />
     </ItemGroup>
 </Project>

@@ -12,14 +12,14 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.3.0-alpha.2</PackageVersion>
+        <PackageVersion>2.3.0-alpha.3</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 9.7.0 to 9.7.2
-* Updated to use CliInvoke.Core 2.3.0 Alpha 2</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.7.2 to 9.7.3
+* Updated to use CliInvoke.Core 2.3.0 Alpha 3</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>
@@ -29,7 +29,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.7.2" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.7.3" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>
