@@ -69,8 +69,9 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
             return false;
 
         return StandardOutput == other.StandardOutput
-            && StandardError == other.StandardError
-            && ExitCode == other.ExitCode;
+               && ExecutedFilePath.Equals(other.ExecutedFilePath)
+               && StandardError == other.StandardError
+               && ExitCode == other.ExitCode;
     }
 
     /// <summary>
