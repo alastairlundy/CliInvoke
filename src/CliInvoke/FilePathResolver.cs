@@ -109,19 +109,23 @@ public class FilePathResolver : IFilePathResolver
             resolvedFilePath = null;
             return false;
         }
-
-        string fileName = Path.GetFileNameWithoutExtension(filePathToResolve);
         
-        bool fileHasExtension = Path.GetExtension(fileName) != string.Empty;
+        bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
+
+        string fileName = Path.GetFileName(filePathToResolve);
+
+        bool lookForExtension = !fileHasExtension && (OperatingSystem.IsWindows() ||
+                                                      OperatingSystem.IsMacOS() ||
+                                                      OperatingSystem.IsMacCatalyst());
         
         foreach (string pathEntry in pathContents)
         {
-            if (fileHasExtension)
+            if (lookForExtension)
             {
                 foreach (string pathExtension in pathExtensions)
                 {
                     string filePath =
-                        Path.Combine(pathEntry, $"{fileName}{pathExtension}");
+                        Path.Combine(pathEntry, $"{fileName}{pathExtension.ToLower()}");
 
                     if (File.Exists(filePath))
                     {
