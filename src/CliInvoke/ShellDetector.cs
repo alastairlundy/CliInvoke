@@ -12,6 +12,7 @@ using System.Linq;
 using CliInvoke.Core.Factories;
 
 using DotExtensions.Platforms;
+using DotExtensions.Versions;
 
 namespace CliInvoke;
 
@@ -69,12 +70,10 @@ public class ShellDetector : IShellDetector
         string[] commaSplit = versionLine.Split(',');
         
         string shellPrettyName = commaSplit.First();
+
+        string versionString = commaSplit.Last().Replace(".", string.Empty);
         
-        string versionString = commaSplit.Last().Replace(".", string.Empty)
-            .Replace("version", string.Empty)
-            .Replace(" ", string.Empty);
-        
-        Version shellVersion = Version.Parse(versionString);
+        Version shellVersion = Version.GracefulParse(versionString);
         
         return new ShellInformation(shellPrettyName, 
             new FileInfo(shellExe), shellVersion);
@@ -98,7 +97,7 @@ public class ShellDetector : IShellDetector
             string versionString = powershellResults.Last();
             versionString = versionString.Substring(0, versionString.LastIndexOf('.') + 1);
             
-            Version version = Version.Parse(versionString);
+            Version version = Version.GracefulParse(versionString);
 
             return new ShellInformation(powershellResults.First(), new FileInfo(powershell5Plus),
                 version);
@@ -116,7 +115,8 @@ public class ShellDetector : IShellDetector
             string line = result.StandardOutput.Split(Environment.NewLine).First();
 
             string versionString = line.Replace("Microsoft", string.Empty).Replace("Windows", string.Empty).Replace("]", string.Empty);
-            Version cmdVersion = Version.Parse(versionString.Split('[')[1].Replace("Version", "")
+            Version cmdVersion = Version.GracefulParse(versionString.Split('[')[1]
+                .Replace("Version", "")
                 .Replace(" ", string.Empty));
 
             return new ShellInformation("cmd", new FileInfo(cmdExe), cmdVersion);
