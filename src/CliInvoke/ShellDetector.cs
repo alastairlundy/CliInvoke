@@ -80,7 +80,21 @@ public class ShellDetector : IShellDetector
         {
             string powershell5Plus = _filePathResolver.ResolveFilePath("pwsh.exe");
             
-            using ProcessConfiguration powershellConfig = 
+            using ProcessConfiguration powershellConfig = _processConfigurationFactory
+                .Create(powershell5Plus, "");
+            
+            BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(powershellConfig, 
+                ProcessExitConfiguration.Default, false,  cancellationToken);
+            
+            string[] powershellResults = result.StandardOutput.Replace("v", string.Empty).Split(' ');
+
+            string versionString = powershellResults.Last();
+            versionString = versionString.Substring(0, versionString.LastIndexOf('.') + 1);
+            
+            Version version = Version.Parse(versionString);
+
+            return new ShellInformation(powershellResults.First(), new FileInfo(powershell5Plus),
+                version);
         }
         catch
         {
@@ -88,8 +102,15 @@ public class ShellDetector : IShellDetector
 
             using ProcessConfiguration cmdConfig = _processConfigurationFactory
                 .Create(cmdExe, "");
+            
+            BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
+                ProcessExitConfiguration.Default, false,  cancellationToken);
+            
+            string line = result.StandardOutput.Split(Environment.NewLine).First();
 
-            Version cmdVersion;
+            string versionString = line.Replace("Microsoft", string.Empty).Replace("Windows", string.Empty).Replace("]", string.Empty);
+            Version cmdVersion = Version.Parse(versionString.Split('[')[1].Replace("Version", "")
+                .Replace(" ", string.Empty));
 
             return new ShellInformation("cmd", new FileInfo(cmdExe), cmdVersion);
         }
