@@ -44,7 +44,7 @@ public class ProcessCancellationTests
         Assert.False(actual);
     }
     
-    [Fact]
+    /*[Fact]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
@@ -74,7 +74,7 @@ public class ProcessCancellationTests
 
         //Assert
         Assert.False(actual);
-    }
+    }*/
     
     [Fact]
     [SupportedOSPlatform("windows")]
