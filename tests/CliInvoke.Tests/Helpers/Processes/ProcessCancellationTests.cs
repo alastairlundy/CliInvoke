@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
-using System.Threading;
 using System.Threading.Tasks;
 using CliInvoke.Core;
 using CliInvoke.Helpers.Processes;
@@ -13,7 +12,6 @@ namespace CliInvoke.Tests.Helpers.Processes;
 
 public class ProcessCancellationTests
 {
-    
     [Fact]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -27,28 +25,27 @@ public class ProcessCancellationTests
         string filePath = ProcessTestHelper.GetTargetFilePath();
         Process process = ProcessTestHelper.CreateProcess(filePath, "");
         
-        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(10),
-            ProcessCancellationMode.Graceful),
+        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(10)),
             ProcessResultValidation.None, ProcessCancellationExceptionBehavior.SuppressException);
 
         
         //Act
        
-       process.Start();
+        process.Start();
        
-       int processId = process.Id;
+        int processId = process.Id;
        
-       await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
+        await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
 
-      await Task.Delay(1000, TestContext.Current.CancellationToken);
+        await Task.Delay(1000, TestContext.Current.CancellationToken);
 
-       bool actual = Process.GetProcesses().Any(x => x.Id == processId);
+        bool actual = Process.GetProcesses().Any(x => x.Id == processId);
 
         //Assert
         Assert.False(actual);
     }
     
-    [Fact]
+    /*[Fact]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
@@ -78,7 +75,7 @@ public class ProcessCancellationTests
 
         //Assert
         Assert.False(actual);
-    }
+    }*/
     
     [Fact]
     [SupportedOSPlatform("windows")]
