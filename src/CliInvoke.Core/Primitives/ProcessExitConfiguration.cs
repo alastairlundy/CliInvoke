@@ -12,7 +12,7 @@ using CliInvoke.Core.Internal;
 namespace CliInvoke.Core;
 
 /// <summary>
-/// Represents configuration information about the exit behavior of a process, including timeout policy and result validation.
+/// Represents configuration information about the exit behaviour of a process, including timeout policy and result validation.
 /// </summary>
 [Obsolete(DeprecationMessages.DeprecationV3)]
 public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
