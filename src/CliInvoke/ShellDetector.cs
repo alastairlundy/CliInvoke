@@ -51,8 +51,8 @@ public class ShellDetector : IShellDetector
             .Create("ps", "-p $$ -o comm=");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
-            execConfiguration,
-            ProcessExitConfiguration.Default, false, cancellationToken);
+            execConfiguration, ProcessExitConfiguration.Default, false,
+            cancellationToken);
 
         string shellExe = _filePathResolver.ResolveFilePath(execResult.StandardOutput.Split(Environment.NewLine).First());
 
