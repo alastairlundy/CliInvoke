@@ -107,7 +107,7 @@ public class FilePathResolver : IFilePathResolver
 
         foreach (string pathEntry in pathContents)
         {
-            if (fileHasExtension)
+            if (!fileHasExtension && OperatingSystem.IsWindows())
             {
                 foreach (string pathExtension in pathExtensions)
                 {
