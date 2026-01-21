@@ -55,7 +55,8 @@ public class BufferedTestHelper
         
         Task<BufferedProcessResult> task = processInvoker.ExecuteBufferedAsync(configuration, ProcessExitConfiguration.DefaultNoException,
             false, CancellationToken.None);
-        task.Wait(0);
+        
+        task.Wait();
         
         if (task.Result.ExitCode != 0)
         {
