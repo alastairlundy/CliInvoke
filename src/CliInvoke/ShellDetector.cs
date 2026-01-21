@@ -60,15 +60,22 @@ public class ShellDetector : IShellDetector
             .Create(shellExe, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
-            shellInfoProcessConfig,
-            ProcessExitConfiguration.Default, false, cancellationToken);
+            shellInfoProcessConfig, ProcessExitConfiguration.Default, false,
+            cancellationToken);
+        
+        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l => l.ToLower().Contains("version") &&
+            l.Any(c => char.IsDigit(c)));
 
-        string[] infoResults = shellInfoResult.StandardOutput.Split(' ');
-
-        string shellPrettyName;
-
-        Version shellVersion;
-
+        string[] commaSplit = versionLine.Split(',');
+        
+        string shellPrettyName = commaSplit.First();
+        
+        string versionString = commaSplit.Last().Replace(".", string.Empty)
+            .Replace("version", string.Empty)
+            .Replace(" ", string.Empty);
+        
+        Version shellVersion = Version.Parse(versionString);
+        
         return new ShellInformation(shellPrettyName, 
             new FileInfo(shellExe), shellVersion);
     }
