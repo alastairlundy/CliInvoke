@@ -3,14 +3,12 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Bogus;
-
 using Spectre.Console;
 using Spectre.Console.Cli;
 using ValidationResult = Spectre.Console.ValidationResult;
 
-namespace CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
+namespace CliInvoke.Benchmarking.MockDataSimTool.Commands;
 
 public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
 {

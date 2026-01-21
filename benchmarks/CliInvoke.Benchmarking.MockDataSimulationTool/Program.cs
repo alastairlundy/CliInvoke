@@ -1,5 +1,4 @@
-﻿
-using CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
+﻿using CliInvoke.Benchmarking.MockDataSimTool.Commands;
 using Spectre.Console.Cli;
 
 CommandApp app = new CommandApp();

@@ -10,13 +10,14 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <PublishAot>false</PublishAot>
-    <Title>CliInvokeMockDataSim</Title>
+    <Title>CliInvokeMockDataSimTool</Title>
     <Authors>Alastair Lundy</Authors>
     <Description>A Simulation tool that generates mock data for the CliInvoke Benchmarks.</Description>
     <Copyright>Copyright (c) Alastair Lundy 2026</Copyright>
     <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Company>Alastair Lundy</Company>
+    <RootNamespace>CliInvoke.Benchmarking.MockDataSimTool</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />
