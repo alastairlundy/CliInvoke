@@ -39,8 +39,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     )
         : base(executableFilePath, exitCode, startTime, exitTime)
     {
-        ArgumentException.ThrowIfNullOrEmpty(standardOutput);
-        
+        ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
         ArgumentNullException.ThrowIfNull(standardOutput);
         ArgumentNullException.ThrowIfNull(standardError);
         

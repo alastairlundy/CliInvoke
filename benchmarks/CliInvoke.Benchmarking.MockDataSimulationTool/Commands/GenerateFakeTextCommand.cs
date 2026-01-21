@@ -3,14 +3,12 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Bogus;
-
 using Spectre.Console;
 using Spectre.Console.Cli;
 using ValidationResult = Spectre.Console.ValidationResult;
 
-namespace CliInvoke.Benchmarking.MockDataSimulationTool.Commands;
+namespace CliInvoke.Benchmarking.MockDataSimTool.Commands;
 
 public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
 {
@@ -20,12 +18,12 @@ public class GenerateFakeTextCommand : Command<GenerateFakeTextCommand.Settings>
 
     public class Settings : CommandSettings
     {
-        [CommandOption("--line-length|-ll")]
+        [CommandOption("--line-length|-l")]
         [DefaultValue(100_000)]
         [Range(1, 1_000_000)]
         public int FakeTextLineLength { get; init; }
 
-        [CommandOption("--lines|-ln")]
+        [CommandOption("--lines|-n")]
         [DefaultValue(100)]
         [Range(1, 1000)]
         public int NumberOfFakeTextLines { get; init; }

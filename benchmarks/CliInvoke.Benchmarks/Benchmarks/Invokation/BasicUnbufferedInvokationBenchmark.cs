@@ -1,7 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Order;
-using CliInvoke.Benchmarking.Data;
+﻿using CliInvoke.Benchmarking.Data;
 using CliInvoke.Benchmarking.Helpers;
 using CliInvoke.Builders;
 using CliInvoke.Core;
@@ -29,8 +26,7 @@ public class BasicUnbufferedInvokationBenchmark
     public async Task<int> CliInvoke_ProcessInvoker()
     {
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
-            _dotnetCommandHelper.DotnetExecutableTargetFilePath
-        )
+                _dotnetCommandHelper.DotnetExecutableTargetFilePath)
             .SetArguments(_dotnetCommandHelper.Arguments)
             .RedirectStandardOutput(false)
             .RedirectStandardError(false);
