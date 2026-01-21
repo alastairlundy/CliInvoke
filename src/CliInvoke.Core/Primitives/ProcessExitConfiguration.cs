@@ -14,7 +14,6 @@ namespace CliInvoke.Core;
 /// <summary>
 /// Represents configuration information about the exit behaviour of a process, including timeout policy and result validation.
 /// </summary>
-[Obsolete(DeprecationMessages.DeprecationV3)]
 public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 {
     /// <summary>
@@ -36,8 +35,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessExitConfiguration(
         ProcessTimeoutPolicy timeoutPolicy,
         ProcessResultValidation resultValidation,
-        ProcessCancellationExceptionBehavior cancellationValidation
-    )
+        ProcessCancellationExceptionBehavior cancellationValidation)
     {
         TimeoutPolicy = timeoutPolicy;
         ResultValidation = resultValidation;
