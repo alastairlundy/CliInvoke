@@ -12,7 +12,7 @@ namespace CliInvoke.Core;
 /// <summary>
 /// 
 /// </summary>
-public class ShellInformation
+public class ShellInformation : IEquatable<ShellInformation>
 {
     /// <summary>
     /// 
@@ -20,20 +20,100 @@ public class ShellInformation
     /// <param name="name"></param>
     /// <param name="targetFilePath"></param>
     /// <param name="version"></param>
-    public ShellInformation(string name, FileInfo targetFilePath,
-        Version version)
+    public ShellInformation(string name, FileInfo targetFilePath, Version version)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
-        ArgumentNullException.ThrowIfNull(version);
         
         Name = name;
         TargetFilePath = targetFilePath;
         Version = version;
     }
 
-    public string Name { get; private set; }
+    /// <summary>
+    /// Gets or sets the name.
+    /// </summary>
+    /// <remarks>
+    /// Represents a property that holds the name associated with an instance of the ShellInformation class.
+    /// </remarks>
+    public string Name { get; }
+
+    /// <summary>
+    /// Gets or sets the target file path.
+    /// </summary>
+    /// <remarks>
+    /// Represents the path of a file that is targeted by an instance of the ShellInformation class.
+    /// </remarks>
+    public FileInfo TargetFilePath { get; }
     
-    public FileInfo TargetFilePath { get; private set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public Version Version { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals(ShellInformation? other)
+    {
+        if (other is null) return false;
+        
+        return Name == other.Name && TargetFilePath.Equals(other.TargetFilePath);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) 
+            return false;
+        
+        if(obj is ShellInformation shellInformation) 
+            return Equals(shellInformation);
+
+        return false;
+    }
     
-    public Version Version { get; private set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Name, TargetFilePath);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static bool Equals(ShellInformation? left, ShellInformation? right)
+    {
+        if (left is null || right is null)
+            return false;
+        
+        return left.Equals(right);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static bool operator ==(ShellInformation? left, ShellInformation? right) => Equals(left, right);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static bool operator !=(ShellInformation? left, ShellInformation? right) => !Equals(left, right);
 }
