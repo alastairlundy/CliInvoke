@@ -140,11 +140,14 @@ public class ProcessInvoker : IProcessInvoker
             process.StartInfo.RedirectStandardInput = true;
         }
 
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
         try
         {
             bool processWasNew = process.Start();
             
-            await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
+            if(processConfiguration.RedirectStandardInput)
+                await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -214,6 +217,9 @@ public class ProcessInvoker : IProcessInvoker
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        
         try
         {
             bool processWasNew = process.Start();
