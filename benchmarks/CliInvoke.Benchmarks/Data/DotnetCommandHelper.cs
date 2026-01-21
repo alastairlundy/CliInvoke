@@ -1,6 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using AlastairLundy.WhatExecLib;
-using AlastairLundy.WhatExecLib.Detectors;
 using CliInvoke.Benchmarking.Helpers;
 using CliInvoke.Core;
 
@@ -12,9 +10,9 @@ public class DotnetCommandHelper
 
     public DotnetCommandHelper()
     {
-        PathExecutableResolver filePathResolver = new(new ExecutableFileDetector());
-
-        _dotnetFilePath = filePathResolver.ResolvePathEnvironmentExecutableFile("dotnet").FullName;
+        IFilePathResolver filePathResolver = new FilePathResolver();
+        
+        _dotnetFilePath = filePathResolver.ResolveFilePath(OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet");
     }
 
     public string DotnetExecutableTargetFilePath => _dotnetFilePath;

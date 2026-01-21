@@ -1,6 +1,3 @@
-﻿using AlastairLundy.WhatExecLib;
-using AlastairLundy.WhatExecLib.Detectors;
-using AlastairLundy.WhatExecLib.Locators;
 using CliInvoke.Core;
 using CliInvoke.Core.Builders;
 using CliInvoke.Factories;
