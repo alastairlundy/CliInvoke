@@ -1,6 +1,4 @@
-﻿using CliInvoke.Core;
-using CliInvoke.Piping;
-using DotExtensions.IO.Directories;
+﻿using DotExtensions.IO.Directories;
 using DotPrimitives.IO.Drives;
 
 #nullable enable
