@@ -15,9 +15,11 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Added ``ProcessResultValidator&lt;TProcessResult&gt;`` implementation
-* Added CancellationToken support to ``ProcessPipeHandler``
-* Updated internal Polyfill version from 9.7.2 to 9.7.3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.7.2 to 9.7.4
+* Updated DotPrimitives version from 4.1.0 to 4.2.0
+* Updated DotExtensions version from 9.3.1 to 9.4.1
+* Fixed an issue where ``FilePathResolver`` wouldn't successfully resolve executable file paths
+* Fixed an issue with ``ProcessInvoker``exit code validation logic</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

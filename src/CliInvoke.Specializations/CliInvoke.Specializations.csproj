@@ -18,8 +18,7 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 9.7.2 to 9.7.3
-* Updated to use CliInvoke.Core 2.3.0 Alpha 3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.7.2 to 9.7.4</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>

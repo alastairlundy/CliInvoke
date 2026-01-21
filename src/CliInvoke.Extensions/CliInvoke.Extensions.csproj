@@ -16,9 +16,7 @@
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Added registration of ``IProcessResultValidator&lt;TProcessResult&gt;`` in ``AddCliInvoke&lt;TProcessResult&gt;`` overload
-* Added registration of ``IProcessResultValidator&lt;ProcessResult&gt;``, ``IProcessResultValidator&lt;BufferedProcessResult&gt;``, and ``IProcessResultValidator&lt;PipedProcessResult&gt;`` in ``AddCliInvoke`` method
-* Updated to use CliInvoke.Core 2.3.0 Alpha 3 and CliInvoke 2.3.0 Alpha 3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.3.0 Beta 1 and CliInvoke 2.3.0 Beta 1</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

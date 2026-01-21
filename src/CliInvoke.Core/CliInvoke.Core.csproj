@@ -25,12 +25,10 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <Version>2.3.0-beta.1</Version>
-        <PackageReleaseNotes>* Added ``IProcessResultValidator&lt;TProcessResult&gt;`` the replacement for ``ProcessResultValidation``
-* Added ``CommonValidationRules`` static class for common Validation Rules
-* Added CancellationToken support to ``IProcessPipeHandler``
-* Changed default ProcessorAffinity in ``ProcessResourcePolicy``
-* Deprecated ``ProcessResult``'s ```WasSuccessful`` property
-* Updated internal Polyfill version from 9.7.2 to 9.7.3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.7.2 to 9.7.4
+* Un-deprecated ``ProcessExitConfiguration`` class
+* Fixed xml doc comment issues
+* Fixed an issue where an empty StandardOutput in ``BufferedProcessResult`` constructor would throw a new ArgumentException</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
