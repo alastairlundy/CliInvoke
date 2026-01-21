@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using CliInvoke.Benchmarking.Helpers;
-using CliInvoke.Core;
+﻿using CliInvoke.Core;
 
 namespace CliInvoke.Benchmarking.Data;
 
