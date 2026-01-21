@@ -1,4 +1,4 @@
-using CliInvoke.Core;
+﻿using CliInvoke.Core;
 using CliInvoke.Core.Builders;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
