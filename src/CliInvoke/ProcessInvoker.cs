@@ -87,7 +87,8 @@ public class ProcessInvoker : IProcessInvoker
 
             if (
                 processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0
+                && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
+                !=  ProcessCancellationExceptionBehavior.SuppressException
             )
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
@@ -166,7 +167,8 @@ public class ProcessInvoker : IProcessInvoker
 
             if (
                 processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0
+                && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
+                != ProcessCancellationExceptionBehavior.SuppressException
             )
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
@@ -238,7 +240,8 @@ public class ProcessInvoker : IProcessInvoker
             );
 
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0)
+                && process.ExitCode != 0 && processExitConfiguration.
+                    CancellationExceptionBehavior != ProcessCancellationExceptionBehavior.SuppressException)
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
             }
