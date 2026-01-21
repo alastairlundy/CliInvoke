@@ -8,7 +8,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>
-        <Copyright>Copyright (c) 2024-2025 Alastair Lundy</Copyright>
+        <Copyright>Copyright (c) 2024-2026 Alastair Lundy</Copyright>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
