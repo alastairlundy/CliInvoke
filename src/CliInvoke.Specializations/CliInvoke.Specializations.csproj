@@ -8,11 +8,11 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>
-        <Copyright>Copyright (c) 2024-2025 Alastair Lundy</Copyright>
+        <Copyright>Copyright (c) 2024-2026 Alastair Lundy</Copyright>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.3.0-alpha.3</PackageVersion>
+        <PackageVersion>2.3.0-beta.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -29,7 +29,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.7.3" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.7.4" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>

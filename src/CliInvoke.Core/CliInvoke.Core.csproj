@@ -7,7 +7,7 @@
         <PackageId>CliInvoke.Core</PackageId>
         <Title>CliInvoke.Core</Title>
         <Authors>Alastair Lundy</Authors>
-        <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
+        <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -24,7 +24,7 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.3.0-alpha.3</Version>
+        <Version>2.3.0-beta.1</Version>
         <PackageReleaseNotes>* Added ``IProcessResultValidator&lt;TProcessResult&gt;`` the replacement for ``ProcessResultValidation``
 * Added ``CommonValidationRules`` static class for common Validation Rules
 * Added CancellationToken support to ``IProcessPipeHandler``
@@ -35,7 +35,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.7.3" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.7.4" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
     </ItemGroup>
 

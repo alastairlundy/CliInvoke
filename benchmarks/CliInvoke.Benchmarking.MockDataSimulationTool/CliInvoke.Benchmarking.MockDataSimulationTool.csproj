@@ -13,7 +13,7 @@
     <Title>CliInvokeMockDataSim</Title>
     <Authors>Alastair Lundy</Authors>
     <Description>A Simulation tool that generates mock data for the CliInvoke Benchmarks.</Description>
-    <Copyright>Copyright (c) Alastair Lundy 2025</Copyright>
+    <Copyright>Copyright (c) Alastair Lundy 2026</Copyright>
     <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Company>Alastair Lundy</Company>

@@ -1,6 +1,6 @@
 /*
     CliInvoke.Core
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,9 +12,8 @@ using CliInvoke.Core.Internal;
 namespace CliInvoke.Core;
 
 /// <summary>
-/// Represents configuration information about the exit behavior of a process, including timeout policy and result validation.
+/// Represents configuration information about the exit behaviour of a process, including timeout policy and result validation.
 /// </summary>
-[Obsolete(DeprecationMessages.DeprecationV3)]
 public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 {
     /// <summary>
@@ -36,8 +35,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessExitConfiguration(
         ProcessTimeoutPolicy timeoutPolicy,
         ProcessResultValidation resultValidation,
-        ProcessCancellationExceptionBehavior cancellationValidation
-    )
+        ProcessCancellationExceptionBehavior cancellationValidation)
     {
         TimeoutPolicy = timeoutPolicy;
         ResultValidation = resultValidation;
