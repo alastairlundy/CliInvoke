@@ -53,17 +53,17 @@ public class EnvironmentVariablesBuilderTests
         
         list = list.DistinctBy(x => x.Key).ToList();
         
-       // Act
-       IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
-           .SetEnumerable(list);
+        // Act
+        IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
+            .SetEnumerable(list);
        
-       IReadOnlyDictionary<string, string> variables = builder.Build();
+        IReadOnlyDictionary<string, string> variables = builder.Build();
        
-       // Assert
-       foreach (KeyValuePair<string, string> pair in list)
-       {
-           Assert.Equal(pair.Value, variables[pair.Key]);
-       }
+        // Assert
+        foreach (KeyValuePair<string, string> pair in list)
+        {
+            Assert.Equal(pair.Value, variables[pair.Key]);
+        }
     }
 
     [Fact]
