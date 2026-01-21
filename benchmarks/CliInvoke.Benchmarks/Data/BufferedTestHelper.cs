@@ -1,8 +1,9 @@
 ﻿using CliInvoke.Core;
-using CliInvoke.Core.Builders;
-using CliInvoke.Factories;
 using CliInvoke.Piping;
 using DotExtensions.IO.Directories;
+using DotPrimitives.IO.Drives;
+
+#nullable enable
 
 namespace CliInvoke.Benchmarking.Data;
 
@@ -17,50 +18,19 @@ public class BufferedTestHelper
 
     private string GetMockDataSimExePath()
     {
-        IProcessInvoker processInvoker = new ProcessInvoker(new FilePathResolver(), new ProcessPipeHandler());
-
-        DirectoryInfo directoryInfo = new DirectoryInfo(Environment.CurrentDirectory)
-            .Root;
-
-        FileInfo? mockDataProjectFile = directoryInfo.SafelyEnumerateFiles("CliInvoke.Benchmarking.MockDataSimulationTool.csproj",
-                SearchOption.AllDirectories)
+        string mockDataToolExe = OperatingSystem.IsWindows() ? "CliInvokeMockDataSimTool.exe" : "CliInvokeMockDataSimTool";
+        
+        FileInfo? executable = StorageDrives.Shared.EnumeratePhysicalDrives()
+            .Where(d => d.IsReady)
+            .Select(d => d.RootDirectory)
+            .SelectMany(d =>
+                d.SafelyEnumerateFiles(mockDataToolExe, SearchOption.AllDirectories))
             .FirstOrDefault();
-        
-        ProcessConfigurationFactory processConfigurationFactory = new();
 
-        if (mockDataProjectFile is not null)
-        {
-            using ProcessConfiguration buildConfig =
-                new ProcessConfiguration(OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet",
-                    false, true,
-                    true,
-                    "build -c Release", mockDataProjectFile.Directory?.FullName);
+        if (executable is not null)
+            return executable.FullName;
 
-            Task<BufferedProcessResult> resultTask = processInvoker.ExecuteBufferedAsync(buildConfig, 
-                ProcessExitConfiguration.DefaultNoException,
-                false, CancellationToken.None);
-
-            resultTask.Wait();
-        }
-        
-        string whichOrWhere = OperatingSystem.IsWindows() ? "where.exe" : "which";
-        
-        string mockDataExe = OperatingSystem.IsWindows() ? "CliInvokeMockDataSimTool.exe" : "CliInvokeMockDataSimTool";
-        
-        using ProcessConfiguration configuration = processConfigurationFactory.Create(whichOrWhere,
-            mockDataExe);
-        
-        Task<BufferedProcessResult> task = processInvoker.ExecuteBufferedAsync(configuration, ProcessExitConfiguration.DefaultNoException,
-            false, CancellationToken.None);
-        
-        task.Wait();
-        
-        if (task.Result.ExitCode != 0)
-        {
-            throw new ArgumentException("CliInvoke Mock Data Simulation Tool could not be found.");
-        }
-
-        return task.Result.StandardOutput.Split(Environment.NewLine).First();
+        throw new ArgumentException("Could not find CliInvoke Mock Data Sim Tool executable");
     }
 
     public string TargetFilePath
