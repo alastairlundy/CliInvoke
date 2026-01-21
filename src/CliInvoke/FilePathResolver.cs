@@ -112,7 +112,7 @@ public class FilePathResolver : IFilePathResolver
                 foreach (string pathExtension in pathExtensions)
                 {
                     string filePath =
-                        Path.Combine(pathEntry, $"{filePathToResolve}{pathExtension}");
+                        Path.Combine(pathEntry, $"{filePathToResolve}{pathExtension.ToLower()}");
 
                     if (File.Exists(filePath))
                     {
