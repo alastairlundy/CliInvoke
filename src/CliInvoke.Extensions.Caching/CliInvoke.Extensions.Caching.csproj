@@ -11,7 +11,7 @@
         <Authors>AlastairLundy</Authors>
         <PackageReleaseNotes>Initial release of caching extension. Released as version 2.3 to match with CliInvoke</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <Copyright>Copyright (c) Alastair Lundy 2025</Copyright>
+        <Copyright>Copyright (c) Alastair Lundy 2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

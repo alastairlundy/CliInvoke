@@ -7,7 +7,7 @@
         <PackageId>CliInvoke.Core</PackageId>
         <Title>CliInvoke.Core</Title>
         <Authors>Alastair Lundy</Authors>
-        <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
+        <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

@@ -10,7 +10,7 @@
         <Title>CliInvoke</Title>
         <Authors>AlastairLundy</Authors>
         <Description>CliInvoke is a .NET Library for interacting with Command Line Interfaces, CliInvoke is a library for interacting with Command Line Interfaces and wrapping around executables.</Description>
-        <Copyright>Copyright (c) Alastair Lundy 2024-2025</Copyright>
+        <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
