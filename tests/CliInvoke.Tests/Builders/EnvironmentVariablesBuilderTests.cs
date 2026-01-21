@@ -108,7 +108,7 @@ public class EnvironmentVariablesBuilderTests
         while (dictionary.Count < number)
         {
             if (stopwatch.ElapsedMilliseconds / 1000 > 10)
-                throw new Exception("Took to long to generate test data");
+                throw new Exception("Took too long to generate test data");
             
             string key = _faker.Database.Column();
             string value = _faker.Random.Word();
