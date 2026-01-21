@@ -24,7 +24,7 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.3.0-alpha.3</Version>
+        <Version>2.3.0-beta.1</Version>
         <PackageReleaseNotes>* Added ``IProcessResultValidator&lt;TProcessResult&gt;`` the replacement for ``ProcessResultValidation``
 * Added ``CommonValidationRules`` static class for common Validation Rules
 * Added CancellationToken support to ``IProcessPipeHandler``
