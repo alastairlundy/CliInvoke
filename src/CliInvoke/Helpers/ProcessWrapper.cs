@@ -17,7 +17,7 @@ internal class ProcessWrapper : Process
     {
         Exited += OnExited;
         Started += OnStarted;
-
+        StartInfo = new ProcessStartInfo();
         HasStarted = false;
         ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
     }
@@ -54,8 +54,15 @@ internal class ProcessWrapper : Process
 
     internal new DateTime ExitTime { get; private set; }
 
+    internal new string ProcessName { get; private set; }
+    
+    internal new int Id { get; private set; }
+    
+    internal new ProcessStartInfo  StartInfo { get; init; }
+    
     public new bool Start()
     {
+        base.StartInfo = StartInfo;
         bool result = base.Start();
 
         HasStarted = result;
@@ -64,6 +71,8 @@ internal class ProcessWrapper : Process
         {
             StartTime = DateTime.UtcNow;
             Started?.Invoke(this, EventArgs.Empty);
+            ProcessName = StartInfo.FileName;
+            Id = base.Id;
         }
 
         return result;

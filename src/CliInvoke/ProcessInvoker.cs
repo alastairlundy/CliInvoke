@@ -112,7 +112,7 @@ public class ProcessInvoker : IProcessInvoker
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
 
             ProcessResult result = new(
-                process.StartInfo.FileName,
+                process.ProcessName,
                 process.ExitCode,
                 process.StartTime,
                 process.ExitTime
@@ -227,7 +227,7 @@ public class ProcessInvoker : IProcessInvoker
             await Task.WhenAll(standardOut, standardError, waitForExit);
 
             BufferedProcessResult result = new(
-                process.StartInfo.FileName,
+                process.ProcessName,
                 process.ExitCode,
                 await standardOut,
                 await standardError,
@@ -340,7 +340,7 @@ public class ProcessInvoker : IProcessInvoker
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
             PipedProcessResult result = new(
-                process.StartInfo.FileName,
+                process.ProcessName,
                 process.ExitCode,
                 process.StartTime,
                 process.ExitTime,
