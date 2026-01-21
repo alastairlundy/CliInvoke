@@ -9,7 +9,7 @@ using CliWrap.Buffered;
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 [SimpleJob(RuntimeMoniker.Net90)]
-[SimpleJob(RuntimeMoniker.Mono10_0)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser(true), Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BufferedInvokationBenchmark
 {
