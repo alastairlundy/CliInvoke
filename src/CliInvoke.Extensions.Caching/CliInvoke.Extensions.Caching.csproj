@@ -30,7 +30,7 @@
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
         <PackageReference Include="Polyfill" Condition="'$(TargetFramework)' == 'netstandard2.0'"
-                          Version="9.7.4" PrivateAssets="all"/>
+                          Version="9.7.5" PrivateAssets="all"/>
 </ItemGroup>
 
 
