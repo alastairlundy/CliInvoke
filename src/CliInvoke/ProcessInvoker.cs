@@ -80,7 +80,6 @@ public class ProcessInvoker : IProcessInvoker
 
             ProcessResult result = new(
                 process.ProcessName,
-                process.ExitCode,
                 process.ExitCode, process.Id,
                 process.StartTime,
                 process.ExitTime
