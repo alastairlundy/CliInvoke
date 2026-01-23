@@ -10,9 +10,11 @@
 namespace CliInvoke.Core.Validation;
 
 /// <summary>
-/// 
+/// Represents a validator interface for process results. It defines methods to obtain validation rules and validate a given process result.
 /// </summary>
-/// <typeparam name="TProcessResult"></typeparam>
+/// <typeparam name="TProcessResult">
+/// The type of the process result being validated, which must inherit from the 'ProcessResult' class.
+/// </typeparam>
 public interface IProcessResultValidator<in TProcessResult> where TProcessResult : ProcessResult
 {
     /// <summary>
