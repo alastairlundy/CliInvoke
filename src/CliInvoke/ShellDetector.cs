@@ -53,7 +53,7 @@ public class ShellDetector : IShellDetector
         
         return await ResolveDefaultShellOnWindowsAsync(cancellationToken);
     }
-
+    
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
@@ -90,6 +90,7 @@ public class ShellDetector : IShellDetector
             new FileInfo(shellExe), shellVersion);
     }
 
+    [SupportedOSPlatform("windows")]
     private async Task<ShellInformation> ResolveDefaultShellOnWindowsAsync(
         CancellationToken cancellationToken = default)
     {
