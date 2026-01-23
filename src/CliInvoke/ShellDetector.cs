@@ -16,12 +16,18 @@ using DotExtensions.Versions;
 
 namespace CliInvoke;
 
+/// <summary>
+/// Represents a detector for resolving the default shell on various operating systems.
+/// </summary>
 public class ShellDetector : IShellDetector
 {
     private readonly IProcessInvoker _processInvoker;
     private readonly IFilePathResolver _filePathResolver;
     private readonly IProcessConfigurationFactory _processConfigurationFactory;
 
+    /// <summary>
+    /// Represents a detector for resolving the default shell on various operating systems.
+    /// </summary>
     public ShellDetector(IProcessInvoker processInvoker,
         IFilePathResolver filePathResolver,
         IProcessConfigurationFactory processConfigurationFactory)
@@ -30,7 +36,12 @@ public class ShellDetector : IShellDetector
         _filePathResolver = filePathResolver;
         _processConfigurationFactory = processConfigurationFactory;
     }
-    
+
+    /// <summary>
+    /// Resolves the default shell asynchronously on supported operating systems.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation.</param>
+    /// <returns>A task representing the asynchronous operation, returning a ShellInformation object with details about the detected shell.</returns>
     [UnsupportedOSPlatform("IOS")]
     [UnsupportedOSPlatform("tvOS")]
     [UnsupportedOSPlatform("browser")]
