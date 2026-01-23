@@ -48,6 +48,7 @@ public static partial class DependencyInjectionExtensions
                 services.AddSingleton<IProcessInvoker, ProcessInvoker>();
                 
                 services.AddSingleton<IRunnerProcessFactory, RunnerProcessFactory>();
+                services.AddSingleton<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
@@ -64,6 +65,7 @@ public static partial class DependencyInjectionExtensions
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
 
                 services.AddScoped<IRunnerProcessFactory, RunnerProcessFactory>();
+                services.AddScoped<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Transient:
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
@@ -80,6 +82,7 @@ public static partial class DependencyInjectionExtensions
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
 
                 services.AddTransient<IRunnerProcessFactory, RunnerProcessFactory>();
+                services.AddTransient<IShellDetector, ShellDetector>();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(lifetime),
