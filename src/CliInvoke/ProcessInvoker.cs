@@ -89,7 +89,7 @@ public class ProcessInvoker : IProcessInvoker
                 && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
                 !=  ProcessCancellationExceptionBehavior.SuppressException)
             {
-                ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
 
             return result;
@@ -173,7 +173,7 @@ public class ProcessInvoker : IProcessInvoker
                 != ProcessCancellationExceptionBehavior.SuppressException
             )
             {
-                ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
 
             DisposeCompletedStreams(standardOut, standardError);
@@ -249,7 +249,7 @@ public class ProcessInvoker : IProcessInvoker
                 && process.ExitCode != 0 && processExitConfiguration.
                     CancellationExceptionBehavior != ProcessCancellationExceptionBehavior.SuppressException)
             {
-                ThrowProcessNotSuccessfulException(result, processConfiguration, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
             
             DisposeCompletedStreams(standardOutput, standardError);
@@ -282,16 +282,10 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     private static void ThrowProcessNotSuccessfulException(ProcessResult result,
-        ProcessConfiguration configuration,
-        ProcessWrapper process,
-        bool processWasNew)
+        ProcessConfiguration configuration)
     {
         throw new ProcessNotSuccessfulException(
-            new ProcessExceptionInfo(result, configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
-                    configuration.RedirectStandardError), process.Id, process.ProcessName,
-                processWasNew, process.ResourcePolicy,
-                new UserCredential((string?)process.StartInfo.Domain, (string?)process.StartInfo.UserName, 
-                    process.StartInfo.Password, process.StartInfo.LoadUserProfile))
+            new ProcessExceptionInfo(result, configuration)
         );
     }
 

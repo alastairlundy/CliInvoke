@@ -18,26 +18,19 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     /// 
     /// </summary>
     /// <param name="result"></param>
-    /// <param name="startInfo"></param>
-    /// <param name="processId"></param>
-    /// <param name="processName"></param>
-    /// <param name="processWasNew"></param>
-    /// <param name="processResourcePolicy"></param>
-    /// <param name="credential"></param>
-    public ProcessExceptionInfo(ProcessResult result, ProcessStartInfo startInfo, int processId, string processName, bool processWasNew, 
-        ProcessResourcePolicy processResourcePolicy, UserCredential? credential = null)
+    /// <param name="configuration"></param>
+    public ProcessExceptionInfo(ProcessResult result, ProcessConfiguration configuration)
     {
         Result = result;
-        Id = processId;
-        ProcessName = processName;
-        ProcessWasNew = processWasNew;
-        ResourcePolicy = processResourcePolicy;
-        Credential = credential;
-        StartInfo = startInfo;
+        Id = result.ProcessId;
+        ProcessName = result.ExecutedFilePath;
+        ResourcePolicy = configuration.ResourcePolicy;
+        Credential = configuration.Credential;
+        Configuration = configuration;
         
-        ArgumentsConflict = startInfo.UseShellExecute && (startInfo.RedirectStandardOutput ||
-                                                          startInfo.RedirectStandardError || 
-                                                          startInfo.RedirectStandardInput);
+        ArgumentsConflict = configuration.UseShellExecution && (configuration.RedirectStandardOutput || 
+                                                                configuration.RedirectStandardError ||
+                                                                configuration.RedirectStandardInput);
     }
 
     /// <summary>
@@ -51,7 +44,7 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     /// This includes details such as the file name, arguments, and other properties related
     /// to the process initialization.
     /// </summary>
-    public ProcessStartInfo StartInfo { get; }
+    public ProcessConfiguration Configuration { get; }
 
     /// <summary>
     /// Represents the unique identifier of the process associated with the exception.
@@ -59,13 +52,6 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     /// when the process was initiated.
     /// </summary>
     public int Id { get; }
-
-    /// <summary>
-    /// Indicates whether the associated process was newly created during execution.
-    /// This property is used to determine if the process is a fresh instance
-    /// as opposed to an existing one.
-    /// </summary>
-    public bool ProcessWasNew { get; }
 
     /// <summary>
     /// Indicates whether there is a conflict between the configured process start options.
@@ -109,7 +95,7 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         return Result.Equals(other.Result) &&
-               Id == other.Id && ProcessWasNew == other.ProcessWasNew &&
+               Id == other.Id &&
                ArgumentsConflict == other.ArgumentsConflict &&
                ProcessName == other.ProcessName &&
                ResourcePolicy.Equals(other.ResourcePolicy) &&
@@ -137,7 +123,7 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     /// <returns>An integer that represents the hash code of the current instance.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine(Result, Id, ProcessWasNew, ArgumentsConflict, ProcessName, ResourcePolicy, Credential);
+        return HashCode.Combine(Result, Id, ArgumentsConflict, ProcessName, ResourcePolicy, Credential);
     }
 
     /// <summary>

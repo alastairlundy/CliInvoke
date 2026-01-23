@@ -57,7 +57,7 @@ public sealed class ProcessNotSuccessfulException : Exception
     {
         ExecutedProcess = process;
 
-        Source = ExecutedProcess.StartInfo.FileName;
+        Source = ExecutedProcess.Configuration.TargetFilePath;
 #pragma warning disable CS0618 // Type or member is obsolete
         ExitCode = process.Result.ExitCode;
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -73,13 +73,13 @@ public sealed class ProcessNotSuccessfulException : Exception
         : base(
             Resources.Exceptions_ProcessNotSuccessful_Specific.Replace(
                 "{y}",
-                exitCode.ToString().Replace("{x}", process.StartInfo.FileName)
+                exitCode.ToString().Replace("{x}", process.Configuration.TargetFilePath)
             )
         )
     {
         ExecutedProcess = process;
 
-        Source = ExecutedProcess.StartInfo.FileName;
+        Source = ExecutedProcess.Configuration.TargetFilePath;
         ExitCode = exitCode;
     }
 }
