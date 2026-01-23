@@ -58,7 +58,8 @@ internal static class ProcessCancellationExtensions
             }
         }
 
-        private async Task WaitForExitNoTimeoutAsync(ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken = default)
+        private async Task WaitForExitNoTimeoutAsync(ProcessCancellationExceptionBehavior cancellationExceptionBehavior,
+            CancellationToken cancellationToken = default)
         {
             try
             {
@@ -66,10 +67,8 @@ internal static class ProcessCancellationExtensions
             }
             catch (TaskCanceledException)
             {
-                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
-                {
-                    throw;
-                }
+                await process.WaitForExitOrGracefulTimeoutAsync(TimeSpan.Zero, cancellationExceptionBehavior,
+                    cancellationToken, fallbackToForceful:true);
             }
             catch (Exception)
             {
