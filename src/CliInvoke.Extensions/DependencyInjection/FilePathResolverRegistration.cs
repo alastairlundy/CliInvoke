@@ -37,6 +37,8 @@ public static class FilePathResolverRegistration
             ServiceLifetime serviceLifetime)
             where TResolver : class, IFilePathResolver
         {
+            services.RemoveAll<IFilePathResolver>();
+            
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Singleton:
