@@ -1,14 +1,13 @@
 ﻿/*
     CliInvoke.Core
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable MemberCanBePrivate.Global
+using CliInvoke.Core.Validation;
 
 namespace CliInvoke.Exceptions;
 
@@ -26,6 +25,7 @@ public sealed class ProcessNotSuccessfulException : Exception
     /// The exit code of the Command that was executed.
     /// </summary>
     [Obsolete("This property is deprecated and will be removed in a future version.")]
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public int ExitCode { get; private set; }
     
     /// <summary>
@@ -35,8 +35,7 @@ public sealed class ProcessNotSuccessfulException : Exception
     [Obsolete("This constructor overload is deprecated and will be removed in a future version.")]
     public ProcessNotSuccessfulException(int exitCode)
         : base(
-            Resources.Exceptions_ProcessNotSuccessful_Generic.Replace("{x}", exitCode.ToString())
-        )
+            Resources.Exceptions_ProcessNotSuccessful_Generic.Replace("{x}", exitCode.ToString()))
     {
         ExitCode = exitCode;
 
@@ -50,14 +49,14 @@ public sealed class ProcessNotSuccessfulException : Exception
     public ProcessNotSuccessfulException(ProcessExceptionInfo process)
         : base(
             Resources.Exceptions_ProcessNotSuccessful_Specific.Replace(
-                "{y}",
-                process.Result.ExitCode.ToString().Replace("{x}", process.StartInfo.FileName)
-            )
+                    "{x}",
+                    process.Result.ExecutedFilePath)
+                .Replace("{y}", process.Result.ExitCode.ToString())
         )
     {
         ExecutedProcess = process;
 
-        Source = ExecutedProcess.StartInfo.FileName;
+        Source = ExecutedProcess.Configuration.TargetFilePath;
 #pragma warning disable CS0618 // Type or member is obsolete
         ExitCode = process.Result.ExitCode;
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -73,13 +72,30 @@ public sealed class ProcessNotSuccessfulException : Exception
         : base(
             Resources.Exceptions_ProcessNotSuccessful_Specific.Replace(
                 "{y}",
-                exitCode.ToString().Replace("{x}", process.StartInfo.FileName)
+                exitCode.ToString().Replace("{x}", process.Configuration.TargetFilePath)
             )
         )
     {
         ExecutedProcess = process;
 
-        Source = ExecutedProcess.StartInfo.FileName;
+        Source = ExecutedProcess.Configuration.TargetFilePath;
         ExitCode = exitCode;
+    }
+
+    /// <summary>
+    /// Throws an exception if a process execution is unsuccessful.
+    /// </summary>
+    /// <param name="resultValidator">The validator used to validate the executed process result.</param>
+    /// <param name="result">The result of the executed process.</param>
+    /// <param name="configuration">The configuration for executing the process.</param>
+    /// <exception cref="ProcessNotSuccessfulException">Thrown when the process execution is unsuccessful.</exception>
+    public static void ThrowIfNotSuccessful<TProcessResult>(
+        IProcessResultValidator<TProcessResult> resultValidator, TProcessResult result,
+        ProcessConfiguration configuration)
+        where TProcessResult : ProcessResult
+    {
+        if (!resultValidator.Validate(result))
+            throw new ProcessNotSuccessfulException(
+                new ProcessExceptionInfo(result, configuration));
     }
 }

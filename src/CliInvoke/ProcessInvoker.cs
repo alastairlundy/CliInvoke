@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -79,18 +79,17 @@ public class ProcessInvoker : IProcessInvoker
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
 
             ProcessResult result = new(
-                process.StartInfo.FileName,
-                process.ExitCode,
+                process.ProcessName,
+                process.ExitCode, process.Id,
                 process.StartTime,
                 process.ExitTime
             );
 
-            if (
-                processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0
-            )
+            if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
+                && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
+                !=  ProcessCancellationExceptionBehavior.SuppressException)
             {
-                ThrowProcessNotSuccessfulException(result, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
 
             return result;
@@ -139,11 +138,14 @@ public class ProcessInvoker : IProcessInvoker
             process.StartInfo.RedirectStandardInput = true;
         }
 
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
         try
         {
             bool processWasNew = process.Start();
             
-            await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
+            if(processConfiguration.RedirectStandardInput)
+                await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -156,8 +158,9 @@ public class ProcessInvoker : IProcessInvoker
             await Task.WhenAll(standardOut, standardError, waitForExit);
 
             BufferedProcessResult result = new(
-                process.StartInfo.FileName,
+                process.ProcessName,
                 process.ExitCode,
+                process.Id,
                 await standardOut,
                 await standardError,
                 process.StartTime,
@@ -166,10 +169,11 @@ public class ProcessInvoker : IProcessInvoker
 
             if (
                 processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0
+                && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
+                != ProcessCancellationExceptionBehavior.SuppressException
             )
             {
-                ThrowProcessNotSuccessfulException(result, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
 
             DisposeCompletedStreams(standardOut, standardError);
@@ -212,6 +216,9 @@ public class ProcessInvoker : IProcessInvoker
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        
         try
         {
             bool processWasNew = process.Start();
@@ -229,8 +236,9 @@ public class ProcessInvoker : IProcessInvoker
             await Task.WhenAll(standardOutput, standardError, waitForExit);
 
             PipedProcessResult result = new(
-                process.StartInfo.FileName,
+                process.ProcessName,
                 process.ExitCode,
+                process.Id,
                 process.StartTime,
                 process.ExitTime,
                 await standardOutput,
@@ -238,9 +246,10 @@ public class ProcessInvoker : IProcessInvoker
             );
 
             if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0)
+                && process.ExitCode != 0 && processExitConfiguration.
+                    CancellationExceptionBehavior != ProcessCancellationExceptionBehavior.SuppressException)
             {
-                ThrowProcessNotSuccessfulException(result, process, processWasNew);
+                ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
             
             DisposeCompletedStreams(standardOutput, standardError);
@@ -273,14 +282,10 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     private static void ThrowProcessNotSuccessfulException(ProcessResult result,
-        ProcessWrapper process,
-        bool processWasNew)
+        ProcessConfiguration configuration)
     {
         throw new ProcessNotSuccessfulException(
-            new ProcessExceptionInfo(result, process.StartInfo, process.Id, process.ProcessName,
-                processWasNew, process.ResourcePolicy,
-                new UserCredential((string?)process.StartInfo.Domain, (string?)process.StartInfo.UserName, 
-                    process.StartInfo.Password, process.StartInfo.LoadUserProfile))
+            new ProcessExceptionInfo(result, configuration)
         );
     }
 

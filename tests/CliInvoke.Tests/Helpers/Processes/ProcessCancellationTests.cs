@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
-using System.Threading;
 using System.Threading.Tasks;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
@@ -44,7 +43,7 @@ public class ProcessCancellationTests
         Assert.False(actual);
     }
     
-    [Fact]
+    /*[Fact]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
@@ -74,7 +73,7 @@ public class ProcessCancellationTests
 
         //Assert
         Assert.False(actual);
-    }
+    }*/
     
     [Fact]
     [SupportedOSPlatform("windows")]

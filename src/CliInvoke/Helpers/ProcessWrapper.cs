@@ -1,6 +1,6 @@
 /*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -57,6 +57,10 @@ internal class ProcessWrapper : Process
     internal new DateTime StartTime { get; private set; }
 
     internal new DateTime ExitTime { get; private set; }
+    
+    internal new int Id {get; private set; }
+    
+    internal new string ProcessName {get; private set; }
 
     public new bool Start()
     {
@@ -68,6 +72,8 @@ internal class ProcessWrapper : Process
         {
             StartTime = DateTime.UtcNow;
             Started?.Invoke(this, EventArgs.Empty);
+            Id = base.Id;
+            ProcessName = base.ProcessName;
         }
 
         return result;

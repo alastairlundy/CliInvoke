@@ -1,11 +1,13 @@
 /*
     CliInvoke.Core
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
+
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Core;
 
@@ -16,6 +18,7 @@ namespace CliInvoke.Core;
 ///  <para> Consumers should not depend on concrete implementations. </para>
 ///  <para><b>Note for Implementers:</b> Implementations should return a valid file path or throw <see cref="System.IO.FileNotFoundException"/> if resolution fails.</para>
 /// </remarks>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public interface IFilePathResolver
 {
     /// <summary>
@@ -23,5 +26,6 @@ public interface IFilePathResolver
     /// </summary>
     /// <param name="filePathToResolve">The file path to resolve.</param>
     /// <returns>The resolved file path if successful, otherwise throws a FileNotFoundException.</returns>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     string ResolveFilePath(string filePathToResolve);
 }

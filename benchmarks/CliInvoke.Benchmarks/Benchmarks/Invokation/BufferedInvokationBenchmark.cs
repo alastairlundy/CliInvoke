@@ -1,103 +1,77 @@
-﻿using System.Diagnostics;
-
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Order;
-using CliInvoke.Benchmarking.Data;
+﻿using CliInvoke.Benchmarking.Data;
 using CliInvoke.Benchmarking.Helpers;
+using CliInvoke.Builders;
 using CliInvoke.Core;
-
+using CliInvoke.Core.Builders;
 using CliWrap;
 using CliWrap.Buffered;
-using Cysharp.Diagnostics;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
+[SimpleJob(RuntimeMoniker.Net90)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser(true), Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BufferedInvokationBenchmark
 {
     private readonly IProcessInvoker _processInvoker;
 
-    private BufferedTestHelper _bufferedTestHelper;
+    private readonly BufferedTestHelper _bufferedTestHelper;
 
     public BufferedInvokationBenchmark()
     {
-        _bufferedTestHelper = new BufferedTestHelper();
         _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
-    }
-
-    /*[Benchmark]
-    public async Task<(string standardOutput, string standardError)> CliInvoke_ProcessFactory()
-    {
-        ProcessConfiguration processConfiguration =
-#pragma warning disable CA1416
-            new ProcessConfiguration(_bufferedTestHelper.TargetFilePath, _bufferedTestHelper.Arguments,
-                commandResultValidation: ProcessResultValidation.ExitCodeZero);
-#pragma warning restore CA1416
-
-#pragma warning disable CA1416
-        ProcessStartInfo startInfo = processConfiguration.ToProcessStartInfo();
-#pragma warning restore CA1416
-        
-        startInfo.RedirectStandardOutput = true;
-        startInfo.RedirectStandardError = true;
-
-        Process process = _processFactory.StartNew(startInfo);
-       
-        BufferedProcessResult result = await _processFactory.ContinueWhenExitBufferedAsync(process);
-      
-        return (result.StandardOutput, result.StandardError);
-    }
-    
-    [Benchmark(Baseline = true)]
-    public async Task<(string standardOutput, string standardError)> CliInvoke_CliCommandInvoker()
-    {
-        ICliCommandConfigurationBuilder commandConfigurationBuilder = new
-                CliCommandConfigurationBuilder(_bufferedTestHelper.TargetFilePath)
-            .WithArguments(_bufferedTestHelper.Arguments)
-            .WithValidation(ProcessResultValidation.ExitCodeZero);
-        
-        CliCommandConfiguration configuration = commandConfigurationBuilder.Build();
-
-        BufferedProcessResult result = await _cliCommandInvoker.ExecuteBufferedAsync(configuration);
-
-        return (result.StandardOutput, result.StandardError);
+        _bufferedTestHelper = new BufferedTestHelper();
     }
     
     [Benchmark]
-    public async Task<(string standardOutput, string standardError)> CliWrap()
+    public async Task<string> CliInvoke_ProcessInvoker()
+    {
+        IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
+                _bufferedTestHelper.TargetFilePath)
+            .SetArguments(_bufferedTestHelper.Arguments)
+            .RedirectStandardOutput(false)
+            .RedirectStandardError(false);
+
+        ProcessConfiguration configuration = processConfigurationBuilder.Build();
+
+        BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(configuration);
+
+        return result.StandardOutput;
+    }
+    
+    [Benchmark]
+    public async Task<string> CliWrap()
     {
         BufferedCommandResult result = await Cli.Wrap(_bufferedTestHelper.TargetFilePath)
             .WithArguments(_bufferedTestHelper.Arguments)
-            .WithValidation(global::CliWrap.CommandResultValidation.ZeroExitCode)
+            .WithValidation(CommandResultValidation.ZeroExitCode)
             .ExecuteBufferedAsync();
-      
-        return (result.StandardOutput, result.StandardError);
+
+        return result.StandardOutput;
     }
     
     [Benchmark]
-    public async Task<(string standardOutput, string standardError)> MedallionShell()
+    public async Task<string> MedallionShell()
     {
-        Medallion.Shell.CommandResult result = await Medallion.Shell.Command.Run(_bufferedTestHelper.TargetFilePath, _bufferedTestHelper.Arguments).Task;
-        
-        return (result.StandardOutput, result.StandardError);
+        Medallion.Shell.CommandResult result = await Medallion
+            .Shell.Command.Run(
+                _bufferedTestHelper.TargetFilePath,
+                _bufferedTestHelper.Arguments
+            )
+            .Task;
+
+        return result.StandardOutput;
     }
     
     [Benchmark]
-    public async Task<(string standardOut, string standardError)> ProcessX()
+    public async Task<string> SimpleExec()
     {
-        (Process process,
-            ProcessAsyncEnumerable stdOut,
-            ProcessAsyncEnumerable stdError) result =
-            Cysharp.Diagnostics.ProcessX.GetDualAsyncEnumerable($"{_bufferedTestHelper.TargetFilePath} {_bufferedTestHelper.Arguments}");
+        (string StandardOutput, string StandardError) result = await global::SimpleExec.Command.ReadAsync(
+            _bufferedTestHelper.TargetFilePath,
+            _bufferedTestHelper.Arguments,
+            handleExitCode: code => code == 0
+        );
 
-        Task<string[]> standardOutTask = result.stdOut.ToTask();
-        Task<string[]> standardErrorTask = result.stdError.ToTask();
-
-        await Task.WhenAll([standardOutTask, standardErrorTask]);
-        
-        string standardOut = string.Join(Environment.NewLine, standardOutTask.Result);
-        string standardError = string.Join(Environment.NewLine, standardErrorTask.Result);
-        
-        return (standardOut, standardError);
-    }*/
+        return result.StandardOutput;
+    }
 }
