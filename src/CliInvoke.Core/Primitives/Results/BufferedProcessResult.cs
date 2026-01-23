@@ -25,6 +25,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
+    /// <param name="processId"></param>
     /// <param name="standardOutput">The process' standard output as a string.</param>
     /// <param name="standardError">The process' standard error as a string.</param>
     /// <param name="startTime">The start time of the process.</param>
@@ -32,12 +33,13 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public BufferedProcessResult(
         string executableFilePath,
         int exitCode,
+        int processId,
         string standardOutput,
         string standardError,
         DateTime startTime,
         DateTime exitTime
     )
-        : base(executableFilePath, exitCode, startTime, exitTime)
+        : base(executableFilePath, exitCode, processId, startTime, exitTime)
     {
         ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
         ArgumentNullException.ThrowIfNull(standardOutput);

@@ -28,11 +28,13 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
+    /// <param name="processId"></param>
     /// <param name="startTime">The start time of the process.</param>
     /// <param name="exitTime">The exit time of the process.</param>
     public ProcessResult(
         string executableFilePath,
         int exitCode,
+        int processId,
         DateTime startTime,
         DateTime exitTime
     )
@@ -41,6 +43,7 @@ public class ProcessResult : IEquatable<ProcessResult>
         ExecutedFilePath = executableFilePath;
         StartTime = startTime;
         ExitTime = exitTime;
+        ProcessId = processId;
     }
 
     /// <summary>
@@ -48,6 +51,11 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// </summary>
     [Obsolete(DeprecationMessages.DeprecationV3)]
     public bool WasSuccessful => ExitCode == 0;
+
+    /// <summary>
+    /// The unique identifier assigned to the process when it was executed.
+    /// </summary>
+    public int ProcessId { get; }
 
     /// <summary>
     /// The exit code from the Command that was executed.
@@ -88,6 +96,7 @@ public class ProcessResult : IEquatable<ProcessResult>
 
         return ExitCode == other.ExitCode
                && ExecutedFilePath == other.ExecutedFilePath
+               && ProcessId == other.ProcessId
                && StartTime == other.StartTime
                && ExitTime == other.ExitTime;
     }

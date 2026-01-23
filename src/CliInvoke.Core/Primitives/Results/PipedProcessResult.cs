@@ -46,12 +46,13 @@ public class PipedProcessResult
     public PipedProcessResult(
         string executableFilePath,
         int exitCode,
+        int processId,
         DateTime startTime,
         DateTime exitTime,
         Stream standardOutput,
         Stream standardError
     )
-        : base(executableFilePath, exitCode, startTime, exitTime)
+        : base(executableFilePath, exitCode, processId, startTime, exitTime)
     {
         ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
         

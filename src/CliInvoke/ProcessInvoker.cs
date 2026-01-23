@@ -81,6 +81,7 @@ public class ProcessInvoker : IProcessInvoker
             ProcessResult result = new(
                 process.ProcessName,
                 process.ExitCode,
+                process.ExitCode, process.Id,
                 process.StartTime,
                 process.ExitTime
             );
@@ -160,6 +161,7 @@ public class ProcessInvoker : IProcessInvoker
             BufferedProcessResult result = new(
                 process.ProcessName,
                 process.ExitCode,
+                process.Id,
                 await standardOut,
                 await standardError,
                 process.StartTime,
@@ -237,6 +239,7 @@ public class ProcessInvoker : IProcessInvoker
             PipedProcessResult result = new(
                 process.ProcessName,
                 process.ExitCode,
+                process.Id,
                 process.StartTime,
                 process.ExitTime,
                 await standardOutput,
