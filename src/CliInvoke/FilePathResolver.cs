@@ -10,6 +10,8 @@
 using System.Linq;
 using System.Text;
 
+using CliInvoke.Internal;
+
 using DotExtensions.IO.Directories;
 using DotExtensions.IO.Permissions;
 
@@ -20,6 +22,7 @@ namespace CliInvoke;
 /// <summary>
 /// An implementation of IFilePathResolver, a service that resolves file paths.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class FilePathResolver : IFilePathResolver
 {
     /// <summary>
@@ -37,6 +40,7 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public string ResolveFilePath(string filePathToResolve)
     {
         ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
