@@ -42,8 +42,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     protected RunnerProcessInvokerBase(
         IProcessInvoker processInvoker,
         IRunnerProcessFactory runnerProcessFactory,
-        ProcessConfiguration runnerProcessConfiguration
-    )
+        ProcessConfiguration runnerProcessConfiguration)
     {
         _processInvoker = processInvoker;
         _runnerProcessFactory = runnerProcessFactory;
@@ -66,8 +65,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = true,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
             processConfiguration,
@@ -98,8 +96,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = true,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
             processConfiguration,
@@ -130,8 +127,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = true,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
             processConfiguration,
