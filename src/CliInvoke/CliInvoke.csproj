@@ -92,6 +92,6 @@
     
     <ItemGroup>
       <PackageReference Include="DotExtensions" Version="9.5.0" />
-      <PackageReference Include="DotPrimitives" Version="4.3.0" />
+      <PackageReference Include="DotPrimitives" Version="4.3.1" />
     </ItemGroup>
 </Project>
