@@ -60,12 +60,12 @@ public class ExternalProcess : IDisposable
     }
 
     /// <summary>
-    /// 
+    /// Represents the configuration settings used by an external process.
     /// </summary>
     public ProcessConfiguration Configuration { get; set; }
 
     /// <summary>
-    /// 
+    /// Represents the configuration for handling external process exit.
     /// </summary>
     public ProcessExitConfiguration ExitConfiguration { get; set; }
 
@@ -78,20 +78,24 @@ public class ExternalProcess : IDisposable
     /// Indicates whether the external process has started.
     /// </summary>
     public bool HasStarted => _processWrapper.HasStarted;
-    
+
     /// <summary>
-    /// 
+    /// Asynchronously starts the external process using the specified configuration.
     /// </summary>
+    /// <param name="configuration">The configuration settings for starting the external process.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task StartAsync(CancellationToken cancellationToken) => await StartAsync(Configuration, cancellationToken);
 
     /// <summary>
-    /// 
+    /// Starts the external process asynchronously using the specified configuration.
     /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="configuration">The configuration settings for starting the external process.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
@@ -115,10 +119,10 @@ public class ExternalProcess : IDisposable
     }
 
     /// <summary>
-    /// 
+    /// Asynchronously waits for the process to exit or a specified timeout period elapses.
     /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
@@ -160,10 +164,10 @@ public class ExternalProcess : IDisposable
     }
 
     /// <summary>
-    /// 
+    /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
     /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<BufferedProcessResult> WaitForBufferedExitOrTimeoutAsync(CancellationToken cancellationToken)
@@ -200,10 +204,10 @@ public class ExternalProcess : IDisposable
     }
 
     /// <summary>
-    /// 
+    /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
     /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains the piped process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(CancellationToken cancellationToken)
@@ -254,11 +258,11 @@ public class ExternalProcess : IDisposable
             Dispose();
         }
     }
-    
+
     /// <summary>
-    /// 
+    /// Terminates the associated external process based on the specified exit configuration.
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when an invalid value is provided for ExitConfiguration.TimeoutPolicy.CancellationMode.</exception>
     public async Task Kill()
     {
         switch (ExitConfiguration.TimeoutPolicy.CancellationMode)
