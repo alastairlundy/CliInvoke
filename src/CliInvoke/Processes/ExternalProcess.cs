@@ -1,13 +1,21 @@
-﻿using CliInvoke.Core.Piping;
+﻿/*
+    CliInvoke
+    Copyright (C) 2024-2026  Alastair Lundy
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+   */
+
+using CliInvoke.Core.Piping;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 using CliInvoke.Helpers.Processes.Cancellation;
-using CliInvoke.Piping;
 
 namespace CliInvoke.Processes;
 
 /// <summary>
-/// 
+/// Represents an external process that can be run.
 /// </summary>
 public class ExternalProcess : IDisposable
 {
@@ -16,6 +24,12 @@ public class ExternalProcess : IDisposable
     private readonly IProcessPipeHandler _processPipeHandler;
     private readonly IFilePathResolver _filePathResolver;
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePathResolver"></param>
+    /// <param name="processPipeHandler"></param>
+    /// <param name="targetFilePath"></param>
     public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler, string targetFilePath)
     {
         _processPipeHandler = processPipeHandler;
@@ -27,6 +41,13 @@ public class ExternalProcess : IDisposable
         ExitConfiguration = ProcessExitConfiguration.Default;
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePathResolver"></param>
+    /// <param name="processPipeHandler"></param>
+    /// <param name="configuration"></param>
+    /// <param name="exitConfiguration"></param>
     public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler,
         ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null)
     {
@@ -48,8 +69,14 @@ public class ExternalProcess : IDisposable
     /// </summary>
     public ProcessExitConfiguration ExitConfiguration { get; set; }
 
+    /// <summary>
+    /// Indicates whether the external process has exited.
+    /// </summary>
     public bool HasExited => _processWrapper.HasExited;
-    
+
+    /// <summary>
+    /// Indicates whether the external process has started.
+    /// </summary>
     public bool HasStarted => _processWrapper.HasStarted;
     
     /// <summary>
@@ -58,16 +85,17 @@ public class ExternalProcess : IDisposable
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task StartAsync() => await StartAsync(Configuration);
+    public async Task StartAsync(CancellationToken cancellationToken) => await StartAsync(Configuration, cancellationToken);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="configuration"></param>
+    /// <param name="cancellationToken"></param>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task StartAsync(ProcessConfiguration configuration)
+    public async Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken)
     {
         Configuration.TargetFilePath = _filePathResolver.ResolveFilePath(
             Configuration.TargetFilePath);
@@ -83,17 +111,24 @@ public class ExternalProcess : IDisposable
         _processWrapper.Start();
         
         if(configuration.StandardInput is not null)
-            await _processPipeHandler.PipeStandardInputAsync(configuration.StandardInput.BaseStream, _processWrapper);
+            await _processPipeHandler.PipeStandardInputAsync(configuration.StandardInput.BaseStream, _processWrapper, cancellationToken);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
-        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.PipeStandardOutputAsync(_processWrapper) 
+        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
+                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
             : (Task<Stream>)Task.CompletedTask;
         
-        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.PipeStandardErrorAsync(_processWrapper) 
+        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
+                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
             : (Task<Stream>)Task.CompletedTask;
         
         try
@@ -107,6 +142,7 @@ public class ExternalProcess : IDisposable
             ProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
                 _processWrapper.ExitCode,
+                _processWrapper.Id,
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime
             );
@@ -148,7 +184,8 @@ public class ExternalProcess : IDisposable
             ]);
             
             BufferedProcessResult result = new BufferedProcessResult(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
-                await standardOutputString, await standardErrorString, _processWrapper.StartTime, _processWrapper.ExitTime);
+                _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
+                _processWrapper.ExitTime);
 
             ThrowIfProcessNotSuccessful(result);
 
@@ -162,14 +199,21 @@ public class ExternalProcess : IDisposable
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
-        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.PipeStandardOutputAsync(_processWrapper) 
+        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
+                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
             : (Task<Stream>)Task.CompletedTask;
         
-        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.PipeStandardErrorAsync(_processWrapper) 
+        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
+                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
             : (Task<Stream>)Task.CompletedTask;
         
         try
@@ -180,11 +224,11 @@ public class ExternalProcess : IDisposable
                 standardErrorStream
             ]);
 
-            if (Configuration.StandardOutput is not null)
+            if (Configuration.RedirectStandardOutput && Configuration.StandardOutput is not null)
             {
                 await standardOutputStream.Result.CopyToAsync(Configuration.StandardOutput.BaseStream, cancellationToken);
             }
-            if (Configuration.StandardError is not null)
+            if (Configuration.RedirectStandardError && Configuration.StandardError is not null)
             {
                 await standardErrorStream.Result.CopyToAsync(Configuration.StandardError.BaseStream, cancellationToken);
             }
@@ -192,6 +236,7 @@ public class ExternalProcess : IDisposable
             PipedProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
                 _processWrapper.ExitCode,
+                _processWrapper.Id,
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime,
                 await standardOutputStream,
@@ -210,6 +255,10 @@ public class ExternalProcess : IDisposable
         }
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public async Task Kill()
     {
         switch (ExitConfiguration.TimeoutPolicy.CancellationMode)
@@ -229,7 +278,10 @@ public class ExternalProcess : IDisposable
                 throw new ArgumentOutOfRangeException();
         }
     }
-
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public void Dispose()
     {
         Configuration.Dispose();
@@ -242,9 +294,7 @@ public class ExternalProcess : IDisposable
             && _processWrapper.ExitCode != 0)
         {
             throw new ProcessNotSuccessfulException(new ProcessExceptionInfo(result,
-                _processWrapper.StartInfo, _processWrapper.Id,
-                _processWrapper.StartInfo.FileName, true, Configuration.ResourcePolicy,
-                Configuration.Credential));
+                Configuration));
         }
     }
 }
