@@ -224,11 +224,11 @@ public class ExternalProcess : IDisposable
                 standardErrorStream
             ]);
 
-            if (Configuration.RedirectStandardOutput && Configuration.StandardOutput is not null)
+            if (Configuration is { RedirectStandardOutput: true, StandardOutput: not null })
             {
                 await standardOutputStream.Result.CopyToAsync(Configuration.StandardOutput.BaseStream, cancellationToken);
             }
-            if (Configuration.RedirectStandardError && Configuration.StandardError is not null)
+            if (Configuration is { RedirectStandardError: true, StandardError: not null })
             {
                 await standardErrorStream.Result.CopyToAsync(Configuration.StandardError.BaseStream, cancellationToken);
             }
