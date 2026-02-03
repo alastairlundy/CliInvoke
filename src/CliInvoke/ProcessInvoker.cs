@@ -72,7 +72,7 @@ public class ProcessInvoker : IProcessInvoker
 
         try
         {
-            bool processWasNew = process.Start();
+            process.Start();
 
             await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
