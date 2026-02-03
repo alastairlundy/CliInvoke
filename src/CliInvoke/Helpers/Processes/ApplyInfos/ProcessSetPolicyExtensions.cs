@@ -7,10 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-
-
-// ReSharper disable RedundantBoolCompare
-
 namespace CliInvoke.Helpers.Processes;
 
 /// <summary>
