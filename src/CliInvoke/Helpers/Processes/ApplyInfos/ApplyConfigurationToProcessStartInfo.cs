@@ -1,13 +1,11 @@
 /*
     CliInvoke 
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
-
-using System.Linq;
 
 namespace CliInvoke.Helpers.Processes;
 
@@ -67,7 +65,7 @@ internal static class ApplyConfigurationToProcessStartInfo
         /// <param name="environmentVariables">A dictionary of environment variable names and their corresponding values.</param>
         internal void SetEnvironmentVariables(IReadOnlyDictionary<string, string> environmentVariables)
         {
-            if (!environmentVariables.Any())
+            if (environmentVariables.Count == 0)
                 return;
 
             foreach (KeyValuePair<string, string> variable in environmentVariables)

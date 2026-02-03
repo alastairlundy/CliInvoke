@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,6 +14,8 @@
  */
 
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -26,11 +28,13 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
+    /// <param name="processId"></param>
     /// <param name="startTime">The start time of the process.</param>
     /// <param name="exitTime">The exit time of the process.</param>
     public ProcessResult(
         string executableFilePath,
         int exitCode,
+        int processId,
         DateTime startTime,
         DateTime exitTime
     )
@@ -39,12 +43,19 @@ public class ProcessResult : IEquatable<ProcessResult>
         ExecutedFilePath = executableFilePath;
         StartTime = startTime;
         ExitTime = exitTime;
+        ProcessId = processId;
     }
 
     /// <summary>
     /// Whether the Command successfully exited.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public bool WasSuccessful => ExitCode == 0;
+
+    /// <summary>
+    /// The unique identifier assigned to the process when it was executed.
+    /// </summary>
+    public int ProcessId { get; }
 
     /// <summary>
     /// The exit code from the Command that was executed.
@@ -85,6 +96,7 @@ public class ProcessResult : IEquatable<ProcessResult>
 
         return ExitCode == other.ExitCode
                && ExecutedFilePath == other.ExecutedFilePath
+               && ProcessId == other.ProcessId
                && StartTime == other.StartTime
                && ExitTime == other.ExitTime;
     }
@@ -149,5 +161,5 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are not equal; otherwise, <c>false</c>.
     /// </returns>
     public static bool operator !=(ProcessResult left, ProcessResult? right) =>
-        left.Equals(right) == false;
+        !left.Equals(right);
 }

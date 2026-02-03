@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,12 +18,10 @@ public enum ProcessCancellationMode
     /// Forcefully terminates the Process along with all child processes.
     /// </summary>
     Forceful,
-
     /// <summary>
-    /// Gracefully cancels the Process using a new <see cref="CancellationTokenSource"/>.
+    /// Gracefully cancels the Process using SIGTERM/SIGINT Signals, or a <see cref="CancellationTokenSource"/> if that fails.
     /// </summary>
     Graceful,
-
     /// <summary>
     /// No cancellation is desired, Process will run until exit.
     /// </summary>

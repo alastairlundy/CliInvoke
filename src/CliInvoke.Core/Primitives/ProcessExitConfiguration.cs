@@ -1,16 +1,18 @@
 /*
     CliInvoke.Core
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core;
 
 /// <summary>
-/// Represents configuration information about the exit behavior of a process, including timeout policy and result validation.
+/// Represents configuration information about the exit behaviour of a process, including timeout policy and result validation.
 /// </summary>
 public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 {
@@ -33,8 +35,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessExitConfiguration(
         ProcessTimeoutPolicy timeoutPolicy,
         ProcessResultValidation resultValidation,
-        ProcessCancellationExceptionBehavior cancellationValidation
-    )
+        ProcessCancellationExceptionBehavior cancellationValidation)
     {
         TimeoutPolicy = timeoutPolicy;
         ResultValidation = resultValidation;
@@ -79,8 +80,9 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <summary>
     /// Gets the result validation strategy used to determine if the process exited successfully.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public ProcessResultValidation ResultValidation { get; }
-
+    
     /// <summary>
     /// Gets the result validation strategy used to determine if Process cancellation should throw an exception.
     /// </summary>
@@ -137,7 +139,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool Equals(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
+    public static bool Equals(ProcessExitConfiguration? left,
+        ProcessExitConfiguration? right)
     {
         if (left is null || right is null)
             return false;
@@ -162,8 +165,9 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="left">The first <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are not equal; otherwise, <c>false</c>.</returns>
-    public static bool operator !=(ProcessExitConfiguration? left, ProcessExitConfiguration? right)
+    public static bool operator !=(ProcessExitConfiguration? left,
+        ProcessExitConfiguration? right)
     {
-        return Equals(left, right) == false;
+        return !Equals(left, right);
     }
 }

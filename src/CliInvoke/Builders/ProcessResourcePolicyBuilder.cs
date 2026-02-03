@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -45,14 +45,10 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [Pure]
     public IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity)
     {
-//        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, (nint)1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(processorAffinity,
+            2 * Environment.ProcessorCount);
         
-        if (processorAffinity < 1)
-            throw new ArgumentOutOfRangeException(nameof(processorAffinity));
-
-        if (processorAffinity > 2 * Environment.ProcessorCount)
-            throw new ArgumentOutOfRangeException(nameof(processorAffinity));
-
         return new ProcessResourcePolicyBuilder(
             new(
                 processorAffinity,
@@ -129,13 +125,16 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [UnsupportedOSPlatform("android")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
-        //TODO: Migrate to Ensure and ArgumentOutOfRange exception static methods once fixed in Polyfill   
-        if (maxWorkingSet < _processResourcePolicy.MinWorkingSet || maxWorkingSet < 1)
-            throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-
-        if (_processResourcePolicy.MinWorkingSet > maxWorkingSet)
-            throw new ArgumentOutOfRangeException(nameof(maxWorkingSet));
-
+        nint minWorkingSet = _processResourcePolicy.MinWorkingSet ?? 
+#pragma warning disable CS8629
+                             (nint)ProcessResourcePolicy.Default.MinWorkingSet;
+#pragma warning restore CS8629
+        
+        ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 
+            minWorkingSet);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet, maxWorkingSet);
+        ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 1);
+        
         return new ProcessResourcePolicyBuilder(
             new(
 #pragma warning disable CA1416

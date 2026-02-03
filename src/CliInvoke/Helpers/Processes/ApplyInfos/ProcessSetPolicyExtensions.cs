@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,7 +19,7 @@ namespace CliInvoke.Helpers.Processes;
 internal static class ProcessSetPolicyExtensions
 {
     /// <param name="process">The process to apply the policy to.</param>
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         /// <summary>
         /// Applies a ProcessResourcePolicy to a Process.
@@ -38,7 +38,7 @@ internal static class ProcessSetPolicyExtensions
         {
             resourcePolicy ??= ProcessResourcePolicy.Default;
 
-            if (process.HasStarted() == false)
+            if (process.HasStarted == false)
                 throw new InvalidOperationException(
                     Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
                 );

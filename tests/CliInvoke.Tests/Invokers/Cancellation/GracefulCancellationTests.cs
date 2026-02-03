@@ -1,8 +1,8 @@
-using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using CliInvoke.Core;
+using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes.Cancellation;
 using CliInvoke.Tests.Internal.Helpers;
 using Xunit;
@@ -20,7 +20,7 @@ public class GracefulCancellationTests
 
         int gracefulTimeoutSeconds = 10;
         
-        Process process;
+        ProcessWrapper process;
         
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsAndroid() || OperatingSystem.IsFreeBSD())
         {
@@ -46,7 +46,7 @@ public class GracefulCancellationTests
 
         long elapsedTimeSeconds = stopwatch.ElapsedMilliseconds / 1000;
 
-        Assert.InRange(elapsedTimeSeconds, Math.Max(gracefulTimeoutSeconds - 5, 0), Math.Min(gracefulTimeoutSeconds * 3, 60));
+        Assert.InRange(elapsedTimeSeconds, 0, Math.Min(gracefulTimeoutSeconds * 3, 60));
         
         Assert.True(process.HasExited);
 

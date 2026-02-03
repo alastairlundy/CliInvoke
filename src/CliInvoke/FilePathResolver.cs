@@ -1,6 +1,6 @@
 /*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,6 +9,8 @@
 
 using System.Linq;
 using System.Text;
+
+using CliInvoke.Internal;
 
 using DotExtensions.IO.Directories;
 using DotExtensions.IO.Permissions;
@@ -20,6 +22,7 @@ namespace CliInvoke;
 /// <summary>
 /// An implementation of IFilePathResolver, a service that resolves file paths.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class FilePathResolver : IFilePathResolver
 {
     /// <summary>
@@ -37,6 +40,7 @@ public class FilePathResolver : IFilePathResolver
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public string ResolveFilePath(string filePathToResolve)
     {
         ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
@@ -109,19 +113,23 @@ public class FilePathResolver : IFilePathResolver
             resolvedFilePath = null;
             return false;
         }
-
-        string fileName = Path.GetFileNameWithoutExtension(filePathToResolve);
         
-        bool fileHasExtension = Path.GetExtension(fileName) != string.Empty;
+        bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
+
+        string fileName = Path.GetFileName(filePathToResolve);
+
+        bool lookForExtension = !fileHasExtension && (OperatingSystem.IsWindows() ||
+                                                      OperatingSystem.IsMacOS() ||
+                                                      OperatingSystem.IsMacCatalyst());
         
         foreach (string pathEntry in pathContents)
         {
-            if (fileHasExtension)
+            if (lookForExtension)
             {
                 foreach (string pathExtension in pathExtensions)
                 {
                     string filePath =
-                        Path.Combine(pathEntry, $"{fileName}{pathExtension}");
+                        Path.Combine(pathEntry, $"{fileName}{pathExtension.ToLower()}");
 
                     if (File.Exists(filePath))
                     {

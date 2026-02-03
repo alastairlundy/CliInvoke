@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke.Core
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,6 +8,8 @@
    */
 
 using System.Text;
+
+using CliInvoke.Core.Internal;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
@@ -150,11 +152,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The Standard Output target to redirect Standard Output to if configured.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public StreamReader? StandardOutput { get; protected set; }
 
     /// <summary>
     /// The Standard Error target to redirect Standard Output to if configured.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public StreamReader? StandardError { get; protected set; }
 
     /// <summary>
@@ -315,7 +319,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         if (left is null || right is null)
             return false;
 
-        return Equals(left, right) == false;
+        return !Equals(left, right);
     }
 
     /// <summary>
@@ -324,7 +328,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public void Dispose()
     {
         Credential.Dispose();
-
         StandardInput?.Dispose();
         StandardOutput?.Dispose();
         StandardError?.Dispose();

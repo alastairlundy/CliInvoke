@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-    <LangVersion>13</LangVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyName>CliInvokeMockDataSimTool</AssemblyName>
+    <AssemblyName>CliInvokeBenchMockData</AssemblyName>
     <IsPackable>false</IsPackable>
-    <Title>CliInvokeMockDataSim</Title>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <PublishAot>false</PublishAot>
+    <Title>CliInvokeBenchMockData</Title>
     <Authors>Alastair Lundy</Authors>
     <Description>A Simulation tool that generates mock data for the CliInvoke Benchmarks.</Description>
-    <Copyright>Copyright (c) Alastair Lundy 2025</Copyright>
+    <Copyright>Copyright (c) Alastair Lundy 2026</Copyright>
     <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Company>Alastair Lundy</Company>
+    <RootNamespace>CliInvoke.Benchmarking.MockDataSimTool</RootNamespace>
+    <PackageId>CliInvokeBenchMockData</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />

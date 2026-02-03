@@ -8,19 +8,17 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>
-        <Copyright>Copyright (c) 2024-2025 Alastair Lundy</Copyright>
+        <Copyright>Copyright (c) 2024-2026 Alastair Lundy</Copyright>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.2.0</PackageVersion>
+        <PackageVersion>2.4.0-alpha.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Improved Unix Powershell install location detection (https://github.com/alastairlundy/CliInvoke/pull/192 ) - This introduces a minor breaking change in the PowershellCommmandConfiguration class
-* Deprecated ``ClassicPowershellConfiguration`` for removal in CliInvoke Specializations version 3
-* Added ``PowershellProcessInvoker`` and ``CmdProcessInvoker`` as specialized instances of ``RunnerProcessInvokerBase``</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.4.0 Alpha 1</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsAotCompatible>true</IsAotCompatible>
@@ -30,7 +28,7 @@
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.6.0" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.8.1" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>

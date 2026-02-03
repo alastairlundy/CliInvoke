@@ -42,6 +42,7 @@ Launch processes, redirect standard input and output streams, await process comp
 | Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                        ✅                        |
 | Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                       ❌*                        |
 | Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                        ✅                        |
+| Graceful Cancellation Support via SIGTERM/SIGINT Signals |  ✅, 2.3.0+ |  ✅ | ❌ |
 | Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                        ✅                        |
 | Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |
 

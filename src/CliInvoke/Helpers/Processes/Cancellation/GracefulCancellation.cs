@@ -1,6 +1,6 @@
 /*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,7 +15,7 @@ internal static partial class GracefulCancellation
 {
     internal const int GracefulTimeoutWaitSeconds = 30;
     
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         /// <summary>
         /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
@@ -35,33 +35,23 @@ internal static partial class GracefulCancellation
         [SupportedOSPlatform("freebsd")]
         [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken, bool fallbackToForceful = true)
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken,
+            bool fallbackToForceful = true)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
+
             DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
             
-            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero); 
+            Task<bool> gracefulInterruptCancellation = process.GracefulInterruptCancellation(timeoutThreshold, 
+                cancellationExceptionBehavior, cancellationToken);
             
-            if (!OperatingSystem.IsWindows())
-            {
-                Task gracefulInterruptCancellation = process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
-            
-                await Task.WhenAny([
-                    process.WaitForExitAsync(cancellationToken),
-                    gracefulInterruptCancellation,
-                    process.GracefulCancellationWithCancelToken(
-                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                        cancellationExceptionBehavior, expectedExitTime)
-                ]);
-            }
-            else
-            {
-                await Task.WhenAny([
-                    process.WaitForExitAsync(cancellationToken),
-                    process.GracefulCancellationWithCancelToken(
-                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                        cancellationExceptionBehavior, expectedExitTime)
-                ]);
-            }
+            await Task.WhenAny([
+                process.WaitForExitAsync(cancellationToken),
+                gracefulInterruptCancellation,
+                process.GracefulCancellationWithCancelToken(
+                    timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                    cancellationExceptionBehavior, expectedExitTime)
+            ]);
 
             await Task.WhenAny([Task.Delay(500, cancellationToken), process.WaitForExitAsync(cancellationToken)]);
             
@@ -69,6 +59,15 @@ internal static partial class GracefulCancellation
             {
                 process.ForcefulExit(cancellationExceptionBehavior);
             }
+        }
+
+        private Task<bool> GracefulInterruptCancellation(TimeSpan timeoutThreshold,
+            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
+        {
+            Task<bool> gracefulInterruptCancellation = !OperatingSystem.IsWindows()
+                ? process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken)
+                : process.CancelWithInterruptOnWindows(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
+            return gracefulInterruptCancellation;
         }
 
         private async Task GracefulCancellationWithCancelToken(TimeSpan timeoutThreshold,

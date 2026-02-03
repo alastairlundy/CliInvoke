@@ -1,6 +1,6 @@
 /*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,7 +18,7 @@ internal static partial class GracefulCancellation
 
     private const int DelayBeforeSigintMilliseconds = 3000;
     
-    extension(Process process)
+    extension(ProcessWrapper process)
     {
         /// <summary>
         /// 
@@ -38,7 +38,8 @@ internal static partial class GracefulCancellation
 
             try
             {
-                if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS())
+                if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS() ||
+                    OperatingSystem.IsTvOS())
                     throw new PlatformNotSupportedException();
 
                 await Task.Delay(timeoutThreshold, cancellationToken);
@@ -61,9 +62,8 @@ internal static partial class GracefulCancellation
             }
             catch (Exception)
             {
-                if (cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowException ||
-                    cancellationExceptionBehavior == ProcessCancellationExceptionBehavior
+                if (cancellationExceptionBehavior is ProcessCancellationExceptionBehavior.AllowException
+                    or ProcessCancellationExceptionBehavior
                         .AllowExceptionIfUnexpected)
                     throw;
             }

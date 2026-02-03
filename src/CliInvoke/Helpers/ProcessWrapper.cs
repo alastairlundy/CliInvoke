@@ -1,6 +1,6 @@
 /*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,15 +13,16 @@ namespace CliInvoke.Helpers;
 
 internal class ProcessWrapper : Process
 {
-    internal ProcessWrapper(ProcessConfiguration configuration, ProcessResourcePolicy? resourcePolicy)
+    internal ProcessWrapper(ProcessConfiguration configuration, 
+        ProcessResourcePolicy? resourcePolicy)
     {
-        Exited += OnExited;
-        Started += OnStarted;
-
-        HasStarted = false;
         StartInfo = configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
             configuration.RedirectStandardError);
+        Exited += OnExited;
+        Started += OnStarted;
         EnableRaisingEvents = true;
+
+        HasStarted = false;
         ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
     }
 
@@ -56,6 +57,10 @@ internal class ProcessWrapper : Process
     internal new DateTime StartTime { get; private set; }
 
     internal new DateTime ExitTime { get; private set; }
+    
+    internal new int Id {get; private set; }
+    
+    internal new string ProcessName {get; private set; }
 
     public new bool Start()
     {
@@ -67,6 +72,8 @@ internal class ProcessWrapper : Process
         {
             StartTime = DateTime.UtcNow;
             Started?.Invoke(this, EventArgs.Empty);
+            Id = base.Id;
+            ProcessName = base.ProcessName;
         }
 
         return result;

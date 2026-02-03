@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,6 +21,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// </summary>
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -31,7 +32,8 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<bool> PipeStandardInputAsync(Stream source, Process destination)
+    public async Task<bool> PipeStandardInputAsync(Stream source, Process destination,
+        CancellationToken cancellationToken)
     {
         if (destination.StartInfo.RedirectStandardInput)
         {
@@ -49,6 +51,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// Asynchronously retrieves the standard output stream from a specified process.
     /// </summary>
     /// <param name="source">The process from which to read the standard output data.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -59,7 +62,8 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<Stream> PipeStandardOutputAsync(Process source)
+    public async Task<Stream> PipeStandardOutputAsync(Process source,
+        CancellationToken cancellationToken)
     {
         Stream destination = new MemoryStream();
 
@@ -78,6 +82,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// Asynchronously retrieves the standard error stream from a specified process.
     /// </summary>
     /// <param name="source">The process from which to read the standard error data.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -88,7 +93,8 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<Stream> PipeStandardErrorAsync(Process source)
+    public async Task<Stream> PipeStandardErrorAsync(Process source,
+        CancellationToken cancellationToken)
     {
         Stream destination = new MemoryStream();
 

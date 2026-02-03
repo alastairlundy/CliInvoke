@@ -1,6 +1,6 @@
 /*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -42,8 +42,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     protected RunnerProcessInvokerBase(
         IProcessInvoker processInvoker,
         IRunnerProcessFactory runnerProcessFactory,
-        ProcessConfiguration runnerProcessConfiguration
-    )
+        ProcessConfiguration runnerProcessConfiguration)
     {
         _processInvoker = processInvoker;
         _runnerProcessFactory = runnerProcessFactory;
@@ -66,8 +65,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = true,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
             processConfiguration,
@@ -98,8 +96,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = true,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
             processConfiguration,
@@ -130,8 +127,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = true,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         ProcessConfiguration runnerConfiguration = _runnerProcessFactory.CreateRunnerConfiguration(
             processConfiguration,

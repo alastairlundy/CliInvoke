@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke.Core
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,20 +21,23 @@ public interface IProcessPipeHandler
     /// </summary>
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
-    Task<bool> PipeStandardInputAsync(Stream source, Process destination);
+    Task<bool> PipeStandardInputAsync(Stream source, Process destination, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously retrieves the standard output stream from a specified process.
     /// </summary>
     /// <param name="source">The process from which to read the standard output data.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
-    Task<Stream> PipeStandardOutputAsync(Process source);
+    Task<Stream> PipeStandardOutputAsync(Process source, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously retrieves the standard error stream from a specified process.
     /// </summary>
     /// <param name="source">The process from which to read the standard error data.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
-    Task<Stream> PipeStandardErrorAsync(Process source);
+    Task<Stream> PipeStandardErrorAsync(Process source, CancellationToken cancellationToken);
 }

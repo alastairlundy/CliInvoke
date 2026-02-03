@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -46,12 +46,13 @@ public class PipedProcessResult
     public PipedProcessResult(
         string executableFilePath,
         int exitCode,
+        int processId,
         DateTime startTime,
         DateTime exitTime,
         Stream standardOutput,
         Stream standardError
     )
-        : base(executableFilePath, exitCode, startTime, exitTime)
+        : base(executableFilePath, exitCode, processId, startTime, exitTime)
     {
         ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
         
@@ -133,7 +134,7 @@ public class PipedProcessResult
     /// <param name="right">The other PipedProcessResult to be compared.</param>
     /// <returns>True if both PipedProcessResults are not equal to each other; false otherwise.</returns>
     public static bool operator !=(PipedProcessResult? left, PipedProcessResult? right) =>
-        Equals(left, right) == false;
+        !Equals(left, right);
 
     /// <summary>
     /// Disposes of the <see cref="StandardOutput"/> and <see cref="StandardError"/> streams.

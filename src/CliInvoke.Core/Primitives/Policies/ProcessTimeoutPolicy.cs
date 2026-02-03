@@ -1,6 +1,6 @@
 ﻿/*
     AlastairLundy.DotPrimitives
-    Copyright (C) 2024-2025  Alastair Lundy
+    Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -30,8 +30,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <param name="cancellationMode">Defaults to Graceful cancellation, otherwise uses the Cancellation Mode specified.</param>
     public ProcessTimeoutPolicy(
         TimeSpan timeoutThreshold,
-        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful
-    )
+        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(timeoutThreshold.TotalMilliseconds);
         ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
@@ -44,13 +43,13 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
     /// </summary>
     public static ProcessTimeoutPolicy Default { get; } =
-        new ProcessTimeoutPolicy(TimeSpan.FromMinutes(30));
+        new(TimeSpan.FromMinutes(30));
 
     /// <summary>
     /// Disables waiting for Process Timeout.
     /// </summary>
     public static ProcessTimeoutPolicy None { get; } =
-        new ProcessTimeoutPolicy(TimeSpan.FromSeconds(0), ProcessCancellationMode.None);
+        new(TimeSpan.FromSeconds(0), ProcessCancellationMode.None);
 
     /// <summary>
     /// The timespan after which a Process should no longer be allowed to continue waiting to exit.
@@ -121,10 +120,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <param name="left">The first <see cref="ProcessTimeoutPolicy"/> instance to compare.</param>
     /// <param name="right">The second <see cref="ProcessTimeoutPolicy"/> instance to compare.</param>
     /// <returns><c>true</c> if the two <see cref="ProcessTimeoutPolicy"/> instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right) 
+        => Equals(left, right);
 
     /// <summary>
     ///
@@ -132,10 +129,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool operator !=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
-    {
-        return Equals(left, right) == false;
-    }
+    public static bool operator !=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right) 
+        => !Equals(left, right);
 
     /// <summary>
     ///
