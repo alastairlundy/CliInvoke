@@ -60,7 +60,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public string StandardError { get; }
 
     /// <summary>
-    /// Determines whether this BufferedProcessResult is equal to another BufferedProcessResult object.
+    /// Determines whether this BufferedProcessResult object is equal to another BufferedProcessResult object.
     /// </summary>
     /// <remarks>This method intentionally does not consider Start and Exit times of Command Results for equality comparison.</remarks>
     /// <param name="other">The other BufferedProcessResult to compare.</param>
