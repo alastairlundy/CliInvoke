@@ -8,6 +8,7 @@
    */
 
 using CliInvoke.Core.Piping;
+using CliInvoke.Core.Processes;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 using CliInvoke.Helpers.Processes.Cancellation;
@@ -17,7 +18,7 @@ namespace CliInvoke.Processes;
 /// <summary>
 /// Represents an external process that can be run.
 /// </summary>
-public class ExternalProcess : IDisposable
+public class ExternalProcess : IExternalProcess
 {
     private ProcessWrapper _processWrapper;
     
