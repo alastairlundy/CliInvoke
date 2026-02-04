@@ -8,4 +8,5 @@ global using System.Runtime.Versioning;
 global using System.Threading;
 global using System.Threading.Tasks;
 
+global using CliInvoke.Core.Internal;
 global using CliInvoke.Core.Internal.Localizations;

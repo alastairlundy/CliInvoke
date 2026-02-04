@@ -5,8 +5,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using CliInvoke.Core.Internal;
-
 namespace CliInvoke.Core;
 
 /// <summary>

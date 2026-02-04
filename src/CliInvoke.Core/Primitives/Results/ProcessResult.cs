@@ -14,8 +14,6 @@
  */
 
 
-using CliInvoke.Core.Internal;
-
 namespace CliInvoke.Core;
 
 /// <summary>

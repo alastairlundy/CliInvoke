@@ -9,8 +9,6 @@
 
 using System.Text;
 
-using CliInvoke.Core.Internal;
-
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace CliInvoke.Core;
