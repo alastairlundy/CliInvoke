@@ -15,18 +15,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Added Graceful Cancellation via Signals on Windows and Unix (#243 and #236 respectively ) -@RoadTrain Thanks  for the Feature Request ( #231 )
-* Added ``ProcessResultValidator&lt;TProcessResult&gt;`` implementation
-* Added CancellationToken support to ``ProcessPipeHandler``
-* Updated ``ProcessConfigurationFactory`` to use default ``ArgumentsBuilder`` validation
-* Updated ``ArgumentsBuilder`` logic to allow setting empty arguments
-* Removed unnecessary Process ``HasStarted`` internal helper method - ``ProcessWrapper``'s ``HasStarted`` property is used instead
-* Replaced manual ``ArgumentOutOfRangeException`` instantiation and throwing with cleaner Throw method calls
-* Reduced code duplication in ``ProcessInvoker`` implementation class</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.7.5 to 9.8.1
+* Updated DotPrimitives version from 4.2.0 to 4.3.1
+* Updated DotExtensions version from 9.4.1 to 9.5.1</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.3.0</PackageVersion>
+        <PackageVersion>2.3.1</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>

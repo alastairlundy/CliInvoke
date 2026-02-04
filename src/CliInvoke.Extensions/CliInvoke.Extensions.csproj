@@ -9,17 +9,14 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.3.0</Version>
+        <Version>2.3.1</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Added DI registration of ``IProcessResultValidator&lt;ProcessResult&gt;``, ``IProcessResultValidator&lt;BufferedProcessResult&gt;``, and ``IProcessResultValidator&lt;PipedProcessResult&gt;`` in ``AddCliInvoke`` method
-* Added ``AddValidationRules&lt;TProcessResult&gt;Func&lt;TProcessResult, bool&gt;[] validationRules, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)`` DI registration method
-* Added ``AddCustomResultValidators&lt;TProcessResult, TProcessResultValidator&gt;(TProcessResultValidator validator, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)`` DI registration method
-* Updated to use CliInvoke.Core 2.3.0 and CliInvoke 2.3.0</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.core 2.3.1 and CliInvoke 2.3.1</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
