@@ -35,16 +35,17 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Comparison vs Alternatives
 
-| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   | [ProcessX](https://github.com/Cysharp/ProcessX) |
-|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------:|
-| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                        ❌                        |
-| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                         |                        ❌                        |
-| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                       ❌*                        |
-| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Graceful Cancellation Support via SIGTERM/SIGINT Signals |  ✅, 2.3.0+ |  ✅ | ❌ |
-| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |
+| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   |[ProcessX](https://github.com/Cysharp/ProcessX) | .NET Process class |
+|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------:|:----:|
+| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                        ❌                        |                   ⚠️, offers limited separation of concerns via ProcessStartInfo model class     |
+| Dependency Injection registration extensions                               |      ✅      | ❌                                                         |                        ❌                        |         ❌   |
+| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                        ✅                        |  ✅ , Built into .NET |
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                       ❌*                        |     ✅      |  
+| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                        ✅                        |  ⚠️, can lead to deadlocks or exceptions if not careful |
+| Support for Process/Command Timeout |   ✅ | :warning:, limited to cancelling CancellationToken |:warning:, limited to cancelling CancellationToken | :warning:, limited to cancelling CancellationToken |
+| Graceful Cancellation Support via SIGTERM/SIGINT Signals |  ✅, 2.3.0+ |  ✅ | ❌ |  ❌ |
+| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                        ✅                        |      ✅      |  
+| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |  ✅ (.NET Runtime licensed under MIT)  |
 
 Notes:
 - *Indicates not explicitly advertised for all listed OSes but may work in practice; check each project's docs.
