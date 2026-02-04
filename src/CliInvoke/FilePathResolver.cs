@@ -10,8 +10,6 @@
 using System.Linq;
 using System.Text;
 
-using CliInvoke.Internal;
-
 using DotExtensions.IO.Directories;
 using DotExtensions.IO.Permissions;
 
