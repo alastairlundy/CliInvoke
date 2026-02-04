@@ -15,11 +15,11 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Add ``ShellDetector`` implementation of ``IShellDetector`` for detecting default system Shell</PackageReleaseNotes>
+        <PackageReleaseNotes>* Adds ``ExternalProcess`` - An alternative to the Process Invokation design pattern. This initial version makes use of CliInvoke v2's file path resolver and process pipe handling as well as internal CliInvoke helper code.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.4.0-alpha.1</PackageVersion>
+        <PackageVersion>2.4.0-alpha.2</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>

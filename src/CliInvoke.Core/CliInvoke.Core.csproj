@@ -24,8 +24,8 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.4.0-alpha.1</Version>
-        <PackageReleaseNotes>* Add ``IShellDetector`` interface for detecting default system Shell</PackageReleaseNotes>
+        <Version>2.4.0-alpha.2</Version>
+        <PackageReleaseNotes>* Adds ``IExternalProcess`` (the interface for ``ExternalProcess``) - This is not an injectable service and exists to facilitate a possible future ``ExternalProcess`` Factory pattern, and/or allow alternate implementations.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
