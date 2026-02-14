@@ -31,16 +31,16 @@ public interface IExternalProcess : IDisposable
     /// Indicates whether the external process has started.
     /// </summary>
     bool HasStarted { get; }
-    
+
     /// <summary>
     ///
     /// </summary>
-    EventHandler Started { get; }
-    
+    event EventHandler Started;
+
     /// <summary>
     /// 
     /// </summary>
-    EventHandler Exited { get; }
+    event EventHandler Exited;
 
     /// <summary>
     /// Asynchronously starts the external process using the specified configuration.

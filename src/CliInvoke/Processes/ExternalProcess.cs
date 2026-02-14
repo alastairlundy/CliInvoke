@@ -88,12 +88,12 @@ public class ExternalProcess : IExternalProcess
     /// <summary>
     /// 
     /// </summary>
-    public EventHandler Started { get; private set; }
-    
+    public event EventHandler Started;
+
     /// <summary>
     ///
     /// </summary>
-    public EventHandler Exited { get; private set; }
+    public event EventHandler Exited;
 
     /// <summary>
     /// Asynchronously starts the external process using the specified configuration.
