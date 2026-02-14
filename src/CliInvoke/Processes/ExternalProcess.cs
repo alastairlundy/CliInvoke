@@ -88,12 +88,12 @@ public class ExternalProcess : IExternalProcess
     public bool HasStarted => _processWrapper.HasStarted;
 
     /// <summary>
-    /// 
+    /// Indicates whether the external process has been started.
     /// </summary>
     public event EventHandler Started;
 
     /// <summary>
-    ///
+    /// Represents an event that occurs when the associated external process exits.
     /// </summary>
     public event EventHandler Exited;
 
