@@ -18,9 +18,10 @@ internal class ProcessWrapper : Process
     {
         StartInfo = configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
             configuration.RedirectStandardError);
+        ProcessName = StartInfo.FileName;
+        EnableRaisingEvents = true;
         Exited += OnExited;
         Started += OnStarted;
-        EnableRaisingEvents = true;
 
         HasStarted = false;
         ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
@@ -71,6 +72,7 @@ internal class ProcessWrapper : Process
         if (result)
         {
             StartTime = DateTime.UtcNow;
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
             Started?.Invoke(this, EventArgs.Empty);
             Id = base.Id;
             ProcessName = base.ProcessName;

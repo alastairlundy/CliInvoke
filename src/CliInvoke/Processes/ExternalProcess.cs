@@ -39,6 +39,9 @@ public class ExternalProcess : IExternalProcess
             false, true, true);
         _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
         ExitConfiguration = ProcessExitConfiguration.Default;
+        
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
     }
     
     /// <summary>
@@ -78,6 +81,16 @@ public class ExternalProcess : IExternalProcess
     /// Indicates whether the external process has started.
     /// </summary>
     public bool HasStarted => _processWrapper.HasStarted;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public EventHandler Started { get; private set; }
+    
+    /// <summary>
+    ///
+    /// </summary>
+    public EventHandler Exited { get; private set; }
 
     /// <summary>
     /// Asynchronously starts the external process using the specified configuration.

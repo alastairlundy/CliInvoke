@@ -31,11 +31,20 @@ public interface IExternalProcess : IDisposable
     /// Indicates whether the external process has started.
     /// </summary>
     bool HasStarted { get; }
+    
+    /// <summary>
+    ///
+    /// </summary>
+    EventHandler Started { get; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    EventHandler Exited { get; }
 
     /// <summary>
     /// Asynchronously starts the external process using the specified configuration.
     /// </summary>
-    /// <param name="configuration">The configuration settings for starting the external process.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     Task StartAsync(CancellationToken cancellationToken);
