@@ -22,7 +22,7 @@ internal class ProcessWrapper : Process
         EnableRaisingEvents = true;
         Exited += OnExited;
         Started += OnStarted;
-
+        
         HasStarted = false;
         ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
     }

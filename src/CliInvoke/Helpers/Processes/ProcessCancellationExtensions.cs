@@ -21,12 +21,6 @@ internal static class ProcessCancellationExtensions
     {
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrTimeoutAsync(ProcessExitConfiguration processExitConfiguration,
             CancellationToken cancellationToken = default)
         {

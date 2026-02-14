@@ -38,12 +38,6 @@ internal static class ForcefulCancellation
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
             ProcessCancellationExceptionBehavior cancellationExceptionBehavior,
             CancellationToken cancellationToken)

@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+#pragma warning disable CS0618 
+
 using CliInvoke.Core.Processes;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;

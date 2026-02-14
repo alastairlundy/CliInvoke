@@ -28,12 +28,6 @@ internal static partial class GracefulCancellation
         /// <exception cref="NotSupportedException">Thrown if run on a remote computer or device.</exception>
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
-        [SupportedOSPlatform("maccatalyst")]
-        [SupportedOSPlatform("macos")]
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("freebsd")]
-        [SupportedOSPlatform("android")]
         internal async Task WaitForExitOrGracefulTimeoutAsync(TimeSpan timeoutThreshold,
             ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken,
             bool fallbackToForceful = true)
