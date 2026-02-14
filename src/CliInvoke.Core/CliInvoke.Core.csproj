@@ -24,8 +24,8 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.3.1</Version>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 9.7.5 to 9.8.1</PackageReleaseNotes>
+        <Version>2.3.2</Version>
+        <PackageReleaseNotes>* Fixed xml doc comment grammar issues</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
