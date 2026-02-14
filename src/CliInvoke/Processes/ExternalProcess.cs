@@ -60,6 +60,9 @@ public class ExternalProcess : IExternalProcess
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
+        
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
     }
 
     /// <summary>
@@ -95,7 +98,6 @@ public class ExternalProcess : IExternalProcess
     /// <summary>
     /// Asynchronously starts the external process using the specified configuration.
     /// </summary>
-    /// <param name="configuration">The configuration settings for starting the external process.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
