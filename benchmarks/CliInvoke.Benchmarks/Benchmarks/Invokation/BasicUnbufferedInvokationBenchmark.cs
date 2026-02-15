@@ -3,16 +3,15 @@ using CliInvoke.Benchmarking.Helpers;
 using CliInvoke.Builders;
 using CliInvoke.Core;
 using CliInvoke.Core.Builders;
-
 using CliWrap;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 [SimpleJob(RuntimeMoniker.Net90)]
-[MemoryDiagnoser(true), Orderer(SummaryOrderPolicy.FastestToSlowest)]
+[MemoryDiagnoser, Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BasicUnbufferedInvokationBenchmark
 {
-    private readonly IProcessInvoker _processInvoker;
+    private readonly ProcessInvoker _processInvoker;
 
     private readonly DotnetCommandHelper _dotnetCommandHelper;
 
