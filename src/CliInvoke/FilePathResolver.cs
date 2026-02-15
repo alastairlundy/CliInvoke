@@ -30,12 +30,6 @@ public class FilePathResolver : IFilePathResolver
     /// <returns>The resolved file path if successful, otherwise throws a FileNotFoundException.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file path does not exist or cannot be located.</exception>
     /// <exception cref="PlatformNotSupportedException">Thrown if run on an unsupported platform.</exception>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [Obsolete(DeprecationMessages.DeprecationV3)]
@@ -60,13 +54,7 @@ public class FilePathResolver : IFilePathResolver
         
         return LocateFileFromDirectory(filePathToResolve).FullName;
     }
-
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
+    
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     private bool ExecutableFileCheck(string fileName)
@@ -82,13 +70,7 @@ public class FilePathResolver : IFilePathResolver
     
     protected string[] GetPathExtensionsInfo()
         => PathEnvironmentVariable.GetPathFileExtensions();
-
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
+    
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     protected bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
@@ -151,13 +133,7 @@ public class FilePathResolver : IFilePathResolver
         resolvedFilePath = null;
         return false;
     }
-
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("android")]
+    
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     protected FileInfo LocateFileFromDirectory(string filePathToResolve)
