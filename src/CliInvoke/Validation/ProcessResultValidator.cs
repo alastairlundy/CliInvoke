@@ -35,10 +35,10 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
     public Func<TProcessResult, bool>[] ValidationRules { get; }
     
     /// <summary>
-    /// 
+    /// Validates a <see cref="TProcessResult"/> against the configured <see cref="ValidationRules"/>.
     /// </summary>
-    /// <param name="result"></param>
-    /// <returns></returns>
+    /// <param name="result">The <see cref="TProcessResult"/> to validate against the validation rules.</param>
+    /// <returns>True if the <paramref name="result"/> passes all validation rules, false otherwise.</returns>
     public bool Validate(TProcessResult result)
     {
         foreach (Func<TProcessResult, bool> rule in ValidationRules)
