@@ -301,7 +301,7 @@ public class ExternalProcess : IExternalProcess
     }
     
     /// <summary>
-    /// 
+    /// Disposes of the <see cref="Configuration"/> and the internal managed and unmanaged resources.
     /// </summary>
     public void Dispose()
     {
