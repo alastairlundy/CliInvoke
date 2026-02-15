@@ -42,7 +42,7 @@ public static class CommonValidationRules<TProcessResult>
     /// A function that takes an instance of <typeparamref name="TProcessResult"/> as input and evaluates to true if the exit code matches; otherwise, false.
     /// </returns>
     public static Func<TProcessResult, bool> RequiresExitCode(int exitCode)
-        => (result => result.ExitCode == exitCode);
+        => result => result.ExitCode == exitCode;
 
     /// <summary>
     /// A validation rule that checks whether the process result's exit code is one of the specified allowed exit codes.
@@ -54,7 +54,7 @@ public static class CommonValidationRules<TProcessResult>
     /// A function that takes an instance of <typeparamref name="TProcessResult"/> as input and evaluates to true if the exit code matches any in the provided collection; otherwise, false.
     /// </returns>
     public static Func<TProcessResult, bool> RequiresAllowedExitCodes(params int[] exitCodes)
-        => (result => exitCodes.Any(code => result.ExitCode == code));
+        => result => exitCodes.Any(code => result.ExitCode == code);
 
     /// <summary>
     /// A predefined validation rule that ensures the process result's exit code is zero.
