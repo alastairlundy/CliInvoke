@@ -129,7 +129,7 @@ public class ProcessInvoker : IProcessInvoker
         process.StartInfo.RedirectStandardError = true;
         try
         {
-            bool processWasNew = process.Start();
+            process.Start();
             
             if(processConfiguration.RedirectStandardInput)
                 await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
@@ -202,7 +202,7 @@ public class ProcessInvoker : IProcessInvoker
         
         try
         {
-            bool processWasNew = process.Start();
+            process.Start();
             
             await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 

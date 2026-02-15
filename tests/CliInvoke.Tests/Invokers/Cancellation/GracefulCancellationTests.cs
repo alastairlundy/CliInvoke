@@ -1,11 +1,8 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using CliInvoke.Core;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes.Cancellation;
-using CliInvoke.Tests.Internal.Helpers;
-using Xunit;
 
 namespace CliInvoke.Tests.Invokers.Cancellation;
 

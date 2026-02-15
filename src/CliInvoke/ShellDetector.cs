@@ -50,8 +50,11 @@ public class ShellDetector : IShellDetector
     {
         if (OperatingSystem.IsUnix())
             return await ResolveDefaultShellOnUnixAsync(cancellationToken);
+     
+        if(OperatingSystem.IsWindows())
+            return await ResolveDefaultShellOnWindowsAsync(cancellationToken);
         
-        return await ResolveDefaultShellOnWindowsAsync(cancellationToken);
+        throw new PlatformNotSupportedException();
     }
     
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(

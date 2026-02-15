@@ -89,6 +89,7 @@ public static class ConfigurationExtensions
             
             IUserCredentialBuilder userCredentialBuilder = new  UserCredentialBuilder();
             
+#pragma warning disable CA1416
             if(processStartInfo.Domain != string.Empty)
                 userCredentialBuilder = userCredentialBuilder.SetDomain(processStartInfo.Domain);
 
@@ -102,6 +103,7 @@ public static class ConfigurationExtensions
             
             processConfigurationBuilder = processConfigurationBuilder.SetUserCredential(userCredentialBuilder.Build());
             
+#pragma warning restore CA1416
             return processConfigurationBuilder.Build();
         }
     }

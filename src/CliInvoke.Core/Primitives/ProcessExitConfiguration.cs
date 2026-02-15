@@ -128,10 +128,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// Returns a hash code for the current instance.
     /// </summary>
     /// <returns>The hash code for the current instance.</returns>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(ResultValidation, TimeoutPolicy, CancellationExceptionBehavior);
-    }
+    public override int GetHashCode() => HashCode.Combine(ResultValidation, TimeoutPolicy,
+        CancellationExceptionBehavior);
 
     /// <summary>
     /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal.

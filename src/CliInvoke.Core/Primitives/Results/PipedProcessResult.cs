@@ -7,9 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-#if NET8_0_OR_GREATER
-#endif
-
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -39,6 +36,7 @@ public class PipedProcessResult
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
+    /// <param name="processId"></param>
     /// <param name="startTime">The start time of the process.</param>
     /// <param name="exitTime">The exit time of the process.</param>
     /// <param name="standardOutput">The process' standard output.</param>
@@ -64,7 +62,7 @@ public class PipedProcessResult
     }
 
     /// <summary>
-    /// Determines whether this PipedProcessResult is equal to another PipedProcessResult object.
+    /// Determines whether this PipedProcessResult object is equal to another PipedProcessResult object.
     /// </summary>
     /// <remarks>This method intentionally does not consider Start and Exit times of Command Results for equality comparison.</remarks>
     /// <param name="other">The other PipedProcessResult to compare.</param>
@@ -83,7 +81,7 @@ public class PipedProcessResult
     }
 
     /// <summary>
-    /// Determines whether this PipedProcessResult is equal to another object.
+    /// Determines whether this PipedProcessResult object is equal to another object.
     /// </summary>
     /// <param name="obj">The other object to compare.</param>
     /// <returns>True if the other object is a PipedProcessResult and is equal to this PipedProcessResult; false otherwise.</returns>

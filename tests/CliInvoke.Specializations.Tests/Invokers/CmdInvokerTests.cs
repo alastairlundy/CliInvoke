@@ -1,11 +1,7 @@
-﻿using System.Threading.Tasks;
-using CliInvoke.Builders;
-
-namespace CliInvoke.Specializations.Tests.Invokers;
+﻿namespace CliInvoke.Specializations.Tests.Invokers;
 
 public class CmdInvokerTests : IClassFixture<TestFixture>
 {
-    
     public CmdInvokerTests(TestFixture testFixture)
     {
         //        CliCommandInvoker cliInvoker = new CliCommandInvoker(new PipedProcessRunner(new ProcessRunnerUtility(new FilePathResolver()),
@@ -17,7 +13,7 @@ public class CmdInvokerTests : IClassFixture<TestFixture>
         //        _specializedCliCommandInvoker = new CmdCliCommandInvoker(cliInvoker);
     }
     
-    [Fact]
+    /*[Fact]
     public async Task Invoke_Calc_Open_With_CMD_Test()
     {
         if (OperatingSystem.IsWindows())
@@ -35,6 +31,5 @@ public class CmdInvokerTests : IClassFixture<TestFixture>
                 
             //       Assert.True(Process.GetProcessesByName("Calculator").Any() &&
             //                     result.WasSuccessful);
-        }
-    }
+        }*/
 }

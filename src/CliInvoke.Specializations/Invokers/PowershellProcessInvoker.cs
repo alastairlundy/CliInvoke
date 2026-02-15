@@ -47,7 +47,6 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
             filePathResolver, "", false, redirectOutputs, redirectOutputs,
             windowCreation: windowCreation))
     {
-        
     }
 
     /// <summary>

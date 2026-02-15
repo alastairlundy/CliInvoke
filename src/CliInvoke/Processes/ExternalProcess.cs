@@ -221,62 +221,6 @@ public class ExternalProcess : IExternalProcess
     }
 
     /// <summary>
-    /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
-    /// </summary>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the asynchronous operation. The result contains the piped process result when the method completes.</returns>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    public async Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(CancellationToken cancellationToken)
-    {
-        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
-                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
-            : (Task<Stream>)Task.CompletedTask;
-        
-        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
-                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
-            : (Task<Stream>)Task.CompletedTask;
-        
-        try
-        {
-            await Task.WhenAll([
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputStream,
-                standardErrorStream
-            ]);
-
-            if (Configuration is { RedirectStandardOutput: true, StandardOutput: not null })
-            {
-                await standardOutputStream.Result.CopyToAsync(Configuration.StandardOutput.BaseStream, cancellationToken);
-            }
-            if (Configuration is { RedirectStandardError: true, StandardError: not null })
-            {
-                await standardErrorStream.Result.CopyToAsync(Configuration.StandardError.BaseStream, cancellationToken);
-            }
-            
-            PipedProcessResult result = new(
-                _processWrapper.StartInfo.FileName,
-                _processWrapper.ExitCode,
-                _processWrapper.Id,
-                _processWrapper.StartTime,
-                _processWrapper.ExitTime,
-                await standardOutputStream,
-                await standardErrorStream
-            );
-
-            ThrowIfProcessNotSuccessful(result);
-
-            return result;
-        }
-        finally
-        {
-            standardOutputStream.Dispose();
-            standardErrorStream.Dispose();
-            Dispose();
-        }
-    }
-
-    /// <summary>
     /// Terminates the associated external process based on the specified exit configuration.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when an invalid value is provided for ExitConfiguration.TimeoutPolicy.CancellationMode.</exception>

@@ -4,7 +4,7 @@ using CliInvoke.Builders;
 
 namespace CliInvoke.Tests.Builders;
 
-public partial class ArgumentsBuilderTests
+public class ArgumentsBuilderTests
 {
     [Fact]
     public void Add_AppendsValue_WithSingleSpaceBetween()
@@ -14,7 +14,7 @@ public partial class ArgumentsBuilderTests
         IArgumentsBuilder afterFirst = builder.Add("first");
         IArgumentsBuilder afterSecond = afterFirst.Add("second");
 
-        Assert.False(object.ReferenceEquals(builder, afterFirst)); // new instance returned when no validation logic provided
+        Assert.False(ReferenceEquals(builder, afterFirst)); // new instance returned when no validation logic provided
         Assert.Equal("first second", afterSecond.ToString());
     }
 
@@ -53,18 +53,18 @@ public partial class ArgumentsBuilderTests
 
         IArgumentsBuilder result = builder.Add("bad");
 
-        Assert.True(object.ReferenceEquals(builder, result));
+        Assert.True(ReferenceEquals(builder, result));
         Assert.Equal(string.Empty, builder.ToString());
     }
 
     [Fact]
     public void Add_WithValidationLogic_ValidReturnsDifferentInstance_BufferIsShared()
     {
-        IArgumentsBuilder builder = new ArgumentsBuilder(s => true);
+        IArgumentsBuilder builder = new ArgumentsBuilder(_ => true);
 
         IArgumentsBuilder result = builder.Add("ok");
 
-        Assert.False(object.ReferenceEquals(builder, result));
+        Assert.False(ReferenceEquals(builder, result));
         Assert.Equal("ok", builder.ToString());
         Assert.Equal("ok", result.ToString());
     }
@@ -88,7 +88,7 @@ public partial class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        Assert.Throws<ArgumentNullException>(() => builder.AddEnumerable((IEnumerable<string>)null!, true));
+        Assert.Throws<ArgumentNullException>(() => builder.AddEnumerable((IEnumerable<string>)null, true));
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public partial class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        Assert.Throws<ArgumentNullException>(() => builder.AddEnumerable((IEnumerable<IFormattable>)null!, CultureInfo.InvariantCulture));
+        Assert.Throws<ArgumentNullException>(() => builder.AddEnumerable(null, CultureInfo.InvariantCulture));
     }
 
     [Fact]

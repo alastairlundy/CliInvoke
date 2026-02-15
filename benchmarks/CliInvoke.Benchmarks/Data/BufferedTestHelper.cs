@@ -1,8 +1,4 @@
-﻿using CliInvoke;
-using DotExtensions.IO.Directories;
-using System.Linq;
-
-namespace CliInvoke.Benchmarking.Data;
+﻿namespace CliInvoke.Benchmarking.Data;
 
 public class BufferedTestHelper
 {

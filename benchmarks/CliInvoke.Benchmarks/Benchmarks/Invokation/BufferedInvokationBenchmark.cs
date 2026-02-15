@@ -10,7 +10,7 @@ namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 [SimpleJob(RuntimeMoniker.Net90)]
 [SimpleJob(RuntimeMoniker.Net10_0)]
-[MemoryDiagnoser(true), Orderer(SummaryOrderPolicy.FastestToSlowest)]
+[MemoryDiagnoser, Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BufferedInvokationBenchmark
 {
     private readonly IProcessInvoker _processInvoker;

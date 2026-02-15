@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 using CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 //BenchmarkRunner.Run<BasicUnbufferedInvokationBenchmark>();

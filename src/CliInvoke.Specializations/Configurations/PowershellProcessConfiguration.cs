@@ -13,8 +13,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-// ReSharper disable RedundantBoolCompare
-
 namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>

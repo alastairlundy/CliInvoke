@@ -81,9 +81,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         RedirectStandardOutput = redirectStandardOutput;
         RedirectStandardError = redirectStandardError;
 
+#pragma warning disable CS0618 // Type or member is obsolete
         StandardInput = standardInput ?? StreamWriter.Null;
         StandardOutput = standardOutput ?? StreamReader.Null;
         StandardError = standardError ?? StreamReader.Null;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         UseShellExecution = useShellExecution;
         WindowCreation = windowCreation;
@@ -214,8 +216,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && Credential.Equals(other.Credential)
                && ResourcePolicy.Equals(other.ResourcePolicy)
                && StandardInput.Equals(other.StandardInput)
+#pragma warning disable CS0618 // Type or member is obsolete
                && StandardOutput.Equals(other.StandardOutput)
                && StandardError.Equals(other.StandardError)
+#pragma warning restore CS0618 // Type or member is obsolete
                && RedirectStandardInput.Equals(other.RedirectStandardInput)
                && RedirectStandardOutput.Equals(other.RedirectStandardOutput)
                && RedirectStandardError.Equals(other.RedirectStandardError)
@@ -261,8 +265,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(Credential);
 
         hashCode.Add(StandardInput);
+#pragma warning disable CS0618 // Type or member is obsolete
         hashCode.Add(StandardOutput);
         hashCode.Add(StandardError);
+#pragma warning restore CS0618 // Type or member is obsolete
         hashCode.Add(ResourcePolicy);
         hashCode.Add(StandardInputEncoding);
         hashCode.Add(StandardOutputEncoding);
@@ -322,8 +328,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     {
         Credential.Dispose();
         StandardInput?.Dispose();
+        
+#pragma warning disable CS0618 // Type or member is obsolete
         StandardOutput?.Dispose();
         StandardError?.Dispose();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     /// <summary>

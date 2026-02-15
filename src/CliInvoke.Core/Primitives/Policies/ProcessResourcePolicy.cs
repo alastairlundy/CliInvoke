@@ -36,7 +36,9 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         {
             ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
 
+#pragma warning disable CA1416
             MinWorkingSet = minWorkingSet;
+#pragma warning restore CA1416
         }
 
         if (maxWorkingSet is not null)
@@ -63,9 +65,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         }
 
         if (maxWorkingSet is not null)
+#pragma warning disable CA1416
             MaxWorkingSet = maxWorkingSet;
         
         ProcessorAffinity = processorAffinity ??
+#pragma warning restore CA1416
 #if NETSTANDARD2_0
                             (nint)
 #endif
@@ -169,6 +173,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <returns>The hash code for the current ProcessResourcePolicy.</returns>
     public override int GetHashCode()
     {
+#pragma warning disable CA1416
         return HashCode.Combine(
             ProcessorAffinity ?? Default.ProcessorAffinity,
             (int)PriorityClass,
@@ -176,6 +181,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
             MinWorkingSet ?? Default.MinWorkingSet,
             MaxWorkingSet ?? Default.MaxWorkingSet
         );
+#pragma warning restore CA1416
     }
 
     /// <summary>
