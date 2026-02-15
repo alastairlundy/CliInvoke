@@ -10,6 +10,9 @@
 
 namespace CliInvoke.Core.Processes;
 
+/// <summary>
+/// A contract for an external process that can be run.
+/// </summary>
 public interface IExternalProcess : IDisposable
 {
     /// <summary>
@@ -33,12 +36,12 @@ public interface IExternalProcess : IDisposable
     bool HasStarted { get; }
 
     /// <summary>
-    ///
+    /// Represents an event that occurs when the external process starts.
     /// </summary>
     event EventHandler Started;
 
     /// <summary>
-    /// 
+    /// Represents an event that occurs when the external process exits.
     /// </summary>
     event EventHandler Exited;
 
