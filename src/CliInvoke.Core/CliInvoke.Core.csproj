@@ -24,13 +24,17 @@
         <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.4.0-alpha.2</Version>
-        <PackageReleaseNotes>* Adds ``IExternalProcess`` (the interface for ``ExternalProcess``) - This is not an injectable service and exists to facilitate a possible future ``ExternalProcess`` Factory pattern, and/or allow alternate implementations.</PackageReleaseNotes>
+        <Version>2.4.0-beta.1</Version>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.8.1 to 9.9.0
+* Added ``Started`` and ``Exited`` event handlers for ``IExternalProcess``
+* Updated xml doc comments
+* Added missing xml doc comments
+* Removed ``IExternalProcess``'s ``WaitForPipedExitOrTimeoutAsync`` method</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.8.1" PrivateAssets="all"/>
+        <PackageReference Include="Polyfill" Version="9.9.0" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
     </ItemGroup>
 

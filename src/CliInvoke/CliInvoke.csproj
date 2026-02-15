@@ -15,11 +15,15 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Adds ``ExternalProcess`` - An alternative to the Process Invokation design pattern. This initial version makes use of CliInvoke v2's file path resolver and process pipe handling as well as internal CliInvoke helper code.</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.8.1 to 9.9.0
+* Added ``Started`` and ``Exited`` event handlers for ``ExternalProcess``
+* Updated xml doc comments
+* Added missing xml doc comments
+* Removed ``ExternalProcess``'s ``WaitForPipedExitOrTimeoutAsync`` method</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.4.0-alpha.2</PackageVersion>
+        <PackageVersion>2.4.0-beta.1</PackageVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -38,7 +42,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.8.1" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.9.0" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
