@@ -1,9 +1,9 @@
 # CliInvoke
 
 <!-- Badges -->
-[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
-[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
-[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
+[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.svg?style=flat-square)](https://www.nuget.org/packages/CliInvoke/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.svg?style=flat-square)](https://www.nuget.org/packages/CliInvoke/)
+[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.svg?style=flat-square)](https://www.nuget.org/packages/CliInvoke/)
 ![GitHub License](https://img.shields.io/github/license/alastairlundy/CliInvoke?style=flat-square&color=6a0dad)
 
 
