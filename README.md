@@ -4,7 +4,8 @@
 [![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
 [![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
 [![Downloads](https://img.shields.io/nuget/dt/CliInvoke.svg)](https://www.nuget.org/packages/CliInvoke/)
-![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
+![GitHub License](https://img.shields.io/github/license/alastairlundy/CliInvoke?style=flat-square&color=6a0dad)
+
 
 <img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
 
