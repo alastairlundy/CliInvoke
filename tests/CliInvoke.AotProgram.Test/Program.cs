@@ -6,7 +6,7 @@ using CliInvoke.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 // ReSharper disable LocalizableElement
 
-Console.WriteLine("CliInvoke.Aot.Test starting");
+Console.WriteLine("CliInvoke.AotProgram.Test starting");
 
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
