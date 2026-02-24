@@ -80,5 +80,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
     [SupportedOSPlatform("windows")]
     public new string TargetFilePath =>
         OperatingSystem.IsWindows() ?
-            $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe" : throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
+            $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe" : 
+            throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
 }
