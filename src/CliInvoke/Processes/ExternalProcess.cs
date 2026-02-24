@@ -105,7 +105,8 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task StartAsync(CancellationToken cancellationToken) => await StartAsync(Configuration, cancellationToken);
+    public async Task StartAsync(CancellationToken cancellationToken) 
+        => await StartAsync(Configuration, cancellationToken);
 
     /// <summary>
     /// Starts the external process asynchronously using the specified configuration.
