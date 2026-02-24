@@ -40,7 +40,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Polyfill" Version="9.9.0" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.10.0" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -93,7 +93,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="DotExtensions" Version="9.6.2" />
+      <PackageReference Include="DotExtensions" Version="9.7.0" />
       <PackageReference Include="DotPrimitives" Version="4.3.2" />
     </ItemGroup>
 </Project>
