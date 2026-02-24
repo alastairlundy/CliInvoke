@@ -12,11 +12,11 @@ namespace CliInvoke.Core;
 /// <summary>
 /// Specifies the behaviour for handling exceptions when a process cancellation occurs.
 /// </summary>
-// TODO: Rename type for v3
+// TODO: Rename type to ProcessCancellationHandlingMode for v3
 public enum ProcessCancellationExceptionBehavior
 {
     /// <summary>
-    /// No validation is performed.
+    /// Suppresses thrown exceptions.
     /// </summary>
     SuppressException = 0,
 

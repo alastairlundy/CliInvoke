@@ -338,7 +338,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
             credentialBuilder.SetPassword(_configuration.Credential.Password);
                 
         if(_configuration.Credential.UserName is not null)
-                credentialBuilder.SetUsername(_configuration.Credential.UserName);
+            credentialBuilder.SetUsername(_configuration.Credential.UserName);
         
         credentialBuilder.LoadUserProfile(_configuration.Credential.LoadUserProfile ?? false);
 
