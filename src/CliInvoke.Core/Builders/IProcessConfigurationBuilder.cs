@@ -9,6 +9,8 @@
 
 using System.Text;
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core.Builders;
 
 /// <summary>
@@ -114,6 +116,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="target">The target to send the Standard Output to.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Standard Output Pipe Target.</returns>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target);
 
     /// <summary>
@@ -121,6 +124,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="target">The target to send the Standard Error to.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Standard Error Pipe Target.</returns>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target);
 
     /// <summary>

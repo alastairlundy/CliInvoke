@@ -338,7 +338,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
             credentialBuilder.SetPassword(_configuration.Credential.Password);
                 
         if(_configuration.Credential.UserName is not null)
-                credentialBuilder.SetUsername(_configuration.Credential.UserName);
+            credentialBuilder.SetUsername(_configuration.Credential.UserName);
         
         credentialBuilder.LoadUserProfile(_configuration.Credential.LoadUserProfile ?? false);
 
@@ -482,6 +482,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Output will throw an Exception. This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput"/>
     [Pure]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target)
     {
         ArgumentNullException.ThrowIfNull(target);
@@ -518,6 +519,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Error will throw an Exception. This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror"/>
     [Pure]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target)
     {
         ArgumentNullException.ThrowIfNull(target);
