@@ -491,7 +491,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// Configures whether shell execution should be used for the process.
     /// </summary>
     /// <param name="useShellExecution">True to use shell execution, false otherwise.</param>
-    /// <returns>The updated Process Configuration builder with the updated configuration info.</returns>
+    /// <returns>The updated Process Configuration builder with the updated configuration information.</returns>
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Input will throw an Exception.
     /// This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput"/>
@@ -555,7 +555,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="standardInputEncoding">The encoding scheme to use for standard input.
     /// Uses the Default Encoding if null.</param>
-    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
+    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration information.</returns>
     [Pure]
     public IProcessConfigurationBuilder SetStandardInputEncoding(
         Encoding? standardInputEncoding = null
@@ -588,7 +588,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="standardOutputEncoding">The encoding scheme to use for standard output.
     /// Uses the Default Encoding if null.</param>
-    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
+    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration information.</returns>
     [Pure]
     public IProcessConfigurationBuilder SetStandardOutputEncoding(
         Encoding? standardOutputEncoding = null
@@ -621,7 +621,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="standardErrorEncoding">The encoding scheme to use for standard error.
     /// Uses the Default Encoding if null.</param>
-    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration info.</returns>
+    /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration information.</returns>
     [Pure]
     public IProcessConfigurationBuilder SetStandardErrorEncoding(
         Encoding? standardErrorEncoding = null
