@@ -13,6 +13,7 @@
 ### 2.3
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.3.4 | February 24th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.3.4 | 
 | 2.3.3 | February 15th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.3.3 |
 | 2.3.2 | February 14th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.3.2 |
 | 2.3.1 | February 4th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.3.1 |
