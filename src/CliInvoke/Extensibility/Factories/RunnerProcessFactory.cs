@@ -43,8 +43,6 @@ public class RunnerProcessFactory : IRunnerProcessFactory
             .SetStandardOutputEncoding(processConfigToBeRun.StandardOutputEncoding)
             .SetStandardErrorEncoding(processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)
-            .SetStandardOutputPipe(processConfigToBeRun.StandardOutput ?? StreamReader.Null)
-            .SetStandardErrorPipe(processConfigToBeRun.StandardError ?? StreamReader.Null)
             .SetUserCredential(processConfigToBeRun.Credential)
             .ConfigureShellExecution(processConfigToBeRun.UseShellExecution)
             .RedirectStandardInput(processConfigToBeRun.RedirectStandardInput)

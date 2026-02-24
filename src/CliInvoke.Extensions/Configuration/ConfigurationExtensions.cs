@@ -72,8 +72,6 @@ public static class ConfigurationExtensions
                 .RedirectStandardError(processStartInfo.RedirectStandardError)
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
                 .SetStandardInputPipe(StreamWriter.Null)
-                .SetStandardOutputPipe(StreamReader.Null)
-                .SetStandardErrorPipe(StreamReader.Null)
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
                 .SetStandardInputEncoding(processStartInfo.StandardInputEncoding)
 #endif

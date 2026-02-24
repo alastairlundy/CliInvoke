@@ -9,8 +9,6 @@
 
 using System.Text;
 
-using CliInvoke.Core.Internal;
-
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace CliInvoke.Core;
@@ -30,8 +28,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
     /// <param name="credential">The credential to be used (if specified).</param>
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
-    /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
-    /// <param name="standardError">The standard error destination to be used (if specified).</param>
     /// <param name="standardInputEncoding">The Standard Input Encoding to be used (if specified).</param>
     /// <param name="standardOutputEncoding">The Standard Output Encoding to be used (if specified).</param>
     /// <param name="standardErrorEncoding">The Standard Error Encoding to be used (if specified).</param>
@@ -55,8 +51,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         IReadOnlyDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null,
         StreamWriter? standardInput = null,
-        StreamReader? standardOutput = null,
-        StreamReader? standardError = null,
         Encoding? standardInputEncoding = null,
         Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null,
@@ -83,8 +77,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
 #pragma warning disable CS0618 // Type or member is obsolete
         StandardInput = standardInput ?? StreamWriter.Null;
-        StandardOutput = standardOutput ?? StreamReader.Null;
-        StandardError = standardError ?? StreamReader.Null;
 #pragma warning restore CS0618 // Type or member is obsolete
 
         UseShellExecution = useShellExecution;
@@ -143,18 +135,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Input will throw an Exception. This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror" />
     public StreamWriter? StandardInput { get; protected set; }
-
-    /// <summary>
-    /// The Standard Output target to redirect Standard Output to if configured.
-    /// </summary>
-    [Obsolete(DeprecationMessages.DeprecationV3)]
-    public StreamReader? StandardOutput { get; protected set; }
-
-    /// <summary>
-    /// The Standard Error target to redirect Standard Output to if configured.
-    /// </summary>
-    [Obsolete(DeprecationMessages.DeprecationV3)]
-    public StreamReader? StandardError { get; protected set; }
 
     /// <summary>
     /// Whether to redirect the Standard Input.
@@ -216,10 +196,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && Credential.Equals(other.Credential)
                && ResourcePolicy.Equals(other.ResourcePolicy)
                && StandardInput.Equals(other.StandardInput)
-#pragma warning disable CS0618 // Type or member is obsolete
-               && StandardOutput.Equals(other.StandardOutput)
-               && StandardError.Equals(other.StandardError)
-#pragma warning restore CS0618 // Type or member is obsolete
                && RedirectStandardInput.Equals(other.RedirectStandardInput)
                && RedirectStandardOutput.Equals(other.RedirectStandardOutput)
                && RedirectStandardError.Equals(other.RedirectStandardError)
@@ -265,10 +241,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(Credential);
 
         hashCode.Add(StandardInput);
-#pragma warning disable CS0618 // Type or member is obsolete
-        hashCode.Add(StandardOutput);
-        hashCode.Add(StandardError);
-#pragma warning restore CS0618 // Type or member is obsolete
         hashCode.Add(ResourcePolicy);
         hashCode.Add(StandardInputEncoding);
         hashCode.Add(StandardOutputEncoding);
@@ -328,11 +300,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     {
         Credential.Dispose();
         StandardInput?.Dispose();
-        
-#pragma warning disable CS0618 // Type or member is obsolete
-        StandardOutput?.Dispose();
-        StandardError?.Dispose();
-#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     /// <summary>

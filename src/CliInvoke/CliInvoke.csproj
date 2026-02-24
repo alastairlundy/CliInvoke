@@ -94,5 +94,6 @@
     <ItemGroup>
       <PackageReference Include="DotExtensions" Version="9.7.0" />
       <PackageReference Include="DotPrimitives" Version="4.3.2" />
+      <PackageReference Include="WhatExec.Lib.Abstractions" Version="1.0.0-preview.2" />
     </ItemGroup>
 </Project>

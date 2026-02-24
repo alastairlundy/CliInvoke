@@ -40,8 +40,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
     /// <param name="credentials">The user credentials to be used when running the command.</param>
     /// <param name="standardInput">The stream for the standard input.</param>
-    /// <param name="standardOutput">The stream for the standard output.</param>
-    /// <param name="standardError">The stream for the standard error.</param>
     /// <param name="standardInputEncoding">The encoding for the standard input stream.</param>
     /// <param name="standardOutputEncoding">The encoding for the standard output stream.</param>
     /// <param name="standardErrorEncoding">The encoding for the standard error stream.</param>
@@ -55,7 +53,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
-        StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
+        StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
@@ -63,8 +61,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
             redirectStandardInput, redirectStandardOutput, redirectStandardError,
             arguments, workingDirectoryPath,
             requiresAdministrator, environmentVariables, credentials,
-            standardInput, standardOutput, standardError,
-            standardInputEncoding, standardOutputEncoding, standardErrorEncoding,
+            standardInput, standardInputEncoding, standardOutputEncoding, standardErrorEncoding,
             processResourcePolicy,
             windowCreation: windowCreation,
             useShellExecution: useShellExecution)

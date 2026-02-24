@@ -110,20 +110,6 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source);
 
     /// <summary>
-    /// Sets the Standard Output Pipe target.
-    /// </summary>
-    /// <param name="target">The target to send the Standard Output to.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Output Pipe Target.</returns>
-    IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target);
-
-    /// <summary>
-    /// Sets the Standard Error Pipe target.
-    /// </summary>
-    /// <param name="target">The target to send the Standard Error to.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Error Pipe Target.</returns>
-    IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target);
-
-    /// <summary>
     /// Sets the Process Resource Policy to be used for this Process.
     /// </summary>
     /// <param name="processResourcePolicy">The process resource policy to use.</param>

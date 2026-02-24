@@ -14,6 +14,8 @@ using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 using CliInvoke.Helpers.Processes.Cancellation;
 
+using WhatExec.Lib.Abstractions;
+
 namespace CliInvoke.Processes;
 
 /// <summary>
@@ -24,18 +26,18 @@ public class ExternalProcess : IExternalProcess
     private ProcessWrapper _processWrapper;
     
     private readonly IProcessPipeHandler _processPipeHandler;
-    private readonly IFilePathResolver _filePathResolver;
+    private readonly IExecutableFileResolver _executableFileResolver;
     
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="filePathResolver"></param>
+    /// <param name="executableFileResolver"></param>
     /// <param name="processPipeHandler"></param>
     /// <param name="targetFilePath"></param>
-    public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler, string targetFilePath)
+    public ExternalProcess(IExecutableFileResolver executableFileResolver, IProcessPipeHandler processPipeHandler, string targetFilePath)
     {
         _processPipeHandler = processPipeHandler;
-        _filePathResolver = filePathResolver;
+        _executableFileResolver = executableFileResolver;
         
         Configuration = new ProcessConfiguration(targetFilePath,
             false, true, true);
@@ -49,15 +51,15 @@ public class ExternalProcess : IExternalProcess
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="filePathResolver"></param>
+    /// <param name="executableFileResolver"></param>
     /// <param name="processPipeHandler"></param>
     /// <param name="configuration"></param>
     /// <param name="exitConfiguration"></param>
-    public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler,
+    public ExternalProcess(IExecutableFileResolver executableFileResolver, IProcessPipeHandler processPipeHandler,
         ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null)
     {
         _processPipeHandler = processPipeHandler;
-        _filePathResolver = filePathResolver;
+        _executableFileResolver = executableFileResolver;
         
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
@@ -118,8 +120,10 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("browser")]
     public async Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken)
     {
-        Configuration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            Configuration.TargetFilePath);
+        FileInfo filePath = await _executableFileResolver.LocateExecutableAsync(
+            Configuration.TargetFilePath, SearchOption.AllDirectories, cancellationToken);
+
+        Configuration.TargetFilePath = filePath.FullName;
 
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         
@@ -255,11 +259,11 @@ public class ExternalProcess : IExternalProcess
 
     private void ThrowIfProcessNotSuccessful(ProcessResult result)
     {
-        if (ExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
+        /*if (ExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
             && _processWrapper.ExitCode != 0)
         {
             throw new ProcessNotSuccessfulException(new ProcessExceptionInfo(result,
                 Configuration));
-        }
+        }*/
     }
 }

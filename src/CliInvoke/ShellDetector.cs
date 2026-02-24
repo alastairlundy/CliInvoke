@@ -14,6 +14,8 @@ using CliInvoke.Core.Factories;
 using DotExtensions.Platforms;
 using DotExtensions.Versions;
 
+using WhatExec.Lib.Abstractions;
+
 namespace CliInvoke;
 
 /// <summary>
@@ -22,18 +24,18 @@ namespace CliInvoke;
 public class ShellDetector : IShellDetector
 {
     private readonly IProcessInvoker _processInvoker;
-    private readonly IFilePathResolver _filePathResolver;
+    private readonly IExecutableFileResolver _executableFileResolver;
     private readonly IProcessConfigurationFactory _processConfigurationFactory;
 
     /// <summary>
     /// Represents a detector for resolving the default shell on various operating systems.
     /// </summary>
     public ShellDetector(IProcessInvoker processInvoker,
-        IFilePathResolver filePathResolver,
+        IExecutableFileResolver executableFileResolver,
         IProcessConfigurationFactory processConfigurationFactory)
     {
         _processInvoker = processInvoker;
-        _filePathResolver = filePathResolver;
+        _executableFileResolver = executableFileResolver;
         _processConfigurationFactory = processConfigurationFactory;
     }
 
@@ -69,10 +71,11 @@ public class ShellDetector : IShellDetector
             execConfiguration, ProcessExitConfiguration.Default, false,
             cancellationToken);
 
-        string shellExe = _filePathResolver.ResolveFilePath(execResult.StandardOutput.Split(Environment.NewLine).First());
+        FileInfo shellExeInfo = await _executableFileResolver.LocateExecutableAsync(execResult.StandardOutput.Split(Environment.NewLine).First(),
+            SearchOption.AllDirectories, cancellationToken);
 
         using ProcessConfiguration shellInfoProcessConfig = _processConfigurationFactory
-            .Create(shellExe, "--version");
+            .Create(shellExeInfo.FullName, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
             shellInfoProcessConfig, ProcessExitConfiguration.Default, false,
@@ -90,7 +93,7 @@ public class ShellDetector : IShellDetector
         Version shellVersion = Version.GracefulParse(versionString);
         
         return new ShellInformation(shellPrettyName, 
-            new FileInfo(shellExe), shellVersion);
+            shellExeInfo, shellVersion);
     }
 
     [SupportedOSPlatform("windows")]
@@ -99,10 +102,10 @@ public class ShellDetector : IShellDetector
     {
         try
         {
-            string powershell5Plus = _filePathResolver.ResolveFilePath("pwsh.exe");
+            FileInfo powershell5PlusFileInfo = await _executableFileResolver.LocateExecutableAsync("pwsh.exe", SearchOption.AllDirectories, cancellationToken);
             
             using ProcessConfiguration powershellConfig = _processConfigurationFactory
-                .Create(powershell5Plus, "");
+                .Create(powershell5PlusFileInfo.FullName, "");
             
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(powershellConfig, 
                 ProcessExitConfiguration.Default, false,  cancellationToken);
@@ -114,15 +117,15 @@ public class ShellDetector : IShellDetector
             
             Version version = Version.GracefulParse(versionString);
 
-            return new ShellInformation(powershellResults.First(), new FileInfo(powershell5Plus),
+            return new ShellInformation(powershellResults.First(), powershell5PlusFileInfo,
                 version);
         }
         catch
         {
-            string cmdExe = _filePathResolver.ResolveFilePath("cmd.exe");
+            FileInfo cmdExeInfo = await _executableFileResolver.LocateExecutableAsync("cmd.exe",  SearchOption.AllDirectories, cancellationToken);
 
             using ProcessConfiguration cmdConfig = _processConfigurationFactory
-                .Create(cmdExe, "");
+                .Create(cmdExeInfo.FullName, "");
             
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
                 ProcessExitConfiguration.Default, false,  cancellationToken);
@@ -134,7 +137,7 @@ public class ShellDetector : IShellDetector
                 .Replace("Version", "")
                 .Replace(" ", string.Empty));
 
-            return new ShellInformation("cmd", new FileInfo(cmdExe), cmdVersion);
+            return new ShellInformation("cmd", cmdExeInfo, cmdVersion);
         }
     }
 }

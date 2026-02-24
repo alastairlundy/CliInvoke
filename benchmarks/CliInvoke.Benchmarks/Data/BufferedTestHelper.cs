@@ -1,4 +1,6 @@
-﻿namespace CliInvoke.Benchmarking.Data;
+﻿using CliInvoke.Benchmarking.Helpers;
+
+namespace CliInvoke.Benchmarking.Data;
 
 public class BufferedTestHelper
 {
@@ -13,7 +15,7 @@ public class BufferedTestHelper
 
         try
         {
-            return new FilePathResolver().ResolveFilePath(mockDataToolExe);
+            return CliInvokeHelpers.CreateFileResolver().LocateExecutableAsync(mockDataToolExe, SearchOption.AllDirectories, CancellationToken.None).Result.FullName;
         }
         catch (Exception)
         {
@@ -24,10 +26,10 @@ public class BufferedTestHelper
             {
                 // Check if the current directory contains the tool project directly or inside a 'benchmarks' folder
                 string[] potentialProjectPaths =
-                {
+                [
                     Path.Combine(currentDir.FullName, "CliInvoke.Benchmarking.MockDataSimulationTool"),
                     Path.Combine(currentDir.FullName, "benchmarks", "CliInvoke.Benchmarking.MockDataSimulationTool")
-                };
+                ];
 
                 foreach (string projectPath in potentialProjectPaths)
                 {
@@ -64,11 +66,7 @@ public class BufferedTestHelper
         throw new ArgumentException($"Could not find {mockDataToolExe} executable in PATH or project structure.");
     }
 
-    public string TargetFilePath
-    {
-        get;
-        private set => field = value;
-    }
+    public string TargetFilePath { get; private set; }
 
     public string Arguments => "gen-fake-text";
 }

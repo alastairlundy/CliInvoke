@@ -89,8 +89,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -124,8 +122,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -160,8 +156,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -197,8 +191,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 environmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -229,8 +221,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -263,8 +253,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -300,8 +288,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -366,8 +352,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput ?? StreamWriter.Null,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -396,8 +380,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput ?? StreamReader.Null,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -426,8 +408,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError ?? StreamReader.Null,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -462,80 +442,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 source,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
-        );
-    }
-
-    /// <summary>
-    /// Sets the Standard Output Pipe target.
-    /// </summary>
-    /// <param name="target">The target to send the Standard Output to.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Output Pipe Target.</returns>
-    /// <remarks>Using Shell Execution whilst also Redirecting Standard Output will throw an Exception. This is a known issue with the System Process class.</remarks>
-    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput"/>
-    [Pure]
-    public IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target)
-    {
-        ArgumentNullException.ThrowIfNull(target);
-        
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                target,
-                _configuration.StandardError,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
-        );
-    }
-
-    /// <summary>
-    /// Sets the Standard Error Pipe target.
-    /// </summary>
-    /// <param name="target">The target to send the Standard Error to.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Error Pipe Target.</returns>
-    /// <remarks>Using Shell Execution whilst also Redirecting Standard Error will throw an Exception. This is a known issue with the System Process class.</remarks>
-    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror"/>
-    [Pure]
-    public IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target)
-    {
-        ArgumentNullException.ThrowIfNull(target);
-        
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardOutput,
-                target,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -571,8 +477,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -606,8 +510,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -638,8 +540,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
@@ -673,9 +573,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
-                standardInputEncoding: standardInputEncoding ?? Encoding.Default,
+                standardInputEncoding ?? Encoding.Default,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy: _configuration.ResourcePolicy,
@@ -708,10 +606,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
-                standardOutputEncoding: standardOutputEncoding ?? Encoding.Default,
+                standardOutputEncoding ?? Encoding.Default,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy: _configuration.ResourcePolicy,
                 windowCreation: _configuration.WindowCreation,
@@ -743,11 +639,9 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.EnvironmentVariables,
                 _configuration.Credential,
                 _configuration.StandardInput,
-                _configuration.StandardOutput,
-                _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
-                standardErrorEncoding: standardErrorEncoding ?? Encoding.Default,
+                standardErrorEncoding ?? Encoding.Default,
                 processResourcePolicy: _configuration.ResourcePolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution

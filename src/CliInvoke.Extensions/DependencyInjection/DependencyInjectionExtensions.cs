@@ -13,6 +13,9 @@ using CliInvoke.Factories;
 using CliInvoke.Piping;
 using CliInvoke.Validation;
 
+using WhatExec.Lib;
+using WhatExec.Lib.Abstractions;
+
 // ReSharper disable RedundantAssignment
 
 namespace CliInvoke.Extensions;
@@ -34,7 +37,7 @@ public static partial class DependencyInjectionExtensions
         switch (lifetime)
         {
             case ServiceLifetime.Singleton:
-                services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
+                services.TryAddSingleton<IExecutableFileResolver, ExecutableFileResolver>();
                 services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.TryAddSingleton<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(
@@ -51,7 +54,7 @@ public static partial class DependencyInjectionExtensions
                 services.AddSingleton<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Scoped:
-                services.TryAddScoped<IFilePathResolver, FilePathResolver>();
+                services.TryAddScoped<IExecutableFileResolver, ExecutableFileResolver>();
                 services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 
                 services.TryAddScoped<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(
@@ -68,7 +71,7 @@ public static partial class DependencyInjectionExtensions
                 services.AddScoped<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Transient:
-                services.TryAddTransient<IFilePathResolver, FilePathResolver>();
+                services.TryAddTransient<IExecutableFileResolver, ExecutableFileResolver>();
                 services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
 
                 services.TryAddTransient<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(

@@ -45,13 +45,7 @@ public class ProcessResult : IEquatable<ProcessResult>
         ExitTime = exitTime;
         ProcessId = processId;
     }
-
-    /// <summary>
-    /// Whether the Command successfully exited.
-    /// </summary>
-    [Obsolete(DeprecationMessages.DeprecationV3)]
-    public bool WasSuccessful => ExitCode == 0;
-
+    
     /// <summary>
     /// The unique identifier assigned to the process when it was executed.
     /// </summary>

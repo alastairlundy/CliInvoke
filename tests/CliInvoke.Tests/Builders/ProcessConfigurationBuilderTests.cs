@@ -30,8 +30,6 @@ public class ProcessConfigurationBuilderTests
                             builtCommand.StandardErrorEncoding.Equals(Encoding.Default));
                 Assert.Equal(builtCommand.Credential, UserCredential.Null);
                 Assert.Equal(builtCommand.StandardInput, StreamWriter.Null);
-                Assert.Equal(builtCommand.StandardOutput, StreamReader.Null);
-                Assert.Equal(builtCommand.StandardError, StreamReader.Null);
                 Assert.Equal(builtCommand.Credential, UserCredential.Null);
                 Assert.Equal(ProcessResourcePolicy.Default, builtCommand.ResourcePolicy);
                 Assert.False(builtCommand.WindowCreation);
@@ -58,18 +56,6 @@ public class ProcessConfigurationBuilderTests
                         new ProcessConfigurationBuilder("foo");
 
                 //Assert
-                Assert.Throws<ArgumentException>(() =>
-                {
-                        processConfigBuilder.ConfigureShellExecution(true)
-                                .SetStandardOutputPipe(new StreamReader(Console.OpenStandardOutput()));
-                });
-                
-                Assert.Throws<ArgumentException>(() =>
-                {
-                        processConfigBuilder.ConfigureShellExecution(true)
-                                .SetStandardErrorPipe(new StreamReader(Console.OpenStandardError()));
-                });
-                
                 Assert.Throws<ArgumentException>(() =>
                 {
                         processConfigBuilder.ConfigureShellExecution(true)
@@ -107,10 +93,8 @@ public class ProcessConfigurationBuilderTests
                 Assert.NotEqual(newArguments,
                         processConfigBuilder.Build());
         }
-
-
+        
         [SupportedOSPlatform("windows")]
-
         [Fact]
         public void TestReconfiguredUserCredential()
         {
@@ -152,7 +136,6 @@ public class ProcessConfigurationBuilderTests
         [SupportedOSPlatform("linux")]
         [SupportedOSPlatform("macos")]
         [SupportedOSPlatform("freebsd")]
-
         [Fact]
         public void TestReconfiguredResourcePolicy()
         {

@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using WhatExec.Lib.Abstractions;
+
 namespace CliInvoke.Extensions;
 
 public static class FilePathResolverRegistration
@@ -15,12 +17,12 @@ public static class FilePathResolverRegistration
     extension(IServiceCollection services)
     {
         /// <summary>
-        /// Registers a custom implementation of the <see cref="IFilePathResolver"/> interface
+        /// Registers a custom implementation of the <see cref="IExecutableFileResolver"/> interface
         /// with the specified service lifetime in the dependency injection container.
         /// </summary>
         /// <typeparam name="TResolver">
-        /// The type of the custom implementation for <see cref="IFilePathResolver"/>.
-        /// This type must be a class and implement the <see cref="IFilePathResolver"/> interface.
+        /// The type of the custom implementation for <see cref="IExecutableFileResolver"/>.
+        /// This type must be a class and implement the <see cref="IExecutableFileResolver"/> interface.
         /// </typeparam>
         /// <param name="serviceLifetime">
         /// The <see cref="ServiceLifetime"/> defining the lifetime of the registered service.
@@ -35,20 +37,20 @@ public static class FilePathResolverRegistration
 #endif
             TResolver>(
             ServiceLifetime serviceLifetime)
-            where TResolver : class, IFilePathResolver
+            where TResolver : class, IExecutableFileResolver
         {
-            services.RemoveAll<IFilePathResolver>();
+            services.RemoveAll<IExecutableFileResolver>();
             
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Singleton:
-                    services.TryAddSingleton<IFilePathResolver, TResolver>();
+                    services.TryAddSingleton<IExecutableFileResolver, TResolver>();
                     return services;
                 case ServiceLifetime.Scoped:
-                    services.TryAddScoped<IFilePathResolver, TResolver>();
+                    services.TryAddScoped<IExecutableFileResolver, TResolver>();
                     return services;
                 case ServiceLifetime.Transient:
-                    services.TryAddTransient<IFilePathResolver, TResolver>();
+                    services.TryAddTransient<IExecutableFileResolver, TResolver>();
                     return services;
                 default:
                     throw new NotSupportedException();

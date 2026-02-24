@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 
 using CliInvoke.Specializations.Configurations;
 
+using WhatExec.Lib.Abstractions;
+
 namespace CliInvoke.Specializations;
 
 /// <summary>
@@ -41,7 +43,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     public PowershellProcessInvoker(IProcessInvoker processInvoker,
-        IRunnerProcessFactory runnerProcessFactory, IFilePathResolver filePathResolver,
+        IRunnerProcessFactory runnerProcessFactory, IExecutableFileResolver filePathResolver,
         bool windowCreation = true, bool redirectOutputs = true)
         : base(processInvoker, runnerProcessFactory, new PowershellProcessConfiguration(
             filePathResolver, "", false, redirectOutputs, redirectOutputs,
@@ -53,7 +55,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     /// Executes a PowerShell process asynchronously using the specified configuration.
     /// </summary>
     /// <param name="processConfiguration">The configuration of the process to execute.</param>
-    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behavior. Defaults to null.</param>
+    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behaviour. Defaults to null.</param>
     /// <param name="disposeOfConfig">Specifies whether to dispose of the configuration after execution. Defaults to true.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation. Defaults to CancellationToken.None.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ProcessResult"/> object with the details of the process execution outcome.</returns>
@@ -76,7 +78,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     /// Executes a PowerShell process asynchronously with buffered input and output.
     /// </summary>
     /// <param name="processConfiguration">The configuration of the process to execute.</param>
-    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behavior. Defaults to null.</param>
+    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behaviour. Defaults to null.</param>
     /// <param name="disposeOfConfig">Specifies whether to dispose of the configuration after execution. Defaults to true.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation. Defaults to CancellationToken.None.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="BufferedProcessResult"/> object with the details of the process execution outcome.</returns>
@@ -100,7 +102,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     /// Executes a PowerShell process asynchronously with piped input and output.
     /// </summary>
     /// <param name="processConfiguration">The configuration of the process to execute.</param>
-    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behavior. Defaults to null.</param>
+    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behaviour. Defaults to null.</param>
     /// <param name="disposeOfConfig">Specifies whether to dispose of the configuration after execution. Defaults to true.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation. Defaults to CancellationToken.None.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="PipedProcessResult"/> object with the details of the process execution outcome.</returns>
