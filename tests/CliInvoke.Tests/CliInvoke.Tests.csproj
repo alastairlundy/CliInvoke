@@ -31,7 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ExternalProcess\" />
       <Folder Include="Invokers\Cancellation\" />
     </ItemGroup>
 
