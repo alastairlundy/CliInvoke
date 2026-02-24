@@ -10,10 +10,10 @@ Versions that are currently supported with Bug Fixes and/or Security Fixes.
 
 | Version series | Supported with Bug Fixes | Supported with Security Fixes |
 |--| --|--|
+| 2.4 | Until 2.6 | Until 2.6 |
 | 2.3 | Until 2.5 | Until 2.5 |
-| 2.2 | Until 2.4 | Until 2.5 |
-| 2.1 | :x:, ended January 23rd 2026 | Until 2.4 |
-| < 2.1 | :x: | :x: |
+| 2.2 | :x:, ended February 24th 2026 | Until 2.5 |
+| < 2.2 | :x: | :x: |
 
 ## Reporting a Security Vulnerability
 
