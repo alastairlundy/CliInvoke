@@ -1,0 +1,206 @@
+﻿; ls -la
+| cat /etc/passwd
+& whoami
+" --help "
+' --version '
+` command injection `
+$(echo hacked)
+${VAR}
+%USERPROFILE%
+\x00
+\r\n\r\n
+	
+  
+""
+''
+\\
+\/
+""""""
+''''''
+"'
+'"
+\\\\\
+/\/\/\
+--
+---
+----
+-
+---help
+--help=value
+-h=value
+--no-
+--no-arg=
+--=value
+=
+===
+====value
+argument=value==extra
+" " " " 
+' ' ' ' 
+"	"	"
+' 	' 	'
+"\\"
+'\\' 
+"'"
+'"'
+''''
+""""
+"""""""
+..
+../
+..\\
+../../
+..\..
+C:\Windows\System32
+/root/.ssh/id_rsa
+~/.bash_history
+/etc/shadow
+./test
+../test
+...test
+....test
+file with spaces.txt
+"file with spaces.txt"
+'file with spaces.txt'
+file	with	tabs.txt
+file
+with
+newlines.txt
+verylongstringwithnospaces1234567890verylongstringwithnospaces1234567890verylongstringwithnospaces1234567890verylongstringwithnospaces1234567890verylongstringwithnospaces1234567890
+	verylongstringwithtabs	verylongstringwithtabs	verylongstringwithtabs	verylongstringwithtabs	verylongstringwithtabs
+	
+ 	 	 	
+特殊文字
+日本語テスト
+中文测试
+한국어 테스트
+العربية
+עברית
+ελληνικά
+Ελληνικά
+🎉🎊🎈🎁
+🔒🔐🔓
+emoji\nemoji
+emoji\temoji
+<script>alert('xss')</script>
+<img src=x onerror=alert('xss')>
+../../../../../../etc/passwd
+..\\..\\..\\..\\windows\\system32\\config\\sam
+C:\..\..\..\..\..\..\etc\passwd
+\\server\share
+//server/share
+\\\?\C:\Windows
+\\.\COM1
+\\.\pipe\
+file://C:/Windows/System32
+file:///etc/passwd
+java.io.FileInputStream
+java.lang.Runtime.exec
+System.Diagnostics.Process
+ProcessInfo
+-e cmd.exe
+-c /bin/bash
+--stdin
+--stdout
+--stderr
+2>&1
+1>&2
+>&2
+|&
+>&
+<&
+>&-
+exec
+source
+.
+eval
+*
+?
+[abc]
+{a,b,c}
+~
+!
+@
+$
+%
+^
+&
+*
+(
+)
+-
+=
++
+[
+]
+{
+}
+;
+:
+'
+"
+<
+>
+,
+.
+/
+\
+|
+`
+~
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+00000000
+99999999
+-1
+-9999
+2147483647
+2147483648
+9223372036854775807
+9223372036854775808
+0x00
+0xFF
+0xFFFFFFFF
+0xFFFFFFFFFFFFFFFF
+\n
+\r
+\t
+\0
+\x00
+\u0000
+\u0001
+\uFFFF
+\uFFFE
+\uFFFF
+NULL
+NONE
+NOTHING
+undefined
+null
+false
+true
+0.0
+1.0
+-1.0
+3.14159265359
+.
+..
+...
+....
+a
+ab
+abc
+abcd
+abcdefghijklmnopqrstuvwxyz
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+0123456789
+!@#$%^&*()
+[]{}|;:'",.<>?/\`~

@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Tests.Trimming", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.AotProgram.Test", "..\tests\CliInvoke.AotProgram.Test\CliInvoke.AotProgram.Test.csproj", "{6658B781-1C15-4917-8EDF-AB9538B262AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Tests.Fuzzing", "CliInvoke.Tests.Fuzzing\CliInvoke.Tests.Fuzzing.csproj", "{CD938F9C-B49D-47BD-8899-B548131EBD4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
