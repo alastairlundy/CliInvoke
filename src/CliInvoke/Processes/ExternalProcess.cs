@@ -90,12 +90,12 @@ public class ExternalProcess : IExternalProcess
     /// <summary>
     /// Represents an event that occurs when the external process starts.
     /// </summary>
-    public event EventHandler Started;
+    public event EventHandler? Started;
 
     /// <summary>
     /// Represents an event that occurs when the external process exits.
     /// </summary>
-    public event EventHandler Exited;
+    public event EventHandler? Exited;
 
     /// <summary>
     /// Asynchronously starts the external process using the specified configuration.
