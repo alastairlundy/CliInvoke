@@ -45,6 +45,7 @@ public static partial class DependencyInjectionExtensions
                     [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
                 
                 services.AddSingleton<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddSingleton<IProcessInvoker, ProcessInvoker>();
                 
                 services.AddSingleton<IRunnerProcessFactory, RunnerProcessFactory>();
@@ -62,6 +63,7 @@ public static partial class DependencyInjectionExtensions
                     [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
                 
                 services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddScoped<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
 
                 services.AddScoped<IRunnerProcessFactory, RunnerProcessFactory>();
@@ -79,6 +81,7 @@ public static partial class DependencyInjectionExtensions
                     [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
                 
                 services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
+                services.AddTransient<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
 
                 services.AddTransient<IRunnerProcessFactory, RunnerProcessFactory>();

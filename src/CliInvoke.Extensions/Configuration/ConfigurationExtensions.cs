@@ -40,7 +40,7 @@ public static class ConfigurationExtensions
         /// <returns>An instance of <see cref="ProcessConfiguration"/> with the configuration applied from
         /// the provided <see cref="ProcessStartInfo"/>.</returns>
         [Pure]
-        public static ProcessConfiguration FromStartInfo(ProcessStartInfo processStartInfo)
+        public static ProcessConfiguration FromProcessStartInfo(ProcessStartInfo processStartInfo)
         {
             bool requiresAdministrator =
                 processStartInfo.Verb.StartsWith("runas", StringComparison.OrdinalIgnoreCase)

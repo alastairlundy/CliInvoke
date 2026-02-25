@@ -33,7 +33,7 @@ public static class ExternalProcessFactoryExtensions
         /// <returns>An implementation of <see cref="IExternalProcess"/> that represents the created external process.</returns>
         [Pure]
         public IExternalProcess CreateExternalProcess(ProcessStartInfo startInfo)
-            => externalProcessFactory.CreateExternalProcess(ProcessConfiguration.FromStartInfo(startInfo));
+            => externalProcessFactory.CreateExternalProcess(ProcessConfiguration.FromProcessStartInfo(startInfo));
 
         /// <summary>
         /// Creates an instance of the <see cref="IExternalProcess"/> interface based on the provided
@@ -45,7 +45,7 @@ public static class ExternalProcessFactoryExtensions
         [Pure]
         public IExternalProcess CreateExternalProcess(ProcessStartInfo startInfo,
             ProcessExitConfiguration exitConfiguration) =>
-            externalProcessFactory.CreateExternalProcess(ProcessConfiguration.FromStartInfo(startInfo),
+            externalProcessFactory.CreateExternalProcess(ProcessConfiguration.FromProcessStartInfo(startInfo),
                 exitConfiguration);
     }
 }
