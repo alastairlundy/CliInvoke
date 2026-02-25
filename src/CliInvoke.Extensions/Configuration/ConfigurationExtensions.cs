@@ -17,6 +17,7 @@ using System.Runtime.CompilerServices;
 
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
+using CliInvoke.Helpers.Processes;
 
 namespace CliInvoke.Extensions;
 
@@ -117,6 +118,23 @@ public static class ConfigurationExtensions
             
 #pragma warning restore CA1416
             return processConfigurationBuilder.Build();
+        }
+    }
+
+    /// <param name="processConfiguration">The <see cref="ProcessConfiguration"/> containing the process configuration.</param>
+    extension(ProcessConfiguration processConfiguration)
+    {
+        /// <summary>
+        /// Converts a <see cref="ProcessConfiguration"/> instance to a <see cref="ProcessStartInfo"/> instance,
+        /// applying all relevant configurations such as environment variables, execution settings,
+        /// user credentials, and other process-related parameters.
+        /// </summary>
+        /// <returns>An instance of <see cref="ProcessStartInfo"/> with the configuration applied from
+        /// the provided <see cref="ProcessConfiguration"/>.</returns>
+        public ProcessStartInfo ToProcessStartInfo()
+        {
+            return processConfiguration.ToProcessStartInfo(processConfiguration.RedirectStandardOutput,
+                processConfiguration.RedirectStandardError);
         }
     }
 }

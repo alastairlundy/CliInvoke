@@ -36,9 +36,11 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
+        <InternalsVisibleTo Include="CliInvoke.Extensions"/>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'
+OR '$(TargetFramework)' == 'net8.0'">
         <PackageReference Include="Polyfill" Version="9.10.0" PrivateAssets="all" />
     </ItemGroup>
 
