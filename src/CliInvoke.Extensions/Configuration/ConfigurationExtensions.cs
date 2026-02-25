@@ -66,14 +66,7 @@ public static class ConfigurationExtensions
                 .ConfigureShellExecution(processStartInfo.UseShellExecute)
                 .ConfigureWindowCreation(!processStartInfo.CreateNoWindow)
                 .SetWorkingDirectory(processStartInfo.WorkingDirectory)
-                .SetArguments(processStartInfo.Arguments);
-
-            if (requiresAdministrator)
-            {
-                processConfigurationBuilder = processConfigurationBuilder.RequireAdministratorPrivileges();
-            }
-
-            processConfigurationBuilder = processConfigurationBuilder
+                .SetArguments(processStartInfo.Arguments)
                 .RedirectStandardInput(processStartInfo.RedirectStandardInput)
                 .RedirectStandardOutput(processStartInfo.RedirectStandardOutput)
                 .RedirectStandardError(processStartInfo.RedirectStandardError)
@@ -86,6 +79,11 @@ public static class ConfigurationExtensions
 #endif
                 .SetStandardOutputEncoding(processStartInfo.StandardOutputEncoding)
                 .SetStandardErrorEncoding(processStartInfo.StandardErrorEncoding);
+
+            if (requiresAdministrator)
+            {
+                processConfigurationBuilder = processConfigurationBuilder.RequireAdministratorPrivileges();
+            }
             
             IUserCredentialBuilder userCredentialBuilder = new  UserCredentialBuilder();
             

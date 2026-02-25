@@ -12,7 +12,6 @@ using System.IO;
 using System.Text;
 
 // ReSharper disable MemberCanBeMadeStatic.Global
-
 // ReSharper disable UnusedMember.Global
 
 namespace CliInvoke.Specializations.Configurations;
@@ -80,5 +79,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
     [SupportedOSPlatform("windows")]
     public new string TargetFilePath =>
         OperatingSystem.IsWindows() ?
-            $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe" : throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
+            $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe" : 
+            throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
 }
