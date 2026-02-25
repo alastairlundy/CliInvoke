@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
@@ -31,6 +32,19 @@ public static class ConfigurationExtensions
     /// </summary>
     extension(ProcessConfiguration)
     {
+        /// <summary>
+        /// Converts a <see cref="ProcessStartInfo"/> instance to a <see cref="ProcessConfiguration"/> instance,
+        /// applying all relevant configurations such as environment variables, execution settings,
+        /// user credentials, and other process-related parameters.
+        /// </summary>
+        /// <param name="processStartInfo">The <see cref="ProcessStartInfo"/> containing the process start configuration.</param>
+        /// <returns>An instance of <see cref="ProcessConfiguration"/> with the configuration applied from
+        /// the provided <see cref="ProcessStartInfo"/>.</returns>
+        [OverloadResolutionPriority(2)]
+        [Obsolete("This method is deprecated and will be removed in CliInvoke.Extensions version 3.")]
+        public static ProcessConfiguration FromStartInfo(ProcessStartInfo processStartInfo)
+            => FromProcessStartInfo(processStartInfo);
+        
         /// <summary>
         /// Converts a <see cref="ProcessStartInfo"/> instance to a <see cref="ProcessConfiguration"/> instance,
         /// applying all relevant configurations such as environment variables, execution settings,
