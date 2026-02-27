@@ -31,57 +31,56 @@ jobs:
       - uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5.1.0
         with:
           dotnet-version: 10.0.x
-      - name: Restore dependencies
-        run: dotnet restore
-        working-directory: src/CliInvoke.Core
-      - name: Create packages
-        run: dotnet build -c Release
-        working-directory: src/CliInvoke.Core
-        
-          # Get a short-lived NuGet API key
+
+      - name: Create local nupkg output dir
+        run: mkdir -p ./nupkgs
+
+      # Build Core
+      - name: Build Core
+        run: dotnet build src/CliInvoke.Core -c Release
+
+      # Pack Core into ./nupkgs
+      - name: Pack Core to local feed
+        run: dotnet pack src/CliInvoke.Core -c Release -o ./nupkg
+
+      # Use local feed for Specializations
+      - name: Restore Specializations from local feed + NuGet.org
+        run: dotnet restore src/CliInvoke.Specializations -s ./nupkgs -s https://api.nuget.org/v3/index.json
+
+      - name: Build Specializations (resolves CliInvoke.Core from local feed)
+        run: dotnet build src/CliInvoke.Specializations -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }}
+
+      # Use local feed for main
+      - name: Restore Main from local feed + NuGet.org
+        run: dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json
+
+      - name: Build Main (resolves CliInvoke.Core from local feed)
+        run: dotnet build src/CliInvoke -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }}
+
+      # Use local feed for extensions
+      - name: Restore Extensions from local feed + NuGet.org
+        run: dotnet restore src/CliInvoke.Extensions -s ./nupkgs -s https://api.nuget.org/v3/index.json
+
+      - name: Build Extensions (resolves CliInvoke.Core from local feed)
+        run: dotnet build src/CliInvoke.Extensions -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }} -p:CliInvokeVersion=${{ inputs.main-version }}
+
+      # Pack the builds to ./nupkgs as well (so all resulting nupkgs end up in ./nupkgs)
+      - name: Pack Specializations and Main into local feed
+        run: |
+          dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+          dotnet pack src/CliInvoke -c Release -o ./nupkgs /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+          dotnet pack src/CliInvoke.Extensions -c Release -o ./nupkgs /p:CliInvokeCoreVersion=${{ inputs.core-version }}  -p:CliInvokeVersion=${{ inputs.main-version }}
+
+      # Authenticate to NuGet (OIDC)
       - name: NuGet login (OIDC → temp API key)
         uses: NuGet/login@d22cc5f58ff5b88bf9bd452535b4335137e24544 # v1.1.0
         id: login
         with:
-            user: ${{ secrets.NUGET_USER }}
-              
-          # Push the Core package
-      - name: NuGet push
-        run: dotnet nuget push src/CliInvoke.Core/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-      - name: Sleep for 300 seconds
-        run: sleep 300s
-        shell: bash
-      - name: Restore dependencies
-        run: dotnet restore
-        working-directory: src/CliInvoke.Specializations
-      - name: Create packages
-        run: dotnet build -c Release -p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }}
-        working-directory: src/CliInvoke.Specializations
-        # Push the Specializations package
-      - name: NuGet push
-        run: dotnet nuget push src/CliInvoke.Specializations/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-      - name: Restore dependencies
-        run: dotnet restore
-        working-directory: src/CliInvoke
-      - name: Create packages
-        run: dotnet build -c Release -p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }} 
-        working-directory: src/CliInvoke
+          user: ${{ secrets.NUGET_USER }}
 
-      # Push the Main package
-      - name: NuGet push
-        run: dotnet nuget push src/CliInvoke/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-
-      - name: Sleep for 300 seconds
-        run: sleep 300s
-        shell: bash
-      - name: Restore dependencies
-        run: dotnet restore
-        working-directory: src/CliInvoke.Extensions
-      - name: Create packages
-        run: dotnet build -c Release -p:UsePublishedPackages=true -p:CliInvokeCoreVersion=${{ inputs.core-version }} -p:CliInvokeVersion=${{ inputs.main-version }}
-        working-directory: src/CliInvoke.Extensions
-
-        # Push the Extensions package
-      - name: NuGet push
-        run: dotnet nuget push src/CliInvoke.Extensions/bin/Release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-
+      # Push all nupkgs (no sleeps needed)
+      - name: Push all nupkgs to NuGet.org
+        run: |
+          for f in ./nupkgs/*.nupkg; do
+            dotnet nuget push "$f" --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          done
