@@ -35,6 +35,10 @@ jobs:
       - name: Create local nupkg output dir
         run: mkdir -p ./nupkgs
 
+      # Build Core
+      - name: Build Core
+        run: dotnet build src/CliInvoke.Core -c Release
+
       # Pack Core into ./nupkgs
       - name: Pack Core to local feed
         run: dotnet pack src/CliInvoke.Core -c Release -o ./nupkg
