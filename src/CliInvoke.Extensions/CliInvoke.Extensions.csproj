@@ -31,6 +31,9 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <PackageReference Include="Polyfill" 
+                          Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'net8.0'"
+                          Version="9.11.0"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.3" />
     </ItemGroup>
 
