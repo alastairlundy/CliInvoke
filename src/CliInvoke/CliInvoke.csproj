@@ -15,12 +15,14 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Added ``ShellDetector`` implementation of ``IShellDetector`` for detecting default system Shell
-* Added ``ExternalProcess`` - An alternative to the Process Invokation design pattern. This initial version makes use of CliInvoke v2's file path resolver and process pipe handling as well as internal CliInvoke helper code.</PackageReleaseNotes>
+        <PackageReleaseNotes>* Deprecated ``ProcessConfigurationBuilder``'s ``SetStandardOutputPipe`` and ``SetStandardErrorPipe`` methods for removal in CliInvoke v3
+* Added ``ExternalProcessFactory``, the implementation of ``IExternalProcessFactory`` for easily creating ``IExternalProcess`` instances.
+* Updated internal Polyfill version from 9.10.0 to 9.12.0</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.4.0</PackageVersion>
+        <PackageVersion>2.5.0-alpha.1</PackageVersion>
+        <AssemblyVersion>2.5.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -41,7 +43,7 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'
 OR '$(TargetFramework)' == 'net8.0'">
-        <PackageReference Include="Polyfill" Version="9.10.0" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" Version="9.12.0" PrivateAssets="all" />
     </ItemGroup>
 
     <PropertyGroup>
