@@ -2,6 +2,11 @@
 # CliInvoke version history
 
 ## As CliInvoke
+### 2.5
+| Version | Release Date | Changelog |
+|-|-|-|
+| 2.5.0 Alpha 1| February 27th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.5.0-alpha.1 |
+
 ### 2.4
 | Version | Release Date | Changelog |
 |-|-|-|
