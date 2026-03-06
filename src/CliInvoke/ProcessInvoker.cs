@@ -82,7 +82,7 @@ public class ProcessInvoker : IProcessInvoker
 
             //TODO: Add support for <see cref="IProcessResultValidator"/>
             if (processExitConfiguration.CancellationExceptionBehavior
-                !=  ProcessCancellationExceptionBehavior.SuppressException)
+                !=  ProcessCancellationHandlingMode.SuppressException)
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
@@ -159,7 +159,7 @@ public class ProcessInvoker : IProcessInvoker
             //TODO: Add support for <see cref="IProcessResultValidator"/>
 
             if (processExitConfiguration.CancellationExceptionBehavior
-                != ProcessCancellationExceptionBehavior.SuppressException)
+                != ProcessCancellationHandlingMode.SuppressException)
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
@@ -229,7 +229,7 @@ public class ProcessInvoker : IProcessInvoker
 
             //TODO: Add support for <see cref="IProcessResultValidator"/>
             if (processExitConfiguration.
-                    CancellationExceptionBehavior != ProcessCancellationExceptionBehavior.SuppressException)
+                    CancellationExceptionBehavior != ProcessCancellationHandlingMode.SuppressException)
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration);
             }

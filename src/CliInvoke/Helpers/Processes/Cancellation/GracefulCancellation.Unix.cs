@@ -32,7 +32,7 @@ internal static partial class GracefulCancellation
         [UnsupportedOSPlatform("tvos")]
         [UnsupportedOSPlatform("windows")]
         internal async Task<bool> CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
+            ProcessCancellationHandlingMode cancellationExceptionBehavior, CancellationToken cancellationToken)
         {
             bool sigIntSuccess = false;
 
@@ -57,13 +57,13 @@ internal static partial class GracefulCancellation
             catch (TaskCanceledException)
             {
                 if (cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowException)
+                    ProcessCancellationHandlingMode.AllowException)
                     throw;
             }
             catch (Exception)
             {
-                if (cancellationExceptionBehavior is ProcessCancellationExceptionBehavior.AllowException
-                    or ProcessCancellationExceptionBehavior
+                if (cancellationExceptionBehavior is ProcessCancellationHandlingMode.AllowException
+                    or ProcessCancellationHandlingMode
                         .AllowExceptionIfUnexpected)
                     throw;
             }
@@ -81,11 +81,9 @@ internal static partial class GracefulCancellation
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("browser")]
-    private static bool SendSignal(int processId, int signalId)
-    {
-        return kill_libc(processId, signalId) == 0;
-    }
-    
+    private static bool SendSignal(int processId, int signalId) 
+        => kill_libc(processId, signalId) == 0;
+
     [DllImport("libc", SetLastError = true, EntryPoint = "kill")]
     private static extern int kill_libc(int processid, int signal);
 }

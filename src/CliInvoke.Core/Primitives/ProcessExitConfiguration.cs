@@ -24,7 +24,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessExitConfiguration()
     {
         TimeoutPolicy = ProcessTimeoutPolicy.Default;
-        CancellationExceptionBehavior = ProcessCancellationExceptionBehavior.AllowException;
+        CancellationExceptionBehavior = ProcessCancellationHandlingMode.AllowException;
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="cancellationValidation"></param>
     public ProcessExitConfiguration(
         ProcessTimeoutPolicy timeoutPolicy,
-        ProcessCancellationExceptionBehavior cancellationValidation)
+        ProcessCancellationHandlingMode cancellationValidation)
     {
         TimeoutPolicy = timeoutPolicy;
         CancellationExceptionBehavior = cancellationValidation;
@@ -45,7 +45,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// </summary>
     public static readonly ProcessExitConfiguration Default = new(
         ProcessTimeoutPolicy.Default,
-        ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
+        ProcessCancellationHandlingMode.AllowExceptionIfUnexpected
     );
 
     /// <summary>
@@ -53,7 +53,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// </summary>
     public static readonly ProcessExitConfiguration DefaultNoException = new(
         ProcessTimeoutPolicy.Default,
-        ProcessCancellationExceptionBehavior.SuppressException
+        ProcessCancellationHandlingMode.SuppressException
     );
 
     /// <summary>
@@ -61,7 +61,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// </summary>
     public static readonly ProcessExitConfiguration NoTimeoutDefault = new(
         ProcessTimeoutPolicy.None,
-        ProcessCancellationExceptionBehavior.SuppressException
+        ProcessCancellationHandlingMode.SuppressException
     );
 
     /// <summary>
@@ -69,12 +69,12 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// or constraints, using no timeout, no result validation, and suppression of exceptions.
     /// </summary>
     public static readonly ProcessExitConfiguration NoValidation = new(ProcessTimeoutPolicy.None,
-        ProcessCancellationExceptionBehavior.SuppressException);
+        ProcessCancellationHandlingMode.SuppressException);
     
     /// <summary>
     /// Gets the result validation strategy used to determine if Process cancellation should throw an exception.
     /// </summary>
-    public ProcessCancellationExceptionBehavior CancellationExceptionBehavior { get; }
+    public ProcessCancellationHandlingMode CancellationExceptionBehavior { get; }
 
     /// <summary>
     /// Gets the timeout policy applied to the process.

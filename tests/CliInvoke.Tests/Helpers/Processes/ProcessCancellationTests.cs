@@ -23,7 +23,7 @@ public class ProcessCancellationTests
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
         
         ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(10)),
-            ProcessCancellationExceptionBehavior.SuppressException);
+            ProcessCancellationHandlingMode.SuppressException);
         
         //Act
        
@@ -88,7 +88,7 @@ public class ProcessCancellationTests
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
         
         ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30)),
-            ProcessCancellationExceptionBehavior.SuppressException);
+            ProcessCancellationHandlingMode.SuppressException);
         
         //Act
         process.Start();

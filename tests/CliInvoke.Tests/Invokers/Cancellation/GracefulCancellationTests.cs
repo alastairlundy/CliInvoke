@@ -11,7 +11,7 @@ public class GracefulCancellationTests
     [Fact]
     public async Task GracefulCancel_InterruptSignals_Success()
     {
-        ProcessCancellationExceptionBehavior exceptionBehavior = ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected;
+        ProcessCancellationHandlingMode exceptionBehavior = ProcessCancellationHandlingMode.AllowExceptionIfUnexpected;
 
         int sleepTimeSeconds = 500;
 
