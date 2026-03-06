@@ -225,6 +225,11 @@ public class ExternalProcess : IExternalProcess
         }
     }
 
+    public async Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
+    {
+        
+    }
+
     /// <summary>
     /// Terminates the associated external process based on the specified exit configuration.
     /// </summary>
