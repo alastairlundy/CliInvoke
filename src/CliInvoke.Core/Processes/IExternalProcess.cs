@@ -71,8 +71,9 @@ public interface IExternalProcess : IDisposable
     /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
-    Task<BufferedProcessResult> WaitForBufferedExitOrTimeoutAsync(CancellationToken cancellationToken);
+    /// <returns>A task that represents the asynchronous operation.
+    /// The result contains the buffered process result when the method completes.</returns>
+    Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Terminates the associated external process based on the specified exit configuration.

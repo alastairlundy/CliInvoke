@@ -192,7 +192,7 @@ public class ExternalProcess : IExternalProcess
     /// <returns>A task that represents the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public async Task<BufferedProcessResult> WaitForBufferedExitOrTimeoutAsync(CancellationToken cancellationToken)
+    public async Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken)
     {
         Task<string> standardOutputString = Configuration.RedirectStandardOutput ? _processWrapper.StandardOutput.ReadToEndAsync(cancellationToken) 
             : Task.FromResult(string.Empty);
