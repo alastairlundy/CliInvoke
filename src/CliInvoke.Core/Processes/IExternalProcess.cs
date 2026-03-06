@@ -49,7 +49,8 @@ public interface IExternalProcess : IDisposable
     /// Asynchronously starts the external process using the specified configuration.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-    /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
+    /// <returns>A task representing the asynchronous operation.
+    /// The result contains the buffered process result when the method completes.</returns>
     Task StartAsync(CancellationToken cancellationToken);
 
     /// <summary>
@@ -57,18 +58,20 @@ public interface IExternalProcess : IDisposable
     /// </summary>
     /// <param name="configuration">The configuration settings for starting the external process.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-    /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
+    /// <returns>A task representing the asynchronous operation.
+    /// The result contains the buffered process result when the method completes.</returns>
     Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Asynchronously waits for the process to exit or a specified timeout period elapses.
+    /// Asynchronously waits for the process to exit or a specified timeout period to elapse.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
+    /// <returns>A task that represents the asynchronous operation.
+    /// The result contains the buffered process result when the method completes.</returns>
     Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
+    /// Asynchronously captures output and waits for the external process to exit or a specified timeout period to elapse.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the asynchronous operation.
@@ -78,6 +81,6 @@ public interface IExternalProcess : IDisposable
     /// <summary>
     /// Terminates the associated external process based on the specified exit configuration.
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when an invalid value is provided for ExitConfiguration.TimeoutPolicy.CancellationMode.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when an invalid value is provided for ExitConfiguration, TimeoutPolicy, or CancellationMode.</exception>
     Task Kill();
 }
