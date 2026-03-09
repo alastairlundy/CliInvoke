@@ -11,7 +11,7 @@ public class TestFixture
     {
         IServiceCollection serviceCollection = new ServiceCollection();
 
-        serviceCollection = serviceCollection.AddMemoryCache()
+        serviceCollection = serviceCollection
             .AddCliInvoke();
 
         ServiceProvider = serviceCollection.BuildServiceProvider();

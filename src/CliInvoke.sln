@@ -18,12 +18,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B495ADF6-7FA
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7ACFC22E-0481-44EB-BCE8-6A61338013FA}"
+	ProjectSection(SolutionItems) = preProject
+		..\tests\Directory.Packages.props = ..\tests\Directory.Packages.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Specializations.Tests", "..\tests\CliInvoke.Specializations.Tests\CliInvoke.Specializations.Tests.csproj", "{E4B5EE54-C1B5-495B-AAF5-D3DED2DED452}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Tests", "..\tests\CliInvoke.Tests\CliInvoke.Tests.csproj", "{CB4C5E53-10AB-44C3-B98A-5C4D58BEBC0D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{25140BEB-ED04-484F-9131-BFDDA150B4B4}"
+	ProjectSection(SolutionItems) = preProject
+		..\benchmarks\Directory.Packages.props = ..\benchmarks\Directory.Packages.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Benchmarking", "..\benchmarks\CliInvoke.Benchmarks\CliInvoke.Benchmarking.csproj", "{829E4595-D71C-4E2D-8F4D-61D62B8F5A62}"
 EndProject
