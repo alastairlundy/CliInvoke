@@ -21,7 +21,7 @@
     <PackageId>CliInvokeBenchMockData</PackageId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.5" />
-    <PackageReference Include="Spectre.Console.Cli" Version="1.0.0-alpha.0.14" />
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="Spectre.Console.Cli"/>
   </ItemGroup>
 </Project>
