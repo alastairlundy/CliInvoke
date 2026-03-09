@@ -29,8 +29,8 @@
         <AssemblyVersion>2.5.0.0</AssemblyVersion>
     </PropertyGroup>
     
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Polyfill" Version="9.12.0" PrivateAssets="all"/>
+    <ItemGroup>
+        <PackageReference Include="Polyfill" PrivateAssets="all"/>
     </ItemGroup>
 
     <PropertyGroup>

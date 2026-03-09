@@ -41,9 +41,10 @@
         <InternalsVisibleTo Include="CliInvoke.Extensions"/>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'
-OR '$(TargetFramework)' == 'net8.0'">
-        <PackageReference Include="Polyfill" Version="9.12.0" PrivateAssets="all" />
+    <ItemGroup>
+        <PackageReference Include="Polyfill" PrivateAssets="all" />
+        <PackageReference Include="DotExtensions" />
+        <PackageReference Include="DotPrimitives"/>
     </ItemGroup>
 
     <PropertyGroup>
@@ -93,10 +94,5 @@ OR '$(TargetFramework)' == 'net8.0'">
         <PackagePath>icon.png</PackagePath>
         <Link>icon.png</Link>
       </None>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <PackageReference Include="DotExtensions" Version="9.7.0" />
-      <PackageReference Include="DotPrimitives" Version="4.3.2" />
     </ItemGroup>
 </Project>
