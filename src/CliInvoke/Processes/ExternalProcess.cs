@@ -151,9 +151,7 @@ public class ExternalProcess : IExternalProcess
     {
         try
         {
-            await Task.WhenAll([
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-            ]);
+            await _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
             
             ProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
