@@ -9,7 +9,6 @@
 
 #pragma warning disable CS0618
 
-using System.IO.Pipelines;
 using CliInvoke.Core.Processes;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
@@ -163,9 +162,7 @@ public class ExternalProcess : IExternalProcess
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime
             );
-
-            ThrowIfProcessNotSuccessful(result);
-
+            
             return result;
         }
         finally
@@ -201,9 +198,7 @@ public class ExternalProcess : IExternalProcess
             BufferedProcessResult result = new BufferedProcessResult(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
                 _processWrapper.ExitTime);
-
-            ThrowIfProcessNotSuccessful(result);
-
+            
             return result;
         }
         finally
@@ -214,6 +209,13 @@ public class ExternalProcess : IExternalProcess
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
     public async Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
     {
         Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
@@ -241,9 +243,7 @@ public class ExternalProcess : IExternalProcess
                 await standardOutputStream,
                 await standardErrorStream
             );
-
-            ThrowIfProcessNotSuccessful(result);
-
+            
             return result;
         }
         finally
@@ -285,15 +285,5 @@ public class ExternalProcess : IExternalProcess
     {
         Configuration.Dispose();
         _processWrapper.Dispose();
-    }
-
-    private void ThrowIfProcessNotSuccessful(ProcessResult result)
-    {
-        /*if (ExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-            && _processWrapper.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(new ProcessExceptionInfo(result,
-                Configuration));
-        }*/
     }
 }
