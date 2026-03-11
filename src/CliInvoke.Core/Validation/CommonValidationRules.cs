@@ -53,7 +53,7 @@ public static class CommonValidationRules<TProcessResult>
     /// <returns>
     /// A function that takes an instance of <typeparamref name="TProcessResult"/> as input and evaluates to true if the exit code matches any in the provided collection; otherwise, false.
     /// </returns>
-    public static Func<TProcessResult, bool> RequiresAllowedExitCodes(params int[] exitCodes)
+    public static Func<TProcessResult, bool> RequiresAllowedExitCode(params int[] exitCodes)
         => result => exitCodes.Any(code => result.ExitCode == code);
 
     /// <summary>
