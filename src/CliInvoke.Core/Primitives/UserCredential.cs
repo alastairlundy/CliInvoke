@@ -14,7 +14,6 @@
  */
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
-// ReSharper disable MemberCanBePrivate.Global
 
 using System.Security;
 
