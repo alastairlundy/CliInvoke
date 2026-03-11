@@ -170,8 +170,6 @@ public class ExternalProcess : IExternalProcess
         }
         finally
         {
-            standardOutputStream.Dispose();
-            standardErrorStream.Dispose();
             Dispose();
         }
     }
