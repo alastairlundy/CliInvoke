@@ -14,8 +14,6 @@
  */
 
 
-using CliInvoke.Core.Internal;
-
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -36,8 +34,7 @@ public class ProcessResult : IEquatable<ProcessResult>
         int exitCode,
         int processId,
         DateTime startTime,
-        DateTime exitTime
-    )
+        DateTime exitTime)
     {
         ExitCode = exitCode;
         ExecutedFilePath = executableFilePath;
