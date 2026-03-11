@@ -150,20 +150,10 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
-        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
-                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
-            : (Task<Stream>)Task.CompletedTask;
-        
-        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
-                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
-            : (Task<Stream>)Task.CompletedTask;
-        
         try
         {
             await Task.WhenAll([
                 _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputStream,
-                standardErrorStream
             ]);
             
             ProcessResult result = new(
