@@ -7,8 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-#pragma warning disable CS0618 
+#pragma warning disable CS0618
 
+using System.IO.Pipelines;
 using CliInvoke.Core.Processes;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
@@ -227,7 +228,42 @@ public class ExternalProcess : IExternalProcess
 
     public async Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
     {
+        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
+                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
+            : (Task<Stream>)Task.CompletedTask;
         
+        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
+                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
+            : (Task<Stream>)Task.CompletedTask;
+        
+        try
+        {
+            await Task.WhenAll([
+                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
+                standardOutputStream,
+                standardErrorStream
+            ]);
+            
+            PipedProcessResult result = new(
+                _processWrapper.StartInfo.FileName,
+                _processWrapper.ExitCode,
+                _processWrapper.Id,
+                _processWrapper.StartTime,
+                _processWrapper.ExitTime,
+                await standardOutputStream,
+                await standardErrorStream
+            );
+
+            ThrowIfProcessNotSuccessful(result);
+
+            return result;
+        }
+        finally
+        {
+            standardOutputStream.Dispose();
+            standardErrorStream.Dispose();
+            Dispose();
+        }
     }
 
     /// <summary>

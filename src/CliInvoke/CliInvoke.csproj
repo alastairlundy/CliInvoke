@@ -44,7 +44,7 @@
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all" />
         <PackageReference Include="DotExtensions" />
-        <PackageReference Include="DotPrimitives"/>
+        <PackageReference Include="WhatExec.Lib.Abstractions"/>
     </ItemGroup>
 
     <PropertyGroup>

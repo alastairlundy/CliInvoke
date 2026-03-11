@@ -12,6 +12,8 @@
     <PackageReference Include="MedallionShell" />
     <PackageReference Include="ProcessX" />
     <PackageReference Include="SimpleExec"/>
+    <PackageReference Include="WhatExec.Lib.Abstractions"/>
+    <PackageReference Include="WhatExec.Lib"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />

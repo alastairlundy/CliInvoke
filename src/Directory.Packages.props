@@ -6,8 +6,9 @@
     <ItemGroup>
         <PackageVersion Include="Polyfill" PrivateAssets="all" Version="9.18.0" />
         <PackageVersion Include="DotExtensions" Version="9.7.2" />
-        <PackageVersion Include="DotPrimitives" Version="4.3.2"/>
         <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.3" />
+        <PackageVersion Include="WhatExec.Lib.Abstractions" Version="1.0.0-preview.4"/>
+        <PackageVersion Include="WhatExec.Lib" Version="1.0.0-preview.4"/>
     </ItemGroup>
 </Project>
