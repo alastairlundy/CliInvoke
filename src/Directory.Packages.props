@@ -11,4 +11,9 @@
         <PackageVersion Include="WhatExec.Lib.Abstractions" Version="1.0.0-preview.4"/>
         <PackageVersion Include="WhatExec.Lib" Version="1.0.0-preview.4"/>
     </ItemGroup>
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+        <!-- set CliInvokeCoreVersion in the workflow -->
+        <PackageVersion Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)"/>
+        <PackageVersion Include="CliInvoke" Version="$(CliInvokeVersion)"/>
+    </ItemGroup>
 </Project>
