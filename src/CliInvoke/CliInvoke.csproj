@@ -15,13 +15,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Deprecated ``ProcessConfigurationBuilder``'s ``SetStandardOutputPipe`` and ``SetStandardErrorPipe`` methods for removal in CliInvoke v3
-* Added ``ExternalProcessFactory``, the implementation of ``IExternalProcessFactory`` for easily creating ``IExternalProcess`` instances.
-* Updated internal Polyfill version from 9.10.0 to 9.12.0</PackageReleaseNotes>
+        <PackageReleaseNotes>* Switched to using Central Package Management
+* Updated internal Polyfill version from 9.12.0 to 9.18.0
+* Updated DotExtensions version from 9.7.0 to 9.7.3</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.5.0-alpha.1</PackageVersion>
+        <PackageVersion>2.4.1</PackageVersion>
         <AssemblyVersion>2.5.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
