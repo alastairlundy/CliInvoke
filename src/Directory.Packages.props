@@ -10,4 +10,9 @@
         <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.4" />
     </ItemGroup>
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+        <!-- set CliInvokeCoreVersion in the workflow -->
+        <PackageVersion Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)"/>
+        <PackageVersion Include="CliInvoke" Version="$(CliInvokeVersion)"/>
+    </ItemGroup>
 </Project>
