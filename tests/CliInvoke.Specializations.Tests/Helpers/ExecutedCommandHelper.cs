@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using System.Runtime.InteropServices;
-using CliInvoke.Core.Piping;
-using CliInvoke.Piping;
 
 namespace CliInvoke.Specializations.Tests.Helpers;
 
@@ -19,5 +17,4 @@ public static class ExecutedCommandHelper
             throw new PlatformNotSupportedException();
         }
     }
-
 }
