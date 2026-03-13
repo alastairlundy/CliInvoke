@@ -5,9 +5,18 @@
   </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Polyfill" PrivateAssets="all" Version="9.18.0" />
-        <PackageVersion Include="DotExtensions" Version="9.7.2" />
+        <PackageVersion Include="DotExtensions" Version="9.7.3" />
         <PackageVersion Include="DotPrimitives" Version="4.3.2"/>
         <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.3" />
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.4" />
+    </ItemGroup>
+    <PropertyGroup>
+        <!-- default false, CI can set to true -->
+        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+        <!-- set CliInvokeCoreVersion in the workflow -->
+        <PackageVersion Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)"/>
+        <PackageVersion Include="CliInvoke" Version="$(CliInvokeVersion)"/>
     </ItemGroup>
 </Project>
