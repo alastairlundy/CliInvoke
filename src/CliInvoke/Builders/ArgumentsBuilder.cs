@@ -14,8 +14,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-// ReSharper disable ConvertClosureToMethodGroup
-
 namespace CliInvoke.Builders;
 
 /// <summary>
