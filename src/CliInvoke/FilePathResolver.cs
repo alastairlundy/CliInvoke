@@ -10,7 +10,6 @@
 using System.Linq;
 using System.Text;
 
-using DotExtensions.IO.Directories;
 using DotExtensions.IO.Permissions;
 
 using DotPrimitives.IO.Paths;
@@ -159,7 +158,12 @@ public class FilePathResolver : IFilePathResolver
         
         DirectoryInfo directory = new(directoryPath);
 
-        FileInfo? file = directory.SafelyEnumerateFiles("*", SearchOption.AllDirectories)
+        FileInfo? file = directory.EnumerateFiles("*", new EnumerationOptions
+            {
+                IgnoreInaccessible = true,
+                MatchCasing = OperatingSystem.IsWindows() ? MatchCasing.CaseInsensitive : MatchCasing.CaseSensitive,
+                RecurseSubdirectories = true,
+            })
             .Where(f => f.Exists)
             .Select(f =>
             {
