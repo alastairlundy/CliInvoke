@@ -1,4 +1,6 @@
-﻿namespace CliInvoke.Benchmarking.Data;
+﻿using CliInvoke.Benchmarking.Helpers;
+
+namespace CliInvoke.Benchmarking.Data;
 
 public class BufferedTestHelper
 {
@@ -13,7 +15,11 @@ public class BufferedTestHelper
 
         try
         {
-            return new FilePathResolver().ResolveFilePath(mockDataToolExe);
+            Task<FileInfo> taskResult = CliInvokeHelpers.CreateExecutableFileResolver()
+                .LocateExecutableAsync(mockDataToolExe,
+                    SearchOption.AllDirectories, CancellationToken.None);
+            
+            taskResult.Wait();
         }
         catch (Exception)
         {
@@ -24,10 +30,10 @@ public class BufferedTestHelper
             {
                 // Check if the current directory contains the tool project directly or inside a 'benchmarks' folder
                 string[] potentialProjectPaths =
-                {
+                [
                     Path.Combine(currentDir.FullName, "CliInvoke.Benchmarking.MockDataSimulationTool"),
                     Path.Combine(currentDir.FullName, "benchmarks", "CliInvoke.Benchmarking.MockDataSimulationTool")
-                };
+                ];
 
                 foreach (string projectPath in potentialProjectPaths)
                 {
