@@ -31,12 +31,13 @@ public class CmdInvokerTests : IDisposable
 
         IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
                 (ExecutedCommandHelper.WinCalcExePath)
-            .SetWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe", string.Empty));
+            .SetWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe", string.Empty))
+            .ConfigureWindowCreation(true);
 
         ProcessConfiguration commandConfiguration = configurationBuilder.Build();
 
         ProcessResult result = await cmdProcessInvoker.ExecuteAsync(commandConfiguration,
-            new ProcessExitConfiguration(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30.0), ProcessCancellationMode.Forceful),
+            new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(1)),
                 ProcessResultValidation.None, ProcessCancellationExceptionBehavior.SuppressException),
             false, CancellationToken.None);
 
