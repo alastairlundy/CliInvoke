@@ -31,12 +31,13 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
         
+        string combinedArgs = $"{runnerProcessConfig.Arguments} {processConfigToBeRun.TargetFilePath} {processConfigToBeRun.Arguments}"
+            .Trim();
+
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath
             )
-            .SetArguments(
-                processConfigToBeRun.TargetFilePath + " " + processConfigToBeRun.Arguments
-            )
+            .SetArguments(combinedArgs)
             .SetEnvironmentVariables(processConfigToBeRun.EnvironmentVariables)
             .SetProcessResourcePolicy(processConfigToBeRun.ResourcePolicy)
             .SetStandardInputEncoding(processConfigToBeRun.StandardInputEncoding)
