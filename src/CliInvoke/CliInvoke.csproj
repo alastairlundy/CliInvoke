@@ -15,13 +15,12 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Switched to using Central Package Management
-* Updated internal Polyfill version from 9.12.0 to 9.18.0
-* Updated DotExtensions version from 9.7.0 to 9.7.3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Fixed an issue where ``RunnerProcessFactory`` failed to adequately apply runner configuration arguments and runner process arguments to a runner process.
+* Fixed an issue where ``ProcessInvoker``'s ``ExecuteAsync`` method would attempt Standard Input Redirection without checking first if it was requested</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.4.1</PackageVersion>
+        <PackageVersion>2.4.2</PackageVersion>
         <AssemblyVersion>2.5.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
