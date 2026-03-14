@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +40,8 @@ public class CmdInvokerTests : IDisposable
                 ProcessResultValidation.None, ProcessCancellationExceptionBehavior.SuppressException),
             false, CancellationToken.None);
 
-        await Assert.That(Process.GetProcessesByName("Calculator").Length != 0)
+        await Assert.That(Process.GetProcesses().Any(p => p.ProcessName.Contains("calculatorapp", 
+                StringComparison.InvariantCultureIgnoreCase)))
             .IsTrue();
 
         await Assert.That(result.ExitCode)
