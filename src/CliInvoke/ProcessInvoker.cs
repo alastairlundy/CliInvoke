@@ -69,7 +69,8 @@ public class ProcessInvoker : IProcessInvoker
         {
             process.Start();
 
-            await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
+            if(processConfiguration.RedirectStandardInput)
+                await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
 
