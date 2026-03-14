@@ -61,7 +61,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
         bool useShellExecution = false, bool windowCreation = false) : 
         base("cmd.exe",
             redirectStandardInput, redirectStandardOutput, redirectStandardError,
-            arguments, workingDirectoryPath,
+            $"/c {arguments}", workingDirectoryPath,
             requiresAdministrator, environmentVariables, credentials,
             standardInput, standardOutput, standardError,
             standardInputEncoding, standardOutputEncoding, standardErrorEncoding,
