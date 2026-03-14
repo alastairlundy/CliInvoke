@@ -59,7 +59,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
-        base("",
+        base("cmd.exe",
             redirectStandardInput, redirectStandardOutput, redirectStandardError,
             arguments, workingDirectoryPath,
             requiresAdministrator, environmentVariables, credentials,
