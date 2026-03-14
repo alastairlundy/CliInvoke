@@ -19,5 +19,4 @@ public static class ExecutedCommandHelper
             throw new PlatformNotSupportedException();
         }
     }
-
 }
