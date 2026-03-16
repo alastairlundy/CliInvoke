@@ -1,4 +1,8 @@
-﻿using CliInvoke.Core;
+﻿using CliInvoke.Benchmarking.Helpers;
+using CliInvoke.Core;
+using WhatExec.Lib.Abstractions.Resolvers;
+using WhatExec.Lib.Detectors;
+using WhatExec.Lib.Resolvers;
 
 namespace CliInvoke.Benchmarking.Data;
 
@@ -6,9 +10,14 @@ public class DotnetCommandHelper
 {
     public DotnetCommandHelper()
     {
-        IFilePathResolver filePathResolver = new FilePathResolver();
+        IExecutableFileResolver executableFileResolver = CliInvokeHelpers.CreateExecutableFileResolver();
         
-        DotnetExecutableTargetFilePath = filePathResolver.ResolveFilePath(OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet");
+        Task<FileInfo> resultTask = executableFileResolver.LocateExecutableAsync(OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet", SearchOption.AllDirectories,
+            CancellationToken.None);
+
+        resultTask.Wait();
+
+        DotnetExecutableTargetFilePath = resultTask.Result.FullName;
     }
 
     public string DotnetExecutableTargetFilePath { get; }

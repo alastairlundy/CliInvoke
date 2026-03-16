@@ -34,7 +34,7 @@ internal static partial class GracefulCancellation
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
-            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+            DateTime expectedExitTime = DateTime.Now.AddTicks(timeoutThreshold.Ticks);
             
             Task<bool> gracefulInterruptCancellation = process.GracefulInterruptCancellation(timeoutThreshold, 
                 cancellationExceptionBehavior, cancellationToken);
@@ -47,8 +47,6 @@ internal static partial class GracefulCancellation
                     cancellationExceptionBehavior, expectedExitTime)
             ]);
 
-            await Task.WhenAny([Task.Delay(500, cancellationToken), process.WaitForExitAsync(cancellationToken)]);
-            
             if (!process.HasExited && fallbackToForceful)
             {
                 process.ForcefulExit(cancellationExceptionBehavior);
@@ -71,12 +69,6 @@ internal static partial class GracefulCancellation
 
             cts.CancelAfter(timeoutThreshold);
 
-            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
-            {
-                await process.WaitForExitAsync(cts.Token);
-                return;
-            }
-
             try
             {
                 await process.WaitForExitAsync(cts.Token);
@@ -86,13 +78,10 @@ internal static partial class GracefulCancellation
                 DateTime actualExitTime = DateTime.UtcNow;
                 TimeSpan difference = expectedExitTime.Difference(actualExitTime);
 
-                if (cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
+                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException || (cancellationExceptionBehavior
+                        == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected && (difference > TimeSpan.FromSeconds(10))))
                 {
-                    if (difference > TimeSpan.FromSeconds(10))
-                    {
-                        throw;
-                    }
+                    throw;
                 }
             }
             finally
