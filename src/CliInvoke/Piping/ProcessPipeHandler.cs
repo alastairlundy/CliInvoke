@@ -29,7 +29,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     {
         if (destination.StartInfo.RedirectStandardInput)
         {
-            await destination.StandardInput.FlushAsync();
+            await destination.StandardInput.FlushAsync(cancellationToken);
             destination.StandardInput.BaseStream.Position = 0;
             await source.CopyToAsync(destination.StandardInput.BaseStream, cancellationToken);
 
