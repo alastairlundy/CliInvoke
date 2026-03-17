@@ -13,8 +13,6 @@ using System.Text;
 
 // ReSharper disable MemberCanBeMadeStatic.Global
 
-// ReSharper disable UnusedMember.Global
-
 namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
