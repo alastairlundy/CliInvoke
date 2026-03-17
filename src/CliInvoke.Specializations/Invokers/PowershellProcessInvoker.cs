@@ -40,6 +40,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
     public PowershellProcessInvoker(IProcessInvoker processInvoker,
         IRunnerProcessFactory runnerProcessFactory, IFilePathResolver filePathResolver,
         bool windowCreation = true, bool redirectOutputs = true)
@@ -61,6 +62,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
     public new Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
@@ -84,6 +86,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
     public new Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
@@ -108,6 +111,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
     public new Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
