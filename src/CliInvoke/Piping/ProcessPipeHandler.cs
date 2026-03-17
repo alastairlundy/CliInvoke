@@ -57,7 +57,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
         {
             if (source.StandardOutput != StreamReader.Null)
             {
-                await source.StandardOutput.BaseStream.CopyToAsync(destination);
+                await source.StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken);
             }
         }
 
@@ -82,7 +82,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
         {
             if (source.StandardError != StreamReader.Null)
             {
-                await source.StandardError.BaseStream.CopyToAsync(destination);
+                await source.StandardError.BaseStream.CopyToAsync(destination, cancellationToken);
             }
         }
 
