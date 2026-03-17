@@ -31,7 +31,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
         {
             await destination.StandardInput.FlushAsync();
             destination.StandardInput.BaseStream.Position = 0;
-            await source.CopyToAsync(destination.StandardInput.BaseStream);
+            await source.CopyToAsync(destination.StandardInput.BaseStream, cancellationToken);
 
             return source.Equals(destination.StandardInput.BaseStream);
         }
