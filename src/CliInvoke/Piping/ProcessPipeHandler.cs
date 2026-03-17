@@ -21,13 +21,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <param name="destination">The process to which the standard input will be piped.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<bool> PipeStandardInputAsync(Stream source, Process destination,
@@ -35,9 +29,9 @@ public class ProcessPipeHandler : IProcessPipeHandler
     {
         if (destination.StartInfo.RedirectStandardInput)
         {
-            await destination.StandardInput.FlushAsync();
+            await destination.StandardInput.FlushAsync(cancellationToken);
             destination.StandardInput.BaseStream.Position = 0;
-            await source.CopyToAsync(destination.StandardInput.BaseStream);
+            await source.CopyToAsync(destination.StandardInput.BaseStream, cancellationToken);
 
             return source.Equals(destination.StandardInput.BaseStream);
         }
@@ -51,13 +45,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <param name="source">The process from which to read the standard output data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<Stream> PipeStandardOutputAsync(Process source,
@@ -69,7 +57,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
         {
             if (source.StandardOutput != StreamReader.Null)
             {
-                await source.StandardOutput.BaseStream.CopyToAsync(destination);
+                await source.StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken);
             }
         }
 
@@ -82,13 +70,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <param name="source">The process from which to read the standard error data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<Stream> PipeStandardErrorAsync(Process source,
@@ -100,7 +82,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
         {
             if (source.StandardError != StreamReader.Null)
             {
-                await source.StandardError.BaseStream.CopyToAsync(destination);
+                await source.StandardError.BaseStream.CopyToAsync(destination, cancellationToken);
             }
         }
 
