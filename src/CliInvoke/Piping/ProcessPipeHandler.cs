@@ -35,9 +35,9 @@ public class ProcessPipeHandler : IProcessPipeHandler
     {
         if (destination.StartInfo.RedirectStandardInput)
         {
-            await destination.StandardInput.FlushAsync();
+            await destination.StandardInput.FlushAsync(cancellationToken);
             destination.StandardInput.BaseStream.Position = 0;
-            await source.CopyToAsync(destination.StandardInput.BaseStream);
+            await source.CopyToAsync(destination.StandardInput.BaseStream, cancellationToken);
 
             return source.Equals(destination.StandardInput.BaseStream);
         }
@@ -69,7 +69,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
         {
             if (source.StandardOutput != StreamReader.Null)
             {
-                await source.StandardOutput.BaseStream.CopyToAsync(destination);
+                await source.StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken);
             }
         }
 
@@ -100,7 +100,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
         {
             if (source.StandardError != StreamReader.Null)
             {
-                await source.StandardError.BaseStream.CopyToAsync(destination);
+                await source.StandardError.BaseStream.CopyToAsync(destination, cancellationToken);
             }
         }
 
