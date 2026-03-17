@@ -21,13 +21,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <param name="destination">The process to which the standard input will be piped.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<bool> PipeStandardInputAsync(Stream source, Process destination,
@@ -51,13 +45,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <param name="source">The process from which to read the standard output data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<Stream> PipeStandardOutputAsync(Process source,
@@ -82,13 +70,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <param name="source">The process from which to read the standard error data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<Stream> PipeStandardErrorAsync(Process source,
