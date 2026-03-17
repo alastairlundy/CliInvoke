@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace CliInvoke.Tests.Internal.Constants;
 
 public static class TargetFilePaths

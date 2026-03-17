@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Runtime.Versioning;
-using CliInvoke.Builders;
 
 // ReSharper disable JoinDeclarationAndInitializer
 // ReSharper disable NotAccessedVariable

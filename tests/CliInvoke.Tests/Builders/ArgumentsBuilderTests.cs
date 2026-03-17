@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Globalization;
-using CliInvoke.Builders;
 
 namespace CliInvoke.Tests.Builders;
 
