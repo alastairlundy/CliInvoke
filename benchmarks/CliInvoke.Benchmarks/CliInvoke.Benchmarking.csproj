@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" />
@@ -12,8 +13,7 @@
     <PackageReference Include="MedallionShell" />
     <PackageReference Include="ProcessX" />
     <PackageReference Include="SimpleExec"/>
-    <PackageReference Include="WhatExec.Lib.Abstractions"/>
-    <PackageReference Include="WhatExec.Lib"/>
+    <PackageReference Include="WhatExec.Lib" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />

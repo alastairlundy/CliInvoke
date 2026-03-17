@@ -15,7 +15,11 @@ public class BufferedTestHelper
 
         try
         {
-            return CliInvokeHelpers.CreateFileResolver().LocateExecutableAsync(mockDataToolExe, SearchOption.AllDirectories, CancellationToken.None).Result.FullName;
+            Task<FileInfo> taskResult = CliInvokeHelpers.CreateExecutableFileResolver()
+                .LocateExecutableAsync(mockDataToolExe,
+                    SearchOption.AllDirectories, CancellationToken.None);
+            
+            taskResult.Wait();
         }
         catch (Exception)
         {
@@ -66,7 +70,11 @@ public class BufferedTestHelper
         throw new ArgumentException($"Could not find {mockDataToolExe} executable in PATH or project structure.");
     }
 
-    public string TargetFilePath { get; private set; }
+    public string TargetFilePath
+    {
+        get;
+        private set => field = value;
+    }
 
     public string Arguments => "gen-fake-text";
 }

@@ -1,24 +1,28 @@
-﻿using CliInvoke.Core.Piping;
+﻿using CliInvoke.Core;
+using CliInvoke.Core.Piping;
 using CliInvoke.Piping;
-using WhatExec.Lib;
-using WhatExec.Lib.Abstractions;
+using WhatExec.Lib.Abstractions.Resolvers;
 using WhatExec.Lib.Detectors;
+using WhatExec.Lib.Resolvers;
 
 namespace CliInvoke.Benchmarking.Helpers;
 
 internal static class CliInvokeHelpers
 {
+    private static readonly ProcessInvoker _processInvoker;
+    private static readonly IExecutableFileResolver executableFileResolver;
+
+    static CliInvokeHelpers()
+    {
+        executableFileResolver = new ExecutableFileResolver(new ExecutableFileDetector(), new PathEnvironmentVariableResolver(
+            new PathEnvironmentVariableDetector(), new ExecutableFileDetector()));
+        
+        _processInvoker = new ProcessInvoker(new FilePathResolver(), new ProcessPipeHandler());
+    }
+
     internal static ProcessInvoker CreateProcessInvoker()
-    {
-        IProcessPipeHandler processPipeHandler = new ProcessPipeHandler();
-        return new ProcessInvoker(CreateFileResolver(), processPipeHandler);
-    }
+        => _processInvoker;
 
-    internal static IExecutableFileResolver CreateFileResolver()
-    {
-        var executableFileDetector = new ExecutableFileDetector();
-
-        return new ExecutableFileResolver(executableFileDetector,
-            new PathEnvironmentVariableResolver(new PathEnvironmentVariableDetector(), executableFileDetector));
-    }
+    internal static IExecutableFileResolver CreateExecutableFileResolver()
+        => executableFileResolver;
 }

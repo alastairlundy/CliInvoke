@@ -1,4 +1,5 @@
 ﻿using CliInvoke.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace CliInvoke.Specializations.Tests;
@@ -9,13 +10,11 @@ public class TestFixture
 
     public TestFixture()
     {
-        IHost hostBuilder = Host.CreateDefaultBuilder()
-            .ConfigureServices(serviceCollection=>
-            {
-                serviceCollection.AddCliInvoke();
-            })
-            .Build();
-            
-        ServiceProvider = hostBuilder.Services;
+        IServiceCollection serviceCollection = new ServiceCollection();
+
+        serviceCollection = serviceCollection
+            .AddCliInvoke();
+
+        ServiceProvider = serviceCollection.BuildServiceProvider();
     }
 }

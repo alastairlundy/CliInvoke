@@ -11,8 +11,7 @@
     <PackageVersion Include="MedallionShell" Version="1.6.2" />
     <PackageVersion Include="ProcessX" Version="1.5.6" />
     <PackageVersion Include="SimpleExec" Version="13.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.3" />
-    <PackageVersion Include="WhatExec.Lib.Abstractions" Version="1.0.0-preview.4"/>
-    <PackageVersion Include="WhatExec.Lib" Version="1.0.0-preview.4"/>
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+    <PackageVersion Include="WhatExec.Lib" Version="1.0.0" />
   </ItemGroup>
 </Project>
