@@ -41,7 +41,7 @@ jobs:
 
       # Pack Core into ./nupkgs
       - name: Pack Core to local feed
-        run: dotnet pack src/CliInvoke.Core -c Release -o ./nupkg
+        run: dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs
 
       # Use local feed for Specializations
       - name: Restore Specializations from local feed + NuGet.org
