@@ -32,6 +32,11 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
     </ItemGroup>
 
+    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+        <IsAotCompatible>true</IsAotCompatible>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <PropertyGroup>
         <!-- default false, CI can set to true -->
         <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
