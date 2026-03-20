@@ -21,7 +21,6 @@
         <IncludeSymbols>true</IncludeSymbols>
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-        <IsAotCompatible>true</IsAotCompatible>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <Version>2.5.0-alpha.1</Version>
@@ -36,6 +35,10 @@
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
     </ItemGroup>
+
+    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+        <IsAotCompatible>true</IsAotCompatible>
+    </PropertyGroup>
 
     <ItemGroup>
         <Content Include="README.md">

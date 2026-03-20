@@ -22,7 +22,6 @@
 * Updated internal Polyfill version from 9.10.0 to 9.12.0</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
-        <IsAotCompatible>true</IsAotCompatible>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
@@ -33,6 +32,10 @@
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
         <PackageReference Include="WhatExec.Lib.Abstractions"/>
     </ItemGroup>
+
+    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+        <IsAotCompatible>true</IsAotCompatible>
+    </PropertyGroup>
 
     <PropertyGroup>
         <!-- default false, CI can set to true -->
