@@ -86,6 +86,11 @@ internal static partial class GracefulCancellation
         return kill_libc(processId, signalId) == 0;
     }
     
+#if NETSTANDARD2_0
     [DllImport("libc", SetLastError = true, EntryPoint = "kill")]
     private static extern int kill_libc(int processid, int signal);
+#else
+    [LibraryImport("libc", SetLastError = true, EntryPoint = "kill")]
+    private static partial int kill_libc(int processid, int signal);
+#endif
 }
