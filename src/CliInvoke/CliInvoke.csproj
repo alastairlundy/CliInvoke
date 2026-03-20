@@ -29,7 +29,6 @@ Fixed an issue where ProcessPipeHandler didn't make use of the CancellationToken
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
-        <IsAotCompatible>true</IsAotCompatible>
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
@@ -37,6 +36,9 @@ Fixed an issue where ProcessPipeHandler didn't make use of the CancellationToken
         <NoWarn>$(NoWarn);CS0618</NoWarn>
     </PropertyGroup>
     
+    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+        <IsAotCompatible>true</IsAotCompatible>
+    </PropertyGroup>
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>CliInvoke.Tests</_Parameter1>
