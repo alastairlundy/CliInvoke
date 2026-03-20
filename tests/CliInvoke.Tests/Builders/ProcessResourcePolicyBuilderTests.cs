@@ -184,14 +184,23 @@ public class ProcessResourcePolicyBuilderTests
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
         
         // Act
-#pragma warning disable CA1416
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .SetProcessorAffinity(processorAffinity)
-#pragma warning restore CA1416
-            .ConfigurePriorityBoost(priorityBoostEnabled)
-            .SetPriorityClass(priorityClass)
-            .SetMinWorkingSet(minWorkingSet)
-            .SetMaxWorkingSet(maxWorkingSet);
+            .ConfigurePriorityBoost(priorityBoostEnabled);
+
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacCatalyst() ||
+            OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+        {
+            processResourcePolicyBuilder
+                .SetPriorityClass(priorityClass)
+                .SetMinWorkingSet(minWorkingSet)
+                .SetMaxWorkingSet(maxWorkingSet);
+        }
+
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        {
+            processResourcePolicyBuilder = processResourcePolicyBuilder
+                .SetProcessorAffinity(processorAffinity);
+        }
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         
