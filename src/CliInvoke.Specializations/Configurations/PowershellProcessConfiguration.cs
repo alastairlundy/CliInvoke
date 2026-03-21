@@ -117,7 +117,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
 
     private static string GetInstallLocationOnWindows()
     {
-        string programFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem == true
+        string programFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem
             ? Environment.SpecialFolder.ProgramFiles
             : Environment.SpecialFolder.ProgramFilesX86);
 

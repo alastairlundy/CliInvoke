@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using CliInvoke.Builders;
 
 namespace CliInvoke.Tests.Builders;
 

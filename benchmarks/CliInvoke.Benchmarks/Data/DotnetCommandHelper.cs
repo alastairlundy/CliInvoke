@@ -1,8 +1,5 @@
 ﻿using CliInvoke.Benchmarking.Helpers;
-using CliInvoke.Core;
 using WhatExec.Lib.Abstractions.Resolvers;
-using WhatExec.Lib.Detectors;
-using WhatExec.Lib.Resolvers;
 
 namespace CliInvoke.Benchmarking.Data;
 

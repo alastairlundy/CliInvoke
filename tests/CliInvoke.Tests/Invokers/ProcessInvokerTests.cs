@@ -1,5 +1,3 @@
-using System.IO;
-using System.Threading.Tasks;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Tests.TestData;

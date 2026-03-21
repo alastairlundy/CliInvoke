@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Runtime.Versioning;
-using CliInvoke.Builders;
 
 // ReSharper disable JoinDeclarationAndInitializer
 // ReSharper disable NotAccessedVariable
@@ -186,14 +184,23 @@ public class ProcessResourcePolicyBuilderTests
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
         
         // Act
-#pragma warning disable CA1416
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .SetProcessorAffinity(processorAffinity)
-#pragma warning restore CA1416
-            .ConfigurePriorityBoost(priorityBoostEnabled)
-            .SetPriorityClass(priorityClass)
-            .SetMinWorkingSet(minWorkingSet)
-            .SetMaxWorkingSet(maxWorkingSet);
+            .ConfigurePriorityBoost(priorityBoostEnabled);
+        
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacCatalyst() ||
+            OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+        {
+            processResourcePolicyBuilder = processResourcePolicyBuilder
+                .SetPriorityClass(priorityClass)
+                .SetMinWorkingSet(minWorkingSet)
+                .SetMaxWorkingSet(maxWorkingSet);
+        }
+
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        {
+            processResourcePolicyBuilder = processResourcePolicyBuilder
+                .SetProcessorAffinity(processorAffinity);
+        }
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         
@@ -201,13 +208,23 @@ public class ProcessResourcePolicyBuilderTests
 
         // Assert
         Assert.NotNull(resourcePolicy.ProcessorAffinity);
-        Assert.NotNull(resourcePolicy.MinWorkingSet);
-        Assert.NotNull(resourcePolicy.MaxWorkingSet);
-        Assert.Equal(processorAffinity, resourcePolicy.ProcessorAffinity);
-        Assert.Equal(minWorkingSet, resourcePolicy.MinWorkingSet);
-        Assert.Equal(maxWorkingSet, resourcePolicy.MaxWorkingSet);
+
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacCatalyst() ||
+            OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+        {
+            Assert.NotNull(resourcePolicy.MinWorkingSet);
+            Assert.NotNull(resourcePolicy.MaxWorkingSet); 
+            Assert.Equal(minWorkingSet, resourcePolicy.MinWorkingSet);
+            Assert.Equal(maxWorkingSet, resourcePolicy.MaxWorkingSet);
+            Assert.Equal(priorityClass, resourcePolicy.PriorityClass);
+        }
+
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        {
+            Assert.Equal(processorAffinity, resourcePolicy.ProcessorAffinity);
+        }
+
         Assert.Equal(priorityBoostEnabled, resourcePolicy.EnablePriorityBoost);
-        Assert.Equal(priorityClass, resourcePolicy.PriorityClass);
 #pragma warning restore CA1416
     }
 }
