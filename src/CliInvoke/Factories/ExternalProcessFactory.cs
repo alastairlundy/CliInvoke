@@ -11,6 +11,8 @@ using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 using CliInvoke.Processes;
 
+using WhatExec.Lib.Abstractions.Resolvers;
+
 namespace CliInvoke.Factories;
 
 /// <summary>
@@ -18,7 +20,7 @@ namespace CliInvoke.Factories;
 /// </summary>
 public class ExternalProcessFactory : IExternalProcessFactory
 {
-    private readonly IFilePathResolver _filePathResolver;
+    private readonly IExecutableFileResolver _filePathResolver;
     private readonly IProcessPipeHandler _processPipeHandler;
 
     /// <summary>
@@ -26,7 +28,7 @@ public class ExternalProcessFactory : IExternalProcessFactory
     /// </summary>
     /// <param name="filePathResolver"></param>
     /// <param name="processPipeHandler"></param>
-    public ExternalProcessFactory(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler)
+    public ExternalProcessFactory(IExecutableFileResolver filePathResolver, IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;

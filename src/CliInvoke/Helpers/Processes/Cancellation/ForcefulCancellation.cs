@@ -15,7 +15,7 @@ internal static class ForcefulCancellation
 {
     extension(ProcessWrapper process)
     {
-        internal void ForcefulExit(ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+        internal void ForcefulExit(ProcessCancellationHandlingMode cancellationExceptionBehavior)
         {
             try
             {
@@ -37,7 +37,7 @@ internal static class ForcefulCancellation
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
         internal async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior,
+            ProcessCancellationHandlingMode cancellationExceptionBehavior,
             CancellationToken cancellationToken)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
@@ -57,13 +57,13 @@ internal static class ForcefulCancellation
                 TimeSpan difference = expectedExitTime.Difference(actualExitTime);
 
                 if (cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowException)
+                    ProcessCancellationHandlingMode.AllowException)
                 {
                     throw;
                 }
 
                 if (cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected && difference > TimeSpan.FromSeconds(30))
+                    ProcessCancellationHandlingMode.AllowExceptionIfUnexpected && difference > TimeSpan.FromSeconds(30))
                 {
                     throw;
                 }
@@ -71,9 +71,9 @@ internal static class ForcefulCancellation
             catch (Exception)
             {
                 if (cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected ||
+                    ProcessCancellationHandlingMode.AllowExceptionIfUnexpected ||
                     cancellationExceptionBehavior ==
-                    ProcessCancellationExceptionBehavior.AllowException)
+                    ProcessCancellationHandlingMode.AllowException)
                 {
                     throw;
                 }

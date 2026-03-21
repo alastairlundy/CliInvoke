@@ -26,7 +26,7 @@ internal static partial class GracefulCancellation
         /// <exception cref="PlatformNotSupportedException"></exception>
         [SupportedOSPlatform("windows")]
         internal async Task<bool> CancelWithInterruptOnWindows(TimeSpan timeoutThreshold,
-            ProcessCancellationExceptionBehavior cancellationExceptionBehavior, CancellationToken cancellationToken)
+            ProcessCancellationHandlingMode cancellationExceptionBehavior, CancellationToken cancellationToken)
         {
             if(!OperatingSystem.IsWindows())
                 throw new PlatformNotSupportedException();
@@ -52,14 +52,14 @@ internal static partial class GracefulCancellation
             }
             catch (TaskCanceledException)
             {
-                if (cancellationExceptionBehavior is ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
-                    or ProcessCancellationExceptionBehavior.AllowException)
+                if (cancellationExceptionBehavior is ProcessCancellationHandlingMode.AllowExceptionIfUnexpected
+                    or ProcessCancellationHandlingMode.AllowException)
                     throw;
             }
             catch (Exception)
             {
                 if (cancellationExceptionBehavior !=
-                    ProcessCancellationExceptionBehavior.SuppressException)
+                    ProcessCancellationHandlingMode.SuppressException)
                     throw;
             }
 

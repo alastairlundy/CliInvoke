@@ -7,12 +7,15 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-#pragma warning disable CS0618 
+#pragma warning disable CS0618
 
 using CliInvoke.Core.Processes;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 using CliInvoke.Helpers.Processes.Cancellation;
+
+using WhatExec.Lib.Abstractions;
+using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke.Processes;
 
@@ -24,18 +27,18 @@ public class ExternalProcess : IExternalProcess
     private ProcessWrapper _processWrapper;
     
     private readonly IProcessPipeHandler _processPipeHandler;
-    private readonly IFilePathResolver _filePathResolver;
+    private readonly IExecutableFileResolver _executableFileResolver;
     
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="filePathResolver"></param>
+    /// <param name="executableFileResolver"></param>
     /// <param name="processPipeHandler"></param>
     /// <param name="targetFilePath"></param>
-    public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler, string targetFilePath)
+    public ExternalProcess(IExecutableFileResolver executableFileResolver, IProcessPipeHandler processPipeHandler, string targetFilePath)
     {
         _processPipeHandler = processPipeHandler;
-        _filePathResolver = filePathResolver;
+        _executableFileResolver = executableFileResolver;
         
         Configuration = new ProcessConfiguration(targetFilePath,
             false, true, true);
@@ -49,15 +52,15 @@ public class ExternalProcess : IExternalProcess
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="filePathResolver"></param>
+    /// <param name="executableFileResolver"></param>
     /// <param name="processPipeHandler"></param>
     /// <param name="configuration"></param>
     /// <param name="exitConfiguration"></param>
-    public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler,
+    public ExternalProcess(IExecutableFileResolver executableFileResolver, IProcessPipeHandler processPipeHandler,
         ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null)
     {
         _processPipeHandler = processPipeHandler;
-        _filePathResolver = filePathResolver;
+        _executableFileResolver = executableFileResolver;
         
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
@@ -119,8 +122,10 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("browser")]
     public async Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken)
     {
-        Configuration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            Configuration.TargetFilePath);
+        FileInfo filePath = await _executableFileResolver.LocateExecutableAsync(
+            Configuration.TargetFilePath, SearchOption.AllDirectories, cancellationToken);
+
+        Configuration.TargetFilePath = filePath.FullName;
 
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         
@@ -145,21 +150,9 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
-        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
-                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
-            : (Task<Stream>)Task.CompletedTask;
-        
-        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
-                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
-            : (Task<Stream>)Task.CompletedTask;
-        
         try
         {
-            await Task.WhenAll([
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputStream,
-                standardErrorStream
-            ]);
+            await _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
             
             ProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
@@ -168,15 +161,11 @@ public class ExternalProcess : IExternalProcess
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime
             );
-
-            ThrowIfProcessNotSuccessful(result);
-
+            
             return result;
         }
         finally
         {
-            standardOutputStream.Dispose();
-            standardErrorStream.Dispose();
             Dispose();
         }
     }
@@ -188,7 +177,7 @@ public class ExternalProcess : IExternalProcess
     /// <returns>A task that represents the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public async Task<BufferedProcessResult> WaitForBufferedExitOrTimeoutAsync(CancellationToken cancellationToken)
+    public async Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken)
     {
         Task<string> standardOutputString = Configuration.RedirectStandardOutput ? _processWrapper.StandardOutput.ReadToEndAsync(cancellationToken) 
             : Task.FromResult(string.Empty);
@@ -208,15 +197,58 @@ public class ExternalProcess : IExternalProcess
             BufferedProcessResult result = new BufferedProcessResult(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
                 _processWrapper.ExitTime);
-
-            ThrowIfProcessNotSuccessful(result);
-
+            
             return result;
         }
         finally
         {
             standardOutputString.Dispose();
             standardErrorString.Dispose();
+            Dispose();
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    public async Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
+    {
+        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
+                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
+            : (Task<Stream>)Task.CompletedTask;
+        
+        Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
+                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
+            : (Task<Stream>)Task.CompletedTask;
+        
+        try
+        {
+            await Task.WhenAll([
+                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
+                standardOutputStream,
+                standardErrorStream
+            ]);
+            
+            PipedProcessResult result = new(
+                _processWrapper.StartInfo.FileName,
+                _processWrapper.ExitCode,
+                _processWrapper.Id,
+                _processWrapper.StartTime,
+                _processWrapper.ExitTime,
+                await standardOutputStream,
+                await standardErrorStream
+            );
+            
+            return result;
+        }
+        finally
+        {
+            standardOutputStream.Dispose();
+            standardErrorStream.Dispose();
             Dispose();
         }
     }
@@ -252,15 +284,5 @@ public class ExternalProcess : IExternalProcess
     {
         Configuration.Dispose();
         _processWrapper.Dispose();
-    }
-
-    private void ThrowIfProcessNotSuccessful(ProcessResult result)
-    {
-        if (ExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-            && _processWrapper.ExitCode != 0)
-        {
-            throw new ProcessNotSuccessfulException(new ProcessExceptionInfo(result,
-                Configuration));
-        }
     }
 }

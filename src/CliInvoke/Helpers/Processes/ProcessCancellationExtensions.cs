@@ -52,7 +52,7 @@ internal static class ProcessCancellationExtensions
             }
         }
 
-        private async Task WaitForExitNoTimeoutAsync(ProcessCancellationExceptionBehavior cancellationExceptionBehavior,
+        private async Task WaitForExitNoTimeoutAsync(ProcessCancellationHandlingMode cancellationExceptionBehavior,
             CancellationToken cancellationToken = default)
         {
             try
@@ -66,7 +66,7 @@ internal static class ProcessCancellationExtensions
             }
             catch (Exception)
             {
-                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
+                if (cancellationExceptionBehavior == ProcessCancellationHandlingMode.AllowExceptionIfUnexpected)
                 {
                     throw;
                 }

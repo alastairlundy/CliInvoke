@@ -14,8 +14,6 @@
  */
 
 
-using CliInvoke.Core.Internal;
-
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -36,8 +34,7 @@ public class ProcessResult : IEquatable<ProcessResult>
         int exitCode,
         int processId,
         DateTime startTime,
-        DateTime exitTime
-    )
+        DateTime exitTime)
     {
         ExitCode = exitCode;
         ExecutedFilePath = executableFilePath;
@@ -45,13 +42,7 @@ public class ProcessResult : IEquatable<ProcessResult>
         ExitTime = exitTime;
         ProcessId = processId;
     }
-
-    /// <summary>
-    /// Whether the Command successfully exited.
-    /// </summary>
-    [Obsolete(DeprecationMessages.DeprecationV3)]
-    public bool WasSuccessful => ExitCode == 0;
-
+    
     /// <summary>
     /// The unique identifier assigned to the process when it was executed.
     /// </summary>

@@ -7,13 +7,15 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core.Internal;
+using CliInvoke.Core.Validation;
 
 namespace CliInvoke.Core;
 
 /// <summary>
 /// Represents configuration information about the exit behaviour of a process, including timeout policy and result validation.
 /// </summary>
+///
+/// TODO: Add support for <see cref="IProcessResultValidator{TProcessResult}"/>
 public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 {
     /// <summary>
@@ -22,23 +24,19 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessExitConfiguration()
     {
         TimeoutPolicy = ProcessTimeoutPolicy.Default;
-        ResultValidation = ProcessResultValidation.ExitCodeZero;
-        CancellationExceptionBehavior = ProcessCancellationExceptionBehavior.AllowException;
+        CancellationExceptionBehavior = ProcessCancellationHandlingMode.AllowException;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProcessExitConfiguration"/> class with the specified timeout policy and result validation.
     /// </summary>
     /// <param name="timeoutPolicy">The timeout policy to apply to the process.</param>
-    /// <param name="resultValidation">The result validation strategy to use for the process exit.</param>
     /// <param name="cancellationValidation"></param>
     public ProcessExitConfiguration(
         ProcessTimeoutPolicy timeoutPolicy,
-        ProcessResultValidation resultValidation,
-        ProcessCancellationExceptionBehavior cancellationValidation)
+        ProcessCancellationHandlingMode cancellationValidation)
     {
         TimeoutPolicy = timeoutPolicy;
-        ResultValidation = resultValidation;
         CancellationExceptionBehavior = cancellationValidation;
     }
 
@@ -47,8 +45,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// </summary>
     public static readonly ProcessExitConfiguration Default = new(
         ProcessTimeoutPolicy.Default,
-        ProcessResultValidation.ExitCodeZero,
-        ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
+        ProcessCancellationHandlingMode.AllowExceptionIfUnexpected
     );
 
     /// <summary>
@@ -56,8 +53,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// </summary>
     public static readonly ProcessExitConfiguration DefaultNoException = new(
         ProcessTimeoutPolicy.Default,
-        ProcessResultValidation.ExitCodeZero,
-        ProcessCancellationExceptionBehavior.SuppressException
+        ProcessCancellationHandlingMode.SuppressException
     );
 
     /// <summary>
@@ -65,8 +61,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// </summary>
     public static readonly ProcessExitConfiguration NoTimeoutDefault = new(
         ProcessTimeoutPolicy.None,
-        ProcessResultValidation.ExitCodeZero,
-        ProcessCancellationExceptionBehavior.SuppressException
+        ProcessCancellationHandlingMode.SuppressException
     );
 
     /// <summary>
@@ -74,19 +69,12 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// or constraints, using no timeout, no result validation, and suppression of exceptions.
     /// </summary>
     public static readonly ProcessExitConfiguration NoValidation = new(ProcessTimeoutPolicy.None,
-        ProcessResultValidation.None,
-        ProcessCancellationExceptionBehavior.SuppressException);
-
-    /// <summary>
-    /// Gets the result validation strategy used to determine if the process exited successfully.
-    /// </summary>
-    [Obsolete(DeprecationMessages.DeprecationV3)]
-    public ProcessResultValidation ResultValidation { get; }
+        ProcessCancellationHandlingMode.SuppressException);
     
     /// <summary>
     /// Gets the result validation strategy used to determine if Process cancellation should throw an exception.
     /// </summary>
-    public ProcessCancellationExceptionBehavior CancellationExceptionBehavior { get; }
+    public ProcessCancellationHandlingMode CancellationExceptionBehavior { get; }
 
     /// <summary>
     /// Gets the timeout policy applied to the process.
@@ -103,8 +91,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         if (other is null)
             return false;
 
-        return ResultValidation == other.ResultValidation
-               && TimeoutPolicy.Equals(other.TimeoutPolicy)
+        return TimeoutPolicy.Equals(other.TimeoutPolicy)
                && CancellationExceptionBehavior == other.CancellationExceptionBehavior;
     }
 
@@ -128,7 +115,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// Returns a hash code for the current instance.
     /// </summary>
     /// <returns>The hash code for the current instance.</returns>
-    public override int GetHashCode() => HashCode.Combine(ResultValidation, TimeoutPolicy,
+    public override int GetHashCode() => HashCode.Combine(TimeoutPolicy,
         CancellationExceptionBehavior);
 
     /// <summary>

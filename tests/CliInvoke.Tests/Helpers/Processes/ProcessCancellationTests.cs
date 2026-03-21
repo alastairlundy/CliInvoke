@@ -7,7 +7,6 @@ namespace CliInvoke.Tests.Helpers.Processes;
 
 public class ProcessCancellationTests
 {
-    
     [Fact]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -22,7 +21,7 @@ public class ProcessCancellationTests
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
         
         ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(10)),
-            ProcessResultValidation.None, ProcessCancellationExceptionBehavior.SuppressException);
+            ProcessCancellationHandlingMode.SuppressException);
         
         //Act
        
@@ -86,8 +85,8 @@ public class ProcessCancellationTests
         string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "120" : "/T 120 /NOBREAK";
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
         
-        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30)), ProcessResultValidation.None,
-            ProcessCancellationExceptionBehavior.SuppressException);
+        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30)),
+            ProcessCancellationHandlingMode.SuppressException);
         
         //Act
         process.Start();

@@ -1,6 +1,4 @@
-﻿using CliInvoke.Core;
-using CliInvoke.Core.Piping;
-using CliInvoke.Piping;
+﻿using CliInvoke.Piping;
 using WhatExec.Lib.Abstractions.Resolvers;
 using WhatExec.Lib.Detectors;
 using WhatExec.Lib.Resolvers;
@@ -17,7 +15,7 @@ internal static class CliInvokeHelpers
         executableFileResolver = new ExecutableFileResolver(new ExecutableFileDetector(), new PathEnvironmentVariableResolver(
             new PathEnvironmentVariableDetector(), new ExecutableFileDetector()));
         
-        _processInvoker = new ProcessInvoker(new FilePathResolver(), new ProcessPipeHandler());
+        _processInvoker = new ProcessInvoker(executableFileResolver, new ProcessPipeHandler());
     }
 
     internal static ProcessInvoker CreateProcessInvoker()

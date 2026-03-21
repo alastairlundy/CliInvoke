@@ -10,6 +10,9 @@
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 
+using WhatExec.Lib.Abstractions;
+using WhatExec.Lib.Abstractions.Resolvers;
+
 namespace CliInvoke;
 
 /// <summary>
@@ -19,18 +22,18 @@ public class ProcessInvoker : IProcessInvoker
 {
     private readonly IProcessPipeHandler _processPipeHandler;
 
-    private readonly IFilePathResolver _filePathResolver;
+    private readonly IExecutableFileResolver _executableFileResolver;
 
     /// <summary>
     /// Instantiates a <see cref="ProcessInvoker"/> for creating and executing processes.
     /// </summary>
-    /// <param name="filePathResolver">The file path resolver to be used.</param>
+    /// <param name="executableFileResolver">The file path resolver to be used.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
     public ProcessInvoker(
-        IFilePathResolver filePathResolver,
+        IExecutableFileResolver executableFileResolver,
         IProcessPipeHandler processPipeHandler)
     {
-        _filePathResolver = filePathResolver;
+        _executableFileResolver = executableFileResolver;
         _processPipeHandler = processPipeHandler;
     }
 
@@ -53,7 +56,7 @@ public class ProcessInvoker : IProcessInvoker
         bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
-        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
+        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration, processExitConfiguration, cancellationToken);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
@@ -79,9 +82,9 @@ public class ProcessInvoker : IProcessInvoker
                 process.ExitTime
             );
 
-            if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
-                !=  ProcessCancellationExceptionBehavior.SuppressException)
+            //TODO: Add support for <see cref="IProcessResultValidator"/>
+            if (processExitConfiguration.CancellationExceptionBehavior
+                !=  ProcessCancellationHandlingMode.SuppressException)
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
@@ -114,7 +117,7 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
+        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration, processExitConfiguration, cancellationToken);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
@@ -155,11 +158,10 @@ public class ProcessInvoker : IProcessInvoker
                 process.ExitTime
             );
 
-            if (
-                processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
-                != ProcessCancellationExceptionBehavior.SuppressException
-            )
+            //TODO: Add support for <see cref="IProcessResultValidator"/>
+
+            if (processExitConfiguration.CancellationExceptionBehavior
+                != ProcessCancellationHandlingMode.SuppressException)
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
@@ -194,7 +196,7 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
+        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration, processExitConfiguration, cancellationToken);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
@@ -227,9 +229,9 @@ public class ProcessInvoker : IProcessInvoker
                 await standardError
             );
 
-            if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0 && processExitConfiguration.
-                    CancellationExceptionBehavior != ProcessCancellationExceptionBehavior.SuppressException)
+            //TODO: Add support for <see cref="IProcessResultValidator"/>
+            if (processExitConfiguration.
+                    CancellationExceptionBehavior != ProcessCancellationHandlingMode.SuppressException)
             {
                 ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
@@ -291,14 +293,16 @@ public class ProcessInvoker : IProcessInvoker
         }
     }
     
-    private ProcessExitConfiguration ValidateConfigurations(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration)
+    private async Task<ProcessExitConfiguration> ValidateConfigurationsAsync(ProcessConfiguration processConfiguration,
+        ProcessExitConfiguration? processExitConfiguration, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(processConfiguration);
         
-        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            processConfiguration.TargetFilePath);
+        FileInfo fileInfo = await _executableFileResolver.LocateExecutableAsync(
+            processConfiguration.TargetFilePath, SearchOption.AllDirectories, cancellationToken);
 
+        processConfiguration.TargetFilePath = fileInfo.FullName;
+        
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
         ThrowFileNotFoundException(processConfiguration);

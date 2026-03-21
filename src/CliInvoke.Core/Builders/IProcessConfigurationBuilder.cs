@@ -9,8 +9,6 @@
 
 using System.Text;
 
-using CliInvoke.Core.Internal;
-
 namespace CliInvoke.Core.Builders;
 
 /// <summary>
@@ -110,22 +108,6 @@ public interface IProcessConfigurationBuilder
     /// <param name="source">The source to use for the Standard Input pipe.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Standard Input pipe source.</returns>
     IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source);
-
-    /// <summary>
-    /// Sets the Standard Output Pipe target.
-    /// </summary>
-    /// <param name="target">The target to send the Standard Output to.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Output Pipe Target.</returns>
-    [Obsolete(DeprecationMessages.DeprecationV3)]
-    IProcessConfigurationBuilder SetStandardOutputPipe(StreamReader target);
-
-    /// <summary>
-    /// Sets the Standard Error Pipe target.
-    /// </summary>
-    /// <param name="target">The target to send the Standard Error to.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Standard Error Pipe Target.</returns>
-    [Obsolete(DeprecationMessages.DeprecationV3)]
-    IProcessConfigurationBuilder SetStandardErrorPipe(StreamReader target);
 
     /// <summary>
     /// Sets the Process Resource Policy to be used for this Process.
