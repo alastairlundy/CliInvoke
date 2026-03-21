@@ -258,15 +258,15 @@ public class ExternalProcess : IExternalProcess
     /// <exception cref="ArgumentOutOfRangeException">Thrown when an invalid value is provided for ExitConfiguration.TimeoutPolicy.CancellationMode.</exception>
     public async Task Kill()
     {
-        switch (ExitConfiguration.TimeoutPolicy.CancellationMode)
+        switch (ExitConfiguration.RequestedCancellationPolicy
+                    .CancellationMode)
         {
             case ProcessCancellationMode.Forceful:
-                await _processWrapper.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero,
-                    ExitConfiguration.CancellationExceptionBehavior, CancellationToken.None);
+                await _processWrapper.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero, CancellationToken.None);
                 break;
             case ProcessCancellationMode.Graceful:
                 await _processWrapper.WaitForExitOrGracefulTimeoutAsync(TimeSpan.Zero,
-                    ExitConfiguration.CancellationExceptionBehavior, CancellationToken.None);
+                    ExitConfiguration.ExceptionBehavior, CancellationToken.None);
                 break;
             case ProcessCancellationMode.None:
                 _processWrapper.Kill();

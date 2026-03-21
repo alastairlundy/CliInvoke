@@ -15,7 +15,7 @@ internal static class ForcefulCancellation
 {
     extension(ProcessWrapper process)
     {
-        internal void ForcefulExit(ProcessCancellationHandlingMode cancellationExceptionBehavior)
+        internal void ForcefulExit()
         {
             try
             {
@@ -31,19 +31,19 @@ internal static class ForcefulCancellation
         /// 
         /// </summary>
         /// <param name="timeoutThreshold"></param>
-        /// <param name="cancellationExceptionBehavior"></param>
+        /// <param name="exitConfiguration"></param>
         /// <param name="cancellationToken"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
         internal async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
-            ProcessCancellationHandlingMode cancellationExceptionBehavior,
+            ProcessExitConfiguration exitConfiguration,
             CancellationToken cancellationToken)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
             DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
-
+            
             try
             {
                 Task waitForExit = process.WaitForExitAsync(cancellationToken);
@@ -57,13 +57,13 @@ internal static class ForcefulCancellation
                 TimeSpan difference = expectedExitTime.Difference(actualExitTime);
 
                 if (cancellationExceptionBehavior ==
-                    ProcessCancellationHandlingMode.AllowException)
+                    ProcessExceptionBehaviour.AllowException)
                 {
                     throw;
                 }
 
                 if (cancellationExceptionBehavior ==
-                    ProcessCancellationHandlingMode.AllowExceptionIfUnexpected && difference > TimeSpan.FromSeconds(30))
+                    ProcessExceptionBehaviour.AllowExceptionIfUnexpected && difference > TimeSpan.FromSeconds(30))
                 {
                     throw;
                 }
@@ -71,16 +71,16 @@ internal static class ForcefulCancellation
             catch (Exception)
             {
                 if (cancellationExceptionBehavior ==
-                    ProcessCancellationHandlingMode.AllowExceptionIfUnexpected ||
+                    ProcessExceptionBehaviour.AllowExceptionIfUnexpected ||
                     cancellationExceptionBehavior ==
-                    ProcessCancellationHandlingMode.AllowException)
+                    ProcessExceptionBehaviour.AllowException)
                 {
                     throw;
                 }
             }
             finally
             {
-                process.ForcefulExit(cancellationExceptionBehavior);
+                process.ForcefulExit();
             }
         }
     }

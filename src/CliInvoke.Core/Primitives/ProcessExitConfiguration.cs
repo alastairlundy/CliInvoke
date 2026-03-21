@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core.Validation;
-
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -23,62 +21,67 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessExitConfiguration()
     {
         TimeoutPolicy = ProcessTimeoutPolicy.Default;
-        CancellationExceptionBehavior = ProcessCancellationHandlingMode.AllowException;
+        TimeoutCancellationPolicy =  ProcessCancellationPolicy.Default;
+        RequestedCancellationPolicy =  ProcessCancellationPolicy.Default;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProcessExitConfiguration"/> class with the specified timeout policy and result validation.
     /// </summary>
     /// <param name="timeoutPolicy">The timeout policy to apply to the process.</param>
-    /// <param name="cancellationValidation"></param>
-    public ProcessExitConfiguration(
-        ProcessTimeoutPolicy timeoutPolicy,
-        ProcessCancellationHandlingMode cancellationValidation)
+    /// <param name="timeoutCancellationPolicy"></param>
+    /// <param name="requestedCancellationPolicy"></param>
+    public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy,
+        ProcessCancellationPolicy timeoutCancellationPolicy,
+        ProcessCancellationPolicy requestedCancellationPolicy)
     {
         TimeoutPolicy = timeoutPolicy;
-        CancellationExceptionBehavior = cancellationValidation;
+        TimeoutCancellationPolicy = timeoutCancellationPolicy;
+        RequestedCancellationPolicy = requestedCancellationPolicy;
     }
 
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy and exit code zero validation.
     /// </summary>
-    public static readonly ProcessExitConfiguration Default = new(
-        ProcessTimeoutPolicy.Default,
-        ProcessCancellationHandlingMode.AllowExceptionIfUnexpected
-    );
+    public static ProcessExitConfiguration Default { get; } = new();
 
     /// <summary>
     /// Gets the default <see cref="ProcessExitConfiguration"/> instance, which uses the default timeout policy, but suppresses the Exception from cancellation.
     /// </summary>
-    public static readonly ProcessExitConfiguration DefaultNoException = new(
-        ProcessTimeoutPolicy.Default,
-        ProcessCancellationHandlingMode.SuppressException
-    );
+    public static ProcessExitConfiguration DefaultNoException { get; }= new(
+        ProcessTimeoutPolicy.Default, ProcessCancellationPolicy.DefaultNoException,
+        ProcessCancellationPolicy.DefaultNoException);
 
     /// <summary>
     /// A preconfigured <see cref="ProcessExitConfiguration"/> instance with Exit Code Validation and without a Timeout Policy.
     /// </summary>
-    public static readonly ProcessExitConfiguration NoTimeoutDefault = new(
+    public static ProcessExitConfiguration NoTimeoutDefault { get; } = new(
         ProcessTimeoutPolicy.None,
-        ProcessCancellationHandlingMode.SuppressException
+        timeoutCancellationPolicy: ProcessCancellationPolicy.None,
+        requestedCancellationPolicy: ProcessCancellationPolicy.Default
     );
 
     /// <summary>
-    /// Represents a <see cref="ProcessExitConfiguration"/> that applies no validation
-    /// or constraints, using no timeout, no result validation, and suppression of exceptions.
+    /// 
     /// </summary>
-    public static readonly ProcessExitConfiguration NoValidation = new(ProcessTimeoutPolicy.None,
-        ProcessCancellationHandlingMode.SuppressException);
+    public static ProcessExitConfiguration NoTimeoutNoException
+        => new(ProcessTimeoutPolicy.None, timeoutCancellationPolicy: ProcessCancellationPolicy.None,
+            requestedCancellationPolicy: ProcessCancellationPolicy.Graceful);
     
-    /// <summary>
-    /// Gets the result validation strategy used to determine if Process cancellation should throw an exception.
-    /// </summary>
-    public ProcessCancellationHandlingMode CancellationExceptionBehavior { get; }
-
     /// <summary>
     /// Gets the timeout policy applied to the process.
     /// </summary>
     public ProcessTimeoutPolicy TimeoutPolicy { get; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public ProcessCancellationPolicy TimeoutCancellationPolicy { get; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public ProcessCancellationPolicy RequestedCancellationPolicy { get; }
 
     /// <summary>
     /// Determines whether the specified <see cref="ProcessExitConfiguration"/> is equal to the current instance.
@@ -90,8 +93,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         if (other is null)
             return false;
 
-        return TimeoutPolicy.Equals(other.TimeoutPolicy)
-               && CancellationExceptionBehavior == other.CancellationExceptionBehavior;
+        return TimeoutPolicy.Equals(other.TimeoutPolicy);
     }
 
     /// <summary>
@@ -114,8 +116,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// Returns a hash code for the current instance.
     /// </summary>
     /// <returns>The hash code for the current instance.</returns>
-    public override int GetHashCode() => HashCode.Combine(TimeoutPolicy,
-        CancellationExceptionBehavior);
+    public override int GetHashCode() => HashCode.Combine(TimeoutPolicy);
 
     /// <summary>
     /// Determines whether two <see cref="ProcessExitConfiguration"/> instances are equal.

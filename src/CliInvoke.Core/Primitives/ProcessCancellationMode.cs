@@ -19,6 +19,10 @@ public enum ProcessCancellationMode
     /// </summary>
     Forceful,
     /// <summary>
+    /// Cancels the Process using a <see cref="CancellationToken"/> directly.
+    /// </summary>
+    Normal,
+    /// <summary>
     /// Gracefully cancels the Process using SIGTERM/SIGINT Signals, or a <see cref="CancellationTokenSource"/> if that fails.
     /// </summary>
     Graceful,

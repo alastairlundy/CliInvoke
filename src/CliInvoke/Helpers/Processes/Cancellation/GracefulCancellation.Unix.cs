@@ -32,7 +32,7 @@ internal static partial class GracefulCancellation
         [UnsupportedOSPlatform("tvos")]
         [UnsupportedOSPlatform("windows")]
         internal async Task<bool> CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
-            ProcessCancellationHandlingMode cancellationExceptionBehavior, CancellationToken cancellationToken)
+            ProcessExceptionBehaviour cancellationExceptionBehavior, CancellationToken cancellationToken)
         {
             bool sigIntSuccess = false;
 
@@ -57,13 +57,13 @@ internal static partial class GracefulCancellation
             catch (TaskCanceledException)
             {
                 if (cancellationExceptionBehavior ==
-                    ProcessCancellationHandlingMode.AllowException)
+                    ProcessExceptionBehaviour.AllowException)
                     throw;
             }
             catch (Exception)
             {
-                if (cancellationExceptionBehavior is ProcessCancellationHandlingMode.AllowException
-                    or ProcessCancellationHandlingMode
+                if (cancellationExceptionBehavior is ProcessExceptionBehaviour.AllowException
+                    or ProcessExceptionBehaviour
                         .AllowExceptionIfUnexpected)
                     throw;
             }

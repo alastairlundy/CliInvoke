@@ -19,57 +19,44 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// </summary>
     public ProcessTimeoutPolicy()
     {
+        Enabled = true;
         TimeoutThreshold = TimeSpan.FromMinutes(30);
-        CancellationMode = ProcessCancellationMode.Graceful;
     }
 
     /// <summary>
     /// Instantiates the <see cref="ProcessTimeoutPolicy"/> with default values unless specified parameters are provided.
     /// </summary>
     /// <param name="timeoutThreshold">The timespan to wait for the Process timeout before cancelling the Process.</param>
-    /// <param name="cancellationMode">Defaults to Graceful cancellation, otherwise uses the Cancellation Mode specified.</param>
-    public ProcessTimeoutPolicy(
-        TimeSpan timeoutThreshold,
-        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful)
+    /// <param name="enabled"></param>
+    public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, bool enabled)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(timeoutThreshold.TotalMilliseconds);
         ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
         TimeoutThreshold = timeoutThreshold;
-        CancellationMode = cancellationMode;
+        Enabled = enabled;
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="timeoutThreshold"></param>
-    /// <param name="cancellationMode"></param>
-    /// <returns></returns>
-    public static ProcessTimeoutPolicy FromTimeSpan(TimeSpan timeoutThreshold, 
-        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful) =>
-        new(timeoutThreshold, cancellationMode);
-
     /// <summary>
     /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
     /// </summary>
-    public static ProcessTimeoutPolicy Default { get; } =
-        new(TimeSpan.FromMinutes(30));
+    public static ProcessTimeoutPolicy Default { get; } = 
+        new(TimeSpan.FromMinutes(30), true);
 
     /// <summary>
     /// Disables waiting for Process Timeout.
     /// </summary>
     public static ProcessTimeoutPolicy None { get; } =
-        new(TimeSpan.FromSeconds(0), ProcessCancellationMode.None);
+        new(TimeSpan.FromSeconds(0), false);
 
     /// <summary>
     /// The timespan after which a Process should no longer be allowed to continue waiting to exit.
     /// </summary>
     public TimeSpan TimeoutThreshold { get; }
-
+    
     /// <summary>
-    /// The mode to use for cancelling the Process if the timeout threshold is reached.
+    /// Whether the timeout policy is enabled or not.
     /// </summary>
-    public ProcessCancellationMode CancellationMode { get; }
+    public bool Enabled { get; }
 
     /// <summary>
     /// Determines whether the current <see cref="ProcessTimeoutPolicy"/> is equal to another <see cref="ProcessTimeoutPolicy"/> instance.
@@ -81,8 +68,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         if (other is null)
             return false;
 
-        return TimeoutThreshold.Equals(other.TimeoutThreshold)
-               && CancellationMode == other.CancellationMode;
+        return TimeoutThreshold.Equals(other.TimeoutThreshold) &&
+               Enabled == other.Enabled;
     }
 
     /// <summary>
@@ -107,7 +94,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <returns>A hash code that represents the current <see cref="ProcessTimeoutPolicy"/>.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine(TimeoutThreshold, (int)CancellationMode);
+        return HashCode.Combine(TimeoutThreshold, Enabled);
     }
 
     /// <summary>
@@ -167,12 +154,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         if (left is null || right is null)
             return false;
 
-        if (
-            left.CancellationMode == ProcessCancellationMode.None
-            && right.CancellationMode != ProcessCancellationMode.None
-        )
-            return false;
-
         return left.TimeoutThreshold < right.TimeoutThreshold;
     }
 
@@ -190,42 +171,18 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         if (left is null || right is null)
             return false;
 
-        if (
-            left.CancellationMode == ProcessCancellationMode.None
-            && right.CancellationMode != ProcessCancellationMode.None
-        )
-            return false;
-
-        if (
-            right.CancellationMode == ProcessCancellationMode.None
-            && left.CancellationMode != ProcessCancellationMode.None
-        )
-            return true;
-
         return left.TimeoutThreshold >= right.TimeoutThreshold;
     }
 
     /// <summary>
-    ///
+    /// Defines an operator for comparing two <see cref="ProcessTimeoutPolicy"/> instances based on their TimeoutThreshold.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The left operand, a <see cref="ProcessTimeoutPolicy"/> instance.</param>
+    /// <param name="right">The right operand, a <see cref="ProcessTimeoutPolicy"/> instance.</param>
+    /// <returns>Returns true if the TimeoutThreshold of the left <see cref="ProcessTimeoutPolicy"/> is less than or equal to the TimeoutThreshold of the right <see cref="ProcessTimeoutPolicy"/>, otherwise returns false. If either operand is null, returns false.</returns>
     public static bool operator <=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
-            return false;
-
-        if (
-            left.CancellationMode == ProcessCancellationMode.None
-            && right.CancellationMode != ProcessCancellationMode.None
-        )
-            return true;
-
-        if (
-            right.CancellationMode == ProcessCancellationMode.None
-            && left.CancellationMode != ProcessCancellationMode.None
-        )
             return false;
 
         return left.TimeoutThreshold <= right.TimeoutThreshold;
