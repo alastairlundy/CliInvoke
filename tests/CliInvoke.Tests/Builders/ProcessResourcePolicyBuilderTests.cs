@@ -186,11 +186,11 @@ public class ProcessResourcePolicyBuilderTests
         // Act
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
             .ConfigurePriorityBoost(priorityBoostEnabled);
-
+        
         if (OperatingSystem.IsWindows() || OperatingSystem.IsMacCatalyst() ||
             OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
         {
-            processResourcePolicyBuilder
+            processResourcePolicyBuilder = processResourcePolicyBuilder
                 .SetPriorityClass(priorityClass)
                 .SetMinWorkingSet(minWorkingSet)
                 .SetMaxWorkingSet(maxWorkingSet);
@@ -208,13 +208,23 @@ public class ProcessResourcePolicyBuilderTests
 
         // Assert
         Assert.NotNull(resourcePolicy.ProcessorAffinity);
-        Assert.NotNull(resourcePolicy.MinWorkingSet);
-        Assert.NotNull(resourcePolicy.MaxWorkingSet);
-        Assert.Equal(processorAffinity, resourcePolicy.ProcessorAffinity);
-        Assert.Equal(minWorkingSet, resourcePolicy.MinWorkingSet);
-        Assert.Equal(maxWorkingSet, resourcePolicy.MaxWorkingSet);
+
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacCatalyst() ||
+            OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+        {
+            Assert.NotNull(resourcePolicy.MinWorkingSet);
+            Assert.NotNull(resourcePolicy.MaxWorkingSet); 
+            Assert.Equal(minWorkingSet, resourcePolicy.MinWorkingSet);
+            Assert.Equal(maxWorkingSet, resourcePolicy.MaxWorkingSet);
+            Assert.Equal(priorityClass, resourcePolicy.PriorityClass);
+        }
+
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        {
+            Assert.Equal(processorAffinity, resourcePolicy.ProcessorAffinity);
+        }
+
         Assert.Equal(priorityBoostEnabled, resourcePolicy.EnablePriorityBoost);
-        Assert.Equal(priorityClass, resourcePolicy.PriorityClass);
 #pragma warning restore CA1416
     }
 }
