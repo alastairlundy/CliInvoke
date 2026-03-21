@@ -9,16 +9,15 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.5.0</Version>
+        <Version>2.5.1</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Added support for ``IExternalProcessFactory`` and ``ExternalProcessFactory``
-* Deprecated ``ProcessConfiguration``'s ``FromStartInfo`` static extension method as deprecated for removal in CliInvoke v3 - This is being replaced with a replacement method called ``FromProcessStartInfo``
-* Updated to use CliInvoke.Core 2.5.0 and CliInvoke 2.5.0</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.5.1 and CliInvoke 2.5.1
+* Updated AoT Compatibility property in ``CliInvoke.Extensions.csproj`` to only be set to true on .NET 8+</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -27,7 +26,7 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageId>CliInvoke.Extensions</PackageId>
         <Product>CliInvoke.Extensions</Product>
-        <AssemblyVersion>2.5.0.0</AssemblyVersion>
+        <AssemblyVersion>2.5.1.0</AssemblyVersion>
     </PropertyGroup>
     
     <ItemGroup>

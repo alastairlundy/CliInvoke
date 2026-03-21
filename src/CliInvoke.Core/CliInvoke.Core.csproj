@@ -23,11 +23,10 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.5.0</Version>
-        <PackageReleaseNotes>* Deprecated ``IProcessConfigurationBuilder``'s ``SetStandardOutputPipe`` and ``SetStandardErrorPipe`` methods for removal in CliInvoke.Core v3
-* Added ``IExternalProcessFactory``, an interface for easily creating ``IExternalProcess`` instances.</PackageReleaseNotes>
+        <Version>2.5.1</Version>
+        <PackageReleaseNotes>* Reduced warnings regarding supported and unsupported OSes in ``IProcessResourcePolicyBuilder``</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.5.0.0</AssemblyVersion>
+        <AssemblyVersion>2.5.1.0</AssemblyVersion>
     </PropertyGroup>
     
     <ItemGroup>

@@ -12,19 +12,19 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.5.0</PackageVersion>
+        <PackageVersion>2.5.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated CliInvoke.Core 2.5.0* Updated to use CliInvoke.Core 2.5.0 Beta 1</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated AoT Compatibility property in ``CliInvoke.Specializations.csproj`` to only be set to true on .NET 8+</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>2.5.0.0</AssemblyVersion>
+        <AssemblyVersion>2.5.1.0</AssemblyVersion>
     </PropertyGroup>
     
     <ItemGroup>
