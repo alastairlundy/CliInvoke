@@ -5,6 +5,7 @@
 ### 2.5
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.5.1 | March 21st 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.5.1 |
 | 2.5.0 | March 18th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.5.0 |
 | 2.5.0 Beta 1 | March 14th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.5.0-alpha.1 |
 | 2.5.0 Alpha 1| February 27th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.5.0-alpha.1 |
@@ -12,6 +13,7 @@
 ### 2.4
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.4.4 | March 21st 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.4.4 |
 | 2.4.3 | March 18th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.4.3 |
 | 2.4.2 | March 14th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.4.2 |
 | 2.4.1 | March 12th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.4.1 |
