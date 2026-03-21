@@ -73,6 +73,10 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("linux")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("android")]
     [Pure]
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
@@ -115,6 +119,10 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("linux")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("android")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
         nint minWorkingSet = _processResourcePolicy.MinWorkingSet ?? 
@@ -147,7 +155,8 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated Process Priority Class.</returns>
     [Pure]
     public IProcessResourcePolicyBuilder SetPriorityClass(
-        ProcessPriorityClass processPriorityClass)
+        ProcessPriorityClass processPriorityClass
+    )
     {
         return new ProcessResourcePolicyBuilder(
             new(

@@ -35,6 +35,8 @@ public interface IProcessResourcePolicyBuilder
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("linux")]
+    [UnsupportedOSPlatform("android")]
     IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet);
 
     /// <summary>
@@ -46,6 +48,8 @@ public interface IProcessResourcePolicyBuilder
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("linux")]
+    [UnsupportedOSPlatform("android")]
     IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet);
 
     /// <summary>
