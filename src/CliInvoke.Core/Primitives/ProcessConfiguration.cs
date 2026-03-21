@@ -44,8 +44,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         string targetFilePath,
         bool redirectStandardInput,
         bool redirectStandardOutput,
-        bool redirectStandardError,
-        string? arguments = null,
+        bool redirectStandardError, string? arguments = null,
         string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
         IReadOnlyDictionary<string, string>? environmentVariables = null,
@@ -56,8 +55,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Encoding? standardErrorEncoding = null,
         ProcessResourcePolicy? processResourcePolicy = null,
         bool windowCreation = false,
-        bool useShellExecution = false
-    )
+        bool useShellExecution = false)
     {
         TargetFilePath = targetFilePath;
         
