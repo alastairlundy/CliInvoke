@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using System.Threading;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
