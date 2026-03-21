@@ -15,14 +15,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Fixed an issue where ``ProcessPipeHandler`` didn't make use of the CancellationToken passed to its methods
-* Removed nuisance OS Support warnings for ``ProcessPipeHandler``
-* Updated internal Polyfill version from 9.20.0 to 9.22.0</PackageReleaseNotes>
+        <PackageReleaseNotes>* Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AoT compatible despite CliInvoke advertising itself as Trimming Safe and AoT compatible. It is now fixed to be Trimming safe and AoT compatible on .NET 8+
+* Updated AoT Compatibility property in ``CliInvoke.csproj`` to only be set to true on .NET 8+</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.4.3</PackageVersion>
-        <AssemblyVersion>2.5.0.0</AssemblyVersion>
+        <PackageVersion>2.4.4</PackageVersion>
+        <AssemblyVersion>2.4.4.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>

@@ -23,10 +23,10 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.4.3</Version>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 9.20.0 to 9.22.0</PackageReleaseNotes>
+        <Version>2.4.4</Version>
+        <PackageReleaseNotes>* Updated AoT Compatibility property in ``CliInvoke.Core.csproj`` to only be set to true on .NET 8+</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.5.0.0</AssemblyVersion>
+        <AssemblyVersion>2.4.4.0</AssemblyVersion>
     </PropertyGroup>
     
     <ItemGroup>
