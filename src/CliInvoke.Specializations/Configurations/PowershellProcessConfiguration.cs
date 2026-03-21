@@ -60,14 +60,12 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : base("",
-        redirectStandardInput, redirectStandardOutput, redirectStandardError,
-        arguments, workingDirectoryPath,
+        redirectStandardInput, redirectStandardOutput, redirectStandardError, arguments,workingDirectoryPath,
         requiresAdministrator, environmentVariables,
-        credentials,
-        standardInput, standardInputEncoding, standardOutputEncoding,
-        standardErrorEncoding, processResourcePolicy,
-        windowCreation: windowCreation,
-        useShellExecution: useShellExecution)
+        credentials, standardInput, standardInputEncoding,
+        standardOutputEncoding, standardErrorEncoding,
+        processResourcePolicy,
+        windowCreation: windowCreation, useShellExecution: useShellExecution)
     {
         string filePath;
 

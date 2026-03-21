@@ -93,9 +93,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -126,9 +124,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -160,9 +156,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -195,9 +189,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -225,9 +217,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -257,9 +247,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -292,9 +280,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -324,9 +310,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
             credentialBuilder.SetPassword(_configuration.Credential.Password);
                 
         if(_configuration.Credential.UserName is not null)
-                credentialBuilder.SetUsername(_configuration.Credential.UserName);
+            credentialBuilder.SetUsername(_configuration.Credential.UserName);
         
-        credentialBuilder.LoadUserProfile(_configuration.Credential.LoadUserProfile ?? false);
+        credentialBuilder = credentialBuilder.LoadUserProfile
+            (_configuration.Credential.LoadUserProfile ?? false);
 
         configure(credentialBuilder);
 
@@ -356,9 +343,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
 
     /// <summary>
@@ -384,9 +369,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
 
     /// <summary>
@@ -412,9 +395,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
 
     /// <summary>
@@ -446,9 +427,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -481,9 +460,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -514,9 +491,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: useShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: useShellExecution)
         );
     }
 
@@ -544,9 +519,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: enableWindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: enableWindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -577,9 +550,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy: _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -610,9 +581,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 standardOutputEncoding ?? Encoding.Default,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy: _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -643,9 +612,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 standardErrorEncoding ?? Encoding.Default,
                 processResourcePolicy: _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation,
-                useShellExecution: _configuration.UseShellExecution
-            )
+                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
         );
     }
 

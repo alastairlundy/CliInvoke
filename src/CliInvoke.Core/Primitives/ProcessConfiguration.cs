@@ -22,6 +22,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// Configures the Command configuration to be wrapped and executed.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardOutput"></param>
+    /// <param name="redirectStandardError"></param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <param name="workingDirectoryPath">The working directory to be used.</param>
     /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
@@ -34,9 +37,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
-    /// <param name="redirectStandardInput"></param>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="redirectStandardError"></param>
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]

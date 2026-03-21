@@ -15,7 +15,6 @@ namespace CliInvoke.Core;
 /// Represents configuration information about the exit behaviour of a process, including timeout policy and result validation.
 /// </summary>
 ///
-/// TODO: Add support for <see cref="IProcessResultValidator{TProcessResult}"/>
 public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 {
     /// <summary>
@@ -151,8 +150,6 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="right">The second <see cref="ProcessExitConfiguration"/> to compare.</param>
     /// <returns><c>true</c> if both instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right)
-    {
-        return !Equals(left, right);
-    }
+        ProcessExitConfiguration? right) =>
+        !Equals(left, right);
 }

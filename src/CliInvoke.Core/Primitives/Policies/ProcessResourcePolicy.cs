@@ -29,8 +29,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         nint? minWorkingSet = null,
         nint? maxWorkingSet = null,
         ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal,
-        bool enablePriorityBoost = false
-    )
+        bool enablePriorityBoost = false)
     {
         if (minWorkingSet is not null)
         {

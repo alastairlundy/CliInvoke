@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-// ReSharper disable MemberCanBeMadeStatic.Global
 // ReSharper disable UnusedMember.Global
 
 namespace CliInvoke.Specializations.Configurations;
@@ -57,13 +56,12 @@ public class CmdProcessConfiguration : ProcessConfiguration
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
         base("cmd.exe",
-            redirectStandardInput, redirectStandardOutput, redirectStandardError,
-            $"/c {arguments}", workingDirectoryPath,
-            requiresAdministrator, environmentVariables, credentials,
-            standardInput, standardInputEncoding, standardOutputEncoding, standardErrorEncoding,
+            redirectStandardInput, redirectStandardOutput, redirectStandardError, $"/c {arguments}",
+            workingDirectoryPath, requiresAdministrator, environmentVariables, credentials,
+            standardInput, standardInputEncoding, standardOutputEncoding,
+            standardErrorEncoding,
             processResourcePolicy,
-            windowCreation: windowCreation,
-            useShellExecution: useShellExecution)
+            windowCreation: windowCreation, useShellExecution: useShellExecution)
     {
         base.TargetFilePath = TargetFilePath;
     }
