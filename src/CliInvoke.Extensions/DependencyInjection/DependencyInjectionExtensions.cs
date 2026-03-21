@@ -13,8 +13,6 @@ using CliInvoke.Factories;
 using CliInvoke.Piping;
 using CliInvoke.Validation;
 
-using WhatExec.Lib;
-using WhatExec.Lib.Abstractions;
 using WhatExec.Lib.Abstractions.Resolvers;
 using WhatExec.Lib.Resolvers;
 

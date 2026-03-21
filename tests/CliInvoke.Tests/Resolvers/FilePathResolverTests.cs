@@ -1,11 +1,8 @@
-using System.IO;
 using System.Linq;
 using System.Threading;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
-using WhatExec.Lib;
-using WhatExec.Lib.Abstractions;
 using WhatExec.Lib.Abstractions.Detectors;
 using WhatExec.Lib.Abstractions.Resolvers;
 using WhatExec.Lib.Detectors;
@@ -15,12 +12,11 @@ namespace CliInvoke.Tests.Resolvers;
 
 public class FilePathResolverTests
 {
-
     public static IExecutableFileResolver CreateFileResolver()
     {
         IExecutableFileDetector fileDetector = new ExecutableFileDetector();
         
-       return new ExecutableFileResolver(fileDetector, new PathEnvironmentVariableResolver(new PathEnvironmentVariableDetector(), fileDetector));
+        return new ExecutableFileResolver(fileDetector, new PathEnvironmentVariableResolver(new PathEnvironmentVariableDetector(), fileDetector));
     }
     
     [Fact]

@@ -14,7 +14,6 @@ using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 using CliInvoke.Helpers.Processes.Cancellation;
 
-using WhatExec.Lib.Abstractions;
 using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke.Processes;
