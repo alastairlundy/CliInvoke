@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 
 using WhatExec.Lib.Abstractions;
+using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke.Specializations.Configurations;
 

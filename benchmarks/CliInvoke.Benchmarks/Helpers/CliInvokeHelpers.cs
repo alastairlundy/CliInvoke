@@ -17,7 +17,7 @@ internal static class CliInvokeHelpers
         executableFileResolver = new ExecutableFileResolver(new ExecutableFileDetector(), new PathEnvironmentVariableResolver(
             new PathEnvironmentVariableDetector(), new ExecutableFileDetector()));
         
-        _processInvoker = new ProcessInvoker(new FilePathResolver(), new ProcessPipeHandler());
+        _processInvoker = new ProcessInvoker(executableFileResolver, new ProcessPipeHandler());
     }
 
     internal static ProcessInvoker CreateProcessInvoker()

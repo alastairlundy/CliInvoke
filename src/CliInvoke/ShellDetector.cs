@@ -15,6 +15,7 @@ using DotExtensions.Platforms;
 using DotExtensions.Versions;
 
 using WhatExec.Lib.Abstractions;
+using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke;
 

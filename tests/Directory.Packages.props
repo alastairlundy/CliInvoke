@@ -12,5 +12,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="xunit.v3" Version="3.2.1" />
+    <PackageVersion Include="TUnit" Version="1.19.74"/>
   </ItemGroup>
 </Project>

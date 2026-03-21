@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using CliInvoke.Specializations.Configurations;
 
 using WhatExec.Lib.Abstractions;
+using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke.Specializations;
 
