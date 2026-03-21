@@ -90,7 +90,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// Whether administrator privileges should be used when executing the Command.
     /// </summary>
-    public bool RequiresAdministrator { get; protected set; }
+    public bool RequiresAdministrator { get; }
 
     /// <summary>
     /// The file path of the executable to be run and wrapped.
@@ -100,7 +100,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// The working directory path to be used when executing the Command.
     /// </summary>
-    public string WorkingDirectoryPath { get; protected set; }
+    public string WorkingDirectoryPath { get; }
 
     /// <summary>
     /// The arguments to be provided to the executable to be run.
@@ -110,69 +110,69 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// Whether to enable window creation or not when the Command's Process is run.
     /// </summary>
-    public bool WindowCreation { get; protected set; }
+    public bool WindowCreation { get; }
 
     /// <summary>
     /// The environment variables to be set.
     /// </summary>
-    public IReadOnlyDictionary<string, string> EnvironmentVariables { get; protected set; }
+    public IReadOnlyDictionary<string, string> EnvironmentVariables { get; }
 
     /// <summary>
     /// The credential to be used when executing the Command.
     /// </summary>
-    public UserCredential Credential { get; protected set; }
+    public UserCredential Credential { get; }
 
     /// <summary>
     /// Whether to use Shell Execution or not when executing the Command.
     /// </summary>
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Input will throw an Exception. This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror" />
-    public bool UseShellExecution { get; protected set; }
+    public bool UseShellExecution { get; }
 
     /// <summary>
     /// The Standard Input source to redirect Standard Input to if configured.
     /// </summary>
     /// <remarks>Using Shell Execution whilst also Redirecting Standard Input will throw an Exception. This is a known issue with the System Process class.</remarks>
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror" />
-    public StreamWriter? StandardInput { get; protected set; }
+    public StreamWriter? StandardInput { get; }
 
     /// <summary>
     /// Whether to redirect the Standard Input.
     /// </summary>
-    public bool RedirectStandardInput { get; protected set; }
+    public bool RedirectStandardInput { get; }
 
     /// <summary>
     /// Whether to redirect the Standard Output.
     /// </summary>
-    public bool RedirectStandardOutput { get; protected set; }
+    public bool RedirectStandardOutput { get; }
 
     /// <summary>
     /// Whether to redirect the Standard Error.
     /// </summary>
-    public bool RedirectStandardError { get; protected set; }
+    public bool RedirectStandardError { get; }
 
     /// <summary>
     /// The Process Resource Policy to be used for executing the Command.
     /// </summary>
     /// <remarks>Process Resource Policy objects enable configuring Processor Affinity and other resource settings to be applied to the Command if supported by the currently running operating system.
     /// <para>Not all properties of a Process Resource Policy support all operating systems. Check before configuring a property.</para></remarks>
-    public ProcessResourcePolicy ResourcePolicy { get; protected set; }
+    public ProcessResourcePolicy ResourcePolicy { get; }
 
     /// <summary>
     /// The encoding to use for the Standard Input.
     /// </summary>
-    public Encoding StandardInputEncoding { get; protected set; }
+    public Encoding StandardInputEncoding { get; }
 
     /// <summary>
     /// The encoding to use for the Standard Output.
     /// </summary>
-    public Encoding StandardOutputEncoding { get; protected set; }
+    public Encoding StandardOutputEncoding { get; }
 
     /// <summary>
     /// The encoding to use for the Standard Error.
     /// </summary>
-    public Encoding StandardErrorEncoding { get; protected set; }
-
+    public Encoding StandardErrorEncoding { get; }
+    
     /// <summary>
     /// Determines if a Process configuration is equal to another Process configuration.
     /// </summary>
