@@ -81,13 +81,6 @@ public class ProcessInvoker : IProcessInvoker
                 process.ExitTime
             );
 
-            //TODO: Add support for <see cref="IProcessResultValidator"/>
-            if (processExitConfiguration.CancellationExceptionBehavior
-                !=  ProcessCancellationHandlingMode.SuppressException)
-            {
-                ThrowProcessNotSuccessfulException(result, processConfiguration);
-            }
-
             return result;
         }
         finally
@@ -157,14 +150,6 @@ public class ProcessInvoker : IProcessInvoker
                 process.ExitTime
             );
 
-            //TODO: Add support for <see cref="IProcessResultValidator"/>
-
-            if (processExitConfiguration.CancellationExceptionBehavior
-                != ProcessCancellationHandlingMode.SuppressException)
-            {
-                ThrowProcessNotSuccessfulException(result, processConfiguration);
-            }
-
             DisposeCompletedStreams(standardOut, standardError);
 
             return result;
@@ -227,13 +212,6 @@ public class ProcessInvoker : IProcessInvoker
                 await standardOutput,
                 await standardError
             );
-
-            //TODO: Add support for <see cref="IProcessResultValidator"/>
-            if (processExitConfiguration.
-                    CancellationExceptionBehavior != ProcessCancellationHandlingMode.SuppressException)
-            {
-                ThrowProcessNotSuccessfulException(result, processConfiguration);
-            }
             
             DisposeCompletedStreams(standardOutput, standardError);
 
@@ -262,14 +240,6 @@ public class ProcessInvoker : IProcessInvoker
 
         if (standardError.IsCompleted)
             standardError.Dispose();
-    }
-
-    private static void ThrowProcessNotSuccessfulException(ProcessResult result,
-        ProcessConfiguration configuration)
-    {
-        throw new ProcessNotSuccessfulException(
-            new ProcessExceptionInfo(result, configuration)
-        );
     }
 
     private async Task PipeStandardInputAsync(ProcessConfiguration processConfiguration,
