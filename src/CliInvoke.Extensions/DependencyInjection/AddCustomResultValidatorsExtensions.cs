@@ -101,14 +101,13 @@ public static class AddCustomResultValidatorsExtensions
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Scoped:
-                    services.TryAddScoped<IProcessResultValidator<TProcessResult>, TProcessResultValidator>();
+                    services.TryAddScoped<IProcessResultValidator<TProcessResult>>(_ => validator);
                     break;
                 case ServiceLifetime.Singleton:
-                    services.TryAddSingleton<IProcessResultValidator<TProcessResult>,
-                        TProcessResultValidator>();
+                    services.TryAddSingleton<IProcessResultValidator<TProcessResult>>(_ => validator);
                     break;
                 case ServiceLifetime.Transient:
-                    services.TryAddTransient<IProcessResultValidator<TProcessResult>, TProcessResultValidator>();
+                    services.TryAddTransient<IProcessResultValidator<TProcessResult>>(_ => validator);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
