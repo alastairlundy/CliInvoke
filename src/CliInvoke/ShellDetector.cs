@@ -11,7 +11,6 @@ using System.Linq;
 
 using CliInvoke.Core.Factories;
 
-using DotExtensions.Platforms;
 using DotExtensions.Versions;
 
 using WhatExec.Lib.Abstractions.Resolvers;
@@ -27,6 +26,8 @@ public class ShellDetector : IShellDetector
     private readonly IExecutableFileResolver _executableFileResolver;
     private readonly IProcessConfigurationFactory _processConfigurationFactory;
 
+    private readonly bool isUnix;
+
     /// <summary>
     /// Represents a detector for resolving the default shell on various operating systems.
     /// </summary>
@@ -37,6 +38,8 @@ public class ShellDetector : IShellDetector
         _processInvoker = processInvoker;
         _executableFileResolver = executableFileResolver;
         _processConfigurationFactory = processConfigurationFactory;
+        
+        isUnix = OperatingSystem.IsAndroid() || OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() || OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst();
     }
 
     /// <summary>
@@ -44,13 +47,13 @@ public class ShellDetector : IShellDetector
     /// </summary>
     /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation.</param>
     /// <returns>A task representing the asynchronous operation, returning a ShellInformation object with details about the detected shell.</returns>
-    [UnsupportedOSPlatform("IOS")]
+    [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvOS")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ShellInformation> ResolveDefaultShellAsync(
         CancellationToken cancellationToken = default)
     {
-        if (OperatingSystem.IsUnix())
+        if (isUnix)
             return await ResolveDefaultShellOnUnixAsync(cancellationToken);
      
         if(OperatingSystem.IsWindows())
@@ -59,6 +62,9 @@ public class ShellDetector : IShellDetector
         throw new PlatformNotSupportedException();
     }
     
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
