@@ -23,6 +23,7 @@ public class RunnerProcessFactory : IRunnerProcessFactory
     /// <param name="processConfigToBeRun">The command to be run by the Command Runner command.</param>
     /// <param name="runnerProcessConfig"></param>
     /// <returns></returns>
+    [Pure]
     public ProcessConfiguration CreateRunnerConfiguration(
         ProcessConfiguration processConfigToBeRun,
         ProcessConfiguration runnerProcessConfig
