@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
-internal static partial class GracefulCancellation
+internal static partial class UnixGracefulCancellation
 {
     private const int Sigint = 2;
     private const int Sigterm = 15;
@@ -24,7 +24,7 @@ internal static partial class GracefulCancellation
         /// 
         /// </summary>
         /// <param name="timeoutThreshold"></param>
-        /// <param name="cancellationExceptionBehavior"></param>
+        /// <param name="exitConfiguration"></param>
         /// <param name="cancellationToken"></param>
         /// <exception cref="PlatformNotSupportedException"></exception>
         [UnsupportedOSPlatform("browser")]
@@ -32,7 +32,7 @@ internal static partial class GracefulCancellation
         [UnsupportedOSPlatform("tvos")]
         [UnsupportedOSPlatform("windows")]
         internal async Task<bool> CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
-            ProcessExceptionBehaviour cancellationExceptionBehavior, CancellationToken cancellationToken)
+            ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
         {
             bool sigIntSuccess = false;
 
@@ -44,7 +44,7 @@ internal static partial class GracefulCancellation
 
                 await Task.Delay(timeoutThreshold, cancellationToken);
 
-                bool sigTermSuccess = SendSignal(process.Id, Sigterm);
+                bool sigTermSuccess = SendUnixSignal(process.Id, Sigterm);
 
                 await Task.Delay(millisecondsDelay: DelayBeforeSigintMilliseconds,
                     cancellationToken);
@@ -52,7 +52,7 @@ internal static partial class GracefulCancellation
                 if (sigTermSuccess)
                     return true;
 
-                sigIntSuccess = SendSignal(process.Id, Sigint);
+                sigIntSuccess = SendUnixSignal(process.Id, Sigint);
             }
             catch (TaskCanceledException)
             {
@@ -81,7 +81,7 @@ internal static partial class GracefulCancellation
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("browser")]
-    private static bool SendSignal(int processId, int signalId)
+    private static bool SendUnixSignal(int processId, int signalId)
     {
         return kill_libc(processId, signalId) == 0;
     }

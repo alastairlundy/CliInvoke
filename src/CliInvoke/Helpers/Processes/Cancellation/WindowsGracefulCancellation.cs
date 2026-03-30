@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
-internal static partial class GracefulCancellation
+internal static partial class WindowsGracefulCancellation
 {
     private const uint CtrlCSignalEvent = 0;
     
@@ -21,12 +21,12 @@ internal static partial class GracefulCancellation
         /// 
         /// </summary>
         /// <param name="timeoutThreshold"></param>
-        /// <param name="cancellationExceptionBehavior"></param>
+        /// <param name="exitConfiguration"></param>
         /// <param name="cancellationToken"></param>
         /// <exception cref="PlatformNotSupportedException"></exception>
         [SupportedOSPlatform("windows")]
         internal async Task<bool> CancelWithInterruptOnWindows(TimeSpan timeoutThreshold,
-            ProcessExceptionBehaviour cancellationExceptionBehavior, CancellationToken cancellationToken)
+            ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
         {
             if(!OperatingSystem.IsWindows())
                 throw new PlatformNotSupportedException();
