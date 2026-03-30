@@ -38,10 +38,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// </summary>
     /// <param name="stringComparer">The <see cref="StringComparer"/> to use for the internal dictionary.</param>
     /// <param name="throwExceptionIfDuplicateKeyFound">Whether to throw an exception if a duplicate key is found or suppress the exception and override the previous value.</param>
-    public EnvironmentVariablesBuilder(
-        StringComparer stringComparer,
-        bool throwExceptionIfDuplicateKeyFound = true
-    )
+    public EnvironmentVariablesBuilder(StringComparer stringComparer,
+        bool throwExceptionIfDuplicateKeyFound = true)
     {
         ArgumentNullException.ThrowIfNull(stringComparer);
 
@@ -59,8 +57,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     protected EnvironmentVariablesBuilder(
         IDictionary<string, string> vars,
         StringComparer stringComparer,
-        bool throwExceptionIfDuplicateKeyFound
-    )
+        bool throwExceptionIfDuplicateKeyFound)
     {
         ArgumentNullException.ThrowIfNull(vars);
         ArgumentNullException.ThrowIfNull(stringComparer);
@@ -104,8 +101,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     }
 
     protected IEnvironmentVariablesBuilder SetInternal(
-        IEnumerable<KeyValuePair<string, string>> variables
-    )
+        IEnumerable<KeyValuePair<string, string>> variables)
     {
         ArgumentNullException.ThrowIfNull(variables);
 

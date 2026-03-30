@@ -65,15 +65,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public IProcessConfigurationBuilder SetArguments(
         IEnumerable<string> arguments,
-        bool escapeArguments
-    )
+        bool escapeArguments)
     {
         ArgumentNullException.ThrowIfNull(arguments);
 
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder().AddEnumerable(
             arguments,
-            escapeArguments
-        );
+            escapeArguments);
 
         string args = argumentsBuilder.ToString();
 
@@ -156,7 +154,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 _configuration.ResourcePolicy,
-                windowCreation: _configuration.WindowCreation, useShellExecution: _configuration.UseShellExecution)
+                windowCreation: _configuration.WindowCreation, 
+                useShellExecution: _configuration.UseShellExecution)
         );
     }
 
@@ -168,8 +167,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="environmentVariables"/> is null.</exception>
     [Pure]
     public IProcessConfigurationBuilder SetEnvironmentVariables(
-        IReadOnlyDictionary<string, string> environmentVariables
-    )
+        IReadOnlyDictionary<string, string> environmentVariables)
     {
         ArgumentNullException.ThrowIfNull(environmentVariables);
 
@@ -439,8 +437,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// allowing method chaining.</returns>
     [Pure]
     public IProcessConfigurationBuilder SetProcessResourcePolicy(
-        ProcessResourcePolicy processResourcePolicy
-    )
+        ProcessResourcePolicy processResourcePolicy)
     {
         ArgumentNullException.ThrowIfNull(processResourcePolicy);
         
@@ -562,8 +559,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration information.</returns>
     [Pure]
     public IProcessConfigurationBuilder SetStandardOutputEncoding(
-        Encoding? standardOutputEncoding = null
-    )
+        Encoding? standardOutputEncoding = null)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
@@ -593,8 +589,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <returns>The updated Process Configuration builder with the updated encoding scheme configuration information.</returns>
     [Pure]
     public IProcessConfigurationBuilder SetStandardErrorEncoding(
-        Encoding? standardErrorEncoding = null
-    )
+        Encoding? standardErrorEncoding = null)
     {
         return new ProcessConfigurationBuilder(
             new ProcessConfiguration(
