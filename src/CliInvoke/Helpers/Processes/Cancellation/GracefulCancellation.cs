@@ -18,7 +18,7 @@ internal static class GracefulCancellation
     extension(ProcessWrapper process)
     {
         /// <summary>
-        /// Asynchronously waits for the process to exit or for the <paramref name="timeoutThreshold"/> to be exceeded, whichever is sooner.
+        /// Asynchronously waits for the process to exit or for the exit configuration's timeout policy threshold to be exceeded, whichever is sooner.
         /// </summary>
         /// <param name="exitConfiguration"></param>
         /// <param name="cancellationToken"></param>

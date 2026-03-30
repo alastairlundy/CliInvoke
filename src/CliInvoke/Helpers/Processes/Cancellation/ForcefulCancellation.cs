@@ -35,44 +35,26 @@ internal static class ForcefulCancellation
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
-        internal async Task WaitForExitOrForcefulTimeoutAsync(TimeSpan timeoutThreshold,
+        internal async Task WaitForExitOrForcefulTimeoutAsync(
             ProcessExitConfiguration exitConfiguration,
             CancellationToken cancellationToken)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
+            ArgumentOutOfRangeException.ThrowIfLessThan(exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
 
-            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+            DateTime expectedExitTime = DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
             
             try
             {
                 Task waitForExit = process.WaitForExitAsync(cancellationToken);
-                Task delay = Task.Delay(timeoutThreshold, cancellationToken);
+                Task delay = Task.Delay(exitConfiguration.TimeoutPolicy.TimeoutThreshold, cancellationToken);
 
                 await Task.WhenAny(delay, waitForExit);
             }
-            catch (TaskCanceledException)
+            catch (Exception)
             {
                 DateTime actualExitTime = DateTime.UtcNow;
                 TimeSpan difference = expectedExitTime.Difference(actualExitTime);
 
-                if (cancellationExceptionBehavior ==
-                    ProcessExceptionBehaviour.AllowException)
-                {
-                    throw;
-                }
-
-                if (cancellationExceptionBehavior ==
-                    ProcessExceptionBehaviour.AllowExceptionIfUnexpected && difference > TimeSpan.FromSeconds(30))
-                {
-                    throw;
-                }
-            }
-            catch (Exception)
-            {
-                if (cancellationExceptionBehavior ==
-                    ProcessExceptionBehaviour.AllowExceptionIfUnexpected ||
-                    cancellationExceptionBehavior ==
-                    ProcessExceptionBehaviour.AllowException)
                 {
                     throw;
                 }

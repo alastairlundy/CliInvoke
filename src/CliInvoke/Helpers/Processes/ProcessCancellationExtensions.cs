@@ -76,9 +76,7 @@ internal static class ProcessCancellationExtensions
             {
                 if (!process.HasExited)
                 {
-                    // Tweak to ensure 
-                    await process.WaitForExitOrGracefulTimeoutAsync(ProcessExitConfiguration.NoTimeoutDefault
-                        cancellationToken, fallbackToForceful: true);
+                    process.ForcefulExit();
                 }
             }
         }

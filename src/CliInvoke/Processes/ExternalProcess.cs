@@ -269,10 +269,9 @@ public class ExternalProcess : IExternalProcess
                     ExitConfiguration.ExceptionBehavior, CancellationToken.None);
                 break;
             case ProcessCancellationMode.None:
+            default:
                 _processWrapper.Kill();
                 break;
-            default:
-                throw new ArgumentOutOfRangeException();
         }
     }
     
@@ -283,5 +282,7 @@ public class ExternalProcess : IExternalProcess
     {
         Configuration.Dispose();
         _processWrapper.Dispose();
+        
+        GC.SuppressFinalize(this);
     }
 }
