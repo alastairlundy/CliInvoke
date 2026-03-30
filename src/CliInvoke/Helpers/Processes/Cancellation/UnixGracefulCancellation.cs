@@ -34,6 +34,17 @@ internal static partial class UnixGracefulCancellation
         internal async Task<bool> CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
             ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
         {
+            // Provide a default value to satisfy compiler.
+            CancellationReason cancellationReason = CancellationReason.NotKnown;
+            
+            DateTime expectedExitTime =
+                CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
+            
+            cancellationToken.Register(() =>
+            {
+                cancellationReason = CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+            });
+            
             bool sigIntSuccess = false;
 
             try
@@ -54,21 +65,73 @@ internal static partial class UnixGracefulCancellation
 
                 sigIntSuccess = SendUnixSignal(process.Id, Sigint);
             }
-            catch (TaskCanceledException)
+            catch (Exception exception)
             {
-                if (cancellationExceptionBehavior ==
-                    ProcessExceptionBehaviour.AllowException)
-                    throw;
-            }
-            catch (Exception)
-            {
-                if (cancellationExceptionBehavior is ProcessExceptionBehaviour.AllowException
-                    or ProcessExceptionBehaviour
-                        .AllowExceptionIfUnexpected)
-                    throw;
+                sigIntSuccess =
+                    process.HandleCancellationMode(exitConfiguration, cancellationReason);
+
+                CancellationHelper.HandleCancellationExceptions(expectedExitTime,
+                    cancellationReason, exitConfiguration, exception);
             }
             
             return sigIntSuccess;
+        }
+
+        [UnsupportedOSPlatform("browser")]
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("windows")]
+        private bool HandleCancellationMode(ProcessExitConfiguration exitConfiguration, CancellationReason cancellationReason)
+        {
+            switch (cancellationReason)
+            {
+                case CancellationReason.Timeout:
+                {
+                    if (exitConfiguration.TimeoutCancellationPolicy.CancellationMode ==
+                        ProcessCancellationMode.Forceful)
+                    {
+                        if (!process.HasExited)
+                            process.ForcefulExit();
+
+                        return true;
+                    }
+
+                    if (exitConfiguration.TimeoutCancellationPolicy.CancellationMode ==
+                        ProcessCancellationMode.Graceful)
+                    {
+                        if (!process.HasExited)
+                            return SendUnixSignal(process.Id, Sigint);
+
+                        return true;
+                    }
+
+                    break;
+                }
+                case CancellationReason.RequestedCancellation or CancellationReason.NotKnown:
+                default:
+                {
+                    if (exitConfiguration.RequestedCancellationPolicy.CancellationMode ==
+                        ProcessCancellationMode.Forceful)
+                    {
+                        if (!process.HasExited)
+                            process.ForcefulExit();
+                        return true;
+                    }
+
+                    if (exitConfiguration.RequestedCancellationPolicy.CancellationMode ==
+                        ProcessCancellationMode.Graceful)
+                    {
+                        if (!process.HasExited)
+                            return SendUnixSignal(process.Id, Sigint);
+
+                        return true;
+                    }
+
+                    break;
+                }    
+            }
+
+            return false;
         }
     }
 

@@ -17,15 +17,15 @@ public enum ProcessExceptionBehaviour
     /// <summary>
     /// Suppresses thrown exceptions.
     /// </summary>
-    SuppressException = 0,
+    SuppressExceptions = 0,
 
     /// <summary>
     /// Allow .NET to throw the exception if expected.
     /// </summary>
-    AllowException,
+    AllowExceptions,
 
     /// <summary>
     /// Allows the exception to be thrown if it is unexpected.
     /// </summary>
-    AllowExceptionIfUnexpected,
+    AllowExceptionsIfUnexpected,
 }

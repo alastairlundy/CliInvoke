@@ -9,8 +9,6 @@ public class GracefulCancellationTests
     [Fact]
     public async Task GracefulCancel_InterruptSignals_Success()
     {
-        ProcessExceptionBehaviour exceptionBehavior = ProcessExceptionBehaviour.AllowExceptionIfUnexpected;
-
         int sleepTimeSeconds = 500;
 
         int gracefulTimeoutSeconds = 10;
@@ -33,9 +31,12 @@ public class GracefulCancellationTests
         Stopwatch stopwatch = new();
         process.Start();
         stopwatch.Start();
-            
-        await process.WaitForExitOrGracefulTimeoutAsync(TimeSpan.FromSeconds(gracefulTimeoutSeconds),
-            exceptionBehavior, CancellationToken.None, false);
+
+        ProcessExitConfiguration exitConfiguration = new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan
+                (TimeSpan.FromSeconds(gracefulTimeoutSeconds)), ProcessCancellationPolicy.DefaultNoException,
+            ProcessCancellationPolicy.DefaultNoException);
+        
+        await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None, false);
             
         stopwatch.Stop();
 

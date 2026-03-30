@@ -20,8 +20,8 @@ public class ProcessCancellationTests
         string filePath = ProcessTestHelper.GetTargetFilePath();
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
         
-        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(10)),
-            ProcessExceptionBehaviour.SuppressException);
+        ProcessExitConfiguration processExitConfiguration = new( ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)), 
+            ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
         
         //Act
        
@@ -85,8 +85,8 @@ public class ProcessCancellationTests
         string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "120" : "/T 120 /NOBREAK";
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
         
-        ProcessExitConfiguration processExitConfiguration = new(new ProcessTimeoutPolicy(TimeSpan.FromSeconds(30)),
-            ProcessExceptionBehaviour.SuppressException);
+        ProcessExitConfiguration processExitConfiguration = new(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(30)),
+            ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
         
         //Act
         process.Start();

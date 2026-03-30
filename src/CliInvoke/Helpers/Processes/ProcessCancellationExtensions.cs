@@ -24,10 +24,9 @@ internal static class ProcessCancellationExtensions
         internal async Task WaitForExitOrTimeoutAsync(ProcessExitConfiguration processExitConfiguration,
             CancellationToken cancellationToken = default)
         {
-            if (processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero ||
-                !processExitConfiguration.TimeoutPolicy.Enabled)
+            if (processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero)
             {
-                await process.WaitForExitNoTimeoutAsync(processExitConfiguration, cancellationToken);
+                await process.WaitForExitOrCancellationAsync(processExitConfiguration, cancellationToken);
                 return;
             }
             
@@ -35,13 +34,13 @@ internal static class ProcessCancellationExtensions
             {
                 case ProcessCancellationMode.None:
                 {
-                    await process.WaitForExitNoTimeoutAsync(processExitConfiguration, cancellationToken);
+                    await process.WaitForExitOrCancellationAsync(processExitConfiguration, cancellationToken);
                     return;
                 }
                 case ProcessCancellationMode.Graceful:
+                default:
                 {
-                    await process.WaitForExitOrGracefulTimeoutAsync(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                        processExitConfiguration, cancellationToken);
+                    await process.WaitForExitOrGracefulTimeoutAsync(processExitConfiguration, cancellationToken);
                     return;
                 }
                 case ProcessCancellationMode.Forceful:
@@ -52,25 +51,23 @@ internal static class ProcessCancellationExtensions
             }
         }
 
-        private async Task WaitForExitNoTimeoutAsync(ProcessExitConfiguration processExitConfiguration,
+        private async Task WaitForExitOrCancellationAsync(ProcessExitConfiguration processExitConfiguration,
             CancellationToken cancellationToken = default)
         {
             try
             {
                 await process.WaitForExitAsync(cancellationToken);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
-                await process.WaitForExitOrGracefulTimeoutAsync(processExitConfiguration,
-                    cancellationToken, fallbackToForceful:true);
+                await process.GracefulInterruptCancellation(TimeSpan.Zero,
+                    processExitConfiguration, cancellationToken);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                if (processExitConfiguration.RequestedCancellationPolicy.CancellationExceptionBehaviour
-                    == ProcessExceptionBehaviour.AllowExceptionIfUnexpected)
-                {
-                    throw;
-                }
+                CancellationHelper.HandleCancellationExceptions(
+                    CancellationHelper.CalculateExpectedExitTime(processExitConfiguration)
+                    , CancellationReason.RequestedCancellation, processExitConfiguration, exception);
             }
             finally
             {

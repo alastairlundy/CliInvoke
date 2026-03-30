@@ -262,11 +262,10 @@ public class ExternalProcess : IExternalProcess
                     .CancellationMode)
         {
             case ProcessCancellationMode.Forceful:
-                await _processWrapper.WaitForExitOrForcefulTimeoutAsync(TimeSpan.Zero, CancellationToken.None);
+                await _processWrapper.WaitForExitOrForcefulTimeoutAsync(ExitConfiguration, CancellationToken.None);
                 break;
             case ProcessCancellationMode.Graceful:
-                await _processWrapper.WaitForExitOrGracefulTimeoutAsync(TimeSpan.Zero,
-                    ExitConfiguration.ExceptionBehavior, CancellationToken.None);
+                await _processWrapper.WaitForExitOrGracefulTimeoutAsync(ExitConfiguration, CancellationToken.None);
                 break;
             case ProcessCancellationMode.None:
             default:

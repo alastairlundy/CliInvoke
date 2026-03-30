@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using DotExtensions.Dates;
-
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
 internal static class GracefulCancellation
@@ -31,17 +29,13 @@ internal static class GracefulCancellation
             bool fallbackToForceful = true)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
-
-            DateTime expectedExitTime = DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
             
-            Task<bool> gracefulInterruptCancellation = process.GracefulInterruptCancellation(timeoutThreshold, 
-                cancellationExceptionBehavior, cancellationToken);
+            Task<bool> gracefulInterruptCancellation = process.GracefulInterruptCancellation(exitConfiguration.TimeoutPolicy.TimeoutThreshold, 
+                exitConfiguration, cancellationToken);
             
             await Task.WhenAny([
                 process.WaitForExitAsync(cancellationToken),
                 gracefulInterruptCancellation,
-                process.GracefulCancellationWithCancelToken(timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                    cancellationExceptionBehavior, expectedExitTime)
             ]);
 
             await Task.WhenAny([Task.Delay(500, cancellationToken), process.WaitForExitAsync(cancellationToken)]);
@@ -52,51 +46,13 @@ internal static class GracefulCancellation
             }
         }
 
-        private Task<bool> GracefulInterruptCancellation(TimeSpan timeoutThreshold,
-            ProcessExceptionBehaviour cancellationExceptionBehavior, CancellationToken cancellationToken)
+        internal Task<bool> GracefulInterruptCancellation(TimeSpan timeoutThreshold,
+            ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
         {
             Task<bool> gracefulInterruptCancellation = !OperatingSystem.IsWindows()
-                ? process.CancelWithInterruptOnUnix(timeoutThreshold, cancellationExceptionBehavior, cancellationToken)
-                : process.CancelWithInterruptOnWindows(timeoutThreshold, cancellationExceptionBehavior, cancellationToken);
+                ? process.CancelWithInterruptOnUnix(timeoutThreshold, exitConfiguration, cancellationToken)
+                : process.CancelWithInterruptOnWindows(timeoutThreshold, exitConfiguration, cancellationToken);
             return gracefulInterruptCancellation;
-        }
-
-        private async Task GracefulCancellationWithCancelToken(TimeSpan timeoutThreshold,
-            ProcessExceptionBehaviour cancellationExceptionBehavior, DateTime expectedExitTime)
-        {
-            CancellationTokenSource cts = new();
-
-            cts.CancelAfter(timeoutThreshold);
-
-            if (cancellationExceptionBehavior == ProcessExceptionBehaviour.AllowException)
-            {
-                await process.WaitForExitAsync(cts.Token);
-                return;
-            }
-
-            try
-            {
-                await process.WaitForExitAsync(cts.Token);
-            }
-            catch (TaskCanceledException)
-            {
-                DateTime actualExitTime = DateTime.UtcNow;
-                TimeSpan difference = expectedExitTime.Difference(actualExitTime);
-
-                if (cancellationExceptionBehavior
-                    == ProcessExceptionBehaviour.AllowExceptionIfUnexpected)
-                {
-                    if (difference > TimeSpan.FromSeconds(10))
-                    {
-                        throw;
-                    }
-                }
-            }
-            finally
-            {
-                if (!process.HasExited)
-                    process.ForcefulExit();
-            }
         }
     }
 }

@@ -62,24 +62,28 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     );
 
     /// <summary>
-    /// 
+    /// A <see cref="ProcessExitConfiguration"/> instance configured to have no timeout policy
+    /// and no exceptions on cancellation during a process termination.
     /// </summary>
     public static ProcessExitConfiguration NoTimeoutNoException
         => new(ProcessTimeoutPolicy.None, timeoutCancellationPolicy: ProcessCancellationPolicy.None,
-            requestedCancellationPolicy: ProcessCancellationPolicy.Graceful);
+            requestedCancellationPolicy: ProcessCancellationPolicy.DefaultNoException);
     
     /// <summary>
     /// Gets the timeout policy applied to the process.
     /// </summary>
     public ProcessTimeoutPolicy TimeoutPolicy { get; }
-    
+
     /// <summary>
-    /// 
+    /// The configured <see cref="ProcessCancellationPolicy"/> that determines the behaviour
+    /// when a process timeout occurs, including how cancellation is handled and if exceptions
+    /// should be allowed or suppressed.
     /// </summary>
     public ProcessCancellationPolicy TimeoutCancellationPolicy { get; }
-    
+
     /// <summary>
-    /// 
+    /// The <see cref="ProcessCancellationPolicy"/> instance that defines the behaviour
+    /// for handling cancellations explicitly requested during the process lifecycle.
     /// </summary>
     public ProcessCancellationPolicy RequestedCancellationPolicy { get; }
 

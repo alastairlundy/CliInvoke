@@ -30,7 +30,18 @@ internal static partial class WindowsGracefulCancellation
         {
             if(!OperatingSystem.IsWindows())
                 throw new PlatformNotSupportedException();
-
+            
+            // Provide a default value to satisfy compiler.
+            CancellationReason cancellationReason = CancellationReason.NotKnown;
+            
+            DateTime expectedExitTime =
+                CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
+            
+            cancellationToken.Register(() =>
+            {
+                cancellationReason = CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+            });
+            
             bool ctrlCSignalSuccess = false;
             
             try
@@ -50,19 +61,16 @@ internal static partial class WindowsGracefulCancellation
 
                 ctrlCSignalSuccess = SendCtrlCToConsoleWin(CtrlCSignalEvent, 0);
             }
-            catch (TaskCanceledException)
+            catch (Exception exception)
             {
-                if (cancellationExceptionBehavior is ProcessExceptionBehaviour.AllowExceptionIfUnexpected
-                    or ProcessExceptionBehaviour.AllowException)
-                    throw;
+                CancellationHelper.HandleCancellationExceptions(expectedExitTime, cancellationReason,
+                    exitConfiguration, exception);
             }
-            catch (Exception)
+            finally
             {
-                if (cancellationExceptionBehavior !=
-                    ProcessExceptionBehaviour.SuppressException)
-                    throw;
+                if (!process.HasExited)
+                    process.ForcefulExit();
             }
-
             return ctrlCSignalSuccess;
         }
     }

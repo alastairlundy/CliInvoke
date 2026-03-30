@@ -42,22 +42,29 @@ internal static class ForcefulCancellation
             ArgumentOutOfRangeException.ThrowIfLessThan(exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
 
             DateTime expectedExitTime = DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
+
+            CancellationTokenSource cts =
+                CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            
+            if(exitConfiguration.TimeoutPolicy.TimeoutThreshold > TimeSpan.Zero)
+                cts.CancelAfter(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
+
+            CancellationToken actualCancellationToken = cts.Token;
+
+            CancellationReason cancellationReason = CancellationReason.NotKnown;
+
+            actualCancellationToken.Register(() =>
+            {
+                cancellationReason = CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+            });
             
             try
             {
-                Task waitForExit = process.WaitForExitAsync(cancellationToken);
-                Task delay = Task.Delay(exitConfiguration.TimeoutPolicy.TimeoutThreshold, cancellationToken);
-
-                await Task.WhenAny(delay, waitForExit);
+                await process.WaitForExitAsync(actualCancellationToken);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                DateTime actualExitTime = DateTime.UtcNow;
-                TimeSpan difference = expectedExitTime.Difference(actualExitTime);
-
-                {
-                    throw;
-                }
+                CancellationHelper.HandleCancellationExceptions(expectedExitTime, cancellationReason, exitConfiguration, exception);
             }
             finally
             {

@@ -7,11 +7,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.ComponentModel;
+
 namespace CliInvoke.Core;
 
 /// <summary>
 /// Specifies the mode for handling process cancellation.
 /// </summary>
+[DefaultValue(Graceful)]
 public enum ProcessCancellationMode
 {
     /// <summary>
@@ -19,15 +22,12 @@ public enum ProcessCancellationMode
     /// </summary>
     Forceful,
     /// <summary>
-    /// Cancels the Process using a <see cref="CancellationToken"/> directly.
-    /// </summary>
-    Normal,
-    /// <summary>
     /// Gracefully cancels the Process using SIGTERM/SIGINT Signals, or a <see cref="CancellationTokenSource"/> if that fails.
     /// </summary>
     Graceful,
     /// <summary>
-    /// No cancellation is desired, Process will run until exit.
+    /// No cancellation is desired, the Process will run until exit.
     /// </summary>
+    /// <remarks>If the process gets stuck or hangs, the process will not be exited unless cancellation is requested via a cancellation token.</remarks>
     None,
 }
