@@ -36,6 +36,19 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         TimeoutThreshold = timeoutThreshold;
         Enabled = enabled;
     }
+
+    /// <summary>
+    /// Creates an instance of <see cref="ProcessTimeoutPolicy"/> using the specified timeout threshold
+    /// and an optional cancellation mode.
+    /// </summary>
+    /// <param name="timeoutThreshold">The maximum duration to wait before the process is considered timed out.</param>
+    /// <param name="cancellationMode">The method of cancellation to apply when the timeout threshold is reached.
+    /// Defaults to <see cref="ProcessCancellationMode.Graceful"/>.</param>
+    /// <returns>A new instance of <see cref="ProcessTimeoutPolicy"/> configured with the specified parameters.</returns>
+    public static ProcessTimeoutPolicy FromTimeSpan(TimeSpan timeoutThreshold,
+        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful) =>
+        new(timeoutThreshold, cancellationMode);
+
     /// <summary>
     /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
     /// </summary>
