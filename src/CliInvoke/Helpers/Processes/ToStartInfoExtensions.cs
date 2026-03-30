@@ -26,8 +26,7 @@ internal static class ToStartInfoExtensions
         /// <exception cref="ArgumentException"></exception>
         internal ProcessStartInfo ToProcessStartInfo(
             bool redirectStandardOutput,
-            bool redirectStandardError
-        )
+            bool redirectStandardError)
         {
             ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath);
 

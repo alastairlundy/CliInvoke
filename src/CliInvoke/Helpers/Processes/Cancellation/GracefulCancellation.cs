@@ -11,7 +11,7 @@ using DotExtensions.Dates;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
-internal static partial class GracefulCancellation
+internal static class GracefulCancellation
 {
     internal const int GracefulTimeoutWaitSeconds = 30;
     

@@ -30,7 +30,6 @@ internal static class ForcefulCancellation
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="timeoutThreshold"></param>
         /// <param name="exitConfiguration"></param>
         /// <param name="cancellationToken"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
