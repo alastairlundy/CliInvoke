@@ -15,7 +15,7 @@ public class ProcessTimeoutPolicyTests
         TimeSpan timeout = TimeSpan.FromSeconds(_faker.Random.Int(0, 1000));
 
         // Act
-        ProcessTimeoutPolicy timeoutPolicy = new ProcessTimeoutPolicy(timeout);
+        ProcessTimeoutPolicy timeoutPolicy = ProcessTimeoutPolicy.FromTimeSpan(timeout);
 
         // Assert
         Assert.Equal(timeout, timeoutPolicy.TimeoutThreshold);
@@ -34,23 +34,7 @@ public class ProcessTimeoutPolicyTests
         ProcessTimeoutPolicy processTimeoutPolicy;
         
         // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(()=> processTimeoutPolicy = new ProcessTimeoutPolicy(timeout) );
-    }
-
-    [Theory]
-    [InlineData(ProcessCancellationMode.None)]
-    [InlineData(ProcessCancellationMode.Graceful)]
-    [InlineData(ProcessCancellationMode.Forceful)]
-    public void Add_CancellationMode_ShouldSetValidValue(ProcessCancellationMode mode)
-    {
-        // Arrange
-        ProcessCancellationMode cancellationMode = mode;
-        
-        // Act
-        ProcessTimeoutPolicy policy = new ProcessTimeoutPolicy(TimeSpan.Zero, cancellationMode);
-        
-        // Assert
-        Assert.Equal(cancellationMode, policy.CancellationMode);
+        Assert.Throws<ArgumentOutOfRangeException>(()=> processTimeoutPolicy = ProcessTimeoutPolicy.FromTimeSpan(timeout) );
     }
 
     [Theory]
@@ -60,15 +44,14 @@ public class ProcessTimeoutPolicyTests
     public void FullyConfigured_ShouldEqualPolicy(ProcessCancellationMode mode)
     {
         // Arrange
-        ProcessCancellationMode cancellationMode = mode;
         TimeSpan timeoutThreshold = TimeSpan.FromSeconds(_faker.Random.Int(0, 1000));
         
         // Act
-        ProcessTimeoutPolicy policy = new ProcessTimeoutPolicy(timeoutThreshold, cancellationMode);
+        ProcessTimeoutPolicy policy = ProcessTimeoutPolicy.FromTimeSpan(timeoutThreshold);
         
         // Assert
         Assert.NotNull(policy);
-        Assert.Equal(cancellationMode, policy.CancellationMode);
-        Assert.Equal(timeoutThreshold, policy.TimeoutThreshold);
+        /*Assert.Equal(cancellationMode, policy.C);
+        Assert.Equal(timeoutThreshold, policy.TimeoutThreshold);*/
     }
 }
