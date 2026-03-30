@@ -23,7 +23,7 @@ internal static class ForcefulCancellation
             }
             catch
             {
-                process.Kill(false);
+                process.Kill();
             }
         }
 
