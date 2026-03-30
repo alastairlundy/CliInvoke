@@ -26,7 +26,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// </summary>
     public UserCredentialBuilder()
     {
-        _userCredential = new();
+        _userCredential = new UserCredential();
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         ArgumentException.ThrowIfNullOrEmpty(domain);
         
         return new UserCredentialBuilder(
-            new(
+            new UserCredential(
                 domain,
                 _userCredential.UserName,
 #pragma warning disable CA1416
@@ -72,7 +72,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new(
+            new UserCredential(
                 _userCredential.Domain,
                 username,
                 _userCredential.Password,
@@ -95,7 +95,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new(
+            new UserCredential(
                 _userCredential.Domain,
                 _userCredential.UserName,
                 password,
@@ -114,7 +114,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public IUserCredentialBuilder LoadUserProfile(bool loadUserProfile) =>
         new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new(
+            new UserCredential(
                 _userCredential.Domain,
                 _userCredential.UserName,
                 _userCredential.Password,
@@ -144,5 +144,6 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public void Dispose()
     {
         _userCredential.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

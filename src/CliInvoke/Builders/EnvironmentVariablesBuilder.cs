@@ -30,7 +30,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     {
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
         _stringComparer = StringComparer.Ordinal;
-        _environmentVariables = new(_stringComparer);
+        _environmentVariables = new Dictionary<string, string>(_stringComparer);
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
 
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
-        _environmentVariables = new(_stringComparer);
+        _environmentVariables = new Dictionary<string, string>(_stringComparer);
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         ArgumentNullException.ThrowIfNull(vars);
         ArgumentNullException.ThrowIfNull(stringComparer);
 
-        _environmentVariables = new(vars, _stringComparer);
+        _environmentVariables = new Dictionary<string, string>(vars, _stringComparer);
         _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
     }

@@ -14,8 +14,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-// ReSharper disable ConvertClosureToMethodGroup
-
 namespace CliInvoke.Builders;
 
 /// <summary>
@@ -34,7 +32,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// </summary>
     public ArgumentsBuilder()
     {
-        _buffer = new();
+        _buffer = new StringBuilder();
     }
 
     /// <summary>
@@ -43,7 +41,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="argumentValidationLogic">The argument validation logic to use to decide whether to allow Arguments passed to the builder.</param>
     public ArgumentsBuilder(Func<string, bool> argumentValidationLogic)
     {
-        _buffer = new();
+        _buffer = new StringBuilder();
         _argumentValidationLogic = argumentValidationLogic;   
     }
     
