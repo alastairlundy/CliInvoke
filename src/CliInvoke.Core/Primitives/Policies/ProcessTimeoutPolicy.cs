@@ -47,7 +47,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <returns>A new instance of <see cref="ProcessTimeoutPolicy"/> configured with the specified parameters.</returns>
     public static ProcessTimeoutPolicy FromTimeSpan(TimeSpan timeoutThreshold,
         ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful) =>
-        new(timeoutThreshold, cancellationMode);
+        new(timeoutThreshold, true);
 
     /// <summary>
     /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
