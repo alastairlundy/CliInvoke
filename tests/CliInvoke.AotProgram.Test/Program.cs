@@ -1,9 +1,10 @@
 using System;
 using CliInvoke.Core;
 using CliInvoke.Core.Factories;
-using Microsoft.Extensions.Hosting;
 using CliInvoke.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
 // ReSharper disable LocalizableElement
 
 Console.WriteLine("CliInvoke.AotProgram.Test starting");
@@ -16,7 +17,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-using var scopes = host.Services.CreateScope();
+using IServiceScope scopes = host.Services.CreateScope();
 
 // Resolve factory/invoker, run "echo <randomNumber>", and print the random number.
 IProcessConfigurationFactory factory = scopes.ServiceProvider.GetRequiredService<IProcessConfigurationFactory>();

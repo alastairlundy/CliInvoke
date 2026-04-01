@@ -15,19 +15,21 @@ using WhatExec.Lib.Abstractions.Resolvers;
 namespace CliInvoke;
 
 /// <summary>
-/// The default implementation of <see cref="IProcessInvoker"/>, a safer way to execute processes.
+///     The default implementation of <see cref="IProcessInvoker" />, a safer way to execute processes.
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
+    private readonly IExecutableFileResolver _executableFileResolver;
     private readonly IProcessPipeHandler _processPipeHandler;
 
-    private readonly IExecutableFileResolver _executableFileResolver;
-
     /// <summary>
-    /// Instantiates a <see cref="ProcessInvoker"/> for creating and executing processes.
+    ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes.
     /// </summary>
     /// <param name="executableFileResolver">The file path resolver to be used.</param>
-    /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
+    /// <param name="processPipeHandler">
+    ///     The pipe handler to be used for managing the input/output streams
+    ///     of the processes.
+    /// </param>
     public ProcessInvoker(
         IExecutableFileResolver executableFileResolver,
         IProcessPipeHandler processPipeHandler)
@@ -37,15 +39,28 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// Runs the process asynchronously, waits for exit, and safely disposes of the Process before returning.
+    ///     Runs the process asynchronously, waits for exit, and safely disposes of the Process before
+    ///     returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
-    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
+    /// <param name="processExitConfiguration">
+    ///     The exit configuration to use for the process, or the
+    ///     default if null.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Whether to dispose of the provided
+    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
+    /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
-    /// <exception cref="FileNotFoundException">Thrown if the file, with the file name of the process to be executed, is not found.</exception>
-    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
+    /// <exception cref="FileNotFoundException">
+    ///     Thrown if the file, with the file name of the process to be
+    ///     executed, is not found.
+    /// </exception>
+    /// <exception cref="ProcessNotSuccessfulException">
+    ///     Thrown if the result validation requires the
+    ///     process to exit with exit code zero and the process exits with a different exit code.
+    /// </exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
@@ -55,21 +70,20 @@ public class ProcessInvoker : IProcessInvoker
         bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
-        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration, processExitConfiguration, cancellationToken);
+        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
+            processExitConfiguration, cancellationToken);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
         if (processConfiguration.StandardInput is not null
             && processConfiguration.StandardInput != StreamWriter.Null)
-        {
             process.StartInfo.RedirectStandardInput = true;
-        }
 
         try
         {
             process.Start();
 
-            if(processConfiguration.RedirectStandardInput)
+            if (processConfiguration.RedirectStandardInput)
                 await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
@@ -90,15 +104,25 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
-    /// gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the Process before returning.
+    ///     Runs the process asynchronously with Standard Output and Standard Error Redirection,
+    ///     gets Standard Output and Standard Error as Strings, waits for exit, and safely disposes of the
+    ///     Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
-    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
+    /// <param name="processExitConfiguration">
+    ///     The exit configuration to use for the process, or the
+    ///     default if null.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Whether to dispose of the provided
+    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
+    /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
-    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
+    /// <exception cref="ProcessNotSuccessfulException">
+    ///     Thrown if the result validation requires the
+    ///     process to exit with exit code zero and the process exits with a different exit code.
+    /// </exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
@@ -109,7 +133,8 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration, processExitConfiguration, cancellationToken);
+        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
+            processExitConfiguration, cancellationToken);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
@@ -117,17 +142,15 @@ public class ProcessInvoker : IProcessInvoker
             processConfiguration.StandardInput is not null
             && processConfiguration.StandardInput != StreamWriter.Null
         )
-        {
             process.StartInfo.RedirectStandardInput = true;
-        }
 
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         try
         {
             process.Start();
-            
-            if(processConfiguration.RedirectStandardInput)
+
+            if (processConfiguration.RedirectStandardInput)
                 await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
             Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
@@ -161,15 +184,25 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// Runs the process asynchronously with Standard Output and Standard Error Redirection,
-    /// gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the Process before returning.
+    ///     Runs the process asynchronously with Standard Output and Standard Error Redirection,
+    ///     gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the
+    ///     Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processExitConfiguration">The exit configuration to use for the process, or the default if null.</param>
-    /// <param name="disposeOfConfig">Whether to dispose of the provided <see cref="ProcessConfiguration"/> after use or not, defaults to false.</param>
+    /// <param name="processExitConfiguration">
+    ///     The exit configuration to use for the process, or the
+    ///     default if null.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Whether to dispose of the provided
+    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
+    /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
-    /// <exception cref="ProcessNotSuccessfulException">Thrown if the result validation requires the process to exit with exit code zero and the process exits with a different exit code.</exception>
+    /// <exception cref="ProcessNotSuccessfulException">
+    ///     Thrown if the result validation requires the
+    ///     process to exit with exit code zero and the process exits with a different exit code.
+    /// </exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
@@ -180,21 +213,24 @@ public class ProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default
     )
     {
-        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration, processExitConfiguration, cancellationToken);
+        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
+            processExitConfiguration, cancellationToken);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
-        
+
         try
         {
             process.Start();
-            
+
             await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
-            Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process, cancellationToken);
-            Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process, cancellationToken);
+            Task<Stream> standardOutput =
+                _processPipeHandler.PipeStandardOutputAsync(process, cancellationToken);
+            Task<Stream> standardError =
+                _processPipeHandler.PipeStandardErrorAsync(process, cancellationToken);
 
             Task waitForExit = process.WaitForExitOrTimeoutAsync(
                 processExitConfiguration,
@@ -212,7 +248,7 @@ public class ProcessInvoker : IProcessInvoker
                 await standardOutput,
                 await standardError
             );
-            
+
             DisposeCompletedStreams(standardOutput, standardError);
 
             return result;
@@ -224,7 +260,9 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     #region Class private helpers
-    private static void DisposeCompletedStreams(Task<string> standardOut, Task<string> standardError)
+
+    private static void DisposeCompletedStreams(Task<string> standardOut,
+        Task<string> standardError)
     {
         if (standardOut.IsCompleted)
             standardOut.Dispose();
@@ -232,7 +270,7 @@ public class ProcessInvoker : IProcessInvoker
         if (standardError.IsCompleted)
             standardError.Dispose();
     }
-    
+
     private void DisposeCompletedStreams(Task<Stream> standardOutput, Task<Stream> standardError)
     {
         if (standardOutput.IsCompleted)
@@ -249,29 +287,26 @@ public class ProcessInvoker : IProcessInvoker
             processConfiguration.StandardInput is not null
             && processConfiguration.StandardInput != StreamWriter.Null
         )
-        {
             process.StartInfo.RedirectStandardInput = true;
-        }
 
         if (process.StartInfo.RedirectStandardInput
             && processConfiguration.StandardInput is not null)
-        {
             await _processPipeHandler.PipeStandardInputAsync(
                 processConfiguration.StandardInput.BaseStream,
                 process, cancellationToken);
-        }
     }
-    
-    private async Task<ProcessExitConfiguration> ValidateConfigurationsAsync(ProcessConfiguration processConfiguration,
+
+    private async Task<ProcessExitConfiguration> ValidateConfigurationsAsync(
+        ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(processConfiguration);
-        
+
         FileInfo fileInfo = await _executableFileResolver.LocateExecutableAsync(
             processConfiguration.TargetFilePath, SearchOption.AllDirectories, cancellationToken);
 
         processConfiguration.TargetFilePath = fileInfo.FullName;
-        
+
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
         ThrowFileNotFoundException(processConfiguration);
@@ -281,16 +316,14 @@ public class ProcessInvoker : IProcessInvoker
     private void ThrowFileNotFoundException(ProcessConfiguration processConfiguration)
     {
         if (!File.Exists(processConfiguration.TargetFilePath))
-        {
             throw new FileNotFoundException(
                 Resources.Exceptions_FileNotFound.Replace(
                     "{file}",
                     processConfiguration.TargetFilePath
                 )
             );
-        }
     }
-    
+
     private static void DisposeProcessAndConfig(ProcessConfiguration processConfiguration,
         bool disposeOfConfig,
         ProcessWrapper process)
@@ -300,5 +333,6 @@ public class ProcessInvoker : IProcessInvoker
         if (disposeOfConfig)
             processConfiguration.Dispose();
     }
+
     #endregion
 }

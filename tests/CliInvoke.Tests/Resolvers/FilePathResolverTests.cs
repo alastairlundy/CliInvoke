@@ -15,27 +15,32 @@ public class FilePathResolverTests
     public static IExecutableFileResolver CreateFileResolver()
     {
         IExecutableFileDetector fileDetector = new ExecutableFileDetector();
-        
-        return new ExecutableFileResolver(fileDetector, new PathEnvironmentVariableResolver(new PathEnvironmentVariableDetector(), fileDetector));
+
+        return new ExecutableFileResolver(fileDetector,
+            new PathEnvironmentVariableResolver(new PathEnvironmentVariableDetector(), fileDetector));
     }
-    
+
     [Fact]
     public async Task Resolve_Dotnet_PathEnv_Executable()
     {
         string executable = OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet";
-        
+
         IExecutableFileResolver filePathResolver = CreateFileResolver();
 
-        FileInfo actual = await filePathResolver.LocateExecutableAsync(executable, SearchOption.AllDirectories, CancellationToken.None);
+        FileInfo actual =
+            await filePathResolver.LocateExecutableAsync(executable, SearchOption.AllDirectories,
+                CancellationToken.None);
 
         FileInfo expected;
 
         if (OperatingSystem.IsWindows())
         {
             string? winExpected = Environment.GetEnvironmentVariable("DOTNET_ROOT");
-            
-            if(winExpected is not null)
+
+            if (winExpected is not null)
+            {
                 expected = new FileInfo(winExpected);
+            }
             else
             {
                 IProcessConfigurationFactory processConfigurationFactory = new ProcessConfigurationFactory();
@@ -43,7 +48,8 @@ public class FilePathResolverTests
 
                 IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver, new ProcessPipeHandler());
 
-                BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration, cancellationToken: TestContext.Current.CancellationToken);
+                BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
+                    cancellationToken: TestContext.Current.CancellationToken);
 
                 expected = new FileInfo(task.StandardOutput.Split(Environment.NewLine).First());
             }
@@ -52,7 +58,7 @@ public class FilePathResolverTests
         {
             expected = new FileInfo("/usr/bin/dotnet");
         }
-       
+
         Assert.Equal(expected, actual);
     }
 
@@ -63,8 +69,10 @@ public class FilePathResolverTests
 
         IExecutableFileResolver filePathResolver = CreateFileResolver();
 
-        FileInfo actual = await filePathResolver.LocateExecutableAsync(expected.Name, SearchOption.AllDirectories, CancellationToken.None);
-        
+        FileInfo actual =
+            await filePathResolver.LocateExecutableAsync(expected.Name, SearchOption.AllDirectories,
+                CancellationToken.None);
+
         Assert.Equal(expected, actual);
     }
 }

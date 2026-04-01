@@ -16,7 +16,7 @@ using WhatExec.Lib.Abstractions.Resolvers;
 namespace CliInvoke.Factories;
 
 /// <summary>
-/// Represents a factory for creating instances of the <see cref="ExternalProcess"/> class.
+///     Represents a factory for creating instances of the <see cref="ExternalProcess" /> class.
 /// </summary>
 public class ExternalProcessFactory : IExternalProcessFactory
 {
@@ -24,34 +24,41 @@ public class ExternalProcessFactory : IExternalProcessFactory
     private readonly IProcessPipeHandler _processPipeHandler;
 
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="filePathResolver"></param>
     /// <param name="processPipeHandler"></param>
-    public ExternalProcessFactory(IExecutableFileResolver filePathResolver, IProcessPipeHandler processPipeHandler)
+    public ExternalProcessFactory(IExecutableFileResolver filePathResolver,
+        IProcessPipeHandler processPipeHandler)
     {
         _filePathResolver = filePathResolver;
         _processPipeHandler = processPipeHandler;
     }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="ExternalProcess"/> class.
+    ///     Creates a new instance of the <see cref="ExternalProcess" /> class.
     /// </summary>
     /// <param name="configuration">The configuration for the external process.</param>
-    /// <returns>An <see cref="IExternalProcess"/> instance representing the created external process.</returns>
+    /// <returns>An <see cref="IExternalProcess" /> instance representing the created external process.</returns>
     [Pure]
-    public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration) =>
-        CreateExternalProcess(configuration, ProcessExitConfiguration.Default);
+    public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration)
+    {
+        return CreateExternalProcess(configuration, ProcessExitConfiguration.Default);
+    }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="ExternalProcess"/> class.
+    ///     Creates a new instance of the <see cref="ExternalProcess" /> class.
     /// </summary>
     /// <param name="configuration">The configuration for the external process.</param>
-    /// <param name="exitConfiguration">The process exit configuration details for configuring process exit behaviour.</param>
-    /// <returns>An <see cref="IExternalProcess"/> instance representing the created external process.</returns>
+    /// <param name="exitConfiguration">
+    ///     The process exit configuration details for configuring process exit
+    ///     behaviour.
+    /// </param>
+    /// <returns>An <see cref="IExternalProcess" /> instance representing the created external process.</returns>
     [Pure]
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration exitConfiguration)
-        => new ExternalProcess(_filePathResolver, _processPipeHandler, configuration,
+    {
+        return new ExternalProcess(_filePathResolver, _processPipeHandler, configuration,
             exitConfiguration);
+    }
 }

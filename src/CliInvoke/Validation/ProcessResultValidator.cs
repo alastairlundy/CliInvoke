@@ -12,33 +12,35 @@ using CliInvoke.Core.Validation;
 namespace CliInvoke.Validation;
 
 /// <summary>
-/// Represents a validator for process results. It provides functionality to validate a given process result against a set of specified rules.
+///     Represents a validator for process results. It provides functionality to validate a given
+///     process result against a set of specified rules.
 /// </summary>
 /// <typeparam name="TProcessResult">
-/// The type of the process result being validated.
-/// Must be a class that inherits from the <see cref="CliInvoke.Core.ProcessResult"/> class.
+///     The type of the process result being validated.
+///     Must be a class that inherits from the <see cref="CliInvoke.Core.ProcessResult" /> class.
 /// </typeparam>
-public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TProcessResult> where TProcessResult : ProcessResult
+public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TProcessResult>
+    where TProcessResult : ProcessResult
 {
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="rules"></param>
     public ProcessResultValidator(Func<TProcessResult, bool>[] rules)
     {
         ArgumentNullException.ThrowIfNull(rules);
-        
+
         ValidationRules = rules;
     }
-    
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public Func<TProcessResult, bool>[] ValidationRules { get; }
-    
+
     /// <summary>
-    /// Validates a <see cref="TProcessResult"/> against the configured <see cref="ValidationRules"/>.
+    ///     Validates a <see cref="TProcessResult" /> against the configured <see cref="ValidationRules" />
+    ///     .
     /// </summary>
-    /// <param name="result">The <see cref="TProcessResult"/> to validate against the validation rules.</param>
-    /// <returns>True if the <paramref name="result"/> passes all validation rules, false otherwise.</returns>
+    /// <param name="result">The <see cref="TProcessResult" /> to validate against the validation rules.</param>
+    /// <returns>True if the <paramref name="result" /> passes all validation rules, false otherwise.</returns>
     public bool Validate(TProcessResult result)
     {
         foreach (Func<TProcessResult, bool> rule in ValidationRules)

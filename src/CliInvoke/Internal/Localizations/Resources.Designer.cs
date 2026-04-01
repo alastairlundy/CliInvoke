@@ -114,7 +114,7 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to UserCredential Password must not be empty.
+        ///   Looks up a localized string similar to The provided passwor length cannot be zero..
         /// </summary>
         internal static string Exceptions_Credentials_EmptyPassword {
             get {

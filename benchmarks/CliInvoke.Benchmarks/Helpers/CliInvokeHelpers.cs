@@ -12,15 +12,20 @@ internal static class CliInvokeHelpers
 
     static CliInvokeHelpers()
     {
-        executableFileResolver = new ExecutableFileResolver(new ExecutableFileDetector(), new PathEnvironmentVariableResolver(
-            new PathEnvironmentVariableDetector(), new ExecutableFileDetector()));
-        
+        executableFileResolver = new ExecutableFileResolver(new ExecutableFileDetector(),
+            new PathEnvironmentVariableResolver(
+                new PathEnvironmentVariableDetector(), new ExecutableFileDetector()));
+
         _processInvoker = new ProcessInvoker(executableFileResolver, new ProcessPipeHandler());
     }
 
     internal static ProcessInvoker CreateProcessInvoker()
-        => _processInvoker;
+    {
+        return _processInvoker;
+    }
 
     internal static IExecutableFileResolver CreateExecutableFileResolver()
-        => executableFileResolver;
+    {
+        return executableFileResolver;
+    }
 }

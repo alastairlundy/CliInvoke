@@ -15,20 +15,23 @@ using CliInvoke.Specializations.Configurations;
 namespace CliInvoke.Specializations;
 
 /// <summary>
-/// Represents a specialized invoker for executing command-line processes on Windows systems.
-/// Provides functionality to execute processes either with raw output, buffered output, or piped streams.
+///     Represents a specialized invoker for executing command-line processes on Windows systems.
+///     Provides functionality to execute processes either with raw output, buffered output, or piped
+///     streams.
 /// </summary>
 public class CmdProcessInvoker : RunnerProcessInvokerBase
 {
     /// <summary>
-    /// Represents a process invoker specialized for running processes through CMD on Windows platforms.
+    ///     Represents a process invoker specialized for running processes through CMD on Windows
+    ///     platforms.
     /// </summary>
     /// <remarks>
-    /// This class provides a specialization of the <see cref="RunnerProcessInvokerBase"/> for executing
-    /// command-line processes through CMD with additional configuration options such as window creation and output redirection.
-    /// 
-    /// This implementation is supported only on the Windows operating system and explicitly excludes
-    /// support for other platforms.
+    ///     This class provides a specialization of the <see cref="RunnerProcessInvokerBase" /> for
+    ///     executing
+    ///     command-line processes through CMD with additional configuration options such as window
+    ///     creation and output redirection.
+    ///     This implementation is supported only on the Windows operating system and explicitly excludes
+    ///     support for other platforms.
     /// </remarks>
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
@@ -38,7 +41,8 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public CmdProcessInvoker(IProcessInvoker processInvoker, IRunnerProcessFactory runnerProcessFactory, bool windowCreation = true,
+    public CmdProcessInvoker(IProcessInvoker processInvoker,
+        IRunnerProcessFactory runnerProcessFactory, bool windowCreation = true,
         bool redirectOutputs = true) :
         base(processInvoker, runnerProcessFactory, new CmdProcessConfiguration("", false,
             redirectOutputs, redirectOutputs, windowCreation: windowCreation))
@@ -46,17 +50,27 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     }
 
     /// <summary>
-    /// Executes a process asynchronously with support for specific platform constraints.
+    ///     Executes a process asynchronously with support for specific platform constraints.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behavior.</param>
-    /// <param name="disposeOfConfig">Indicates whether the <paramref name="processConfiguration"/> should be disposed
-    /// after the process execution is complete. Default is true.</param>
+    /// <param name="processExitConfiguration">
+    ///     Optional configuration for handling the process exit
+    ///     behavior.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Indicates whether the <paramref name="processConfiguration" /> should be disposed
+    ///     after the process execution is complete. Default is true.
+    /// </param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, where the result contains
-    /// the execution outcome of the process.</returns>
-    /// <exception cref="PlatformNotSupportedException">Thrown if the operating system is not Windows, as this method
-    /// is only supported on Windows platforms.</exception>
+    /// <returns>
+    ///     A <see cref="Task{TResult}" /> representing the asynchronous operation, where the result
+    ///     contains
+    ///     the execution outcome of the process.
+    /// </returns>
+    /// <exception cref="PlatformNotSupportedException">
+    ///     Thrown if the operating system is not Windows, as this method
+    ///     is only supported on Windows platforms.
+    /// </exception>
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
@@ -72,23 +86,33 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
         CancellationToken cancellationToken = default)
     {
         if (!OperatingSystem.IsWindows())
-            throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
-        
-        return await base.ExecuteAsync(processConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+            throw new PlatformNotSupportedException(Resources
+                .Exceptions_Cmd_OnlySupportedOnWindows);
+
+        return await base.ExecuteAsync(processConfiguration, processExitConfiguration,
+            disposeOfConfig, cancellationToken);
     }
 
     /// <summary>
-    /// Executes a process asynchronously with buffering for output and error streams.
+    ///     Executes a process asynchronously with buffering for output and error streams.
     /// </summary>
     /// <param name="processConfiguration"> The configuration for the process to be executed. </param>
-    /// <param name="processExitConfiguration"> Optional configuration for handling the process exit behavior.</param>
-    /// <param name="disposeOfConfig"> Indicates whether the <paramref name="processConfiguration"/> should be disposed
-    /// after the process execution is complete. Default is true. </param>
+    /// <param name="processExitConfiguration">
+    ///     Optional configuration for handling the process exit
+    ///     behavior.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Indicates whether the <paramref name="processConfiguration" /> should be disposed
+    ///     after the process execution is complete. Default is true.
+    /// </param>
     /// <param name="cancellationToken"> A token to monitor for cancellation requests. </param>
-    /// <returns> A <see cref="Task{TResult}"/> representing the asynchronous operation, where the result
-    /// contains the buffered output, error streams, and exit information for the executed process.
+    /// <returns>
+    ///     A <see cref="Task{TResult}" /> representing the asynchronous operation, where the result
+    ///     contains the buffered output, error streams, and exit information for the executed process.
     /// </returns>
-    /// <exception cref="PlatformNotSupportedException"> Thrown if the operating system is not Windows, as this method is only supported on Windows platforms.
+    /// <exception cref="PlatformNotSupportedException">
+    ///     Thrown if the operating system is not Windows, as this method is only supported on Windows
+    ///     platforms.
     /// </exception>
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
@@ -98,28 +122,40 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public new async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
+    public new async Task<BufferedProcessResult> ExecuteBufferedAsync(
+        ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
     {
         if (!OperatingSystem.IsWindows())
-            throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
-        
-        return await base.ExecuteBufferedAsync(processConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+            throw new PlatformNotSupportedException(Resources
+                .Exceptions_Cmd_OnlySupportedOnWindows);
+
+        return await base.ExecuteBufferedAsync(processConfiguration, processExitConfiguration,
+            disposeOfConfig, cancellationToken);
     }
 
     /// <summary>
-    /// Executes a process asynchronously while piping the output and error streams for processing.
+    ///     Executes a process asynchronously while piping the output and error streams for processing.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behavior.</param>
-    /// <param name="disposeOfConfig">Indicates whether the <paramref name="processConfiguration"/> should be disposed
-    /// after the process execution is complete. Default is true.</param>
+    /// <param name="processExitConfiguration">
+    ///     Optional configuration for handling the process exit
+    ///     behavior.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Indicates whether the <paramref name="processConfiguration" /> should be disposed
+    ///     after the process execution is complete. Default is true.
+    /// </param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, where the result
-    /// includes the piped output, error streams, and exit information for the executed process.</returns>
-    /// <exception cref="PlatformNotSupportedException">Thrown if the operating system is not Windows, as this method
-    /// is only supported on Windows platforms.</exception>
+    /// <returns>
+    ///     A <see cref="Task{TResult}" /> representing the asynchronous operation, where the result
+    ///     includes the piped output, error streams, and exit information for the executed process.
+    /// </returns>
+    /// <exception cref="PlatformNotSupportedException">
+    ///     Thrown if the operating system is not Windows, as this method
+    ///     is only supported on Windows platforms.
+    /// </exception>
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
@@ -128,13 +164,16 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public new async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
+    public new async Task<PipedProcessResult> ExecutePipedAsync(
+        ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
     {
         if (!OperatingSystem.IsWindows())
-            throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
-        
-        return await base.ExecutePipedAsync(processConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+            throw new PlatformNotSupportedException(Resources
+                .Exceptions_Cmd_OnlySupportedOnWindows);
+
+        return await base.ExecutePipedAsync(processConfiguration, processExitConfiguration,
+            disposeOfConfig, cancellationToken);
     }
 }

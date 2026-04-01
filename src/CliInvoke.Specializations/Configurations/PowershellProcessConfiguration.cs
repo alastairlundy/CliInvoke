@@ -19,7 +19,7 @@ using WhatExec.Lib.Abstractions.Resolvers;
 namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
-/// A Command configuration to make running commands through cross-platform PowerShell easier.
+///     A Command configuration to make running commands through cross-platform PowerShell easier.
 /// </summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("macos")]
@@ -34,12 +34,15 @@ namespace CliInvoke.Specializations.Configurations;
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
-    /// Initializes a new instance of the PowershellCommandConfiguration class.
+    ///     Initializes a new instance of the PowershellCommandConfiguration class.
     /// </summary>
     /// <param name="filePathResolver"></param>
     /// <param name="arguments">The arguments to be passed to the command.</param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
-    /// <param name="requiresAdministrator">Indicates whether the command requires administrator privileges.</param>
+    /// <param name="requiresAdministrator">
+    ///     Indicates whether the command requires administrator
+    ///     privileges.
+    /// </param>
     /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
     /// <param name="credentials">The user credentials to be used when running the command.</param>
     /// <param name="standardInput">The stream for the standard input.</param>
@@ -52,7 +55,8 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
-    public PowershellProcessConfiguration(IExecutableFileResolver filePathResolver, string arguments,
+    public PowershellProcessConfiguration(IExecutableFileResolver filePathResolver,
+        string arguments,
         bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
@@ -60,44 +64,46 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : base("",
-        redirectStandardInput, redirectStandardOutput, redirectStandardError, arguments,workingDirectoryPath,
+        redirectStandardInput, redirectStandardOutput, redirectStandardError, arguments,
+        workingDirectoryPath,
         requiresAdministrator, environmentVariables,
         credentials, standardInput, standardInputEncoding,
         standardOutputEncoding, standardErrorEncoding,
         processResourcePolicy,
-        windowCreation: windowCreation, useShellExecution: useShellExecution)
+        windowCreation, useShellExecution)
     {
         string filePath;
 
         if (OperatingSystem.IsWindows())
-        {
             try
             {
-                filePath = filePathResolver.LocateExecutableAsync("pwsh.exe", SearchOption.AllDirectories, CancellationToken.None).Result.FullName;
+                filePath = filePathResolver.LocateExecutableAsync("pwsh.exe",
+                    SearchOption.AllDirectories, CancellationToken.None).Result.FullName;
             }
             catch
             {
                 filePath = $"{GetInstallLocationOnWindows()}";
             }
-        }
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
                  OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
-        {
-            filePath = filePathResolver.LocateExecutableAsync("pwsh", SearchOption.AllDirectories, CancellationToken.None).Result.FullName;
-        }
+            filePath = filePathResolver
+                .LocateExecutableAsync("pwsh", SearchOption.AllDirectories, CancellationToken.None)
+                .Result.FullName;
         else
-        {
-            throw new PlatformNotSupportedException(Resources.Exceptions_Powershell_OnlySupportedOnDesktop);
-        }
+            throw new PlatformNotSupportedException(Resources
+                .Exceptions_Powershell_OnlySupportedOnDesktop);
 
         TargetFilePath = filePath;
         base.TargetFilePath = TargetFilePath;
     }
 
     /// <summary>
-    /// The target file path of cross-platform PowerShell.
+    ///     The target file path of cross-platform PowerShell.
     /// </summary>
-    /// <exception cref="PlatformNotSupportedException">Thrown if run on an operating system besides Windows, macOS, Linux, and FreeBSD.</exception>
+    /// <exception cref="PlatformNotSupportedException">
+    ///     Thrown if run on an operating system besides
+    ///     Windows, macOS, Linux, and FreeBSD.
+    /// </exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -108,10 +114,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
-    public new string TargetFilePath
-    {
-        get; private set;
-    }
+    public new string TargetFilePath { get; }
 
     private static string GetInstallLocationOnWindows()
     {
@@ -127,7 +130,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         foreach (string directory in directories)
         {
             string expectedFilePath = $"{directory}{Path.DirectorySeparatorChar}pwsh.exe";
-            
+
             if (File.Exists(expectedFilePath))
                 return expectedFilePath;
         }

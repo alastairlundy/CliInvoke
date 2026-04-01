@@ -14,10 +14,11 @@ CliInvoke is a .NET library for interacting with Command Line Interfaces and wra
 Launch processes, redirect standard input and output streams, await process completion, and much more.
 
 ## Table of Contents
+
 * [Features](#features)
 * [Comparison vs Alternatives](#comparison-vs-alternatives)
 * [Installing CliInvoke](#installing-cliinvoke)
-   * [Supported Platforms](#supported-platforms)
+    * [Supported Platforms](#supported-platforms)
 * [CliInvoke Examples](#examples)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
 * [Used By](#used-by)
@@ -26,38 +27,45 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Acknowledgements](#acknowledgements)
 
 ## Features
+
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
 * Supports .NET Standard 2.0, .NET 8, and newer TFMs, and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
-* Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on Windows <sup>1</sup>
+* Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
+  Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
 <sup>1</sup> Specializations library distributed separately.
 
 ## Comparison vs Alternatives
 
-| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   |[ProcessX](https://github.com/Cysharp/ProcessX) | .NET Process class |
-|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------:|:----:|
-| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                        ❌                        |                   ⚠️, offers limited separation of concerns via ProcessStartInfo model class     |
-| Dependency Injection registration extensions                               |      ✅      | ❌                                                         |                        ❌                        |         ❌   |
-| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                        ✅                        |  ✅ , Built into .NET |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                       ❌*                        |     ✅      |  
-| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                        ✅                        |  ⚠️, can lead to deadlocks or exceptions if not careful |
-| Support for Process/Command Timeout |   ✅ | :warning:, limited to cancelling CancellationToken |:warning:, limited to cancelling CancellationToken | :warning:, limited to cancelling CancellationToken |
-| Graceful Cancellation Support via SIGTERM/SIGINT Signals |  ✅, 2.3.0+ |  ✅ | ❌ |  ❌ |
-| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                        ✅                        |      ✅      |  
-| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |  ✅ (.NET Runtime licensed under MIT)  |
+| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   |  [ProcessX](https://github.com/Cysharp/ProcessX)   |                             .NET Process class                             |
+|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------:|:--------------------------------------------------------------------------:|
+| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                         ❌                          | ⚠️, offers limited separation of concerns via ProcessStartInfo model class |
+| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                         |                         ❌                          |                                     ❌                                      |
+| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                         ✅                          |                            ✅ , Built into .NET                             |
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                         ❌*                         |                                     ✅                                      |  
+| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                         ✅                          |           ⚠️, can lead to deadlocks or exceptions if not careful           |
+| Support for Process/Command Timeout                                        |      ✅      |                                :warning:, limited to cancelling CancellationToken                                | :warning:, limited to cancelling CancellationToken |             :warning:, limited to cancelling CancellationToken             |
+| Graceful Cancellation Support via SIGTERM/SIGINT Signals                   |  ✅, 2.3.0+  |                                                        ✅                                                         |                         ❌                          |                                     ❌                                      |
+| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                         ✅                          |                                     ✅                                      |  
+| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                      ✅ (MIT)                       |                    ✅ (.NET Runtime licensed under MIT)                     |
 
 Notes:
-- *Indicates not explicitly advertised for all listed OSes but may work in practice; check each project's docs.
-- The CliWrap repository includes a test project that references a source‑available (non‑open source) library; that library is used for tests and is not distributed with the runtime package. The repo also contains an informal "Terms of Use" statement — review repository files if legal certainty is required.
 
+- *Indicates not explicitly advertised for all listed OSes but may work in practice; check each project's docs.
+- The CliWrap repository includes a test project that references a source‑available (non‑open source) library; that
+  library is used for tests and is not distributed with the runtime package. The repo also contains an informal "Terms
+  of Use" statement — review repository files if legal certainty is required.
 
 ## Installing CliInvoke
+
 CliInvoke is available on [the NuGet Gallery](https://nuget.org) but call be also installed via the ``dotnet`` SDK CLI.
 
 The package(s) to install depends on your use case:
-* For use in a .NET library - Install the abstractions package, your developer users can install the Implementation and Dependency Injection packages.
+
+* For use in a .NET library - Install the abstractions package, your developer users can install the Implementation and
+  Dependency Injection packages.
 * For use in a .NET app - Install the implementation package and the Dependency Injection Extensions Package
 
 | Project type / Need                                                          | Packages to install (dotnet add package ...)                                      | Notes                                                                        |
@@ -68,12 +76,14 @@ The package(s) to install depends on your use case:
 | Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed) | Adds Cmd/PowerShell and other specializations; include only when required.   |
 
 ### Links to packages
+
 [CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core)
 [CliInvoke Nuget](https://nuget.org/packages/CliInvoke)
 [CliInvoke.Extensions Nuget](https://nuget.org/packages/CliInvoke.Extensions)
 [CliInvoke.Specializations Nuget](https://nuget.org/packages/CliInvoke.Specializations)
 
 ## Supported Platforms
+
 CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
 
 For more details see the [list of supported platforms](docs/docs/Supported-OperatingSystems.md)
@@ -125,17 +135,23 @@ class Program
 ```
 
 Notes
+
 - Replace "dotnet --info" with the executable and arguments you need for your platform.
-- For non‑buffered/streaming scenarios, use ExecuteAsync/ExecuteBufferedAsync variants and builder options to redirect streams instead of buffering everything in memory.
+- For non‑buffered/streaming scenarios, use ExecuteAsync/ExecuteBufferedAsync variants and builder options to redirect
+  streams instead of buffering everything in memory.
 
 ## Examples
 
 ### Simple ``ProcessConfiguration`` creation with Factory Pattern
-This approach uses the ``IProcessConfigurationFactory`` interface factory to create a ``ProcessConfiguration``. It requires fewer parameters and sets up more defaults for you. 
 
-It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is desired.
+This approach uses the ``IProcessConfigurationFactory`` interface factory to create a ``ProcessConfiguration``. It
+requires fewer parameters and sets up more defaults for you.
+
+It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is
+desired.
 
 #### Non-Buffered Execution Example
+
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, ID, and other information.
 
 ```csharp
@@ -158,6 +174,7 @@ ProcessResult result = await _invoker.ExecuteAsync(configuration, CancellationTo
 ```
 
 #### Buffered Execution Example
+
 This example gets a ``BufferedProcessResult`` which contains redirected Standard Output and Standard Error as strings.
 
 ```csharp
@@ -179,12 +196,13 @@ ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", 
 BufferedProcessResult result = await _invoker.ExecuteBufferedAsync(configuration, CancellationToken.None);
 ```
 
-
 ### Advanced Configuration with Builders
 
-The following examples show how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
+The following examples show how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the
+output is desired.
 
 #### Non-Buffered Execution Example
+
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
@@ -215,6 +233,7 @@ ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
 ```
 
 #### Buffered Execution Example
+
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
@@ -248,51 +267,71 @@ BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config
 ```
 
 ## How to Build CliInvoke's code
+
 Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
 
 ## How to Contribute to CliInvoke
+
 Please see the [CONTRIBUTING.md file](CONTRIBUTING.md) for code and localization contributions.
 
-If you want to file a bug report or suggest a potential feature to add, please check out the [GitHub issues page](https://github.com/alastairlundy/CliInvoke/issues/) to see if a similar or identical issue is already open.
-If there isn't already a relevant issue filed, please [file one here](https://github.com/alastairlundy/CliInvoke/issues/new) and follow the respective guidance from the appropriate issue template.
+If you want to file a bug report or suggest a potential feature to add, please check out
+the [GitHub issues page](https://github.com/alastairlundy/CliInvoke/issues/) to see if a similar or identical issue is
+already open.
+If there isn't already a relevant issue filed,
+please [file one here](https://github.com/alastairlundy/CliInvoke/issues/new) and follow the respective guidance from
+the appropriate issue template.
 
 ## Used By
+
 CliInvoke is used by these projects:
-* [WCountLib.Providers.wc](https://github.com/alastairlundy/WCount/tree/main/src/lib/WCountLib.Providers.wc) - Implements WCountLib.Abstractions using the Unix ``wc`` command.
+
+* [WCountLib.Providers.wc](https://github.com/alastairlundy/WCount/tree/main/src/lib/WCountLib.Providers.wc) -
+  Implements WCountLib.Abstractions using the Unix ``wc`` command.
 
 Want your project added to this list? [Open an issue](https://github.com/alastairlundy/cliinvoke/issues/new/)
 
 ## CliInvoke's Roadmap
+
 CliInvoke aims to make working with Commands and external processes easier.
 
-Whilst an initial set of features are available in version 1, there is room for more features and for modifications of existing features in future updates.
+Whilst an initial set of features are available in version 1, there is room for more features and for modifications of
+existing features in future updates.
 
 Future updates may focus on one or more of the following:
+
 * Improved ease of use
-* Improved stability 
+* Improved stability
 * New features
 * Enhancing existing features
 
 ## New vs Old Package and Namespace
-CliInvoke changed it's Nuget package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has since been published directly under the ``CliInvoke`` package ID prefix and namespace.
+
+CliInvoke changed it's Nuget package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
+since been published directly under the ``CliInvoke`` package ID prefix and namespace.
 
 The previous packages Ids are marked as deprecated and will not receive future updates.
 
 ## License
+
 CliInvoke is licensed under the MPL 2.0 license. You can learn more about it [here](https://www.mozilla.org/en-US/MPL/)
 
-Should your project incorporate CliInvoke, ensure that the full text of CliInvoke's LICENSE.txt is either incorporated into your third-party licenses TXT file or provided as a distinct TXT file within your project's repository.
+Should your project incorporate CliInvoke, ensure that the full text of CliInvoke's LICENSE.txt is either incorporated
+into your third-party licenses TXT file or provided as a distinct TXT file within your project's repository.
 
 ### CliInvoke Assets
+
 CliInvoke's Icon is owned by and has all rights reserved to me (Alastair Lundy).
 
-If you fork CliInvoke and re-distribute it, please replace the icon unless you have prior written approval from me. 
+If you fork CliInvoke and re-distribute it, please replace the icon unless you have prior written approval from me.
 
 ## Acknowledgements
 
 ### Projects
+
 This project would like to thank the following projects for their work:
+
 * [CliWrap](https://github.com/Tyrrrz/CliWrap/) for inspiring this project
 * [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying .NET Standard 2.0 support
 
-For more information, please see the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).
+For more information, please see
+the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).

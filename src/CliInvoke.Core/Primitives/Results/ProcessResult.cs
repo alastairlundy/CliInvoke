@@ -16,12 +16,12 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-/// A class that represents the results from an executed Process or Command.
+///     A class that represents the results from an executed Process or Command.
 /// </summary>
 public class ProcessResult : IEquatable<ProcessResult>
 {
     /// <summary>
-    /// Instantiates a ProcessResult with data about a Process' execution.
+    ///     Instantiates a ProcessResult with data about a Process' execution.
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
@@ -41,43 +41,45 @@ public class ProcessResult : IEquatable<ProcessResult>
         ExitTime = exitTime;
         ProcessId = processId;
     }
-    
+
     /// <summary>
-    /// The unique identifier assigned to the process when it was executed.
+    ///     The unique identifier assigned to the process when it was executed.
     /// </summary>
     public int ProcessId { get; }
 
     /// <summary>
-    /// The exit code from the Command that was executed.
+    ///     The exit code from the Command that was executed.
     /// </summary>
     public int ExitCode { get; }
 
     /// <summary>
-    /// The file path of the file to be executed.
+    ///     The file path of the file to be executed.
     /// </summary>
     public string ExecutedFilePath { get; }
 
     /// <summary>
-    /// The Date and Time that the Command's execution started.
+    ///     The Date and Time that the Command's execution started.
     /// </summary>
     public DateTime StartTime { get; }
 
     /// <summary>
-    /// The Date and Time that the Command's execution finished.
+    ///     The Date and Time that the Command's execution finished.
     /// </summary>
     public DateTime ExitTime { get; }
 
     /// <summary>
-    /// How long the Command took to execute represented as a TimeSpan.
+    ///     How long the Command took to execute represented as a TimeSpan.
     /// </summary>
     public TimeSpan RuntimeDuration => ExitTime.Subtract(StartTime);
 
     /// <summary>
-    /// Determines whether the specified <see cref="ProcessResult"/> instance is equal to the current instance.
+    ///     Determines whether the specified <see cref="ProcessResult" /> instance is equal to the current
+    ///     instance.
     /// </summary>
-    /// <param name="other">The <see cref="ProcessResult"/> instance to compare with the current instance.</param>
+    /// <param name="other">The <see cref="ProcessResult" /> instance to compare with the current instance.</param>
     /// <returns>
-    /// <c>True</c> if the specified <see cref="ProcessResult"/> is equal to the current instance; otherwise, <c>false</c>.
+    ///     <c>True</c> if the specified <see cref="ProcessResult" /> is equal to the current instance;
+    ///     otherwise, <c>false</c>.
     /// </returns>
     public bool Equals(ProcessResult? other)
     {
@@ -92,10 +94,13 @@ public class ProcessResult : IEquatable<ProcessResult>
     }
 
     /// <summary>
-    /// Determines whether this ProcessResult is equal to another object.
+    ///     Determines whether this ProcessResult is equal to another object.
     /// </summary>
     /// <param name="obj">The object to compare with this ProcessResult.</param>
-    /// <returns><c>True</c> if the specified object is a ProcessResult and is equal to this instance; otherwise, <c>false</c>.</returns>
+    /// <returns>
+    ///     <c>True</c> if the specified object is a ProcessResult and is equal to this instance;
+    ///     otherwise, <c>false</c>.
+    /// </returns>
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -108,7 +113,7 @@ public class ProcessResult : IEquatable<ProcessResult>
     }
 
     /// <summary>
-    /// Returns the hash code for the current ProcessResult.
+    ///     Returns the hash code for the current ProcessResult.
     /// </summary>
     /// <returns>The hash code for the current ProcessResult.</returns>
     public override int GetHashCode()
@@ -117,12 +122,13 @@ public class ProcessResult : IEquatable<ProcessResult>
     }
 
     /// <summary>
-    /// Determines whether two specified <see cref="ProcessResult"/> instances are equal.
+    ///     Determines whether two specified <see cref="ProcessResult" /> instances are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessResult"/> instance to compare.</param>
-    /// <param name="right">The second <see cref="ProcessResult"/> instance to compare.</param>
+    /// <param name="left">The first <see cref="ProcessResult" /> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessResult" /> instance to compare.</param>
     /// <returns>
-    /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are equal; otherwise, <c>false</c>.
+    ///     <c>true</c> if the specified <see cref="ProcessResult" /> instances are equal; otherwise,
+    ///     <c>false</c>.
     /// </returns>
     public static bool Equals(ProcessResult? left, ProcessResult? right)
     {
@@ -133,23 +139,30 @@ public class ProcessResult : IEquatable<ProcessResult>
     }
 
     /// <summary>
-    /// Determines whether two specified <see cref="ProcessResult"/> instances are equal.
+    ///     Determines whether two specified <see cref="ProcessResult" /> instances are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessResult"/> instance to compare.</param>
-    /// <param name="right">The second <see cref="ProcessResult"/> instance to compare.</param>
+    /// <param name="left">The first <see cref="ProcessResult" /> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessResult" /> instance to compare.</param>
     /// <returns>
-    /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are equal; otherwise, <c>false</c>.
+    ///     <c>true</c> if the specified <see cref="ProcessResult" /> instances are equal; otherwise,
+    ///     <c>false</c>.
     /// </returns>
-    public static bool operator ==(ProcessResult left, ProcessResult? right) => left.Equals(right);
+    public static bool operator ==(ProcessResult left, ProcessResult? right)
+    {
+        return left.Equals(right);
+    }
 
     /// <summary>
-    /// Determines whether two specified <see cref="ProcessResult"/> instances are not equal.
+    ///     Determines whether two specified <see cref="ProcessResult" /> instances are not equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessResult"/> instance to compare.</param>
-    /// <param name="right">The second <see cref="ProcessResult"/> instance to compare.</param>
+    /// <param name="left">The first <see cref="ProcessResult" /> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessResult" /> instance to compare.</param>
     /// <returns>
-    /// <c>true</c> if the specified <see cref="ProcessResult"/> instances are not equal; otherwise, <c>false</c>.
+    ///     <c>true</c> if the specified <see cref="ProcessResult" /> instances are not equal; otherwise,
+    ///     <c>false</c>.
     /// </returns>
-    public static bool operator !=(ProcessResult left, ProcessResult? right) =>
-        !left.Equals(right);
+    public static bool operator !=(ProcessResult left, ProcessResult? right)
+    {
+        return !left.Equals(right);
+    }
 }

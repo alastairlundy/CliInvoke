@@ -15,22 +15,21 @@ using System.Security;
 namespace CliInvoke.Builders;
 
 /// <summary>
-/// A class that provides builder methods for constructing UserCredentials.
+///     A class that provides builder methods for constructing UserCredentials.
 /// </summary>
 public class UserCredentialBuilder : IUserCredentialBuilder
 {
     private readonly UserCredential _userCredential;
 
     /// <summary>
-    /// Instantiates the UserCredentialBuilder class.
+    ///     Instantiates the UserCredentialBuilder class.
     /// </summary>
     public UserCredentialBuilder()
     {
-        _userCredential = new();
+        _userCredential = new UserCredential();
     }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="credential"></param>
     protected UserCredentialBuilder(UserCredential credential)
@@ -39,7 +38,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     }
 
     /// <summary>
-    /// Sets the domain for the credential to be created.
+    ///     Sets the domain for the credential to be created.
     /// </summary>
     /// <param name="domain">The domain to set.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated domain.</returns>
@@ -47,9 +46,9 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public IUserCredentialBuilder SetDomain(string domain)
     {
         ArgumentException.ThrowIfNullOrEmpty(domain);
-        
+
         return new UserCredentialBuilder(
-            new(
+            new UserCredential(
                 domain,
                 _userCredential.UserName,
 #pragma warning disable CA1416
@@ -61,7 +60,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     }
 
     /// <summary>
-    /// Sets the username for the credential to be created.
+    ///     Sets the username for the credential to be created.
     /// </summary>
     /// <param name="username">The username to set.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated username.</returns>
@@ -69,10 +68,10 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public IUserCredentialBuilder SetUsername(string username)
     {
         ArgumentException.ThrowIfNullOrEmpty(username);
-        
+
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new(
+            new UserCredential(
                 _userCredential.Domain,
                 username,
                 _userCredential.Password,
@@ -83,7 +82,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     }
 
     /// <summary>
-    /// Sets the password for the credential to be created.
+    ///     Sets the password for the credential to be created.
     /// </summary>
     /// <param name="password">The password to set, as a SecureString.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated password.</returns>
@@ -97,7 +96,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new(
+            new UserCredential(
                 _userCredential.Domain,
                 _userCredential.UserName,
                 password,
@@ -108,7 +107,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     }
 
     /// <summary>
-    /// Specifies whether to load the user profile.
+    ///     Specifies whether to load the user profile.
     /// </summary>
     /// <param name="loadUserProfile">True to load the user profile, false otherwise.</param>
     /// <returns>A new instance of the CredentialsBuilder with the updated load user profile setting.</returns>
@@ -116,7 +115,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public IUserCredentialBuilder LoadUserProfile(bool loadUserProfile) =>
         new UserCredentialBuilder(
 #pragma warning disable CA1416
-            new(
+            new UserCredential(
                 _userCredential.Domain,
                 _userCredential.UserName,
                 _userCredential.Password,
@@ -126,7 +125,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
         );
 
     /// <summary>
-    /// Builds a new instance of UserCredentials using the current settings.
+    ///     Builds a new instance of UserCredentials using the current settings.
     /// </summary>
     /// <returns>The built UserCredentials.</returns>
     [Pure]
@@ -141,10 +140,11 @@ public class UserCredentialBuilder : IUserCredentialBuilder
 #pragma warning restore CA1416
 
     /// <summary>
-    /// Disposes of the provided settings.
+    ///     Disposes of the provided settings.
     /// </summary>
     public void Dispose()
     {
         _userCredential.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

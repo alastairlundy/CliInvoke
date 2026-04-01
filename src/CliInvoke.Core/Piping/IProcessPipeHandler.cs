@@ -12,21 +12,22 @@ using System.Diagnostics;
 namespace CliInvoke.Core.Piping;
 
 /// <summary>
-/// An interface to allow for a standardized way of Process pipe handling.
+///     An interface to allow for a standardized way of Process pipe handling.
 /// </summary>
 public interface IProcessPipeHandler
 {
     /// <summary>
-    /// Asynchronously pipes the standard input from a source stream to a specified process.
+    ///     Asynchronously pipes the standard input from a source stream to a specified process.
     /// </summary>
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
-    Task<bool> PipeStandardInputAsync(Stream source, Process destination, CancellationToken cancellationToken);
+    Task<bool> PipeStandardInputAsync(Stream source, Process destination,
+        CancellationToken cancellationToken);
 
     /// <summary>
-    /// Asynchronously retrieves the standard output stream from a specified process.
+    ///     Asynchronously retrieves the standard output stream from a specified process.
     /// </summary>
     /// <param name="source">The process from which to read the standard output data.</param>
     /// <param name="cancellationToken"></param>
@@ -34,7 +35,7 @@ public interface IProcessPipeHandler
     Task<Stream> PipeStandardOutputAsync(Process source, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Asynchronously retrieves the standard error stream from a specified process.
+    ///     Asynchronously retrieves the standard error stream from a specified process.
     /// </summary>
     /// <param name="source">The process from which to read the standard error data.</param>
     /// <param name="cancellationToken"></param>

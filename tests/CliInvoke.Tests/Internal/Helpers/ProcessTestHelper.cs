@@ -9,22 +9,14 @@ internal class ProcessTestHelper
     {
         string filePath;
         if (OperatingSystem.IsWindows())
-        {
             filePath = TargetFilePaths.CmdFilePath;
-        }
-        else if(OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() || OperatingSystem.IsAndroid())
-        {
+        else if (OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() || OperatingSystem.IsAndroid())
             filePath = TargetFilePaths.LinuxEchoFilePath;
-        }
         else if (OperatingSystem.IsMacOS())
-        {
             filePath = "echo";
-        }
         else
-        {
             throw new PlatformNotSupportedException();
-        }
-        
+
         return filePath;
     }
 

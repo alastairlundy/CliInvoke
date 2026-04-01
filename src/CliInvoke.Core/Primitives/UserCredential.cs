@@ -19,12 +19,12 @@ using System.Security;
 namespace CliInvoke.Core;
 
 /// <summary>
-/// A class to represent a User Credential to be used with ProcessPrimitives.
+///     A class to represent a User Credential to be used with ProcessPrimitives.
 /// </summary>
 public class UserCredential : IEquatable<UserCredential>, IDisposable
 {
     /// <summary>
-    /// Instantiates the user credential with null values.
+    ///     Instantiates the user credential with null values.
     /// </summary>
     public UserCredential()
     {
@@ -37,7 +37,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     }
 
     /// <summary>
-    /// Instantiates user credential with the specified values.
+    ///     Instantiates user credential with the specified values.
     /// </summary>
     /// <param name="domain">The domain to be used.</param>
     /// <param name="username">The username to be used.</param>
@@ -59,35 +59,35 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     }
 
     /// <summary>
-    /// The domain to be used.
+    ///     The domain to be used.
     /// </summary>
     [SupportedOSPlatform("windows")]
     public string? Domain { get; }
 
     /// <summary>
-    /// The username to be used.
+    ///     The username to be used.
     /// </summary>
     public string? UserName { get; }
 
     /// <summary>
-    /// The password to be used.
+    ///     The password to be used.
     /// </summary>
     [SupportedOSPlatform("windows")]
     public SecureString? Password { get; }
 
     /// <summary>
-    /// Whether to load the Windows User Profile.
+    ///     Whether to load the Windows User Profile.
     /// </summary>
     [SupportedOSPlatform("windows")]
     public bool? LoadUserProfile { get; }
 
     /// <summary>
-    /// A null UserCredential instance.
+    ///     A null UserCredential instance.
     /// </summary>
     public static UserCredential Null { get; } = new(null, null, null, null);
 
     /// <summary>
-    /// Disposes of the Password SecureString and other UserCredential values.
+    ///     Disposes of the Password SecureString and other UserCredential values.
     /// </summary>
     public void Dispose()
     {
@@ -97,10 +97,13 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     }
 
     /// <summary>
-    /// Determines whether the specified user credential is equal to the current user credential.
+    ///     Determines whether the specified user credential is equal to the current user credential.
     /// </summary>
     /// <param name="other">The user credential to compare with the current user credential.</param>
-    /// <returns>True if the specified user credential is equal to the current user credential; false otherwise.</returns>
+    /// <returns>
+    ///     True if the specified user credential is equal to the current user credential; false
+    ///     otherwise.
+    /// </returns>
     public bool Equals(UserCredential? other)
     {
 #pragma warning disable CA1416
@@ -126,7 +129,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     }
 
     /// <summary>
-    /// Determines whether one User Credential is equal to another.
+    ///     Determines whether one User Credential is equal to another.
     /// </summary>
     /// <param name="left">The first user credential to compare.</param>
     /// <param name="right">The second user credential to compare.</param>
@@ -140,7 +143,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     }
 
     /// <summary>
-    /// Determines whether the specified object is equal to the current user credential.
+    ///     Determines whether the specified object is equal to the current user credential.
     /// </summary>
     /// <param name="obj">The object to compare with the current user credential.</param>
     /// <returns>True if the specified object is equal to the current user credential; false otherwise.</returns>
@@ -156,7 +159,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     }
 
     /// <summary>
-    /// Returns the hash code for the current user credential.
+    ///     Returns the hash code for the current user credential.
     /// </summary>
     /// <returns>The hash code for the current user credential.</returns>
     public override int GetHashCode()
@@ -167,20 +170,32 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     }
 
     /// <summary>
-    /// Determines if a <see cref="UserCredential"/> is equal to another <see cref="UserCredential"/>.
+    ///     Determines if a <see cref="UserCredential" /> is equal to another <see cref="UserCredential" />
+    ///     .
     /// </summary>
-    /// <param name="left">A <see cref="UserCredential"/> to be compared.</param>
-    /// <param name="right">The other <see cref="UserCredential"/> to be compared.</param>
-    /// <returns>True if both <see cref="UserCredential"/> objects are equal to each other, false otherwise.</returns>
-    public static bool operator ==(UserCredential? left, UserCredential? right) =>
-        Equals(left, right);
+    /// <param name="left">A <see cref="UserCredential" /> to be compared.</param>
+    /// <param name="right">The other <see cref="UserCredential" /> to be compared.</param>
+    /// <returns>
+    ///     True if both <see cref="UserCredential" /> objects are equal to each other, false
+    ///     otherwise.
+    /// </returns>
+    public static bool operator ==(UserCredential? left, UserCredential? right)
+    {
+        return Equals(left, right);
+    }
 
     /// <summary>
-    /// Determines if a <see cref="UserCredential"/> is not equal to another <see cref="UserCredential"/>.
+    ///     Determines if a <see cref="UserCredential" /> is not equal to another
+    ///     <see cref="UserCredential" />.
     /// </summary>
-    /// <param name="left">A <see cref="UserCredential"/> to be compared.</param>
-    /// <param name="right">The other <see cref="UserCredential"/> to be compared.</param>
-    /// <returns>True if both <see cref="UserCredential"/> objects are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(UserCredential? left, UserCredential? right) =>
-        !Equals(left, right);
+    /// <param name="left">A <see cref="UserCredential" /> to be compared.</param>
+    /// <param name="right">The other <see cref="UserCredential" /> to be compared.</param>
+    /// <returns>
+    ///     True if both <see cref="UserCredential" /> objects are not equal to each other; false
+    ///     otherwise.
+    /// </returns>
+    public static bool operator !=(UserCredential? left, UserCredential? right)
+    {
+        return !Equals(left, right);
+    }
 }

@@ -16,8 +16,9 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReleaseNotes>* Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AoT compatible despite CliInvoke advertising itself as Trimming Safe and AoT compatible. It is now fixed to be Trimming safe and AoT compatible on .NET 8+ - This fix is also backported to CliInvoke 2.4 via version 2.4.4
-* Updated AoT Compatibility property in ``CliInvoke.csproj`` to only be set to true on .NET 8+
-* Reduced warnings regarding supported and unsupported OSes in ``ProcessResourcePolicyBuilder``</PackageReleaseNotes>
+            * Updated AoT Compatibility property in ``CliInvoke.csproj`` to only be set to true on .NET 8+
+            * Reduced warnings regarding supported and unsupported OSes in ``ProcessResourcePolicyBuilder``
+        </PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -32,12 +33,12 @@
         <PolyEnsure>true</PolyEnsure>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
         <IsAotCompatible>true</IsAotCompatible>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>CliInvoke.Tests</_Parameter1>
@@ -46,8 +47,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Polyfill" PrivateAssets="all" />
-        <PackageReference Include="DotExtensions" />
+        <PackageReference Include="Polyfill" PrivateAssets="all"/>
+        <PackageReference Include="DotExtensions"/>
         <PackageReference Include="WhatExec.Lib.Abstractions"/>
     </ItemGroup>
 
@@ -57,46 +58,46 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
-        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
+        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
         <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="CliInvoke.Core" />
+        <PackageReference Include="CliInvoke.Core"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <Content Include="..\..\README.md">
-        <Link>README.md</Link>
-          <PackagePath>README.md</PackagePath>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Include="..\..\THIRD_PARTY_NOTICES.txt">
-        <Link>THIRD_PARTY_NOTICES.txt</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <Content Include="..\..\README.md">
+            <Link>README.md</Link>
+            <PackagePath>README.md</PackagePath>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Include="..\..\THIRD_PARTY_NOTICES.txt">
+            <Link>THIRD_PARTY_NOTICES.txt</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <EmbeddedResource Update="Internal\Localizations\Resources.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="Internal\Localizations\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <Compile Update="Internal\Localizations\Resources.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.resx</DependentUpon>
-      </Compile>
+        <Compile Update="Internal\Localizations\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <None Include="..\..\.assets\icon.png">
-        <Pack>True</Pack>
-        <PackagePath>icon.png</PackagePath>
-        <Link>icon.png</Link>
-      </None>
+        <None Include="..\..\.assets\icon.png">
+            <Pack>True</Pack>
+            <PackagePath>icon.png</PackagePath>
+            <Link>icon.png</Link>
+        </None>
     </ItemGroup>
 </Project>

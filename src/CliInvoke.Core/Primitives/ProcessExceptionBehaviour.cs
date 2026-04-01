@@ -10,22 +10,22 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-/// Specifies the behaviour for handling exceptions when a process cancellation occurs.
+///     Specifies the behaviour for handling exceptions.
 /// </summary>
-public enum ProcessCancellationHandlingMode
+public enum ProcessExceptionBehaviour
 {
     /// <summary>
-    /// Suppresses thrown exceptions.
+    ///     Suppresses thrown exceptions.
     /// </summary>
-    SuppressException = 0,
+    SuppressExceptions = 0,
 
     /// <summary>
-    /// Allow .NET to throw the exception if the cancellation succeeds.
+    ///     Allow .NET to throw the exception if expected.
     /// </summary>
-    AllowException,
+    AllowExceptions,
 
     /// <summary>
-    /// Allows the exception if the cancellation is unexpected.
+    ///     Allows the exception to be thrown if it is unexpected.
     /// </summary>
-    AllowExceptionIfUnexpected,
+    AllowExceptionsIfUnexpected
 }
