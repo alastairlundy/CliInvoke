@@ -17,11 +17,10 @@ internal static partial class UnixGracefulCancellation
     private const int Sigterm = 15;
 
     private const int DelayBeforeSigintMilliseconds = 3000;
-    
+
     extension(ProcessWrapper process)
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="timeoutThreshold"></param>
         /// <param name="exitConfiguration"></param>
@@ -34,54 +33,76 @@ internal static partial class UnixGracefulCancellation
         internal async Task<bool> CancelWithInterruptOnUnix(TimeSpan timeoutThreshold,
             ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
         {
-            // Provide a default value to satisfy compiler.
-            CancellationReason cancellationReason = CancellationReason.NotKnown;
-            
-            DateTime expectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-            
-            cancellationToken.Register(() =>
+            // Use semaphore to prevent simultaneous cancellation attempts
+            if (!await process._cancellationSemaphore.WaitAsync(0, cancellationToken))
             {
-                cancellationReason = CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
-            });
-            
-            bool sigIntSuccess = false;
+                // Another cancellation is already in progress, wait for it to complete
+                await process.WaitForExitAsync(cancellationToken);
+                return process.HasExited;
+            }
 
             try
             {
-                if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS() ||
-                    OperatingSystem.IsTvOS())
-                    throw new PlatformNotSupportedException();
+                DateTime expectedExitTime =
+                    CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
 
-                await Task.Delay(timeoutThreshold, cancellationToken);
+                // Use a local variable to store the cancellation reason to avoid race conditions
+                CancellationReason cancellationReason = CancellationReason.NotKnown;
 
-                bool sigTermSuccess = SendUnixSignal(process.Id, Sigterm);
+                // Register the callback to update the cancellation reason
+                cancellationToken.Register(() =>
+                {
+                    cancellationReason =
+                        CancellationHelper.GetCancellationReason(expectedExitTime,
+                            cancellationToken);
+                });
 
-                await Task.Delay(millisecondsDelay: DelayBeforeSigintMilliseconds,
-                    cancellationToken);
+                bool sigIntSuccess = false;
 
-                if (sigTermSuccess)
-                    return true;
+                try
+                {
+                    if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS() ||
+                        OperatingSystem.IsTvOS())
+                        throw new PlatformNotSupportedException();
 
-                sigIntSuccess = SendUnixSignal(process.Id, Sigint);
+                    await Task.Delay(timeoutThreshold, cancellationToken);
+
+                    bool sigTermSuccess = SendUnixSignal(process.Id, Sigterm);
+
+                    await Task.Delay(DelayBeforeSigintMilliseconds,
+                        cancellationToken);
+
+                    if (sigTermSuccess)
+                        return true;
+
+                    sigIntSuccess = SendUnixSignal(process.Id, Sigint);
+                }
+                catch (Exception exception)
+                {
+                    sigIntSuccess =
+                        process.HandleCancellationMode(exitConfiguration, cancellationReason);
+
+                    // Recalculate expected exit time in exception handler to avoid using stale values
+                    DateTime currentExpectedExitTime =
+                        CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
+                    CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
+                        cancellationReason, exitConfiguration, exception);
+                }
+
+                return sigIntSuccess;
             }
-            catch (Exception exception)
+            finally
             {
-                sigIntSuccess =
-                    process.HandleCancellationMode(exitConfiguration, cancellationReason);
-
-                CancellationHelper.HandleCancellationExceptions(expectedExitTime,
-                    cancellationReason, exitConfiguration, exception);
+                process._cancellationSemaphore.Release();
             }
-            
-            return sigIntSuccess;
         }
 
         [UnsupportedOSPlatform("browser")]
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
         [UnsupportedOSPlatform("windows")]
-        private bool HandleCancellationMode(ProcessExitConfiguration exitConfiguration, CancellationReason cancellationReason)
+        private bool HandleCancellationMode(ProcessExitConfiguration exitConfiguration,
+            CancellationReason cancellationReason)
         {
             switch (cancellationReason)
             {
@@ -128,7 +149,7 @@ internal static partial class UnixGracefulCancellation
                     }
 
                     break;
-                }    
+                }
             }
 
             return false;
@@ -136,7 +157,6 @@ internal static partial class UnixGracefulCancellation
     }
 
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="processId"></param>
     /// <param name="signalId"></param>
@@ -148,7 +168,7 @@ internal static partial class UnixGracefulCancellation
     {
         return kill_libc(processId, signalId) == 0;
     }
-    
+
 #if NETSTANDARD2_0
     [DllImport("libc", SetLastError = true, EntryPoint = "kill")]
     private static extern int kill_libc(int processid, int signal);

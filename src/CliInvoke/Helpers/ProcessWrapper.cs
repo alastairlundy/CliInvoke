@@ -13,7 +13,10 @@ namespace CliInvoke.Helpers;
 
 internal class ProcessWrapper : Process
 {
-    internal ProcessWrapper(ProcessConfiguration configuration, 
+    // Synchronization primitive to prevent simultaneous cancellation attempts
+    internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
+
+    internal ProcessWrapper(ProcessConfiguration configuration,
         ProcessResourcePolicy? resourcePolicy)
     {
         StartInfo = configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
@@ -22,15 +25,26 @@ internal class ProcessWrapper : Process
         EnableRaisingEvents = true;
         Exited += OnExited;
         Started += OnStarted;
-        
+
         HasStarted = false;
         ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
     }
 
+    internal ProcessResourcePolicy ResourcePolicy { get; set; }
+
+    internal bool HasStarted { get; private set; }
+
+    internal new DateTime StartTime { get; private set; }
+
+    internal new DateTime ExitTime { get; private set; }
+
+    internal new int Id { get; private set; }
+
+    internal new string ProcessName { get; private set; }
+
     private void OnStarted(object? sender, EventArgs e)
     {
         if (!HasExited && HasStarted)
-        {
             try
             {
 #pragma warning disable CA1416
@@ -41,7 +55,6 @@ internal class ProcessWrapper : Process
             {
                 // ignored
             }
-        }
     }
 
     private void OnExited(object? sender, EventArgs e)
@@ -49,24 +62,12 @@ internal class ProcessWrapper : Process
         ExitTime = base.ExitTime;
     }
 
-    internal ProcessResourcePolicy ResourcePolicy { get; set; }
-
-    internal bool HasStarted { get; private set; }
-
     internal event EventHandler Started;
-
-    internal new DateTime StartTime { get; private set; }
-
-    internal new DateTime ExitTime { get; private set; }
-    
-    internal new int Id {get; private set; }
-    
-    internal new string ProcessName {get; private set; }
 
     public new bool Start()
     {
         HasStarted = base.Start();
-        
+
         if (HasStarted)
         {
             StartTime = DateTime.UtcNow;

@@ -14,11 +14,10 @@ namespace CliInvoke.Helpers.Processes.Cancellation;
 internal static partial class WindowsGracefulCancellation
 {
     private const uint CtrlCSignalEvent = 0;
-    
+
     extension(ProcessWrapper process)
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="timeoutThreshold"></param>
         /// <param name="exitConfiguration"></param>
@@ -28,50 +27,74 @@ internal static partial class WindowsGracefulCancellation
         internal async Task<bool> CancelWithInterruptOnWindows(TimeSpan timeoutThreshold,
             ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
         {
-            if(!OperatingSystem.IsWindows())
+            if (!OperatingSystem.IsWindows())
                 throw new PlatformNotSupportedException();
-            
-            // Provide a default value to satisfy compiler.
-            CancellationReason cancellationReason = CancellationReason.NotKnown;
-            
-            DateTime expectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-            
-            cancellationToken.Register(() =>
+
+            // Use semaphore to prevent simultaneous cancellation attempts
+            if (!await process._cancellationSemaphore.WaitAsync(0, cancellationToken))
             {
-                cancellationReason = CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
-            });
-            
-            bool ctrlCSignalSuccess = false;
-            
+                // Another cancellation is already in progress, wait for it to complete
+                await process.WaitForExitAsync(cancellationToken);
+                return process.HasExited;
+            }
+
             try
             {
-                await Task.Delay(timeoutThreshold, cancellationToken);
+                DateTime expectedExitTime =
+                    CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
 
-                if (process.HasExited)
-                    return true;
+                // Use a local variable to store the cancellation reason to avoid race conditions
+                CancellationReason cancellationReason = CancellationReason.NotKnown;
 
-                // Allocate a Console to the Process so that it has one it can use.
-                bool successfulAttachment = AllocConsoleWin();
-                // Attach the allocated console to the process.
-                successfulAttachment = successfulAttachment && AttachConsoleWin((uint)process.Id);
+                // Register the callback to update the cancellation reason
+                cancellationToken.Register(() =>
+                {
+                    cancellationReason =
+                        CancellationHelper.GetCancellationReason(expectedExitTime,
+                            cancellationToken);
+                });
 
-                if (!successfulAttachment)
-                    return false;
+                bool ctrlCSignalSuccess = false;
 
-                ctrlCSignalSuccess = SendCtrlCToConsoleWin(CtrlCSignalEvent, 0);
-            }
-            catch (Exception exception)
-            {
-                CancellationHelper.HandleCancellationExceptions(expectedExitTime, cancellationReason,
-                    exitConfiguration, exception);
+                try
+                {
+                    await Task.Delay(timeoutThreshold, cancellationToken);
+
+                    if (process.HasExited)
+                        return true;
+
+                    // Allocate a Console to the Process so that it has one it can use.
+                    bool successfulAttachment = AllocConsoleWin();
+                    // Attach the allocated console to the process.
+                    successfulAttachment =
+                        successfulAttachment && AttachConsoleWin((uint)process.Id);
+
+                    if (!successfulAttachment)
+                        return false;
+
+                    ctrlCSignalSuccess = SendCtrlCToConsoleWin(CtrlCSignalEvent, 0);
+                }
+                catch (Exception exception)
+                {
+                    // Recalculate expected exit time in exception handler to avoid using stale values
+                    DateTime currentExpectedExitTime =
+                        CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
+                    CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
+                        cancellationReason,
+                        exitConfiguration, exception);
+                }
+                finally
+                {
+                    if (!process.HasExited)
+                        process.ForcefulExit();
+                }
+
+                return ctrlCSignalSuccess;
             }
             finally
             {
-                if (!process.HasExited)
-                    process.ForcefulExit();
+                process._cancellationSemaphore.Release();
             }
-            return ctrlCSignalSuccess;
         }
     }
 

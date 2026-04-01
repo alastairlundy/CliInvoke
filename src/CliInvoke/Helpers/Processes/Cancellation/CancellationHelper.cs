@@ -14,31 +14,31 @@ namespace CliInvoke.Helpers.Processes.Cancellation;
 internal static class CancellationHelper
 {
     /// <summary>
-    /// Determines the reason for the cancellation of a process.
+    ///     Determines the reason for the cancellation of a process.
     /// </summary>
     /// <param name="expectedExitTime">The expected exit time of the process.</param>
-    /// <param name="cancellationToken">The token associated with the cancellation, used to determine the reason.</param>
+    /// <param name="cancellationToken">
+    ///     The token associated with the cancellation, used to determine the
+    ///     reason.
+    /// </param>
     /// <returns>A string describing the reason for the cancellation.</returns>
     internal static CancellationReason GetCancellationReason(DateTime expectedExitTime,
         CancellationToken cancellationToken)
     {
-        CancellationReason cancellationReason;
-        if (cancellationToken.IsCancellationRequested)
-        {
-            cancellationReason = CancellationReason.RequestedCancellation;
-        }
-        else
-        {
-            DateTime cancellationTime = DateTime.UtcNow;
+        // Make the check atomic by capturing both values before making the decision
+        bool isCancellationRequested = cancellationToken.IsCancellationRequested;
+        DateTime cancellationTime = DateTime.UtcNow;
 
-            cancellationReason = cancellationTime >= expectedExitTime ? CancellationReason.Timeout : CancellationReason.NotKnown;
-        }
+        if (isCancellationRequested) return CancellationReason.RequestedCancellation;
 
-        return cancellationReason;
+        return cancellationTime >= expectedExitTime
+            ? CancellationReason.Timeout
+            : CancellationReason.NotKnown;
     }
 
     /// <summary>
-    /// Calculates the expected exit time of a process using its specified <see cref="ProcessExitConfiguration"/> object.
+    ///     Calculates the expected exit time of a process using its specified
+    ///     <see cref="ProcessExitConfiguration" /> object.
     /// </summary>
     /// <param name="exitConfiguration">The exit configuration to use.</param>
     /// <returns>The calculated expected exit time for a process.</returns>
@@ -46,17 +46,17 @@ internal static class CancellationHelper
     {
         return DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
     }
-    
-    
+
+
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="expectedExitTime"></param>
     /// <param name="cancellationReason"></param>
     /// <param name="exitConfiguration"></param>
     /// <param name="exception"></param>
     /// <exception cref="Exception"></exception>
-    internal static void HandleCancellationExceptions(DateTime expectedExitTime, CancellationReason cancellationReason, ProcessExitConfiguration exitConfiguration,
+    internal static void HandleCancellationExceptions(DateTime expectedExitTime,
+        CancellationReason cancellationReason, ProcessExitConfiguration exitConfiguration,
         Exception exception)
     {
         DateTime actualExitTime = DateTime.UtcNow;
@@ -68,13 +68,12 @@ internal static class CancellationHelper
             {
                 if (exitConfiguration.RequestedCancellationPolicy
                         .CancellationExceptionBehaviour
-                    == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration.RequestedCancellationPolicy
+                    == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
+                            .RequestedCancellationPolicy
                             .CancellationExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
                         difference > TimeSpan.FromSeconds(10)))
-                {
                     throw exception;
-                }
 
                 break;
             }
@@ -82,13 +81,12 @@ internal static class CancellationHelper
             {
                 if (exitConfiguration.TimeoutCancellationPolicy
                         .CancellationExceptionBehaviour
-                    == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration.TimeoutCancellationPolicy
+                    == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
+                            .TimeoutCancellationPolicy
                             .CancellationExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
                         difference > TimeSpan.FromSeconds(10)))
-                {
                     throw exception;
-                }
 
                 break;
             }
