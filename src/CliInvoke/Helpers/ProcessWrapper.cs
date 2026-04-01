@@ -65,19 +65,16 @@ internal class ProcessWrapper : Process
 
     public new bool Start()
     {
-        bool result = base.Start();
-
-        HasStarted = result;
+        HasStarted = base.Start();
         
-        if (result)
+        if (HasStarted)
         {
             StartTime = DateTime.UtcNow;
-            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
             Started?.Invoke(this, EventArgs.Empty);
             Id = base.Id;
             ProcessName = base.ProcessName;
         }
 
-        return result;
+        return HasStarted;
     }
 }
