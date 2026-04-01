@@ -90,8 +90,10 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public IUserCredentialBuilder SetPassword(SecureString password)
     {
         ArgumentNullException.ThrowIfNull(password);
-        ArgumentException.ThrowIfNullOrEmpty(password);
-
+        
+        if(password.Length == 0)
+            throw new ArgumentException(Resources.Exceptions_Credentials_EmptyPassword,  nameof(password));
+        
         return new UserCredentialBuilder(
 #pragma warning disable CA1416
             new UserCredential(

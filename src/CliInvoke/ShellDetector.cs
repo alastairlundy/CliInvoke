@@ -11,7 +11,6 @@ using System.Linq;
 
 using CliInvoke.Core.Factories;
 
-using DotExtensions.Platforms;
 using DotExtensions.Versions;
 
 using WhatExec.Lib.Abstractions.Resolvers;
@@ -27,6 +26,8 @@ public class ShellDetector : IShellDetector
     private readonly IProcessConfigurationFactory _processConfigurationFactory;
     private readonly IProcessInvoker _processInvoker;
 
+    private readonly bool isUnix;
+
     /// <summary>
     ///     Represents a detector for resolving the default shell on various operating systems.
     /// </summary>
@@ -37,6 +38,8 @@ public class ShellDetector : IShellDetector
         _processInvoker = processInvoker;
         _executableFileResolver = executableFileResolver;
         _processConfigurationFactory = processConfigurationFactory;
+        
+        isUnix = OperatingSystem.IsAndroid() || OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() || OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst();
     }
 
     /// <summary>
@@ -53,7 +56,7 @@ public class ShellDetector : IShellDetector
     public async Task<ShellInformation> ResolveDefaultShellAsync(
         CancellationToken cancellationToken = default)
     {
-        if (OperatingSystem.IsUnix())
+        if (isUnix)
             return await ResolveDefaultShellOnUnixAsync(cancellationToken);
 
         if (OperatingSystem.IsWindows())
@@ -62,6 +65,9 @@ public class ShellDetector : IShellDetector
         throw new PlatformNotSupportedException();
     }
 
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
