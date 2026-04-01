@@ -9,8 +9,6 @@ global using System.Runtime.Versioning;
 global using System.Threading;
 global using System.Threading.Tasks;
 
-global using DotExtensions.Exceptions;
-
 global using CliInvoke.Core;
 global using CliInvoke.Core.Builders;
 global using CliInvoke.Core.Piping;

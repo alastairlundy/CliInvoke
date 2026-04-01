@@ -13,7 +13,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-// ReSharper disable NonReadonlyMemberInGetHashCode
 
 using System.Security;
 
@@ -63,12 +62,12 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     ///     The domain to be used.
     /// </summary>
     [SupportedOSPlatform("windows")]
-    public string? Domain { get; private set; }
+    public string? Domain { get; }
 
     /// <summary>
     ///     The username to be used.
     /// </summary>
-    public string? UserName { get; private set; }
+    public string? UserName { get; }
 
     /// <summary>
     ///     The password to be used.
@@ -80,7 +79,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     ///     Whether to load the Windows User Profile.
     /// </summary>
     [SupportedOSPlatform("windows")]
-    public bool? LoadUserProfile { get; private set; }
+    public bool? LoadUserProfile { get; }
 
     /// <summary>
     ///     A null UserCredential instance.
@@ -93,9 +92,6 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     public void Dispose()
     {
 #pragma warning disable CA1416
-        Domain = string.Empty;
-        UserName = string.Empty;
-        LoadUserProfile = false;
         Password?.Dispose();
 #pragma warning restore CA1416
     }
