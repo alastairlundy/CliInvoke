@@ -10,8 +10,6 @@
 using System.Linq;
 using System.Text;
 
-using DotExtensions.IO.Permissions;
-
 using DotPrimitives.IO.Paths;
 
 namespace CliInvoke;
@@ -39,29 +37,17 @@ public class FilePathResolver : IFilePathResolver
         
         if (Path.IsPathRooted(filePathToResolve))
         {
-            if(ExecutableFileCheck(filePathToResolve))
-                return filePathToResolve;
+            return filePathToResolve;
         }
 
         bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out FileInfo? filePath);
 
         if (filePath is not null && resolveFromPath)
         {
-            if (ExecutableFileCheck(filePath.FullName))
-                return filePath.FullName;
+            return filePath.FullName;
         }
         
         return LocateFileFromDirectory(filePathToResolve).FullName;
-    }
-    
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    private bool ExecutableFileCheck(string fileName)
-    {
-        FileInfo file =  new(fileName);
-
-        return file.HasExecutePermission() ? true :
-            throw new ArgumentException(Resources.Exceptions_TargetFile_NotExecutable);
     }
 
     protected IEnumerable<string>? GetPathInfo()
@@ -191,13 +177,8 @@ public class FilePathResolver : IFilePathResolver
 
                 return f;
             })
-            .FirstOrDefault(f =>
-            {
-                bool sameName = OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.InvariantCultureIgnoreCase) 
-                    : f.Name.Equals(filePathToResolve, StringComparison.InvariantCulture);
-
-                return sameName && f.HasExecutePermission();
-            });
+            .FirstOrDefault(f => OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.InvariantCultureIgnoreCase) 
+                : f.Name.Equals(filePathToResolve, StringComparison.InvariantCulture));
 
         return file ?? throw new FileNotFoundException(
             Resources.Exceptions_FileNotFound.Replace(
