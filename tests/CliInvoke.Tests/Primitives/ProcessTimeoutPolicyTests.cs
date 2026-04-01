@@ -36,11 +36,8 @@ public class ProcessTimeoutPolicyTests
             processTimeoutPolicy = ProcessTimeoutPolicy.FromTimeSpan(timeout));
     }
 
-    [Theory]
-    [InlineData(ProcessCancellationMode.None)]
-    [InlineData(ProcessCancellationMode.Graceful)]
-    [InlineData(ProcessCancellationMode.Forceful)]
-    public void FullyConfigured_ShouldEqualPolicy(ProcessCancellationMode mode)
+    [Fact]
+    public void FullyConfigured_ShouldEqualPolicy()
     {
         // Arrange
         TimeSpan timeoutThreshold = TimeSpan.FromSeconds(_faker.Random.Int(0, 1000));

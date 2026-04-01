@@ -62,4 +62,7 @@
     <data name="Exceptions.TargetFile.NotExecutable" xml:space="preserve">
         <value>The resolved file is not an executable file or did not have executable permissions.</value>
     </data>
+    <data name="Exceptions.Credentials.EmptyPassword" xml:space="preserve">
+        <value>The provided passwor length cannot be zero.</value>
+    </data>
 </root>

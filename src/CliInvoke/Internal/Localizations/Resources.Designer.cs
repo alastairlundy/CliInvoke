@@ -114,6 +114,15 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided passwor length cannot be zero..
+        /// </summary>
+        internal static string Exceptions_Credentials_EmptyPassword {
+            get {
+                return ResourceManager.GetString("Exceptions.Credentials.EmptyPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The file {file} does not exist in the specified path..
         /// </summary>
         internal static string Exceptions_FileNotFound {

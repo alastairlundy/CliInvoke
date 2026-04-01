@@ -5,7 +5,7 @@ internal class NullReturningFormattable : IFormattable
 {
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
-        return null;
+        return null!;
     }
 
     public override string ToString()
