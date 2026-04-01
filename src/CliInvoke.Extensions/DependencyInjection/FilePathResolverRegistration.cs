@@ -13,24 +13,28 @@ namespace CliInvoke.Extensions;
 
 public static class FilePathResolverRegistration
 {
-    /// <param name="services">The <see cref="IServiceCollection"/> to register the implementation with.</param>
+    /// <param name="services">The <see cref="IServiceCollection" /> to register the implementation with.</param>
     extension(IServiceCollection services)
     {
         /// <summary>
-        /// Registers a custom implementation of the <see cref="IExecutableFileResolver"/> interface
-        /// with the specified service lifetime in the dependency injection container.
+        ///     Registers a custom implementation of the <see cref="IExecutableFileResolver" /> interface
+        ///     with the specified service lifetime in the dependency injection container.
         /// </summary>
         /// <typeparam name="TResolver">
-        /// The type of the custom implementation for <see cref="IExecutableFileResolver"/>.
-        /// This type must be a class and implement the <see cref="IExecutableFileResolver"/> interface.
+        ///     The type of the custom implementation for <see cref="IExecutableFileResolver" />.
+        ///     This type must be a class and implement the <see cref="IExecutableFileResolver" /> interface.
         /// </typeparam>
         /// <param name="serviceLifetime">
-        /// The <see cref="ServiceLifetime"/> defining the lifetime of the registered service.
-        /// Supported lifetimes are <see cref="ServiceLifetime.Singleton"/>, <see cref="ServiceLifetime.Scoped"/>,
-        /// and <see cref="ServiceLifetime.Transient"/>.
+        ///     The <see cref="ServiceLifetime" /> defining the lifetime of the registered service.
+        ///     Supported lifetimes are <see cref="ServiceLifetime.Singleton" />,
+        ///     <see cref="ServiceLifetime.Scoped" />,
+        ///     and <see cref="ServiceLifetime.Transient" />.
         /// </param>
-        /// <returns>The modified <see cref="IServiceCollection"/> instance for further configuration.</returns>
-        /// <exception cref="NotSupportedException">Thrown if an unsupported <see cref="ServiceLifetime"/> is specified.</exception>
+        /// <returns>The modified <see cref="IServiceCollection" /> instance for further configuration.</returns>
+        /// <exception cref="NotSupportedException">
+        ///     Thrown if an unsupported <see cref="ServiceLifetime" /> is
+        ///     specified.
+        /// </exception>
         public IServiceCollection UseCustomFilePathResolver<
 #if NET8_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
@@ -40,7 +44,7 @@ public static class FilePathResolverRegistration
             where TResolver : class, IExecutableFileResolver
         {
             services.RemoveAll<IExecutableFileResolver>();
-            
+
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Singleton:

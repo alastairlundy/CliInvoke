@@ -13,13 +13,13 @@ using CliInvoke.Core.Extensibility.Factories;
 namespace CliInvoke.Extensibility;
 
 /// <summary>
-/// The default implementation of <see cref="RunnerProcessInvokerBase"/>.
+///     The default implementation of <see cref="RunnerProcessInvokerBase" />.
 /// </summary>
 public class DefaultRunnerProcessInvoker : RunnerProcessInvokerBase
 {
     /// <summary>
-    /// Provides a default implementation for executing and managing runner processes, extending
-    /// the abstract functionality defined in <see cref="RunnerProcessInvokerBase"/>.
+    ///     Provides a default implementation for executing and managing runner processes, extending
+    ///     the abstract functionality defined in <see cref="RunnerProcessInvokerBase" />.
     /// </summary>
     /// <param name="processInvoker"></param>
     /// <param name="runnerProcessFactory"></param>

@@ -10,14 +10,14 @@
 namespace CliInvoke.Builders;
 
 /// <summary>
-/// A class to fluently configure and build ProcessResourcePolicy objects.
+///     A class to fluently configure and build ProcessResourcePolicy objects.
 /// </summary>
 public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 {
     private readonly ProcessResourcePolicy _processResourcePolicy;
 
     /// <summary>
-    /// Instantiates the ProcessResourcePolicy Builder with default ProcessResourcePolicy values.
+    ///     Instantiates the ProcessResourcePolicy Builder with default ProcessResourcePolicy values.
     /// </summary>
     public ProcessResourcePolicyBuilder()
     {
@@ -25,7 +25,8 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     }
 
     /// <summary>
-    /// Internally instantiates the ProcessResourcePolicy object with the specified ProcessResourcePolicy value.
+    ///     Internally instantiates the ProcessResourcePolicy object with the specified
+    ///     ProcessResourcePolicy value.
     /// </summary>
     /// <param name="processResourcePolicy">The process resource policy object to use.</param>
     protected ProcessResourcePolicyBuilder(ProcessResourcePolicy processResourcePolicy)
@@ -34,12 +35,15 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     }
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified ProcessorAffinity.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified ProcessorAffinity.
     /// </summary>
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if processor affinity is less than 1 or greater than 2x Processor Count.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     Thrown if processor affinity is less than 1 or
+    ///     greater than 2x Processor Count.
+    /// </exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Pure]
@@ -48,7 +52,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
         ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(processorAffinity,
             2 * Environment.ProcessorCount);
-        
+
         return new ProcessResourcePolicyBuilder(
             new ProcessResourcePolicy(
                 processorAffinity,
@@ -63,12 +67,18 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     }
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
     /// </summary>
-    /// <remarks>If <see cref="minWorkingSet"/> is higher than the configured maximum working set then the maximum working set will be overriden with the new <see cref="minWorkingSet"/> value.</remarks>
+    /// <remarks>
+    ///     If <see cref="minWorkingSet" /> is higher than the configured maximum working set then the
+    ///     maximum working set will be overriden with the new <see cref="minWorkingSet" /> value.
+    /// </remarks>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if <see cref="minWorkingSet"/> is less than 0.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     Thrown if <see cref="minWorkingSet" /> is less than
+    ///     0.
+    /// </exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
@@ -77,15 +87,15 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet);
-        
+
         if (minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
             return new ProcessResourcePolicyBuilder(
                 new ProcessResourcePolicy(
 #pragma warning disable CA1416
                     _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
-                    minWorkingSet: minWorkingSet,
-                    maxWorkingSet: minWorkingSet,
+                    minWorkingSet,
+                    minWorkingSet,
                     _processResourcePolicy.PriorityClass,
                     _processResourcePolicy.EnablePriorityBoost
                 )
@@ -96,7 +106,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 #pragma warning disable CA1416
                 _processResourcePolicy.ProcessorAffinity,
 #pragma warning restore CA1416
-                minWorkingSet: minWorkingSet,
+                minWorkingSet,
                 _processResourcePolicy.MaxWorkingSet,
                 _processResourcePolicy.PriorityClass,
                 _processResourcePolicy.EnablePriorityBoost
@@ -105,11 +115,14 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     }
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified Maximum Working Set.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified Maximum Working Set.
     /// </summary>
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the <see cref="maxWorkingSet"/> is less than the min working set value or less than 1.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     Thrown if the <see cref="maxWorkingSet" /> is less
+    ///     than the min working set value or less than 1.
+    /// </exception>
     [Pure]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -117,16 +130,16 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [SupportedOSPlatform("freebsd")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
-        nint minWorkingSet = _processResourcePolicy.MinWorkingSet ?? 
+        nint minWorkingSet = _processResourcePolicy.MinWorkingSet ??
 #pragma warning disable CS8629
                              (nint)ProcessResourcePolicy.Default.MinWorkingSet;
 #pragma warning restore CS8629
-        
-        ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 
+
+        ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet,
             minWorkingSet);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet, maxWorkingSet);
         ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 1);
-        
+
         return new ProcessResourcePolicyBuilder(
             new ProcessResourcePolicy(
 #pragma warning disable CA1416
@@ -141,7 +154,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     }
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified Process Priority Class.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified Process Priority Class.
     /// </summary>
     /// <param name="processPriorityClass">The Process Priority Class to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated Process Priority Class.</returns>
@@ -163,7 +176,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     }
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified Priority Boost behaviour.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified Priority Boost behaviour.
     /// </summary>
     /// <param name="enablePriorityBoost">The priority boost behaviour to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated priority boost behaviour.</returns>
@@ -182,8 +195,11 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
         );
 
     /// <summary>
-    /// Builds the configured ProcessResourcePolicy
+    ///     Builds the configured ProcessResourcePolicy
     /// </summary>
     /// <returns>The configured ProcessResourcePolicy.</returns>
-    public ProcessResourcePolicy Build() => _processResourcePolicy;
+    public ProcessResourcePolicy Build()
+    {
+        return _processResourcePolicy;
+    }
 }

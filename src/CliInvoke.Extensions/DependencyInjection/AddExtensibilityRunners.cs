@@ -14,15 +14,21 @@ namespace CliInvoke.Extensions;
 public static partial class DependencyInjectionExtensions
 {
     /// <summary>
-    /// Registers a default implementation of the <see cref="DefaultRunnerProcessInvoker"/>
-    /// with the specified process configuration and service lifetime to the service collection.
+    ///     Registers a default implementation of the <see cref="DefaultRunnerProcessInvoker" />
+    ///     with the specified process configuration and service lifetime to the service collection.
     /// </summary>
     /// <param name="services">The service collection to which the default runner process invoker is added.</param>
     /// <param name="runnerProcessConfiguration">The configuration for the runner process.</param>
-    /// <param name="lifetime">The desired service lifetime for the default runner process invoker (Scoped by default).</param>
-    /// <returns>The updated service collection, now including the default runner process invoker registration.</returns>
+    /// <param name="lifetime">
+    ///     The desired service lifetime for the default runner process invoker (Scoped
+    ///     by default).
+    /// </param>
+    /// <returns>
+    ///     The updated service collection, now including the default runner process invoker
+    ///     registration.
+    /// </returns>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// Thrown if the specified service lifetime is not a valid <see cref="ServiceLifetime"/> value.
+    ///     Thrown if the specified service lifetime is not a valid <see cref="ServiceLifetime" /> value.
     /// </exception>
     public static IServiceCollection AddDefaultRunnerProcessInvoker(
         this IServiceCollection services,
@@ -87,13 +93,22 @@ public static partial class DependencyInjectionExtensions
 
 
     /// <summary>
-    /// Configures dependency injection to include a derived runner process invoker type.
+    ///     Configures dependency injection to include a derived runner process invoker type.
     /// </summary>
     /// <param name="services">The service collection to add the derived runner process invoker to.</param>
-    /// <param name="lifetime">The service lifetime to use for the derived runner process invoker. The default is Scoped.</param>
+    /// <param name="lifetime">
+    ///     The service lifetime to use for the derived runner process invoker. The
+    ///     default is Scoped.
+    /// </param>
     /// <returns>The updated service collection with the derived runner process invoker configured.</returns>
-    /// <typeparam name="TRunnerType">The type of the derived runner process invoker, which must inherit from <see cref="RunnerProcessInvokerBase"/>.</typeparam>
-    /// <exception cref="ArgumentException">Thrown if the provided type is not a subclass of or assignable from <see cref="RunnerProcessInvokerBase"/>.</exception>
+    /// <typeparam name="TRunnerType">
+    ///     The type of the derived runner process invoker, which must inherit
+    ///     from <see cref="RunnerProcessInvokerBase" />.
+    /// </typeparam>
+    /// <exception cref="ArgumentException">
+    ///     Thrown if the provided type is not a subclass of or assignable
+    ///     from <see cref="RunnerProcessInvokerBase" />.
+    /// </exception>
     public static IServiceCollection AddDerivedRunnerProcessInvoker<
 #if NET8_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
@@ -119,14 +134,26 @@ public static partial class DependencyInjectionExtensions
     }
 
     /// <summary>
-    /// Configures dependency injection to include a derived runner process invoker type.
+    ///     Configures dependency injection to include a derived runner process invoker type.
     /// </summary>
     /// <param name="services">The service collection to add the derived runner process invoker to.</param>
-    /// <param name="runnerProcessInvokerType">The type of the derived runner process invoker, which must inherit from <see cref="RunnerProcessInvokerBase"/>.</param>
-    /// <param name="runnerProcessConfiguration">The process configuration instance to use for the derived runner process invoker.</param>
-    /// <param name="lifetime">The service lifetime to use for the derived runner process invoker. The default is Scoped.</param>
+    /// <param name="runnerProcessInvokerType">
+    ///     The type of the derived runner process invoker, which must
+    ///     inherit from <see cref="RunnerProcessInvokerBase" />.
+    /// </param>
+    /// <param name="runnerProcessConfiguration">
+    ///     The process configuration instance to use for the derived
+    ///     runner process invoker.
+    /// </param>
+    /// <param name="lifetime">
+    ///     The service lifetime to use for the derived runner process invoker. The
+    ///     default is Scoped.
+    /// </param>
     /// <returns>The updated service collection with the derived runner process invoker configured.</returns>
-    /// <exception cref="ArgumentException">Thrown if the provided type is not a subclass of or assignable from <see cref="RunnerProcessInvokerBase"/>.</exception>
+    /// <exception cref="ArgumentException">
+    ///     Thrown if the provided type is not a subclass of or assignable
+    ///     from <see cref="RunnerProcessInvokerBase" />.
+    /// </exception>
     public static IServiceCollection AddDerivedRunnerProcessInvoker(
         this IServiceCollection services,
 #if NET8_0_OR_GREATER
@@ -146,9 +173,11 @@ public static partial class DependencyInjectionExtensions
                 $"Provided type is not a subclass of or assignable from type {nameof(RunnerProcessInvokerBase)}");
 
         // Factory resolves constructor parameters from the service provider and uses extraArgs for remaining parameters.
-        object Factory(IServiceProvider provider) =>
-            ActivatorUtilities.CreateInstance(provider, runnerProcessInvokerType,
+        object Factory(IServiceProvider provider)
+        {
+            return ActivatorUtilities.CreateInstance(provider, runnerProcessInvokerType,
                 runnerProcessConfiguration);
+        }
 
         services.Add(new ServiceDescriptor(typeof(RunnerProcessInvokerBase), Factory, lifetime));
 

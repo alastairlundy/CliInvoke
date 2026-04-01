@@ -2,5 +2,6 @@
 
 internal static class DeprecationMessages
 {
-    internal const string DeprecationV3 = "This code is deprecated and will be removed in CliInvoke v3.";
+    internal const string DeprecationV3 =
+        "This code is deprecated and will be removed in CliInvoke v3.";
 }

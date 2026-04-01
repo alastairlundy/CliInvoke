@@ -9,6 +9,10 @@ public class BufferedTestHelper
         TargetFilePath = GetMockDataSimExePath();
     }
 
+    public string TargetFilePath { get; private set; }
+
+    public string Arguments => "gen-fake-text";
+
     private string GetMockDataSimExePath()
     {
         string mockDataToolExe = OperatingSystem.IsWindows() ? "CliInvokeBenchMockData.exe" : "CliInvokeBenchMockData";
@@ -18,7 +22,7 @@ public class BufferedTestHelper
             Task<FileInfo> taskResult = CliInvokeHelpers.CreateExecutableFileResolver()
                 .LocateExecutableAsync(mockDataToolExe,
                     SearchOption.AllDirectories, CancellationToken.None);
-            
+
             taskResult.Wait();
         }
         catch (Exception)
@@ -36,32 +40,29 @@ public class BufferedTestHelper
                 ];
 
                 foreach (string projectPath in potentialProjectPaths)
-                {
                     if (Directory.Exists(projectPath))
                     {
                         string binPath = Path.Combine(projectPath, "bin");
                         if (Directory.Exists(binPath))
                         {
-                            FileInfo[] files = new DirectoryInfo(binPath).GetFiles(mockDataToolExe, SearchOption.AllDirectories);
+                            FileInfo[] files = new DirectoryInfo(binPath).GetFiles(mockDataToolExe,
+                                SearchOption.AllDirectories);
                             if (files.Length > 0)
-                            {
                                 // Prioritize Release over Debug, and newer .NET versions
                                 return files
-                                    .OrderByDescending(f => f.FullName.Contains("Release", StringComparison.OrdinalIgnoreCase))
-                                    .ThenByDescending(f => f.FullName.Contains("net10.0", StringComparison.OrdinalIgnoreCase))
-                                    .ThenByDescending(f => f.FullName.Contains("net9.0", StringComparison.OrdinalIgnoreCase))
+                                    .OrderByDescending(f =>
+                                        f.FullName.Contains("Release", StringComparison.OrdinalIgnoreCase))
+                                    .ThenByDescending(f =>
+                                        f.FullName.Contains("net10.0", StringComparison.OrdinalIgnoreCase))
+                                    .ThenByDescending(f =>
+                                        f.FullName.Contains("net9.0", StringComparison.OrdinalIgnoreCase))
                                     .First().FullName;
-                            }
                         }
                     }
-                }
 
                 // Check if the executable is in the current directory itself (for published benchmarks)
                 string localExe = Path.Combine(currentDir.FullName, mockDataToolExe);
-                if (File.Exists(localExe))
-                {
-                    return Path.GetFullPath(localExe);
-                }
+                if (File.Exists(localExe)) return Path.GetFullPath(localExe);
 
                 currentDir = currentDir.Parent;
             }
@@ -69,12 +70,4 @@ public class BufferedTestHelper
 
         throw new ArgumentException($"Could not find {mockDataToolExe} executable in PATH or project structure.");
     }
-
-    public string TargetFilePath
-    {
-        get;
-        private set => field = value;
-    }
-
-    public string Arguments => "gen-fake-text";
 }

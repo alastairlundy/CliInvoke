@@ -8,8 +8,9 @@ public class DotnetCommandHelper
     public DotnetCommandHelper()
     {
         IExecutableFileResolver executableFileResolver = CliInvokeHelpers.CreateExecutableFileResolver();
-        
-        Task<FileInfo> resultTask = executableFileResolver.LocateExecutableAsync(OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet", SearchOption.AllDirectories,
+
+        Task<FileInfo> resultTask = executableFileResolver.LocateExecutableAsync(
+            OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet", SearchOption.AllDirectories,
             CancellationToken.None);
 
         resultTask.Wait();

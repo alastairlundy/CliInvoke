@@ -13,27 +13,35 @@ using CliInvoke.Core.Factories;
 namespace CliInvoke.Factories;
 
 /// <summary>
-/// A Dependency Injection supporting factory class to enable easier <see cref="ProcessConfiguration"/> creation.
+///     A Dependency Injection supporting factory class to enable easier
+///     <see cref="ProcessConfiguration" /> creation.
 /// </summary>
 public class ProcessConfigurationFactory : IProcessConfigurationFactory
 {
     /// <summary>
-    /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
+    ///     Creates a Process configuration that can be run by a <see cref="IProcessInvoker" /> from
+    ///     specified parameters.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
-    /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
+    /// <returns>The <see cref="ProcessConfiguration" /> created from the configured parameters.</returns>
     [Pure]
-    public ProcessConfiguration Create(string targetFilePath, params string[] arguments) =>
-        Create(targetFilePath, arguments, null);
+    public ProcessConfiguration Create(string targetFilePath, params string[] arguments)
+    {
+        return Create(targetFilePath, arguments, null);
+    }
 
     /// <summary>
-    /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
+    ///     Creates a Process configuration that can be run by a <see cref="IProcessInvoker" /> from
+    ///     specified parameters.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
-    /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
-    /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
+    /// <param name="configureBuilder">
+    ///     Actions to apply to the internal
+    ///     <see cref="IProcessConfigurationBuilder" /> if not null.
+    /// </param>
+    /// <returns>The <see cref="ProcessConfiguration" /> created from the configured parameters.</returns>
     [Pure]
     public ProcessConfiguration Create(
         string targetFilePath,
@@ -57,12 +65,16 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     }
 
     /// <summary>
-    /// Creates a Process configuration that can be run by a <see cref="IProcessInvoker"/> from specified parameters.
+    ///     Creates a Process configuration that can be run by a <see cref="IProcessInvoker" /> from
+    ///     specified parameters.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
-    /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
-    /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
+    /// <param name="configureBuilder">
+    ///     Actions to apply to the internal
+    ///     <see cref="IProcessConfigurationBuilder" /> if not null.
+    /// </param>
+    /// <returns>The <see cref="ProcessConfiguration" /> created from the configured parameters.</returns>
     [Pure]
     public ProcessConfiguration Create(
         string targetFilePath,
@@ -71,7 +83,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
-        
+
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
             .AddEnumerable(arguments);
 

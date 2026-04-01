@@ -1,6 +1,6 @@
 ﻿/*
     CliInvoke.Extensions
-     
+
     Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,36 +16,52 @@ using CliInvoke.Core.Processes;
 namespace CliInvoke.Extensions.Factories;
 
 /// <summary>
-/// Extension methods for creating <see cref="IExternalProcess"/> instances.
+///     Extension methods for creating <see cref="IExternalProcess" /> instances.
 /// </summary>
 public static class ExternalProcessFactoryExtensions
 {
     /// <summary>
-    /// Extension methods for creating <see cref="IExternalProcess"/> instances using <see cref="ProcessStartInfo"/>.
+    ///     Extension methods for creating <see cref="IExternalProcess" /> instances using
+    ///     <see cref="ProcessStartInfo" />.
     /// </summary>
     extension(IExternalProcessFactory externalProcessFactory)
     {
         /// <summary>
-        /// Creates an instance of the <see cref="IExternalProcess"/> interface based on the provided
-        /// <see cref="ProcessStartInfo"/>.
+        ///     Creates an instance of the <see cref="IExternalProcess" /> interface based on the provided
+        ///     <see cref="ProcessStartInfo" />.
         /// </summary>
-        /// <param name="startInfo">The <see cref="ProcessStartInfo"/> used to configure the external process.</param>
-        /// <returns>An implementation of <see cref="IExternalProcess"/> that represents the created external process.</returns>
+        /// <param name="startInfo">The <see cref="ProcessStartInfo" /> used to configure the external process.</param>
+        /// <returns>
+        ///     An implementation of <see cref="IExternalProcess" /> that represents the created external
+        ///     process.
+        /// </returns>
         [Pure]
         public IExternalProcess CreateExternalProcess(ProcessStartInfo startInfo)
-            => externalProcessFactory.CreateExternalProcess(ProcessConfiguration.FromProcessStartInfo(startInfo));
+        {
+            return externalProcessFactory.CreateExternalProcess(
+                ProcessConfiguration.FromProcessStartInfo(startInfo));
+        }
 
         /// <summary>
-        /// Creates an instance of the <see cref="IExternalProcess"/> interface based on the provided
-        /// <see cref="ProcessStartInfo"/>.
+        ///     Creates an instance of the <see cref="IExternalProcess" /> interface based on the provided
+        ///     <see cref="ProcessStartInfo" />.
         /// </summary>
-        /// <param name="startInfo">The <see cref="ProcessStartInfo"/> used to configure the external process.</param>
-        /// <param name="exitConfiguration">The process exit configuration details for configuring process exit behaviour.</param>
-        /// <returns>An implementation of <see cref="IExternalProcess"/> that represents the created external process.</returns>
+        /// <param name="startInfo">The <see cref="ProcessStartInfo" /> used to configure the external process.</param>
+        /// <param name="exitConfiguration">
+        ///     The process exit configuration details for configuring process exit
+        ///     behaviour.
+        /// </param>
+        /// <returns>
+        ///     An implementation of <see cref="IExternalProcess" /> that represents the created external
+        ///     process.
+        /// </returns>
         [Pure]
         public IExternalProcess CreateExternalProcess(ProcessStartInfo startInfo,
-            ProcessExitConfiguration exitConfiguration) =>
-            externalProcessFactory.CreateExternalProcess(ProcessConfiguration.FromProcessStartInfo(startInfo),
+            ProcessExitConfiguration exitConfiguration)
+        {
+            return externalProcessFactory.CreateExternalProcess(
+                ProcessConfiguration.FromProcessStartInfo(startInfo),
                 exitConfiguration);
+        }
     }
 }

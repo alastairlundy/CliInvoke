@@ -8,8 +8,8 @@ namespace CliInvoke.Tests.Builders;
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class UserCredentialBuilderTests
 {
-    private readonly Faker _faker = new Faker();
-    
+    private readonly Faker _faker = new();
+
     [Fact]
     public void Constructor_ShouldInstantiate()
     {
@@ -23,17 +23,17 @@ public class UserCredentialBuilderTests
         // Arrange
         // ReSharper disable once JoinDeclarationAndInitializer
         IUserCredentialBuilder builder;
-        string userName = _faker.Internet.UserName();
-       
-       // Act
-       builder = new UserCredentialBuilder()
-           .SetUsername(userName);
-       
-       // Assert
+        string? userName = _faker.Internet.UserName();
 
-      UserCredential credential = builder.Build();
-       
-       Assert.Equal(credential.UserName, userName);
+        // Act
+        builder = new UserCredentialBuilder()
+            .SetUsername(userName);
+
+        // Assert
+
+        UserCredential credential = builder.Build();
+
+        Assert.Equal(credential.UserName, userName);
     }
 
     [Fact]
@@ -47,24 +47,24 @@ public class UserCredentialBuilderTests
         password.AppendChar('a');
         password.AppendChar('k');
         password.AppendChar('e');
-        
+
         // Act
         builder = new UserCredentialBuilder()
             .SetPassword(password);
-        
+
         UserCredential credential = builder.Build();
-       
+
         // Assert
 #pragma warning disable CA1416
         Assert.Equal(credential.Password, password);
 #pragma warning restore CA1416
     }
-    
+
     [Fact]
     public void WithDomain_ShouldSetDomain()
     {
         //Arrange
-        string domain = _faker.Internet.DomainName();
+        string? domain = _faker.Internet.DomainName();
 
 
         //Act
@@ -72,10 +72,10 @@ public class UserCredentialBuilderTests
             .SetDomain(domain);
 
         UserCredential credential = builder.Build();
-        
+
         //Assert
 #pragma warning disable CA1416
-        Assert.Equal(expected: credential.Domain, actual: domain);
+        Assert.Equal(credential.Domain, domain);
 #pragma warning restore CA1416
     }
 
@@ -84,65 +84,65 @@ public class UserCredentialBuilderTests
     {
         //Arrange
         bool loadUserProfile = true;
-        
+
         //Arrange
         IUserCredentialBuilder builder = new UserCredentialBuilder()
             .LoadUserProfile(loadUserProfile);
-        
+
         UserCredential credential = builder.Build();
-        
+
         //Assert
         Assert.True(credential.LoadUserProfile);
     }
-    
+
     [Fact]
     public void LoadUserProfile_False_ShouldNotSetUserProfile()
     {
         //Arrange
         bool loadUserProfile = false;
-        
+
         //Arrange
         IUserCredentialBuilder builder = new UserCredentialBuilder()
             .LoadUserProfile(loadUserProfile);
-        
+
         UserCredential credential = builder.Build();
-        
+
         //Assert
         Assert.False(credential.LoadUserProfile);
     }
-    
+
     [Fact]
     public void Build_All_ShouldReturnCredential()
     {
         //Arrange
         IUserCredentialBuilder builder;
-        
+
         SecureString password = new SecureString();
         password.AppendChar('f');
         password.AppendChar('a');
         password.AppendChar('k');
         password.AppendChar('e');
-       
-        string domain =  _faker.Internet.DomainName();
-        string userName = _faker.Internet.UserName();
+
+        string? domain = _faker.Internet.DomainName();
+        string? userName = _faker.Internet.UserName();
         bool loadUserProfile = true;
-        
+
         //Act
         builder = new UserCredentialBuilder()
             .SetDomain(domain)
             .SetUsername(userName)
             .SetPassword(password)
             .LoadUserProfile(loadUserProfile);
-        
+
         UserCredential credential = builder.Build();
-        
+
         //Assert
         Assert.NotNull(credential);
         Assert.NotNull(credential.Domain);
         Assert.NotNull(credential.Password);
         Assert.NotNull(credential.UserName);
         Assert.NotNull(credential.LoadUserProfile);
-        
+
         Assert.Equal(credential.Domain, domain);
         Assert.Equal(credential.UserName, userName);
         Assert.Equal(credential.Password, password);

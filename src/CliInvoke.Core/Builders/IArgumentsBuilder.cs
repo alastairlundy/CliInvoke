@@ -13,12 +13,13 @@
 namespace CliInvoke.Core.Builders;
 
 /// <summary>
-/// An interface that defines the fluent builder methods for building arguments and escaping them (as needed).
+///     An interface that defines the fluent builder methods for building arguments and escaping them
+///     (as needed).
 /// </summary>
 public interface IArgumentsBuilder
 {
     /// <summary>
-    /// Appends a string value to the arguments builder.
+    ///     Appends a string value to the arguments builder.
     /// </summary>
     /// <param name="value">The string value to append.</param>
     /// <param name="escape">True to escape special characters in the value, false otherwise.</param>
@@ -26,14 +27,14 @@ public interface IArgumentsBuilder
     IArgumentsBuilder Add(string value, bool escape);
 
     /// <summary>
-    /// Appends a string value to the arguments builder without escaping special characters.
+    ///     Appends a string value to the arguments builder without escaping special characters.
     /// </summary>
     /// <param name="value">The string value to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     IArgumentsBuilder Add(string value);
 
     /// <summary>
-    /// Appends a collection of string values to the arguments builder.
+    ///     Appends a collection of string values to the arguments builder.
     /// </summary>
     /// <param name="values">The collection of string values to append.</param>
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
@@ -41,21 +42,23 @@ public interface IArgumentsBuilder
     IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars);
 
     /// <summary>
-    /// Appends a collection of string values to the arguments builder without escaping special characters.
+    ///     Appends a collection of string values to the arguments builder without escaping special
+    ///     characters.
     /// </summary>
     /// <param name="values">The collection of string values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     IArgumentsBuilder AddEnumerable(IEnumerable<string> values);
 
     /// <summary>
-    /// Appends a formattable value to the arguments builder without specifying a culture and without escaping special characters.
+    ///     Appends a formattable value to the arguments builder without specifying a culture and without
+    ///     escaping special characters.
     /// </summary>
     /// <param name="value">The formattable value to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     IArgumentsBuilder Add(IFormattable value);
 
     /// <summary>
-    /// Appends a formattable value to the arguments builder.
+    ///     Appends a formattable value to the arguments builder.
     /// </summary>
     /// <param name="value">The formattable value to append.</param>
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
@@ -63,7 +66,7 @@ public interface IArgumentsBuilder
     IArgumentsBuilder Add(IFormattable value, bool escapeSpecialChars);
 
     /// <summary>
-    /// Appends a formattable value to the arguments builder.
+    ///     Appends a formattable value to the arguments builder.
     /// </summary>
     /// <param name="value">The formattable value to append.</param>
     /// <param name="formatProvider">The format provider to use for formatting the value.</param>
@@ -78,14 +81,16 @@ public interface IArgumentsBuilder
     );
 
     /// <summary>
-    /// Appends a collection of formattable values to the arguments builder without specifying a culture and without escaping special characters.
+    ///     Appends a collection of formattable values to the arguments builder without specifying a
+    ///     culture and without escaping special characters.
     /// </summary>
     /// <param name="values">The collection of formattable values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values);
 
     /// <summary>
-    /// Appends a collection of formattable values to the arguments builder without specifying a culture.
+    ///     Appends a collection of formattable values to the arguments builder without specifying a
+    ///     culture.
     /// </summary>
     /// <param name="values">The collection of formattable values to append.</param>
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
@@ -93,7 +98,7 @@ public interface IArgumentsBuilder
     IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values, bool escapeSpecialChars);
 
     /// <summary>
-    /// Appends a collection of formattable values to the arguments builder.
+    ///     Appends a collection of formattable values to the arguments builder.
     /// </summary>
     /// <param name="values">The collection of formattable values to append.</param>
     /// <param name="formatProvider">The format provider to use for formatting the values.</param>
@@ -108,20 +113,20 @@ public interface IArgumentsBuilder
     );
 
     /// <summary>
-    /// Escapes special characters in an argument such that it is suitable to be used with a Process.
+    ///     Escapes special characters in an argument such that it is suitable to be used with a Process.
     /// </summary>
     /// <param name="argument">The argument to escape</param>
     /// <returns>The argument with special characters escaped.</returns>
     string EscapeCharacters(string argument);
 
     /// <summary>
-    /// Builds the arguments into a string.
+    ///     Builds the arguments into a string.
     /// </summary>
     /// <returns>The arguments as a string.</returns>
     string ToString();
 
     /// <summary>
-    /// Clears the provided argument strings.
+    ///     Clears the provided argument strings.
     /// </summary>
     void Clear();
 }

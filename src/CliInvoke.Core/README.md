@@ -1,4 +1,5 @@
 # CliInvoke.Core
+
 This package contains Process Running and handling abstractions as well as common types used by implementing classes.
 
 For an implementing package, check out [CliInvoke](https://www.nuget.org/packages/CliInvoke/).
@@ -10,24 +11,28 @@ For an implementing package, check out [CliInvoke](https://www.nuget.org/package
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 Key Abstractions:
+
 * ``IProcessInvoker``
 * ``IProcessConfigurationFactory``
 
 * Piping:
-  * ``IProcessPipeHandler``
+    * ``IProcessPipeHandler``
 
 * Fluent Builders:
-  * ``IArgumentsBuilder`` - An interface to help with Argument Building and argument escaping.
-  * ``IEnvironmentVariablesBuilder`` - An interface to help with setting Environment variables.
-  * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
-  * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy`` objects.
-  * ``IUserCredentialBuilder``
+    * ``IArgumentsBuilder`` - An interface to help with Argument Building and argument escaping.
+    * ``IEnvironmentVariablesBuilder`` - An interface to help with setting Environment variables.
+    * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
+    * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy``
+      objects.
+    * ``IUserCredentialBuilder``
 
 ## Features
+
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
 * Supports .NET Standard 2.0, .NET 8, and newer TFMs, and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
-* Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on Windows <sup>1</sup>
+* Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
+  Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
 <sup>1</sup> Specializations library distributed separately.
@@ -45,25 +50,33 @@ Key Abstractions:
 | Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |
 
 ## Installing CliInvoke.Core
-CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your IDE or code editor's package interface, or via the Nuget website.
+
+CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your IDE or code editor's package interface, or
+via the Nuget website.
 
 | Package Name   | Nuget Link                                                        | .NET SDK CLI command                  |
 |----------------|-------------------------------------------------------------------|---------------------------------------|
 | CliInvoke.Core | [CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core) | ``dotnet add package CliInvoke.Core`` |
 
 ## Supported Platforms
+
 CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
 
-For more details see the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/Supported-OperatingSystems.md)
+For more details see
+the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/Supported-OperatingSystems.md)
 
 ## Examples
 
 ### Simple ``ProcessConfiguration`` creation with Factory Pattern
-This approach uses the ``IProcessConfigurationFactory`` interface factory to create a ``ProcessConfiguration``. It requires fewer parameters and sets up more defaults for you. 
 
-It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is desired.
+This approach uses the ``IProcessConfigurationFactory`` interface factory to create a ``ProcessConfiguration``. It
+requires fewer parameters and sets up more defaults for you.
+
+It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is
+desired.
 
 #### Non-Buffered Execution Example
+
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
@@ -88,6 +101,7 @@ ProcessResult result = await _invoker.ExecuteAsync(configuration, CancellationTo
 ```
 
 #### Buffered Execution Example
+
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
@@ -111,12 +125,13 @@ ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", 
 BufferedProcessResult result = await _invoker.ExecuteBufferedAsync(configuration, CancellationToken.None);
 ```
 
-
 ### Advanced Configuration with Builders
 
-The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the output is desired.
+The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the
+output is desired.
 
 #### Non-Buffered Execution Example
+
 This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
 
 ```csharp
@@ -147,6 +162,7 @@ ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
 ```
 
 #### Buffered Execution Example
+
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
@@ -182,8 +198,12 @@ BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config
 ## Acknowledgements
 
 ### Projects
+
 This project would like to thank the following projects for their work:
-* [Microsoft.Bcl.HashCode](https://github.com/dotnet/maintenance-packages) for providing a backport of the HashCode class and static methods to .NET Standard 2.0
+
+* [Microsoft.Bcl.HashCode](https://github.com/dotnet/maintenance-packages) for providing a backport of the HashCode
+  class and static methods to .NET Standard 2.0
 * [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying .NET Standard 2.0 support
 
-For more information, please see the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).
+For more information, please see
+the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).

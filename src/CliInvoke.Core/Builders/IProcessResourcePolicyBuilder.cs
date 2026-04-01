@@ -12,12 +12,12 @@ using System.Diagnostics;
 namespace CliInvoke.Core.Builders;
 
 /// <summary>
-/// A fluent builder interface for configuring and building a Process Resource Policy.
+///     A fluent builder interface for configuring and building a Process Resource Policy.
 /// </summary>
 public interface IProcessResourcePolicyBuilder
 {
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified ProcessorAffinity.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified ProcessorAffinity.
     /// </summary>
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
@@ -27,7 +27,7 @@ public interface IProcessResourcePolicyBuilder
     IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity);
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
     /// </summary>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
@@ -38,7 +38,7 @@ public interface IProcessResourcePolicyBuilder
     IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet);
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified Maximum Working Set.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified Maximum Working Set.
     /// </summary>
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
@@ -49,21 +49,21 @@ public interface IProcessResourcePolicyBuilder
     IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet);
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified Process Priority Class.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified Process Priority Class.
     /// </summary>
     /// <param name="processPriorityClass">The Process Priority Class to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated Process Priority Class.</returns>
     IProcessResourcePolicyBuilder SetPriorityClass(ProcessPriorityClass processPriorityClass);
 
     /// <summary>
-    /// Configures the ProcessResourcePolicyBuilder with the specified Priority Boost behaviour.
+    ///     Configures the ProcessResourcePolicyBuilder with the specified Priority Boost behaviour.
     /// </summary>
     /// <param name="enablePriorityBoost">The priority boost behaviour to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated priority boost behaviour.</returns>
     IProcessResourcePolicyBuilder ConfigurePriorityBoost(bool enablePriorityBoost);
 
     /// <summary>
-    /// Builds the configured ProcessResourcePolicy
+    ///     Builds the configured ProcessResourcePolicy
     /// </summary>
     /// <returns>The configured ProcessResourcePolicy.</returns>
     ProcessResourcePolicy Build();

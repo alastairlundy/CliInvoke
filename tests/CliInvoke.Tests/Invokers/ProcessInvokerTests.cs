@@ -8,7 +8,7 @@ namespace CliInvoke.Tests.Invokers;
 public class ProcessInvokerTests : IClassFixture<TestFixture>
 {
     private readonly TestFixture _testFixture;
-    
+
     public ProcessInvokerTests(TestFixture testFixture)
     {
         _testFixture = testFixture;
@@ -22,13 +22,13 @@ public class ProcessInvokerTests : IClassFixture<TestFixture>
 
         // A real file path is required here to avoid throwing FileNotFoundException.
         using ProcessConfiguration config = configFactory.Create(ProcessTestHelper.GetTargetFilePath());
-        
+
         config.TargetFilePath = " ";
 
         await Assert.ThrowsAsync<ArgumentException>(() => processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.Default, cancellationToken: TestContext.Current.CancellationToken));
     }
-    
+
     [Fact]
     public async Task Invoker_EmptyFilePath_ShouldThrow()
     {
@@ -36,22 +36,22 @@ public class ProcessInvokerTests : IClassFixture<TestFixture>
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config = configFactory.Create("FAKE/PATH");
-        
+
         config.TargetFilePath = string.Empty;
 
         await Assert.ThrowsAsync<ArgumentException>(() => processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.DefaultNoException, cancellationToken: TestContext.Current.CancellationToken));
     }
-    
+
     [Fact]
     public async Task Invoker_InvalidFilePath_ShouldThrow()
-    {        
+    {
         IProcessConfigurationFactory configFactory = _testFixture.ServiceProvider.GetRequiredService<IProcessConfigurationFactory>();
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
-        
+
         using ProcessConfiguration config = configFactory.Create("FAKE.FILE");
 
-        await Assert.ThrowsAsync<FileNotFoundException>(() => processInvoker.ExecuteBufferedAsync(config, 
+        await Assert.ThrowsAsync<FileNotFoundException>(() => processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.DefaultNoException, cancellationToken: TestContext.Current.CancellationToken));
     }
 }

@@ -19,16 +19,16 @@ using WhatExec.Lib.Abstractions.Resolvers;
 namespace CliInvoke;
 
 /// <summary>
-/// Represents a detector for resolving the default shell on various operating systems.
+///     Represents a detector for resolving the default shell on various operating systems.
 /// </summary>
 public class ShellDetector : IShellDetector
 {
-    private readonly IProcessInvoker _processInvoker;
     private readonly IExecutableFileResolver _executableFileResolver;
     private readonly IProcessConfigurationFactory _processConfigurationFactory;
+    private readonly IProcessInvoker _processInvoker;
 
     /// <summary>
-    /// Represents a detector for resolving the default shell on various operating systems.
+    ///     Represents a detector for resolving the default shell on various operating systems.
     /// </summary>
     public ShellDetector(IProcessInvoker processInvoker,
         IExecutableFileResolver executableFileResolver,
@@ -40,10 +40,13 @@ public class ShellDetector : IShellDetector
     }
 
     /// <summary>
-    /// Resolves the default shell asynchronously on supported operating systems.
+    ///     Resolves the default shell asynchronously on supported operating systems.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation.</param>
-    /// <returns>A task representing the asynchronous operation, returning a ShellInformation object with details about the detected shell.</returns>
+    /// <returns>
+    ///     A task representing the asynchronous operation, returning a ShellInformation object with
+    ///     details about the detected shell.
+    /// </returns>
     [UnsupportedOSPlatform("IOS")]
     [UnsupportedOSPlatform("tvOS")]
     [UnsupportedOSPlatform("browser")]
@@ -52,18 +55,18 @@ public class ShellDetector : IShellDetector
     {
         if (OperatingSystem.IsUnix())
             return await ResolveDefaultShellOnUnixAsync(cancellationToken);
-     
-        if(OperatingSystem.IsWindows())
+
+        if (OperatingSystem.IsWindows())
             return await ResolveDefaultShellOnWindowsAsync(cancellationToken);
-        
+
         throw new PlatformNotSupportedException();
     }
-    
+
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
         cancellationToken.Register(() => throw new TaskCanceledException());
-        
+
         using ProcessConfiguration execConfiguration = _processConfigurationFactory
             .Create("ps", "-p $$ -o comm=");
 
@@ -71,7 +74,8 @@ public class ShellDetector : IShellDetector
             execConfiguration, ProcessExitConfiguration.Default, false,
             cancellationToken);
 
-        FileInfo shellExeInfo = await _executableFileResolver.LocateExecutableAsync(execResult.StandardOutput.Split(Environment.NewLine).First(),
+        FileInfo shellExeInfo = await _executableFileResolver.LocateExecutableAsync(
+            execResult.StandardOutput.Split(Environment.NewLine).First(),
             SearchOption.AllDirectories, cancellationToken);
 
         using ProcessConfiguration shellInfoProcessConfig = _processConfigurationFactory
@@ -80,19 +84,20 @@ public class ShellDetector : IShellDetector
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
             shellInfoProcessConfig, ProcessExitConfiguration.Default, false,
             cancellationToken);
-        
-        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l => l.ToLower().Contains("version") &&
+
+        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l =>
+            l.ToLower().Contains("version") &&
             l.Any(c => char.IsDigit(c)));
 
         string[] commaSplit = versionLine.Split(',');
-        
+
         string shellPrettyName = commaSplit.First();
 
         string versionString = commaSplit.Last().Replace(".", string.Empty);
-        
+
         Version shellVersion = Version.GracefulParse(versionString);
-        
-        return new ShellInformation(shellPrettyName, 
+
+        return new ShellInformation(shellPrettyName,
             shellExeInfo, shellVersion);
     }
 
@@ -102,19 +107,23 @@ public class ShellDetector : IShellDetector
     {
         try
         {
-            FileInfo powershell5PlusFileInfo = await _executableFileResolver.LocateExecutableAsync("pwsh.exe", SearchOption.AllDirectories, cancellationToken);
-            
+            FileInfo powershell5PlusFileInfo =
+                await _executableFileResolver.LocateExecutableAsync("pwsh.exe",
+                    SearchOption.AllDirectories, cancellationToken);
+
             using ProcessConfiguration powershellConfig = _processConfigurationFactory
                 .Create(powershell5PlusFileInfo.FullName, "");
-            
-            BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(powershellConfig, 
-                ProcessExitConfiguration.Default, false,  cancellationToken);
-            
-            string[] powershellResults = result.StandardOutput.Replace("v", string.Empty).Split(' ');
+
+            BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
+                powershellConfig,
+                ProcessExitConfiguration.Default, false, cancellationToken);
+
+            string[] powershellResults =
+                result.StandardOutput.Replace("v", string.Empty).Split(' ');
 
             string versionString = powershellResults.Last();
             versionString = versionString.Substring(0, versionString.LastIndexOf('.') + 1);
-            
+
             Version version = Version.GracefulParse(versionString);
 
             return new ShellInformation(powershellResults.First(), powershell5PlusFileInfo,
@@ -122,17 +131,19 @@ public class ShellDetector : IShellDetector
         }
         catch
         {
-            FileInfo cmdExeInfo = await _executableFileResolver.LocateExecutableAsync("cmd.exe",  SearchOption.AllDirectories, cancellationToken);
+            FileInfo cmdExeInfo = await _executableFileResolver.LocateExecutableAsync("cmd.exe",
+                SearchOption.AllDirectories, cancellationToken);
 
             using ProcessConfiguration cmdConfig = _processConfigurationFactory
                 .Create(cmdExeInfo.FullName, "");
-            
+
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
-                ProcessExitConfiguration.Default, false,  cancellationToken);
-            
+                ProcessExitConfiguration.Default, false, cancellationToken);
+
             string line = result.StandardOutput.Split(Environment.NewLine).First();
 
-            string versionString = line.Replace("Microsoft", string.Empty).Replace("Windows", string.Empty).Replace("]", string.Empty);
+            string versionString = line.Replace("Microsoft", string.Empty)
+                .Replace("Windows", string.Empty).Replace("]", string.Empty);
             Version cmdVersion = Version.GracefulParse(versionString.Split('[')[1]
                 .Replace("Version", "")
                 .Replace(" ", string.Empty));

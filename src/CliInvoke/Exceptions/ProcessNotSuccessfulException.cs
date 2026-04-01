@@ -14,24 +14,12 @@ using CliInvoke.Core.Validation;
 namespace CliInvoke.Exceptions;
 
 /// <summary>
-/// An exception thrown if a Process is run unsuccessfully.
+///     An exception thrown if a Process is run unsuccessfully.
 /// </summary>
 public sealed class ProcessNotSuccessfulException : Exception
 {
     /// <summary>
-    /// The command that was executed.
-    /// </summary>
-    public ProcessExceptionInfo? ExecutedProcess { get; }
-
-    /// <summary>
-    /// The exit code of the Command that was executed.
-    /// </summary>
-    [Obsolete("This property is deprecated and will be removed in a future version.")]
-    // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    public int ExitCode { get; private set; }
-    
-    /// <summary>
-    /// Thrown when an executed Process exited with a non-zero exit code.
+    ///     Thrown when an executed Process exited with a non-zero exit code.
     /// </summary>
     /// <param name="exitCode">The exit code of the Process that was executed.</param>
     [Obsolete("This constructor overload is deprecated and will be removed in a future version.")]
@@ -46,7 +34,7 @@ public sealed class ProcessNotSuccessfulException : Exception
     }
 
     /// <summary>
-    /// Thrown when an executed Process exited with a non-zero exit code.
+    ///     Thrown when an executed Process exited with a non-zero exit code.
     /// </summary>
     /// <param name="process">The Process that was executed.</param>
     public ProcessNotSuccessfulException(ProcessExceptionInfo process)
@@ -64,9 +52,9 @@ public sealed class ProcessNotSuccessfulException : Exception
         ExitCode = process.Result.ExitCode;
 #pragma warning restore CS0618 // Type or member is obsolete
     }
-    
+
     /// <summary>
-    /// Thrown when an executed Process exited with a non-zero exit code.
+    ///     Thrown when an executed Process exited with a non-zero exit code.
     /// </summary>
     /// <param name="exitCode">The exit code of the Process that was executed.</param>
     /// <param name="process">The Process that was executed.</param>
@@ -87,7 +75,19 @@ public sealed class ProcessNotSuccessfulException : Exception
     }
 
     /// <summary>
-    /// Throws an exception if a process execution is unsuccessful.
+    ///     The command that was executed.
+    /// </summary>
+    public ProcessExceptionInfo? ExecutedProcess { get; }
+
+    /// <summary>
+    ///     The exit code of the Command that was executed.
+    /// </summary>
+    [Obsolete("This property is deprecated and will be removed in a future version.")]
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
+    public int ExitCode { get; private set; }
+
+    /// <summary>
+    ///     Throws an exception if a process execution is unsuccessful.
     /// </summary>
     /// <param name="resultValidator">The validator used to validate the executed process result.</param>
     /// <param name="result">The result of the executed process.</param>

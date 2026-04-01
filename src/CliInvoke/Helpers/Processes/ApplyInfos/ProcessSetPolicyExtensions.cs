@@ -10,7 +10,6 @@
 namespace CliInvoke.Helpers.Processes;
 
 /// <summary>
-///
 /// </summary>
 internal static class ProcessSetPolicyExtensions
 {
@@ -18,7 +17,7 @@ internal static class ProcessSetPolicyExtensions
     extension(ProcessWrapper process)
     {
         /// <summary>
-        /// Applies a ProcessResourcePolicy to a Process.
+        ///     Applies a ProcessResourcePolicy to a Process.
         /// </summary>
         /// <param name="resourcePolicy">The process resource policy to be applied.</param>
         /// <exception cref="InvalidOperationException"></exception>
@@ -34,16 +33,14 @@ internal static class ProcessSetPolicyExtensions
         {
             resourcePolicy ??= ProcessResourcePolicy.Default;
 
-            if (process.HasStarted == false)
+            if (!process.HasStarted)
                 throw new InvalidOperationException(
                     Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
                 );
 
             if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
-            {
-                if (resourcePolicy.ProcessorAffinity is not null) 
+                if (resourcePolicy.ProcessorAffinity is not null)
                     process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
-            }
 
             if (OperatingSystem.IsMacOS()
                 || OperatingSystem.IsMacCatalyst()
@@ -51,10 +48,10 @@ internal static class ProcessSetPolicyExtensions
                 || OperatingSystem.IsWindows()
                )
             {
-                if (resourcePolicy.MinWorkingSet is not null) 
+                if (resourcePolicy.MinWorkingSet is not null)
                     process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
 
-                if (resourcePolicy.MaxWorkingSet is not null) 
+                if (resourcePolicy.MaxWorkingSet is not null)
                     process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
             }
 

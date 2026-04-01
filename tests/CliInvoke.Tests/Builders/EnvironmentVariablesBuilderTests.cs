@@ -6,7 +6,8 @@ namespace CliInvoke.Tests.Builders;
 
 public class EnvironmentVariablesBuilderTests
 {
-    private readonly Faker _faker = new Faker();
+    private readonly Faker _faker = new();
+
     [Fact]
     public void Constructor_ShouldInstantiate()
     {
@@ -18,17 +19,17 @@ public class EnvironmentVariablesBuilderTests
     public void Set_SingleVariable_Success()
     {
         // Arrange
-        string key = _faker.Database.Column();
-        string value = _faker.Database.Random.Word();
+        string? key = _faker.Database.Column();
+        string? value = _faker.Database.Random.Word();
 
         // Act
         IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
             .SetPair(key, value);
 
         IReadOnlyDictionary<string, string> variables = builder.Build();
-        
+
         // Assert
-        Assert.Equal(value,variables[key]);
+        Assert.Equal(value, variables[key]);
     }
 
     [Fact]
@@ -39,25 +40,22 @@ public class EnvironmentVariablesBuilderTests
 
         while (list.Count < number)
         {
-            string key = _faker.Database.Column();
-            string value = _faker.Random.Word();
-            
+            string? key = _faker.Database.Column();
+            string? value = _faker.Random.Word();
+
             list.Add(new KeyValuePair<string, string>(key, value));
         }
-        
+
         list = list.DistinctBy(x => x.Key).ToList();
-        
-       // Act
-       IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
-           .SetEnumerable(list);
-       
-       IReadOnlyDictionary<string, string> variables = builder.Build();
-       
-       // Assert
-       foreach (KeyValuePair<string, string> pair in list)
-       {
-           Assert.Equal(pair.Value, variables[pair.Key]);
-       }
+
+        // Act
+        IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
+            .SetEnumerable(list);
+
+        IReadOnlyDictionary<string, string> variables = builder.Build();
+
+        // Assert
+        foreach (KeyValuePair<string, string> pair in list) Assert.Equal(pair.Value, variables[pair.Key]);
     }
 
     [Fact]
@@ -69,26 +67,23 @@ public class EnvironmentVariablesBuilderTests
 
         while (dictionary.Count < number)
         {
-            string key = _faker.Phone.PhoneNumber();
-            string value = _faker.Random.Word();
-            
+            string? key = _faker.Phone.PhoneNumber();
+            string? value = _faker.Random.Word();
+
             dictionary.TryAdd(key, value);
         }
-        
+
         // Act
         IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
             .SetDictionary(dictionary);
-       
+
         IReadOnlyDictionary<string, string> variables = builder.Build();
-       
+
         // Assert
-        foreach (KeyValuePair<string, string> pair in dictionary)
-        {
-            Assert.Equal(pair.Value, variables[pair.Key]);
-        }
+        foreach (KeyValuePair<string, string> pair in dictionary) Assert.Equal(pair.Value, variables[pair.Key]);
     }
-    
-    
+
+
     [Fact]
     public void Set_ReadOnlyDictionary_Success()
     {
@@ -100,38 +95,35 @@ public class EnvironmentVariablesBuilderTests
         stopwatch.Start();
 
         IList<string> keys = _faker.MakeLazy(number * 4, () => _faker.Internet.Ip())
-        .Distinct(StringComparer.InvariantCulture)
-        .Take(number)
-        .ToList();
+            .Distinct(StringComparer.InvariantCulture)
+            .Take(number)
+            .ToList();
 
         int keyIndex = 0;
-        
+
         while (dictionary.Count < number)
         {
             if (stopwatch.ElapsedMilliseconds / 1000 > 10)
                 throw new Exception("Took to long to generate test data");
 
-            string value = _faker.Random.Word();
-            
+            string? value = _faker.Random.Word();
+
             dictionary.Add(keys[keyIndex], value);
             keyIndex++;
         }
-        
+
         stopwatch.Stop();
-        
+
         ReadOnlyDictionary<string, string> readOnlyDictionary = new ReadOnlyDictionary<string, string>(dictionary);
-        
+
         // Act
         IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
             .SetReadOnlyDictionary(readOnlyDictionary);
-       
+
         IReadOnlyDictionary<string, string> variables = builder.Build();
-       
+
         // Assert
-        foreach (KeyValuePair<string, string> pair in readOnlyDictionary)
-        {
-            Assert.Equal(pair.Value, variables[pair.Key]);
-        }
+        foreach (KeyValuePair<string, string> pair in readOnlyDictionary) Assert.Equal(pair.Value, variables[pair.Key]);
     }
 
     [Fact]
@@ -144,39 +136,39 @@ public class EnvironmentVariablesBuilderTests
 
         while (dictionary.Count < number)
         {
-            string key = _faker.Database.Column();
-            string value = _faker.Random.Word();
-            
+            string? key = _faker.Database.Column();
+            string? value = _faker.Random.Word();
+
             dictionary.TryAdd(key, value);
         }
-        
+
         // Arrange
         Dictionary<string, string> dictionary2 = new();
 
         while (dictionary.Count < number)
         {
-            string key = _faker.Commerce.Ean13();
-            string value = _faker.Random.Word();
-            
+            string? key = _faker.Commerce.Ean13();
+            string? value = _faker.Random.Word();
+
             dictionary2.TryAdd(key, value);
         }
-        
+
         ReadOnlyDictionary<string, string> readOnlyDictionary = new(dictionary2);
 
         List<KeyValuePair<string, string>> list = new();
 
         while (list.Count < number)
         {
-            string key = _faker.Internet.Ipv6();
-            string value = _faker.Internet.Color();
-            
+            string? key = _faker.Internet.Ipv6();
+            string? value = _faker.Internet.Color();
+
             list.Add(new KeyValuePair<string, string>(key, value));
         }
-        
+
         list = list.DistinctBy(x => x.Key).ToList();
 
-        string pairKey = _faker.Address.ZipCode();
-        string pairValue = _faker.Address.City();
+        string? pairKey = _faker.Address.ZipCode();
+        string? pairValue = _faker.Address.City();
 
         //Act
         IEnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder()
@@ -184,25 +176,16 @@ public class EnvironmentVariablesBuilderTests
             .SetEnumerable(list)
             .SetDictionary(dictionary)
             .SetReadOnlyDictionary(readOnlyDictionary);
-        
+
         IReadOnlyDictionary<string, string> variables = builder.Build();
-        
+
         //Assert 
         Assert.Equal(pairValue, variables[pairKey]);
 
-        foreach (KeyValuePair<string, string> pair in dictionary)
-        {
-            Assert.Equal(pair.Value, variables[pair.Key]);
-        }
+        foreach (KeyValuePair<string, string> pair in dictionary) Assert.Equal(pair.Value, variables[pair.Key]);
 
-        foreach (KeyValuePair<string, string> pair2 in dictionary2)
-        {
-            Assert.Equal(pair2.Value, variables[pair2.Key]);
-        }
+        foreach (KeyValuePair<string, string> pair2 in dictionary2) Assert.Equal(pair2.Value, variables[pair2.Key]);
 
-        foreach (KeyValuePair<string, string> pair3 in list)
-        {
-            Assert.Equal(pair3.Value, variables[pair3.Key]);
-        }
+        foreach (KeyValuePair<string, string> pair3 in list) Assert.Equal(pair3.Value, variables[pair3.Key]);
     }
 }

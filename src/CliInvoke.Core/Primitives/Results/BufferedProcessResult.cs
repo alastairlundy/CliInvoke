@@ -16,12 +16,13 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-/// A buffered ProcessResult containing a Process's or Command's StandardOutput and StandardError information.
+///     A buffered ProcessResult containing a Process's or Command's StandardOutput and StandardError
+///     information.
 /// </summary>
 public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessResult>
 {
     /// <summary>
-    /// Initializes the BufferedProcessResult with process information.
+    ///     Initializes the BufferedProcessResult with process information.
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
@@ -44,27 +45,34 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
         ArgumentNullException.ThrowIfNull(standardOutput);
         ArgumentNullException.ThrowIfNull(standardError);
-        
+
         StandardOutput = standardOutput;
         StandardError = standardError;
     }
 
     /// <summary>
-    /// The Standard Output from a Process or Command represented as a string.
+    ///     The Standard Output from a Process or Command represented as a string.
     /// </summary>
     public string StandardOutput { get; }
 
     /// <summary>
-    /// The Standard Error from a Process or Command represented as a string.
+    ///     The Standard Error from a Process or Command represented as a string.
     /// </summary>
     public string StandardError { get; }
 
     /// <summary>
-    /// Determines whether this BufferedProcessResult object is equal to another BufferedProcessResult object.
+    ///     Determines whether this BufferedProcessResult object is equal to another BufferedProcessResult
+    ///     object.
     /// </summary>
-    /// <remarks>This method intentionally does not consider Start and Exit times of Command Results for equality comparison.</remarks>
+    /// <remarks>
+    ///     This method intentionally does not consider Start and Exit times of Command Results for
+    ///     equality comparison.
+    /// </remarks>
     /// <param name="other">The other BufferedProcessResult to compare.</param>
-    /// <returns>True if this BufferedProcessResult is equal to the other BufferedProcessResult; false otherwise.</returns>
+    /// <returns>
+    ///     True if this BufferedProcessResult is equal to the other BufferedProcessResult; false
+    ///     otherwise.
+    /// </returns>
     public bool Equals(BufferedProcessResult? other)
     {
         if (other is null)
@@ -77,10 +85,13 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     }
 
     /// <summary>
-    /// Determines whether this BufferedProcessResult is equal to another object.
+    ///     Determines whether this BufferedProcessResult is equal to another object.
     /// </summary>
     /// <param name="obj">The other object to compare.</param>
-    /// <returns>True if the other object is a BufferedProcessResult and is equal to this BufferedProcessResult; false otherwise.</returns>
+    /// <returns>
+    ///     True if the other object is a BufferedProcessResult and is equal to this
+    ///     BufferedProcessResult; false otherwise.
+    /// </returns>
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -93,35 +104,45 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     }
 
     /// <summary>
-    /// Returns the hash code for the current BufferedProcessResult.
+    ///     Returns the hash code for the current BufferedProcessResult.
     /// </summary>
     /// <returns>The hash code for the current BufferedProcessResult.</returns>
-    public override int GetHashCode() => HashCode.Combine(ExecutedFilePath, StandardOutput, StandardError, ExitCode, StartTime, ExitTime);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ExecutedFilePath, StandardOutput, StandardError, ExitCode,
+            StartTime, ExitTime);
+    }
 
     /// <summary>
-    /// Determines whether two BufferedProcessResults are equal.
+    ///     Determines whether two BufferedProcessResults are equal.
     /// </summary>
     /// <param name="left">The first BufferedProcessResult to compare.</param>
     /// <param name="right">The second BufferedProcessResult to compare.</param>
     /// <returns>True if the two BufferedProcessResult objects are equal; false otherwise.</returns>
-    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right) =>
-        left.Equals(right);
+    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right)
+    {
+        return left.Equals(right);
+    }
 
     /// <summary>
-    /// Determines if a BufferedProcessResult is equal to another BufferedProcessResult.
+    ///     Determines if a BufferedProcessResult is equal to another BufferedProcessResult.
     /// </summary>
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are equal to each other; false otherwise.</returns>
-    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right) =>
-        Equals(left, right);
+    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right)
+    {
+        return Equals(left, right);
+    }
 
     /// <summary>
-    /// Determines if a BufferedProcessResult is not equal to another BufferedProcessResult.
+    ///     Determines if a BufferedProcessResult is not equal to another BufferedProcessResult.
     /// </summary>
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right) =>
-        !Equals(left, right);
+    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right)
+    {
+        return !Equals(left, right);
+    }
 }

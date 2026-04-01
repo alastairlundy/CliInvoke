@@ -12,13 +12,11 @@ namespace CliInvoke.Helpers.Processes;
 internal static class ToStartInfoExtensions
 {
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="processConfiguration"></param>
     extension(ProcessConfiguration processConfiguration)
     {
         /// <summary>
-        ///
         /// </summary>
         /// <param name="redirectStandardOutput"></param>
         /// <param name="redirectStandardError"></param>
@@ -43,9 +41,9 @@ internal static class ToStartInfoExtensions
                     processConfiguration.StandardInput is not null
                     && processConfiguration.RedirectStandardInput,
                 RedirectStandardOutput = redirectStandardOutput,
-                RedirectStandardError = redirectStandardError,
+                RedirectStandardError = redirectStandardError
             };
-        
+
             if (processConfiguration.RequiresAdministrator)
                 processStartInfo.RunAsAdministrator();
 
@@ -60,9 +58,10 @@ internal static class ToStartInfoExtensions
             if (processStartInfo.RedirectStandardInput)
                 processStartInfo.StandardInputEncoding = processConfiguration.StandardInputEncoding;
 #endif
-        
+
             if (processStartInfo.RedirectStandardOutput)
-                processStartInfo.StandardOutputEncoding = processConfiguration.StandardOutputEncoding;
+                processStartInfo.StandardOutputEncoding =
+                    processConfiguration.StandardOutputEncoding;
 
             if (processStartInfo.RedirectStandardError)
                 processStartInfo.StandardErrorEncoding = processConfiguration.StandardErrorEncoding;

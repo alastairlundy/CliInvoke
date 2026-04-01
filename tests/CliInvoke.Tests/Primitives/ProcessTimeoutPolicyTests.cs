@@ -1,12 +1,10 @@
-
-
 // ReSharper disable NotAccessedVariable
 
 namespace CliInvoke.Tests.Primitives;
 
 public class ProcessTimeoutPolicyTests
 {
-    private readonly Faker _faker = new Faker();
+    private readonly Faker _faker = new();
 
     [Fact]
     public void Add_TimeoutThreshold_ShouldSetValidTimeout()
@@ -29,12 +27,13 @@ public class ProcessTimeoutPolicyTests
     {
         // Arrange
         TimeSpan timeout = TimeSpan.FromSeconds(timeoutSpanSeconds);
-        
+
         // Act
         ProcessTimeoutPolicy processTimeoutPolicy;
-        
+
         // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(()=> processTimeoutPolicy = ProcessTimeoutPolicy.FromTimeSpan(timeout) );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            processTimeoutPolicy = ProcessTimeoutPolicy.FromTimeSpan(timeout));
     }
 
     [Theory]
@@ -45,10 +44,10 @@ public class ProcessTimeoutPolicyTests
     {
         // Arrange
         TimeSpan timeoutThreshold = TimeSpan.FromSeconds(_faker.Random.Int(0, 1000));
-        
+
         // Act
         ProcessTimeoutPolicy policy = ProcessTimeoutPolicy.FromTimeSpan(timeoutThreshold);
-        
+
         // Assert
         Assert.NotNull(policy);
         /*Assert.Equal(cancellationMode, policy.C);

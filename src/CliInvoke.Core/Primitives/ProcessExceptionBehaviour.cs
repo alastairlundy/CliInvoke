@@ -10,22 +10,22 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-/// Specifies the behaviour for handling exceptions.
+///     Specifies the behaviour for handling exceptions.
 /// </summary>
 public enum ProcessExceptionBehaviour
 {
     /// <summary>
-    /// Suppresses thrown exceptions.
+    ///     Suppresses thrown exceptions.
     /// </summary>
     SuppressExceptions = 0,
 
     /// <summary>
-    /// Allow .NET to throw the exception if expected.
+    ///     Allow .NET to throw the exception if expected.
     /// </summary>
     AllowExceptions,
 
     /// <summary>
-    /// Allows the exception to be thrown if it is unexpected.
+    ///     Allows the exception to be thrown if it is unexpected.
     /// </summary>
-    AllowExceptionsIfUnexpected,
+    AllowExceptionsIfUnexpected
 }

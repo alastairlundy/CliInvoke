@@ -12,9 +12,11 @@ using CliInvoke.Core.Extensibility.Factories;
 namespace CliInvoke.Core.Extensibility;
 
 /// <summary>
-/// An abstract invoker class that runs other Process Configurations through its own Process.
+///     An abstract invoker class that runs other Process Configurations through its own Process.
 /// </summary>
-/// <remarks>Users should implement this abstract class when exposing an invoker that is easier to set up with Dependency Injection is desired
+/// <remarks>
+///     Users should implement this abstract class when exposing an invoker that is easier to set up
+///     with Dependency Injection is desired
 /// </remarks>
 public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
 {
@@ -22,23 +24,28 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     private readonly IRunnerProcessFactory _runnerProcessFactory;
 
     /// <summary>
-    /// Gets the <see cref="ProcessConfiguration"/> object that represents the configuration
-    /// for the runner process.
-    /// </summary>
-    public ProcessConfiguration RunnerProcessConfiguration { get; }
-
-    /// <summary>
-    /// Represents an abstract base class for implementing process invokers that leverage their own configuration and execution pipeline
-    /// to invoke other processes with a variety of configurations.
+    ///     Represents an abstract base class for implementing process invokers that leverage their own
+    ///     configuration and execution pipeline
+    ///     to invoke other processes with a variety of configurations.
     /// </summary>
     /// <remarks>
-    /// Note to Implementers: Implementing classes don't need to publicly require users to provide their own <paramref name="runnerProcessConfiguration"/> if the class
-    /// provides a <see cref="ProcessConfiguration"/> for the runner process configuration.
+    ///     Note to Implementers: Implementing classes don't need to publicly require users to provide
+    ///     their own <paramref name="runnerProcessConfiguration" /> if the class
+    ///     provides a <see cref="ProcessConfiguration" /> for the runner process configuration.
     /// </remarks>
-    /// <param name="processInvoker">The <see cref="IProcessInvoker"/> to use to invoke the actual runner configuration.</param>
-    /// <param name="runnerProcessFactory">The <see cref="IRunnerProcessFactory"/> to use to create the actual runner configuration from the
-    /// input process configuration and the runner process configuration.</param>
-    /// <param name="runnerProcessConfiguration">The process configuration of the process to run other process configurations through.</param>
+    /// <param name="processInvoker">
+    ///     The <see cref="IProcessInvoker" /> to use to invoke the actual runner
+    ///     configuration.
+    /// </param>
+    /// <param name="runnerProcessFactory">
+    ///     The <see cref="IRunnerProcessFactory" /> to use to create the actual runner configuration from
+    ///     the
+    ///     input process configuration and the runner process configuration.
+    /// </param>
+    /// <param name="runnerProcessConfiguration">
+    ///     The process configuration of the process to run other
+    ///     process configurations through.
+    /// </param>
     protected RunnerProcessInvokerBase(
         IProcessInvoker processInvoker,
         IRunnerProcessFactory runnerProcessFactory,
@@ -50,13 +57,40 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     }
 
     /// <summary>
-    /// Executes a process using the specified configurations and returns the result of the process execution.
+    ///     Gets the <see cref="ProcessConfiguration" /> object that represents the configuration
+    ///     for the runner process.
+    /// </summary>
+    public ProcessConfiguration RunnerProcessConfiguration { get; }
+
+    /// <summary>
+    ///     Releases the resources used by the RunnerProcessInvoker and associated configurations.
+    /// </summary>
+    public void Dispose()
+    {
+        RunnerProcessConfiguration.Dispose();
+    }
+
+    /// <summary>
+    ///     Executes a process using the specified configurations and returns the result of the process
+    ///     execution.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process that will be executed.</param>
-    /// <param name="processExitConfiguration">The configuration defining behaviour for process exit, if any.</param>
-    /// <param name="disposeOfConfig">Specifies whether the provided process configuration should be disposed of after execution.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests during the process execution.</param>
-    /// <returns>A task representing the asynchronous execution, containing the result of the executed process.</returns>
+    /// <param name="processExitConfiguration">
+    ///     The configuration defining behaviour for process exit, if
+    ///     any.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Specifies whether the provided process configuration should be
+    ///     disposed of after execution.
+    /// </param>
+    /// <param name="cancellationToken">
+    ///     A token to monitor for cancellation requests during the process
+    ///     execution.
+    /// </param>
+    /// <returns>
+    ///     A task representing the asynchronous execution, containing the result of the executed
+    ///     process.
+    /// </returns>
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
@@ -81,13 +115,26 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     }
 
     /// <summary>
-    /// Executes a process using the specified configurations and returns the buffered result of the process execution.
+    ///     Executes a process using the specified configurations and returns the buffered result of the
+    ///     process execution.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitConfiguration">Optional configuration that defines behaviour for process exit.</param>
-    /// <param name="disposeOfConfig">Specifies whether the provided process configuration should be disposed of after execution.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests during the process execution.</param>
-    /// <returns>A task representing the asynchronous execution, containing the buffered result of the executed process.</returns>
+    /// <param name="processExitConfiguration">
+    ///     Optional configuration that defines behaviour for process
+    ///     exit.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Specifies whether the provided process configuration should be
+    ///     disposed of after execution.
+    /// </param>
+    /// <param name="cancellationToken">
+    ///     A token to monitor for cancellation requests during the process
+    ///     execution.
+    /// </param>
+    /// <returns>
+    ///     A task representing the asynchronous execution, containing the buffered result of the
+    ///     executed process.
+    /// </returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
@@ -112,13 +159,26 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     }
 
     /// <summary>
-    /// Executes a piped process using the specified configurations and returns the result of the process execution.
+    ///     Executes a piped process using the specified configurations and returns the result of the
+    ///     process execution.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process that will be executed.</param>
-    /// <param name="processExitConfiguration">The configuration defining behaviour for process exit, if any. This parameter is optional.</param>
-    /// <param name="disposeOfConfig">Specifies whether the provided process configuration should be disposed of after execution.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests during the process execution. This parameter is optional.</param>
-    /// <returns>A task representing the asynchronous execution, containing the piped result of the executed process.</returns>
+    /// <param name="processExitConfiguration">
+    ///     The configuration defining behaviour for process exit, if
+    ///     any. This parameter is optional.
+    /// </param>
+    /// <param name="disposeOfConfig">
+    ///     Specifies whether the provided process configuration should be
+    ///     disposed of after execution.
+    /// </param>
+    /// <param name="cancellationToken">
+    ///     A token to monitor for cancellation requests during the process
+    ///     execution. This parameter is optional.
+    /// </param>
+    /// <returns>
+    ///     A task representing the asynchronous execution, containing the piped result of the
+    ///     executed process.
+    /// </returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
@@ -140,13 +200,5 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
             disposeOfConfig,
             cancellationToken
         );
-    }
-
-    /// <summary>
-    /// Releases the resources used by the RunnerProcessInvoker and associated configurations.
-    /// </summary>
-    public void Dispose()
-    {
-        RunnerProcessConfiguration.Dispose();
     }
 }

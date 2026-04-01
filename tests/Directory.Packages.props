@@ -1,17 +1,17 @@
 <Project>
-  <PropertyGroup>
-    <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Bogus" Version="35.6.5" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
-    <PackageVersion Include="xunit.v3" Version="3.2.1" />
-    <PackageVersion Include="TUnit" Version="1.19.74"/>
-  </ItemGroup>
+    <PropertyGroup>
+        <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageVersion Include="Bogus" Version="35.6.5"/>
+        <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.3"/>
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1"/>
+        <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageVersion>
+        <PackageVersion Include="xunit.v3" Version="3.2.1"/>
+        <PackageVersion Include="TUnit" Version="1.19.74"/>
+    </ItemGroup>
 </Project>

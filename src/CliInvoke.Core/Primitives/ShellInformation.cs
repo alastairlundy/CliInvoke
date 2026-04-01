@@ -10,12 +10,11 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-/// Provides information about a shell program.
+///     Provides information about a shell program.
 /// </summary>
 public class ShellInformation : IEquatable<ShellInformation>
 {
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="name"></param>
     /// <param name="targetFilePath"></param>
@@ -23,90 +22,101 @@ public class ShellInformation : IEquatable<ShellInformation>
     public ShellInformation(string name, FileInfo targetFilePath, Version version)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
-        
+
         Name = name;
         TargetFilePath = targetFilePath;
         Version = version;
     }
 
     /// <summary>
-    /// Gets or sets the name.
+    ///     Gets or sets the name.
     /// </summary>
     /// <remarks>
-    /// Represents a property that holds the name associated with an instance of the ShellInformation class.
+    ///     Represents a property that holds the name associated with an instance of the ShellInformation
+    ///     class.
     /// </remarks>
     public string Name { get; }
 
     /// <summary>
-    /// Gets or sets the target file path.
+    ///     Gets or sets the target file path.
     /// </summary>
     /// <remarks>
-    /// Represents the path of a file that is targeted by an instance of the ShellInformation class.
+    ///     Represents the path of a file that is targeted by an instance of the ShellInformation class.
     /// </remarks>
     public FileInfo TargetFilePath { get; }
 
     /// <summary>
-    /// Represents the version of a shell program.
+    ///     Represents the version of a shell program.
     /// </summary>
     public Version Version { get; }
 
     /// <summary>
-    /// Determines whether this instance and a specified <see cref="ShellInformation"/> have the same value.
+    ///     Determines whether this instance and a specified <see cref="ShellInformation" /> have the same
+    ///     value.
     /// </summary>
-    /// <param name="other">The <see cref="ShellInformation"/> to compare with the current <see cref="ShellInformation"/>.</param>
-    /// <returns>true if the two <see cref="ShellInformation"/> are equal; otherwise, false.</returns>
+    /// <param name="other">
+    ///     The <see cref="ShellInformation" /> to compare with the current
+    ///     <see cref="ShellInformation" />.
+    /// </param>
+    /// <returns>true if the two <see cref="ShellInformation" /> are equal; otherwise, false.</returns>
     public bool Equals(ShellInformation? other)
     {
         if (other is null) return false;
 
         return Name == other.Name && TargetFilePath.Equals(other.TargetFilePath);
     }
-    
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
-        if (obj is null) 
+        if (obj is null)
             return false;
-        
-        if(obj is ShellInformation shellInformation) 
+
+        if (obj is ShellInformation shellInformation)
             return Equals(shellInformation);
 
         return false;
     }
-    
-    /// <inheritdoc/>
+
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         return HashCode.Combine(Name, Version, TargetFilePath);
     }
 
     /// <summary>
-    /// Determines whether two <see cref="ShellInformation"/> objects are equal.
+    ///     Determines whether two <see cref="ShellInformation" /> objects are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ShellInformation"/> to compare.</param>
-    /// <param name="right">The second <see cref="ShellInformation"/> to compare.</param>
-    /// <returns>true if the two <see cref="ShellInformation"/> are equal; otherwise, false.</returns>
+    /// <param name="left">The first <see cref="ShellInformation" /> to compare.</param>
+    /// <param name="right">The second <see cref="ShellInformation" /> to compare.</param>
+    /// <returns>true if the two <see cref="ShellInformation" /> are equal; otherwise, false.</returns>
     public static bool Equals(ShellInformation? left, ShellInformation? right)
     {
         if (left is null || right is null)
             return false;
-        
+
         return left.Equals(right);
     }
-    
-    /// <summary>
-    /// Determines whether two <see cref="ShellInformation"/> objects are equal.
-    /// </summary>
-    /// <param name="left">The first <see cref="ShellInformation"/> to compare.</param>
-    /// <param name="right">The second <see cref="ShellInformation"/> to compare.</param>
-    /// <returns>true if the two <see cref="ShellInformation"/> are equal; otherwise, false.</returns>
-    public static bool operator ==(ShellInformation? left, ShellInformation? right) => Equals(left, right);
 
     /// <summary>
-    /// Determines whether two <see cref="ShellInformation"/> objects are not equal.
+    ///     Determines whether two <see cref="ShellInformation" /> objects are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ShellInformation"/> to compare.</param>
-    /// <param name="right">The second <see cref="ShellInformation"/> to compare.</param>
-    /// <returns>true if the two <see cref="ShellInformation"/> are not equal; otherwise, false.</returns>
-    public static bool operator !=(ShellInformation? left, ShellInformation? right) => !Equals(left, right);
+    /// <param name="left">The first <see cref="ShellInformation" /> to compare.</param>
+    /// <param name="right">The second <see cref="ShellInformation" /> to compare.</param>
+    /// <returns>true if the two <see cref="ShellInformation" /> are equal; otherwise, false.</returns>
+    public static bool operator ==(ShellInformation? left, ShellInformation? right)
+    {
+        return Equals(left, right);
+    }
+
+    /// <summary>
+    ///     Determines whether two <see cref="ShellInformation" /> objects are not equal.
+    /// </summary>
+    /// <param name="left">The first <see cref="ShellInformation" /> to compare.</param>
+    /// <param name="right">The second <see cref="ShellInformation" /> to compare.</param>
+    /// <returns>true if the two <see cref="ShellInformation" /> are not equal; otherwise, false.</returns>
+    public static bool operator !=(ShellInformation? left, ShellInformation? right)
+    {
+        return !Equals(left, right);
+    }
 }

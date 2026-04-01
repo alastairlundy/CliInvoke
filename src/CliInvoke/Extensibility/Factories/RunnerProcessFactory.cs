@@ -13,12 +13,13 @@ using CliInvoke.Core.Extensibility.Factories;
 namespace CliInvoke.Extensibility.Factories;
 
 /// <summary>
-/// A class to allow creating a ProcessConfiguration that can be run through another Process' ProcessConfiguration.
+///     A class to allow creating a ProcessConfiguration that can be run through another Process'
+///     ProcessConfiguration.
 /// </summary>
 public class RunnerProcessFactory : IRunnerProcessFactory
 {
     /// <summary>
-    /// Create the command to be run from the Command runner configuration and an input command.
+    ///     Create the command to be run from the Command runner configuration and an input command.
     /// </summary>
     /// <param name="processConfigToBeRun">The command to be run by the Command Runner command.</param>
     /// <param name="runnerProcessConfig"></param>
@@ -30,9 +31,10 @@ public class RunnerProcessFactory : IRunnerProcessFactory
     {
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
-        
-        string combinedArgs = $"{runnerProcessConfig.Arguments} {processConfigToBeRun.TargetFilePath} {processConfigToBeRun.Arguments}"
-            .Trim();
+
+        string combinedArgs =
+            $"{runnerProcessConfig.Arguments} {processConfigToBeRun.TargetFilePath} {processConfigToBeRun.Arguments}"
+                .Trim();
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath

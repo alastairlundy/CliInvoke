@@ -16,7 +16,7 @@ using System.Text;
 namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
-/// A Command configuration to make running commands through Windows CMD easier.
+///     A Command configuration to make running commands through Windows CMD easier.
 /// </summary>
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]
@@ -30,11 +30,14 @@ namespace CliInvoke.Specializations.Configurations;
 public class CmdProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
-    /// Initializes a new instance of the CmdCommandConfiguration class.
+    ///     Initializes a new instance of the CmdCommandConfiguration class.
     /// </summary>
     /// <param name="arguments">The arguments to be passed to the command.</param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
-    /// <param name="requiresAdministrator">Indicates whether the command requires administrator privileges.</param>
+    /// <param name="requiresAdministrator">
+    ///     Indicates whether the command requires administrator
+    ///     privileges.
+    /// </param>
     /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
     /// <param name="credentials">The user credentials to be used when running the command.</param>
     /// <param name="standardInput">The stream for the standard input.</param>
@@ -54,26 +57,30 @@ public class CmdProcessConfiguration : ProcessConfiguration
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : 
+        bool useShellExecution = false, bool windowCreation = false) :
         base("cmd.exe",
             redirectStandardInput, redirectStandardOutput, redirectStandardError, $"/c {arguments}",
             workingDirectoryPath, requiresAdministrator, environmentVariables, credentials,
             standardInput, standardInputEncoding, standardOutputEncoding,
             standardErrorEncoding,
             processResourcePolicy,
-            windowCreation: windowCreation, useShellExecution: useShellExecution)
+            windowCreation, useShellExecution)
     {
         base.TargetFilePath = TargetFilePath;
     }
 
 
     /// <summary>
-    /// The target file path of Cmd.
+    ///     The target file path of Cmd.
     /// </summary>
-    /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Windows-based operating system.</exception>
+    /// <exception cref="PlatformNotSupportedException">
+    ///     Thrown if not run on a Windows-based operating
+    ///     system.
+    /// </exception>
     [SupportedOSPlatform("windows")]
     public new string TargetFilePath =>
-        OperatingSystem.IsWindows() ?
-            $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe" : 
-            throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
+        OperatingSystem.IsWindows()
+            ? $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe"
+            : throw new PlatformNotSupportedException(Resources
+                .Exceptions_Cmd_OnlySupportedOnWindows);
 }

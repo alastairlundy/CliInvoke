@@ -5,24 +5,26 @@ using CliInvoke.Core;
 using CliInvoke.Core.Builders;
 using CliWrap;
 using CliWrap.Buffered;
+using Command = Medallion.Shell.Command;
+using CommandResult = Medallion.Shell.CommandResult;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 [SimpleJob(RuntimeMoniker.Net90)]
 [SimpleJob(RuntimeMoniker.Net10_0)]
-[MemoryDiagnoser, Orderer(SummaryOrderPolicy.FastestToSlowest)]
+[MemoryDiagnoser]
+[Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BufferedInvokationBenchmark
 {
-    private readonly IProcessInvoker _processInvoker;
-
     private readonly BufferedTestHelper _bufferedTestHelper;
+    private readonly IProcessInvoker _processInvoker;
 
     public BufferedInvokationBenchmark()
     {
         _processInvoker = CliInvokeHelpers.CreateProcessInvoker();
         _bufferedTestHelper = new BufferedTestHelper();
     }
-    
+
     [Benchmark]
     public async Task<string> CliInvoke_ProcessInvoker()
     {
@@ -38,7 +40,7 @@ public class BufferedInvokationBenchmark
 
         return result.StandardOutput;
     }
-    
+
     [Benchmark]
     public async Task<string> CliWrap()
     {
@@ -49,12 +51,11 @@ public class BufferedInvokationBenchmark
 
         return result.StandardOutput;
     }
-    
+
     [Benchmark]
     public async Task<string> MedallionShell()
     {
-        Medallion.Shell.CommandResult result = await Medallion
-            .Shell.Command.Run(
+        CommandResult result = await Command.Run(
                 _bufferedTestHelper.TargetFilePath,
                 _bufferedTestHelper.Arguments
             )
@@ -62,7 +63,7 @@ public class BufferedInvokationBenchmark
 
         return result.StandardOutput;
     }
-    
+
     [Benchmark]
     public async Task<string> SimpleExec()
     {

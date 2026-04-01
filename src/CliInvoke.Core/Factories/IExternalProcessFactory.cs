@@ -12,23 +12,35 @@ using CliInvoke.Core.Processes;
 namespace CliInvoke.Core.Factories;
 
 /// <summary>
-/// Represents an interface for creating instances of the <see cref="IExternalProcess"/> interface.
+///     Represents an interface for creating instances of the <see cref="IExternalProcess" />
+///     interface.
 /// </summary>
 public interface IExternalProcessFactory
 {
     /// <summary>
-    /// Creates an instance of the <see cref="IExternalProcess"/> interface based on the provided process configuration.
+    ///     Creates an instance of the <see cref="IExternalProcess" /> interface based on the provided
+    ///     process configuration.
     /// </summary>
     /// <param name="configuration">The configuration details for creating the external process.</param>
-    /// <returns>An instance of <see cref="IExternalProcess"/> configured according to the specified <paramref name="configuration"/>.</returns>
+    /// <returns>
+    ///     An instance of <see cref="IExternalProcess" /> configured according to the specified
+    ///     <paramref name="configuration" />.
+    /// </returns>
     IExternalProcess CreateExternalProcess(ProcessConfiguration configuration);
 
     /// <summary>
-    /// Creates an instance of the <see cref="IExternalProcess"/> interface based on the provided process configuration.
+    ///     Creates an instance of the <see cref="IExternalProcess" /> interface based on the provided
+    ///     process configuration.
     /// </summary>
     /// <param name="configuration">The configuration details for creating the external process.</param>
-    /// <param name="exitConfiguration">The process exit configuration details for configuring process exit behaviour.</param>
-    /// <returns>An instance of <see cref="IExternalProcess"/> configured according to the specified <paramref name="configuration"/>.</returns>
+    /// <param name="exitConfiguration">
+    ///     The process exit configuration details for configuring process exit
+    ///     behaviour.
+    /// </param>
+    /// <returns>
+    ///     An instance of <see cref="IExternalProcess" /> configured according to the specified
+    ///     <paramref name="configuration" />.
+    /// </returns>
     IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration exitConfiguration);
 }

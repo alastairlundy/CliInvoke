@@ -10,15 +10,20 @@
 namespace CliInvoke.Core.Extensibility.Factories;
 
 /// <summary>
-/// An interface to allow creating a ProcessConfiguration that can be run through another Process' ProcessConfiguration.
+///     An interface to allow creating a ProcessConfiguration that can be run through another Process'
+///     ProcessConfiguration.
 /// </summary>
 public interface IRunnerProcessFactory
 {
     /// <summary>
-    /// Creates a ProcessConfiguration to be run from a runner configuration and an input ProcessConfiguration.
+    ///     Creates a ProcessConfiguration to be run from a runner configuration and an input
+    ///     ProcessConfiguration.
     /// </summary>
     /// <param name="processConfigToBeRun">The command to be run by the ProcessConfiguration Runner.</param>
-    /// <param name="runnerProcessConfig">The process running configuration to use for the ProcessConfiguration that will run other ProcessConfigurations.</param>
+    /// <param name="runnerProcessConfig">
+    ///     The process running configuration to use for the
+    ///     ProcessConfiguration that will run other ProcessConfigurations.
+    /// </param>
     /// <returns>The built Command that will run the input command with the runner process configuration.</returns>
     ProcessConfiguration CreateRunnerConfiguration(
         ProcessConfiguration processConfigToBeRun,

@@ -5,8 +5,6 @@ namespace CliInvoke.Tests.TestData;
 
 public class TestFixture
 {
-    public IServiceProvider ServiceProvider { get; private set; }
-
     public TestFixture()
     {
         IServiceCollection serviceCollection = new ServiceCollection();
@@ -16,4 +14,6 @@ public class TestFixture
 
         ServiceProvider = serviceCollection.BuildServiceProvider();
     }
+
+    public IServiceProvider ServiceProvider { get; private set; }
 }

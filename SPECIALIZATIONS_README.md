@@ -1,5 +1,6 @@
 # CliInvoke.Specializations
-This readme covers the **CliInvoke Specializations** library. 
+
+This readme covers the **CliInvoke Specializations** library.
 
 Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/blob/main/README.md)?
 
@@ -11,14 +12,22 @@ Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/bl
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
 ## Usage
-CliInvoke.Specializations comes with three specializations as of 1.0.0: 
-- [CmdProcessConfiguration](#cmdprocessconfiguration) — An easier way to execute processes and commands through cmd.exe (Only supported on Windows)
-- [ClassicPowershellProcessConfiguration](#classicpowershellprocessconfiguration) — An easier way to execute processes and commands through Windows PowerShell (Only supported on Windows)
-- [PowershellProcessConfiguration](#powershellprocessconfiguration) — An easier way to execute processes and commands through the modern Cross-Platform open source PowerShell (PowerShell is not installed by CliInvoke and is expected to be installed if you plan to use it.)
 
-All Command specialization classes come with an already configured TargetFilePath that points to the relevant executable.
+CliInvoke.Specializations comes with three specializations as of 1.0.0:
+
+- [CmdProcessConfiguration](#cmdprocessconfiguration) — An easier way to execute processes and commands through
+  cmd.exe (Only supported on Windows)
+- [ClassicPowershellProcessConfiguration](#classicpowershellprocessconfiguration) — An easier way to execute processes
+  and commands through Windows PowerShell (Only supported on Windows)
+- [PowershellProcessConfiguration](#powershellprocessconfiguration) — An easier way to execute processes and commands
+  through the modern Cross-Platform open source PowerShell (PowerShell is not installed by CliInvoke and is expected to
+  be installed if you plan to use it.)
+
+All Command specialization classes come with an already configured TargetFilePath that points to the relevant
+executable.
 
 ### CmdProcessConfiguration
+
 The CmdProcessConfiguration TargetFilePath points to Windows' copy of cmd.exe. This is only supported on Windows.
 
 ```csharp
@@ -50,7 +59,9 @@ using CliInvoke.Specializations;
   BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
 ```
 
-If the result of the command being run is not of concern you can call ``ExecuteAsync()`` instead of ``ExecuteBufferedAsync()`` and ignore the returned ProcessResult like so:
+If the result of the command being run is not of concern you can call ``ExecuteAsync()`` instead of
+``ExecuteBufferedAsync()`` and ignore the returned ProcessResult like so:
+
 ```csharp
 using CliInvoke.Core;
 using CliInvoke.Builders;
@@ -81,7 +92,9 @@ using CliInvoke.Specializations;
 ```
 
 ### ClassicPowershellProcessConfiguration
-The ClassicPowershellCommand is a specialized Command class with an already configured TargetFilePath that points to Windows' copy of powershell.exe.
+
+The ClassicPowershellCommand is a specialized Command class with an already configured TargetFilePath that points to
+Windows' copy of powershell.exe.
 
 This is only supported on Windows.
 
@@ -115,7 +128,9 @@ using CliInvoke.Specializations;
 ```
 
 ### PowershellProcessConfiguration
-The PowershellProcessConfiguration's TargetFilePath points to the installed copy of cross-platform PowerShell if it is installed.
+
+The PowershellProcessConfiguration's TargetFilePath points to the installed copy of cross-platform PowerShell if it is
+installed.
 
 This is only supported on platforms that cross-platform PowerShell supports.
 
@@ -149,6 +164,8 @@ using CliInvoke.Specializations;
 ```
 
 ## Licensing
+
 CliInvoke and CliInvoke Specializations are licensed under the MPL 2.0 license.
 
-If you use CliInvoke or CliInvoke.Specializations in your project, please make an exact copy of CliInvoke's LICENSE.txt file available either in your third party licenses txt file or as a separate txt file.
+If you use CliInvoke or CliInvoke.Specializations in your project, please make an exact copy of CliInvoke's LICENSE.txt
+file available either in your third party licenses txt file or as a separate txt file.

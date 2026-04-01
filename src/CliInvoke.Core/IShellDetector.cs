@@ -10,15 +10,20 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-/// Provides functionality to detect the default shell on various operating systems.
+///     Provides functionality to detect the default shell on various operating systems.
 /// </summary>
 public interface IShellDetector
 {
     /// <summary>
-    /// Resolves the default shell on various operating systems asynchronously.
+    ///     Resolves the default shell on various operating systems asynchronously.
     /// </summary>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
-    /// <returns>A task representing the asynchronous resolution of the default shell,
-    /// returning a <see cref="ShellInformation"/> object containing details about the detected shell.</returns>
+    /// <param name="cancellationToken">
+    ///     A cancellation token that can be used to cancel the asynchronous
+    ///     operation.
+    /// </param>
+    /// <returns>
+    ///     A task representing the asynchronous resolution of the default shell,
+    ///     returning a <see cref="ShellInformation" /> object containing details about the detected shell.
+    /// </returns>
     Task<ShellInformation> ResolveDefaultShellAsync(CancellationToken cancellationToken);
 }

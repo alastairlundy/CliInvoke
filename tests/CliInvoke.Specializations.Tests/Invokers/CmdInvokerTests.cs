@@ -13,7 +13,7 @@ namespace CliInvoke.Specializations.Tests.Invokers;
 public class CmdInvokerTests : IDisposable
 {
     private readonly CmdProcessInvoker cmdProcessInvoker;
-    
+
     [SupportedOSPlatform("windows")]
     public CmdInvokerTests(TestFixture testFixture)
     {
@@ -21,6 +21,11 @@ public class CmdInvokerTests : IDisposable
         IRunnerProcessFactory runnerProcessFactory = testFixture.ServiceProvider.GetRequiredService<IRunnerProcessFactory>();
 
         cmdProcessInvoker = new CmdProcessInvoker(procInvoker, runnerProcessFactory);
+    }
+
+    public void Dispose()
+    {
+        cmdProcessInvoker.Dispose();
     }
 
     [Test]
@@ -41,16 +46,11 @@ public class CmdInvokerTests : IDisposable
                 ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException),
             false, CancellationToken.None);
 
-        await Assert.That(Process.GetProcesses().Any(p => p.ProcessName.Contains("calculatorapp", 
+        await Assert.That(Process.GetProcesses().Any(p => p.ProcessName.Contains("calculatorapp",
                 StringComparison.InvariantCultureIgnoreCase)))
             .IsTrue();
 
         await Assert.That(result.ExitCode)
             .IsEqualTo(0);
-    }
-
-    public void Dispose()
-    {
-        cmdProcessInvoker.Dispose();
     }
 }

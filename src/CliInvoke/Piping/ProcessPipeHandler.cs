@@ -10,12 +10,13 @@
 namespace CliInvoke.Piping;
 
 /// <summary>
-/// An implementation of IProcessPipeHandler. Pipes Process Standard Input, Output, and Error as required.
+///     An implementation of IProcessPipeHandler. Pipes Process Standard Input, Output, and Error as
+///     required.
 /// </summary>
 public class ProcessPipeHandler : IProcessPipeHandler
 {
     /// <summary>
-    /// Asynchronously pipes the standard input from a source stream to a specified process.
+    ///     Asynchronously pipes the standard input from a source stream to a specified process.
     /// </summary>
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
@@ -40,7 +41,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     }
 
     /// <summary>
-    /// Asynchronously retrieves the standard output stream from a specified process.
+    ///     Asynchronously retrieves the standard output stream from a specified process.
     /// </summary>
     /// <param name="source">The process from which to read the standard output data.</param>
     /// <param name="cancellationToken"></param>
@@ -54,18 +55,14 @@ public class ProcessPipeHandler : IProcessPipeHandler
         Stream destination = new MemoryStream();
 
         if (source.StartInfo.RedirectStandardOutput)
-        {
             if (source.StandardOutput != StreamReader.Null)
-            {
                 await source.StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken);
-            }
-        }
 
         return destination;
     }
 
     /// <summary>
-    /// Asynchronously retrieves the standard error stream from a specified process.
+    ///     Asynchronously retrieves the standard error stream from a specified process.
     /// </summary>
     /// <param name="source">The process from which to read the standard error data.</param>
     /// <param name="cancellationToken"></param>
@@ -79,12 +76,8 @@ public class ProcessPipeHandler : IProcessPipeHandler
         Stream destination = new MemoryStream();
 
         if (source.StartInfo.RedirectStandardError)
-        {
             if (source.StandardError != StreamReader.Null)
-            {
                 await source.StandardError.BaseStream.CopyToAsync(destination, cancellationToken);
-            }
-        }
 
         return destination;
     }

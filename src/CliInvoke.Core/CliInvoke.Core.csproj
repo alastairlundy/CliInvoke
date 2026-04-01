@@ -28,7 +28,7 @@
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>2.5.1.0</AssemblyVersion>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
@@ -47,11 +47,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="..\..\.assets\icon.png">
-        <Pack>True</Pack>
-        <PackagePath>icon.png</PackagePath>
-        <Link>icon.png</Link>
-      </None>
+        <None Include="..\..\.assets\icon.png">
+            <Pack>True</Pack>
+            <PackagePath>icon.png</PackagePath>
+            <Link>icon.png</Link>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

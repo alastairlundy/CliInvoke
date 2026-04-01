@@ -4,16 +4,17 @@ using CliInvoke.Builders;
 using CliInvoke.Core;
 using CliInvoke.Core.Builders;
 using CliWrap;
+using Command = Medallion.Shell.Command;
 
 namespace CliInvoke.Benchmarking.Benchmarks.Invokation;
 
 [SimpleJob(RuntimeMoniker.Net90)]
-[MemoryDiagnoser, Orderer(SummaryOrderPolicy.FastestToSlowest)]
+[MemoryDiagnoser]
+[Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class BasicUnbufferedInvokationBenchmark
 {
-    private readonly ProcessInvoker _processInvoker;
-
     private readonly DotnetCommandHelper _dotnetCommandHelper;
+    private readonly ProcessInvoker _processInvoker;
 
     public BasicUnbufferedInvokationBenchmark()
     {
@@ -51,8 +52,7 @@ public class BasicUnbufferedInvokationBenchmark
     [Benchmark]
     public async Task<int> MedallionShell()
     {
-        Medallion.Shell.CommandResult result = await Medallion
-            .Shell.Command.Run(
+        Medallion.Shell.CommandResult result = await Command.Run(
                 _dotnetCommandHelper.DotnetExecutableTargetFilePath,
                 _dotnetCommandHelper.Arguments
             )

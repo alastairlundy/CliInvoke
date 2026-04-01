@@ -19,16 +19,17 @@ public class ProcessCancellationTests
         //Arrange 
         string filePath = ProcessTestHelper.GetTargetFilePath();
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
-        
-        ProcessExitConfiguration processExitConfiguration = new( ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)), 
+
+        ProcessExitConfiguration processExitConfiguration = new(
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
             ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
-        
+
         //Act
-       
+
         process.Start();
-       
+
         int processId = process.Id;
-       
+
         await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
 
         await Task.Delay(1000, TestContext.Current.CancellationToken);
@@ -38,7 +39,7 @@ public class ProcessCancellationTests
         //Assert
         Assert.False(actual);
     }
-    
+
     /*[Fact]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -48,17 +49,17 @@ public class ProcessCancellationTests
     [UnsupportedOSPlatform("tvos")]
     public async Task ProcessCancelled_Normal_Delay_DefaultTimeOutPolicy_Success()
     {
-        //Arrange 
+        //Arrange
         string filePath = ProcessTestHelper.GetTargetFilePath();
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
 
         ProcessExitConfiguration processExitConfiguration = new(ProcessTimeoutPolicy.Default,
             ProcessResultValidation.None, ProcessCancellationExceptionBehavior.SuppressException);
-        
+
         //Act
-       
+
         process.Start();
-       
+
         int processId = process.Id;
 
         await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
@@ -70,7 +71,7 @@ public class ProcessCancellationTests
         //Assert
         Assert.False(actual);
     }*/
-    
+
     [Fact]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -84,20 +85,21 @@ public class ProcessCancellationTests
         string filePath = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "/usr/bin/sleep" : "timeout";
         string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "120" : "/T 120 /NOBREAK";
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
-        
-        ProcessExitConfiguration processExitConfiguration = new(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(30)),
+
+        ProcessExitConfiguration processExitConfiguration = new(
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(30)),
             ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
-        
+
         //Act
         process.Start();
-       
+
         int processId = process.Id;
         try
         {
             await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
-        
+
             await Task.Delay(1000, TestContext.Current.CancellationToken);
-            
+
             bool actual = Process.GetProcesses().Any(x => x.Id == processId);
             //Assert
             Assert.False(actual);

@@ -10,12 +10,12 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-/// A class that defines a Process' Timeout configuration, if any.
+///     A class that defines a Process' Timeout configuration, if any.
 /// </summary>
 public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 {
     /// <summary>
-    /// Instantiates the <see cref="ProcessTimeoutPolicy"/> with default values.
+    ///     Instantiates the <see cref="ProcessTimeoutPolicy" /> with default values.
     /// </summary>
     public ProcessTimeoutPolicy()
     {
@@ -24,9 +24,13 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// Instantiates the <see cref="ProcessTimeoutPolicy"/> with default values unless specified parameters are provided.
+    ///     Instantiates the <see cref="ProcessTimeoutPolicy" /> with default values unless specified
+    ///     parameters are provided.
     /// </summary>
-    /// <param name="timeoutThreshold">The timespan to wait for the Process timeout before cancelling the Process.</param>
+    /// <param name="timeoutThreshold">
+    ///     The timespan to wait for the Process timeout before cancelling the
+    ///     Process.
+    /// </param>
     /// <param name="enabled"></param>
     public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, bool enabled)
     {
@@ -38,44 +42,39 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// Creates an instance of <see cref="ProcessTimeoutPolicy"/> using the specified timeout threshold
-    /// and an optional cancellation mode.
+    ///     Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
     /// </summary>
-    /// <param name="timeoutThreshold">The maximum duration to wait before the process is considered timed out.</param>
-    /// <param name="cancellationMode">The method of cancellation to apply when the timeout threshold is reached.
-    /// Defaults to <see cref="ProcessCancellationMode.Graceful"/>.</param>
-    /// <returns>A new instance of <see cref="ProcessTimeoutPolicy"/> configured with the specified parameters.</returns>
-    public static ProcessTimeoutPolicy FromTimeSpan(TimeSpan timeoutThreshold,
-        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful) =>
-        new(timeoutThreshold, true);
-
-    /// <summary>
-    /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
-    /// </summary>
-    public static ProcessTimeoutPolicy Default { get; } = 
+    public static ProcessTimeoutPolicy Default { get; } =
         new(TimeSpan.FromMinutes(30), true);
 
     /// <summary>
-    /// Disables waiting for Process Timeout.
+    ///     Disables waiting for Process Timeout.
     /// </summary>
     public static ProcessTimeoutPolicy None { get; } =
         new(TimeSpan.FromSeconds(0), false);
 
     /// <summary>
-    /// The timespan after which a Process should no longer be allowed to continue waiting to exit.
+    ///     The timespan after which a Process should no longer be allowed to continue waiting to exit.
     /// </summary>
     public TimeSpan TimeoutThreshold { get; }
-    
+
     /// <summary>
-    /// Whether the timeout policy is enabled or not.
+    ///     Whether the timeout policy is enabled or not.
     /// </summary>
     public bool Enabled { get; }
 
     /// <summary>
-    /// Determines whether the current <see cref="ProcessTimeoutPolicy"/> is equal to another <see cref="ProcessTimeoutPolicy"/> instance.
+    ///     Determines whether the current <see cref="ProcessTimeoutPolicy" /> is equal to another
+    ///     <see cref="ProcessTimeoutPolicy" /> instance.
     /// </summary>
-    /// <param name="other">The <see cref="ProcessTimeoutPolicy"/> instance to compare with the current <see cref="ProcessTimeoutPolicy"/> instance.</param>
-    /// <returns><c>true</c> if the current <see cref="ProcessTimeoutPolicy"/> is equal to the specified <see cref="ProcessTimeoutPolicy"/> instance; otherwise, <c>false</c>.</returns>
+    /// <param name="other">
+    ///     The <see cref="ProcessTimeoutPolicy" /> instance to compare with the current
+    ///     <see cref="ProcessTimeoutPolicy" /> instance.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the current <see cref="ProcessTimeoutPolicy" /> is equal to the specified
+    ///     <see cref="ProcessTimeoutPolicy" /> instance; otherwise, <c>false</c>.
+    /// </returns>
     public bool Equals(ProcessTimeoutPolicy? other)
     {
         if (other is null)
@@ -86,10 +85,40 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// Determines whether the specified object is equal to the current <see cref="ProcessTimeoutPolicy"/> instance.
+    ///     Creates an instance of <see cref="ProcessTimeoutPolicy" /> using the specified timeout
+    ///     threshold
+    ///     and an optional cancellation mode.
     /// </summary>
-    /// <param name="obj">The object to compare with the current <see cref="ProcessTimeoutPolicy"/> instance.</param>
-    /// <returns><c>true</c> if the specified object is equal to the current <see cref="ProcessTimeoutPolicy"/> instance; otherwise, <c>false</c>.</returns>
+    /// <param name="timeoutThreshold">
+    ///     The maximum duration to wait before the process is considered timed
+    ///     out.
+    /// </param>
+    /// <param name="cancellationMode">
+    ///     The method of cancellation to apply when the timeout threshold is reached.
+    ///     Defaults to <see cref="ProcessCancellationMode.Graceful" />.
+    /// </param>
+    /// <returns>
+    ///     A new instance of <see cref="ProcessTimeoutPolicy" /> configured with the specified
+    ///     parameters.
+    /// </returns>
+    public static ProcessTimeoutPolicy FromTimeSpan(TimeSpan timeoutThreshold,
+        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful)
+    {
+        return new ProcessTimeoutPolicy(timeoutThreshold, true);
+    }
+
+    /// <summary>
+    ///     Determines whether the specified object is equal to the current
+    ///     <see cref="ProcessTimeoutPolicy" /> instance.
+    /// </summary>
+    /// <param name="obj">
+    ///     The object to compare with the current <see cref="ProcessTimeoutPolicy" />
+    ///     instance.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the specified object is equal to the current
+    ///     <see cref="ProcessTimeoutPolicy" /> instance; otherwise, <c>false</c>.
+    /// </returns>
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -102,20 +131,23 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// Returns a hash code for the current <see cref="ProcessTimeoutPolicy"/> instance.
+    ///     Returns a hash code for the current <see cref="ProcessTimeoutPolicy" /> instance.
     /// </summary>
-    /// <returns>A hash code that represents the current <see cref="ProcessTimeoutPolicy"/>.</returns>
+    /// <returns>A hash code that represents the current <see cref="ProcessTimeoutPolicy" />.</returns>
     public override int GetHashCode()
     {
         return HashCode.Combine(TimeoutThreshold, Enabled);
     }
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessTimeoutPolicy"/> instances are equal.
+    ///     Determines whether two <see cref="ProcessTimeoutPolicy" /> instances are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessTimeoutPolicy"/> instance to compare.</param>
-    /// <param name="right">The second <see cref="ProcessTimeoutPolicy"/> instance to compare.</param>
-    /// <returns><c>true</c> if the two <see cref="ProcessTimeoutPolicy"/> instances are equal; otherwise, <c>false</c>.</returns>
+    /// <param name="left">The first <see cref="ProcessTimeoutPolicy" /> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessTimeoutPolicy" /> instance to compare.</param>
+    /// <returns>
+    ///     <c>true</c> if the two <see cref="ProcessTimeoutPolicy" /> instances are equal; otherwise,
+    ///     <c>false</c>.
+    /// </returns>
     public static bool Equals(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
@@ -125,25 +157,30 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// Determines whether two <see cref="ProcessTimeoutPolicy"/> instances are equal.
+    ///     Determines whether two <see cref="ProcessTimeoutPolicy" /> instances are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessTimeoutPolicy"/> instance to compare.</param>
-    /// <param name="right">The second <see cref="ProcessTimeoutPolicy"/> instance to compare.</param>
-    /// <returns><c>true</c> if the two <see cref="ProcessTimeoutPolicy"/> instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right) 
-        => Equals(left, right);
+    /// <param name="left">The first <see cref="ProcessTimeoutPolicy" /> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessTimeoutPolicy" /> instance to compare.</param>
+    /// <returns>
+    ///     <c>true</c> if the two <see cref="ProcessTimeoutPolicy" /> instances are equal; otherwise,
+    ///     <c>false</c>.
+    /// </returns>
+    public static bool operator ==(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
+    {
+        return Equals(left, right);
+    }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool operator !=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right) 
-        => !Equals(left, right);
+    public static bool operator !=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
+    {
+        return !Equals(left, right);
+    }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -157,7 +194,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -171,13 +207,15 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// Defines a less-than-or-equal-to comparison between two <see cref="ProcessTimeoutPolicy"/> instances.
+    ///     Defines a less-than-or-equal-to comparison between two <see cref="ProcessTimeoutPolicy" />
+    ///     instances.
     /// </summary>
     /// <param name="left">The left-hand operand in the comparison.</param>
     /// <param name="right">The right-hand operand in the comparison.</param>
     /// <returns>
-    /// <see langword="true"/> if the left-hand operand is less than or equal to the right-hand operand;
-    /// otherwise, <see langword="false"/>.
+    ///     <see langword="true" /> if the left-hand operand is less than or equal to the right-hand
+    ///     operand;
+    ///     otherwise, <see langword="false" />.
     /// </returns>
     public static bool operator >=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
@@ -188,11 +226,16 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    /// Defines an operator for comparing two <see cref="ProcessTimeoutPolicy"/> instances based on their TimeoutThreshold.
+    ///     Defines an operator for comparing two <see cref="ProcessTimeoutPolicy" /> instances based on
+    ///     their TimeoutThreshold.
     /// </summary>
-    /// <param name="left">The left operand, a <see cref="ProcessTimeoutPolicy"/> instance.</param>
-    /// <param name="right">The right operand, a <see cref="ProcessTimeoutPolicy"/> instance.</param>
-    /// <returns>Returns true if the TimeoutThreshold of the left <see cref="ProcessTimeoutPolicy"/> is less than or equal to the TimeoutThreshold of the right <see cref="ProcessTimeoutPolicy"/>, otherwise returns false. If either operand is null, returns false.</returns>
+    /// <param name="left">The left operand, a <see cref="ProcessTimeoutPolicy" /> instance.</param>
+    /// <param name="right">The right operand, a <see cref="ProcessTimeoutPolicy" /> instance.</param>
+    /// <returns>
+    ///     Returns true if the TimeoutThreshold of the left <see cref="ProcessTimeoutPolicy" /> is
+    ///     less than or equal to the TimeoutThreshold of the right <see cref="ProcessTimeoutPolicy" />,
+    ///     otherwise returns false. If either operand is null, returns false.
+    /// </returns>
     public static bool operator <=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
