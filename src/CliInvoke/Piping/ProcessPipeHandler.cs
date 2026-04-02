@@ -12,6 +12,7 @@ namespace CliInvoke.Piping;
 /// <summary>
 /// An implementation of IProcessPipeHandler. Pipes Process Standard Input, Output, and Error as required.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class ProcessPipeHandler : IProcessPipeHandler
 {
     /// <summary>
@@ -24,6 +25,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public async Task<bool> PipeStandardInputAsync(Stream source, Process destination,
         CancellationToken cancellationToken)
     {
@@ -48,6 +50,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public async Task<Stream> PipeStandardOutputAsync(Process source,
         CancellationToken cancellationToken)
     {
@@ -73,6 +76,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public async Task<Stream> PipeStandardErrorAsync(Process source,
         CancellationToken cancellationToken)
     {

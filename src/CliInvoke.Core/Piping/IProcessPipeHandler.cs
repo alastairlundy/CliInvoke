@@ -9,11 +9,14 @@
 
 using System.Diagnostics;
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core.Piping;
 
 /// <summary>
 /// An interface to allow for a standardized way of Process pipe handling.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public interface IProcessPipeHandler
 {
     /// <summary>
@@ -22,7 +25,8 @@ public interface IProcessPipeHandler
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
+    /// <returns>A task that represents the asynchronous operation containing the destination process.</returns>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     Task<bool> PipeStandardInputAsync(Stream source, Process destination, CancellationToken cancellationToken);
 
     /// <summary>
@@ -31,6 +35,7 @@ public interface IProcessPipeHandler
     /// <param name="source">The process from which to read the standard output data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     Task<Stream> PipeStandardOutputAsync(Process source, CancellationToken cancellationToken);
 
     /// <summary>
@@ -39,5 +44,6 @@ public interface IProcessPipeHandler
     /// <param name="source">The process from which to read the standard error data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     Task<Stream> PipeStandardErrorAsync(Process source, CancellationToken cancellationToken);
 }
