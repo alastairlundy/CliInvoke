@@ -15,6 +15,7 @@ namespace CliInvoke.Extensibility;
 /// <summary>
 /// The default implementation of <see cref="RunnerProcessInvokerBase"/>.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class DefaultRunnerProcessInvoker : RunnerProcessInvokerBase
 {
     /// <summary>
