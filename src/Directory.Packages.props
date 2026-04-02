@@ -4,8 +4,8 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Polyfill" PrivateAssets="all" Version="9.22.0" />
-    <PackageVersion Include="DotExtensions" Version="10.0.0" />
+    <PackageVersion Include="Polyfill" PrivateAssets="all" Version="9.23.0" />
+    <PackageVersion Include="DotExtensions" Version="10.1.1" />
     <PackageVersion Include="DotPrimitives" Version="4.3.3" />
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
