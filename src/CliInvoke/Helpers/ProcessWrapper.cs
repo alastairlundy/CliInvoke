@@ -11,8 +11,19 @@ using CliInvoke.Helpers.Processes;
 
 namespace CliInvoke.Helpers;
 
-internal class ProcessWrapper : Process
+internal class ProcessWrapper : Process, IDisposable
 {
+    // Synchronization primitives for cancellation operations
+    internal readonly SemaphoreSlim CancellationSemaphore = new(1, 1);
+    
+    internal readonly SemaphoreSlim ForcefulExitLock = new(1, 1);
+    
+    // Track if forceful exit has been attempted to prevent double invocation
+    internal bool ForcefulExitAttempted = false;
+    
+    // Track if disposed to prevent multiple disposals
+    private bool _disposed;
+    
     internal ProcessWrapper(ProcessConfiguration configuration, 
         ProcessResourcePolicy? resourcePolicy)
     {
@@ -79,5 +90,24 @@ internal class ProcessWrapper : Process
         }
 
         return result;
+    }
+    
+    public new void Dispose()
+    {
+        if (_disposed)
+            return;
+        
+        _disposed = true;
+        
+        // Dispose of SemaphoreSlim instances
+        CancellationSemaphore.Dispose();
+        ForcefulExitLock.Dispose();
+        
+        // Unsubscribe from events to prevent memory leaks
+        Exited -= OnExited;
+        Started -= OnStarted;
+        
+        base.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

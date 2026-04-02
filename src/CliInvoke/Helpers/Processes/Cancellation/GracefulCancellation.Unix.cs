@@ -54,7 +54,7 @@ internal static partial class GracefulCancellation
 
                 sigIntSuccess = SendSignal(process.Id, Sigint);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 if (cancellationExceptionBehavior ==
                     ProcessCancellationExceptionBehavior.AllowException)

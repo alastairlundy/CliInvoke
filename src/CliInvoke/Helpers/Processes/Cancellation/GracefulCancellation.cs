@@ -8,6 +8,7 @@
    */
 
 using DotExtensions.Dates;
+using System.Threading;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
@@ -34,24 +35,44 @@ internal static partial class GracefulCancellation
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
-            DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+            // Reset forceful exit attempt flag for this operation
+            process.ForcefulExitAttempted = false;
             
-            Task<bool> gracefulInterruptCancellation = process.GracefulInterruptCancellation(timeoutThreshold, 
-                cancellationExceptionBehavior, cancellationToken);
-            
-            await Task.WhenAny([
-                process.WaitForExitAsync(cancellationToken),
-                gracefulInterruptCancellation,
-                process.GracefulCancellationWithCancelToken(
-                    timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
-                    cancellationExceptionBehavior, expectedExitTime)
-            ]);
-
-            await Task.WhenAny([Task.Delay(500, cancellationToken), process.WaitForExitAsync(cancellationToken)]);
-            
-            if (!process.HasExited && fallbackToForceful)
+            // Acquire synchronization lock to prevent concurrent cancellation operations
+            await process.CancellationSemaphore.WaitAsync(cancellationToken);
+            try
             {
-                process.ForcefulExit(cancellationExceptionBehavior);
+                DateTime expectedExitTime = DateTime.UtcNow.AddTicks(timeoutThreshold.Ticks);
+                
+                Task<bool> gracefulInterruptCancellation = process.GracefulInterruptCancellation(timeoutThreshold, 
+                    cancellationExceptionBehavior, cancellationToken);
+                
+                // Wait for any of the three tasks to complete
+                Task[] tasks =
+                [
+                    process.WaitForExitAsync(cancellationToken),
+                    gracefulInterruptCancellation,
+                    process.GracefulCancellationWithCancelToken(
+                        timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
+                        cancellationExceptionBehavior, expectedExitTime)
+                ];
+                
+                // Wait for any task to complete and get its index
+                Task completedTask = await Task.WhenAny(tasks);
+                int completedTaskIndex = Array.IndexOf(tasks, completedTask);
+                
+                // Only proceed with forceful exit if:
+                // 1. The completed task was the timeout task (index 2)
+                // 2. The process hasn't exited yet
+                // 3. Fallback to forceful is enabled
+                if (completedTaskIndex == 2 && !process.HasExited && fallbackToForceful)
+                {
+                    SafeForcefulExit(process, cancellationExceptionBehavior);
+                }
+            }
+            finally
+            {
+                process.CancellationSemaphore.Release();
             }
         }
 
@@ -67,15 +88,10 @@ internal static partial class GracefulCancellation
         private async Task GracefulCancellationWithCancelToken(TimeSpan timeoutThreshold,
             ProcessCancellationExceptionBehavior cancellationExceptionBehavior, DateTime expectedExitTime)
         {
-            CancellationTokenSource cts = new();
+            // Use using statement to ensure proper disposal of CancellationTokenSource
+            using var cts = new CancellationTokenSource();
 
             cts.CancelAfter(timeoutThreshold);
-
-            if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException)
-            {
-                await process.WaitForExitAsync(cts.Token);
-                return;
-            }
 
             try
             {
@@ -86,19 +102,39 @@ internal static partial class GracefulCancellation
                 DateTime actualExitTime = DateTime.UtcNow;
                 TimeSpan difference = expectedExitTime.Difference(actualExitTime);
 
-                if (cancellationExceptionBehavior
-                    == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected)
+                if (cancellationExceptionBehavior == ProcessCancellationExceptionBehavior.AllowException || (cancellationExceptionBehavior
+                        == ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected && (difference > TimeSpan.FromSeconds(10))))
                 {
-                    if (difference > TimeSpan.FromSeconds(10))
+                    throw;
+                }
+            }
+            // Note: We don't call ForcefulExit here anymore to prevent double invocation
+            // It's handled in the calling method after checking which task completed
+        }
+        
+        /// <summary>
+        /// Safely attempts forceful exit, ensuring it's only called once per process lifecycle.
+        /// </summary>
+        /// <param name="proc">The process to forcefully exit.</param>
+        /// <param name="cancellationExceptionBehavior">Behavior for handling cancellation exceptions.</param>
+        private static void SafeForcefulExit(ProcessWrapper proc, ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+        {
+            // Only attempt forceful exit if it hasn't been attempted before and process hasn't exited
+            proc.ForcefulExitLock.Wait();
+            try
+            {
+                if (!proc.ForcefulExitAttempted)
+                {
+                    if (!proc.HasExited)
                     {
-                        throw;
+                        proc.ForcefulExitAttempted = true;
+                        proc.ForcefulExit(cancellationExceptionBehavior);
                     }
                 }
             }
             finally
             {
-                if (!process.HasExited)
-                    process.ForcefulExit(cancellationExceptionBehavior);
+                proc.ForcefulExitLock.Release();
             }
         }
     }

@@ -8,6 +8,7 @@
    */
 
 using DotExtensions.Dates;
+using System.Threading;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
@@ -80,7 +81,20 @@ internal static class ForcefulCancellation
             }
             finally
             {
-                process.ForcefulExit(cancellationExceptionBehavior);
+                // Only call ForcefulExit if process hasn't exited yet and forceful exit hasn't been attempted
+                process.ForcefulExitLock.Wait();
+                try
+                {
+                    if (!process.ForcefulExitAttempted && !process.HasExited)
+                    {
+                        process.ForcefulExitAttempted = true;
+                        process.ForcefulExit(cancellationExceptionBehavior);
+                    }
+                }
+                finally
+                {
+                    process.ForcefulExitLock.Release();
+                }
             }
         }
     }
