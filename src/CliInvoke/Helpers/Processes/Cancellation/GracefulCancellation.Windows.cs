@@ -50,7 +50,7 @@ internal static partial class GracefulCancellation
 
                 ctrlCSignalSuccess = SendCtrlCToConsoleWin(CtrlCSignalEvent, 0);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 if (cancellationExceptionBehavior is ProcessCancellationExceptionBehavior.AllowExceptionIfUnexpected
                     or ProcessCancellationExceptionBehavior.AllowException)
