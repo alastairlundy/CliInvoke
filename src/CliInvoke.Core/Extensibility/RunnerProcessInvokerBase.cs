@@ -8,6 +8,7 @@
  */
 
 using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Core.Extensibility;
 
@@ -16,6 +17,7 @@ namespace CliInvoke.Core.Extensibility;
 /// </summary>
 /// <remarks>Users should implement this abstract class when exposing an invoker that is easier to set up with Dependency Injection is desired
 /// </remarks>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
 {
     private readonly IProcessInvoker _processInvoker;
@@ -61,6 +63,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public virtual async Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
@@ -92,6 +95,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public virtual async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
@@ -123,6 +127,7 @@ public abstract class RunnerProcessInvokerBase : IProcessInvoker, IDisposable
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [Pure]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public virtual async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
