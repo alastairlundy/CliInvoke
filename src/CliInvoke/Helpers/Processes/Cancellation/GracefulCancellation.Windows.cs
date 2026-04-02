@@ -32,6 +32,7 @@ internal static partial class GracefulCancellation
                 throw new PlatformNotSupportedException();
 
             bool ctrlCSignalSuccess = false;
+            bool allocatedConsole = false;
             
             try
             {
@@ -40,15 +41,42 @@ internal static partial class GracefulCancellation
                 if (process.HasExited)
                     return true;
 
-                // Allocate a Console to the Process so that it has one it can use.
-                bool successfulAttachment = AllocConsoleWin();
-                // Attach the allocated console to the process.
-                successfulAttachment = successfulAttachment && AttachConsoleWin((uint)process.Id);
-
-                if (!successfulAttachment)
-                    return false;
-
-                ctrlCSignalSuccess = SendCtrlCToConsoleWin(CtrlCSignalEvent, 0);
+                // Get the process group ID of the target process
+                uint processGroupId = GetProcessGroupId(process);
+                
+                // On Windows, to send Ctrl+C to a process, we need a console attached
+                // Allocate one if we don't already have one
+                allocatedConsole = AllocConsoleWin();
+                
+                // Attempt to attach to the process's console
+                // This allows us to send console control events to it
+                bool attached = AttachConsoleWin((uint)process.Id);
+                
+                if (attached)
+                {
+                    // We're now attached to the target's console group
+                    // Send Ctrl+C signal (event 0) using the process group ID
+                    ctrlCSignalSuccess = SendCtrlCToConsoleWin(CtrlCSignalEvent, processGroupId);
+                    
+                    // Try Ctrl+Break as a fallback if Ctrl+C didn't work
+                    if (!ctrlCSignalSuccess)
+                    {
+                        ctrlCSignalSuccess = SendCtrlCToConsoleWin(1, processGroupId);
+                    }
+                    
+                    // Give the signal time to propagate
+                    await Task.Delay(50, CancellationToken.None);
+                }
+                else if (allocatedConsole)
+                {
+                    // If attachment failed but we allocated a console,
+                    // try sending to the process group ID directly as a fallback
+                    ctrlCSignalSuccess = SendCtrlCToConsoleWin(CtrlCSignalEvent, processGroupId);
+                    if (!ctrlCSignalSuccess)
+                    {
+                        ctrlCSignalSuccess = SendCtrlCToConsoleWin(1, processGroupId);
+                    }
+                }
             }
             catch (OperationCanceledException)
             {
@@ -62,12 +90,66 @@ internal static partial class GracefulCancellation
                     ProcessCancellationExceptionBehavior.SuppressException)
                     throw;
             }
+            finally
+            {
+                // Free the console if we allocated one
+                if (allocatedConsole)
+                    FreeConsoleWin();
+            }
 
             return ctrlCSignalSuccess;
         }
+        
+        /// <summary>
+        /// Gets the process group ID for the given process.
+        /// </summary>
+        private static uint GetProcessGroupId(ProcessWrapper targetProcess)
+        {
+            try
+            {
+                // Try to get process group ID using NtQueryInformationProcess
+                // This is more reliable than using the process ID directly
+                if (NtQueryInformationProcess(targetProcess.Handle, 0, out PROCESS_BASIC_INFORMATION pbi, 
+                    Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out _) == 0)
+                {
+                    // ProcessGroupId is stored in the 5th ULONG in the structure
+                    return pbi.ProcessGroupId;
+                }
+            }
+            catch
+            {
+                // If NtQueryInformationProcess fails, fall back to using process ID
+            }
+            
+            // Fallback: use process ID as group ID
+            return (uint)targetProcess.Id;
+        }
+    }
+
+    /// <summary>
+    /// Process basic information structure for NtQueryInformationProcess
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    private struct PROCESS_BASIC_INFORMATION
+    {
+        public uint ExitStatus;
+        public IntPtr PebBaseAddress;
+        public ulong AffinityMask;
+        public uint BasePriority;
+        public ulong UniqueProcessId;
+        public ulong InheritedFromUniqueProcessId;
+        public uint ProcessGroupId;
     }
 
 #if NETSTANDARD2_0
+    [DllImport("ntdll.dll", SetLastError = true)]
+    private static extern int NtQueryInformationProcess(
+        IntPtr ProcessHandle,
+        int ProcessInformationClass,
+        out PROCESS_BASIC_INFORMATION ProcessInformation,
+        int ProcessInformationLength,
+        out int ReturnLength);
+
     [DllImport("Kernel32.dll", EntryPoint = "GenerateConsoleCtrlEvent", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SendCtrlCToConsoleWin(uint ctrlEvent, uint processGroupEventId);
@@ -79,7 +161,19 @@ internal static partial class GracefulCancellation
     [DllImport("Kernel32.dll", EntryPoint = "AttachConsole", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool AttachConsoleWin(uint processId);
+
+    [DllImport("Kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FreeConsoleWin();
 #else
+    [LibraryImport("ntdll.dll", SetLastError = true)]
+    private static partial int NtQueryInformationProcess(
+        IntPtr ProcessHandle,
+        int ProcessInformationClass,
+        out PROCESS_BASIC_INFORMATION ProcessInformation,
+        int ProcessInformationLength,
+        out int ReturnLength);
+
     [LibraryImport("Kernel32.dll", EntryPoint = "GenerateConsoleCtrlEvent", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SendCtrlCToConsoleWin(uint ctrlEvent, uint processGroupEventId);
@@ -91,5 +185,9 @@ internal static partial class GracefulCancellation
     [LibraryImport("Kernel32.dll", EntryPoint = "AttachConsole", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool AttachConsoleWin(uint processId);
+
+    [LibraryImport("Kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool FreeConsoleWin();
 #endif
 }
