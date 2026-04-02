@@ -15,14 +15,15 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AoT compatible despite CliInvoke advertising itself as Trimming Safe and AoT compatible. It is now fixed to be Trimming safe and AoT compatible on .NET 8+ - This fix is also backported to CliInvoke 2.4 via version 2.4.4
-* Updated AoT Compatibility property in ``CliInvoke.csproj`` to only be set to true on .NET 8+
-* Reduced warnings regarding supported and unsupported OSes in ``ProcessResourcePolicyBuilder``</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated DotExtensions version from 10.0.0 to 10.1.1
+* Fixed a potential issue where Graceful cancellation on Windows would not free an allocated console leading to leaking memory
+* Fixed possible cancellation related race conditions
+* Fixed an issue where the wrong exception type was attempted to be caught in cancellation methods</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.5.1</PackageVersion>
-        <AssemblyVersion>2.5.1.0</AssemblyVersion>
+        <PackageVersion>2.5.2</PackageVersion>
+        <AssemblyVersion>2.5.2.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -32,6 +33,7 @@
         <PolyEnsure>true</PolyEnsure>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
+        <FileVersion>2.5.2.0</FileVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">

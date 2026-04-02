@@ -8,6 +8,7 @@
 */
 
 using CliInvoke.Extensibility;
+using CliInvoke.Internal;
 
 namespace CliInvoke.Extensions;
 
@@ -24,6 +25,7 @@ public static partial class DependencyInjectionExtensions
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown if the specified service lifetime is not a valid <see cref="ServiceLifetime"/> value.
     /// </exception>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static IServiceCollection AddDefaultRunnerProcessInvoker(
         this IServiceCollection services,
         ProcessConfiguration runnerProcessConfiguration,
@@ -94,6 +96,7 @@ public static partial class DependencyInjectionExtensions
     /// <returns>The updated service collection with the derived runner process invoker configured.</returns>
     /// <typeparam name="TRunnerType">The type of the derived runner process invoker, which must inherit from <see cref="RunnerProcessInvokerBase"/>.</typeparam>
     /// <exception cref="ArgumentException">Thrown if the provided type is not a subclass of or assignable from <see cref="RunnerProcessInvokerBase"/>.</exception>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static IServiceCollection AddDerivedRunnerProcessInvoker<
 #if NET8_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
@@ -127,6 +130,7 @@ public static partial class DependencyInjectionExtensions
     /// <param name="lifetime">The service lifetime to use for the derived runner process invoker. The default is Scoped.</param>
     /// <returns>The updated service collection with the derived runner process invoker configured.</returns>
     /// <exception cref="ArgumentException">Thrown if the provided type is not a subclass of or assignable from <see cref="RunnerProcessInvokerBase"/>.</exception>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static IServiceCollection AddDerivedRunnerProcessInvoker(
         this IServiceCollection services,
 #if NET8_0_OR_GREATER
