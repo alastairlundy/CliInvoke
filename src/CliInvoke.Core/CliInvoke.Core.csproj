@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net10.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net10.0;net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <PackageId>CliInvoke.Core</PackageId>
@@ -31,6 +31,7 @@
 
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.Bcl.HashCode" Condition="$(TargetFramework) == 'netstandard2.0'"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
