@@ -57,7 +57,7 @@ public static partial class DependencyInjectionExtensions
                 services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddSingleton<IProcessInvoker, ProcessInvoker>();
 
-                services.AddSingleton<IRunnerProcessFactory, RunnerProcessFactory>();
+                services.AddSingleton<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
                 services.AddSingleton<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Scoped:
@@ -80,7 +80,7 @@ public static partial class DependencyInjectionExtensions
                 services.AddScoped<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
 
-                services.AddScoped<IRunnerProcessFactory, RunnerProcessFactory>();
+                services.AddScoped<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
                 services.AddScoped<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Transient:
@@ -103,7 +103,7 @@ public static partial class DependencyInjectionExtensions
                 services.AddTransient<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
 
-                services.AddTransient<IRunnerProcessFactory, RunnerProcessFactory>();
+                services.AddTransient<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
                 services.AddTransient<IShellDetector, ShellDetector>();
                 break;
             default:

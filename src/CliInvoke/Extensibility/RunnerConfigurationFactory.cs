@@ -16,7 +16,7 @@ namespace CliInvoke.Extensibility;
 ///     A class to allow creating a ProcessConfiguration that can be run through another Process'
 ///     ProcessConfiguration.
 /// </summary>
-public class RunnerProcessFactory : IRunnerProcessFactory
+public class RunnerConfigurationFactory : IRunnerConfigurationFactory
 {
     /// <summary>
     ///     Create the command to be run from the Command runner configuration and an input command.
