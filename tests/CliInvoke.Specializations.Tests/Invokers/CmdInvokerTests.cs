@@ -10,22 +10,16 @@ using Microsoft.Extensions.DependencyInjection;
 namespace CliInvoke.Specializations.Tests.Invokers;
 
 [ClassDataSource<TestFixture>(Shared = SharedType.PerClass)]
-public class CmdInvokerTests : IDisposable
+public class CmdInvokerTests
 {
     private readonly CmdProcessInvoker cmdProcessInvoker;
 
     [SupportedOSPlatform("windows")]
     public CmdInvokerTests(TestFixture testFixture)
     {
-        IProcessInvoker procInvoker = testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
-        IRunnerProcessFactory runnerProcessFactory = testFixture.ServiceProvider.GetRequiredService<IRunnerProcessFactory>();
+        IRunnerConfigurationFactory runnerProcessFactory = testFixture.ServiceProvider.GetRequiredService<IRunnerConfigurationFactory>();
 
-        cmdProcessInvoker = new CmdProcessInvoker(procInvoker, runnerProcessFactory);
-    }
-
-    public void Dispose()
-    {
-        cmdProcessInvoker.Dispose();
+        cmdProcessInvoker = new CmdProcessInvoker(runnerProcessFactory);
     }
 
     [Test]
