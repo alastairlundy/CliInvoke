@@ -20,23 +20,14 @@ namespace CliInvoke;
 public class ProcessInvoker : IProcessInvoker
 {
     private readonly IExecutableFileResolver _executableFileResolver;
-    private readonly IProcessPipeHandler _processPipeHandler;
 
     /// <summary>
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes.
     /// </summary>
     /// <param name="executableFileResolver">The file path resolver to be used.</param>
-    /// <param name="processPipeHandler">
-    ///     The pipe handler to be used for managing the input/output streams
-    ///     of the processes.
-    /// </param>
     public ProcessInvoker(
-        IExecutableFileResolver executableFileResolver,
-        IProcessPipeHandler processPipeHandler)
-    {
-        _executableFileResolver = executableFileResolver;
-        _processPipeHandler = processPipeHandler;
-    }
+        IExecutableFileResolver executableFileResolver){
+        _executableFileResolver = executableFileResolver; }
 
     /// <summary>
     ///     Runs the process asynchronously, waits for exit, and safely disposes of the Process before
@@ -228,9 +219,9 @@ public class ProcessInvoker : IProcessInvoker
             await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
 
             Task<Stream> standardOutput =
-                _processPipeHandler.PipeStandardOutputAsync(process, cancellationToken);
+                process.PipeStandardOutputAsync(cancellationToken);
             Task<Stream> standardError =
-                _processPipeHandler.PipeStandardErrorAsync(process, cancellationToken);
+                process.PipeStandardErrorAsync(cancellationToken);
 
             Task waitForExit = process.WaitForExitOrTimeoutAsync(
                 processExitConfiguration,
@@ -291,9 +282,9 @@ public class ProcessInvoker : IProcessInvoker
 
         if (process.StartInfo.RedirectStandardInput
             && processConfiguration.StandardInput is not null)
-            await _processPipeHandler.PipeStandardInputAsync(
+            await process.PipeStandardInputAsync(
                 processConfiguration.StandardInput.BaseStream,
-                process, cancellationToken);
+                cancellationToken);
     }
 
     private async Task<ProcessExitConfiguration> ValidateConfigurationsAsync(

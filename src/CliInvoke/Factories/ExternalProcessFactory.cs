@@ -21,17 +21,12 @@ namespace CliInvoke.Factories;
 public class ExternalProcessFactory : IExternalProcessFactory
 {
     private readonly IExecutableFileResolver _filePathResolver;
-    private readonly IProcessPipeHandler _processPipeHandler;
 
     /// <summary>
     /// </summary>
     /// <param name="filePathResolver"></param>
-    /// <param name="processPipeHandler"></param>
-    public ExternalProcessFactory(IExecutableFileResolver filePathResolver,
-        IProcessPipeHandler processPipeHandler)
-    {
+    public ExternalProcessFactory(IExecutableFileResolver filePathResolver){
         _filePathResolver = filePathResolver;
-        _processPipeHandler = processPipeHandler;
     }
 
     /// <summary>
@@ -40,10 +35,8 @@ public class ExternalProcessFactory : IExternalProcessFactory
     /// <param name="configuration">The configuration for the external process.</param>
     /// <returns>An <see cref="IExternalProcess" /> instance representing the created external process.</returns>
     [Pure]
-    public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration)
-    {
-        return CreateExternalProcess(configuration, ProcessExitConfiguration.Default);
-    }
+    public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration) 
+        => CreateExternalProcess(configuration, ProcessExitConfiguration.Default);
 
     /// <summary>
     ///     Creates a new instance of the <see cref="ExternalProcess" /> class.
@@ -58,7 +51,7 @@ public class ExternalProcessFactory : IExternalProcessFactory
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration exitConfiguration)
     {
-        return new ExternalProcess(_filePathResolver, _processPipeHandler, configuration,
+        return new ExternalProcess(_filePathResolver, configuration,
             exitConfiguration);
     }
 }

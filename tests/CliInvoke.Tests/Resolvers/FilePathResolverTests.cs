@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
-using CliInvoke.Piping;
 using WhatExec.Lib.Abstractions.Detectors;
 using WhatExec.Lib.Abstractions.Resolvers;
 using WhatExec.Lib.Detectors;
@@ -46,7 +45,7 @@ public class FilePathResolverTests
                 IProcessConfigurationFactory processConfigurationFactory = new ProcessConfigurationFactory();
                 using ProcessConfiguration configuration = processConfigurationFactory.Create("where", "dotnet.exe");
 
-                IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver, new ProcessPipeHandler());
+                IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver);
 
                 BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
                     cancellationToken: TestContext.Current.CancellationToken);

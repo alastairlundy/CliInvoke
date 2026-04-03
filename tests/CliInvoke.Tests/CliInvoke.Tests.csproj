@@ -28,6 +28,7 @@
 
     <ItemGroup>
         <Folder Include="Invokers\Cancellation\"/>
+        <Folder Include="Piping\" />
     </ItemGroup>
 
 </Project>

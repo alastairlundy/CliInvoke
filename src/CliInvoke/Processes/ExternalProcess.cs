@@ -24,18 +24,15 @@ public class ExternalProcess : IExternalProcess
 {
     private readonly IExecutableFileResolver _executableFileResolver;
 
-    private readonly IProcessPipeHandler _processPipeHandler;
     private ProcessWrapper _processWrapper;
 
     /// <summary>
     /// </summary>
     /// <param name="executableFileResolver"></param>
-    /// <param name="processPipeHandler"></param>
     /// <param name="targetFilePath"></param>
     public ExternalProcess(IExecutableFileResolver executableFileResolver,
-        IProcessPipeHandler processPipeHandler, string targetFilePath)
+        string targetFilePath)
     {
-        _processPipeHandler = processPipeHandler;
         _executableFileResolver = executableFileResolver;
 
         Configuration = new ProcessConfiguration(targetFilePath,
@@ -50,14 +47,11 @@ public class ExternalProcess : IExternalProcess
     /// <summary>
     /// </summary>
     /// <param name="executableFileResolver"></param>
-    /// <param name="processPipeHandler"></param>
     /// <param name="configuration"></param>
     /// <param name="exitConfiguration"></param>
     public ExternalProcess(IExecutableFileResolver executableFileResolver,
-        IProcessPipeHandler processPipeHandler,
         ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null)
     {
-        _processPipeHandler = processPipeHandler;
         _executableFileResolver = executableFileResolver;
 
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
@@ -149,8 +143,8 @@ public class ExternalProcess : IExternalProcess
         _processWrapper.Start();
 
         if (configuration.StandardInput is not null)
-            await _processPipeHandler.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
-                _processWrapper, cancellationToken);
+            await _processWrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
+                cancellationToken);
     }
 
     /// <summary>
@@ -244,11 +238,11 @@ public class ExternalProcess : IExternalProcess
         CancellationToken cancellationToken)
     {
         Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput
-            ? _processPipeHandler.PipeStandardOutputAsync(_processWrapper, cancellationToken)
+            ? _processWrapper.PipeStandardOutputAsync(cancellationToken)
             : (Task<Stream>)Task.CompletedTask;
 
         Task<Stream> standardErrorStream = Configuration.RedirectStandardError
-            ? _processPipeHandler.PipeStandardErrorAsync(_processWrapper, cancellationToken)
+            ? _processWrapper.PipeStandardErrorAsync(cancellationToken)
             : (Task<Stream>)Task.CompletedTask;
 
         try

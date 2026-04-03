@@ -7,25 +7,25 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-namespace CliInvoke.Piping;
+namespace CliInvoke.Helpers.Processes;
 
 /// <summary>
 ///     An implementation of IProcessPipeHandler. Pipes Process Standard Input, Output, and Error as
 ///     required.
 /// </summary>
-public class ProcessPipeHandler : IProcessPipeHandler
+internal static class ProcessPipingHelper
 {
     /// <summary>
     ///     Asynchronously pipes the standard input from a source stream to a specified process.
     /// </summary>
-    /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
+    /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<bool> PipeStandardInputAsync(Stream source, Process destination,
+    internal static async Task<bool> PipeStandardInputAsync(this Process destination, Stream source,
         CancellationToken cancellationToken)
     {
         if (destination.StartInfo.RedirectStandardInput)
@@ -49,7 +49,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<Stream> PipeStandardOutputAsync(Process source,
+    internal static async Task<Stream> PipeStandardOutputAsync(this Process source,
         CancellationToken cancellationToken)
     {
         Stream destination = new MemoryStream();
@@ -70,7 +70,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<Stream> PipeStandardErrorAsync(Process source,
+    internal static async Task<Stream> PipeStandardErrorAsync(this Process source,
         CancellationToken cancellationToken)
     {
         Stream destination = new MemoryStream();
