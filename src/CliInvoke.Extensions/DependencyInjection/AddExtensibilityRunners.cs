@@ -7,91 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Extensibility;
-
 namespace CliInvoke.Extensions;
 
 public static partial class DependencyInjectionExtensions
 {
-    /// <summary>
-    ///     Registers a default implementation of the <see cref="DefaultRunnerProcessInvoker" />
-    ///     with the specified process configuration and service lifetime to the service collection.
-    /// </summary>
-    /// <param name="services">The service collection to which the default runner process invoker is added.</param>
-    /// <param name="runnerProcessConfiguration">The configuration for the runner process.</param>
-    /// <param name="lifetime">
-    ///     The desired service lifetime for the default runner process invoker (Scoped
-    ///     by default).
-    /// </param>
-    /// <returns>
-    ///     The updated service collection, now including the default runner process invoker
-    ///     registration.
-    /// </returns>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if the specified service lifetime is not a valid <see cref="ServiceLifetime" /> value.
-    /// </exception>
-    public static IServiceCollection AddDefaultRunnerProcessInvoker(
-        this IServiceCollection services,
-        ProcessConfiguration runnerProcessConfiguration,
-        ServiceLifetime lifetime = ServiceLifetime.Scoped
-    )
-    {
-        switch (lifetime)
-        {
-            case ServiceLifetime.Scoped:
-                services.AddScoped<RunnerProcessInvokerBase>(sp => new DefaultRunnerProcessInvoker(
-                    sp.GetRequiredService<IProcessInvoker>(),
-                    sp.GetRequiredService<IRunnerProcessFactory>(),
-                    runnerProcessConfiguration
-                ));
-                services.AddScoped<DefaultRunnerProcessInvoker>(sp =>
-                    new DefaultRunnerProcessInvoker(
-                        sp.GetRequiredService<IProcessInvoker>(),
-                        sp.GetRequiredService<IRunnerProcessFactory>(),
-                        runnerProcessConfiguration
-                    )
-                );
-                break;
-            case ServiceLifetime.Singleton:
-                services.AddSingleton<RunnerProcessInvokerBase>(sp =>
-                    new DefaultRunnerProcessInvoker(
-                        sp.GetRequiredService<IProcessInvoker>(),
-                        sp.GetRequiredService<IRunnerProcessFactory>(),
-                        runnerProcessConfiguration
-                    )
-                );
-                services.AddSingleton<DefaultRunnerProcessInvoker>(sp =>
-                    new DefaultRunnerProcessInvoker(
-                        sp.GetRequiredService<IProcessInvoker>(),
-                        sp.GetRequiredService<IRunnerProcessFactory>(),
-                        runnerProcessConfiguration
-                    )
-                );
-                break;
-            case ServiceLifetime.Transient:
-                services.AddTransient<RunnerProcessInvokerBase>(sp =>
-                    new DefaultRunnerProcessInvoker(
-                        sp.GetRequiredService<IProcessInvoker>(),
-                        sp.GetRequiredService<IRunnerProcessFactory>(),
-                        runnerProcessConfiguration
-                    )
-                );
-                services.AddTransient<DefaultRunnerProcessInvoker>(sp =>
-                    new DefaultRunnerProcessInvoker(
-                        sp.GetRequiredService<IProcessInvoker>(),
-                        sp.GetRequiredService<IRunnerProcessFactory>(),
-                        runnerProcessConfiguration
-                    )
-                );
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        return services;
-    }
-
-
     /// <summary>
     ///     Configures dependency injection to include a derived runner process invoker type.
     /// </summary>

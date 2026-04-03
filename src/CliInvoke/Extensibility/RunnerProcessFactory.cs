@@ -8,9 +8,9 @@
  */
 
 using CliInvoke.Builders;
-using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core.Extensibility;
 
-namespace CliInvoke.Extensibility.Factories;
+namespace CliInvoke.Extensibility;
 
 /// <summary>
 ///     A class to allow creating a ProcessConfiguration that can be run through another Process'
