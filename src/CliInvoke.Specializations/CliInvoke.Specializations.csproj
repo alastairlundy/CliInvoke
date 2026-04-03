@@ -80,4 +80,8 @@
             <Link>icon.png</Link>
         </None>
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
+    </ItemGroup>
 </Project>
