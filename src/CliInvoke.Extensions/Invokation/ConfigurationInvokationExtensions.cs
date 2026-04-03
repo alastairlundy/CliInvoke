@@ -33,10 +33,6 @@ public static class ConfigurationInvokationExtensions
     ///     The exit configuration to use for the process, or the
     ///     default if null.
     /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Whether to dispose of the provided
-    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
-    /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">
@@ -62,14 +58,12 @@ public static class ConfigurationInvokationExtensions
         this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default
     )
     {
         return await processConfigurationInvoker.ExecuteAsync(
             processConfiguration,
             processExitConfiguration,
-            disposeOfConfig,
             cancellationToken
         );
     }
@@ -121,7 +115,6 @@ public static class ConfigurationInvokationExtensions
         return await processConfigurationInvoker.ExecuteBufferedAsync(
             processConfiguration,
             processExitConfiguration,
-            disposeOfConfig,
             cancellationToken
         );
     }
@@ -173,7 +166,6 @@ public static class ConfigurationInvokationExtensions
         return await processConfigurationInvoker.ExecutePipedAsync(
             processConfiguration,
             processExitConfiguration,
-            disposeOfConfig,
             cancellationToken
         );
     }

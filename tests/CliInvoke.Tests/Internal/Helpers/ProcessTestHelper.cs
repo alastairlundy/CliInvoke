@@ -22,8 +22,7 @@ internal class ProcessTestHelper
 
     internal static ProcessWrapper CreateProcess(string targetFilePath, string arguments)
     {
-        ProcessConfiguration configuration = new ProcessConfiguration(targetFilePath, false, true,
-            true, arguments, windowCreation: false);
+        ProcessConfiguration configuration = new ProcessConfiguration(targetFilePath,arguments);
 
         ProcessWrapper process = new ProcessWrapper(configuration, configuration.ResourcePolicy);
 

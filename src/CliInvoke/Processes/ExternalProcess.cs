@@ -34,7 +34,7 @@ public class ExternalProcess : IExternalProcess
         _executableFileResolver = executableFileResolver;
 
         Configuration = new ProcessConfiguration(targetFilePath,
-            false, true, true);
+            redirectStdOutAndErr: true);
         _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
         ExitConfiguration = ProcessExitConfiguration.Default;
 

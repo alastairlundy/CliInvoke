@@ -19,6 +19,44 @@ namespace CliInvoke.Core;
 public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposable
 {
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="targetFilePath"></param>
+    /// <param name="arguments"></param>
+    /// <param name="redirectStdOutAndErr"></param>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentNullException"></exception>
+    public ProcessConfiguration(string targetFilePath, string arguments = "", bool redirectStdOutAndErr = true)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
+        ArgumentNullException.ThrowIfNull(arguments);
+        
+        TargetFilePath = targetFilePath;
+        Arguments = arguments;
+        RedirectStandardInput = false;
+        RedirectStandardOutput = redirectStdOutAndErr;
+        RedirectStandardError = redirectStdOutAndErr;
+        
+        RequiresAdministrator = false;
+        WorkingDirectoryPath = Directory.GetCurrentDirectory();
+        EnvironmentVariables = new Dictionary<string, string>();
+        Credential = UserCredential.Null;
+
+        ResourcePolicy = ProcessResourcePolicy.Default;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        StandardInput = StreamWriter.Null;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        UseShellExecution = false;
+        WindowCreation = false;
+
+        StandardInputEncoding = Encoding.Default;
+        StandardOutputEncoding = Encoding.Default;
+        StandardErrorEncoding = Encoding.Default;
+    }
+    
+    /// <summary>
     ///     Configures the Command configuration to be wrapped and executed.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
@@ -43,7 +81,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
-    public ProcessConfiguration(
+    protected ProcessConfiguration(
         string targetFilePath,
         bool redirectStandardInput,
         bool redirectStandardOutput,
@@ -62,7 +100,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     {
         TargetFilePath = targetFilePath;
 
-        ArgumentException.ThrowIfNullOrWhiteSpace(targetFilePath);
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
 
         RequiresAdministrator = requiresAdministrator;
         Arguments = arguments ?? string.Empty;

@@ -65,10 +65,6 @@ public class PowershellProcessInvoker : IProcessInvoker
     ///     Optional configuration for handling the process exit
     ///     behaviour. Defaults to null.
     /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Specifies whether to dispose of the configuration after execution.
-    ///     Defaults to true.
-    /// </param>
     /// <param name="cancellationToken">
     ///     A token to cancel the asynchronous operation. Defaults to
     ///     CancellationToken.None.
@@ -86,7 +82,7 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
+        ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
@@ -109,10 +105,6 @@ public class PowershellProcessInvoker : IProcessInvoker
     ///     Optional configuration for handling the process exit
     ///     behaviour. Defaults to null.
     /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Specifies whether to dispose of the configuration after execution.
-    ///     Defaults to true.
-    /// </param>
     /// <param name="cancellationToken">
     ///     A token to cancel the asynchronous operation. Defaults to
     ///     CancellationToken.None.
@@ -131,7 +123,7 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("freebsd")]
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
+        ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
@@ -146,10 +138,6 @@ public class PowershellProcessInvoker : IProcessInvoker
     /// <param name="processExitConfiguration">
     ///     Optional configuration for handling the process exit
     ///     behaviour. Defaults to null.
-    /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Specifies whether to dispose of the configuration after execution.
-    ///     Defaults to true.
     /// </param>
     /// <param name="cancellationToken">
     ///     A token to cancel the asynchronous operation. Defaults to
@@ -168,7 +156,7 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
+        ProcessExitConfiguration? processExitConfiguration = null, 
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();

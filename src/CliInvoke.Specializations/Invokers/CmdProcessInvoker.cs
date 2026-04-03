@@ -30,7 +30,7 @@ public class CmdProcessInvoker : IProcessInvoker
     ///     platforms.
     /// </summary>
     /// <remarks>
-    ///     This class provides a specialization of the <see cref="RunnerProcessInvokerBase" /> for
+    ///     This class provides a specialization of the <see cref="IProcessInvoker" /> for
     ///     executing
     ///     command-line processes through CMD with additional configuration options such as window
     ///     creation and output redirection.
@@ -61,10 +61,6 @@ public class CmdProcessInvoker : IProcessInvoker
     ///     Optional configuration for handling the process exit
     ///     behavior.
     /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Indicates whether the <paramref name="processConfiguration" /> should be disposed
-    ///     after the process execution is complete. Default is true.
-    /// </param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>
     ///     A <see cref="Task{TResult}" /> representing the asynchronous operation, where the result
@@ -85,14 +81,13 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = true,
+        ProcessExitConfiguration? processExitConfiguration = null, 
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
 
-       using ProcessConfiguration runnerConfiguration = _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-           new CmdProcessConfiguration(processConfiguration.Arguments))
+        using ProcessConfiguration runnerConfiguration = _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
+            new CmdProcessConfiguration())
     }
 
     private static void ThrowIfUnsupported()
@@ -109,10 +104,6 @@ public class CmdProcessInvoker : IProcessInvoker
     /// <param name="processExitConfiguration">
     ///     Optional configuration for handling the process exit
     ///     behavior.
-    /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Indicates whether the <paramref name="processConfiguration" /> should be disposed
-    ///     after the process execution is complete. Default is true.
     /// </param>
     /// <param name="cancellationToken"> A token to monitor for cancellation requests. </param>
     /// <returns>
@@ -133,7 +124,7 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
+        ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
@@ -148,10 +139,6 @@ public class CmdProcessInvoker : IProcessInvoker
     /// <param name="processExitConfiguration">
     ///     Optional configuration for handling the process exit
     ///     behavior.
-    /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Indicates whether the <paramref name="processConfiguration" /> should be disposed
-    ///     after the process execution is complete. Default is true.
     /// </param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>
@@ -172,7 +159,7 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
+        ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();

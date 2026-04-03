@@ -28,8 +28,9 @@ public interface IProcessConfigurationBuilder
     ///     Sets the arguments to pass to the executable.
     /// </summary>
     /// <param name="arguments">The arguments to pass to the executable.</param>
+    /// <param name="escapeArguments"></param>
     /// <returns>The new IProcessConfigurationBuilder object with the specified arguments.</returns>
-    IProcessConfigurationBuilder SetArguments(string arguments);
+    IProcessConfigurationBuilder SetArguments(string arguments, bool escapeArguments = true);
 
     /// <summary>
     ///     Sets the Target File Path of the Process Executable.
