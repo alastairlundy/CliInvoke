@@ -25,7 +25,7 @@ public class ProcessInvokerTests : IClassFixture<TestFixture>
 
         config.TargetFilePath = " ";
 
-        await Assert.ThrowsAsync<ArgumentException>(() => processInvoker.ExecuteBufferedAsync(config,
+        await Assert.ThrowsAsync<FileNotFoundException>(() => processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.Default, cancellationToken: TestContext.Current.CancellationToken));
     }
 
