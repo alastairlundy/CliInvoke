@@ -74,7 +74,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// </param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters)
+    public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters = true)
     {
         ArgumentNullException.ThrowIfNull(value);
 
@@ -100,24 +100,13 @@ public class ArgumentsBuilder : IArgumentsBuilder
     }
 
     /// <summary>
-    ///     Appends a string value to the arguments builder without escaping special characters.
-    /// </summary>
-    /// <param name="value">The string value to append.</param>
-    /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    [Pure]
-    public IArgumentsBuilder Add(string value)
-    {
-        return IsValidArgument(value) ? Add(value, false) : this;
-    }
-
-    /// <summary>
     ///     Appends a collection of string values to the arguments builder.
     /// </summary>
     /// <param name="values">The collection of string values to append.</param>
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars)
+    public IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars = true)
     {
         ArgumentNullException.ThrowIfNull(values);
 
@@ -128,18 +117,6 @@ public class ArgumentsBuilder : IArgumentsBuilder
         string joinedValues = string.Join(" ", filtered);
 
         return Add(joinedValues, escapeSpecialChars);
-    }
-
-    /// <summary>
-    ///     Appends a collection of string values to the arguments builder without escaping special
-    ///     characters.
-    /// </summary>
-    /// <param name="values">The collection of string values to append.</param>
-    /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    [Pure]
-    public IArgumentsBuilder AddEnumerable(IEnumerable<string> values)
-    {
-        return AddEnumerable(values, true);
     }
 
     /// <summary>
@@ -203,21 +180,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
-    public IArgumentsBuilder Add(IFormattable value, bool escapeSpecialChars)
+    public IArgumentsBuilder Add(IFormattable value, bool escapeSpecialChars = true)
     {
         return Add(value, DefaultFormatProvider, null, escapeSpecialChars);
-    }
-
-    /// <summary>
-    ///     Appends a formattable value to the arguments builder without specifying a culture
-    ///     and without escaping special characters.
-    /// </summary>
-    /// <param name="value">The formattable value to append.</param>
-    /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    [Pure]
-    public IArgumentsBuilder Add(IFormattable value)
-    {
-        return Add(value, true);
     }
 
     /// <summary>
@@ -229,21 +194,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     [Pure]
     public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values,
-        bool escapeSpecialChars)
+        bool escapeSpecialChars = true)
     {
         return AddEnumerable(values, CultureInfo.CurrentCulture, null, escapeSpecialChars);
-    }
-
-    /// <summary>
-    ///     Appends a collection of formattable values to the arguments builder without specifying a
-    ///     culture and without escaping special characters.
-    /// </summary>
-    /// <param name="values">The collection of formattable values to append.</param>
-    /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    [Pure]
-    public IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values)
-    {
-        return AddEnumerable(values, true);
     }
 
     /// <summary>
