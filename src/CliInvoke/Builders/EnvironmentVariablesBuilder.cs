@@ -79,31 +79,24 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// <param name="name">The name of the environment variable to set.</param>
     /// <param name="value">The value of the environment variable to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    [Pure]
     public IEnvironmentVariablesBuilder SetPair(string name, string value)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentException.ThrowIfNullOrEmpty(value);
 
-        Dictionary<string, string> output = new(_environmentVariables);
-
         if (_throwExceptionIfDuplicateKeyFound)
         {
-            output.Add(name, value);
+            _environmentVariables.Add(name, value);
         }
         else
         {
-            bool result = output.TryAdd(name, value);
+            bool result = _environmentVariables.TryAdd(name, value);
 
             if (!result)
-                output[name] = value;
+                _environmentVariables[name] = value;
         }
 
-        return new EnvironmentVariablesBuilder(
-            output,
-            _stringComparer,
-            _throwExceptionIfDuplicateKeyFound
-        );
+        return this;
     }
 
     /// <summary>
@@ -111,37 +104,26 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// </summary>
     /// <param name="variables">The environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    [Pure]
     public IEnvironmentVariablesBuilder SetEnumerable(
-        IEnumerable<KeyValuePair<string, string>> variables
-    )
-    {
-        return SetInternal(variables);
-    }
+        IEnumerable<KeyValuePair<string, string>> variables) =>
+        SetInternal(variables);
 
     /// <summary>
     ///     Sets multiple environment variables from a dictionary.
     /// </summary>
     /// <param name="variables">The dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    [Pure]
-    public IEnvironmentVariablesBuilder SetDictionary(IDictionary<string, string> variables)
-    {
-        return SetInternal(variables);
-    }
+    public IEnvironmentVariablesBuilder SetDictionary(IDictionary<string, string> variables) =>
+        SetInternal(variables);
 
     /// <summary>
     ///     Sets multiple environment variables from a read-only dictionary.
     /// </summary>
     /// <param name="variables">The read-only dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
-    [Pure]
     public IEnvironmentVariablesBuilder SetReadOnlyDictionary(
-        IReadOnlyDictionary<string, string> variables
-    )
-    {
-        return SetInternal(variables);
-    }
+        IReadOnlyDictionary<string, string> variables) =>
+        SetInternal(variables);
 
     /// <summary>
     ///     Builds the dictionary of configured environment variables.
@@ -160,33 +142,29 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         _environmentVariables.Clear();
     }
 
-    protected IEnvironmentVariablesBuilder SetInternal(
+    private IEnvironmentVariablesBuilder SetInternal(
         IEnumerable<KeyValuePair<string, string>> variables)
     {
         ArgumentNullException.ThrowIfNull(variables);
 
-        Dictionary<string, string> output = new(
-            _environmentVariables,
-            StringComparer.Ordinal
-        );
-
         foreach (KeyValuePair<string, string> pair in variables)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(pair.Key);
+            ArgumentException.ThrowIfNullOrEmpty(pair.Value);
+
             if (_throwExceptionIfDuplicateKeyFound)
             {
-                output.Add(pair.Key, pair.Value);
+                _environmentVariables.Add(pair.Key, pair.Value);
             }
             else
             {
-                bool result = output.TryAdd(pair.Key, pair.Value);
+                bool result = _environmentVariables.TryAdd(pair.Key, pair.Value);
 
                 if (!result)
-                    output[pair.Key] = pair.Value;
+                    _environmentVariables[pair.Key] = pair.Value;
             }
+        }
 
-        return new EnvironmentVariablesBuilder(
-            output,
-            _stringComparer,
-            _throwExceptionIfDuplicateKeyFound
-        );
+        return this;
     }
 }

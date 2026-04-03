@@ -21,10 +21,6 @@ public interface IProcessInvoker
     /// </summary>
     /// <param name="processConfiguration">The process configuration to use.</param>
     /// <param name="processExitConfiguration">The process exiting configuration information to use.</param>
-    /// <param name="disposeOfConfig">
-    ///     Whether to dispose of the provided
-    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
-    /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from the running the process.</returns>
     [UnsupportedOSPlatform("tvos")]
@@ -33,7 +29,6 @@ public interface IProcessInvoker
     Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default
     );
 
@@ -55,7 +50,6 @@ public interface IProcessInvoker
     Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default
     );
 
@@ -78,7 +72,6 @@ public interface IProcessInvoker
     Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default
     );
 }
