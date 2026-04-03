@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-namespace CliInvoke.Core.Extensibility.Factories;
+namespace CliInvoke.Core.Extensibility;
 
 /// <summary>
 ///     An interface to allow creating a ProcessConfiguration that can be run through another Process'

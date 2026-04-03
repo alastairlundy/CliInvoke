@@ -8,9 +8,8 @@
 */
 
 using CliInvoke.Core.Validation;
-using CliInvoke.Extensibility.Factories;
+using CliInvoke.Extensibility;
 using CliInvoke.Factories;
-using CliInvoke.Piping;
 using CliInvoke.Validation;
 
 using WhatExec.Lib.Abstractions.Resolvers;
@@ -38,7 +37,6 @@ public static partial class DependencyInjectionExtensions
         {
             case ServiceLifetime.Singleton:
                 services.TryAddSingleton<IExecutableFileResolver, ExecutableFileResolver>();
-                services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
 
                 services.TryAddSingleton<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
@@ -59,7 +57,6 @@ public static partial class DependencyInjectionExtensions
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IExecutableFileResolver, ExecutableFileResolver>();
-                services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
 
                 services.TryAddScoped<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
@@ -80,7 +77,6 @@ public static partial class DependencyInjectionExtensions
                 break;
             case ServiceLifetime.Transient:
                 services.TryAddTransient<IExecutableFileResolver, ExecutableFileResolver>();
-                services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
 
                 services.TryAddTransient<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(

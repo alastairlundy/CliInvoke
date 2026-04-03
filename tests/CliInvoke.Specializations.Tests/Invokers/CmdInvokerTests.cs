@@ -4,7 +4,7 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using CliInvoke.Builders;
-using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Specializations.Tests.Invokers;
