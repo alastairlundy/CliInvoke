@@ -103,10 +103,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     ///     The Minimum Working Set size to be used for the Process.
     /// </summary>
     /// <remarks>This property is not supported on Linux-based operating systems.</remarks>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
     public nint? MinWorkingSet { get; }
@@ -115,10 +111,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     ///     Maximum Working Set size to be used for the Process.
     /// </summary>
     /// <remarks>This property is not supported on Linux-based operating systems.</remarks>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("android")]
     public nint? MaxWorkingSet { get; }
@@ -208,10 +200,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="left">A Process Resource Policy to be compared.</param>
     /// <param name="right">The other  Process Resource Policy to be compared.</param>
     /// <returns>True if both  Process Resource Policies are equal to each other; false otherwise.</returns>
-    public static bool operator ==(ProcessResourcePolicy? left, ProcessResourcePolicy? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(ProcessResourcePolicy? left, ProcessResourcePolicy? right) =>
+        Equals(left, right);
 
     /// <summary>
     ///     Determines if a Process Resource Policy is not equal to another Process Resource Policy.
@@ -219,8 +209,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="left">A Process Resource Policy to be compared.</param>
     /// <param name="right">The other Process Resource Policy to be compared.</param>
     /// <returns>True if both Process Resource Policies are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right)
-    {
-        return !Equals(left, right);
-    }
+    public static bool operator !=(ProcessResourcePolicy? left, ProcessResourcePolicy? right) =>
+        !Equals(left, right);
 }
