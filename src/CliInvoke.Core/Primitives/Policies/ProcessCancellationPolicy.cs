@@ -70,8 +70,9 @@ public class ProcessCancellationPolicy : IEquatable<ProcessCancellationPolicy>
 
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) ||
-               (obj is ProcessCancellationPolicy other && Equals(other));
+        if(obj is null) return false;
+        
+        return obj is ProcessCancellationPolicy other && Equals(other);
     }
 
     public override int GetHashCode()
@@ -85,10 +86,8 @@ public class ProcessCancellationPolicy : IEquatable<ProcessCancellationPolicy>
     /// <param name="right"></param>
     /// <returns></returns>
     public static bool operator ==(ProcessCancellationPolicy? left,
-        ProcessCancellationPolicy? right)
-    {
-        return Equals(left, right);
-    }
+        ProcessCancellationPolicy? right) =>
+        Equals(left, right);
 
     /// <summary>
     /// </summary>
@@ -96,10 +95,8 @@ public class ProcessCancellationPolicy : IEquatable<ProcessCancellationPolicy>
     /// <param name="right"></param>
     /// <returns></returns>
     public static bool operator !=(ProcessCancellationPolicy? left,
-        ProcessCancellationPolicy? right)
-    {
-        return !Equals(left, right);
-    }
+        ProcessCancellationPolicy? right) =>
+        !Equals(left, right);
 
     /// <summary>
     /// </summary>
