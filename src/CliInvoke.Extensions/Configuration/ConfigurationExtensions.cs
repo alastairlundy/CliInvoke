@@ -95,25 +95,24 @@ public static class ConfigurationExtensions
                 new ProcessConfigurationBuilder(processStartInfo.FileName);
 
             processConfigurationBuilder = processConfigurationBuilder
-                .SetEnvironmentVariables(environmentVars)
-                .ConfigureShellExecution(processStartInfo.UseShellExecute)
-                .ConfigureWindowCreation(!processStartInfo.CreateNoWindow)
+                .ConfigureEnvironmentVariables(envConfig =>
+                {
+                    envConfig.SetReadOnlyDictionary(environmentVars);
+                })
+                .UseShellExecution(processStartInfo.UseShellExecute)
+                .EnableWindowCreation(!processStartInfo.CreateNoWindow)
                 .SetWorkingDirectory(processStartInfo.WorkingDirectory)
                 .SetArguments(processStartInfo.Arguments)
-                .RedirectStandardInput(processStartInfo.RedirectStandardInput)
-                .RedirectStandardOutput(processStartInfo.RedirectStandardOutput)
-                .RedirectStandardError(processStartInfo.RedirectStandardError)
+                .SetOutputRedirectionMode( processStartInfo.RedirectStandardOutput ||  processStartInfo.RedirectStandardError ?
+                    OutputRedirectionMode.Buffer : OutputRedirectionMode.None)
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
                 .SetStandardInputPipe(StreamWriter.Null)
-#if NETSTANDARD2_1 || NET5_0_OR_GREATER
-                .SetStandardInputEncoding(processStartInfo.StandardInputEncoding)
-#endif
-                .SetStandardOutputEncoding(processStartInfo.StandardOutputEncoding)
-                .SetStandardErrorEncoding(processStartInfo.StandardErrorEncoding);
-
+                .SetEncoding(processStartInfo.StandardInputEncoding, 
+                    processStartInfo.StandardOutputEncoding, processStartInfo.StandardErrorEncoding);
+            
+            
             if (requiresAdministrator)
-                processConfigurationBuilder =
-                    processConfigurationBuilder.RequireAdministratorPrivileges();
+                processConfigurationBuilder.RequireAdministratorPrivileges();
 
             IUserCredentialBuilder userCredentialBuilder = new UserCredentialBuilder();
 
@@ -153,11 +152,6 @@ public static class ConfigurationExtensions
         ///     An instance of <see cref="ProcessStartInfo" /> with the configuration applied from
         ///     the provided <see cref="ProcessConfiguration" />.
         /// </returns>
-        public ProcessStartInfo ToProcessStartInfo()
-        {
-            return processConfiguration.ToProcessStartInfo(
-                processConfiguration.RedirectStandardOutput,
-                processConfiguration.RedirectStandardError);
-        }
+        public ProcessStartInfo ToProcessStartInfo() => ToStartInfoExtensions.ToProcessStartInfo(processConfiguration);
     }
 }

@@ -33,6 +33,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
     ///     Initializes a new instance of the CmdCommandConfiguration class.
     /// </summary>
     /// <param name="arguments">The arguments to be passed to the command.</param>
+    /// <param name="outputRedirectionMode"></param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator">
     ///     Indicates whether the command requires administrator
@@ -51,7 +52,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardOutput"></param>
     /// <param name="redirectStandardError"></param>
     public CmdProcessConfiguration(string arguments,
-        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
+        bool redirectStandardInput, OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
         StreamWriter? standardInput = null,
@@ -59,7 +60,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) :
         base("cmd.exe",
-            redirectStandardInput, redirectStandardOutput, redirectStandardError, $"/c {arguments}",
+            true, outputRedirectionMode, $"/c {arguments}",
             workingDirectoryPath, requiresAdministrator, environmentVariables, credentials,
             standardInput, standardInputEncoding, standardOutputEncoding,
             standardErrorEncoding,

@@ -14,7 +14,7 @@ namespace CliInvoke.Core.Builders;
 /// <summary>
 ///     A fluent builder interface for configuring and building a UserCredential.
 /// </summary>
-public interface IUserCredentialBuilder
+public interface IUserCredentialBuilder : IDisposable
 {
     /// <summary>
     ///     Sets the domain for the credential to be created.

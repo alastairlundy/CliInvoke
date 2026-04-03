@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Runtime.CompilerServices;
 using System.Text;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
@@ -23,10 +24,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     /// <param name="targetFilePath"></param>
     /// <param name="arguments"></param>
-    /// <param name="redirectStdOutAndErr"></param>
+    /// <param name="outputRedirectionMode"></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public ProcessConfiguration(string targetFilePath, string arguments = "", bool redirectStdOutAndErr = true)
+    public ProcessConfiguration(string targetFilePath, string arguments = "", 
+        OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer)
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
@@ -34,8 +36,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         TargetFilePath = targetFilePath;
         Arguments = arguments;
         RedirectStandardInput = false;
-        RedirectStandardOutput = redirectStdOutAndErr;
-        RedirectStandardError = redirectStdOutAndErr;
+        OutputRedirection = outputRedirectionMode;
         
         RequiresAdministrator = false;
         WorkingDirectoryPath = Directory.GetCurrentDirectory();
@@ -55,14 +56,57 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardOutputEncoding = Encoding.Default;
         StandardErrorEncoding = Encoding.Default;
     }
-    
+
+    internal ProcessConfiguration(
+        string targetFilePath,
+        string arguments,
+        bool redirectStandardInput,
+        OutputRedirectionMode outputRedirection = OutputRedirectionMode.None,
+        string? workingDirectoryPath = null,
+        bool requiresAdministrator = false,
+        IReadOnlyDictionary<string, string>? environmentVariables = null,
+        UserCredential? credential = null,
+        StreamWriter? standardInput = null,
+        Encoding? standardInputEncoding = null,
+        Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null,
+        ProcessResourcePolicy? processResourcePolicy = null,
+        bool windowCreation = false,
+        bool useShellExecution = false)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
+
+        TargetFilePath = targetFilePath;
+        
+        RequiresAdministrator = requiresAdministrator;
+        Arguments = arguments;
+        WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
+        EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+        Credential = credential ?? UserCredential.Null;
+
+        OutputRedirection = outputRedirection;
+        ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+
+        RedirectStandardInput = redirectStandardInput;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        StandardInput = standardInput ?? StreamWriter.Null;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        UseShellExecution = useShellExecution;
+        WindowCreation = windowCreation;
+
+        StandardInputEncoding = standardInputEncoding ?? Encoding.Default;
+        StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
+        StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
+    }
+
     /// <summary>
     ///     Configures the Command configuration to be wrapped and executed.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="redirectStandardInput"></param>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="redirectStandardError"></param>
+    /// <param name="outputRedirection"></param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <param name="workingDirectoryPath">The working directory to be used.</param>
     /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
@@ -84,8 +128,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     protected ProcessConfiguration(
         string targetFilePath,
         bool redirectStandardInput,
-        bool redirectStandardOutput,
-        bool redirectStandardError, string? arguments = null,
+        OutputRedirectionMode outputRedirection = OutputRedirectionMode.None,
+        string? arguments = null,
         string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
         IReadOnlyDictionary<string, string>? environmentVariables = null,
@@ -98,21 +142,20 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         bool windowCreation = false,
         bool useShellExecution = false)
     {
-        TargetFilePath = targetFilePath;
-
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
 
+        TargetFilePath = targetFilePath;
+        
         RequiresAdministrator = requiresAdministrator;
         Arguments = arguments ?? string.Empty;
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
         Credential = credential ?? UserCredential.Null;
 
+        OutputRedirection = outputRedirection;
         ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
 
         RedirectStandardInput = redirectStandardInput;
-        RedirectStandardOutput = redirectStandardOutput;
-        RedirectStandardError = redirectStandardError;
 
 #pragma warning disable CS0618 // Type or member is obsolete
         StandardInput = standardInput ?? StreamWriter.Null;
@@ -188,22 +231,14 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     public bool RedirectStandardInput { get; }
 
-    /// <summary>
-    ///     Whether to redirect the Standard Output.
-    /// </summary>
-    public bool RedirectStandardOutput { get; }
-
-    /// <summary>
-    ///     Whether to redirect the Standard Error.
-    /// </summary>
-    public bool RedirectStandardError { get; }
+    public OutputRedirectionMode OutputRedirection { get; protected set; }
 
     /// <summary>
     ///     The Process Resource Policy to be used for executing the Command.
     /// </summary>
     /// <remarks>
-    ///     Process Resource Policy objects enable configuring Processor Affinity and other resource
-    ///     settings to be applied to the Command if supported by the currently running operating system.
+    ///     Process Resource Policy objects enable configuring Processor Affinity and other resource settings
+    /// to be applied to the Command if supported by the currently running operating system.
     ///     <para>
     ///         Not all properties of a Process Resource Policy support all operating systems. Check
     ///         before configuring a property.
@@ -256,8 +291,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && ResourcePolicy.Equals(other.ResourcePolicy)
                && StandardInput.Equals(other.StandardInput)
                && RedirectStandardInput.Equals(other.RedirectStandardInput)
-               && RedirectStandardOutput.Equals(other.RedirectStandardOutput)
-               && RedirectStandardError.Equals(other.RedirectStandardError)
+               && OutputRedirection == other.OutputRedirection
                && StandardInputEncoding.Equals(other.StandardInputEncoding)
                && StandardOutputEncoding.Equals(other.StandardOutputEncoding)
                && StandardErrorEncoding.Equals(other.StandardErrorEncoding);

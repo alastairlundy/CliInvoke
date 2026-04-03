@@ -19,8 +19,7 @@ internal class ProcessWrapper : Process
     internal ProcessWrapper(ProcessConfiguration configuration,
         ProcessResourcePolicy? resourcePolicy)
     {
-        StartInfo = configuration.ToProcessStartInfo(configuration.RedirectStandardOutput,
-            configuration.RedirectStandardError);
+        StartInfo = configuration.ToProcessStartInfo();
         ProcessName = StartInfo.FileName;
         EnableRaisingEvents = true;
         Exited += OnExited;

@@ -39,6 +39,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="CliInvoke"/>
+    </ItemGroup>
+    
+    <ItemGroup>
         <Content Include="README.md">
             <Link>README.md</Link>
             <PackagePath>README.md</PackagePath>

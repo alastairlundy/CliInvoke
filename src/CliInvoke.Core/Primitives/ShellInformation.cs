@@ -104,10 +104,7 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <param name="left">The first <see cref="ShellInformation" /> to compare.</param>
     /// <param name="right">The second <see cref="ShellInformation" /> to compare.</param>
     /// <returns>true if the two <see cref="ShellInformation" /> are equal; otherwise, false.</returns>
-    public static bool operator ==(ShellInformation? left, ShellInformation? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(ShellInformation? left, ShellInformation? right) => Equals(left, right);
 
     /// <summary>
     ///     Determines whether two <see cref="ShellInformation" /> objects are not equal.
@@ -115,8 +112,5 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <param name="left">The first <see cref="ShellInformation" /> to compare.</param>
     /// <param name="right">The second <see cref="ShellInformation" /> to compare.</param>
     /// <returns>true if the two <see cref="ShellInformation" /> are not equal; otherwise, false.</returns>
-    public static bool operator !=(ShellInformation? left, ShellInformation? right)
-    {
-        return !Equals(left, right);
-    }
+    public static bool operator !=(ShellInformation? left, ShellInformation? right) => !Equals(left, right);
 }

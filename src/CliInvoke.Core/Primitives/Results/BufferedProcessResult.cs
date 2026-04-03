@@ -38,8 +38,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         string standardOutput,
         string standardError,
         DateTime startTime,
-        DateTime exitTime
-    )
+        DateTime exitTime)
         : base(executableFilePath, exitCode, processId, startTime, exitTime)
     {
         ArgumentException.ThrowIfNullOrEmpty(executableFilePath);

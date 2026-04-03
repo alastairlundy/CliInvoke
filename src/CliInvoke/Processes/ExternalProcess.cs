@@ -33,8 +33,7 @@ public class ExternalProcess : IExternalProcess
     {
         _executableFileResolver = executableFileResolver;
 
-        Configuration = new ProcessConfiguration(targetFilePath,
-            redirectStdOutAndErr: true);
+        Configuration = new ProcessConfiguration(targetFilePath);
         _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
         ExitConfiguration = ProcessExitConfiguration.Default;
 
@@ -196,11 +195,11 @@ public class ExternalProcess : IExternalProcess
     public async Task<BufferedProcessResult> CaptureBufferedResultAsync(
         CancellationToken cancellationToken)
     {
-        Task<string> standardOutputString = Configuration.RedirectStandardOutput
+        Task<string> standardOutputString = Configuration.OutputRedirection == OutputRedirectionMode.Buffer
             ? _processWrapper.StandardOutput.ReadToEndAsync(cancellationToken)
             : Task.FromResult(string.Empty);
 
-        Task<string> standardErrorString = Configuration.RedirectStandardError
+        Task<string> standardErrorString = Configuration.OutputRedirection == OutputRedirectionMode.Buffer
             ? _processWrapper.StandardError.ReadToEndAsync(cancellationToken)
             : Task.FromResult(string.Empty);
 
@@ -235,11 +234,11 @@ public class ExternalProcess : IExternalProcess
     public async Task<PipedProcessResult> CapturePipedResultAsync(
         CancellationToken cancellationToken)
     {
-        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput
+        Task<Stream> standardOutputStream = Configuration.OutputRedirection == OutputRedirectionMode.Pipe
             ? _processWrapper.PipeStandardOutputAsync(cancellationToken)
             : (Task<Stream>)Task.CompletedTask;
 
-        Task<Stream> standardErrorStream = Configuration.RedirectStandardError
+        Task<Stream> standardErrorStream = Configuration.OutputRedirection == OutputRedirectionMode.Pipe
             ? _processWrapper.PipeStandardErrorAsync(cancellationToken)
             : (Task<Stream>)Task.CompletedTask;
 

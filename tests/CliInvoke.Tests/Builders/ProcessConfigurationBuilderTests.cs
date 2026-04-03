@@ -55,7 +55,7 @@ public class ProcessConfigurationBuilderTests
         //Assert
         await Assert.That(() =>
         {
-            processConfigBuilder.ConfigureShellExecution(true)
+            processConfigBuilder.UseShellExecution(true)
                 .SetStandardInputPipe(new StreamWriter(Console.OpenStandardInput()));
         }).Throws<ArgumentException>();
     }
@@ -135,7 +135,7 @@ public class ProcessConfigurationBuilderTests
     {
         //Arrange
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-            .SetProcessResourcePolicy(ProcessResourcePolicy.Default);
+            .ConfigureProcessResourcePolicy(ProcessResourcePolicy.Default);
 
 
         //Arrange
@@ -144,7 +144,7 @@ public class ProcessConfigurationBuilderTests
             null,
             ProcessPriorityClass.AboveNormal);
 
-        processConfigBuilder = processConfigBuilder.SetProcessResourcePolicy(resourcePolicy);
+        processConfigBuilder = processConfigBuilder.ConfigureProcessResourcePolicy(resourcePolicy);
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
