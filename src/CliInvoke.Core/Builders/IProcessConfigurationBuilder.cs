@@ -19,17 +19,10 @@ public interface IProcessConfigurationBuilder
     /// <summary>
     ///     Sets the arguments to pass to the executable.
     /// </summary>
-    /// <param name="arguments">The arguments to pass to the Process.</param>
-    /// <returns>The updated IProcessConfigurationBuilder object with the specified arguments.</returns>
-    IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments);
-
-    /// <summary>
-    ///     Sets the arguments to pass to the executable.
-    /// </summary>
     /// <param name="arguments">The arguments to pass to the executable.</param>
     /// <param name="escapeArguments">Whether to escape the arguments if escape characters are detected.</param>
     /// <returns>The new IProcessConfigurationBuilder object with the specified arguments.</returns>
-    IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments, bool escapeArguments);
+    IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments, bool escapeArguments = true);
 
     /// <summary>
     ///     Sets the arguments to pass to the executable.

@@ -43,8 +43,7 @@ public interface IEnvironmentVariablesBuilder
     /// <param name="variables">The read-only dictionary of environment variables to set.</param>
     /// <returns>A new instance of the IEnvironmentVariablesBuilder with the updated environment variables.</returns>
     IEnvironmentVariablesBuilder SetReadOnlyDictionary(
-        IReadOnlyDictionary<string, string> variables
-    );
+        IReadOnlyDictionary<string, string> variables);
 
     /// <summary>
     ///     Builds the dictionary of configured environment variables.
