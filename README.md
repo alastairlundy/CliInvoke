@@ -117,7 +117,7 @@ class Program
         var provider = services.BuildServiceProvider();
 
         var factory = provider.GetRequiredService<IProcessConfigurationFactory>();
-        var invoker = provider.GetRequiredService<IProcessConfigurationInvoker>();
+        var invoker = provider.GetRequiredService<IProcessInvoker>();
 
         // Create a simple configuration (adjust path/args for your OS)
         var config = factory.Create("dotnet", "--info");
@@ -164,7 +164,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 // Get services 
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
-IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
@@ -187,7 +187,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 // Get services 
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
-IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
