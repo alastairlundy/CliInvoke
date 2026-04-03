@@ -33,7 +33,7 @@ public class FilePathResolverTests
 
         if (OperatingSystem.IsWindows())
         {
-            string? winExpected = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            string? winExpected = Environment.GetEnvironmentVariable("DOTNET_ROOT") + $"{Path.DirectorySeparatorChar}dotnet.exe";
 
             if (winExpected is not null)
             {
@@ -57,7 +57,7 @@ public class FilePathResolverTests
             expected = new FileInfo("/usr/bin/dotnet");
         }
 
-        await Assert.That(actual).IsEqualTo(expected);
+        await Assert.That(actual.FullName).IsEqualTo(expected.FullName);
     }
 
     [Test]
@@ -70,6 +70,6 @@ public class FilePathResolverTests
         FileInfo actual = await filePathResolver.LocateExecutableAsync(expected.Name, SearchOption.AllDirectories,
             CancellationToken.None);
 
-        await Assert.That(actual).IsEqualTo(expected);
+        await Assert.That(actual.FullName).IsEqualTo(expected.FullName);
     }
 }
