@@ -19,8 +19,12 @@ namespace CliInvoke.Specializations;
 ///     Provides functionality to execute processes either with raw output, buffered output, or piped
 ///     streams.
 /// </summary>
-public class CmdProcessInvoker : RunnerProcessInvokerBase
+public class CmdProcessInvoker : IProcessInvoker
 {
+    private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
+    private readonly bool _windowCreation;
+    private readonly bool _redirectOutputs;
+
     /// <summary>
     ///     Represents a process invoker specialized for running processes through CMD on Windows
     ///     platforms.
@@ -41,12 +45,12 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public CmdProcessInvoker(IProcessInvoker processInvoker,
-        IRunnerProcessFactory runnerProcessFactory, bool windowCreation = true,
-        bool redirectOutputs = true) :
-        base(processInvoker, runnerProcessFactory, new CmdProcessConfiguration("", false,
-            redirectOutputs, redirectOutputs, windowCreation: windowCreation))
+    public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, bool windowCreation = true,
+        bool redirectOutputs = true)
     {
+        _runnerConfigurationFactory = runnerConfigurationFactory;
+        _windowCreation = windowCreation;
+        _redirectOutputs = redirectOutputs;
     }
 
     /// <summary>
@@ -79,18 +83,23 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public new async Task<ProcessResult> ExecuteAsync(
+    public async Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
     {
+        ThrowIfUnsupported();
+
+       using ProcessConfiguration runnerConfiguration = _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
+           new CmdProcessConfiguration(processConfiguration.Arguments))
+    }
+
+    private static void ThrowIfUnsupported()
+    {
         if (!OperatingSystem.IsWindows())
             throw new PlatformNotSupportedException(Resources
                 .Exceptions_Cmd_OnlySupportedOnWindows);
-
-        return await base.ExecuteAsync(processConfiguration, processExitConfiguration,
-            disposeOfConfig, cancellationToken);
     }
 
     /// <summary>
@@ -122,17 +131,14 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public new async Task<BufferedProcessResult> ExecuteBufferedAsync(
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
     {
-        if (!OperatingSystem.IsWindows())
-            throw new PlatformNotSupportedException(Resources
-                .Exceptions_Cmd_OnlySupportedOnWindows);
+        ThrowIfUnsupported();
 
-        return await base.ExecuteBufferedAsync(processConfiguration, processExitConfiguration,
-            disposeOfConfig, cancellationToken);
+        
     }
 
     /// <summary>
@@ -164,16 +170,13 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public new async Task<PipedProcessResult> ExecutePipedAsync(
+    public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
     {
-        if (!OperatingSystem.IsWindows())
-            throw new PlatformNotSupportedException(Resources
-                .Exceptions_Cmd_OnlySupportedOnWindows);
+        ThrowIfUnsupported();
 
-        return await base.ExecutePipedAsync(processConfiguration, processExitConfiguration,
-            disposeOfConfig, cancellationToken);
+        
     }
 }

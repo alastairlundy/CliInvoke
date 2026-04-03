@@ -33,12 +33,15 @@ namespace CliInvoke.Specializations;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("macos")]
 [SupportedOSPlatform("linux")]
-public class PowershellProcessInvoker : RunnerProcessInvokerBase
+public class PowershellProcessInvoker : IProcessInvoker
 {
+    private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
+    private readonly bool _windowCreation;
+    private readonly bool _redirectOutputs;
+
     /// <summary>
     /// </summary>
-    /// <param name="processInvoker"></param>
-    /// <param name="runnerProcessFactory"></param>
+    /// <param name="runnerConfigurationFactory"></param>
     /// <param name="filePathResolver"></param>
     /// <param name="windowCreation"></param>
     /// <param name="redirectOutputs"></param>
@@ -46,13 +49,12 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public PowershellProcessInvoker(IProcessInvoker processInvoker,
-        IRunnerProcessFactory runnerProcessFactory, IExecutableFileResolver filePathResolver,
+    public PowershellProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, IExecutableFileResolver filePathResolver,
         bool windowCreation = true, bool redirectOutputs = true)
-        : base(processInvoker, runnerProcessFactory, new PowershellProcessConfiguration(
-            filePathResolver, "", false, redirectOutputs, redirectOutputs,
-            windowCreation: windowCreation))
     {
+        _runnerConfigurationFactory = runnerConfigurationFactory;
+        _windowCreation = windowCreation;
+        _redirectOutputs = redirectOutputs;
     }
 
     /// <summary>
@@ -83,16 +85,20 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public new Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
+    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
+    {
+        ThrowIfUnsupported();
+        
+        
+    }
+
+    private static void ThrowIfUnsupported()
     {
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS() ||
             OperatingSystem.IsBrowser())
             throw new PlatformNotSupportedException();
-
-        return base.ExecuteAsync(processConfiguration, processExitConfiguration, disposeOfConfig,
-            cancellationToken);
     }
 
     /// <summary>
@@ -123,18 +129,14 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public new Task<BufferedProcessResult> ExecuteBufferedAsync(
+    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
     {
-        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS() ||
-            OperatingSystem.IsBrowser())
-            throw new PlatformNotSupportedException(Resources
-                .Exceptions_Powershell_OnlySupportedOnDesktop);
-
-        return base.ExecuteBufferedAsync(processConfiguration, processExitConfiguration,
-            disposeOfConfig, cancellationToken);
+        ThrowIfUnsupported();
+        
+        
     }
 
     /// <summary>
@@ -165,16 +167,12 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public new Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
+    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
     {
-        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS() ||
-            OperatingSystem.IsBrowser())
-            throw new PlatformNotSupportedException(Resources
-                .Exceptions_Powershell_OnlySupportedOnDesktop);
-
-        return base.ExecutePipedAsync(processConfiguration, processExitConfiguration,
-            disposeOfConfig, cancellationToken);
+        ThrowIfUnsupported();
+        
+        
     }
 }

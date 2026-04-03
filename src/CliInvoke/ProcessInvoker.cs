@@ -38,10 +38,6 @@ public class ProcessInvoker : IProcessInvoker
     ///     The exit configuration to use for the process, or the
     ///     default if null.
     /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Whether to dispose of the provided
-    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
-    /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
     /// <exception cref="FileNotFoundException">
@@ -55,10 +51,8 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    public async Task<ProcessResult> ExecuteAsync(
-        ProcessConfiguration processConfiguration,
+    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
         processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
@@ -90,7 +84,7 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
+            DisposeProcessAndConfig(processConfiguration, process);
         }
     }
 
@@ -104,10 +98,6 @@ public class ProcessInvoker : IProcessInvoker
     ///     The exit configuration to use for the process, or the
     ///     default if null.
     /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Whether to dispose of the provided
-    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
-    /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">
@@ -120,9 +110,7 @@ public class ProcessInvoker : IProcessInvoker
     public async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
             processExitConfiguration, cancellationToken);
@@ -170,7 +158,7 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
+            DisposeProcessAndConfig(processConfiguration, process);
         }
     }
 
@@ -184,10 +172,6 @@ public class ProcessInvoker : IProcessInvoker
     ///     The exit configuration to use for the process, or the
     ///     default if null.
     /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Whether to dispose of the provided
-    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
-    /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException">
@@ -199,10 +183,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default
-    )
+        ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
         processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
             processExitConfiguration, cancellationToken);
@@ -246,7 +227,7 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
+            DisposeProcessAndConfig(processConfiguration, process);
         }
     }
 
@@ -316,13 +297,10 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     private static void DisposeProcessAndConfig(ProcessConfiguration processConfiguration,
-        bool disposeOfConfig,
         ProcessWrapper process)
     {
         process.Dispose();
-
-        if (disposeOfConfig)
-            processConfiguration.Dispose();
+        processConfiguration.Dispose();
     }
 
     #endregion

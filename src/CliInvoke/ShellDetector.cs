@@ -77,8 +77,7 @@ public class ShellDetector : IShellDetector
             .Create("ps", "-p $$ -o comm=");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
-            execConfiguration, ProcessExitConfiguration.Default, false,
-            cancellationToken);
+            execConfiguration, ProcessExitConfiguration.Default, cancellationToken);
 
         FileInfo shellExeInfo = await _executableFileResolver.LocateExecutableAsync(
             execResult.StandardOutput.Split(Environment.NewLine).First(),
@@ -88,8 +87,7 @@ public class ShellDetector : IShellDetector
             .Create(shellExeInfo.FullName, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
-            shellInfoProcessConfig, ProcessExitConfiguration.Default, false,
-            cancellationToken);
+            shellInfoProcessConfig, ProcessExitConfiguration.Default, cancellationToken);
 
         string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l =>
             l.ToLower().Contains("version") &&
@@ -122,7 +120,7 @@ public class ShellDetector : IShellDetector
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
                 powershellConfig,
-                ProcessExitConfiguration.Default, false, cancellationToken);
+                ProcessExitConfiguration.Default, cancellationToken);
 
             string[] powershellResults =
                 result.StandardOutput.Replace("v", string.Empty).Split(' ');
@@ -144,7 +142,7 @@ public class ShellDetector : IShellDetector
                 .Create(cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
-                ProcessExitConfiguration.Default, false, cancellationToken);
+                ProcessExitConfiguration.Default, cancellationToken);
 
             string line = result.StandardOutput.Split(Environment.NewLine).First();
 
