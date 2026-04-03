@@ -15,7 +15,7 @@ namespace CliInvoke.Helpers.Processes;
 /// </summary>
 internal static class ProcessCancellationExtensions
 {
-    internal const int GracefulTimeoutWaitSeconds = 30;
+    internal const int GracefulTimeoutWaitSeconds = 5;
     
     /// <param name="process">The process to cancel.</param>
     extension(ProcessWrapper process)

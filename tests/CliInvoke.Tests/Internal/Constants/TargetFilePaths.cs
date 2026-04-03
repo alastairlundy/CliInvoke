@@ -1,4 +1,3 @@
-using System.Threading;
 using WhatExec.Lib.Abstractions.Resolvers;
 using WhatExec.Lib.Detectors;
 using WhatExec.Lib.Resolvers;

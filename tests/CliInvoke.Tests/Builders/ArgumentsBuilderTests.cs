@@ -5,20 +5,20 @@ namespace CliInvoke.Tests.Builders;
 
 public class ArgumentsBuilderTests
 {
-    [Fact]
-    public void Add_AppendsValue_WithSingleSpaceBetween()
+    [Test]
+    public async Task Add_AppendsValue_WithSingleSpaceBetween()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
         IArgumentsBuilder afterFirst = builder.Add("first");
         IArgumentsBuilder afterSecond = afterFirst.Add("second");
 
-        Assert.False(ReferenceEquals(builder, afterFirst)); // new instance returned when no validation logic provided
-        Assert.Equal("first second", afterSecond.ToString());
+        await Assert.That(ReferenceEquals(builder, afterFirst)).IsFalse(); // new instance returned when no validation logic provided
+        await Assert.That(afterSecond.ToString()).IsEqualTo("first second");
     }
 
-    [Fact]
-    public void EscapeCharacters_ReplacesSpecialCharacters()
+    [Test]
+    public async Task EscapeCharacters_ReplacesSpecialCharacters()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
         string input = "\\\n\t\r\""; // backslash, newline, tab, carriage return, double quote, single quote
@@ -26,50 +26,50 @@ public class ArgumentsBuilderTests
 
         string result = builder.EscapeCharacters(input);
 
-        Assert.Equal(expected, result);
+        await Assert.That(result).IsEqualTo(expected);
     }
 
-    [Fact]
-    public void Clear_EmptiesBuffer_SharedAcrossInstances()
+    [Test]
+    public async Task Clear_EmptiesBuffer_SharedAcrossInstances()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
         IArgumentsBuilder returned = builder.Add("hello");
 
         // buffer is shared with the returned instance
-        Assert.Equal("hello", builder.ToString());
-        Assert.Equal("hello", returned.ToString());
+        await Assert.That(builder.ToString()).IsEqualTo("hello");
+        await Assert.That(returned.ToString()).IsEqualTo("hello");
 
         builder.Clear();
 
-        Assert.Equal(string.Empty, builder.ToString());
-        Assert.Equal(string.Empty, returned.ToString());
+        await Assert.That(builder.ToString()).IsEqualTo(string.Empty);
+        await Assert.That(returned.ToString()).IsEqualTo(string.Empty);
     }
 
-    [Fact]
-    public void Add_WithValidationLogic_InvalidReturnsSameInstanceAndDoesNotAppend()
+    [Test]
+    public async Task Add_WithValidationLogic_InvalidReturnsSameInstanceAndDoesNotAppend()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder(s => s != "bad");
 
         IArgumentsBuilder result = builder.Add("bad");
 
-        Assert.True(ReferenceEquals(builder, result));
-        Assert.Equal(string.Empty, builder.ToString());
+        await Assert.That(ReferenceEquals(builder, result)).IsTrue();
+        await Assert.That(builder.ToString()).IsEqualTo(string.Empty);
     }
 
-    [Fact]
-    public void Add_WithValidationLogic_ValidReturnsDifferentInstance_BufferIsShared()
+    [Test]
+    public async Task Add_WithValidationLogic_ValidReturnsDifferentInstance_BufferIsShared()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder(_ => true);
 
         IArgumentsBuilder result = builder.Add("ok");
 
-        Assert.False(ReferenceEquals(builder, result));
-        Assert.Equal("ok", builder.ToString());
-        Assert.Equal("ok", result.ToString());
+        await Assert.That(ReferenceEquals(builder, result)).IsFalse();
+        await Assert.That(builder.ToString()).IsEqualTo("ok");
+        await Assert.That(result.ToString()).IsEqualTo("ok");
     }
 
-    [Fact]
-    public void AddEnumerable_Strings_EscapesAndJoinsValues()
+    [Test]
+    public async Task AddEnumerable_Strings_EscapesAndJoinsValues()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
         string[] values = ["a\nb", "c\"d"];
@@ -79,29 +79,29 @@ public class ArgumentsBuilderTests
 
         IArgumentsBuilder result = builder.AddEnumerable(values, true);
 
-        Assert.Equal(expected, result.ToString());
+        await Assert.That(result.ToString()).IsEqualTo(expected);
     }
 
-    [Fact]
-    public void AddEnumerable_Strings_ThrowsOnNullArgument()
+    [Test]
+    public async Task AddEnumerable_Strings_ThrowsOnNullArgument()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        Assert.Throws<ArgumentNullException>(() => builder.AddEnumerable((IEnumerable<string>)null, true));
+        await Assert.That(() => builder.AddEnumerable((IEnumerable<string>)null, true)).Throws<ArgumentNullException>();
     }
 
-    [Fact]
-    public void Add_IFormattable_ThrowsWhenFormattableProducesNullString()
+    [Test]
+    public async Task Add_IFormattable_ThrowsWhenFormattableProducesNullString()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
         NullReturningFormattable nullFormattable = new NullReturningFormattable();
 
         // When IFormattable.ToString returns null or whitespace, Add should throw NullReferenceException
-        Assert.Throws<ArgumentNullException>(() => builder.Add(nullFormattable, CultureInfo.InvariantCulture));
+        await Assert.That(() => builder.Add(nullFormattable, CultureInfo.InvariantCulture)).Throws<ArgumentNullException>();
     }
 
-    [Fact]
-    public void AddEnumerable_IFormattable_JoinsValues()
+    [Test]
+    public async Task AddEnumerable_IFormattable_JoinsValues()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
         IFormattable[] values = { 1, 2 };
@@ -110,24 +110,24 @@ public class ArgumentsBuilderTests
 
         string expected = @"""1 2""";
 
-        Assert.Equal(expected, result.ToString());
+        await Assert.That(result.ToString()).IsEqualTo(expected);
     }
 
-    [Fact]
-    public void AddEnumerable_IFormattable_ThrowsOnNullArgument()
+    [Test]
+    public async Task AddEnumerable_IFormattable_ThrowsOnNullArgument()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        Assert.Throws<ArgumentNullException>(() => builder.AddEnumerable(null, CultureInfo.InvariantCulture));
+        await Assert.That(() => builder.AddEnumerable(null, CultureInfo.InvariantCulture)).Throws<ArgumentNullException>();
     }
 
-    [Fact]
-    public void Add_StringWithoutEscape_AppendsRawValue()
+    [Test]
+    public async Task Add_StringWithoutEscape_AppendsRawValue()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
         IArgumentsBuilder result = builder.Add("x y"); // contains a space inside the value
 
-        Assert.Equal("x y", result.ToString());
+        await Assert.That(result.ToString()).IsEqualTo("x y");
     }
 }

@@ -9,10 +9,10 @@ public class ProcessResourcePolicyBuilderTests
 {
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-    [Theory]
-    [InlineData(1 * 16 - 1)]
-    [InlineData(1 * 8 - 1)]
-    public void WithProcessorAffinity_ValidProcessorAffinity_Valid_Success(nint processorAffinity)
+    [Test]
+    [Arguments(1 * 16 - 1)]
+    [Arguments(1 * 8 - 1)]
+    public async Task WithProcessorAffinity_ValidProcessorAffinity_Valid_Success(nint processorAffinity)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
@@ -23,30 +23,30 @@ public class ProcessResourcePolicyBuilderTests
 
         ProcessResourcePolicy resourcePolicy = processResourcePolicyBuilder.Build();
 
-        Assert.NotNull(resourcePolicy.ProcessorAffinity);
-        Assert.Equal(processorAffinity, resourcePolicy.ProcessorAffinity);
+        await Assert.That(resourcePolicy.ProcessorAffinity).IsNotNull();
+        await Assert.That(resourcePolicy.ProcessorAffinity).IsEqualTo(processorAffinity);
     }
 
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-    [Theory]
-    [InlineData(2 * 24)]
-    [InlineData(0)]
-    public void WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail(nint processorAffinity)
+    [Test]
+    [Arguments(2 * 24)]
+    [Arguments(0)]
+    public async Task WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail(nint processorAffinity)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
 
         // Act and Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder =
+        await Assert.That(() => processResourcePolicyBuilder =
             new ProcessResourcePolicyBuilder()
-                .SetProcessorAffinity(processorAffinity));
+                .SetProcessorAffinity(processorAffinity)).Throws<ArgumentOutOfRangeException>();
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void WithPriorityBoost_Success(bool enablePriorityBoost)
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task WithPriorityBoost_Success(bool enablePriorityBoost)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
@@ -58,17 +58,17 @@ public class ProcessResourcePolicyBuilderTests
         ProcessResourcePolicy resourcePolicy = processResourcePolicyBuilder.Build();
 
         // Assert
-        Assert.Equal(enablePriorityBoost, resourcePolicy.EnablePriorityBoost);
+        await Assert.That(resourcePolicy.EnablePriorityBoost).IsEqualTo(enablePriorityBoost);
     }
 
-    [Theory]
-    [InlineData(ProcessPriorityClass.High)]
-    [InlineData(ProcessPriorityClass.Normal)]
-    [InlineData(ProcessPriorityClass.AboveNormal)]
-    [InlineData(ProcessPriorityClass.BelowNormal)]
-    [InlineData(ProcessPriorityClass.Idle)]
-    [InlineData(ProcessPriorityClass.RealTime)]
-    public void WithPriorityClass_Success(ProcessPriorityClass processPriorityClass)
+    [Test]
+    [Arguments(ProcessPriorityClass.High)]
+    [Arguments(ProcessPriorityClass.Normal)]
+    [Arguments(ProcessPriorityClass.AboveNormal)]
+    [Arguments(ProcessPriorityClass.BelowNormal)]
+    [Arguments(ProcessPriorityClass.Idle)]
+    [Arguments(ProcessPriorityClass.RealTime)]
+    public async Task WithPriorityClass_Success(ProcessPriorityClass processPriorityClass)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
@@ -80,17 +80,17 @@ public class ProcessResourcePolicyBuilderTests
         ProcessResourcePolicy resourcePolicy = processResourcePolicyBuilder.Build();
 
         // Assert
-        Assert.Equal(processPriorityClass, resourcePolicy.PriorityClass);
+        await Assert.That(resourcePolicy.PriorityClass).IsEqualTo(processPriorityClass);
     }
 
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
-    [Theory]
-    [InlineData(1024_000)]
-    [InlineData(8192)]
-    [InlineData(1024)]
-    public void WithMinWorkingSet_Valid_Success(nint minWorkingSet)
+    [Test]
+    [Arguments(1024_000)]
+    [Arguments(8192)]
+    [Arguments(1024)]
+    public async Task WithMinWorkingSet_Valid_Success(nint minWorkingSet)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
@@ -102,37 +102,37 @@ public class ProcessResourcePolicyBuilderTests
         ProcessResourcePolicy resourcePolicy = processResourcePolicyBuilder.Build();
 
         // Assert
-        Assert.NotNull(resourcePolicy.MinWorkingSet);
-        Assert.Equal(minWorkingSet, resourcePolicy.MinWorkingSet);
+        await Assert.That(resourcePolicy.MinWorkingSet).IsNotNull();
+        await Assert.That(resourcePolicy.MinWorkingSet).IsEqualTo(minWorkingSet);
     }
 
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
-    [Theory]
-    [InlineData(-1000)]
-    [InlineData(-1)]
-    public void WithMinWorkingSet_Invalid_Fail(nint minWorkingSet)
+    [Test]
+    [Arguments(-1000)]
+    [Arguments(-1)]
+    public async Task WithMinWorkingSet_Invalid_Fail(nint minWorkingSet)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
 
         // Act
         // and Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder =
+        await Assert.That(() => processResourcePolicyBuilder =
             new ProcessResourcePolicyBuilder()
-                .SetMinWorkingSet(minWorkingSet));
+                .SetMinWorkingSet(minWorkingSet)).Throws<ArgumentOutOfRangeException>();
     }
 
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
-    [Theory]
-    [InlineData(1024_000, 8192)]
-    [InlineData(8192, 1024)]
-    [InlineData(1024, 0)]
-    [InlineData(1024, 1024)]
-    public void WithMaxWorkingSet_Valid_Success(nint maxWorkingSet, nint minWorkingSet)
+    [Test]
+    [Arguments(1024_000, 8192)]
+    [Arguments(8192, 1024)]
+    [Arguments(1024, 0)]
+    [Arguments(1024, 1024)]
+    public async Task WithMaxWorkingSet_Valid_Success(nint maxWorkingSet, nint minWorkingSet)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
@@ -145,40 +145,40 @@ public class ProcessResourcePolicyBuilderTests
         ProcessResourcePolicy resourcePolicy = processResourcePolicyBuilder.Build();
 
         // Assert
-        Assert.NotNull(resourcePolicy.MaxWorkingSet);
-        Assert.Equal(maxWorkingSet, resourcePolicy.MaxWorkingSet);
+        await Assert.That(resourcePolicy.MaxWorkingSet).IsNotNull();
+        await Assert.That(resourcePolicy.MaxWorkingSet).IsEqualTo(maxWorkingSet);
     }
 
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
-    [Theory]
-    [InlineData(8192, 8200)]
-    [InlineData(1024, 2000)]
-    [InlineData(-1, -1)]
-    [InlineData(0, 0)]
-    public void WithMaxWorkingSet_Invalid_Fail(nint maxWorkingSet, nint minWorkingSet)
+    [Test]
+    [Arguments(8192, 8200)]
+    [Arguments(1024, 2000)]
+    [Arguments(-1, -1)]
+    [Arguments(0, 0)]
+    public async Task WithMaxWorkingSet_Invalid_Fail(nint maxWorkingSet, nint minWorkingSet)
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
 
         //Act
         // and Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder =
+        await Assert.That(() => processResourcePolicyBuilder =
             new ProcessResourcePolicyBuilder()
-                .SetMinWorkingSet(minWorkingSet).SetMaxWorkingSet(maxWorkingSet));
+                .SetMinWorkingSet(minWorkingSet).SetMaxWorkingSet(maxWorkingSet)).Throws<ArgumentOutOfRangeException>();
     }
 
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("linux")]
-    [Theory]
-    [InlineData(2 * 16 - 1, 1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]
-    [InlineData(1 * 16 - 1, 8192, 1024, false, ProcessPriorityClass.Normal)]
-    [InlineData(1 * 8 - 1, 1024, 0, false, ProcessPriorityClass.Normal)]
-    [InlineData(2 * 8 - 1, 1024, 1024, true, ProcessPriorityClass.BelowNormal)]
-    public void Build_Successfully(nint processorAffinity, nint maxWorkingSet, nint minWorkingSet,
+    [Test]
+    [Arguments(2 * 16 - 1, 1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]
+    [Arguments(1 * 16 - 1, 8192, 1024, false, ProcessPriorityClass.Normal)]
+    [Arguments(1 * 8 - 1, 1024, 0, false, ProcessPriorityClass.Normal)]
+    [Arguments(2 * 8 - 1, 1024, 1024, true, ProcessPriorityClass.BelowNormal)]
+    public async Task Build_Successfully(nint processorAffinity, nint maxWorkingSet, nint minWorkingSet,
         bool priorityBoostEnabled, ProcessPriorityClass priorityClass)
     {
         // Arrange
@@ -204,22 +204,22 @@ public class ProcessResourcePolicyBuilderTests
 #pragma warning disable CA1416
 
         // Assert
-        Assert.NotNull(resourcePolicy.ProcessorAffinity);
+        await Assert.That(resourcePolicy.ProcessorAffinity).IsNotNull();
 
         if (OperatingSystem.IsWindows() || OperatingSystem.IsMacCatalyst() ||
             OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
         {
-            Assert.NotNull(resourcePolicy.MinWorkingSet);
-            Assert.NotNull(resourcePolicy.MaxWorkingSet);
-            Assert.Equal(minWorkingSet, resourcePolicy.MinWorkingSet);
-            Assert.Equal(maxWorkingSet, resourcePolicy.MaxWorkingSet);
-            Assert.Equal(priorityClass, resourcePolicy.PriorityClass);
+            await Assert.That(resourcePolicy.MinWorkingSet).IsNotNull();
+            await Assert.That(resourcePolicy.MaxWorkingSet).IsNotNull();
+            await Assert.That(resourcePolicy.MinWorkingSet).IsEqualTo(minWorkingSet);
+            await Assert.That(resourcePolicy.MaxWorkingSet).IsEqualTo(maxWorkingSet);
+            await Assert.That(resourcePolicy.PriorityClass).IsEqualTo(priorityClass);
         }
 
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
-            Assert.Equal(processorAffinity, resourcePolicy.ProcessorAffinity);
+            await Assert.That(resourcePolicy.ProcessorAffinity).IsEqualTo(processorAffinity);
 
-        Assert.Equal(priorityBoostEnabled, resourcePolicy.EnablePriorityBoost);
+        await Assert.That(resourcePolicy.EnablePriorityBoost).IsEqualTo(priorityBoostEnabled);
 #pragma warning restore CA1416
     }
 }

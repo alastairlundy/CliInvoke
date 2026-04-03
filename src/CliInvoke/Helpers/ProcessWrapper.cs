@@ -71,7 +71,7 @@ internal class ProcessWrapper : Process
         if (HasStarted)
         {
             StartTime = DateTime.UtcNow;
-            Started?.Invoke(this, EventArgs.Empty);
+            Started.Invoke(this, EventArgs.Empty);
             Id = base.Id;
             ProcessName = base.ProcessName;
         }

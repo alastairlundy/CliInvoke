@@ -7,7 +7,7 @@ namespace CliInvoke.Tests.Helpers.Processes;
 
 public class ProcessCancellationTests
 {
-    [Fact]
+    [Test]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
@@ -19,7 +19,7 @@ public class ProcessCancellationTests
         //Arrange 
         string filePath = ProcessTestHelper.GetTargetFilePath();
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
-
+        
         ProcessExitConfiguration processExitConfiguration = new(
             ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
             ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
@@ -30,14 +30,14 @@ public class ProcessCancellationTests
 
         int processId = process.Id;
 
-        await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
+        await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
 
-        await Task.Delay(1000, TestContext.Current.CancellationToken);
+        await Task.Delay(1000, CancellationToken.None);
 
         bool actual = Process.GetProcesses().Any(x => x.Id == processId);
 
         //Assert
-        Assert.False(actual);
+        await Assert.That(actual).IsFalse();
     }
 
     /*[Fact]
@@ -72,7 +72,7 @@ public class ProcessCancellationTests
         Assert.False(actual);
     }*/
 
-    [Fact]
+    [Test]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
@@ -96,13 +96,13 @@ public class ProcessCancellationTests
         int processId = process.Id;
         try
         {
-            await process.WaitForExitOrTimeoutAsync(processExitConfiguration, TestContext.Current.CancellationToken);
+            await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
 
-            await Task.Delay(1000, TestContext.Current.CancellationToken);
+            await Task.Delay(1000, CancellationToken.None);
 
             bool actual = Process.GetProcesses().Any(x => x.Id == processId);
             //Assert
-            Assert.False(actual);
+            await Assert.That(actual).IsFalse();
         }
         finally
         {

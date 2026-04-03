@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Threading;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using WhatExec.Lib.Abstractions.Detectors;
@@ -19,7 +18,7 @@ public class FilePathResolverTests
             new PathEnvironmentVariableResolver(new PathEnvironmentVariableDetector(), fileDetector));
     }
 
-    [Fact]
+    [Test]
     public async Task Resolve_Dotnet_PathEnv_Executable()
     {
         string executable = OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet";
@@ -48,7 +47,7 @@ public class FilePathResolverTests
                 IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver);
 
                 BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
-                    cancellationToken: TestContext.Current.CancellationToken);
+                    cancellationToken: CancellationToken.None);
 
                 expected = new FileInfo(task.StandardOutput.Split(Environment.NewLine).First());
             }
@@ -58,20 +57,19 @@ public class FilePathResolverTests
             expected = new FileInfo("/usr/bin/dotnet");
         }
 
-        Assert.Equal(expected, actual);
+        await Assert.That(actual).IsEqualTo(expected);
     }
 
-    [Fact]
+    [Test]
     public async Task Resolve_CrossPlatform_PathEnv_Executable()
     {
         FileInfo expected = new FileInfo(ProcessTestHelper.GetTargetFilePath());
 
         IExecutableFileResolver filePathResolver = CreateFileResolver();
 
-        FileInfo actual =
-            await filePathResolver.LocateExecutableAsync(expected.Name, SearchOption.AllDirectories,
-                CancellationToken.None);
+        FileInfo actual = await filePathResolver.LocateExecutableAsync(expected.Name, SearchOption.AllDirectories,
+            CancellationToken.None);
 
-        Assert.Equal(expected, actual);
+        await Assert.That(actual).IsEqualTo(expected);
     }
 }

@@ -8,15 +8,15 @@ public class EnvironmentVariablesBuilderTests
 {
     private readonly Faker _faker = new();
 
-    [Fact]
-    public void Constructor_ShouldInstantiate()
+    [Test]
+    public async Task Constructor_ShouldInstantiate()
     {
         EnvironmentVariablesBuilder builder = new EnvironmentVariablesBuilder();
-        Assert.NotNull(builder);
+        await Assert.That(builder).IsNotNull();
     }
 
-    [Fact]
-    public void Set_SingleVariable_Success()
+    [Test]
+    public async Task Set_SingleVariable_Success()
     {
         // Arrange
         string? key = _faker.Database.Column();
@@ -29,11 +29,11 @@ public class EnvironmentVariablesBuilderTests
         IReadOnlyDictionary<string, string> variables = builder.Build();
 
         // Assert
-        Assert.Equal(value, variables[key]);
+        await Assert.That(variables[key]).IsEqualTo(value);
     }
 
-    [Fact]
-    public void Set_KeyValuePairs_Enumerable_Sequence_Success()
+    [Test]
+    public async Task Set_KeyValuePairs_Enumerable_Sequence_Success()
     {
         int number = _faker.Random.Int(1, 20);
         List<KeyValuePair<string, string>> list = new();
@@ -55,11 +55,12 @@ public class EnvironmentVariablesBuilderTests
         IReadOnlyDictionary<string, string> variables = builder.Build();
 
         // Assert
-        foreach (KeyValuePair<string, string> pair in list) Assert.Equal(pair.Value, variables[pair.Key]);
+        foreach (KeyValuePair<string, string> pair in list) 
+            await Assert.That(variables[pair.Key]).IsEqualTo(pair.Value);
     }
 
-    [Fact]
-    public void Set_Dictionary_Success()
+    [Test]
+    public async Task Set_Dictionary_Success()
     {
         int number = _faker.Random.Int(1, 20);
 
@@ -80,12 +81,13 @@ public class EnvironmentVariablesBuilderTests
         IReadOnlyDictionary<string, string> variables = builder.Build();
 
         // Assert
-        foreach (KeyValuePair<string, string> pair in dictionary) Assert.Equal(pair.Value, variables[pair.Key]);
+        foreach (KeyValuePair<string, string> pair in dictionary) 
+            await Assert.That(variables[pair.Key]).IsEqualTo(pair.Value);
     }
 
 
-    [Fact]
-    public void Set_ReadOnlyDictionary_Success()
+    [Test]
+    public async Task Set_ReadOnlyDictionary_Success()
     {
         int number = _faker.Random.Int(1, 20);
 
@@ -123,11 +125,12 @@ public class EnvironmentVariablesBuilderTests
         IReadOnlyDictionary<string, string> variables = builder.Build();
 
         // Assert
-        foreach (KeyValuePair<string, string> pair in readOnlyDictionary) Assert.Equal(pair.Value, variables[pair.Key]);
+        foreach (KeyValuePair<string, string> pair in readOnlyDictionary) 
+            await Assert.That(variables[pair.Key]).IsEqualTo(pair.Value);
     }
 
-    [Fact]
-    public void Combined_Build_Success()
+    [Test]
+    public async Task Combined_Build_Success()
     {
         // Arrange
         int number = _faker.Random.Int(1, 10);
@@ -180,12 +183,15 @@ public class EnvironmentVariablesBuilderTests
         IReadOnlyDictionary<string, string> variables = builder.Build();
 
         //Assert 
-        Assert.Equal(pairValue, variables[pairKey]);
+        await Assert.That(variables[pairKey]).IsEqualTo(pairValue);
 
-        foreach (KeyValuePair<string, string> pair in dictionary) Assert.Equal(pair.Value, variables[pair.Key]);
+        foreach (KeyValuePair<string, string> pair in dictionary) 
+            await Assert.That(variables[pair.Key]).IsEqualTo(pair.Value);
 
-        foreach (KeyValuePair<string, string> pair2 in dictionary2) Assert.Equal(pair2.Value, variables[pair2.Key]);
+        foreach (KeyValuePair<string, string> pair2 in dictionary2) 
+            await Assert.That(variables[pair2.Key]).IsEqualTo(pair2.Value);
 
-        foreach (KeyValuePair<string, string> pair3 in list) Assert.Equal(pair3.Value, variables[pair3.Key]);
+        foreach (KeyValuePair<string, string> pair3 in list) 
+            await Assert.That(variables[pair3.Key]).IsEqualTo(pair3.Value);
     }
 }

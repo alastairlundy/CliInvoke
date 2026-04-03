@@ -10,15 +10,15 @@ public class UserCredentialBuilderTests
 {
     private readonly Faker _faker = new();
 
-    [Fact]
-    public void Constructor_ShouldInstantiate()
+    [Test]
+    public async Task Constructor_ShouldInstantiate()
     {
         UserCredentialBuilder builder = new UserCredentialBuilder();
-        Assert.NotNull(builder);
+        await Assert.That(builder).IsNotNull();
     }
 
-    [Fact]
-    public void WithUsername_ShouldSetUsername()
+    [Test]
+    public async Task WithUsername_ShouldSetUsername()
     {
         // Arrange
         // ReSharper disable once JoinDeclarationAndInitializer
@@ -33,11 +33,11 @@ public class UserCredentialBuilderTests
 
         UserCredential credential = builder.Build();
 
-        Assert.Equal(credential.UserName, userName);
+        await Assert.That(credential.UserName).IsEqualTo(userName);
     }
 
-    [Fact]
-    public void WithPassword_ShouldSetPassword()
+    [Test]
+    public async Task WithPassword_ShouldSetPassword()
     {
         // Arrange
         // ReSharper disable once JoinDeclarationAndInitializer
@@ -56,12 +56,12 @@ public class UserCredentialBuilderTests
 
         // Assert
 #pragma warning disable CA1416
-        Assert.Equal(credential.Password, password);
+        await Assert.That(credential.Password).IsEqualTo(password);
 #pragma warning restore CA1416
     }
 
-    [Fact]
-    public void WithDomain_ShouldSetDomain()
+    [Test]
+    public async Task WithDomain_ShouldSetDomain()
     {
         //Arrange
         string? domain = _faker.Internet.DomainName();
@@ -75,12 +75,12 @@ public class UserCredentialBuilderTests
 
         //Assert
 #pragma warning disable CA1416
-        Assert.Equal(credential.Domain, domain);
+        await Assert.That(credential.Domain).IsEqualTo(domain);
 #pragma warning restore CA1416
     }
 
-    [Fact]
-    public void LoadUserProfile_True_ShouldSetUserProfile()
+    [Test]
+    public async Task LoadUserProfile_True_ShouldSetUserProfile()
     {
         //Arrange
         bool loadUserProfile = true;
@@ -92,11 +92,11 @@ public class UserCredentialBuilderTests
         UserCredential credential = builder.Build();
 
         //Assert
-        Assert.True(credential.LoadUserProfile);
+        await Assert.That(credential.LoadUserProfile).IsTrue();
     }
 
-    [Fact]
-    public void LoadUserProfile_False_ShouldNotSetUserProfile()
+    [Test]
+    public async Task LoadUserProfile_False_ShouldNotSetUserProfile()
     {
         //Arrange
         bool loadUserProfile = false;
@@ -108,11 +108,11 @@ public class UserCredentialBuilderTests
         UserCredential credential = builder.Build();
 
         //Assert
-        Assert.False(credential.LoadUserProfile);
+        await Assert.That(credential.LoadUserProfile).IsFalse();
     }
 
-    [Fact]
-    public void Build_All_ShouldReturnCredential()
+    [Test]
+    public async Task Build_All_ShouldReturnCredential()
     {
         //Arrange
         IUserCredentialBuilder builder;
@@ -137,15 +137,15 @@ public class UserCredentialBuilderTests
         UserCredential credential = builder.Build();
 
         //Assert
-        Assert.NotNull(credential);
-        Assert.NotNull(credential.Domain);
-        Assert.NotNull(credential.Password);
-        Assert.NotNull(credential.UserName);
-        Assert.NotNull(credential.LoadUserProfile);
+        await Assert.That(credential).IsNotNull();
+        await Assert.That(credential.Domain).IsNotNull();
+        await Assert.That(credential.Password).IsNotNull();
+        await Assert.That(credential.UserName).IsNotNull();
+        await Assert.That(credential.LoadUserProfile).IsNotNull();
 
-        Assert.Equal(credential.Domain, domain);
-        Assert.Equal(credential.UserName, userName);
-        Assert.Equal(credential.Password, password);
-        Assert.Equal(credential.LoadUserProfile, loadUserProfile);
+        await Assert.That(credential.Domain).IsEqualTo(domain);
+        await Assert.That(credential.UserName).IsEqualTo(userName);
+        await Assert.That(credential.Password).IsEqualTo(password);
+        await Assert.That(credential.LoadUserProfile).IsEqualTo(loadUserProfile);
     }
 }

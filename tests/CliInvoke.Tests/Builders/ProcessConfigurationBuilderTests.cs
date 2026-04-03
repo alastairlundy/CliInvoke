@@ -7,8 +7,8 @@ namespace CliInvoke.Tests.Builders;
 
 public class ProcessConfigurationBuilderTests
 {
-    [Fact]
-    public void TestDefaultConfiguration()
+    [Test]
+    public async Task TestDefaultConfiguration()
     {
         // Arrange
         IProcessConfigurationBuilder processConfigBuilder = new
@@ -18,50 +18,50 @@ public class ProcessConfigurationBuilderTests
         ProcessConfiguration builtCommand = processConfigBuilder.Build();
 
         // Assert 
-        Assert.Equal("foo", builtCommand.TargetFilePath);
-        Assert.Equal(string.Empty, builtCommand.Arguments);
-        Assert.Equal(Directory.GetCurrentDirectory(), builtCommand.WorkingDirectoryPath);
-        Assert.Equal(new Dictionary<string, string>(), builtCommand.EnvironmentVariables);
-        Assert.True(builtCommand.StandardInputEncoding.Equals(Encoding.Default) &&
-                    builtCommand.StandardOutputEncoding.Equals(Encoding.Default) &&
-                    builtCommand.StandardErrorEncoding.Equals(Encoding.Default));
-        Assert.Equal(builtCommand.Credential, UserCredential.Null);
-        Assert.Equal(builtCommand.StandardInput, StreamWriter.Null);
-        Assert.Equal(builtCommand.Credential, UserCredential.Null);
-        Assert.Equal(ProcessResourcePolicy.Default, builtCommand.ResourcePolicy);
-        Assert.False(builtCommand.WindowCreation);
-        Assert.False(builtCommand.UseShellExecution);
-        Assert.False(builtCommand.RequiresAdministrator);
+        await Assert.That(builtCommand.TargetFilePath).IsEqualTo("foo");
+        await Assert.That(builtCommand.Arguments).IsEqualTo(string.Empty);
+        await Assert.That(builtCommand.WorkingDirectoryPath).IsEqualTo(Directory.GetCurrentDirectory());
+        await Assert.That(builtCommand.EnvironmentVariables).IsEmpty();
+        await Assert.That(builtCommand.StandardInputEncoding.Equals(Encoding.Default) &&
+                          builtCommand.StandardOutputEncoding.Equals(Encoding.Default) &&
+                          builtCommand.StandardErrorEncoding.Equals(Encoding.Default)).IsTrue();
+        await Assert.That(builtCommand.Credential).IsEqualTo(UserCredential.Null);
+        await Assert.That(builtCommand.StandardInput).IsEqualTo(StreamWriter.Null);
+        await Assert.That(builtCommand.Credential).IsEqualTo(UserCredential.Null);
+        await Assert.That(builtCommand.ResourcePolicy).IsEqualTo(ProcessResourcePolicy.Default);
+        await Assert.That(builtCommand.WindowCreation).IsFalse();
+        await Assert.That(builtCommand.UseShellExecution).IsFalse();
+        await Assert.That(builtCommand.RequiresAdministrator).IsFalse();
     }
 
-    [Fact]
+    [Test]
     public void WithResourcePolicy_ShouldSetResourcePolicy()
     {
         // TODO: Test WithResourcePolicy method
     }
 
-    [Fact]
+    [Test]
     public void Build_ShouldReturnConfiguration()
     {
         // TODO: Test Build method
     }
 
-    [Fact]
-    public void TestIncompatiblePipingOptionsThrowsException()
+    [Test]
+    public async Task TestIncompatiblePipingOptionsThrowsException()
     {
         IProcessConfigurationBuilder processConfigBuilder =
             new ProcessConfigurationBuilder("foo");
 
         //Assert
-        Assert.Throws<ArgumentException>(() =>
+        await Assert.That(() =>
         {
             processConfigBuilder.ConfigureShellExecution(true)
                 .SetStandardInputPipe(new StreamWriter(Console.OpenStandardInput()));
-        });
+        }).Throws<ArgumentException>();
     }
 
-    [Fact]
-    public void TestTargetFileReconfigured()
+    [Test]
+    public async Task TestTargetFileReconfigured()
     {
         //Arrange
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
@@ -71,12 +71,11 @@ public class ProcessConfigurationBuilderTests
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
-        Assert.Equal("bar",
-            command.TargetFilePath);
+        await Assert.That(command.TargetFilePath).IsEqualTo("bar");
     }
 
-    [Fact]
-    public void TestArgumentsReplaced()
+    [Test]
+    public async Task TestArgumentsReplaced()
     {
         //Arrange
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
@@ -87,13 +86,12 @@ public class ProcessConfigurationBuilderTests
             .Build();
 
         //Assert
-        Assert.NotEqual(newArguments,
-            processConfigBuilder.Build());
+        await Assert.That(newArguments).IsNotEqualTo(processConfigBuilder.Build());
     }
 
     [SupportedOSPlatform("windows")]
-    [Fact]
-    public void TestReconfiguredUserCredential()
+    [Test]
+    public async Task TestReconfiguredUserCredential()
     {
         //Arrange
         SecureString password = new SecureString();
@@ -124,8 +122,7 @@ public class ProcessConfigurationBuilderTests
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
-        Assert.Equal(userCredential,
-            command.Credential);
+        await Assert.That(command.Credential).IsEqualTo(userCredential);
     }
 
 
@@ -133,8 +130,8 @@ public class ProcessConfigurationBuilderTests
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
-    [Fact]
-    public void TestReconfiguredResourcePolicy()
+    [Test]
+    public async Task TestReconfiguredResourcePolicy()
     {
         //Arrange
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
@@ -151,12 +148,11 @@ public class ProcessConfigurationBuilderTests
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
-        Assert.Equal(resourcePolicy,
-            command.ResourcePolicy);
+        await Assert.That(command.ResourcePolicy).IsEqualTo(resourcePolicy);
     }
 
-    [Fact]
-    public void TestReconfiguredAdminPrivileges()
+    [Test]
+    public async Task TestReconfiguredAdminPrivileges()
     {
         //Act
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo");
@@ -166,11 +162,11 @@ public class ProcessConfigurationBuilderTests
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
-        Assert.True(command.RequiresAdministrator);
+        await Assert.That(command.RequiresAdministrator).IsTrue();
     }
 
-    [Fact]
-    public void TestReconfiguredWorkingDirectory()
+    [Test]
+    public async Task TestReconfiguredWorkingDirectory()
     {
         //Act
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
@@ -181,7 +177,6 @@ public class ProcessConfigurationBuilderTests
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
-        Assert.Equal("dir2",
-            command.WorkingDirectoryPath);
+        await Assert.That(command.WorkingDirectoryPath).IsEqualTo("dir2");
     }
 }

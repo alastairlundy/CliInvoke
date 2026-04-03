@@ -1,4 +1,3 @@
-using System.Threading;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 
@@ -6,7 +5,7 @@ namespace CliInvoke.Tests.Invokers.Cancellation;
 
 public class GracefulCancellationTests
 {
-    [Fact]
+    [Test]
     public async Task GracefulCancel_InterruptSignals_Success()
     {
         int sleepTimeSeconds = 500;
@@ -37,9 +36,9 @@ public class GracefulCancellationTests
 
         long elapsedTimeSeconds = stopwatch.ElapsedMilliseconds / 1000;
 
-        Assert.InRange(elapsedTimeSeconds, 0, Math.Min(gracefulTimeoutSeconds * 3, 60));
+        await Assert.That(elapsedTimeSeconds).IsBetween(0, Math.Min(gracefulTimeoutSeconds * 3, 60));
 
-        Assert.True(process.HasExited);
+        await Assert.That(process.HasExited).IsTrue();
 
         if (!process.HasExited)
             process.Kill();
