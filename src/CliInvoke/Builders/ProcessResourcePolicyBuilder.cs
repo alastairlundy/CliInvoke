@@ -14,24 +14,22 @@ namespace CliInvoke.Builders;
 /// </summary>
 public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
 {
-    private readonly ProcessResourcePolicy _processResourcePolicy;
+    private IntPtr? internalProcessorAffinity;
+    private nint? internalMinWorkingSet;
+    private nint? internalMaxWorkingSet;
+    private ProcessPriorityClass internalPriorityClass;
+    private bool internalEnablePriorityBoost;
 
     /// <summary>
     ///     Instantiates the ProcessResourcePolicy Builder with default ProcessResourcePolicy values.
     /// </summary>
     public ProcessResourcePolicyBuilder()
     {
-        _processResourcePolicy = ProcessResourcePolicy.Default;
-    }
+#pragma warning disable CA1416
+        internalProcessorAffinity = ProcessResourcePolicy.Default.ProcessorAffinity;
+#pragma warning restore CA1416
 
-    /// <summary>
-    ///     Internally instantiates the ProcessResourcePolicy object with the specified
-    ///     ProcessResourcePolicy value.
-    /// </summary>
-    /// <param name="processResourcePolicy">The process resource policy object to use.</param>
-    protected ProcessResourcePolicyBuilder(ProcessResourcePolicy processResourcePolicy)
-    {
-        _processResourcePolicy = processResourcePolicy;
+        internalEnablePriorityBoost = false;
     }
 
     /// <summary>
@@ -40,78 +38,50 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if processor affinity is less than 1 or
-    ///     greater than 2x Processor Count.
+    /// <exception cref="ArgumentOutOfRangeException"> Thrown if processor affinity is less than 1 or greater than 2x Processor Count.
     /// </exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-    [Pure]
     public IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(processorAffinity,
             2 * Environment.ProcessorCount);
 
-        return new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
-                processorAffinity,
-#pragma warning disable CA1416
-                _processResourcePolicy.MinWorkingSet,
-                _processResourcePolicy.MaxWorkingSet,
-#pragma warning restore CA1416
-                _processResourcePolicy.PriorityClass,
-                _processResourcePolicy.EnablePriorityBoost
-            )
-        );
+        internalProcessorAffinity = processorAffinity;
+        
+        return this;
     }
 
     /// <summary>
     ///     Configures the ProcessResourcePolicyBuilder with the specified Minimum Working Set.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="minWorkingSet" /> is higher than the configured maximum working set then the
-    ///     maximum working set will be overriden with the new <see cref="minWorkingSet" /> value.
+    ///     If <see cref="internalMinWorkingSet" /> is higher than the configured maximum working set then the
+    ///     maximum working set will be overriden with the new <see cref="internalMinWorkingSet" /> value.
     /// </remarks>
     /// <param name="minWorkingSet">The minimum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated minimum working set.</returns>
     /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if <see cref="minWorkingSet" /> is less than
-    ///     0.
+    ///     Thrown if <see cref="internalMinWorkingSet" /> is less than 0.
     /// </exception>
+    /// <exception cref="ArgumentException">Thrown if the <see cref="minWorkingSet"/> is greater than or equal to the maximum working set.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
-    [Pure]
     public IProcessResourcePolicyBuilder SetMinWorkingSet(nint minWorkingSet)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet);
 
-        if (minWorkingSet >= _processResourcePolicy.MaxWorkingSet)
-            return new ProcessResourcePolicyBuilder(
-                new ProcessResourcePolicy(
-#pragma warning disable CA1416
-                    _processResourcePolicy.ProcessorAffinity,
-#pragma warning restore CA1416
-                    minWorkingSet,
-                    minWorkingSet,
-                    _processResourcePolicy.PriorityClass,
-                    _processResourcePolicy.EnablePriorityBoost
-                )
-            );
-
-        return new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
-#pragma warning disable CA1416
-                _processResourcePolicy.ProcessorAffinity,
-#pragma warning restore CA1416
-                minWorkingSet,
-                _processResourcePolicy.MaxWorkingSet,
-                _processResourcePolicy.PriorityClass,
-                _processResourcePolicy.EnablePriorityBoost
-            )
-        );
+        if (internalMaxWorkingSet is not null) 
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet, (nint)internalMaxWorkingSet);
+        else
+            internalMaxWorkingSet = minWorkingSet + 1;
+        
+        internalMinWorkingSet = minWorkingSet;
+        
+        return this;
     }
 
     /// <summary>
@@ -120,37 +90,27 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="maxWorkingSet">The maximum working set to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated maximum working set.</returns>
     /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if the <see cref="maxWorkingSet" /> is less
+    ///     Thrown if the <see cref="internalMaxWorkingSet" /> is less
     ///     than the min working set value or less than 1.
     /// </exception>
-    [Pure]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
-        nint minWorkingSet = _processResourcePolicy.MinWorkingSet ??
-#pragma warning disable CS8629
-                             (nint)ProcessResourcePolicy.Default.MinWorkingSet;
-#pragma warning restore CS8629
+        nint minWorkingSet = internalMinWorkingSet ?? 0;
 
         ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet,
             minWorkingSet);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet, maxWorkingSet);
         ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 1);
 
-        return new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
-#pragma warning disable CA1416
-                _processResourcePolicy.ProcessorAffinity,
-#pragma warning restore CA1416
-                _processResourcePolicy.MinWorkingSet,
-                maxWorkingSet,
-                _processResourcePolicy.PriorityClass,
-                _processResourcePolicy.EnablePriorityBoost
-            )
-        );
+        internalMaxWorkingSet = maxWorkingSet;
+
+        internalMinWorkingSet ??= 0;
+        
+        return this;
     }
 
     /// <summary>
@@ -158,21 +118,12 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// </summary>
     /// <param name="processPriorityClass">The Process Priority Class to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated Process Priority Class.</returns>
-    [Pure]
     public IProcessResourcePolicyBuilder SetPriorityClass(
         ProcessPriorityClass processPriorityClass)
     {
-        return new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
-#pragma warning disable CA1416
-                _processResourcePolicy.ProcessorAffinity,
-                _processResourcePolicy.MinWorkingSet,
-                _processResourcePolicy.MaxWorkingSet,
-#pragma warning restore CA1416
-                processPriorityClass,
-                _processResourcePolicy.EnablePriorityBoost
-            )
-        );
+        internalPriorityClass = processPriorityClass;
+
+        return this;
     }
 
     /// <summary>
@@ -180,26 +131,19 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// </summary>
     /// <param name="enablePriorityBoost">The priority boost behaviour to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated priority boost behaviour.</returns>
-    [Pure]
-    public IProcessResourcePolicyBuilder ConfigurePriorityBoost(bool enablePriorityBoost) =>
-        new ProcessResourcePolicyBuilder(
-            new ProcessResourcePolicy(
-#pragma warning disable CA1416
-                _processResourcePolicy.ProcessorAffinity,
-                _processResourcePolicy.MinWorkingSet,
-                _processResourcePolicy.MaxWorkingSet,
-#pragma warning restore CA1416
-                _processResourcePolicy.PriorityClass,
-                enablePriorityBoost
-            )
-        );
+    public IProcessResourcePolicyBuilder ConfigurePriorityBoost(bool enablePriorityBoost)
+    {
+        internalEnablePriorityBoost = enablePriorityBoost;
+
+        return this;
+    }
 
     /// <summary>
     ///     Builds the configured ProcessResourcePolicy
     /// </summary>
     /// <returns>The configured ProcessResourcePolicy.</returns>
-    public ProcessResourcePolicy Build()
-    {
-        return _processResourcePolicy;
-    }
+    [Pure]
+    public ProcessResourcePolicy Build() =>
+        new(internalProcessorAffinity, internalMinWorkingSet,
+            internalMaxWorkingSet, internalPriorityClass, internalEnablePriorityBoost);
 }
