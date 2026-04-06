@@ -250,8 +250,6 @@ public class ArgumentsBuilder : IArgumentsBuilder
         return output;
     }
 
-    private bool IsValidArgument(IFormattable value, IFormatProvider provider)
-    {
-        return IsValidArgument(value.ToString(null, provider));
-    }
+    private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
+        => IsValidArgument(value.ToString(null, provider));
 }
