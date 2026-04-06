@@ -6,63 +6,6 @@ This document provides brutally honest, constructive feedback on CliInvoke's API
 
 ## 1. Core Architecture Issues
 
-### 1.1 Immutable Builder Creates Memory Churn (HIGH PRIORITY)
-
-**Problem:**  
-`ProcessConfigurationBuilder` creates a new `ProcessConfiguration` instance on every method call:
-```csharp
-builder.SetWorkingDirectory("dir")      // Creates ProcessConfiguration #1
-    .SetArguments("args")                // Creates ProcessConfiguration #2  
-    .SetEnvironmentVariables(dict)       // Creates ProcessConfiguration #3
-    .Build()                             // Creates ProcessConfiguration #4
-```
-Each call allocates all 15+ constructor parameters. This is memory inefficient and computationally wasteful.
-
-**Impact:**  
-- Unnecessary GC pressure
-- Slower configuration building
-- Hidden performance cost
-
-**Recommendation:**  
-Implement a mutable intermediate builder that only constructs `ProcessConfiguration` once at `Build()` time. This is a proven pattern in libraries like ConfigurationBuilder in ASP.NET.
-
----
-
-### 1.2 ProcessConfiguration Constructor is Unmanageable (HIGH PRIORITY)
-
-**Problem:**  
-```csharp
-new ProcessConfiguration(
-    targetFilePath,              // 1: string
-    redirectStandardInput,       // 2: bool - position not obvious
-    redirectStandardOutput,      // 3: bool
-    redirectStandardError,       // 4: bool
-    arguments,                   // 5: string
-    workingDirectoryPath,        // 6: string
-    requiresAdministrator,       // 7: bool
-    environmentVariables,        // 8: dict
-    credential,                  // 9: UserCredential
-    standardInput,               // 10: StreamWriter
-    standardInputEncoding,       // 11: Encoding
-    standardOutputEncoding,      // 12: Encoding
-    standardErrorEncoding,       // 13: Encoding
-    processResourcePolicy,       // 14: ProcessResourcePolicy
-    windowCreation,              // 15: bool
-    useShellExecution            // 16: bool
-)
-```
-
-15-16 positional parameters is untenable. Developers can't remember the order; IntelliSense doesn't help.
-
-**Impact:**  
-- Discourages direct construction
-- API looks immature
-- Error-prone when not using builder
-
-**Recommendation:**  
-Make the constructor private or mark it as `[EditorBrowsable(EditorBrowsableState.Never)]`. Require builder usage. Most modern APIs (Serilog, HttpClientFactory) hide complexity behind fluent builders.
-
----
 
 ### 1.3 Redirect Configuration is Conceptually Confused
 
@@ -91,35 +34,6 @@ Unify the concept: single configuration, execution method inferred or validated.
 ---
 
 ## 2. Naming and Discoverability
-
-### 2.2 SetArguments Has Three Overloads with Unclear Semantics
-
-**Problem:**  
-```csharp
-SetArguments(IEnumerable<string> arguments)           // No escape?
-SetArguments(IEnumerable<string> arguments, bool escape)
-SetArguments(string arguments)                        // Raw string, no split?
-```
-
-When should I use which? Is `"arg1 arg2"` split automatically? (No.) Does escape happen by default? (No, only if `escape=true`.) This is discoverable only by reading XML docs.
-
-**Impact:**  
-Developers guess; command-line argument parsing bugs are common.
-
-**Recommendation:**  
-Rename for clarity:
-```csharp
-AddArgumentsAsList(IEnumerable<string> arguments)
-AddArgumentsAsListAndEscape(IEnumerable<string> arguments)
-AddArgumentsAsString(string rawString)  // Explicit: raw, unescaped
-```
-
-Or use a single method with an enum:
-```csharp
-SetArguments(IEnumerable<string> arguments, ArgumentEscapeMode mode = ArgumentEscapeMode.Always)
-```
-
----
 
 ### 2.3 ProcessExitConfiguration Presets Have Cryptic Names (HIGH PRIORITY)
 
@@ -301,31 +215,6 @@ public ProcessConfiguration Build()
 ```
 
 Or use a builder state machine to prevent invalid states at compile time.
-
----
-
-### 4.3 EnvironmentVariablesBuilder and UserCredentialBuilder Are Hard to Discover
-
-**Problem:**  
-These fluent builders exist but aren't accessible from the main `ProcessConfigurationBuilder`:
-```csharp
-ProcessConfigurationBuilder config = new();
-config.SetEnvironmentVariables(dict)  // Only accepts dict, no fluent builder
-```
-
-Users must instantiate `EnvironmentVariablesBuilder` manually or use the dict-based overload, missing ergonomic features.
-
-**Impact:**  
-Feature underused. API feels incomplete.
-
-**Recommendation:**  
-Add fluent overloads:
-```csharp
-config.ConfigureEnvironmentVariables(envBuilder =>
-{
-    envBuilder.SetPair("PATH", "/usr/bin");
-});
-```
 
 ---
 
