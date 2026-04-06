@@ -47,7 +47,6 @@ public static class ConfigurationExtensions
         ///     An instance of <see cref="ProcessConfiguration" /> with the configuration applied from
         ///     the provided <see cref="ProcessStartInfo" />.
         /// </returns>
-        [OverloadResolutionPriority(2)]
         [Obsolete(
             "This method is deprecated and will be removed in CliInvoke.Extensions version 3.")]
         public static ProcessConfiguration FromStartInfo(ProcessStartInfo processStartInfo)
