@@ -47,27 +47,6 @@ public static class ConfigurationExtensions
         ///     An instance of <see cref="ProcessConfiguration" /> with the configuration applied from
         ///     the provided <see cref="ProcessStartInfo" />.
         /// </returns>
-        [Obsolete(
-            "This method is deprecated and will be removed in CliInvoke.Extensions version 3.")]
-        public static ProcessConfiguration FromStartInfo(ProcessStartInfo processStartInfo)
-        {
-            return ProcessConfiguration.FromProcessStartInfo(processStartInfo);
-        }
-
-        /// <summary>
-        ///     Converts a <see cref="ProcessStartInfo" /> instance to a <see cref="ProcessConfiguration" />
-        ///     instance,
-        ///     applying all relevant configurations such as environment variables, execution settings,
-        ///     user credentials, and other process-related parameters.
-        /// </summary>
-        /// <param name="processStartInfo">
-        ///     The <see cref="ProcessStartInfo" /> containing the process start
-        ///     configuration.
-        /// </param>
-        /// <returns>
-        ///     An instance of <see cref="ProcessConfiguration" /> with the configuration applied from
-        ///     the provided <see cref="ProcessStartInfo" />.
-        /// </returns>
         [Pure]
         public static ProcessConfiguration FromProcessStartInfo(ProcessStartInfo processStartInfo)
         {
