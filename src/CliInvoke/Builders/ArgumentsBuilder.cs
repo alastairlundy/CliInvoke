@@ -217,18 +217,12 @@ public class ArgumentsBuilder : IArgumentsBuilder
     ///     Builds the arguments into a string.
     /// </summary>
     /// <returns>The arguments as a string.</returns>
-    public new string ToString()
-    {
-        return _buffer.ToString();
-    }
+    public new string ToString() => _buffer.ToString();
 
     /// <summary>
     ///     Clears the provided argument strings.
     /// </summary>
-    public void Clear()
-    {
-        _buffer.Clear();
-    }
+    public void Clear() => _buffer.Clear();
 
     private bool IsValidArgument(string value)
     {
