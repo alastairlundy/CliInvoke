@@ -29,6 +29,7 @@
 
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
+        <PackageReference Include="WhatExec.Lib" />
         <PackageReference Include="WhatExec.Lib.Abstractions"/>
     </ItemGroup>
 

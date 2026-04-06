@@ -107,7 +107,10 @@ public static class ConfigurationExtensions
                     OutputRedirectionMode.Buffer : OutputRedirectionMode.None)
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
                 .SetStandardInputPipe(StreamWriter.Null)
-                .SetEncoding(processStartInfo.StandardInputEncoding, 
+                .SetEncoding(
+#if NET8_0_OR_GREATER
+                    processStartInfo.StandardInputEncoding, 
+#endif
                     processStartInfo.StandardOutputEncoding, processStartInfo.StandardErrorEncoding);
             
             

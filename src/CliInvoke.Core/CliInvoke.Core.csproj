@@ -38,9 +38,9 @@
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
-    <ItemGroup>
+<!--    <ItemGroup>
         <InternalsVisibleTo Include="CliInvoke"/>
-    </ItemGroup>
+    </ItemGroup>-->
     
     <ItemGroup>
         <Content Include="README.md">

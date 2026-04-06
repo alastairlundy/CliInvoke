@@ -141,4 +141,14 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <returns>The newly configured Process configuration.</returns>
     ProcessConfiguration Build();
+
+    /// <summary>
+    ///     Configures whether the standard input of the process should be redirected.
+    /// </summary>
+    /// <param name="redirectStandardInput">
+    ///     A value indicating whether standard input redirection is
+    ///     enabled.
+    /// </param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> with the updated configuration.</returns>
+    IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput);
 }

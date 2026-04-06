@@ -57,7 +57,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardErrorEncoding = Encoding.Default;
     }
 
-    internal ProcessConfiguration(
+    protected ProcessConfiguration(
         string targetFilePath,
         string arguments,
         bool redirectStandardInput,

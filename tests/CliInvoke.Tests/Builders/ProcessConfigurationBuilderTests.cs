@@ -135,7 +135,7 @@ public class ProcessConfigurationBuilderTests
     {
         //Arrange
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-            .ConfigureProcessResourcePolicy(ProcessResourcePolicy.Default);
+            .SetProcessResourcePolicy(ProcessResourcePolicy.Default);
 
 
         //Arrange
@@ -144,7 +144,7 @@ public class ProcessConfigurationBuilderTests
             null,
             ProcessPriorityClass.AboveNormal);
 
-        processConfigBuilder = processConfigBuilder.ConfigureProcessResourcePolicy(resourcePolicy);
+        processConfigBuilder = processConfigBuilder.SetProcessResourcePolicy(resourcePolicy);
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
