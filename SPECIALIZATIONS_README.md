@@ -33,7 +33,7 @@ using CliInvoke.Specializations;
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
     IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-  IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
+    IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
   
   //Create your runner configuration.
          ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
@@ -63,7 +63,7 @@ using CliInvoke.Specializations;
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
     IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-  IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
+    IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
   
   //Create your runner configuration.
          ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
@@ -97,7 +97,7 @@ using CliInvoke.Specializations;
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
     IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-  IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
+    IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
   
   //Create your runner configuration.
          ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
@@ -131,10 +131,10 @@ using CliInvoke.Specializations;
     // ServiceProvider and Dependency Injection code ommitted for clarity
     
     IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-  IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
+    IRunnerProcessFactory _runnerProcessFactory = serviceProvider.GetRequiredService<IRunnerProcessFactory>();
   
   //Create your runner configuration.
-         ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
+         ProcessConfiguration runnerConfig = new PowershellProcessConfiguration("Your arguments go here",
                     // Set standard input, output, and error
           false, true, true, Environment.SystemDirectory);
   
