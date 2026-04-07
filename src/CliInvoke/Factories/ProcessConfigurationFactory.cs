@@ -54,9 +54,8 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
                 targetFilePath)
             .SetArguments(arguments)
-            .RedirectStandardOutput(true)
-            .RedirectStandardError(true)
-            .ConfigureWindowCreation(false);
+            .SetOutputRedirectionMode(OutputRedirectionMode.Buffer)
+            .EnableWindowCreation(false);
 
         if (configureBuilder is not null)
             configureBuilder.Invoke(processConfigurationBuilder);
@@ -90,9 +89,8 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
                 targetFilePath)
             .SetArguments(argumentsBuilder.ToString())
-            .RedirectStandardOutput(true)
-            .RedirectStandardError(true)
-            .ConfigureWindowCreation(false);
+            .SetOutputRedirectionMode(OutputRedirectionMode.Buffer)
+            .EnableWindowCreation(false);
 
         if (configureBuilder is not null)
             configureBuilder.Invoke(processConfigurationBuilder);

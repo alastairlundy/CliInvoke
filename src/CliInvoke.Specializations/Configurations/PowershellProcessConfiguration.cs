@@ -57,20 +57,13 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardError"></param>
     public PowershellProcessConfiguration(IExecutableFileResolver filePathResolver,
         string arguments,
-        bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError,
+        bool redirectStandardInput, OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("",
-        redirectStandardInput, redirectStandardOutput, redirectStandardError, arguments,
-        workingDirectoryPath,
-        requiresAdministrator, environmentVariables,
-        credentials, standardInput, standardInputEncoding,
-        standardOutputEncoding, standardErrorEncoding,
-        processResourcePolicy,
-        windowCreation, useShellExecution)
+        bool useShellExecution = false, bool windowCreation = false) : base("", arguments, outputRedirectionMode)
     {
         string filePath;
 

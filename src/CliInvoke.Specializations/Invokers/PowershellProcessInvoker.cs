@@ -33,28 +33,24 @@ namespace CliInvoke.Specializations;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("macos")]
 [SupportedOSPlatform("linux")]
-public class PowershellProcessInvoker : IProcessInvoker
+public class PowershellProcessInvoker : ProcessInvoker
 {
     private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
-    private readonly bool _windowCreation;
-    private readonly bool _redirectOutputs;
+    private readonly IExecutableFileResolver _filePathResolver;
 
     /// <summary>
     /// </summary>
     /// <param name="runnerConfigurationFactory"></param>
     /// <param name="filePathResolver"></param>
-    /// <param name="windowCreation"></param>
-    /// <param name="redirectOutputs"></param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public PowershellProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, IExecutableFileResolver filePathResolver,
-        bool windowCreation = true, bool redirectOutputs = true)
+    public PowershellProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, 
+        IExecutableFileResolver filePathResolver) : base(filePathResolver)
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;
-        _windowCreation = windowCreation;
-        _redirectOutputs = redirectOutputs;
+        _filePathResolver = filePathResolver;
     }
 
     /// <summary>
@@ -81,13 +77,18 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
+    public new async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
         
-        
+        using ProcessConfiguration runnerConfiguration =
+            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
+                new PowershellProcessConfiguration(_filePathResolver, processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
+                    OutputRedirectionMode.None));
+
+        return await base.ExecuteAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
 
     private static void ThrowIfUnsupported()
@@ -121,14 +122,19 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
+    public new async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
         
-        
+        using ProcessConfiguration runnerConfiguration =
+            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
+                new PowershellProcessConfiguration(_filePathResolver, processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
+                    OutputRedirectionMode.None));
+
+        return await base.ExecuteBufferedAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -155,12 +161,17 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
+    public new async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, 
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
         
-        
+        using ProcessConfiguration runnerConfiguration =
+            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
+                new PowershellProcessConfiguration(_filePathResolver, processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
+                    OutputRedirectionMode.None));
+
+        return await base.ExecutePipedAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
 }

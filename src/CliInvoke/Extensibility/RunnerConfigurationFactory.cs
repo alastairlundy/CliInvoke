@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#pragma warning disable CA1416
+
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility;
 
@@ -41,18 +43,30 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                 runnerProcessConfig.TargetFilePath
             )
             .SetArguments(combinedArgs)
-            .SetEnvironmentVariables(processConfigToBeRun.EnvironmentVariables)
-            .SetProcessResourcePolicy(processConfigToBeRun.ResourcePolicy)
-            .SetStandardInputEncoding(processConfigToBeRun.StandardInputEncoding)
-            .SetStandardOutputEncoding(processConfigToBeRun.StandardOutputEncoding)
-            .SetStandardErrorEncoding(processConfigToBeRun.StandardErrorEncoding)
+            .ConfigureEnvironmentVariables(envConfigure =>
+            {
+                envConfigure.SetReadOnlyDictionary(processConfigToBeRun.EnvironmentVariables);
+            })
+            .ConfigureProcessResourcePolicy(resourcePolicyConfig =>
+            {
+                resourcePolicyConfig.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
+                
+                if(processConfigToBeRun.ResourcePolicy.MinWorkingSet is not null)
+                    resourcePolicyConfig.SetMinWorkingSet((nint)processConfigToBeRun.ResourcePolicy.MinWorkingSet);
+                
+                if(processConfigToBeRun.ResourcePolicy.MaxWorkingSet is not null)
+                    resourcePolicyConfig.SetMaxWorkingSet((nint)processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+
+                resourcePolicyConfig.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
+                    .EnablePriorityBoost);
+                
+                if(processConfigToBeRun.ResourcePolicy.ProcessorAffinity is not null)
+                    resourcePolicyConfig.SetProcessorAffinity((nint)processConfigToBeRun.ResourcePolicy.ProcessorAffinity);
+            })
+            .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)
-            .SetUserCredential(processConfigToBeRun.Credential)
-            .ConfigureShellExecution(processConfigToBeRun.UseShellExecution)
-            .RedirectStandardInput(processConfigToBeRun.RedirectStandardInput)
-            .RedirectStandardOutput(processConfigToBeRun.RedirectStandardOutput)
-            .RedirectStandardError(processConfigToBeRun.RedirectStandardError)
-            .ConfigureWindowCreation(processConfigToBeRun.WindowCreation);
+            .UseShellExecution(processConfigToBeRun.UseShellExecution)
+            .EnableWindowCreation(processConfigToBeRun.WindowCreation);
 
         if (runnerProcessConfig.RequiresAdministrator)
             commandBuilder = new ProcessConfigurationBuilder(

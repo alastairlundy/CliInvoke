@@ -18,13 +18,9 @@ internal static class ToStartInfoExtensions
     {
         /// <summary>
         /// </summary>
-        /// <param name="redirectStandardOutput"></param>
-        /// <param name="redirectStandardError"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        internal ProcessStartInfo ToProcessStartInfo(
-            bool redirectStandardOutput,
-            bool redirectStandardError)
+        internal ProcessStartInfo ToProcessStartInfo()
         {
             ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath);
 
@@ -40,8 +36,8 @@ internal static class ToStartInfoExtensions
                 RedirectStandardInput =
                     processConfiguration.StandardInput is not null
                     && processConfiguration.RedirectStandardInput,
-                RedirectStandardOutput = redirectStandardOutput,
-                RedirectStandardError = redirectStandardError
+                RedirectStandardOutput =  processConfiguration.OutputRedirection != OutputRedirectionMode.None,
+                RedirectStandardError = processConfiguration.OutputRedirection != OutputRedirectionMode.None,
             };
 
             if (processConfiguration.RequiresAdministrator)

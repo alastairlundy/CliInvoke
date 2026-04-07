@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
+using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke.Specializations.Tests.Invokers;
 
@@ -19,7 +20,9 @@ public class CmdInvokerTests
     {
         IRunnerConfigurationFactory runnerProcessFactory = testFixture.ServiceProvider.GetRequiredService<IRunnerConfigurationFactory>();
 
-        cmdProcessInvoker = new CmdProcessInvoker(runnerProcessFactory);
+        IExecutableFileResolver executableFileResolver = testFixture.ServiceProvider.GetRequiredService<IExecutableFileResolver>();
+        
+        cmdProcessInvoker = new CmdProcessInvoker(runnerProcessFactory, executableFileResolver);
     }
 
     [Test]
@@ -31,14 +34,13 @@ public class CmdInvokerTests
         IProcessConfigurationBuilder configurationBuilder = new ProcessConfigurationBuilder
                 (ExecutedCommandHelper.WinCalcExePath)
             .SetWorkingDirectory(ExecutedCommandHelper.WinCalcExePath.Replace("calc.exe", string.Empty))
-            .ConfigureWindowCreation(true);
+            .EnableWindowCreation(true);
 
         ProcessConfiguration commandConfiguration = configurationBuilder.Build();
 
         ProcessResult result = await cmdProcessInvoker.ExecuteAsync(commandConfiguration,
             new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(1)),
-                ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException),
-            false, CancellationToken.None);
+                ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException), CancellationToken.None);
 
         await Assert.That(Process.GetProcesses().Any(p => p.ProcessName.Contains("calculatorapp",
                 StringComparison.InvariantCultureIgnoreCase)))

@@ -1,23 +1,23 @@
 <Project>
-    <PropertyGroup>
-        <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    </PropertyGroup>
-    <PropertyGroup>
-        <!-- default false, CI can set to true -->
-        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageVersion Include="Polyfill" Version="9.22.0"/>
-        <PackageVersion Include="DotExtensions" Version="10.0.0"/>
-        <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5"/>
-        <PackageVersion Include="WhatExec.Lib.Abstractions" Version="1.0.0"/>
-        <PackageVersion Include="WhatExec.Lib" Version="1.0.0"/>
-    </ItemGroup>
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
-        <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageVersion Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)"/>
-        <PackageVersion Include="CliInvoke" Version="$(CliInvokeVersion)"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- default false, CI can set to true -->
+    <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Polyfill" Version="9.24.1" />
+    <PackageVersion Include="DotExtensions" Version="10.1.1" />
+    <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+    <PackageVersion Include="WhatExec.Lib.Abstractions" Version="1.0.0" />
+    <PackageVersion Include="WhatExec.Lib" Version="1.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
+    <!-- set CliInvokeCoreVersion in the workflow -->
+    <PackageVersion Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
+    <PackageVersion Include="CliInvoke" Version="$(CliInvokeVersion)" />
+  </ItemGroup>
 </Project>

@@ -55,7 +55,7 @@ public class ProcessConfigurationBuilderTests
         //Assert
         await Assert.That(() =>
         {
-            processConfigBuilder.ConfigureShellExecution(true)
+            processConfigBuilder.UseShellExecution(true)
                 .SetStandardInputPipe(new StreamWriter(Console.OpenStandardInput()));
         }).Throws<ArgumentException>();
     }

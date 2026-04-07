@@ -31,8 +31,7 @@ public class BufferedInvokationBenchmark
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
                 _bufferedTestHelper.TargetFilePath)
             .SetArguments(_bufferedTestHelper.Arguments)
-            .RedirectStandardOutput(false)
-            .RedirectStandardError(false);
+            .SetOutputRedirectionMode(OutputRedirectionMode.Buffer);
 
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
 

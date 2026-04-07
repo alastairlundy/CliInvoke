@@ -22,7 +22,26 @@ namespace CliInvoke.Builders;
 /// </summary>
 public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
 {
-    private readonly ProcessConfiguration _configuration;
+    private string _targetFilePath;
+    private OutputRedirectionMode _outputRedirection;
+    
+    private string _workingDirectoryPath;
+    
+    private bool _redirectStandardInput;
+    private bool _enableWindowCreation;
+    private bool _useShellExecution;
+    private bool _requiresAdministratorPrivileges;
+    
+    private Encoding _standardInputEncoding;
+    private Encoding _standardOutputEncoding;
+    private Encoding _standardErrorEncoding;
+
+    private StreamWriter _standardInput;
+    
+    private readonly ArgumentsBuilder _argumentsBuilder;
+    private readonly EnvironmentVariablesBuilder _environmentVariablesBuilder;
+    private readonly ProcessResourcePolicyBuilder _processResourcePolicyBuilder;
+    private readonly UserCredentialBuilder _userCredentialBuilder;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProcessConfigurationBuilder" /> class,
@@ -31,110 +50,73 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
     public ProcessConfigurationBuilder(string targetFilePath)
     {
-        _configuration = new ProcessConfiguration(targetFilePath,
-            false, false,
-            false);
-    }
+        _targetFilePath = targetFilePath;
+        _argumentsBuilder = new ArgumentsBuilder();
+        _environmentVariablesBuilder = new EnvironmentVariablesBuilder();
+        _processResourcePolicyBuilder = new ProcessResourcePolicyBuilder();
+        _userCredentialBuilder =  new UserCredentialBuilder();
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ProcessConfigurationBuilder" /> class,
-    ///     which is used to build and configure a process.
-    /// </summary>
-    /// <param name="configuration">A process configuration to update.</param>
-    protected ProcessConfigurationBuilder(ProcessConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+        _outputRedirection = OutputRedirectionMode.None;
 
-    /// <summary>
-    ///     Releases all resources used by the <see cref="ProcessConfigurationBuilder" /> instance.
-    ///     This includes disposing of the associated <see cref="ProcessConfiguration" /> object.
-    /// </summary>
-    public void Dispose()
-    {
-        _configuration.Dispose();
-    }
+        _redirectStandardInput = false;
+        _enableWindowCreation = false;
+        _useShellExecution = false;
+        _requiresAdministratorPrivileges = false;
 
-    /// <summary>
-    ///     Adds process arguments to the Process Configuration builder.
-    /// </summary>
-    /// <param name="arguments">The process arguments to be added.</param>
-    /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
-    [Pure]
-    public IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments)
-    {
-        return SetArguments(arguments, false);
-    }
+        _standardInputEncoding = Encoding.Default;
+        _standardOutputEncoding = Encoding.Default;
+        _standardErrorEncoding = Encoding.Default;
 
+        _standardInput = StreamWriter.Null;
+        
+        _workingDirectoryPath = Directory.GetCurrentDirectory();
+    }
+    
     /// <summary>
-    ///     Adds process arguments to the Process Configuration builder.
+    ///     Sets the process arguments to the Process Configuration builder.
     /// </summary>
     /// <param name="arguments">The process arguments to be added or updated.</param>
     /// <param name="escapeArguments">Whether the arguments should be escaped.</param>
     /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref cref="arguments" /> is null.</exception>
-    [Pure]
     public IProcessConfigurationBuilder SetArguments(
         IEnumerable<string> arguments,
-        bool escapeArguments)
+        bool escapeArguments = true)
     {
         ArgumentNullException.ThrowIfNull(arguments);
-
-        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder().AddEnumerable(
-            arguments,
-            escapeArguments);
-
-        string args = argumentsBuilder.ToString();
-
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                args,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+        
+        _argumentsBuilder.Clear();
+        _argumentsBuilder.AddEnumerable(arguments, escapeArguments);
+        
+        return this;
     }
 
     /// <summary>
-    ///     Adds process arguments to the Process Configuration builder.
+    ///     Sets process arguments to the Process Configuration builder.
     /// </summary>
     /// <param name="arguments">The argument string to be added.</param>
+    /// <param name="escapeArguments"></param>
     /// <returns>A reference to this builder with the added string arguments, allowing method chaining.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="arguments" /> is null or empty.</exception>
-    [Pure]
-    public IProcessConfigurationBuilder SetArguments(string arguments)
+    public IProcessConfigurationBuilder SetArguments(string arguments, bool escapeArguments = true)
     {
         ArgumentNullException.ThrowIfNull(arguments);
 
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+        _argumentsBuilder.Clear();
+        _argumentsBuilder.Add(arguments, escapeArguments);
+        return this;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="configureArguments"></param>
+    /// <returns></returns>
+    public IProcessConfigurationBuilder ConfigureArguments(Action<IArgumentsBuilder> configureArguments)
+    {
+        configureArguments.Invoke(_argumentsBuilder);
+        
+        return this;
     }
 
     /// <summary>
@@ -146,66 +128,25 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     Thrown if the <paramref name="targetFilePath" /> is null or
     ///     empty.
     /// </exception>
-    [Pure]
     public IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath)
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
-        ArgumentException.ThrowIfNullOrWhiteSpace(targetFilePath);
+        
+        _targetFilePath = targetFilePath;
 
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                targetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation,
-                _configuration.UseShellExecution)
-        );
+        return this;
     }
 
     /// <summary>
-    ///     Sets environment variables for the process configuration.
+    /// 
     /// </summary>
-    /// <param name="environmentVariables">
-    ///     The environment variables to be added to the process
-    ///     configuration.
-    /// </param>
-    /// <returns>A reference to this builder with the updated target file path, allowing method chaining.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="environmentVariables" /> is null.</exception>
-    [Pure]
-    public IProcessConfigurationBuilder SetEnvironmentVariables(
-        IReadOnlyDictionary<string, string> environmentVariables)
+    /// <param name="configureEnvironmentVariables"></param>
+    /// <returns></returns>
+    public IProcessConfigurationBuilder ConfigureEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configureEnvironmentVariables)
     {
-        ArgumentNullException.ThrowIfNull(environmentVariables);
-
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                environmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+        configureEnvironmentVariables.Invoke(_environmentVariablesBuilder);
+        
+        return this;
     }
 
     /// <summary>
@@ -215,27 +156,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     A reference to this builder with the updated administrator privileges,
     ///     allowing method chaining.
     /// </returns>
-    [Pure]
     public IProcessConfigurationBuilder RequireAdministratorPrivileges()
     {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                true,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+        _requiresAdministratorPrivileges = true;
+
+        return this;
     }
 
     /// <summary>
@@ -243,29 +168,17 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="workingDirectoryPath">The file system path where the process will be executed.</param>
     /// <returns>A reference to this builder, allowing method chaining.</returns>
-    [Pure]
     public IProcessConfigurationBuilder SetWorkingDirectory(string workingDirectoryPath)
     {
         ArgumentException.ThrowIfNullOrEmpty(workingDirectoryPath);
 
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                workingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+        if (!Directory.Exists(workingDirectoryPath))
+            throw new DirectoryNotFoundException(
+                $"Directory '{workingDirectoryPath}' could not be found or does not exist.");
+
+        _workingDirectoryPath = workingDirectoryPath;
+
+        return this;
     }
 
     /// <summary>
@@ -278,66 +191,46 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-    [Pure]
     public IProcessConfigurationBuilder SetUserCredential(UserCredential credential)
     {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+        return ConfigureUserCredential(configureCredential =>
+        {
+            if(credential.LoadUserProfile is not null)
+                configureCredential.LoadUserProfile((bool)credential.LoadUserProfile);
+            
+            if(credential.Domain is not null)
+                configureCredential.SetDomain(credential.Domain);
+            
+            if(credential.UserName is not null)
+                configureCredential.SetUsername(credential.UserName);
+            
+            if(credential.Password is not null)
+                configureCredential.SetPassword(credential.Password);
+        });
     }
 
     /// <summary>
     ///     Sets the credentials for the Command to be executed.
     /// </summary>
-    /// <param name="configure">The CredentialsBuilder configuration.</param>
+    /// <param name="configureCredential">The CredentialsBuilder configuration.</param>
     /// <returns>The new CommandBuilder with the specified Credentials.</returns>
     /// <remarks>
     ///     Credentials are only supported with the Process class on Windows. This is a limitation of
     ///     .NET's Process class.
     /// </remarks>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="configure" /> is null.</exception>
-    [Pure]
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="configureCredential" /> is null.</exception>
     [SupportedOSPlatform("windows")]
     [UnsupportedOSPlatform("macos")]
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-    public IProcessConfigurationBuilder SetUserCredential(Action<IUserCredentialBuilder> configure)
+    public IProcessConfigurationBuilder ConfigureUserCredential(Action<IUserCredentialBuilder> configureCredential)
     {
-        ArgumentNullException.ThrowIfNull(configure);
+        ArgumentNullException.ThrowIfNull(configureCredential);
+        
+        configureCredential(_userCredentialBuilder);
 
-        IUserCredentialBuilder credentialBuilder = new UserCredentialBuilder();
-
-        if (_configuration.Credential.Domain is not null)
-            credentialBuilder.SetDomain(_configuration.Credential.Domain);
-
-        if (_configuration.Credential.Password is not null)
-            credentialBuilder.SetPassword(_configuration.Credential.Password);
-
-        if (_configuration.Credential.UserName is not null)
-            credentialBuilder.SetUsername(_configuration.Credential.UserName);
-
-        credentialBuilder = credentialBuilder.LoadUserProfile
-            (_configuration.Credential.LoadUserProfile ?? false);
-
-        configure(credentialBuilder);
-
-        return SetUserCredential(credentialBuilder.Build());
+        return this;
     }
 
     /// <summary>
@@ -348,89 +241,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     enabled.
     /// </param>
     /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> with the updated configuration.</returns>
-    [Pure]
     public IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput)
     {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                redirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput ?? StreamWriter.Null,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation,
-                _configuration.UseShellExecution)
-        );
-    }
+        _redirectStandardInput = redirectStandardInput;
 
-    /// <summary>
-    ///     Configures whether the standard output of the process should be redirected.
-    /// </summary>
-    /// <param name="redirectStandardOutput">
-    ///     A boolean value indicating whether to redirect the standard
-    ///     output of the process.
-    /// </param>
-    /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> with the updated configuration.</returns>
-    [Pure]
-    public IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput)
-    {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                redirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation,
-                _configuration.UseShellExecution)
-        );
-    }
-
-    /// <summary>
-    ///     Configures the process to redirect the standard error stream.
-    /// </summary>
-    /// <param name="redirectStandardError">Defines whether the standard error stream should be redirected.</param>
-    /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> with the updated configuration.</returns>
-    [Pure]
-    public IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError)
-    {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                redirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation,
-                _configuration.UseShellExecution)
-        );
+        return this;
     }
 
     /// <summary>
@@ -444,63 +259,67 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </remarks>
     /// <seealso
     ///     href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput" />
-    [Pure]
     public IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source)
     {
         ArgumentNullException.ThrowIfNull(source);
 
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                source,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+        _standardInput = source;
+
+        return this;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="outputRedirectionMode"></param>
+    /// <returns></returns>
+    public IProcessConfigurationBuilder SetOutputRedirectionMode(OutputRedirectionMode outputRedirectionMode)
+    {
+        _outputRedirection = outputRedirectionMode;
+        
+        return this;
     }
 
     /// <summary>
     ///     Sets the policy for managing process resources.
     /// </summary>
-    /// <param name="processResourcePolicy">The policy that determines how the process resource is managed.</param>
+    /// <param name="configureResourcePolicy">The policy that determines how the process resource is managed.</param>
     /// <returns>
     ///     A reference to this builder with the updated Process Resource Policy,
     ///     allowing method chaining.
     /// </returns>
-    [Pure]
+    public IProcessConfigurationBuilder ConfigureProcessResourcePolicy(
+        Action<IProcessResourcePolicyBuilder> configureResourcePolicy)
+    {
+        ArgumentNullException.ThrowIfNull(configureResourcePolicy);
+        
+        configureResourcePolicy.Invoke(_processResourcePolicyBuilder);
+        
+        return this;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processResourcePolicy"></param>
+    /// <returns></returns>
     public IProcessConfigurationBuilder SetProcessResourcePolicy(
         ProcessResourcePolicy processResourcePolicy)
     {
-        ArgumentNullException.ThrowIfNull(processResourcePolicy);
+        return ConfigureProcessResourcePolicy(configureResourcePolicy =>
+        {
+            configureResourcePolicy.SetPriorityClass(processResourcePolicy.PriorityClass)
+                .ConfigurePriorityBoost(processResourcePolicy.EnablePriorityBoost);
 
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                processResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+            if (processResourcePolicy.MinWorkingSet is not null)
+                configureResourcePolicy.SetMinWorkingSet((nint)processResourcePolicy.MinWorkingSet);
+            
+            if(processResourcePolicy.MaxWorkingSet is not null)
+                configureResourcePolicy.SetMaxWorkingSet((nint)processResourcePolicy.MaxWorkingSet);
+            
+            if(processResourcePolicy.ProcessorAffinity is not null)
+                configureResourcePolicy.SetProcessorAffinity((nint)processResourcePolicy.ProcessorAffinity);
+        });
     }
 
     /// <summary>
@@ -514,27 +333,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </remarks>
     /// <seealso
     ///     href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardinput" />
-    [Pure]
-    public IProcessConfigurationBuilder ConfigureShellExecution(bool useShellExecution)
+    public IProcessConfigurationBuilder UseShellExecution(bool useShellExecution)
     {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, useShellExecution)
-        );
+        _useShellExecution = useShellExecution;
+        
+        return this;
     }
 
     /// <summary>
@@ -545,27 +348,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     creation.
     /// </param>
     /// <returns>The updated Process Configuration builder with the updated window creation configuration.</returns>
-    [Pure]
-    public IProcessConfigurationBuilder ConfigureWindowCreation(bool enableWindowCreation)
+    public IProcessConfigurationBuilder EnableWindowCreation(bool enableWindowCreation)
     {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                enableWindowCreation, _configuration.UseShellExecution)
-        );
+        _enableWindowCreation = enableWindowCreation;
+        return this;
     }
 
     /// <summary>
@@ -576,113 +362,89 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     The encoding scheme to use for standard input.
     ///     Uses the Default Encoding if null.
     /// </param>
+    /// <param name="standardOutputEncoding"></param>
+    /// <param name="standardErrorEncoding"></param>
     /// <returns>
     ///     The updated Process Configuration builder with the updated encoding scheme configuration
     ///     information.
     /// </returns>
-    [Pure]
-    public IProcessConfigurationBuilder SetStandardInputEncoding(
-        Encoding? standardInputEncoding = null
-    )
+    public IProcessConfigurationBuilder SetEncoding(Encoding? standardInputEncoding = null,
+        Encoding? standardOutputEncoding = null, Encoding? standardErrorEncoding = null)
     {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                standardInputEncoding ?? Encoding.Default,
-                _configuration.StandardOutputEncoding,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
-    }
+        if(standardInputEncoding is not null)
+            _standardInputEncoding = standardInputEncoding;
+        
+        if(standardOutputEncoding is not null)
+            _standardOutputEncoding = standardOutputEncoding;
+        
+        if(standardErrorEncoding is not null)
+            _standardErrorEncoding = standardErrorEncoding;
 
-    /// <summary>
-    ///     Configures the process builder to use specific encoding schemes for Standard output and error
-    ///     streams.
-    /// </summary>
-    /// <param name="standardOutputEncoding">
-    ///     The encoding scheme to use for standard output.
-    ///     Uses the Default Encoding if null.
-    /// </param>
-    /// <returns>
-    ///     The updated Process Configuration builder with the updated encoding scheme configuration
-    ///     information.
-    /// </returns>
-    [Pure]
-    public IProcessConfigurationBuilder SetStandardOutputEncoding(
-        Encoding? standardOutputEncoding = null)
-    {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                standardOutputEncoding ?? Encoding.Default,
-                _configuration.StandardErrorEncoding,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
-    }
-
-    /// <summary>
-    ///     Configures the process builder to use specific encoding schemes for Standard Error streams.
-    /// </summary>
-    /// <param name="standardErrorEncoding">
-    ///     The encoding scheme to use for standard error.
-    ///     Uses the Default Encoding if null.
-    /// </param>
-    /// <returns>
-    ///     The updated Process Configuration builder with the updated encoding scheme configuration
-    ///     information.
-    /// </returns>
-    [Pure]
-    public IProcessConfigurationBuilder SetStandardErrorEncoding(
-        Encoding? standardErrorEncoding = null)
-    {
-        return new ProcessConfigurationBuilder(
-            new ProcessConfiguration(
-                _configuration.TargetFilePath,
-                _configuration.RedirectStandardInput,
-                _configuration.RedirectStandardOutput,
-                _configuration.RedirectStandardError,
-                _configuration.Arguments,
-                _configuration.WorkingDirectoryPath,
-                _configuration.RequiresAdministrator,
-                _configuration.EnvironmentVariables,
-                _configuration.Credential,
-                _configuration.StandardInput,
-                _configuration.StandardInputEncoding,
-                _configuration.StandardOutputEncoding,
-                standardErrorEncoding ?? Encoding.Default,
-                _configuration.ResourcePolicy,
-                _configuration.WindowCreation, _configuration.UseShellExecution)
-        );
+        return this;
     }
 
     /// <summary>
     ///     Builds and returns a ProcessConfiguration object with the specified properties.
     /// </summary>
     /// <returns>The configured ProcessConfiguration object.</returns>
+    [Pure]
     public ProcessConfiguration Build()
     {
-        return _configuration;
+        string arguments = _argumentsBuilder.ToString();
+        
+        IReadOnlyDictionary<string, string> environmentVariables = _environmentVariablesBuilder.Build();
+        
+        ProcessResourcePolicy resourcePolicy = _processResourcePolicyBuilder.Build();
+        UserCredential credential = _userCredentialBuilder.Build();
+
+        ProcessConfigurationWrapper configuration = new ProcessConfigurationWrapper(_targetFilePath, arguments,
+            _redirectStandardInput, _outputRedirection,
+            _workingDirectoryPath, _requiresAdministratorPrivileges, environmentVariables,
+            credential, _standardInput, _standardInputEncoding, _standardOutputEncoding, _standardErrorEncoding, resourcePolicy, _enableWindowCreation,
+            _useShellExecution);
+
+        return configuration;
+    }
+
+    public void Dispose()
+    {
+        _userCredentialBuilder.Dispose();
+        _standardInput.Dispose();
+    }
+}
+
+internal class ProcessConfigurationWrapper : ProcessConfiguration
+{
+    internal ProcessConfigurationWrapper(string targetFilePath, string arguments,
+        bool redirectStandardInput,
+        OutputRedirectionMode outputRedirection = OutputRedirectionMode.None,
+        string? workingDirectoryPath = null, bool requiresAdministrator = false,
+        IReadOnlyDictionary<string, string>? environmentVariables = null,
+        UserCredential? credential = null, StreamWriter? standardInput = null,
+        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
+        bool windowCreation = false, bool useShellExecution = false) : base(targetFilePath,
+        arguments, redirectStandardInput, outputRedirection, workingDirectoryPath,
+        requiresAdministrator, environmentVariables, credential, standardInput,
+        standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
+        windowCreation, useShellExecution)
+    {
+    }
+
+    internal ProcessConfigurationWrapper(string targetFilePath, bool redirectStandardInput,
+        OutputRedirectionMode outputRedirection = OutputRedirectionMode.None,
+        string? arguments = null, string? workingDirectoryPath = null,
+        bool requiresAdministrator = false,
+        IReadOnlyDictionary<string, string>? environmentVariables = null,
+        UserCredential? credential = null, StreamWriter? standardInput = null,
+        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
+        bool windowCreation = false, bool useShellExecution = false) : base(targetFilePath,
+        redirectStandardInput, outputRedirection, arguments, workingDirectoryPath,
+        requiresAdministrator, environmentVariables, credential, standardInput,
+        standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
+        windowCreation, useShellExecution)
+    {
     }
 }
 

@@ -12,6 +12,10 @@ using System.Threading.Tasks;
 
 using CliInvoke.Specializations.Configurations;
 
+using WhatExec.Lib.Abstractions.Resolvers;
+using WhatExec.Lib.Detectors;
+using WhatExec.Lib.Resolvers;
+
 namespace CliInvoke.Specializations;
 
 /// <summary>
@@ -19,11 +23,9 @@ namespace CliInvoke.Specializations;
 ///     Provides functionality to execute processes either with raw output, buffered output, or piped
 ///     streams.
 /// </summary>
-public class CmdProcessInvoker : IProcessInvoker
+public class CmdProcessInvoker : ProcessInvoker
 {
     private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
-    private readonly bool _windowCreation;
-    private readonly bool _redirectOutputs;
 
     /// <summary>
     ///     Represents a process invoker specialized for running processes through CMD on Windows
@@ -45,12 +47,10 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, bool windowCreation = true,
-        bool redirectOutputs = true)
+    public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, IExecutableFileResolver executableFileResolver) :
+        base(executableFileResolver)
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;
-        _windowCreation = windowCreation;
-        _redirectOutputs = redirectOutputs;
     }
 
     /// <summary>
@@ -58,8 +58,7 @@ public class CmdProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
     /// <param name="processExitConfiguration">
-    ///     Optional configuration for handling the process exit
-    ///     behavior.
+    ///     Optional configuration for handling the process exit behaviour.
     /// </param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>
@@ -79,15 +78,19 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public async Task<ProcessResult> ExecuteAsync(
+    public new async Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, 
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
 
-        using ProcessConfiguration runnerConfiguration = _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-            new CmdProcessConfiguration())
+        using ProcessConfiguration runnerConfiguration =
+            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
+                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
+                    OutputRedirectionMode.None));
+
+        return await base.ExecuteAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
 
     private static void ThrowIfUnsupported()
@@ -103,7 +106,7 @@ public class CmdProcessInvoker : IProcessInvoker
     /// <param name="processConfiguration"> The configuration for the process to be executed. </param>
     /// <param name="processExitConfiguration">
     ///     Optional configuration for handling the process exit
-    ///     behavior.
+    ///     behaviour.
     /// </param>
     /// <param name="cancellationToken"> A token to monitor for cancellation requests. </param>
     /// <returns>
@@ -122,14 +125,19 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
+    public new async Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
-
         
+        using ProcessConfiguration runnerConfiguration =
+            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
+                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
+                    OutputRedirectionMode.None));
+
+        return await base.ExecuteBufferedAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -137,8 +145,7 @@ public class CmdProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
     /// <param name="processExitConfiguration">
-    ///     Optional configuration for handling the process exit
-    ///     behavior.
+    ///     Optional configuration for handling the process exit behaviour.
     /// </param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>
@@ -157,13 +164,18 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public async Task<PipedProcessResult> ExecutePipedAsync(
+    public new async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
 
-        
+        using ProcessConfiguration runnerConfiguration =
+            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
+                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
+                    OutputRedirectionMode.None));
+
+        return await base.ExecutePipedAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
 }

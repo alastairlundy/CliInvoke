@@ -33,20 +33,25 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetArguments(string arguments, bool escapeArguments = true);
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="configureArguments"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder ConfigureArguments(Action<IArgumentsBuilder> configureArguments);
+    
+    /// <summary>
     ///     Sets the Target File Path of the Process Executable.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the Process.</param>
     /// <returns>The ProcessConfigurationBuilder with the updated Target File Path.</returns>
     IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath);
-
+    
     /// <summary>
-    ///     Sets the environment variables to be configured.
+    /// 
     /// </summary>
-    /// <param name="environmentVariables">The environment variables to be configured.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified environment variables.</returns>
-    IProcessConfigurationBuilder SetEnvironmentVariables(
-        IReadOnlyDictionary<string, string> environmentVariables
-    );
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder ConfigureEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configure);
 
     /// <summary>
     ///     Enables using Administrator Privileges.
@@ -62,58 +67,19 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetWorkingDirectory(string workingDirectoryPath);
 
     /// <summary>
-    ///     Sets the specified Credentials to be used.
+    /// 
     /// </summary>
-    /// <param name="credentials">The credentials to be used.</param>
-    /// <returns>The new ProcessConfigurationBuilder with the specified Credentials.</returns>
-    IProcessConfigurationBuilder SetUserCredential(UserCredential credentials);
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder ConfigureUserCredential(Action<IUserCredentialBuilder> configure);
 
     /// <summary>
     ///     Sets the credentials for the Process to be executed.
     /// </summary>
-    /// <param name="configure">The CredentialsBuilder configuration.</param>
+    /// <param name="userCredential">The CredentialsBuilder configuration.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Credentials.</returns>
-    IProcessConfigurationBuilder SetUserCredential(Action<IUserCredentialBuilder> configure);
-
-    /// <summary>
-    ///     Configures whether the standard input of the process should be redirected.
-    /// </summary>
-    /// <param name="redirectStandardInput">
-    ///     A value that specifies whether the standard input of the
-    ///     process should be redirected.
-    /// </param>
-    /// <returns>
-    ///     The updated IProcessConfigurationBuilder instance with the configured standard input
-    ///     redirection setting.
-    /// </returns>
-    IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput);
-
-    /// <summary>
-    ///     Configures whether the standard output of the process should be redirected.
-    /// </summary>
-    /// <param name="redirectStandardOutput">
-    ///     A boolean value indicating whether to redirect the standard
-    ///     output.
-    /// </param>
-    /// <returns>
-    ///     The updated IProcessConfigurationBuilder object with the specified standard output
-    ///     redirection setting.
-    /// </returns>
-    IProcessConfigurationBuilder RedirectStandardOutput(bool redirectStandardOutput);
-
-    /// <summary>
-    ///     Configures whether to redirect the standard error stream of the process.
-    /// </summary>
-    /// <param name="redirectStandardError">
-    ///     A boolean value indicating whether the standard error stream
-    ///     should be redirected.
-    /// </param>
-    /// <returns>
-    ///     The updated IProcessConfigurationBuilder object with the specified standard error
-    ///     redirection setting.
-    /// </returns>
-    IProcessConfigurationBuilder RedirectStandardError(bool redirectStandardError);
-
+    IProcessConfigurationBuilder SetUserCredential(UserCredential userCredential);
+    
     /// <summary>
     ///     Sets the Standard Input Pipe source.
     /// </summary>
@@ -122,20 +88,33 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source);
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="outputRedirectionMode"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder SetOutputRedirectionMode(
+        OutputRedirectionMode outputRedirectionMode);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processResourcePolicy"></param>
+    /// <returns></returns>
+    IProcessConfigurationBuilder ConfigureProcessResourcePolicy(Action<IProcessResourcePolicyBuilder> processResourcePolicy);
+
+    /// <summary>
     ///     Sets the Process Resource Policy to be used for this Process.
     /// </summary>
     /// <param name="processResourcePolicy">The process resource policy to use.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified Process Resource Policy.</returns>
-    IProcessConfigurationBuilder SetProcessResourcePolicy(
-        ProcessResourcePolicy processResourcePolicy
-    );
-
+    IProcessConfigurationBuilder SetProcessResourcePolicy(ProcessResourcePolicy processResourcePolicy);
+    
     /// <summary>
     ///     Enables or disables Process execution via Shell Execution.
     /// </summary>
     /// <param name="useShellExecution">Whether to enable or disable shell execution.</param>
     /// <returns>The new ProcessConfigurationBuilder with the specified shell execution behaviour.</returns>
-    IProcessConfigurationBuilder ConfigureShellExecution(bool useShellExecution);
+    IProcessConfigurationBuilder UseShellExecution(bool useShellExecution);
 
     /// <summary>
     ///     Enables or disables Window creation for the wrapped executable.
@@ -145,32 +124,31 @@ public interface IProcessConfigurationBuilder
     ///     executable.
     /// </param>
     /// <returns>The new ProcessConfigurationBuilder with the specified window creation behaviour.</returns>
-    IProcessConfigurationBuilder ConfigureWindowCreation(bool enableWindowCreation);
+    IProcessConfigurationBuilder EnableWindowCreation(bool enableWindowCreation);
 
     /// <summary>
     ///     Sets the Encoding types to be used for Standard Input.
     /// </summary>
     /// <param name="standardInputEncoding">The encoding type to be used for the Standard Input.</param>
+    /// <param name="standardOutputEncoding"></param>
+    /// <param name="standardErrorEncoding"></param>
     /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
-    IProcessConfigurationBuilder SetStandardInputEncoding(Encoding? standardInputEncoding = null);
-
-    /// <summary>
-    ///     Sets the Encoding types to be used for Standard Output.
-    /// </summary>
-    /// <param name="standardOutputEncoding">The encoding type to be used for the Standard Output.</param>
-    /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
-    IProcessConfigurationBuilder SetStandardOutputEncoding(Encoding? standardOutputEncoding = null);
-
-    /// <summary>
-    ///     Sets the Encoding types to be used for Standard Error.
-    /// </summary>
-    /// <param name="standardErrorEncoding">The encoding type to be used for the Standard Error.</param>
-    /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
-    IProcessConfigurationBuilder SetStandardErrorEncoding(Encoding? standardErrorEncoding = null);
+    IProcessConfigurationBuilder SetEncoding(Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null);
 
     /// <summary>
     ///     Builds the Process configuration with the configured parameters.
     /// </summary>
     /// <returns>The newly configured Process configuration.</returns>
     ProcessConfiguration Build();
+
+    /// <summary>
+    ///     Configures whether the standard input of the process should be redirected.
+    /// </summary>
+    /// <param name="redirectStandardInput">
+    ///     A value indicating whether standard input redirection is
+    ///     enabled.
+    /// </param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> with the updated configuration.</returns>
+    IProcessConfigurationBuilder RedirectStandardInput(bool redirectStandardInput);
 }

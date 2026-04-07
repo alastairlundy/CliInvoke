@@ -28,8 +28,8 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
         Configuration = configuration;
 
         ArgumentsConflict = configuration.UseShellExecution &&
-                            (configuration.RedirectStandardOutput ||
-                             configuration.RedirectStandardError ||
+                            (configuration.OutputRedirection == OutputRedirectionMode.Pipe ||
+                             configuration.OutputRedirection == OutputRedirectionMode.Buffer ||
                              configuration.RedirectStandardInput);
     }
 
