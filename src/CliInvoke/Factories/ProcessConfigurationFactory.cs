@@ -84,7 +84,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
         ArgumentNullException.ThrowIfNull(arguments);
 
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
-            .AddEnumerable(arguments);
+            .AddRange(arguments);
 
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
                 targetFilePath)

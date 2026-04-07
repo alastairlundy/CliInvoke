@@ -32,7 +32,7 @@ public interface IArgumentsBuilder
     /// <param name="values">The collection of string values to append.</param>
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    IArgumentsBuilder AddEnumerable(IEnumerable<string> values, bool escapeSpecialChars = true);
+    IArgumentsBuilder AddRange(IEnumerable<string> values, bool escapeSpecialChars = true);
     
     /// <summary>
     ///     Appends a formattable value to the arguments builder.
@@ -41,21 +41,6 @@ public interface IArgumentsBuilder
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     IArgumentsBuilder Add(IFormattable value, bool escapeSpecialChars = true);
-
-    /// <summary>
-    ///     Appends a formattable value to the arguments builder.
-    /// </summary>
-    /// <param name="value">The formattable value to append.</param>
-    /// <param name="formatProvider">The format provider to use for formatting the value.</param>
-    /// <param name="format"></param>
-    /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
-    /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    IArgumentsBuilder Add(
-        IFormattable value,
-        IFormatProvider formatProvider,
-        string? format = null,
-        bool escapeSpecialChars = true
-    );
     
     /// <summary>
     ///     Appends a collection of formattable values to the arguments builder without specifying a
@@ -64,22 +49,7 @@ public interface IArgumentsBuilder
     /// <param name="values">The collection of formattable values to append.</param>
     /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    IArgumentsBuilder AddEnumerable(IEnumerable<IFormattable> values, bool escapeSpecialChars = true);
-
-    /// <summary>
-    ///     Appends a collection of formattable values to the arguments builder.
-    /// </summary>
-    /// <param name="values">The collection of formattable values to append.</param>
-    /// <param name="formatProvider">The format provider to use for formatting the values.</param>
-    /// <param name="format"></param>
-    /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
-    /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    IArgumentsBuilder AddEnumerable(
-        IEnumerable<IFormattable> values,
-        IFormatProvider formatProvider,
-        string? format = null,
-        bool escapeSpecialChars = true
-    );
+    IArgumentsBuilder AddRange(IEnumerable<IFormattable> values, bool escapeSpecialChars = true);
 
     /// <summary>
     ///     Escapes special characters in an argument such that it is suitable to be used with a Process.
