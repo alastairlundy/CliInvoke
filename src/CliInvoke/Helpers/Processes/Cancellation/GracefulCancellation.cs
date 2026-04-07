@@ -67,7 +67,7 @@ internal static partial class GracefulCancellation
                 // 3. Fallback to forceful is enabled
                 if (completedTaskIndex == 2 && !process.HasExited && fallbackToForceful)
                 {
-                    SafeForcefulExit(process, cancellationExceptionBehavior);
+                    await ProcessWrapper.SafeForcefulExit(process, cancellationExceptionBehavior).ConfigureAwait(false);
                 }
             }
             finally
@@ -117,10 +117,11 @@ internal static partial class GracefulCancellation
         /// </summary>
         /// <param name="proc">The process to forcefully exit.</param>
         /// <param name="cancellationExceptionBehavior">Behavior for handling cancellation exceptions.</param>
-        private static void SafeForcefulExit(ProcessWrapper proc, ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
+        private static async Task SafeForcefulExit(ProcessWrapper proc, ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
         {
             // Only attempt forceful exit if it hasn't been attempted before and process hasn't exited
-            proc.ForcefulExitLock.Wait();
+            await proc.ForcefulExitLock.WaitAsync(CancellationToken.None);
+            
             try
             {
                 if (!proc.ForcefulExitAttempted)
