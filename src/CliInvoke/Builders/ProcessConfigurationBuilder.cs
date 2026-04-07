@@ -180,8 +180,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="environmentVariables"/> is null.</exception>
     [Pure]
     public IProcessConfigurationBuilder SetEnvironmentVariables(
-        IReadOnlyDictionary<string, string> environmentVariables
-    )
+        IReadOnlyDictionary<string, string> environmentVariables)
     {
         ArgumentNullException.ThrowIfNull(environmentVariables);
 
@@ -677,7 +676,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardInput,
                 _configuration.StandardOutput,
                 _configuration.StandardError,
-                standardInputEncoding: standardInputEncoding ?? Encoding.Default,
+                standardInputEncoding ?? Encoding.Default,
                 _configuration.StandardOutputEncoding,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy: _configuration.ResourcePolicy,
@@ -713,7 +712,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardOutput,
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
-                standardOutputEncoding: standardOutputEncoding ?? Encoding.Default,
+                standardOutputEncoding ?? Encoding.Default,
                 _configuration.StandardErrorEncoding,
                 processResourcePolicy: _configuration.ResourcePolicy,
                 windowCreation: _configuration.WindowCreation,
@@ -749,7 +748,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
                 _configuration.StandardError,
                 _configuration.StandardInputEncoding,
                 _configuration.StandardOutputEncoding,
-                standardErrorEncoding: standardErrorEncoding ?? Encoding.Default,
+                standardErrorEncoding ?? Encoding.Default,
                 processResourcePolicy: _configuration.ResourcePolicy,
                 windowCreation: _configuration.WindowCreation,
                 useShellExecution: _configuration.UseShellExecution

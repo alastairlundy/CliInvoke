@@ -104,10 +104,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
             return new ArgumentsBuilder(_buffer,
                 _argumentValidationLogic);
         }
-        else
-        {
-            return new ArgumentsBuilder(_buffer);
-        }
+
+        return new ArgumentsBuilder(_buffer);
     }
 
     /// <summary>
