@@ -102,7 +102,7 @@ using Microsoft.Extensions.DependencyInjection;
 IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
 
 // Get IProcessConfigurationInvoker
-IProcessnvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
+IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
