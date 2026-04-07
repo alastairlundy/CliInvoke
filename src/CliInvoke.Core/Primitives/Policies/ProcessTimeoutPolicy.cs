@@ -20,7 +20,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public ProcessTimeoutPolicy()
     {
         Enabled = true;
-        TimeoutThreshold = TimeSpan.FromMinutes(30);
+        TimeoutThreshold = TimeSpan.FromMinutes(10);
     }
 
     /// <summary>
