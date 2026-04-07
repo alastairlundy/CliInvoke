@@ -89,7 +89,7 @@ internal static partial class GracefulCancellation
             ProcessCancellationExceptionBehavior cancellationExceptionBehavior, DateTime expectedExitTime)
         {
             // Use using statement to ensure proper disposal of CancellationTokenSource
-            using var cts = new CancellationTokenSource();
+            using CancellationTokenSource cts = new();
 
             cts.CancelAfter(timeoutThreshold);
 
@@ -108,7 +108,7 @@ internal static partial class GracefulCancellation
                     throw;
                 }
             }
-            // Note: We don't call ForcefulExit here anymore to prevent double invocation
+            // Note: We don't call ForcefulExit here to prevent double invocation
             // It's handled in the calling method after checking which task completed
         }
         

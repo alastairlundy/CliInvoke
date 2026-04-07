@@ -24,7 +24,7 @@ internal static class ForcefulCancellation
             }
             catch
             {
-                process.Kill(false);
+                process.Kill();
             }
         }
 
@@ -82,7 +82,8 @@ internal static class ForcefulCancellation
             finally
             {
                 // Only call ForcefulExit if process hasn't exited yet and forceful exit hasn't been attempted
-                process.ForcefulExitLock.Wait();
+                await process.ForcefulExitLock.WaitAsync(CancellationToken.None);
+                
                 try
                 {
                     if (!process.ForcefulExitAttempted && !process.HasExited)

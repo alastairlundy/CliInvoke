@@ -34,10 +34,9 @@ internal static class ProcessSetPolicyExtensions
         {
             resourcePolicy ??= ProcessResourcePolicy.Default;
 
-            if (process.HasStarted == false)
+            if (!process.HasStarted)
                 throw new InvalidOperationException(
-                    Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
-                );
+                    Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess);
 
             if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
             {
@@ -45,10 +44,9 @@ internal static class ProcessSetPolicyExtensions
                     process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
             }
 
-            if (OperatingSystem.IsMacOS()
-                || OperatingSystem.IsMacCatalyst()
-                || OperatingSystem.IsFreeBSD()
-                || OperatingSystem.IsWindows()
+            if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst()
+                                          || OperatingSystem.IsFreeBSD()
+                                          || OperatingSystem.IsWindows()
                )
             {
                 if (resourcePolicy.MinWorkingSet is not null) 

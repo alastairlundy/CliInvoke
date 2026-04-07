@@ -160,5 +160,6 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     public void Dispose()
     {
         Credential?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
