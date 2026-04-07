@@ -21,7 +21,73 @@ namespace CliInvoke.Core;
 public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposable
 {
     /// <summary>
-    /// Configures the Command configuration to be wrapped and executed.
+    /// Configures the Process configuration to be wrapped and executed.
+    /// </summary>
+    /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+    /// <param name="workingDirectoryPath">The working directory to be used.</param>
+    /// <param name="redirectStandardOutput"></param>
+    /// <param name="redirectStandardError"></param>
+    /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
+    /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
+    /// <param name="credential">The credential to be used (if specified).</param>
+    /// <param name="standardInput">The standard input source to be used (if specified).</param>
+    /// <param name="standardOutput">The standard output destination to be used (if specified).</param>
+    /// <param name="standardError">The standard error destination to be used (if specified).</param>
+    /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
+    /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
+    /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
+    /// <param name="redirectStandardInput"></param>
+    /// <exception cref="ArgumentException"></exception>
+    public ProcessConfiguration(
+        string targetFilePath,
+        string? arguments = null,
+        string? workingDirectoryPath = null,
+        bool redirectStandardInput = false,
+        bool redirectStandardOutput = true,
+        bool redirectStandardError = true,
+        bool requiresAdministrator = false,
+        IReadOnlyDictionary<string, string>? environmentVariables = null,
+        UserCredential? credential = null,
+        StreamWriter? standardInput = null,
+        StreamReader? standardOutput = null,
+        StreamReader? standardError = null,
+        ProcessResourcePolicy? processResourcePolicy = null,
+        bool windowCreation = false,
+        bool useShellExecution = false)
+    {
+        TargetFilePath = targetFilePath;
+        
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetFilePath);
+        
+        RequiresAdministrator = requiresAdministrator;
+        Arguments = arguments ?? string.Empty;
+        WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
+        EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+        Credential = credential ?? UserCredential.Null;
+
+        ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+
+        RedirectStandardInput = redirectStandardInput;
+        RedirectStandardOutput = redirectStandardOutput;
+        RedirectStandardError = redirectStandardError;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        StandardInput = standardInput ?? StreamWriter.Null;
+        StandardOutput = standardOutput ?? StreamReader.Null;
+        StandardError = standardError ?? StreamReader.Null;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        UseShellExecution = useShellExecution;
+        WindowCreation = windowCreation;
+
+        StandardInputEncoding = Encoding.Default;
+        StandardOutputEncoding = Encoding.Default;
+        StandardErrorEncoding = Encoding.Default;
+    }
+    
+    /// <summary>
+    /// Configures the Process configuration to be wrapped and executed.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
@@ -44,6 +110,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public ProcessConfiguration(
         string targetFilePath,
         bool redirectStandardInput,
@@ -62,8 +129,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Encoding? standardErrorEncoding = null,
         ProcessResourcePolicy? processResourcePolicy = null,
         bool windowCreation = false,
-        bool useShellExecution = false
-    )
+        bool useShellExecution = false)
     {
         TargetFilePath = targetFilePath;
         
