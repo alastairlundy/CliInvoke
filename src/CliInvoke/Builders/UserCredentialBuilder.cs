@@ -17,7 +17,7 @@ namespace CliInvoke.Builders;
 /// <summary>
 ///     A class that provides builder methods for constructing UserCredentials.
 /// </summary>
-public class UserCredentialBuilder : IUserCredentialBuilder, IDisposable
+public class UserCredentialBuilder : IUserCredentialBuilder
 {
     private string  _userName;
     private string _domain;

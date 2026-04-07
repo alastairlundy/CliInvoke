@@ -410,6 +410,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     {
         _userCredentialBuilder.Dispose();
         _standardInput.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
 
@@ -425,22 +426,6 @@ internal class ProcessConfigurationWrapper : ProcessConfiguration
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool windowCreation = false, bool useShellExecution = false) : base(targetFilePath,
         arguments, redirectStandardInput, outputRedirection, workingDirectoryPath,
-        requiresAdministrator, environmentVariables, credential, standardInput,
-        standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        windowCreation, useShellExecution)
-    {
-    }
-
-    internal ProcessConfigurationWrapper(string targetFilePath, bool redirectStandardInput,
-        OutputRedirectionMode outputRedirection = OutputRedirectionMode.None,
-        string? arguments = null, string? workingDirectoryPath = null,
-        bool requiresAdministrator = false,
-        IReadOnlyDictionary<string, string>? environmentVariables = null,
-        UserCredential? credential = null, StreamWriter? standardInput = null,
-        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
-        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool windowCreation = false, bool useShellExecution = false) : base(targetFilePath,
-        redirectStandardInput, outputRedirection, arguments, workingDirectoryPath,
         requiresAdministrator, environmentVariables, credential, standardInput,
         standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
         windowCreation, useShellExecution)

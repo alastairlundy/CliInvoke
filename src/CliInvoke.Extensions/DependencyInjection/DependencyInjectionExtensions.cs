@@ -24,7 +24,7 @@ namespace CliInvoke.Extensions;
 /// <summary>
 ///     Provides extension methods for configuring dependency injection for CliInvoke components.
 /// </summary>
-public static partial class DependencyInjectionExtensions
+public static class DependencyInjectionExtensions
 {
     /// <summary>
     ///     Sets up Dependency Injection for CliInvoke's main interface-able types.

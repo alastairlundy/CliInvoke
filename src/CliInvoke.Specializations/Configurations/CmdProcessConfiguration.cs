@@ -49,8 +49,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
     /// <param name="redirectStandardInput"></param>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="redirectStandardError"></param>
     public CmdProcessConfiguration(string arguments,
         bool redirectStandardInput, OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
@@ -60,7 +58,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) :
         base("cmd.exe",
-            true, outputRedirectionMode, $"/c {arguments}",
+            redirectStandardInput, outputRedirectionMode, $"/c {arguments}",
             workingDirectoryPath, requiresAdministrator, environmentVariables, credentials,
             standardInput, standardInputEncoding, standardOutputEncoding,
             standardErrorEncoding,
