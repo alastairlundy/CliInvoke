@@ -769,6 +769,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public void Dispose()
     {
         _configuration.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
 
