@@ -8,7 +8,6 @@
    */
 
 using DotExtensions.Dates;
-using System.Threading;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 

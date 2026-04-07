@@ -8,7 +8,6 @@
    */
 
 using DotExtensions.Dates;
-using System.Threading;
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
@@ -116,7 +115,7 @@ internal static partial class GracefulCancellation
         /// Safely attempts forceful exit, ensuring it's only called once per process lifecycle.
         /// </summary>
         /// <param name="proc">The process to forcefully exit.</param>
-        /// <param name="cancellationExceptionBehavior">Behavior for handling cancellation exceptions.</param>
+        /// <param name="cancellationExceptionBehavior">Behaviour for handling cancellation exceptions.</param>
         private static async Task SafeForcefulExit(ProcessWrapper proc, ProcessCancellationExceptionBehavior cancellationExceptionBehavior)
         {
             // Only attempt forceful exit if it hasn't been attempted before and process hasn't exited
