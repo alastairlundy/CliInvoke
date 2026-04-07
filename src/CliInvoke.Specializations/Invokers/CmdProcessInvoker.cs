@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 using CliInvoke.Specializations.Configurations;
 
 using WhatExec.Lib.Abstractions.Resolvers;
-using WhatExec.Lib.Detectors;
-using WhatExec.Lib.Resolvers;
 
 namespace CliInvoke.Specializations;
 

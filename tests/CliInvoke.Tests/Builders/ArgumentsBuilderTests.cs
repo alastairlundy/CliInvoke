@@ -77,7 +77,7 @@ public class ArgumentsBuilderTests
         // Expect the two escaped values to be joined with a space and wrapped in quotes:
         const string expected = "\"a\\nb c\\\"d\"";
 
-        IArgumentsBuilder result = builder.AddEnumerable(values, true);
+        IArgumentsBuilder result = builder.AddEnumerable(values);
 
         await Assert.That(result.ToString()).IsEqualTo(expected);
     }
@@ -87,7 +87,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddEnumerable((IEnumerable<string>)null, true)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddEnumerable((IEnumerable<string>)null!, true)).Throws<ArgumentNullException>();
     }
 
     [Test]
