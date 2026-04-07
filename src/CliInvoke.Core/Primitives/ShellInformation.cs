@@ -15,11 +15,11 @@ namespace CliInvoke.Core;
 public class ShellInformation : IEquatable<ShellInformation>
 {
     /// <summary>
-    /// 
+    /// Represents information about a shell, including its name, file path, and version.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="targetFilePath"></param>
-    /// <param name="version"></param>
+    /// <param name="name">The name of the shell program.</param>
+    /// <param name="targetFilePath">The file path of the shell program executable.</param>
+    /// <param name="version">The installed version of the shell program.</param>
     public ShellInformation(string name, FileInfo targetFilePath, Version version)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
