@@ -397,7 +397,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         ProcessResourcePolicy resourcePolicy = _processResourcePolicyBuilder.Build();
         UserCredential credential = _userCredentialBuilder.Build();
 
-        ProcessConfigurationWrapper configuration = new ProcessConfigurationWrapper(_targetFilePath, arguments,
+        ProcessConfigurationWrapper configuration = new(_targetFilePath, arguments,
             _redirectStandardInput, _outputRedirection,
             _workingDirectoryPath, _requiresAdministratorPrivileges, environmentVariables,
             credential, _standardInput, _standardInputEncoding, _standardOutputEncoding, _standardErrorEncoding, resourcePolicy, _enableWindowCreation,
@@ -405,7 +405,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
 
         return configuration;
     }
-
+    
+    /// <inheritdoc/>
     public void Dispose()
     {
         _userCredentialBuilder.Dispose();
