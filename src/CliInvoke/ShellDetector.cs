@@ -9,7 +9,8 @@
 
 using System.Linq;
 
-using CliInvoke.Core.Factories;
+using CliInvoke.Extensions;
+
 using DotExtensions.Versions;
 using WhatExec.Lib.Abstractions.Resolvers;
 
@@ -21,7 +22,6 @@ namespace CliInvoke;
 public class ShellDetector : IShellDetector
 {
     private readonly IExecutableFileResolver _executableFileResolver;
-    private readonly IProcessConfigurationFactory _processConfigurationFactory;
     private readonly IProcessInvoker _processInvoker;
 
     private readonly bool isUnix;
@@ -30,12 +30,10 @@ public class ShellDetector : IShellDetector
     ///     Represents a detector for resolving the default shell on various operating systems.
     /// </summary>
     public ShellDetector(IProcessInvoker processInvoker,
-        IExecutableFileResolver executableFileResolver,
-        IProcessConfigurationFactory processConfigurationFactory)
+        IExecutableFileResolver executableFileResolver)
     {
         _processInvoker = processInvoker;
         _executableFileResolver = executableFileResolver;
-        _processConfigurationFactory = processConfigurationFactory;
         
         isUnix = OperatingSystem.IsAndroid() || OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() || OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst();
     }
@@ -71,7 +69,7 @@ public class ShellDetector : IShellDetector
     {
         cancellationToken.Register(() => throw new TaskCanceledException());
 
-        using ProcessConfiguration execConfiguration = _processConfigurationFactory
+        using ProcessConfiguration execConfiguration = ProcessConfiguration
             .Create("ps", "-p $$ -o comm=");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
@@ -81,7 +79,7 @@ public class ShellDetector : IShellDetector
             execResult.StandardOutput.Split(Environment.NewLine).First(),
             SearchOption.AllDirectories, cancellationToken);
 
-        using ProcessConfiguration shellInfoProcessConfig = _processConfigurationFactory
+        using ProcessConfiguration shellInfoProcessConfig = ProcessConfiguration
             .Create(shellExeInfo.FullName, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
@@ -113,7 +111,7 @@ public class ShellDetector : IShellDetector
                 await _executableFileResolver.LocateExecutableAsync("pwsh.exe",
                     SearchOption.AllDirectories, cancellationToken);
 
-            using ProcessConfiguration powershellConfig = _processConfigurationFactory
+            using ProcessConfiguration powershellConfig = ProcessConfiguration
                 .Create(powershell5PlusFileInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
@@ -136,7 +134,7 @@ public class ShellDetector : IShellDetector
             FileInfo cmdExeInfo = await _executableFileResolver.LocateExecutableAsync("cmd.exe",
                 SearchOption.AllDirectories, cancellationToken);
 
-            using ProcessConfiguration cmdConfig = _processConfigurationFactory
+            using ProcessConfiguration cmdConfig = ProcessConfiguration
                 .Create(cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,

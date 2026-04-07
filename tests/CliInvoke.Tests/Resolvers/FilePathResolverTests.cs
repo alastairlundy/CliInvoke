@@ -1,6 +1,5 @@
 using System.Linq;
-using CliInvoke.Core.Factories;
-using CliInvoke.Factories;
+using CliInvoke.Extensions;
 using WhatExec.Lib.Abstractions.Detectors;
 using WhatExec.Lib.Abstractions.Resolvers;
 using WhatExec.Lib.Detectors;
@@ -41,8 +40,7 @@ public class FilePathResolverTests
             }
             else
             {
-                IProcessConfigurationFactory processConfigurationFactory = new ProcessConfigurationFactory();
-                using ProcessConfiguration configuration = processConfigurationFactory.Create("where", "dotnet.exe");
+                using ProcessConfiguration configuration = ProcessConfiguration.Create("where", "dotnet.exe");
 
                 IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver);
 
