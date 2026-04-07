@@ -8,6 +8,7 @@
    */
 
 using System.Runtime.InteropServices;
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
