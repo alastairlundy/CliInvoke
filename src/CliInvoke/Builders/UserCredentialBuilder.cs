@@ -26,7 +26,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     /// </summary>
     public UserCredentialBuilder()
     {
-        _userCredential = new();
+        _userCredential = new UserCredential();
     }
 
     /// <summary>
