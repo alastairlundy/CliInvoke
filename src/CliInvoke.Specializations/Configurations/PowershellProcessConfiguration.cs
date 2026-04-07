@@ -59,7 +59,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("pwsh", redirectStandardInput, outputRedirectionMode, arguments,
+        bool useShellExecution = false, bool windowCreation = false) : base("pwsh",arguments, redirectStandardInput, outputRedirectionMode,
         workingDirectoryPath, requiresAdministrator, environmentVariables, credentials, standardInput, standardInputEncoding, standardOutputEncoding,
         standardErrorEncoding, processResourcePolicy, windowCreation, useShellExecution)
     {
