@@ -10,9 +10,7 @@
 using System.Linq;
 
 using CliInvoke.Core.Factories;
-
 using DotExtensions.Versions;
-
 using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke;
