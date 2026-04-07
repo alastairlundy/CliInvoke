@@ -15,15 +15,18 @@ namespace CliInvoke.Core;
 public enum OutputRedirectionMode
 {
     /// <summary>
-    /// 
+    /// Represents a mode in which output redirection is disabled.
     /// </summary>
     None = 0,
+
     /// <summary>
-    /// 
+    /// Represents a mode in which output is redirected and read to strings asynchronously,
+    /// allowing the data to be captured and processed in memory.
     /// </summary>
     Buffer,
+
     /// <summary>
-    /// 
+    /// Represents a mode in which output is redirected through Streams for processing in real-time.
     /// </summary>
     Pipe,
 }

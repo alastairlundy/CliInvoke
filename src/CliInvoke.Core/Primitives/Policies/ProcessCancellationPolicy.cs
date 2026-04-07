@@ -53,11 +53,13 @@ public class ProcessCancellationPolicy : IEquatable<ProcessCancellationPolicy>
         new(ProcessCancellationMode.Graceful, ProcessExceptionBehaviour.SuppressExceptions);
 
     /// <summary>
+    /// Represents a cancellation policy that uses a forceful mode of process termination.
     /// </summary>
     public static ProcessCancellationPolicy Forceful =>
         new(ProcessCancellationMode.Forceful);
 
     /// <summary>
+    /// A predefined cancellation policy that represents no cancellation mode and suppresses exceptions.
     /// </summary>
     public static ProcessCancellationPolicy None =>
         new(ProcessCancellationMode.None, ProcessExceptionBehaviour.SuppressExceptions);
@@ -72,49 +74,57 @@ public class ProcessCancellationPolicy : IEquatable<ProcessCancellationPolicy>
     }
 
     /// <summary>
+    /// Creates a new instance of <see cref="ProcessCancellationPolicy"/> based on the specified cancellation mode.
     /// </summary>
-    /// <param name="mode"></param>
-    /// <returns></returns>
+    /// <param name="mode">The <see cref="ProcessCancellationMode"/> to define the cancellation policy.</param>
+    /// <returns>A <see cref="ProcessCancellationPolicy"/> instance configured with the specified cancellation mode.</returns>
     public static ProcessCancellationPolicy FromCancellationMode(ProcessCancellationMode mode)
     {
         return new ProcessCancellationPolicy(mode);
     }
 
+    /// <inheritdoc/>
     public override bool Equals(object? obj)
     {
         if(obj is null) return false;
         
         return obj is ProcessCancellationPolicy other && Equals(other);
     }
-
+    
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
         return HashCode.Combine((int)CancellationMode, (int)CancellationExceptionBehaviour);
     }
 
     /// <summary>
+    /// Determines whether two <see cref="ProcessCancellationPolicy"/> instances are equal.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The first instance of <see cref="ProcessCancellationPolicy"/> to compare.</param>
+    /// <param name="right">The second instance of <see cref="ProcessCancellationPolicy"/> to compare.</param>
+    /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(ProcessCancellationPolicy? left,
         ProcessCancellationPolicy? right) =>
         Equals(left, right);
 
     /// <summary>
+    /// Determines whether two specified <see cref="ProcessCancellationPolicy"/> instances are not equal.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The first <see cref="ProcessCancellationPolicy"/> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessCancellationPolicy"/> instance to compare.</param>
+    /// <returns>
+    /// <c>true</c> if the two <see cref="ProcessCancellationPolicy"/> instances are not equal; otherwise, <c>false</c>.
+    /// </returns>
     public static bool operator !=(ProcessCancellationPolicy? left,
         ProcessCancellationPolicy? right) =>
         !Equals(left, right);
 
     /// <summary>
+    /// Determines whether two <see cref="ProcessCancellationPolicy"/> instances are equal.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The first <see cref="ProcessCancellationPolicy"/> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessCancellationPolicy"/> instance to compare.</param>
+    /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
     public static bool Equals(ProcessCancellationPolicy? left, ProcessCancellationPolicy? right)
     {
         if (left is null || right is null)
