@@ -87,7 +87,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddRange((IEnumerable<string>)null!, true)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddRange((IEnumerable<string>)null!)).Throws<ArgumentNullException>();
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class ArgumentsBuilderTests
         NullReturningFormattable nullFormattable = new NullReturningFormattable();
 
         // When IFormattable.ToString returns null or whitespace, Add should throw NullReferenceException
-        await Assert.That(() => builder.Add(nullFormattable, CultureInfo.InvariantCulture)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.Add(nullFormattable)).Throws<ArgumentNullException>();
     }
 
     [Test]
@@ -118,7 +118,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddRange((IEnumerable<string>)null, (bool)CultureInfo.InvariantCulture)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddRange((IEnumerable<string>)null)).Throws<ArgumentNullException>();
     }
 
     [Test]

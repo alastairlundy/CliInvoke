@@ -24,7 +24,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
 {
     private readonly IFormatProvider _formatProvider;
 
-    private readonly Func<string, bool>? _argumentValidationLogic;
+    private readonly Func<string, bool> _argumentValidationLogic;
 
     private readonly StringBuilder _buffer;
 
@@ -35,6 +35,21 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         _buffer = new StringBuilder();
         _formatProvider = CultureInfo.InvariantCulture;
+        
+        _argumentValidationLogic = ArgumentValidationLogic;
+    }
+
+    private bool ArgumentValidationLogic(string arg)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(arg);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -65,16 +80,12 @@ public class ArgumentsBuilder : IArgumentsBuilder
     ///     Appends a string value to the arguments builder.
     /// </summary>
     /// <param name="value">The string value to append.</param>
-    /// <param name="escapeSpecialCharacters">
-    ///     True to escape special characters in the value, false
-    ///     otherwise.
-    /// </param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    public IArgumentsBuilder Add(string value, bool escapeSpecialCharacters = true)
+    public IArgumentsBuilder Add(string value)
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        if (!IsValidArgument(value)) return this;
+        if (! _argumentValidationLogic.Invoke(value)) return this;
 
         if (_buffer.Length is > 0 and < int.MaxValue)
             // Add a space if it's missing before adding the new string.
@@ -82,7 +93,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
                 _buffer.Append(' ');
 
         if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
-            _buffer.Append(escapeSpecialCharacters ? EscapeCharacters(value) : value);
+            _buffer.Append(EscapeCharacters(value));
         else
             throw new InvalidOperationException(Resources
                 .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
@@ -95,28 +106,26 @@ public class ArgumentsBuilder : IArgumentsBuilder
     ///     Appends a collection of string values to the arguments builder.
     /// </summary>
     /// <param name="values">The collection of string values to append.</param>
-    /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    public IArgumentsBuilder AddRange(IEnumerable<string> values, bool escapeSpecialChars = true)
+    public IArgumentsBuilder AddRange(IEnumerable<string> values)
     {
         ArgumentNullException.ThrowIfNull(values);
 
         // Do not escape individual values here when escaping is requested to avoid double-escaping.
         // Instead, join the raw values and perform escaping once at the final Add call.
-        IEnumerable<string> filtered = values.Where(x => IsValidArgument(x));
+        IEnumerable<string> filtered = values.Where(x =>  _argumentValidationLogic.Invoke(x));
 
         string joinedValues = string.Join(" ", filtered);
 
-        return Add(joinedValues, escapeSpecialChars);
+        return Add(joinedValues);
     }
 
     /// <summary>
     ///     Appends a formattable value to the arguments builder.
     /// </summary>
     /// <param name="value">The formattable value to append.</param>
-    /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    public IArgumentsBuilder Add(IFormattable value, bool escapeSpecialChars = true)
+    public IArgumentsBuilder Add(IFormattable value)
     {
         ArgumentNullException.ThrowIfNull(value);
 
@@ -132,18 +141,16 @@ public class ArgumentsBuilder : IArgumentsBuilder
                         "{x}",
                         nameof(value)));
 
-        return Add(valueActual, escapeSpecialChars);    
+        return Add(valueActual);    
     }
-    
+
     /// <summary>
-    ///     Appends a collection of formattable values to the arguments builder without specifying a
+    ///     Appends a collection of formattable values to the argument builder without specifying a
     ///     culture.
     /// </summary>
     /// <param name="values">The collection of formattable values to append.</param>
-    /// <param name="escapeSpecialChars">Whether to escape special characters in the values.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    public IArgumentsBuilder AddRange(IEnumerable<IFormattable> values,
-        bool escapeSpecialChars = true)
+    public IArgumentsBuilder AddRange(IEnumerable<IFormattable> values)
     { 
         ArgumentNullException.ThrowIfNull(values);
 
@@ -152,7 +159,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
         string value = string.Join(' ', valuesStrings);
 
-        return Add(value, escapeSpecialChars);
+        return Add(value);
     }
 
     /// <summary>
@@ -208,27 +215,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     ///     Clears the provided argument strings.
     /// </summary>
     public void Clear() => _buffer.Clear();
-
-    private bool IsValidArgument(string value)
-    {
-        bool output;
-
-        if (_argumentValidationLogic is not null)
-            output = _argumentValidationLogic.Invoke(value);
-        else
-            try
-            {
-                ArgumentNullException.ThrowIfNull(value);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-
-        return output;
-    }
-
+    
     private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
-        => IsValidArgument(value.ToString(null, provider));
+        =>  _argumentValidationLogic.Invoke(value.ToString(null, provider));
 }

@@ -86,7 +86,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         ArgumentNullException.ThrowIfNull(arguments);
         
         _argumentsBuilder.Clear();
-        _argumentsBuilder.AddRange(arguments, escapeArguments);
+        _argumentsBuilder.AddRange(arguments);
         
         return this;
     }
@@ -103,7 +103,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         ArgumentNullException.ThrowIfNull(arguments);
 
         _argumentsBuilder.Clear();
-        _argumentsBuilder.Add(arguments, escapeArguments);
+        _argumentsBuilder.Add(arguments);
         return this;
     }
 
