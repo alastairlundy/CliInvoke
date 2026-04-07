@@ -21,7 +21,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="destination">The process to which the standard input will be piped.</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
+    /// <returns>A task that represents the asynchronous operation containing the destination process.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
