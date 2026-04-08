@@ -36,7 +36,7 @@ public class ExternalProcessFactory : IExternalProcessFactory
     /// <returns>An <see cref="IExternalProcess" /> instance representing the created external process.</returns>
     [Pure]
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration) 
-        => CreateExternalProcess(configuration, ProcessExitConfiguration.Default);
+        => CreateExternalProcess(configuration, ProcessExitConfiguration.Graceful);
 
     /// <summary>
     ///     Creates a new instance of the <see cref="ExternalProcess" /> class.

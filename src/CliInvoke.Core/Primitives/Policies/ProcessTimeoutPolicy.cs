@@ -21,6 +21,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     {
         Enabled = true;
         TimeoutThreshold = TimeSpan.FromMinutes(10);
+        TimeoutExitBehaviour = ProcessExitBehaviour.GracefulExit;
+        Enabled = true;
     }
 
     /// <summary>
@@ -32,13 +34,17 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     ///     Process.
     /// </param>
     /// <param name="enabled"></param>
-    public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, bool enabled)
+    /// <param name="exitBehaviour"></param>
+    public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, bool enabled, 
+        ProcessExitBehaviour exitBehaviour = ProcessExitBehaviour.GracefulExit)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(timeoutThreshold.TotalMilliseconds);
         ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
         TimeoutThreshold = timeoutThreshold;
         Enabled = enabled;
+
+        TimeoutExitBehaviour = exitBehaviour;
     }
 
     /// <summary>
@@ -51,8 +57,10 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     ///     Disables waiting for Process Timeout.
     /// </summary>
     public static ProcessTimeoutPolicy None { get; } =
-        new(TimeSpan.FromSeconds(0), false);
+        new(TimeSpan.FromSeconds(0), false, ProcessExitBehaviour.WaitForExit);
 
+    public ProcessExitBehaviour TimeoutExitBehaviour { get; }
+    
     /// <summary>
     ///     The timespan after which a Process should no longer be allowed to continue waiting to exit.
     /// </summary>
@@ -81,7 +89,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
             return false;
 
         return TimeoutThreshold.Equals(other.TimeoutThreshold) &&
-               Enabled == other.Enabled;
+               Enabled == other.Enabled && TimeoutExitBehaviour == other.TimeoutExitBehaviour;
     }
 
     /// <summary>
@@ -93,18 +101,18 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     ///     The maximum duration to wait before the process is considered timed
     ///     out.
     /// </param>
-    /// <param name="cancellationMode">
+    /// <param name="exitBehaviour">
     ///     The method of cancellation to apply when the timeout threshold is reached.
-    ///     Defaults to <see cref="ProcessCancellationMode.Graceful" />.
+    ///     Defaults to <see cref="ProcessExitBehaviour.GracefulExit" />.
     /// </param>
     /// <returns>
     ///     A new instance of <see cref="ProcessTimeoutPolicy" /> configured with the specified
     ///     parameters.
     /// </returns>
     public static ProcessTimeoutPolicy FromTimeSpan(TimeSpan timeoutThreshold,
-        ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful)
+        ProcessExitBehaviour exitBehaviour = ProcessExitBehaviour.GracefulExit)
     {
-        return new ProcessTimeoutPolicy(timeoutThreshold, true);
+        return new ProcessTimeoutPolicy(timeoutThreshold, true, exitBehaviour);
     }
 
     /// <summary>

@@ -28,7 +28,7 @@ public class GracefulCancellationTests
 
         ProcessExitConfiguration exitConfiguration = new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan
                 (TimeSpan.FromSeconds(gracefulTimeoutSeconds)), ProcessCancellationPolicy.DefaultNoException,
-            ProcessCancellationPolicy.DefaultNoException);
+            cancellationThrowsException: ProcessCancellationPolicy.DefaultNoException);
 
         await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None, false);
 

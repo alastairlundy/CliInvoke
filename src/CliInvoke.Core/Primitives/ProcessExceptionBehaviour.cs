@@ -7,11 +7,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.ComponentModel;
+
 namespace CliInvoke.Core;
 
 /// <summary>
 ///     Specifies the behaviour for handling exceptions.
 /// </summary>
+[DefaultValue(AllowExceptionsIfUnexpected)]
 public enum ProcessExceptionBehaviour
 {
     /// <summary>

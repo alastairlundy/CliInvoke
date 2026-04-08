@@ -66,11 +66,9 @@ internal static class CancellationHelper
         {
             case CancellationReason.RequestedCancellation:
             {
-                if (exitConfiguration.RequestedCancellationPolicy
-                        .CancellationExceptionBehaviour
+                if (exitConfiguration.ExceptionBehaviour
                     == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
-                            .RequestedCancellationPolicy
-                            .CancellationExceptionBehaviour
+                            .ExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
                         difference > TimeSpan.FromSeconds(10)))
                     throw exception;
@@ -79,11 +77,9 @@ internal static class CancellationHelper
             }
             case CancellationReason.Timeout or CancellationReason.NotKnown:
             {
-                if (exitConfiguration.TimeoutCancellationPolicy
-                        .CancellationExceptionBehaviour
+                if (exitConfiguration.ExceptionBehaviour
                     == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
-                            .TimeoutCancellationPolicy
-                            .CancellationExceptionBehaviour
+                            .ExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
                         difference > TimeSpan.FromSeconds(10)))
                     throw exception;

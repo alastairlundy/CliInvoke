@@ -40,7 +40,7 @@ public class CmdInvokerTests
 
         ProcessResult result = await cmdProcessInvoker.ExecuteAsync(commandConfiguration,
             new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(1)),
-                ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException), CancellationToken.None);
+                ProcessCancellationPolicy.DefaultNoException, cancellationThrowsException: ProcessCancellationPolicy.DefaultNoException), CancellationToken.None);
 
         await Assert.That(Process.GetProcesses().Any(p => p.ProcessName.Contains("calculatorapp",
                 StringComparison.InvariantCultureIgnoreCase)))

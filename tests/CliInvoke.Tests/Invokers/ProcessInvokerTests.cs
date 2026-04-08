@@ -25,7 +25,7 @@ public class ProcessInvokerTests
         config.TargetFilePath = " ";
 
         await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config, 
-            ProcessExitConfiguration.Default, cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();
+            ProcessExitConfiguration.Graceful, cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class ProcessInvokerTests
         config.TargetFilePath = string.Empty;
 
         await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config,
-            ProcessExitConfiguration.DefaultNoException, cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();
+            ProcessExitConfiguration.GracefulNoException, cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();
     }
 
     [Test]
@@ -49,6 +49,6 @@ public class ProcessInvokerTests
         using ProcessConfiguration config = ProcessConfiguration.Create("FAKE.FILE");
 
         await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config,
-            ProcessExitConfiguration.DefaultNoException, cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();
+            ProcessExitConfiguration.GracefulNoException, cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();
     }
 }

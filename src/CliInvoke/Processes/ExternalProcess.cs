@@ -35,7 +35,7 @@ public class ExternalProcess : IExternalProcess
 
         Configuration = new ProcessConfiguration(targetFilePath);
         _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
-        ExitConfiguration = ProcessExitConfiguration.Default;
+        ExitConfiguration = ProcessExitConfiguration.Graceful;
 
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
@@ -53,7 +53,7 @@ public class ExternalProcess : IExternalProcess
 
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
-        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
+        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Graceful;
 
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
@@ -277,18 +277,19 @@ public class ExternalProcess : IExternalProcess
     /// </exception>
     public async Task Kill()
     {
-        switch (ExitConfiguration.RequestedCancellationPolicy
-                    .CancellationMode)
+        switch (ExitConfiguration.RequestedCancellationExitBehaviour)
         {
-            case ProcessCancellationMode.Forceful:
+            case ProcessExitBehaviour.ForcefulExit:
                 await _processWrapper.WaitForExitOrForcefulTimeoutAsync(ExitConfiguration,
                     CancellationToken.None);
                 break;
-            case ProcessCancellationMode.Graceful:
+            case ProcessExitBehaviour.GracefulExit:
                 await _processWrapper.WaitForExitOrGracefulTimeoutAsync(ExitConfiguration,
                     CancellationToken.None);
                 break;
-            case ProcessCancellationMode.None:
+            case ProcessExitBehaviour.WaitForExit:
+                await _processWrapper.WaitForExitAsync(CancellationToken.None);
+                return;
             default:
                 _processWrapper.Kill();
                 break;

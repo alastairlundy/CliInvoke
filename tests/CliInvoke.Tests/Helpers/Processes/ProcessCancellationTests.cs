@@ -22,7 +22,7 @@ public class ProcessCancellationTests
         
         ProcessExitConfiguration processExitConfiguration = new(
             ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
-            ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
+            ProcessCancellationPolicy.DefaultNoException, cancellationThrowsException: ProcessCancellationPolicy.DefaultNoException);
 
         //Act
 
@@ -88,7 +88,7 @@ public class ProcessCancellationTests
 
         ProcessExitConfiguration processExitConfiguration = new(
             ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(30)),
-            ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
+            ProcessCancellationPolicy.DefaultNoException, cancellationThrowsException: ProcessCancellationPolicy.DefaultNoException);
 
         //Act
         process.Start();

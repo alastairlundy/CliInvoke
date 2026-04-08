@@ -109,8 +109,8 @@ internal static partial class UnixGracefulCancellation
             {
                 case CancellationReason.Timeout:
                 {
-                    if (exitConfiguration.TimeoutCancellationPolicy.CancellationMode ==
-                        ProcessCancellationMode.Forceful)
+                    if (exitConfiguration.TimeoutPolicy.TimeoutExitBehaviour ==
+                        ProcessExitBehaviour.ForcefulExit)
                     {
                         if (!process.HasExited)
                             process.ForcefulExit();
@@ -118,8 +118,8 @@ internal static partial class UnixGracefulCancellation
                         return true;
                     }
 
-                    if (exitConfiguration.TimeoutCancellationPolicy.CancellationMode ==
-                        ProcessCancellationMode.Graceful)
+                    if (exitConfiguration.TimeoutPolicy.TimeoutExitBehaviour ==
+                        ProcessExitBehaviour.GracefulExit)
                     {
                         if (!process.HasExited)
                             return SendUnixSignal(process.Id, Sigint);
@@ -132,16 +132,16 @@ internal static partial class UnixGracefulCancellation
                 case CancellationReason.RequestedCancellation or CancellationReason.NotKnown:
                 default:
                 {
-                    if (exitConfiguration.RequestedCancellationPolicy.CancellationMode ==
-                        ProcessCancellationMode.Forceful)
+                    if (exitConfiguration.RequestedCancellationExitBehaviour ==
+                        ProcessExitBehaviour.ForcefulExit)
                     {
                         if (!process.HasExited)
                             process.ForcefulExit();
                         return true;
                     }
 
-                    if (exitConfiguration.RequestedCancellationPolicy.CancellationMode ==
-                        ProcessCancellationMode.Graceful)
+                    if (exitConfiguration.RequestedCancellationExitBehaviour ==
+                        ProcessExitBehaviour.GracefulExit)
                     {
                         if (!process.HasExited)
                             return SendUnixSignal(process.Id, Sigint);

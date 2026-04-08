@@ -279,7 +279,7 @@ public class ProcessInvoker : IProcessInvoker
 
         processConfiguration.TargetFilePath = fileInfo.FullName;
 
-        processExitConfiguration ??= ProcessExitConfiguration.Default;
+        processExitConfiguration ??= ProcessExitConfiguration.Graceful;
 
         ThrowFileNotFoundException(processConfiguration);
         return processExitConfiguration;
