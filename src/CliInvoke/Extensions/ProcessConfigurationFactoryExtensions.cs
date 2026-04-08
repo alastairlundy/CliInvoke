@@ -27,10 +27,8 @@ public static class ProcessConfigurationFactoryExtensions
         /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
         /// <returns>The <see cref="ProcessConfiguration" /> created from the configured parameters.</returns>
         [Pure]
-        public static ProcessConfiguration Create(string targetFilePath, params string[] arguments)
-        {
-            return Create(targetFilePath, arguments, null);
-        }
+        public static ProcessConfiguration Create(string targetFilePath, params string[] arguments) 
+            => ProcessConfiguration.Create(targetFilePath, arguments, null);
 
         /// <summary>
         ///     Creates a Process configuration that can be run by a <see cref="IProcessInvoker" /> from
