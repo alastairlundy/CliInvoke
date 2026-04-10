@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
-using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke.Specializations.Tests.Invokers;
 
@@ -20,7 +19,7 @@ public class CmdInvokerTests
     {
         IRunnerConfigurationFactory runnerProcessFactory = testFixture.ServiceProvider.GetRequiredService<IRunnerConfigurationFactory>();
 
-        IExecutableFileResolver executableFileResolver = testFixture.ServiceProvider.GetRequiredService<IExecutableFileResolver>();
+        IFilePathResolver executableFileResolver = testFixture.ServiceProvider.GetRequiredService<IFilePathResolver>();
         
         cmdProcessInvoker = new CmdProcessInvoker(runnerProcessFactory, executableFileResolver);
     }
@@ -40,7 +39,7 @@ public class CmdInvokerTests
 
         ProcessResult result = await cmdProcessInvoker.ExecuteAsync(commandConfiguration,
             new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(1)),
-                ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException), CancellationToken.None);
+                cancellationThrowsException: false), CancellationToken.None);
 
         await Assert.That(Process.GetProcesses().Any(p => p.ProcessName.Contains("calculatorapp",
                 StringComparison.InvariantCultureIgnoreCase)))

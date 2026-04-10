@@ -14,6 +14,7 @@ public class ProcessCancellationTests
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Test]
     public async Task ProcessCancelled_TimeSpanOnlyOverload_Delay_Graceful_Success()
     {
         //Arrange 
@@ -21,8 +22,7 @@ public class ProcessCancellationTests
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
         
         ProcessExitConfiguration processExitConfiguration = new(
-            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
-            ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)));
 
         //Act
 
@@ -87,8 +87,7 @@ public class ProcessCancellationTests
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
 
         ProcessExitConfiguration processExitConfiguration = new(
-            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(30)),
-            ProcessCancellationPolicy.DefaultNoException, ProcessCancellationPolicy.DefaultNoException);
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(30)), cancellationThrowsException: false);
 
         //Act
         process.Start();

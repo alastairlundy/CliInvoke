@@ -33,22 +33,22 @@ internal static class ProcessCancellationExtensions
                 return;
             }
 
-            switch (processExitConfiguration.TimeoutCancellationPolicy.CancellationMode)
+            switch (processExitConfiguration.TimeoutPolicy.TimeoutExitBehaviour)
             {
-                case ProcessCancellationMode.None:
+                case ProcessExitBehaviour.WaitForExit:
                 {
                     await process.WaitForExitOrCancellationAsync(processExitConfiguration,
                         cancellationToken);
                     return;
                 }
-                case ProcessCancellationMode.Graceful:
+                case ProcessExitBehaviour.GracefulExit:
                 default:
                 {
                     await process.WaitForExitOrGracefulTimeoutAsync(processExitConfiguration,
                         cancellationToken);
                     return;
                 }
-                case ProcessCancellationMode.Forceful:
+                case ProcessExitBehaviour.ForcefulExit:
                 {
                     await process.WaitForExitOrForcefulTimeoutAsync(processExitConfiguration,
                         cancellationToken);

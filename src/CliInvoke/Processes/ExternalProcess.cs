@@ -11,8 +11,6 @@ using CliInvoke.Core.Processes;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 
-using WhatExec.Lib.Abstractions.Resolvers;
-
 namespace CliInvoke.Processes;
 
 /// <summary>
@@ -20,22 +18,21 @@ namespace CliInvoke.Processes;
 /// </summary>
 public class ExternalProcess : IExternalProcess
 {
-    private readonly IExecutableFileResolver _executableFileResolver;
-
     private ProcessWrapper _processWrapper;
+    
+    private IFilePathResolver _filePathResolver;
 
     /// <summary>
     /// </summary>
-    /// <param name="executableFileResolver"></param>
+    /// <param name="filePathResolver"></param>
     /// <param name="targetFilePath"></param>
-    public ExternalProcess(IExecutableFileResolver executableFileResolver,
-        string targetFilePath)
+    public ExternalProcess(IFilePathResolver filePathResolver, string targetFilePath)
     {
-        _executableFileResolver = executableFileResolver;
-
         Configuration = new ProcessConfiguration(targetFilePath);
         _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
-        ExitConfiguration = ProcessExitConfiguration.Default;
+        ExitConfiguration = ProcessExitConfiguration.Graceful;
+
+        _filePathResolver = filePathResolver;
 
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
@@ -43,17 +40,14 @@ public class ExternalProcess : IExternalProcess
 
     /// <summary>
     /// </summary>
-    /// <param name="executableFileResolver"></param>
     /// <param name="configuration"></param>
     /// <param name="exitConfiguration"></param>
-    public ExternalProcess(IExecutableFileResolver executableFileResolver,
-        ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null)
+    public ExternalProcess(ProcessConfiguration configuration,
+        ProcessExitConfiguration? exitConfiguration = null)
     {
-        _executableFileResolver = executableFileResolver;
-
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
-        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Default;
+        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Graceful;
 
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
@@ -126,8 +120,7 @@ public class ExternalProcess : IExternalProcess
     public async Task StartAsync(ProcessConfiguration configuration,
         CancellationToken cancellationToken)
     {
-        FileInfo filePath = await _executableFileResolver.LocateExecutableAsync(
-            Configuration.TargetFilePath, SearchOption.AllDirectories, cancellationToken);
+        FileInfo filePath = await ValidateExecutableFile(cancellationToken);
 
         Configuration.TargetFilePath = filePath.FullName;
 
@@ -142,6 +135,14 @@ public class ExternalProcess : IExternalProcess
         if (configuration.StandardInput is not null)
             await _processWrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
                 cancellationToken);
+    }
+
+    private Task<FileInfo> ValidateExecutableFile(CancellationToken cancellationToken)
+    {
+        if (File.Exists(Configuration.TargetFilePath))
+            return Task.FromResult(new FileInfo(Configuration.TargetFilePath));
+        
+        return Task.FromResult(_filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
     }
 
     /// <summary>
@@ -277,18 +278,19 @@ public class ExternalProcess : IExternalProcess
     /// </exception>
     public async Task Kill()
     {
-        switch (ExitConfiguration.RequestedCancellationPolicy
-                    .CancellationMode)
+        switch (ExitConfiguration.RequestedCancellationExitBehaviour)
         {
-            case ProcessCancellationMode.Forceful:
+            case ProcessExitBehaviour.ForcefulExit:
                 await _processWrapper.WaitForExitOrForcefulTimeoutAsync(ExitConfiguration,
                     CancellationToken.None);
                 break;
-            case ProcessCancellationMode.Graceful:
+            case ProcessExitBehaviour.GracefulExit:
                 await _processWrapper.WaitForExitOrGracefulTimeoutAsync(ExitConfiguration,
                     CancellationToken.None);
                 break;
-            case ProcessCancellationMode.None:
+            case ProcessExitBehaviour.WaitForExit:
+                await _processWrapper.WaitForExitAsync(CancellationToken.None);
+                return;
             default:
                 _processWrapper.Kill();
                 break;

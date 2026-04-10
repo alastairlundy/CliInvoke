@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using DotExtensions.Dates;
-
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
 internal static class CancellationHelper
@@ -60,17 +58,15 @@ internal static class CancellationHelper
         Exception exception)
     {
         DateTime actualExitTime = DateTime.UtcNow;
-        TimeSpan difference = expectedExitTime.Difference(actualExitTime);
+        TimeSpan difference = TimeSpan.FromTicks(Math.Abs(expectedExitTime.Ticks - actualExitTime.Ticks));
 
         switch (cancellationReason)
         {
             case CancellationReason.RequestedCancellation:
             {
-                if (exitConfiguration.RequestedCancellationPolicy
-                        .CancellationExceptionBehaviour
+                if (exitConfiguration.ExceptionBehaviour
                     == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
-                            .RequestedCancellationPolicy
-                            .CancellationExceptionBehaviour
+                            .ExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
                         difference > TimeSpan.FromSeconds(10)))
                     throw exception;
@@ -79,11 +75,9 @@ internal static class CancellationHelper
             }
             case CancellationReason.Timeout or CancellationReason.NotKnown:
             {
-                if (exitConfiguration.TimeoutCancellationPolicy
-                        .CancellationExceptionBehaviour
+                if (exitConfiguration.ExceptionBehaviour
                     == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
-                            .TimeoutCancellationPolicy
-                            .CancellationExceptionBehaviour
+                            .ExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
                         difference > TimeSpan.FromSeconds(10)))
                     throw exception;

@@ -22,8 +22,9 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessExitConfiguration()
     {
         TimeoutPolicy = ProcessTimeoutPolicy.Default;
-        TimeoutCancellationPolicy = ProcessCancellationPolicy.Default;
-        RequestedCancellationPolicy = ProcessCancellationPolicy.Default;
+        RequestedCancellationExitBehaviour = ProcessExitBehaviour.GracefulExit;
+        CancellationThrowsException = false;
+        ExceptionBehaviour = ProcessExceptionBehaviour.AllowExceptionsIfUnexpected;
     }
 
     /// <summary>
@@ -31,48 +32,63 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     ///     specified timeout policy and result validation.
     /// </summary>
     /// <param name="timeoutPolicy">The timeout policy to apply to the process.</param>
-    /// <param name="timeoutCancellationPolicy"></param>
-    /// <param name="requestedCancellationPolicy"></param>
-    public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy,
-        ProcessCancellationPolicy timeoutCancellationPolicy,
-        ProcessCancellationPolicy requestedCancellationPolicy)
+    /// <param name="requestedCancellationExitBehaviour"></param>
+    /// <param name="exceptionBehaviour"></param>
+    /// <param name="cancellationThrowsException"></param>
+    public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy, 
+        ProcessExitBehaviour requestedCancellationExitBehaviour = ProcessExitBehaviour.GracefulExit,
+        ProcessExceptionBehaviour exceptionBehaviour = ProcessExceptionBehaviour.AllowExceptionsIfUnexpected,
+        bool cancellationThrowsException = false)
     {
         TimeoutPolicy = timeoutPolicy;
-        TimeoutCancellationPolicy = timeoutCancellationPolicy;
-        RequestedCancellationPolicy = requestedCancellationPolicy;
+        RequestedCancellationExitBehaviour = requestedCancellationExitBehaviour;
+        CancellationThrowsException = cancellationThrowsException;
+        ExceptionBehaviour = exceptionBehaviour;
     }
 
     /// <summary>
-    ///     Gets the default <see cref="ProcessExitConfiguration" /> instance, which uses the default
-    ///     timeout policy and exit code zero validation.
+    ///     Gets the <see cref="ProcessExitConfiguration" /> instance with graceful cancellation and exit,
+    ///     and the default timeout policy.
     /// </summary>
-    public static ProcessExitConfiguration Default { get; } = new();
+    public static ProcessExitConfiguration Graceful { get; } = new(ProcessTimeoutPolicy.Default,
+        cancellationThrowsException: true);
 
     /// <summary>
     ///     Gets the default <see cref="ProcessExitConfiguration" /> instance, which uses the default
     ///     timeout policy, but suppresses the Exception from cancellation.
     /// </summary>
-    public static ProcessExitConfiguration DefaultNoException { get; } = new(
-        ProcessTimeoutPolicy.Default, ProcessCancellationPolicy.DefaultNoException,
-        ProcessCancellationPolicy.DefaultNoException);
+    public static ProcessExitConfiguration GracefulNoException { get; } = new(
+        ProcessTimeoutPolicy.Default, ProcessExitBehaviour.GracefulExit, 
+        ProcessExceptionBehaviour.SuppressExceptions);
 
     /// <summary>
-    ///     A preconfigured <see cref="ProcessExitConfiguration" /> instance with Exit Code Validation and
-    ///     without a Timeout Policy.
+    /// 
     /// </summary>
-    public static ProcessExitConfiguration NoTimeoutDefault { get; } = new(
-        ProcessTimeoutPolicy.None,
-        ProcessCancellationPolicy.None,
-        ProcessCancellationPolicy.Default
-    );
+    public static ProcessExitConfiguration Forceful { get; } = new(
+        ProcessTimeoutPolicy.Default, ProcessExitBehaviour.ForcefulExit, 
+        ProcessExceptionBehaviour.AllowExceptions, true);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public static ProcessExitConfiguration ForcefulNoException { get; } = new(ProcessTimeoutPolicy.Default,
+        ProcessExitBehaviour.ForcefulExit, ProcessExceptionBehaviour.SuppressExceptions);
 
+    /// <summary>
+    /// Gets the <see cref="ProcessExitConfiguration" /> instance configured to wait indefinitely
+    /// for the process to exit without applying any timeout restrictions and with cancellation
+    /// throwing exceptions if cancellation is requested.
+    /// </summary>
+    public static ProcessExitConfiguration WaitForExit { get;  } = new(ProcessTimeoutPolicy.None,
+        ProcessExitBehaviour.WaitForExit, cancellationThrowsException: true);
+    
     /// <summary>
     ///     A <see cref="ProcessExitConfiguration" /> instance configured to have no timeout policy
-    ///     and no exceptions on cancellation during a process termination.
+    /// and no exceptions on cancellation during a process termination.
     /// </summary>
-    public static ProcessExitConfiguration NoTimeoutNoException
-        => new(ProcessTimeoutPolicy.None, ProcessCancellationPolicy.None,
-            ProcessCancellationPolicy.DefaultNoException);
+    public static ProcessExitConfiguration WaitForExitNoException
+        => new(ProcessTimeoutPolicy.None, ProcessExitBehaviour.WaitForExit, 
+            ProcessExceptionBehaviour.SuppressExceptions);
 
     /// <summary>
     ///     Gets the timeout policy applied to the process.
@@ -80,18 +96,29 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ProcessTimeoutPolicy TimeoutPolicy { get; }
 
     /// <summary>
-    ///     The configured <see cref="ProcessCancellationPolicy" /> that determines the behaviour
-    ///     when a process timeout occurs, including how cancellation is handled and if exceptions
-    ///     should be allowed or suppressed.
+    /// Gets the <see cref="ProcessExitBehaviour" /> value that determines the behaviour
+    /// when a cancellation request is issued for the process.
     /// </summary>
-    public ProcessCancellationPolicy TimeoutCancellationPolicy { get; }
+    /// <remarks>
+    /// Options include waiting for the process to exit, attempting a graceful exit, or forcing
+    /// termination. The default behaviour is <see cref="ProcessExitBehaviour.GracefulExit" />.
+    /// </remarks>
+    public ProcessExitBehaviour RequestedCancellationExitBehaviour { get; }
 
     /// <summary>
-    ///     The <see cref="ProcessCancellationPolicy" /> instance that defines the behaviour
-    ///     for handling cancellations explicitly requested during the process lifecycle.
+    /// Gets the <see cref="ProcessExceptionBehaviour" /> value that determines how exceptions
+    /// are handled during process execution.
     /// </summary>
-    public ProcessCancellationPolicy RequestedCancellationPolicy { get; }
+    /// <remarks>This property controls whether exceptions are suppressed,
+    /// always allowed, or allowed only if they are unexpected.</remarks>
+    public ProcessExceptionBehaviour ExceptionBehaviour { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether a cancellation request during process execution
+    /// will throw an exception.
+    /// </summary>
+    public bool CancellationThrowsException { get; }
+    
     /// <summary>
     ///     Determines whether the specified <see cref="ProcessExitConfiguration" /> is equal to the
     ///     current instance.
@@ -109,7 +136,10 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         if (other is null)
             return false;
 
-        return TimeoutPolicy.Equals(other.TimeoutPolicy);
+        return TimeoutPolicy.Equals(other.TimeoutPolicy) &&
+               CancellationThrowsException == other.CancellationThrowsException &&
+               ExceptionBehaviour == other.ExceptionBehaviour &&
+               RequestedCancellationExitBehaviour ==  other.RequestedCancellationExitBehaviour;
     }
 
     /// <summary>
@@ -137,7 +167,9 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <returns>The hash code for the current instance.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine(TimeoutPolicy);
+        return HashCode.Combine(TimeoutPolicy, CancellationThrowsException,
+            RequestedCancellationExitBehaviour, RequestedCancellationExitBehaviour,
+            ExceptionBehaviour);
     }
 
     /// <summary>
@@ -161,13 +193,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="left">The first <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(
-        ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right
-    )
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(ProcessExitConfiguration? left,
+        ProcessExitConfiguration? right) => Equals(left, right);
 
     /// <summary>
     ///     Determines whether two <see cref="ProcessExitConfiguration" /> instances are not equal.
@@ -176,8 +203,5 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="right">The second <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <returns><c>true</c> if both instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right)
-    {
-        return !Equals(left, right);
-    }
+        ProcessExitConfiguration? right) => !Equals(left, right);
 }

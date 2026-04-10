@@ -1,6 +1,4 @@
-﻿using CliInvoke.Benchmarking.Helpers;
-
-namespace CliInvoke.Benchmarking.Data;
+﻿namespace CliInvoke.Benchmarking.Data;
 
 public class BufferedTestHelper
 {
@@ -19,11 +17,9 @@ public class BufferedTestHelper
 
         try
         {
-            Task<FileInfo> taskResult = CliInvokeHelpers.CreateExecutableFileResolver()
-                .LocateExecutableAsync(mockDataToolExe,
-                    SearchOption.AllDirectories, CancellationToken.None);
+            FileInfo fileResult = FilePathResolver.Shared.ResolveFilePath(mockDataToolExe);
 
-            taskResult.Wait();
+            return fileResult.FullName;
         }
         catch (Exception)
         {

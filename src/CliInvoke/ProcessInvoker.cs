@@ -10,8 +10,6 @@
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 
-using WhatExec.Lib.Abstractions.Resolvers;
-
 namespace CliInvoke;
 
 /// <summary>
@@ -19,15 +17,16 @@ namespace CliInvoke;
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
-    private readonly IExecutableFileResolver _executableFileResolver;
-
+    private readonly IFilePathResolver _filePathResolver;
+    
     /// <summary>
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes.
     /// </summary>
-    /// <param name="executableFileResolver">The file path resolver to be used.</param>
-    public ProcessInvoker(
-        IExecutableFileResolver executableFileResolver){
-        _executableFileResolver = executableFileResolver; }
+    /// <param name="filePathResolver">The file path resolver to be used.</param>
+    public ProcessInvoker(IFilePathResolver filePathResolver)
+    {
+        _filePathResolver = filePathResolver;
+    }
 
     /// <summary>
     ///     Runs the process asynchronously, waits for exit, and safely disposes of the Process before
@@ -55,8 +54,8 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
-            processExitConfiguration, cancellationToken);
+        processExitConfiguration = ValidateConfigurationsAsync(processConfiguration,
+            processExitConfiguration);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
@@ -112,8 +111,8 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
-            processExitConfiguration, cancellationToken);
+        processExitConfiguration = ValidateConfigurationsAsync(processConfiguration,
+            processExitConfiguration);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
@@ -185,8 +184,8 @@ public class ProcessInvoker : IProcessInvoker
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        processExitConfiguration = await ValidateConfigurationsAsync(processConfiguration,
-            processExitConfiguration, cancellationToken);
+        processExitConfiguration = ValidateConfigurationsAsync(processConfiguration,
+            processExitConfiguration);
 
         ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
 
@@ -268,18 +267,20 @@ public class ProcessInvoker : IProcessInvoker
                 cancellationToken);
     }
 
-    private async Task<ProcessExitConfiguration> ValidateConfigurationsAsync(
+    private ProcessExitConfiguration ValidateConfigurationsAsync(
         ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration, CancellationToken cancellationToken)
+        ProcessExitConfiguration? processExitConfiguration)
     {
         ArgumentNullException.ThrowIfNull(processConfiguration);
 
-        FileInfo fileInfo = await _executableFileResolver.LocateExecutableAsync(
-            processConfiguration.TargetFilePath, SearchOption.AllDirectories, cancellationToken);
+        if (!File.Exists(processConfiguration.TargetFilePath))
+        {
+            FileInfo fileInfo = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
 
-        processConfiguration.TargetFilePath = fileInfo.FullName;
+            processConfiguration.TargetFilePath = fileInfo.FullName;
+        }
 
-        processExitConfiguration ??= ProcessExitConfiguration.Default;
+        processExitConfiguration ??= ProcessExitConfiguration.Graceful;
 
         ThrowFileNotFoundException(processConfiguration);
         return processExitConfiguration;

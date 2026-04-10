@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -77,7 +76,7 @@ public class ArgumentsBuilderTests
         // Expect the two escaped values to be joined with a space and wrapped in quotes:
         const string expected = "\"a\\nb c\\\"d\"";
 
-        IArgumentsBuilder result = builder.AddEnumerable(values);
+        IArgumentsBuilder result = builder.AddRange(values);
 
         await Assert.That(result.ToString()).IsEqualTo(expected);
     }
@@ -87,7 +86,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddEnumerable((IEnumerable<string>)null!, true)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddRange((IEnumerable<string>)null!)).Throws<ArgumentNullException>();
     }
 
     [Test]
@@ -97,7 +96,7 @@ public class ArgumentsBuilderTests
         NullReturningFormattable nullFormattable = new NullReturningFormattable();
 
         // When IFormattable.ToString returns null or whitespace, Add should throw NullReferenceException
-        await Assert.That(() => builder.Add(nullFormattable, CultureInfo.InvariantCulture)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.Add(nullFormattable)).Throws<ArgumentNullException>();
     }
 
     [Test]
@@ -106,7 +105,7 @@ public class ArgumentsBuilderTests
         IArgumentsBuilder builder = new ArgumentsBuilder();
         IFormattable[] values = { 1, 2 };
 
-        IArgumentsBuilder result = builder.AddEnumerable(values);
+        IArgumentsBuilder result = builder.AddRange(values);
 
         string expected = @"""1 2""";
 
@@ -118,7 +117,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddEnumerable(null, CultureInfo.InvariantCulture)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddRange((IEnumerable<string>)null)).Throws<ArgumentNullException>();
     }
 
     [Test]

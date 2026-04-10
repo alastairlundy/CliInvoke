@@ -32,8 +32,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
-        <PackageReference Include="WhatExec.Lib.Abstractions"/>
-        <PackageReference Include="WhatExec.Lib"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
@@ -86,5 +84,9 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Invokation\" />
     </ItemGroup>
 </Project>

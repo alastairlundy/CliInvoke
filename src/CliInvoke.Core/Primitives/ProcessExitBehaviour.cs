@@ -14,26 +14,24 @@ namespace CliInvoke.Core;
 /// <summary>
 ///     Specifies the mode for handling process cancellation.
 /// </summary>
-[DefaultValue(Graceful)]
-public enum ProcessCancellationMode
+[DefaultValue(GracefulExit)]
+public enum ProcessExitBehaviour
 {
     /// <summary>
-    ///     Forcefully terminates the Process along with all child processes.
-    /// </summary>
-    Forceful,
-
-    /// <summary>
-    ///     Gracefully cancels the Process using SIGTERM/SIGINT Signals, or a
-    ///     <see cref="CancellationTokenSource" /> if that fails.
-    /// </summary>
-    Graceful,
-
-    /// <summary>
-    ///     No cancellation is desired, the Process will run until exit.
+    ///     The Process will run until it initiates exit.
     /// </summary>
     /// <remarks>
     ///     If the process gets stuck or hangs, the process will not be exited unless cancellation is
     ///     requested via a cancellation token.
     /// </remarks>
-    None
+    WaitForExit = 0,
+    /// <summary>
+    ///     Gracefully cancels the Process upon request using SIGTERM/SIGINT Signals, or a
+    ///     <see cref="CancellationTokenSource" /> if that fails.
+    /// </summary>
+    GracefulExit = 1,
+    /// <summary>
+    ///     Forcefully terminates the Process upon request along with all child processes.
+    /// </summary>
+    ForcefulExit = 2
 }

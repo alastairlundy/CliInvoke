@@ -29,8 +29,6 @@
 
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
-        <PackageReference Include="WhatExec.Lib" />
-        <PackageReference Include="WhatExec.Lib.Abstractions"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
