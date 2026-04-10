@@ -43,7 +43,6 @@ public interface IArgumentsBuilder
     ///     Appends a collection of formattable values to the arguments builder without specifying a
     ///     culture.
     /// </summary>
-    /// <param name="values">The collection of formattable values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     /// <summary>
     ///     Escapes special characters in an argument such that it is suitable to be used with a Process.
