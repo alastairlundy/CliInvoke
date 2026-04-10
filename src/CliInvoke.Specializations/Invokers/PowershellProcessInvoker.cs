@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 
 using CliInvoke.Specializations.Configurations;
 
-using WhatExec.Lib.Abstractions.Resolvers;
-
 namespace CliInvoke.Specializations;
 
 /// <summary>
@@ -36,7 +34,7 @@ namespace CliInvoke.Specializations;
 public class PowershellProcessInvoker : ProcessInvoker
 {
     private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
-    private readonly IExecutableFileResolver _filePathResolver;
+    private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>
     /// </summary>
@@ -47,7 +45,7 @@ public class PowershellProcessInvoker : ProcessInvoker
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     public PowershellProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, 
-        IExecutableFileResolver filePathResolver) : base(filePathResolver)
+        IFilePathResolver filePathResolver) : base(filePathResolver)
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;
         _filePathResolver = filePathResolver;

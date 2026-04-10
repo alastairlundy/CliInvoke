@@ -12,9 +12,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-
-using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke.Specializations.Configurations;
 
@@ -51,7 +48,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
     /// <param name="redirectStandardInput"></param>
-    public PowershellProcessConfiguration(IExecutableFileResolver filePathResolver,
+    public PowershellProcessConfiguration(IFilePathResolver filePathResolver,
         string arguments,
         bool redirectStandardInput, OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
@@ -68,8 +65,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         if (OperatingSystem.IsWindows())
             try
             {
-                filePath = filePathResolver.LocateExecutableAsync("pwsh.exe",
-                    SearchOption.AllDirectories, CancellationToken.None).Result.FullName;
+                filePath = filePathResolver.ResolveFilePath("pwsh.exe").FullName;
             }
             catch
             {
@@ -78,8 +74,8 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
                  OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
             filePath = filePathResolver
-                .LocateExecutableAsync("pwsh", SearchOption.AllDirectories, CancellationToken.None)
-                .Result.FullName;
+                .ResolveFilePath("pwsh")
+                .FullName;
         else
             throw new PlatformNotSupportedException(Resources
                 .Exceptions_Powershell_OnlySupportedOnDesktop);

@@ -12,11 +12,6 @@ using CliInvoke.Extensibility;
 using CliInvoke.Factories;
 using CliInvoke.Validation;
 
-using WhatExec.Lib.Abstractions.Detectors;
-using WhatExec.Lib.Abstractions.Resolvers;
-using WhatExec.Lib.Detectors;
-using WhatExec.Lib.Resolvers;
-
 // ReSharper disable RedundantAssignment
 
 namespace CliInvoke.Extensions;
@@ -38,11 +33,6 @@ public static class DependencyInjectionExtensions
         switch (lifetime)
         {
             case ServiceLifetime.Singleton:
-                services.TryAddSingleton<IExecutableFileDetector, ExecutableFileDetector>();
-                services.TryAddSingleton<IPathEnvironmentVariableDetector, PathEnvironmentVariableDetector>();
-                services.TryAddSingleton<IPathEnvironmentVariableResolver, PathEnvironmentVariableResolver>();
-                services.TryAddSingleton<IExecutableFileResolver, ExecutableFileResolver>();
-
                 services.TryAddSingleton<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
@@ -60,11 +50,6 @@ public static class DependencyInjectionExtensions
                 services.AddSingleton<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Scoped:
-                services.TryAddScoped<IExecutableFileDetector, ExecutableFileDetector>();
-                services.TryAddScoped<IPathEnvironmentVariableDetector, PathEnvironmentVariableDetector>();
-                services.TryAddScoped<IPathEnvironmentVariableResolver, PathEnvironmentVariableResolver>();
-                services.TryAddScoped<IExecutableFileResolver, ExecutableFileResolver>();
-
                 services.TryAddScoped<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
@@ -82,11 +67,6 @@ public static class DependencyInjectionExtensions
                 services.AddScoped<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Transient:
-                services.TryAddTransient<IExecutableFileDetector, ExecutableFileDetector>();
-                services.TryAddTransient<IPathEnvironmentVariableDetector, PathEnvironmentVariableDetector>();
-                services.TryAddTransient<IPathEnvironmentVariableResolver, PathEnvironmentVariableResolver>();
-                services.TryAddTransient<IExecutableFileResolver, ExecutableFileResolver>();
-
                 services.TryAddTransient<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));

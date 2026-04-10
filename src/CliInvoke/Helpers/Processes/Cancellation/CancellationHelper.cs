@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using DotExtensions.Dates;
-
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
 internal static class CancellationHelper
@@ -60,7 +58,7 @@ internal static class CancellationHelper
         Exception exception)
     {
         DateTime actualExitTime = DateTime.UtcNow;
-        TimeSpan difference = expectedExitTime.Difference(actualExitTime);
+        TimeSpan difference = TimeSpan.FromTicks(Math.Abs(expectedExitTime.Ticks - actualExitTime.Ticks));
 
         switch (cancellationReason)
         {

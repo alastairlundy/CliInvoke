@@ -12,7 +12,6 @@ using System.Linq;
 using CliInvoke.Extensions;
 
 using DotExtensions.Versions;
-using WhatExec.Lib.Abstractions.Resolvers;
 
 namespace CliInvoke;
 
@@ -21,7 +20,7 @@ namespace CliInvoke;
 /// </summary>
 public class ShellDetector : IShellDetector
 {
-    private readonly IExecutableFileResolver _executableFileResolver;
+    private readonly IFilePathResolver _filePathResolver;
     private readonly IProcessInvoker _processInvoker;
 
     private readonly bool isUnix;
@@ -29,13 +28,13 @@ public class ShellDetector : IShellDetector
     /// <summary>
     ///     Represents a detector for resolving the default shell on various operating systems.
     /// </summary>
-    public ShellDetector(IProcessInvoker processInvoker,
-        IExecutableFileResolver executableFileResolver)
+    public ShellDetector(IProcessInvoker processInvoker, IFilePathResolver filePathResolver)
     {
         _processInvoker = processInvoker;
-        _executableFileResolver = executableFileResolver;
+        _filePathResolver = filePathResolver;
         
-        isUnix = OperatingSystem.IsAndroid() || OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() || OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst();
+        isUnix = OperatingSystem.IsAndroid() || OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() ||
+                 OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst();
     }
 
     /// <summary>
@@ -75,9 +74,8 @@ public class ShellDetector : IShellDetector
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
             execConfiguration, ProcessExitConfiguration.Graceful, cancellationToken);
 
-        FileInfo shellExeInfo = await _executableFileResolver.LocateExecutableAsync(
-            execResult.StandardOutput.Split(Environment.NewLine).First(),
-            SearchOption.AllDirectories, cancellationToken);
+        FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
+            execResult.StandardOutput.Split(Environment.NewLine).First());
 
         using ProcessConfiguration shellInfoProcessConfig = ProcessConfiguration
             .Create(shellExeInfo.FullName, "--version");
@@ -107,9 +105,7 @@ public class ShellDetector : IShellDetector
     {
         try
         {
-            FileInfo powershell5PlusFileInfo =
-                await _executableFileResolver.LocateExecutableAsync("pwsh.exe",
-                    SearchOption.AllDirectories, cancellationToken);
+            FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
             using ProcessConfiguration powershellConfig = ProcessConfiguration
                 .Create(powershell5PlusFileInfo.FullName, "");
@@ -131,8 +127,7 @@ public class ShellDetector : IShellDetector
         }
         catch
         {
-            FileInfo cmdExeInfo = await _executableFileResolver.LocateExecutableAsync("cmd.exe",
-                SearchOption.AllDirectories, cancellationToken);
+            FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
             using ProcessConfiguration cmdConfig = ProcessConfiguration
                 .Create(cmdExeInfo.FullName, "");

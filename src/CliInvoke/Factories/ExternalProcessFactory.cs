@@ -11,8 +11,6 @@ using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 using CliInvoke.Processes;
 
-using WhatExec.Lib.Abstractions.Resolvers;
-
 namespace CliInvoke.Factories;
 
 /// <summary>
@@ -20,13 +18,10 @@ namespace CliInvoke.Factories;
 /// </summary>
 public class ExternalProcessFactory : IExternalProcessFactory
 {
-    private readonly IExecutableFileResolver _filePathResolver;
-
     /// <summary>
     /// </summary>
-    /// <param name="filePathResolver"></param>
-    public ExternalProcessFactory(IExecutableFileResolver filePathResolver){
-        _filePathResolver = filePathResolver;
+    public ExternalProcessFactory(){
+        
     }
 
     /// <summary>
@@ -51,7 +46,7 @@ public class ExternalProcessFactory : IExternalProcessFactory
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration exitConfiguration)
     {
-        return new ExternalProcess(_filePathResolver, configuration,
+        return new ExternalProcess(configuration,
             exitConfiguration);
     }
 }

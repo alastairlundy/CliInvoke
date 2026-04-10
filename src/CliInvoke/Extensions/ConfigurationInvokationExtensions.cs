@@ -8,10 +8,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace CliInvoke.Extensions.Invokation;
 
 /// <summary>
@@ -20,15 +16,13 @@ namespace CliInvoke.Extensions.Invokation;
 /// </summary>
 public static class ConfigurationInvokationExtensions
 {
+    private static readonly ProcessInvoker _processInvoker = new(FilePathResolver.Shared);
+    
     /// <summary>
     ///     Runs a process configuration asynchronously, waits for exit, and safely disposes of the Process
     ///     before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processConfigurationInvoker">
-    ///     The process configuration invoker to use to execute the
-    ///     command.
-    /// </param>
     /// <param name="processExitConfiguration">
     ///     The exit configuration to use for the process, or the
     ///     default if null.
@@ -55,13 +49,12 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("browser")]
 #endif
     public static async Task<ProcessResult> ExecuteAsync(
-        this ProcessConfiguration processConfiguration,
-        IProcessInvoker processConfigurationInvoker,
+        this ProcessConfiguration processConfiguration, 
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default
     )
     {
-        return await processConfigurationInvoker.ExecuteAsync(
+        return await _processInvoker.ExecuteAsync(
             processConfiguration,
             processExitConfiguration,
             cancellationToken
@@ -75,17 +68,9 @@ public static class ConfigurationInvokationExtensions
     ///     Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processConfigurationInvoker">
-    ///     The process configuration invoker to use to execute the
-    ///     command.
-    /// </param>
     /// <param name="processExitConfiguration">
     ///     The exit configuration to use for the process, or the
     ///     default if null.
-    /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Whether to dispose of the provided
-    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
     /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
@@ -106,13 +91,11 @@ public static class ConfigurationInvokationExtensions
 #endif
     public static async Task<BufferedProcessResult> ExecuteBufferedAsync(
         this ProcessConfiguration processConfiguration,
-        IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
         CancellationToken cancellationToken = default
     )
     {
-        return await processConfigurationInvoker.ExecuteBufferedAsync(
+        return await _processInvoker.ExecuteBufferedAsync(
             processConfiguration,
             processExitConfiguration,
             cancellationToken
@@ -126,17 +109,9 @@ public static class ConfigurationInvokationExtensions
     ///     Process before returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="processConfigurationInvoker">
-    ///     The process configuration invoker to use to execute the
-    ///     command.
-    /// </param>
     /// <param name="processExitConfiguration">
     ///     The exit configuration to use for the process, or the
     ///     default if null.
-    /// </param>
-    /// <param name="disposeOfConfig">
-    ///     Whether to dispose of the provided
-    ///     <see cref="ProcessConfiguration" /> after use or not, defaults to false.
     /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Results from running the process.</returns>
@@ -157,13 +132,10 @@ public static class ConfigurationInvokationExtensions
 #endif
     public static async Task<PipedProcessResult> ExecutePipedAsync(
         this ProcessConfiguration processConfiguration,
-        IProcessInvoker processConfigurationInvoker,
         ProcessExitConfiguration? processExitConfiguration = null,
-        bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
-        return await processConfigurationInvoker.ExecutePipedAsync(
+        return await _processInvoker.ExecutePipedAsync(
             processConfiguration,
             processExitConfiguration,
             cancellationToken

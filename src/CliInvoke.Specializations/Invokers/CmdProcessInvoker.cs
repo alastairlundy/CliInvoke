@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 
 using CliInvoke.Specializations.Configurations;
 
-using WhatExec.Lib.Abstractions.Resolvers;
-
 namespace CliInvoke.Specializations;
 
 /// <summary>
@@ -45,7 +43,7 @@ public class CmdProcessInvoker : ProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, IExecutableFileResolver executableFileResolver) :
+    public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, IFilePathResolver executableFileResolver) :
         base(executableFileResolver)
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;

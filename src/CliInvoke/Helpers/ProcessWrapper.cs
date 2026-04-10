@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.ComponentModel;
+
 using CliInvoke.Helpers.Processes;
 
 namespace CliInvoke.Helpers;
@@ -65,15 +67,27 @@ internal class ProcessWrapper : Process
 
     public new bool Start()
     {
-        HasStarted = base.Start();
-
-        if (HasStarted)
+        try
         {
-            StartTime = DateTime.UtcNow;
-            Started.Invoke(this, EventArgs.Empty);
-            Id = base.Id;
-            ProcessName = base.ProcessName;
+            HasStarted = base.Start();
         }
+        catch(Win32Exception exception)
+        {
+            HasStarted = false;
+
+            throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
+        }
+
+        if (!HasStarted)
+        {
+            throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
+        }
+
+        if (!HasStarted) return HasStarted;
+        StartTime = DateTime.UtcNow;
+        Started.Invoke(this, EventArgs.Empty);
+        Id = base.Id;
+        ProcessName = base.ProcessName;
 
         return HasStarted;
     }
