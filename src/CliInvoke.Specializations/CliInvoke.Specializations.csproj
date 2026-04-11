@@ -18,7 +18,8 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 3.0.0 Alpha 1</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 3.0.0 Alpha 1
+* Updated Specializations' specialized Invokers to inherit from CliInvoke main package's invokers</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
@@ -40,13 +41,16 @@
         <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
     </PropertyGroup>
 
+
     <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
+        <ProjectReference Include="..\CliInvoke\CliInvoke.csproj"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
         <!-- set CliInvokeCoreVersion in the workflow -->
         <PackageReference Include="CliInvoke.Core"/>
+        <PackageReference Include="CliInvoke"/>
     </ItemGroup>
 
     <ItemGroup>
