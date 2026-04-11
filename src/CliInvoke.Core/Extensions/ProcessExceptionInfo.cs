@@ -7,18 +7,30 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-namespace CliInvoke.Exceptions;
+namespace CliInvoke.Core.Exceptions;
 
 /// <summary>
 ///     Represents detailed information about an exception that occurred during a process execution.
 /// </summary>
-public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposable
+public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionInfo<TProcessResult>>, IDisposable
+    where TProcessResult : ProcessResult
 {
+    public ProcessExceptionInfo(TProcessResult result)
+    {
+        Result = result;
+        Id = result.ProcessId;
+        ProcessName = result.ExecutedFilePath;
+        ResourcePolicy = ProcessResourcePolicy.Default;
+        Configuration = null;
+        Credential = null;
+        ArgumentsConflict = false;
+    }
+    
     /// <summary>
     /// </summary>
     /// <param name="result"></param>
     /// <param name="configuration"></param>
-    public ProcessExceptionInfo(ProcessResult result, ProcessConfiguration configuration)
+    public ProcessExceptionInfo(TProcessResult result, ProcessConfiguration configuration)
     {
         Result = result;
         Id = result.ProcessId;
@@ -37,14 +49,14 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     ///     Represents the result of a process execution, encapsulating information such as
     ///     the exit code, execution duration, and other details about the executed process.
     /// </summary>
-    public ProcessResult Result { get; }
+    public TProcessResult Result { get; }
 
     /// <summary>
     ///     Provides information about the configuration and parameters used to start the process.
     ///     This includes details such as the file name, arguments, and other properties related
     ///     to the process initialization.
     /// </summary>
-    public ProcessConfiguration Configuration { get; }
+    public ProcessConfiguration? Configuration { get; }
 
     /// <summary>
     ///     Represents the unique identifier of the process associated with the exception.
@@ -86,45 +98,63 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     public UserCredential? Credential { get; }
 
     /// <summary>
-    ///     Releases all resources used by the current instance of the <see cref="ProcessExceptionInfo" />
+    ///     Releases all resources used by the current instance of the <see cref="ProcessExceptionInfo{TProcessResult}" />
     ///     class.
     /// </summary>
     public void Dispose()
     {
         Credential?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     ///     Determines whether the current instance is equal to another instance of the
-    ///     <see cref="ProcessExceptionInfo" /> class.
+    ///     <see cref="ProcessExceptionInfo{TProcessResult}" /> class.
     /// </summary>
     /// <param name="other">
-    ///     The other <see cref="ProcessExceptionInfo" /> instance to compare with the
+    ///     The other <see cref="ProcessExceptionInfo{TProcessResult}" /> instance to compare with the
     ///     current instance.
     /// </param>
     /// <returns>
     ///     <c>true</c> if the current instance is equal to the specified instance; otherwise,
     ///     <c>false</c>.
     /// </returns>
-    public bool Equals(ProcessExceptionInfo? other)
+    public bool Equals(ProcessExceptionInfo<TProcessResult>? other)
     {
         if (other is null) return false;
 
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        return Result.Equals(other.Result) &&
-               Id == other.Id &&
-               ArgumentsConflict == other.ArgumentsConflict &&
-               ProcessName == other.ProcessName &&
-               ResourcePolicy.Equals(other.ResourcePolicy) &&
-               Credential.Equals(Credential);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+        if (Configuration is not null)
+        {
+            return (Credential is not null) switch
+            {
+                false => Configuration.Equals(other.Configuration) && Result.Equals(other.Result) &&
+                         ArgumentsConflict == other.ArgumentsConflict &&
+                         ResourcePolicy.Equals(other.ResourcePolicy) &&
+                         Credential.Equals(other.Credential),
+                true => Configuration.Equals(other.Configuration) && Result.Equals(other.Result) &&
+                        ArgumentsConflict == other.ArgumentsConflict &&
+                        ResourcePolicy.Equals(other.ResourcePolicy)
+            };
+        }
+        
+        return (Credential is not null) switch
+        {
+            false => Result.Equals(other.Result) &&
+                     ArgumentsConflict == other.ArgumentsConflict &&
+                     ResourcePolicy.Equals(other.ResourcePolicy) &&
+                     Credential.Equals(other.Credential),
+            true => Result.Equals(other.Result) &&
+                    ArgumentsConflict == other.ArgumentsConflict &&
+                    ResourcePolicy.Equals(other.ResourcePolicy)
+        };
     }
 
     /// <summary>
     ///     Determines whether the current instance is equal to the specified object.
     /// </summary>
     /// <param name="obj">
-    ///     The object to compare with the current <see cref="ProcessExceptionInfo" />
+    ///     The object to compare with the current <see cref="ProcessExceptionInfo{TProcessResult}" />
     ///     instance.
     /// </param>
     /// <returns>
@@ -135,13 +165,13 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     {
         if (obj is null) return false;
 
-        if (obj is ProcessExceptionInfo other) return Equals(other);
+        if (obj is ProcessExceptionInfo<TProcessResult> other) return Equals(other);
 
         return false;
     }
 
     /// <summary>
-    ///     Returns a hash code for the current instance of the <see cref="ProcessExceptionInfo" /> class.
+    ///     Returns a hash code for the current instance of the <see cref="ProcessExceptionInfo{TProcessResult}" /> class.
     /// </summary>
     /// <returns>An integer that represents the hash code of the current instance.</returns>
     public override int GetHashCode()
@@ -151,12 +181,12 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     }
 
     /// <summary>
-    ///     Determines whether two instances of the <see cref="ProcessExceptionInfo" /> class are equal.
+    ///     Determines whether two instances of the <see cref="ProcessExceptionInfo{TProcessResult}" /> class are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessExceptionInfo" /> instance to compare.</param>
-    /// <param name="right">The second <see cref="ProcessExceptionInfo" /> instance to compare.</param>
+    /// <param name="left">The first <see cref="ProcessExceptionInfo{TProcessResult}" /> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessExceptionInfo{TProcessResult}" /> instance to compare.</param>
     /// <returns><c>true</c> if the two instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(ProcessExceptionInfo? left, ProcessExceptionInfo? right)
+    public static bool operator ==(ProcessExceptionInfo<TProcessResult>? left, ProcessExceptionInfo<TProcessResult>? right)
     {
         if (left is null || right is null)
             return false;
@@ -165,13 +195,13 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     }
 
     /// <summary>
-    ///     Determines whether two instances of the <see cref="ProcessExceptionInfo" /> class are not
+    ///     Determines whether two instances of the <see cref="ProcessExceptionInfo{TProcessResult}" /> class are not
     ///     equal.
     /// </summary>
-    /// <param name="left">The first <see cref="ProcessExceptionInfo" /> instance to compare.</param>
-    /// <param name="right">The second <see cref="ProcessExceptionInfo" /> instance to compare.</param>
+    /// <param name="left">The first <see cref="ProcessExceptionInfo{TProcessResult}" /> instance to compare.</param>
+    /// <param name="right">The second <see cref="ProcessExceptionInfo{TProcessResult}" /> instance to compare.</param>
     /// <returns><c>true</c> if the two specified instances are not equal; otherwise, <c>false</c>.</returns>
-    public static bool operator !=(ProcessExceptionInfo? left, ProcessExceptionInfo? right)
+    public static bool operator !=(ProcessExceptionInfo<TProcessResult>? left, ProcessExceptionInfo<TProcessResult>? right)
     {
         if (left is null || right is null)
             return false;
