@@ -102,4 +102,8 @@
             <Link>icon.png</Link>
         </None>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Exceptions\" />
+    </ItemGroup>
 </Project>
