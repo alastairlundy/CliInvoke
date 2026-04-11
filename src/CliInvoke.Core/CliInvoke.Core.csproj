@@ -23,10 +23,23 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.5.1</Version>
-        <PackageReleaseNotes>* Reduced warnings regarding supported and unsupported OSes in ``IProcessResourcePolicyBuilder``</PackageReleaseNotes>
+        <Version>3.0.0-alpha.1</Version>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.23.0 to 10.1.1
+* Removed deprecated code marked for removal in CliInvoke v3
+* Simplified ``ProcessConfiguration``'s public constructor and made the prior ``public`` constructor ``protected`` to assist in implementing Builders around ``ProcessConfiguration``
+* Added a new enum ``OutputRedirectionMode`` for clarifying how output should be Redirected (Not Redirected, Buffered, or Piped) - This replaces ``RedirectStandardOutput`` and ``RedirectStandardError`` properties in ``ProcessConfiguration`` and the relevant ``IProcessConfigurationBuilder`` method
+* Added methods to ``IProcessConfigurationBuilder`` to allow configuring UserCredential, Arguments, Environment Variables, and Process Resource Policies via their respective builders through IProcessConfigurationBuilder - these methods have a ``Configure`` prefix to distinguish them from other methods
+* Removed ``IProcessConfigurationFactory``
+* Removed some duplicative/overlapping methods from various Builder interfaces
+* Renamed ``IProcessConfigurationBuilder``'s ``ConfigureWindowCreation`` to ``EnableWindowCreation``
+* Added ``ProcessCancellationPolicy`` and made changes to ``ProcessTimeoutPolicy`` to decouple cancellation policy from Timeout Policy and so it can be configured differently for Timeout Policy and Requested Cancellation if desired
+* Reduced ``ProcessTimeoutPolicy`` default ``TimeoutThreshold`` from 30 minutes to 10 minutes
+* Renamed ``IRunnerProcessFactory`` to ``IRunnerConfigurationFactory`` - This functionality has been moved to new extension method code for ``ProcessConfiguration`` within CliInvoke.Core
+* Shortened the namepace for ``IRunnerConfigurationFactory`` 
+* Reduced potentially excessive OS support warnings for ``ProcessResourcePolicy``
+* Updated ``IFilePathResolver``'s path resolving method to return a different result type</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.5.1.0</AssemblyVersion>
+        <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
