@@ -11,7 +11,6 @@ global using System.Threading.Tasks;
 
 global using CliInvoke.Core;
 global using CliInvoke.Core.Builders;
-global using CliInvoke.Exceptions;
 global using CliInvoke.Internal;
 global using CliInvoke.Internal.Localizations;
 
