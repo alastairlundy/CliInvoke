@@ -17,7 +17,6 @@ namespace CliInvoke;
 /// <summary>
 /// An implementation of IFilePathResolver, a service that resolves file paths.
 /// </summary>
-[Obsolete(DeprecationMessages.DeprecationV3)]
 public class FilePathResolver : IFilePathResolver
 {
     /// <summary>

@@ -18,7 +18,6 @@ namespace CliInvoke.Core;
 ///  <para> Consumers should not depend on concrete implementations. </para>
 ///  <para><b>Note for Implementers:</b> Implementations should return a valid file path or throw <see cref="System.IO.FileNotFoundException"/> if resolution fails.</para>
 /// </remarks>
-[Obsolete(DeprecationMessages.DeprecationV3)]
 public interface IFilePathResolver
 {
     /// <summary>
