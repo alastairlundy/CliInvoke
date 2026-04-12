@@ -18,6 +18,7 @@ using System.Runtime.CompilerServices;
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
 using CliInvoke.Helpers.Processes;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace CliInvoke.Extensions;
 
