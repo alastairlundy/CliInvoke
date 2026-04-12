@@ -20,6 +20,13 @@ namespace CliInvoke;
 public class FilePathResolver : IFilePathResolver
 {
     /// <summary>
+    /// A shared, singleton instance of the <see cref="FilePathResolver"/> class.
+    /// Provides a globally accessible and thread-safe way to resolve file paths
+    /// across different parts of the application.
+    /// </summary>
+    public static FilePathResolver Shared { get; } = new(); 
+    
+    /// <summary>
     /// Resolves a file path by checking if the file path exists or if it's a directory.
     /// </summary>
     /// <param name="filePathToResolve">The file path to resolve.</param>
