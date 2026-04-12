@@ -8,6 +8,7 @@
    */
 
 using CliInvoke.Core.Internal;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace CliInvoke.Core;
 

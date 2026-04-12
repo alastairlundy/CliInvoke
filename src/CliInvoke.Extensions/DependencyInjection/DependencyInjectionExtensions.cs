@@ -12,6 +12,7 @@ using CliInvoke.Extensibility.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
 using CliInvoke.Validation;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 // ReSharper disable RedundantAssignment
 
