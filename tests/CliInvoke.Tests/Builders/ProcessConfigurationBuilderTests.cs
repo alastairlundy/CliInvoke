@@ -2,6 +2,7 @@
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace CliInvoke.Tests.Builders;
 
