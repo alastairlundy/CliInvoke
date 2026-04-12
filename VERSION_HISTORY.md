@@ -2,6 +2,12 @@
 # CliInvoke version history
 
 ## As CliInvoke
+
+### 3.0
+| Version | Release Date | Changelog |
+|-|-|-|
+| 3.0.0 Alpha 1 | April 12th 2026 |  https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.1 |
+
 ### 2.5
 | Version | Release Date | Changelog |
 |-|-|-|
