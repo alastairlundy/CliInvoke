@@ -13,6 +13,7 @@ using CliInvoke.Core.Processes;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
 using CliInvoke.Helpers.Processes.Cancellation;
+using CliInvoke.Piping;
 
 namespace CliInvoke.Processes;
 
@@ -25,6 +26,43 @@ public class ExternalProcess : IExternalProcess
     
     private readonly IProcessPipeHandler _processPipeHandler;
     private readonly IFilePathResolver _filePathResolver;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="targetFilePath"></param>
+    public ExternalProcess(string targetFilePath)
+    {
+        _processPipeHandler = ProcessPipeHandler.Shared;
+        _filePathResolver = FilePathResolver.Shared;
+        
+        Configuration = new ProcessConfiguration(targetFilePath,
+            false, true, true);
+        _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
+        ExitConfiguration = ProcessExitConfiguration.Default;
+        
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processPipeHandler"></param>
+    /// <param name="targetFilePath"></param>
+    public ExternalProcess(IProcessPipeHandler processPipeHandler, string targetFilePath)
+    {
+        _processPipeHandler = processPipeHandler;
+        _filePathResolver = FilePathResolver.Shared;
+        
+        Configuration = new ProcessConfiguration(targetFilePath,
+            false, true, true);
+        _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
+        ExitConfiguration = ProcessExitConfiguration.Default;
+        
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+    }
     
     /// <summary>
     /// 
@@ -32,7 +70,8 @@ public class ExternalProcess : IExternalProcess
     /// <param name="filePathResolver"></param>
     /// <param name="processPipeHandler"></param>
     /// <param name="targetFilePath"></param>
-    public ExternalProcess(IFilePathResolver filePathResolver, IProcessPipeHandler processPipeHandler, string targetFilePath)
+    public ExternalProcess(IFilePathResolver filePathResolver, 
+        IProcessPipeHandler processPipeHandler, string targetFilePath)
     {
         _processPipeHandler = processPipeHandler;
         _filePathResolver = filePathResolver;

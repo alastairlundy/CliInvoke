@@ -1,6 +1,5 @@
 using System.Linq;
-using CliInvoke.Core.Factories;
-using CliInvoke.Factories;
+using CliInvoke.Extensions;
 using CliInvoke.Piping;
 
 namespace CliInvoke.Tests.Resolvers;
@@ -26,10 +25,9 @@ public class FilePathResolverTests
                 expected = winExpected;
             else
             {
-                IProcessConfigurationFactory processConfigurationFactory = new ProcessConfigurationFactory();
-                using ProcessConfiguration configuration = processConfigurationFactory.Create("where", "dotnet.exe");
+                using ProcessConfiguration configuration = ProcessConfiguration.Create("where", "dotnet.exe");
 
-                IProcessInvoker processInvoker = new ProcessInvoker(new FilePathResolver(), new ProcessPipeHandler());
+                IProcessInvoker processInvoker = new ProcessInvoker(new FilePathResolver(), ProcessPipeHandler.Shared);
 
                 BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration, cancellationToken: TestContext.Current.CancellationToken);
 

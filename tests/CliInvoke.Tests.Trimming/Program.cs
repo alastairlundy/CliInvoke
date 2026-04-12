@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using CliInvoke.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using CliInvoke.Core;
-using CliInvoke.Core.Factories;
+
 // ReSharper disable LocalizableElement
 
 Console.WriteLine("TrimmingTest starting");

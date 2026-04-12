@@ -1,6 +1,5 @@
 using System;
 using CliInvoke.Core;
-using CliInvoke.Core.Factories;
 using Microsoft.Extensions.Hosting;
 using CliInvoke.Extensions;
 using Microsoft.Extensions.DependencyInjection;

@@ -77,6 +77,7 @@ public static class ConfigurationExtensions
             IProcessConfigurationBuilder processConfigurationBuilder =
                 new ProcessConfigurationBuilder(processStartInfo.FileName);
             
+#pragma warning disable CS0618 // Type or member is obsolete
             processConfigurationBuilder = processConfigurationBuilder.SetEnvironmentVariables(environmentVars)
                 .ConfigureShellExecution(processStartInfo.UseShellExecute)
                 .ConfigureWindowCreation(!processStartInfo.CreateNoWindow)
@@ -87,6 +88,7 @@ public static class ConfigurationExtensions
                 .RedirectStandardError(processStartInfo.RedirectStandardError)
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
                 .SetStandardInputPipe(StreamWriter.Null)
+#pragma warning restore CS0618 // Type or member is obsolete
                 .SetStandardOutputPipe(StreamReader.Null)
                 .SetStandardErrorPipe(StreamReader.Null)
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER

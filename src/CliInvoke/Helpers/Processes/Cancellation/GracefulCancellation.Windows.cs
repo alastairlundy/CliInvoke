@@ -110,7 +110,7 @@ internal static partial class GracefulCancellation
                 // Try to get process group ID using NtQueryInformationProcess
                 // This is more reliable than using the process ID directly
                 if (NtQueryInformationProcess(targetProcess.Handle, 0, out PROCESS_BASIC_INFORMATION pbi, 
-                    Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out _) == 0)
+                        Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out _) == 0)
                 {
                     // ProcessGroupId is stored in the 5th ULONG in the structure
                     return pbi.ProcessGroupId;

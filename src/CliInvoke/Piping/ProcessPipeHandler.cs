@@ -16,6 +16,21 @@ namespace CliInvoke.Piping;
 public class ProcessPipeHandler : IProcessPipeHandler
 {
     /// <summary>
+    /// A shared instance of the <see cref="ProcessPipeHandler"/> class.
+    /// This instance is a singleton and provides an accessible, centralized object for
+    /// handling process piping operations, including standard input, output, and error management.
+    /// </summary>
+    /// <remarks>
+    /// Note that this class is marked as obsolete and will be removed in a future version.
+    ///</remarks>
+    public static ProcessPipeHandler Shared =>
+        new();
+
+    public ProcessPipeHandler()
+    {
+    }
+    
+    /// <summary>
     /// Asynchronously pipes the standard input from a source stream to a specified process.
     /// </summary>
     /// <param name="source">The stream from which to read the standard input data.</param>

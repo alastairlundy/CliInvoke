@@ -74,7 +74,8 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
         if (!OperatingSystem.IsWindows())
             throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
         
-        return await base.ExecuteAsync(processConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+        return await base.ExecuteAsync(processConfiguration, processExitConfiguration,
+            disposeOfConfig, cancellationToken);
     }
 
     /// <summary>
@@ -105,7 +106,8 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
         if (!OperatingSystem.IsWindows())
             throw new PlatformNotSupportedException(Resources.Exceptions_Cmd_OnlySupportedOnWindows);
         
-        return await base.ExecuteBufferedAsync(processConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+        return await base.ExecuteBufferedAsync(processConfiguration, processExitConfiguration,
+            disposeOfConfig, cancellationToken);
     }
 
     /// <summary>

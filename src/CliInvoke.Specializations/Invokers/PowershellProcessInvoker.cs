@@ -71,7 +71,8 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
             OperatingSystem.IsBrowser())
             throw new PlatformNotSupportedException();
         
-        return base.ExecuteAsync(processConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+        return base.ExecuteAsync(processConfiguration, processExitConfiguration, disposeOfConfig,
+            cancellationToken);
     }
 
     /// <summary>
@@ -96,7 +97,8 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
             OperatingSystem.IsBrowser())
             throw new PlatformNotSupportedException(Resources.Exceptions_Powershell_OnlySupportedOnDesktop);
         
-        return base.ExecuteBufferedAsync(processConfiguration, processExitConfiguration, disposeOfConfig, cancellationToken);
+        return base.ExecuteBufferedAsync(processConfiguration, processExitConfiguration,
+            disposeOfConfig, cancellationToken);
     }
 
     /// <summary>
