@@ -19,14 +19,13 @@ using IHost host = Host.CreateDefaultBuilder(args)
 using var scopes = host.Services.CreateScope();
 
 // Resolve factory/invoker, run "echo <randomNumber>", and print the random number.
-IProcessConfigurationFactory factory = scopes.ServiceProvider.GetRequiredService<IProcessConfigurationFactory>();
 IProcessInvoker invoker = scopes.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
 int randomNumber = Random.Shared.Next();
 
 Console.WriteLine($"Random number is {randomNumber}");
 
-using ProcessConfiguration procConfig = factory.Create("echo", randomNumber.ToString());
+using ProcessConfiguration procConfig = ProcessConfiguration.Create("echo", randomNumber.ToString());
 
 BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procConfig);
 

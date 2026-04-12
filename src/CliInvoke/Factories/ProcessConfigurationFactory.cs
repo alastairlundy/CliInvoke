@@ -15,6 +15,7 @@ namespace CliInvoke.Factories;
 /// <summary>
 /// A Dependency Injection supporting factory class to enable easier <see cref="ProcessConfiguration"/> creation.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class ProcessConfigurationFactory : IProcessConfigurationFactory
 {
     /// <summary>

@@ -8,12 +8,14 @@
    */
 
 using CliInvoke.Core.Builders;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Core.Factories;
 
 /// <summary>
 /// A factory interface to enable easier <see cref="ProcessConfiguration"/> creation.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public interface IProcessConfigurationFactory
 {
     /// <summary>
