@@ -21,7 +21,7 @@ Key Abstractions:
   * ``IEnvironmentVariablesBuilder`` - An interface to help with setting Environment variables.
   * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
   * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy`` objects.
-  * ``IUserCredentialBuilder``
+  * ``IUserCredentialBuilder``  - An interface to fluently configure and build ``UserCredential`` objects.
 
 ## Features
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.

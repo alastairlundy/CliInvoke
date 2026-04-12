@@ -15,15 +15,16 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated DotExtensions version from 10.0.0 to 10.1.1
-* Fixed a potential issue where Graceful cancellation on Windows would not free an allocated console leading to leaking memory
-* Fixed possible cancellation related race conditions
-* Fixed an issue where the wrong exception type was attempted to be caught in cancellation methods</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.23.0 to 10.1.1
+* Updated DotPrimitives version from 4.3.3 to 4.4.0
+* Updated DotExtensions version from 10.1.1 to 10.2.0
+* README fixes
+* Removed deprecation of ``FilePathResolver`` class- The ``ResolveFilePath`` method signature in the class is deprecated and will be replaced with a new method signature in CliInvoke v3</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.5.2</PackageVersion>
-        <AssemblyVersion>2.5.2.0</AssemblyVersion>
+        <PackageVersion>2.5.3</PackageVersion>
+        <AssemblyVersion>2.5.3.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -33,7 +34,7 @@
         <PolyEnsure>true</PolyEnsure>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
-        <FileVersion>2.5.2.0</FileVersion>
+        <FileVersion>2.5.3.0</FileVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
