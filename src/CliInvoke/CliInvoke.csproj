@@ -51,7 +51,6 @@
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all" />
         <PackageReference Include="DotExtensions" />
-        <PackageReference Include="DotPrimitives"/>
     </ItemGroup>
 
     <PropertyGroup>

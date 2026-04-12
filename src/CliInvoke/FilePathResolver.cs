@@ -10,7 +10,7 @@
 using System.Linq;
 using System.Text;
 
-using DotPrimitives.IO.Paths;
+using DotExtensions.IO;
 
 namespace CliInvoke;
 
