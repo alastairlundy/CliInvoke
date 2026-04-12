@@ -1,6 +1,4 @@
-﻿using CliInvoke.Core;
-using CliInvoke.Core.Piping;
-using CliInvoke.Piping;
+﻿using CliInvoke.Piping;
 using WhatExec.Lib.Abstractions.Resolvers;
 using WhatExec.Lib.Detectors;
 using WhatExec.Lib.Resolvers;
