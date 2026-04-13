@@ -72,9 +72,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         ProcessorAffinity = processorAffinity ??
 #pragma warning restore CA1416
-#if NETSTANDARD2_0
-                            (nint)
-#endif
                             2 * Environment.ProcessorCount - 1;
 
         PriorityClass = priorityClass;
@@ -119,9 +116,6 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     ///     Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
     public static ProcessResourcePolicy Default { get; } = new(
-#if NETSTANDARD2_0
-        (nint)
-#endif
         2 * Environment.ProcessorCount - 1
     );
 
