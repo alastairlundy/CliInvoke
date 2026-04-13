@@ -41,8 +41,7 @@
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
 
-
-    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+    <PropertyGroup>
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
