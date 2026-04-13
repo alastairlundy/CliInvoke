@@ -16,9 +16,6 @@ Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/bl
 CliInvoke.Specializations comes with three specializations as of 1.0.0:
 
 - [CmdProcessConfiguration](#cmdprocessconfiguration) — An easier way to execute processes and commands through
-  cmd.exe (Only supported on Windows)
-- [ClassicPowershellProcessConfiguration](#classicpowershellprocessconfiguration) — An easier way to execute processes
-  and commands through Windows PowerShell (Only supported on Windows)
 - [PowershellProcessConfiguration](#powershellprocessconfiguration) — An easier way to execute processes and commands
   through the modern Cross-Platform open source PowerShell (PowerShell is not installed by CliInvoke and is expected to
   be installed if you plan to use it.)
