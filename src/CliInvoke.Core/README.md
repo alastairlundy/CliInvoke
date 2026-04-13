@@ -29,7 +29,7 @@ Key Abstractions:
 ## Features
 
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
-* Supports .NET Standard 2.0, .NET 8, and newer TFMs, and has few dependencies.
+* Supports .NET 8 and newer TFMs and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
   Windows <sup>1</sup>
@@ -201,9 +201,7 @@ BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config
 
 This project would like to thank the following projects for their work:
 
-* [Microsoft.Bcl.HashCode](https://github.com/dotnet/maintenance-packages) for providing a backport of the HashCode
-  class and static methods to .NET Standard 2.0
-* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying .NET Standard 2.0 support
+* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying older TFM support
 
 For more information, please see
 the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).

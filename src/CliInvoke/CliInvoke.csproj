@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net10.0;net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net10.0;net8.0;net9.0;</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
@@ -15,15 +15,23 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AoT compatible despite CliInvoke advertising itself as Trimming Safe and AoT compatible. It is now fixed to be Trimming safe and AoT compatible on .NET 8+ - This fix is also backported to CliInvoke 2.4 via version 2.4.4
-            * Updated AoT Compatibility property in ``CliInvoke.csproj`` to only be set to true on .NET 8+
-            * Reduced warnings regarding supported and unsupported OSes in ``ProcessResourcePolicyBuilder``
-        </PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 9.23.0 to 10.1.1
+* Removed deprecated code marked for removal in CliInvoke v3
+* Updated DotExtensions version from 10.1.1 to 10.2.0
+* Re-designed Builder implementation classes to be stateful instead of immutable/stateless, reducing memory usage from Fluent Composition method chaining. and potentially improving performance
+* Added methods to ``ProcessConfigurationBuilder`` to allow configuring UserCredential, Arguments, Environment Variables, and Process Resource Policies via their respective builders through IProcessConfigurationBuilder - these methods have a ``Configure`` prefix to distinguish them from other methods
+* Removed ``ProcessConfigurationFactory``
+* Removed some duplicative/overlapping methods from various Builder implementations
+* Renamed ``ProcessConfigurationBuilder``'s ``ConfigureWindowCreation`` method to ``EnableWindowCreation``
+* Updated cancellation code to support using different cancellation policies depending on cancellation reason (e.g. Timeout vs requested Cancellation) 
+* Renamed ``RunnerProcessFactory`` to ``RunnerConfigurationFactory``
+* Shortened the namepace for ``RunnerConfigurationFactory`` 
+* Updated ``FilePathResolver`` to support updates to ``IFilePathResolver``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.5.1</PackageVersion>
-        <AssemblyVersion>2.5.1.0</AssemblyVersion>
+        <PackageVersion>3.0.0-alpha.1</PackageVersion>
+        <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -31,10 +39,12 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
+<!--
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
+-->
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+    <PropertyGroup>
         <IsAotCompatible>true</IsAotCompatible>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
@@ -48,10 +58,9 @@
 
     <ItemGroup>
         <PackageReference Include="DotExtensions"/>
-        <PackageReference Include="Polyfill">
-          <PrivateAssets>all</PrivateAssets>
+       <!-- <PackageReference Include="Polyfill" PrivateAssets="all">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        </PackageReference>-->
     </ItemGroup>
 
     <PropertyGroup>

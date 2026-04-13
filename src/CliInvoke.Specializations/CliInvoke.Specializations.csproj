@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net10.0;net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net10.0;net8.0;net9.0</TargetFrameworks>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -12,26 +12,27 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.5.1</PackageVersion>
+        <PackageVersion>3.0.0-alpha.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated AoT Compatibility property in ``CliInvoke.Specializations.csproj`` to only be set to true on .NET 8+</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 3.0.0 Alpha 1
+* Updated Specializations' specialized Invokers to inherit from CliInvoke main package's invokers</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>2.5.1.0</AssemblyVersion>
+        <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
     </ItemGroup>
 
-    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+    <PropertyGroup>
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
@@ -40,13 +41,16 @@
         <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
     </PropertyGroup>
 
+
     <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
+        <ProjectReference Include="..\CliInvoke\CliInvoke.csproj"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
         <!-- set CliInvokeCoreVersion in the workflow -->
         <PackageReference Include="CliInvoke.Core"/>
+        <PackageReference Include="CliInvoke"/>
     </ItemGroup>
 
     <ItemGroup>

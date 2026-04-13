@@ -98,20 +98,7 @@ internal static partial class WindowsGracefulCancellation
             }
         }
     }
-
-#if NETSTANDARD2_0
-    [DllImport("Kernel32.dll", EntryPoint = "GenerateConsoleCtrlEvent", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool SendCtrlCToConsoleWin(uint ctrlEvent, uint processGroupEventId);
-
-    [DllImport("Kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool AllocConsoleWin();
-
-    [DllImport("Kernel32.dll", EntryPoint = "AttachConsole", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool AttachConsoleWin(uint processId);
-#else
+    
     [LibraryImport("Kernel32.dll", EntryPoint = "GenerateConsoleCtrlEvent", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SendCtrlCToConsoleWin(uint ctrlEvent, uint processGroupEventId);
@@ -123,5 +110,4 @@ internal static partial class WindowsGracefulCancellation
     [LibraryImport("Kernel32.dll", EntryPoint = "AttachConsole", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool AttachConsoleWin(uint processId);
-#endif
 }
