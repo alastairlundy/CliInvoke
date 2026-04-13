@@ -41,7 +41,8 @@ internal static class ProcessPipingHelper
 
             return false;
         }
-
+    }
+    extension(Process source){
         /// <summary>
         ///     Asynchronously retrieves the standard output stream from a specified process.
         /// </summary>
@@ -52,13 +53,13 @@ internal static class ProcessPipingHelper
         [UnsupportedOSPlatform("browser")]
         internal async Task<Stream> PipeStandardOutputAsync(CancellationToken cancellationToken)
         {
-            Stream destination1 = new MemoryStream();
+            Stream destination = new MemoryStream();
 
-            if (destination.StartInfo.RedirectStandardOutput)
-                if (destination.StandardOutput != StreamReader.Null)
-                    await destination.StandardOutput.BaseStream.CopyToAsync(destination1, cancellationToken);
+            if (source.StartInfo.RedirectStandardOutput)
+                if (source.StandardOutput != StreamReader.Null)
+                    await source.StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken);
 
-            return destination1;
+            return destination;
         }
 
         /// <summary>
@@ -71,13 +72,13 @@ internal static class ProcessPipingHelper
         [UnsupportedOSPlatform("browser")]
         internal async Task<Stream> PipeStandardErrorAsync(CancellationToken cancellationToken)
         {
-            Stream destination1 = new MemoryStream();
+            Stream destination = new MemoryStream();
 
-            if (destination.StartInfo.RedirectStandardError)
-                if (destination.StandardError != StreamReader.Null)
-                    await destination.StandardError.BaseStream.CopyToAsync(destination1, cancellationToken);
+            if (source.StartInfo.RedirectStandardError)
+                if (source.StandardError != StreamReader.Null)
+                    await source.StandardError.BaseStream.CopyToAsync(destination, cancellationToken);
 
-            return destination1;
+            return destination;
         }
     }
 }
