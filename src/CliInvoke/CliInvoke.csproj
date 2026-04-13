@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net10.0;net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net10.0;net8.0;net9.0;</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
@@ -39,10 +39,12 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
+<!--
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
+-->
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+    <PropertyGroup>
         <IsAotCompatible>true</IsAotCompatible>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
@@ -56,10 +58,9 @@
 
     <ItemGroup>
         <PackageReference Include="DotExtensions"/>
-        <PackageReference Include="Polyfill">
-          <PrivateAssets>all</PrivateAssets>
+       <!-- <PackageReference Include="Polyfill" PrivateAssets="all">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        </PackageReference>-->
     </ItemGroup>
 
     <PropertyGroup>

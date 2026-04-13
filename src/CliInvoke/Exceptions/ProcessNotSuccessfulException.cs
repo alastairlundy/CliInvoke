@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Runtime.CompilerServices;
-
 using CliInvoke.Core.Validation;
 
 namespace CliInvoke.Exceptions;
@@ -18,21 +16,6 @@ namespace CliInvoke.Exceptions;
 /// </summary>
 public sealed class ProcessNotSuccessfulException : Exception
 {
-    /// <summary>
-    ///     Thrown when an executed Process exited with a non-zero exit code.
-    /// </summary>
-    /// <param name="exitCode">The exit code of the Process that was executed.</param>
-    [Obsolete("This constructor overload is deprecated and will be removed in a future version.")]
-    [OverloadResolutionPriority(2)]
-    public ProcessNotSuccessfulException(int exitCode)
-        : base(
-            Resources.Exceptions_ProcessNotSuccessful_Generic.Replace("{x}", exitCode.ToString()))
-    {
-        ExitCode = exitCode;
-
-        ExecutedProcess = null;
-    }
-
     /// <summary>
     ///     Thrown when an executed Process exited with a non-zero exit code.
     /// </summary>
@@ -51,27 +34,6 @@ public sealed class ProcessNotSuccessfulException : Exception
 #pragma warning disable CS0618 // Type or member is obsolete
         ExitCode = process.Result.ExitCode;
 #pragma warning restore CS0618 // Type or member is obsolete
-    }
-
-    /// <summary>
-    ///     Thrown when an executed Process exited with a non-zero exit code.
-    /// </summary>
-    /// <param name="exitCode">The exit code of the Process that was executed.</param>
-    /// <param name="process">The Process that was executed.</param>
-    [OverloadResolutionPriority(3)]
-    [Obsolete("This constructor overload is deprecated and will be removed in a future version.")]
-    public ProcessNotSuccessfulException(int exitCode, ProcessExceptionInfo process)
-        : base(
-            Resources.Exceptions_ProcessNotSuccessful_Specific.Replace(
-                "{y}",
-                exitCode.ToString().Replace("{x}", process.Configuration.TargetFilePath)
-            )
-        )
-    {
-        ExecutedProcess = process;
-
-        Source = ExecutedProcess.Configuration.TargetFilePath;
-        ExitCode = exitCode;
     }
 
     /// <summary>
