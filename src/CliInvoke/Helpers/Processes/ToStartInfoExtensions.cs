@@ -50,10 +50,8 @@ internal static class ToStartInfoExtensions
             if (processConfiguration.EnvironmentVariables.Count > 0)
                 processStartInfo.SetEnvironmentVariables(processConfiguration.EnvironmentVariables);
 
-#if NET8_0_OR_GREATER
             if (processStartInfo.RedirectStandardInput)
                 processStartInfo.StandardInputEncoding = processConfiguration.StandardInputEncoding;
-#endif
 
             if (processStartInfo.RedirectStandardOutput)
                 processStartInfo.StandardOutputEncoding =

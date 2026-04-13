@@ -37,22 +37,13 @@ public static class ConfigurationInvokationExtensions
     ///     Thrown if the result validation requires the
     ///     process to exit with exit code zero and the process exits with a different exit code.
     /// </exception>
-#if NET8_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public static async Task<ProcessResult> ExecuteAsync(
         this ProcessConfiguration processConfiguration, 
         ProcessExitConfiguration? processExitConfiguration = null,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         return await _processInvoker.ExecuteAsync(
             processConfiguration,
@@ -78,17 +69,9 @@ public static class ConfigurationInvokationExtensions
     ///     Thrown if the result validation requires the
     ///     process to exit with exit code zero and the process exits with a different exit code.
     /// </exception>
-#if NET8_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public static async Task<BufferedProcessResult> ExecuteBufferedAsync(
         this ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
@@ -119,17 +102,9 @@ public static class ConfigurationInvokationExtensions
     ///     Thrown if the result validation requires the
     ///     process to exit with exit code zero and the process exits with a different exit code.
     /// </exception>
-#if NET8_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
     [UnsupportedOSPlatform("ios")]
-    [SupportedOSPlatform("android")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-#endif
     public static async Task<PipedProcessResult> ExecutePipedAsync(
         this ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
