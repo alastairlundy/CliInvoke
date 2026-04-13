@@ -124,6 +124,7 @@ public class ProcessInvoker : IProcessInvoker
 
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
+        
         try
         {
             process.Start();
@@ -242,7 +243,8 @@ public class ProcessInvoker : IProcessInvoker
             standardError.Dispose();
     }
 
-    private void DisposeCompletedStreams(Task<Stream> standardOutput, Task<Stream> standardError)
+    private static void DisposeCompletedStreams(Task<Stream> standardOutput, 
+        Task<Stream> standardError)
     {
         if (standardOutput.IsCompleted)
             standardOutput.Dispose();
@@ -286,7 +288,7 @@ public class ProcessInvoker : IProcessInvoker
         return processExitConfiguration;
     }
 
-    private void ThrowFileNotFoundException(ProcessConfiguration processConfiguration)
+    private static void ThrowFileNotFoundException(ProcessConfiguration processConfiguration)
     {
         if (!File.Exists(processConfiguration.TargetFilePath))
             throw new FileNotFoundException(
