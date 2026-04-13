@@ -15,70 +15,69 @@ namespace CliInvoke.Helpers.Processes;
 /// </summary>
 internal static class ProcessPipingHelper
 {
-    /// <summary>
-    ///     Asynchronously pipes the standard input from a source stream to a specified process.
-    /// </summary>
     /// <param name="destination">The process to which the standard input will be piped.</param>
-    /// <param name="source">The stream from which to read the standard input data.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>A task that represents the asynchronous operation, containing the destination process.</returns>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-    internal static async Task<bool> PipeStandardInputAsync(this Process destination, Stream source,
-        CancellationToken cancellationToken)
+    extension(Process destination)
     {
-        if (destination.StartInfo.RedirectStandardInput)
+        /// <summary>
+        ///     Asynchronously pipes the standard input from a source stream to a specified process.
+        /// </summary>
+        /// <param name="source">The stream from which to read the standard input data.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>A task that represents the asynchronous operation containing the destination process.</returns>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("browser")]
+        internal async Task<bool> PipeStandardInputAsync(Stream source,
+            CancellationToken cancellationToken)
         {
-            await destination.StandardInput.FlushAsync(cancellationToken);
-            destination.StandardInput.BaseStream.Position = 0;
-            await source.CopyToAsync(destination.StandardInput.BaseStream, cancellationToken);
+            if (destination.StartInfo.RedirectStandardInput)
+            {
+                await destination.StandardInput.FlushAsync(cancellationToken);
+                destination.StandardInput.BaseStream.Position = 0;
+                await source.CopyToAsync(destination.StandardInput.BaseStream, cancellationToken);
 
-            return source.Equals(destination.StandardInput.BaseStream);
+                return source.Equals(destination.StandardInput.BaseStream);
+            }
+
+            return false;
         }
 
-        return false;
-    }
+        /// <summary>
+        ///     Asynchronously retrieves the standard output stream from a specified process.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("browser")]
+        internal async Task<Stream> PipeStandardOutputAsync(CancellationToken cancellationToken)
+        {
+            Stream destination1 = new MemoryStream();
 
-    /// <summary>
-    ///     Asynchronously retrieves the standard output stream from a specified process.
-    /// </summary>
-    /// <param name="source">The process from which to read the standard output data.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-    internal static async Task<Stream> PipeStandardOutputAsync(this Process source,
-        CancellationToken cancellationToken)
-    {
-        Stream destination = new MemoryStream();
+            if (destination.StartInfo.RedirectStandardOutput)
+                if (destination.StandardOutput != StreamReader.Null)
+                    await destination.StandardOutput.BaseStream.CopyToAsync(destination1, cancellationToken);
 
-        if (source.StartInfo.RedirectStandardOutput)
-            if (source.StandardOutput != StreamReader.Null)
-                await source.StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken);
+            return destination1;
+        }
 
-        return destination;
-    }
+        /// <summary>
+        ///     Asynchronously retrieves the standard error stream from a specified process.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("browser")]
+        internal async Task<Stream> PipeStandardErrorAsync(CancellationToken cancellationToken)
+        {
+            Stream destination1 = new MemoryStream();
 
-    /// <summary>
-    ///     Asynchronously retrieves the standard error stream from a specified process.
-    /// </summary>
-    /// <param name="source">The process from which to read the standard error data.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-    internal static async Task<Stream> PipeStandardErrorAsync(this Process source,
-        CancellationToken cancellationToken)
-    {
-        Stream destination = new MemoryStream();
+            if (destination.StartInfo.RedirectStandardError)
+                if (destination.StandardError != StreamReader.Null)
+                    await destination.StandardError.BaseStream.CopyToAsync(destination1, cancellationToken);
 
-        if (source.StartInfo.RedirectStandardError)
-            if (source.StandardError != StreamReader.Null)
-                await source.StandardError.BaseStream.CopyToAsync(destination, cancellationToken);
-
-        return destination;
+            return destination1;
+        }
     }
 }
