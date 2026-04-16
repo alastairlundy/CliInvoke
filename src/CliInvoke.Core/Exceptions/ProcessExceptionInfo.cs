@@ -40,8 +40,7 @@ public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionI
         Configuration = configuration;
 
         ArgumentsConflict = configuration.UseShellExecution &&
-                            (configuration.OutputRedirection == OutputRedirectionMode.Pipe ||
-                             configuration.OutputRedirection == OutputRedirectionMode.Buffer ||
+                            (configuration.OutputRedirection ||
                              configuration.RedirectStandardInput);
     }
 

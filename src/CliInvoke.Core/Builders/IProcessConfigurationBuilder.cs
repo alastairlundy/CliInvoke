@@ -90,10 +90,10 @@ public interface IProcessConfigurationBuilder
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="outputRedirectionMode"></param>
+    /// <param name="outputRedirection"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder SetOutputRedirectionMode(
-        OutputRedirectionMode outputRedirectionMode);
+    IProcessConfigurationBuilder SetOutputRedirection(
+        bool outputRedirection);
 
     /// <summary>
     /// 

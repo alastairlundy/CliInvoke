@@ -23,11 +23,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     /// <param name="targetFilePath"></param>
     /// <param name="arguments"></param>
-    /// <param name="outputRedirectionMode"></param>
+    /// <param name="outputRedirection"></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
     public ProcessConfiguration(string targetFilePath, string arguments = "", 
-        OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer)
+        bool outputRedirection = true)
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
@@ -35,7 +35,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         TargetFilePath = targetFilePath;
         Arguments = arguments;
         RedirectStandardInput = false;
-        OutputRedirection = outputRedirectionMode;
+        OutputRedirection = outputRedirection;
         
         RequiresAdministrator = false;
         WorkingDirectoryPath = Directory.GetCurrentDirectory();
@@ -60,7 +60,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         string targetFilePath,
         string arguments,
         bool redirectStandardInput,
-        OutputRedirectionMode outputRedirection = OutputRedirectionMode.None,
+        bool outputRedirection = true,
         string? workingDirectoryPath = null,
         bool requiresAdministrator = false,
         IReadOnlyDictionary<string, string>? environmentVariables = null,
@@ -162,7 +162,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// </summary>
     public bool RedirectStandardInput { get; }
 
-    public OutputRedirectionMode OutputRedirection { get; protected set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool OutputRedirection { get; protected set; }
 
     /// <summary>
     ///     The Process Resource Policy to be used for executing the Command.

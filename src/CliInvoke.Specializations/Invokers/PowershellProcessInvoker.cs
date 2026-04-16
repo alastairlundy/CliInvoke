@@ -84,7 +84,7 @@ public class PowershellProcessInvoker : ProcessInvoker
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 new PowershellProcessConfiguration(_filePathResolver, processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
-                    OutputRedirectionMode.None));
+                    false));
 
         return await base.ExecuteAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
@@ -129,8 +129,7 @@ public class PowershellProcessInvoker : ProcessInvoker
         
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                new PowershellProcessConfiguration(_filePathResolver, processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
-                    OutputRedirectionMode.None));
+                new PowershellProcessConfiguration(_filePathResolver, processConfiguration.Arguments, processConfiguration.RedirectStandardInput));
 
         return await base.ExecuteBufferedAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
@@ -167,8 +166,7 @@ public class PowershellProcessInvoker : ProcessInvoker
         
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                new PowershellProcessConfiguration(_filePathResolver, processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
-                    OutputRedirectionMode.None));
+                new PowershellProcessConfiguration(_filePathResolver, processConfiguration.Arguments, processConfiguration.RedirectStandardInput));
 
         return await base.ExecutePipedAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }

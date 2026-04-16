@@ -23,7 +23,7 @@ namespace CliInvoke.Builders;
 public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
 {
     private string _targetFilePath;
-    private OutputRedirectionMode _outputRedirection;
+    private bool _outputRedirection;
     
     private string _workingDirectoryPath;
     
@@ -56,7 +56,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         _processResourcePolicyBuilder = new ProcessResourcePolicyBuilder();
         _userCredentialBuilder =  new UserCredentialBuilder();
 
-        _outputRedirection = OutputRedirectionMode.None;
+        _outputRedirection = false;
 
         _redirectStandardInput = false;
         _enableWindowCreation = false;
@@ -271,11 +271,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="outputRedirectionMode"></param>
+    /// <param name="outputRedirection"></param>
     /// <returns></returns>
-    public IProcessConfigurationBuilder SetOutputRedirectionMode(OutputRedirectionMode outputRedirectionMode)
+    public IProcessConfigurationBuilder SetOutputRedirection(bool outputRedirection)
     {
-        _outputRedirection = outputRedirectionMode;
+        _outputRedirection = outputRedirection;
         
         return this;
     }
@@ -419,7 +419,7 @@ internal class ProcessConfigurationWrapper : ProcessConfiguration
 {
     internal ProcessConfigurationWrapper(string targetFilePath, string arguments,
         bool redirectStandardInput,
-        OutputRedirectionMode outputRedirection = OutputRedirectionMode.None,
+        bool outputRedirection = false,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
         IReadOnlyDictionary<string, string>? environmentVariables = null,
         UserCredential? credential = null, StreamWriter? standardInput = null,

@@ -25,13 +25,13 @@ public static class ProcessConfigurationFactoryExtensions
         /// </summary>
         /// <param name="targetFilePath">The target file path of the command to be executed.</param>
         /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
-        /// <param name="outputRedirectionMode"></param>
+        /// <param name="outputRedirection"></param>
         /// <returns>The <see cref="ProcessConfiguration" /> created from the configured parameters.</returns>
         [Pure]
         public static ProcessConfiguration Create(string targetFilePath, 
-            OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer, params string[] arguments) 
+            bool outputRedirection = true, params string[] arguments) 
             => ProcessConfiguration.Create(targetFilePath, arguments, null,
-                outputRedirectionMode);
+                outputRedirection);
 
         /// <summary>
         ///     Creates a Process configuration that can be run by a <see cref="IProcessInvoker" /> from
@@ -40,7 +40,7 @@ public static class ProcessConfigurationFactoryExtensions
         /// <param name="targetFilePath">The target file path of the command to be executed.</param>
         /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
         /// <param name="workingDirectory"></param>
-        /// <param name="outputRedirectionMode"></param>
+        /// <param name="outputRedirection"></param>
         /// <param name="configureBuilder">
         ///     Actions to apply to the internal
         ///     <see cref="IProcessConfigurationBuilder" /> if not null.
@@ -52,7 +52,7 @@ public static class ProcessConfigurationFactoryExtensions
             string targetFilePath,
             string arguments,
             string? workingDirectory = null,
-            OutputRedirectionMode outputRedirectionMode =  OutputRedirectionMode.Buffer,
+            bool outputRedirection =  true,
             Action<IProcessConfigurationBuilder>? configureBuilder = null,
             bool enableWindowCreation = false)
         {
@@ -66,7 +66,7 @@ public static class ProcessConfigurationFactoryExtensions
                         targetFilePath)
                     .SetArguments(arguments)
                     .SetWorkingDirectory(workingDirectory)
-                    .SetOutputRedirectionMode(outputRedirectionMode)
+                    .SetOutputRedirection(outputRedirection)
                     .EnableWindowCreation(enableWindowCreation);
 
             if (configureBuilder is not null)
@@ -81,7 +81,8 @@ public static class ProcessConfigurationFactoryExtensions
         /// </summary>
         /// <param name="targetFilePath">The target file path of the command to be executed.</param>
         /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
-        /// <param name="outputRedirectionMode"></param>
+        /// <param name="workingDirectory"></param>
+        /// <param name="outputRedirection"></param>
         /// <param name="configureBuilder">
         ///     Actions to apply to the internal
         ///     <see cref="IProcessConfigurationBuilder" /> if not null.
@@ -93,7 +94,7 @@ public static class ProcessConfigurationFactoryExtensions
             string targetFilePath,
             IEnumerable<string> arguments,
             string? workingDirectory = null,
-            OutputRedirectionMode outputRedirectionMode =  OutputRedirectionMode.Buffer,
+            bool outputRedirection =  true,
             Action<IProcessConfigurationBuilder>? configureBuilder = null,
             bool enableWindowCreation = false)
         {
@@ -110,7 +111,7 @@ public static class ProcessConfigurationFactoryExtensions
                         targetFilePath)
                     .SetArguments(argumentsBuilder.ToString())
                     .SetWorkingDirectory(workingDirectory)
-                    .SetOutputRedirectionMode(outputRedirectionMode)
+                    .SetOutputRedirection(outputRedirection)
                     .EnableWindowCreation(enableWindowCreation);
 
             if (configureBuilder is not null)

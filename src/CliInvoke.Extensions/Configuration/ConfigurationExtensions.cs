@@ -80,8 +80,7 @@ public static class ConfigurationExtensions
                 .EnableWindowCreation(!processStartInfo.CreateNoWindow)
                 .SetWorkingDirectory(processStartInfo.WorkingDirectory)
                 .SetArguments(processStartInfo.Arguments)
-                .SetOutputRedirectionMode( processStartInfo.RedirectStandardOutput ||  processStartInfo.RedirectStandardError ?
-                    OutputRedirectionMode.Buffer : OutputRedirectionMode.None)
+                .SetOutputRedirection( processStartInfo.RedirectStandardOutput ||  processStartInfo.RedirectStandardError)
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
                 .SetStandardInputPipe(StreamWriter.Null)
                 .SetEncoding(

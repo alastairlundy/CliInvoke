@@ -45,7 +45,7 @@ public static class CliRun
         workingDirectory ??= Environment.CurrentDirectory;
         
         using ProcessConfiguration configuration = ProcessConfiguration.Create(targetFilePath,
-            arguments, workingDirectory, OutputRedirectionMode.None);
+            arguments, workingDirectory, false);
         
         timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
 
@@ -98,6 +98,13 @@ public static class CliRun
         return await GetInvoker().ExecuteBufferedAsync(configuration, exitConfiguration, cancellationToken);
     }
         
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="configuration"></param>
+    /// <param name="exitConfiguration"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public static async Task<BufferedProcessResult> RunBufferedAsync(
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
@@ -124,7 +131,7 @@ public static class CliRun
         workingDirectory ??= Environment.CurrentDirectory;
         
         using ProcessConfiguration configuration = ProcessConfiguration.Create(targetFilePath,
-            arguments, workingDirectory, OutputRedirectionMode.Pipe);
+            arguments, workingDirectory);
         
         timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
 

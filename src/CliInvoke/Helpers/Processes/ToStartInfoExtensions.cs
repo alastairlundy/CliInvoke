@@ -36,8 +36,8 @@ internal static class ToStartInfoExtensions
                 RedirectStandardInput =
                     processConfiguration.StandardInput is not null
                     && processConfiguration.RedirectStandardInput,
-                RedirectStandardOutput =  processConfiguration.OutputRedirection != OutputRedirectionMode.None,
-                RedirectStandardError = processConfiguration.OutputRedirection != OutputRedirectionMode.None,
+                RedirectStandardOutput =  processConfiguration.OutputRedirection,
+                RedirectStandardError = processConfiguration.OutputRedirection,
             };
 
             if (processConfiguration.RequiresAdministrator)

@@ -215,11 +215,11 @@ public class ExternalProcess : IExternalProcess
     public async Task<BufferedProcessResult> CaptureBufferedResultAsync(
         CancellationToken cancellationToken)
     {
-        Task<string> standardOutputString = Configuration.OutputRedirection == OutputRedirectionMode.Buffer
+        Task<string> standardOutputString = Configuration.OutputRedirection
             ? _processWrapper.StandardOutput.ReadToEndAsync(cancellationToken)
             : Task.FromResult(string.Empty);
 
-        Task<string> standardErrorString = Configuration.OutputRedirection == OutputRedirectionMode.Buffer
+        Task<string> standardErrorString = Configuration.OutputRedirection
             ? _processWrapper.StandardError.ReadToEndAsync(cancellationToken)
             : Task.FromResult(string.Empty);
 
@@ -254,11 +254,11 @@ public class ExternalProcess : IExternalProcess
     public async Task<PipedProcessResult> CapturePipedResultAsync(
         CancellationToken cancellationToken)
     {
-        Task<Stream> standardOutputStream = Configuration.OutputRedirection == OutputRedirectionMode.Pipe
+        Task<Stream> standardOutputStream = Configuration.OutputRedirection
             ? _processWrapper.PipeStandardOutputAsync(cancellationToken)
             : (Task<Stream>)Task.CompletedTask;
 
-        Task<Stream> standardErrorStream = Configuration.OutputRedirection == OutputRedirectionMode.Pipe
+        Task<Stream> standardErrorStream = Configuration.OutputRedirection
             ? _processWrapper.PipeStandardErrorAsync(cancellationToken)
             : (Task<Stream>)Task.CompletedTask;
 
