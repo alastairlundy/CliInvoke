@@ -9,8 +9,6 @@
 
 using System.Linq;
 
-using CliInvoke.Extensions;
-
 using DotExtensions.Versions;
 
 namespace CliInvoke;

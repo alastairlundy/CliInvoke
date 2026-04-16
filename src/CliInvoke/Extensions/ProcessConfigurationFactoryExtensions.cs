@@ -9,7 +9,7 @@
 
 using CliInvoke.Builders;
 
-namespace CliInvoke.Extensions;
+namespace CliInvoke;
 
 /// <summary>
 ///     A Dependency Injection supporting factory class to enable easier
