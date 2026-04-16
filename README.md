@@ -180,14 +180,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code omitted for clarity
 
-// Get services 
-IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
+ // Get services 
+ var invoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-// Simply create the process configuration.
-using ProcessConfiguration configuration = ProcessConfiguration.Create("path/to/exe", "arguments");
+ // Simply create the process configuration.
+ using ProcessConfiguration configuration = ProcessConfiguration.Create("path/to/exe", "arguments");
 
-// Run the process configuration and get the results.
-BufferedProcessResult result = await _invoker.ExecuteBufferedAsync(configuration, CancellationToken.None);
+ // Run the process configuration and get the results.
+ BufferedProcessResult result = await invoker.ExecuteBufferedAsync(configuration, CancellationToken.None);
 ```
 
 ### Advanced Configuration with Builders
