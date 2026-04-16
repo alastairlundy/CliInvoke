@@ -48,7 +48,7 @@ public class ExternalProcess : IExternalProcess
         _filePathResolver = FilePathResolver.Shared;
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
-        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Graceful;
+        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
 
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
