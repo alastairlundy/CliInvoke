@@ -53,6 +53,24 @@ public class ExternalProcess : IExternalProcess
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
     }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePathResolver"></param>
+    /// <param name="configuration"></param>
+    /// <param name="exitConfiguration"></param>
+    public ExternalProcess(IFilePathResolver filePathResolver, ProcessConfiguration configuration,
+        ProcessExitConfiguration? exitConfiguration = null)
+    {
+        _filePathResolver = filePathResolver;
+        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        Configuration = configuration;
+        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
+
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+    }
 
     /// <summary>
     ///     Represents the configuration settings used by an external process.

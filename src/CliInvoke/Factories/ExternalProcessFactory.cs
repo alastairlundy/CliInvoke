@@ -18,10 +18,18 @@ namespace CliInvoke.Factories;
 /// </summary>
 public class ExternalProcessFactory : IExternalProcessFactory
 {
+    private readonly IFilePathResolver _filePathResolver;
+
     /// <summary>
     /// </summary>
-    public ExternalProcessFactory(){
-        
+    public ExternalProcessFactory()
+    {
+        _filePathResolver = FilePathResolver.Shared;
+    }
+
+    public ExternalProcessFactory(IFilePathResolver filePathResolver)
+    {
+        _filePathResolver = filePathResolver;
     }
 
     /// <summary>
@@ -46,7 +54,7 @@ public class ExternalProcessFactory : IExternalProcessFactory
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration exitConfiguration)
     {
-        return new ExternalProcess(configuration,
+        return new ExternalProcess(_filePathResolver,configuration,
             exitConfiguration);
     }
 }
