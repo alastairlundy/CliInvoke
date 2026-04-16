@@ -20,7 +20,7 @@ public class ExternalProcess : IExternalProcess
 {
     private ProcessWrapper _processWrapper;
     
-    private IFilePathResolver _filePathResolver;
+    private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>
     /// </summary>
@@ -45,6 +45,8 @@ public class ExternalProcess : IExternalProcess
     public ExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null)
     {
+        _filePathResolver = FilePathResolver.Shared;
+        
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Graceful;
@@ -120,7 +122,7 @@ public class ExternalProcess : IExternalProcess
     public async Task StartAsync(ProcessConfiguration configuration,
         CancellationToken cancellationToken)
     {
-        FileInfo filePath = await ValidateExecutableFile(cancellationToken);
+        FileInfo filePath = await ValidateExecutableFile();
 
         Configuration.TargetFilePath = filePath.FullName;
 
@@ -137,7 +139,7 @@ public class ExternalProcess : IExternalProcess
                 cancellationToken);
     }
 
-    private Task<FileInfo> ValidateExecutableFile(CancellationToken cancellationToken)
+    private Task<FileInfo> ValidateExecutableFile()
     {
         if (File.Exists(Configuration.TargetFilePath))
             return Task.FromResult(new FileInfo(Configuration.TargetFilePath));
