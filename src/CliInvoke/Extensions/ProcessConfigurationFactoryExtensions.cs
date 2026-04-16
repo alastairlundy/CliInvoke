@@ -25,10 +25,13 @@ public static class ProcessConfigurationFactoryExtensions
         /// </summary>
         /// <param name="targetFilePath">The target file path of the command to be executed.</param>
         /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+        /// <param name="outputRedirectionMode"></param>
         /// <returns>The <see cref="ProcessConfiguration" /> created from the configured parameters.</returns>
         [Pure]
-        public static ProcessConfiguration Create(string targetFilePath, params string[] arguments) 
-            => ProcessConfiguration.Create(targetFilePath, arguments, null);
+        public static ProcessConfiguration Create(string targetFilePath, 
+            OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer, params string[] arguments) 
+            => ProcessConfiguration.Create(targetFilePath, arguments, null,
+                outputRedirectionMode);
 
         /// <summary>
         ///     Creates a Process configuration that can be run by a <see cref="IProcessInvoker" /> from
@@ -36,26 +39,35 @@ public static class ProcessConfigurationFactoryExtensions
         /// </summary>
         /// <param name="targetFilePath">The target file path of the command to be executed.</param>
         /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+        /// <param name="workingDirectory"></param>
+        /// <param name="outputRedirectionMode"></param>
         /// <param name="configureBuilder">
         ///     Actions to apply to the internal
         ///     <see cref="IProcessConfigurationBuilder" /> if not null.
         /// </param>
+        /// <param name="enableWindowCreation"></param>
         /// <returns>The <see cref="ProcessConfiguration" /> created from the configured parameters.</returns>
         [Pure]
         public static ProcessConfiguration Create(
             string targetFilePath,
             string arguments,
-            Action<IProcessConfigurationBuilder>? configureBuilder = null)
+            string? workingDirectory = null,
+            OutputRedirectionMode outputRedirectionMode =  OutputRedirectionMode.Buffer,
+            Action<IProcessConfigurationBuilder>? configureBuilder = null,
+            bool enableWindowCreation = false)
         {
             ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
             ArgumentNullException.ThrowIfNull(arguments);
 
+            workingDirectory ??= Environment.CurrentDirectory;
+            
             IProcessConfigurationBuilder processConfigurationBuilder =
                 new ProcessConfigurationBuilder(
                         targetFilePath)
                     .SetArguments(arguments)
-                    .SetOutputRedirectionMode(OutputRedirectionMode.Buffer)
-                    .EnableWindowCreation(false);
+                    .SetWorkingDirectory(workingDirectory)
+                    .SetOutputRedirectionMode(outputRedirectionMode)
+                    .EnableWindowCreation(enableWindowCreation);
 
             if (configureBuilder is not null)
                 configureBuilder.Invoke(processConfigurationBuilder);
@@ -69,16 +81,21 @@ public static class ProcessConfigurationFactoryExtensions
         /// </summary>
         /// <param name="targetFilePath">The target file path of the command to be executed.</param>
         /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+        /// <param name="outputRedirectionMode"></param>
         /// <param name="configureBuilder">
         ///     Actions to apply to the internal
         ///     <see cref="IProcessConfigurationBuilder" /> if not null.
         /// </param>
+        /// <param name="enableWindowCreation"></param>
         /// <returns>The <see cref="ProcessConfiguration" /> created from the configured parameters.</returns>
         [Pure]
         public static ProcessConfiguration Create(
             string targetFilePath,
             IEnumerable<string> arguments,
-            Action<IProcessConfigurationBuilder>? configureBuilder = null)
+            string? workingDirectory = null,
+            OutputRedirectionMode outputRedirectionMode =  OutputRedirectionMode.Buffer,
+            Action<IProcessConfigurationBuilder>? configureBuilder = null,
+            bool enableWindowCreation = false)
         {
             ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
             ArgumentNullException.ThrowIfNull(arguments);
@@ -86,12 +103,15 @@ public static class ProcessConfigurationFactoryExtensions
             IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
                 .AddRange(arguments);
 
+            workingDirectory ??= Environment.CurrentDirectory;
+            
             IProcessConfigurationBuilder processConfigurationBuilder =
                 new ProcessConfigurationBuilder(
                         targetFilePath)
                     .SetArguments(argumentsBuilder.ToString())
-                    .SetOutputRedirectionMode(OutputRedirectionMode.Buffer)
-                    .EnableWindowCreation(false);
+                    .SetWorkingDirectory(workingDirectory)
+                    .SetOutputRedirectionMode(outputRedirectionMode)
+                    .EnableWindowCreation(enableWindowCreation);
 
             if (configureBuilder is not null)
                 configureBuilder.Invoke(processConfigurationBuilder);
