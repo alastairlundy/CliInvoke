@@ -30,7 +30,7 @@ public class ExternalProcess : IExternalProcess
     {
         Configuration = new ProcessConfiguration(targetFilePath);
         _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
-        ExitConfiguration = ProcessExitConfiguration.Graceful;
+        ExitConfiguration = ProcessExitConfiguration.CreateGraceful();
 
         _filePathResolver = filePathResolver;
 
