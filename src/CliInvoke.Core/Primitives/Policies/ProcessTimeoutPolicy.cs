@@ -22,7 +22,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         Enabled = true;
         TimeoutThreshold = TimeSpan.FromMinutes(10);
         TimeoutExitBehaviour = ProcessExitBehaviour.GracefulExit;
-        Enabled = true;
     }
 
     /// <summary>
