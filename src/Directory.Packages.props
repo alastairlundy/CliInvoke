@@ -8,9 +8,9 @@
     <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Polyfill" Version="10.1.1" />
-    <PackageVersion Include="DotExtensions" Version="10.2.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+    <PackageVersion Include="Polyfill" Version="10.3.0" />
+    <PackageVersion Include="DotExtensions" Version="10.2.1" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.6" />
   </ItemGroup>
   <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
     <!-- set CliInvokeCoreVersion in the workflow -->
