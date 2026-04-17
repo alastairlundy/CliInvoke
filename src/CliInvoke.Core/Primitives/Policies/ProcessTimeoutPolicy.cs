@@ -22,7 +22,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         Enabled = true;
         TimeoutThreshold = TimeSpan.FromMinutes(10);
         TimeoutExitBehaviour = ProcessExitBehaviour.GracefulExit;
-        Enabled = true;
     }
 
     /// <summary>
@@ -48,10 +47,10 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    ///     Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
+    ///     Instantiates a default ProcessTimeoutPolicy which times out after 10 minutes.
     /// </summary>
     public static ProcessTimeoutPolicy Default { get; } =
-        new(TimeSpan.FromMinutes(30), true);
+        new(TimeSpan.FromMinutes(10), true);
 
     /// <summary>
     ///     Disables waiting for Process Timeout.

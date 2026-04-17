@@ -28,6 +28,18 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="timeoutTimeSpan"></param>
+    public ProcessExitConfiguration(TimeSpan timeoutTimeSpan)
+    {
+        TimeoutPolicy = ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan);
+        RequestedCancellationExitBehaviour = ProcessExitBehaviour.GracefulExit;
+        CancellationThrowsException = false;
+        ExceptionBehaviour = ProcessExceptionBehaviour.AllowExceptionsIfUnexpected;
+    }
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="ProcessExitConfiguration" /> class with the
     ///     specified timeout policy and result validation.
     /// </summary>
@@ -45,51 +57,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         CancellationThrowsException = cancellationThrowsException;
         ExceptionBehaviour = exceptionBehaviour;
     }
-
-    /// <summary>
-    ///     Gets the <see cref="ProcessExitConfiguration" /> instance with graceful cancellation and exit,
-    ///     and the default timeout policy.
-    /// </summary>
-    public static ProcessExitConfiguration Graceful { get; } = new(ProcessTimeoutPolicy.Default,
-        cancellationThrowsException: true);
-
-    /// <summary>
-    ///     Gets the default <see cref="ProcessExitConfiguration" /> instance, which uses the default
-    ///     timeout policy, but suppresses the Exception from cancellation.
-    /// </summary>
-    public static ProcessExitConfiguration GracefulNoException { get; } = new(
-        ProcessTimeoutPolicy.Default, ProcessExitBehaviour.GracefulExit, 
-        ProcessExceptionBehaviour.SuppressExceptions);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public static ProcessExitConfiguration Forceful { get; } = new(
-        ProcessTimeoutPolicy.Default, ProcessExitBehaviour.ForcefulExit, 
-        ProcessExceptionBehaviour.AllowExceptions, true);
     
-    /// <summary>
-    /// 
-    /// </summary>
-    public static ProcessExitConfiguration ForcefulNoException { get; } = new(ProcessTimeoutPolicy.Default,
-        ProcessExitBehaviour.ForcefulExit, ProcessExceptionBehaviour.SuppressExceptions);
-
-    /// <summary>
-    /// Gets the <see cref="ProcessExitConfiguration" /> instance configured to wait indefinitely
-    /// for the process to exit without applying any timeout restrictions and with cancellation
-    /// throwing exceptions if cancellation is requested.
-    /// </summary>
-    public static ProcessExitConfiguration WaitForExit { get;  } = new(ProcessTimeoutPolicy.None,
-        ProcessExitBehaviour.WaitForExit, cancellationThrowsException: true);
-    
-    /// <summary>
-    ///     A <see cref="ProcessExitConfiguration" /> instance configured to have no timeout policy
-    /// and no exceptions on cancellation during a process termination.
-    /// </summary>
-    public static ProcessExitConfiguration WaitForExitNoException
-        => new(ProcessTimeoutPolicy.None, ProcessExitBehaviour.WaitForExit, 
-            ProcessExceptionBehaviour.SuppressExceptions);
-
     /// <summary>
     ///     Gets the timeout policy applied to the process.
     /// </summary>

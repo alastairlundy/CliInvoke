@@ -28,7 +28,7 @@ public class BasicUnbufferedInvokationBenchmark
         IProcessConfigurationBuilder processConfigurationBuilder = new ProcessConfigurationBuilder(
                 _dotnetCommandHelper.DotnetExecutableTargetFilePath)
             .SetArguments(_dotnetCommandHelper.Arguments)
-            .SetOutputRedirectionMode(OutputRedirectionMode.None);
+            .SetOutputRedirection(false);
 
         ProcessConfiguration configuration = processConfigurationBuilder.Build();
 

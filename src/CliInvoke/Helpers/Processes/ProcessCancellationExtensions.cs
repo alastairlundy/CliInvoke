@@ -71,25 +71,23 @@ internal static class ProcessCancellationExtensions
 
             try
             {
-                try
-                {
-                    await process.WaitForExitAsync(cancellationToken);
-                }
-                catch (OperationCanceledException)
-                {
-                    await process.GracefulInterruptCancellation(TimeSpan.Zero,
-                        processExitConfiguration, cancellationToken);
-                }
-                catch (Exception exception)
-                {
-                    // Recalculate values in exception handler to avoid using stale values
-                    DateTime currentExpectedExitTime =
-                        CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
-                    CancellationHelper.HandleCancellationExceptions(
-                        currentExpectedExitTime
-                        , CancellationReason.RequestedCancellation, processExitConfiguration,
-                        exception);
-                }
+                await process.WaitForExitAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                await process.GracefulInterruptCancellation(TimeSpan.Zero,
+                    processExitConfiguration, cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                // Recalculate values in exception handler to avoid using stale values
+                DateTime currentExpectedExitTime =
+                    CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
+                
+                CancellationHelper.HandleCancellationExceptions(
+                    currentExpectedExitTime
+                    , CancellationReason.RequestedCancellation, processExitConfiguration,
+                    exception);
             }
             finally
             {

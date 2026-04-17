@@ -58,7 +58,7 @@ internal static partial class UnixGracefulCancellation
                             cancellationToken);
                 });
 
-                bool sigIntSuccess = false;
+                bool sigIntSuccess;
 
                 try
                 {
@@ -121,10 +121,7 @@ internal static partial class UnixGracefulCancellation
                     if (exitConfiguration.TimeoutPolicy.TimeoutExitBehaviour ==
                         ProcessExitBehaviour.GracefulExit)
                     {
-                        if (!process.HasExited)
-                            return SendUnixSignal(process.Id, Sigint);
-
-                        return true;
+                        return process.HasExited || SendUnixSignal(process.Id, Sigint);
                     }
 
                     break;
@@ -137,16 +134,14 @@ internal static partial class UnixGracefulCancellation
                     {
                         if (!process.HasExited)
                             process.ForcefulExit();
+                        
                         return true;
                     }
 
                     if (exitConfiguration.RequestedCancellationExitBehaviour ==
                         ProcessExitBehaviour.GracefulExit)
                     {
-                        if (!process.HasExited)
-                            return SendUnixSignal(process.Id, Sigint);
-
-                        return true;
+                        return process.HasExited || SendUnixSignal(process.Id, Sigint);
                     }
 
                     break;

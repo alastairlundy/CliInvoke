@@ -84,7 +84,7 @@ public class CmdProcessInvoker : ProcessInvoker
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
-                    OutputRedirectionMode.None));
+                    false));
 
         return await base.ExecuteAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
@@ -130,8 +130,7 @@ public class CmdProcessInvoker : ProcessInvoker
         
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
-                    OutputRedirectionMode.None));
+                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput));
 
         return await base.ExecuteBufferedAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }
@@ -169,8 +168,7 @@ public class CmdProcessInvoker : ProcessInvoker
 
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
-                    OutputRedirectionMode.None));
+                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput));
 
         return await base.ExecutePipedAsync(runnerConfiguration, processExitConfiguration, cancellationToken);
     }

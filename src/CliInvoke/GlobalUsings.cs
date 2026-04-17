@@ -4,6 +4,7 @@ global using System;
 global using System.Collections.Generic;
 global using System.Diagnostics;
 global using System.Diagnostics.Contracts;
+global using System.Globalization;
 global using System.IO;
 global using System.Runtime.Versioning;
 global using System.Threading;
@@ -11,7 +12,7 @@ global using System.Threading.Tasks;
 
 global using CliInvoke.Core;
 global using CliInvoke.Core.Builders;
-global using CliInvoke.Exceptions;
+global using CliInvoke.Core.Exceptions;
 global using CliInvoke.Internal;
 global using CliInvoke.Internal.Localizations;
 

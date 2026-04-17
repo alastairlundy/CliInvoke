@@ -9,8 +9,6 @@
 
 using System.Linq;
 
-using CliInvoke.Extensions;
-
 using DotExtensions.Versions;
 
 namespace CliInvoke;
@@ -68,20 +66,20 @@ public class ShellDetector : IShellDetector
     {
         cancellationToken.Register(() => throw new TaskCanceledException());
 
-        using ProcessConfiguration execConfiguration = ProcessConfiguration
+        using ProcessConfiguration execConfiguration = ProcessConfigurationFactory
             .Create("ps", "-p $$ -o comm=");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
-            execConfiguration, ProcessExitConfiguration.Graceful, cancellationToken);
+            execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
         FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
             execResult.StandardOutput.Split(Environment.NewLine).First());
 
-        using ProcessConfiguration shellInfoProcessConfig = ProcessConfiguration
+        using ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
             .Create(shellExeInfo.FullName, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
-            shellInfoProcessConfig, ProcessExitConfiguration.Graceful, cancellationToken);
+            shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
         string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l =>
             l.ToLower().Contains("version") &&
@@ -107,12 +105,12 @@ public class ShellDetector : IShellDetector
         {
             FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
-            using ProcessConfiguration powershellConfig = ProcessConfiguration
+            using ProcessConfiguration powershellConfig = ProcessConfigurationFactory
                 .Create(powershell5PlusFileInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
                 powershellConfig,
-                ProcessExitConfiguration.Graceful, cancellationToken);
+                ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
             string[] powershellResults =
                 result.StandardOutput.Replace("v", string.Empty).Split(' ');
@@ -129,11 +127,11 @@ public class ShellDetector : IShellDetector
         {
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
-            using ProcessConfiguration cmdConfig = ProcessConfiguration
+            using ProcessConfiguration cmdConfig = ProcessConfigurationFactory
                 .Create(cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
-                ProcessExitConfiguration.Graceful, cancellationToken);
+                ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
             string line = result.StandardOutput.Split(Environment.NewLine).First();
 

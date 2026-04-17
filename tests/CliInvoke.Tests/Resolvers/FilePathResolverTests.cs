@@ -1,5 +1,4 @@
 using System.Linq;
-using CliInvoke.Extensions;
 
 namespace CliInvoke.Tests.Resolvers;
 
@@ -21,15 +20,15 @@ public class FilePathResolverTests
 
         if (OperatingSystem.IsWindows())
         {
-            string? winExpected = Environment.GetEnvironmentVariable("DOTNET_ROOT") + $"{Path.DirectorySeparatorChar}dotnet.exe";
+            string? winExpected = Environment.GetEnvironmentVariable("DOTNET_ROOT");
 
             if (winExpected is not null)
             {
-                expected = new FileInfo(winExpected);
+                expected = new FileInfo(Path.Combine(winExpected, "dotnet.exe"));
             }
             else
             {
-                using ProcessConfiguration configuration = ProcessConfiguration.Create("where", "dotnet.exe");
+                using ProcessConfiguration configuration = ProcessConfigurationFactory.Create("where", "dotnet.exe");
 
                 IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver);
 

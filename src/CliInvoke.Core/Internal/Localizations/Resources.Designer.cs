@@ -114,6 +114,24 @@ namespace CliInvoke.Core.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The executed process was not successful and returned an exit code of {x}..
+        /// </summary>
+        internal static string Exceptions_ProcessNotSuccessful_Generic {
+            get {
+                return ResourceManager.GetString("Exceptions.ProcessNotSuccessful.Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The executed process, with executable name of {x}, was not successful and returned an exit code of {y}..
+        /// </summary>
+        internal static string Exceptions_ProcessNotSuccessful_Specific {
+            get {
+                return ResourceManager.GetString("Exceptions.ProcessNotSuccessful.Specific", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Timeout threshold must be greater than or equal to zero. Value was {x}..
         /// </summary>
         internal static string Exceptions_ProcessTimeoutPolicy_Timeout_LessThanZero {

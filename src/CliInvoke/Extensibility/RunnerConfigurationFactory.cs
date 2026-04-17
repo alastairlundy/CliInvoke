@@ -29,8 +29,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
     [Pure]
     public ProcessConfiguration CreateRunnerConfiguration(
         ProcessConfiguration processConfigToBeRun,
-        ProcessConfiguration runnerProcessConfig
-    )
+        ProcessConfiguration runnerProcessConfig)
     {
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);

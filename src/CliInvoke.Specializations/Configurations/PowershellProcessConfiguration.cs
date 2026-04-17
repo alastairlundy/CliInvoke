@@ -35,7 +35,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// </summary>
     /// <param name="filePathResolver"></param>
     /// <param name="arguments">The arguments to be passed to the command.</param>
-    /// <param name="outputRedirectionMode"></param>
+    /// <param name="outputRedirection"></param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator"> Indicates whether the command requires administrator privileges.</param>
     /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
@@ -50,13 +50,13 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="redirectStandardInput"></param>
     public PowershellProcessConfiguration(IFilePathResolver filePathResolver,
         string arguments,
-        bool redirectStandardInput, OutputRedirectionMode outputRedirectionMode = OutputRedirectionMode.Buffer,
+        bool redirectStandardInput, bool outputRedirection = true,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
         Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("pwsh",arguments, redirectStandardInput, outputRedirectionMode,
+        bool useShellExecution = false, bool windowCreation = false) : base("pwsh",arguments, redirectStandardInput, outputRedirection,
         workingDirectoryPath, requiresAdministrator, environmentVariables, credentials, standardInput, standardInputEncoding, standardOutputEncoding,
         standardErrorEncoding, processResourcePolicy, windowCreation, useShellExecution)
     {

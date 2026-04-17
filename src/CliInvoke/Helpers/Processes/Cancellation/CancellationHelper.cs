@@ -9,6 +9,9 @@
 
 namespace CliInvoke.Helpers.Processes.Cancellation;
 
+/// <summary>
+/// 
+/// </summary>
 internal static class CancellationHelper
 {
     /// <summary>
@@ -64,11 +67,8 @@ internal static class CancellationHelper
         {
             case CancellationReason.RequestedCancellation:
             {
-                if (exitConfiguration.ExceptionBehaviour
-                    == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
-                            .ExceptionBehaviour
-                        == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
-                        difference > TimeSpan.FromSeconds(10)))
+                if (exitConfiguration.ExceptionBehaviour is ProcessExceptionBehaviour
+                        .AllowExceptions)
                     throw exception;
 
                 break;

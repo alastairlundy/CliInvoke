@@ -30,7 +30,7 @@ public class ExternalProcess : IExternalProcess
     {
         Configuration = new ProcessConfiguration(targetFilePath);
         _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
-        ExitConfiguration = ProcessExitConfiguration.Graceful;
+        ExitConfiguration = ProcessExitConfiguration.CreateGraceful();
 
         _filePathResolver = filePathResolver;
 
@@ -46,10 +46,27 @@ public class ExternalProcess : IExternalProcess
         ProcessExitConfiguration? exitConfiguration = null)
     {
         _filePathResolver = FilePathResolver.Shared;
-        
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
-        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.Graceful;
+        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
+
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePathResolver"></param>
+    /// <param name="configuration"></param>
+    /// <param name="exitConfiguration"></param>
+    public ExternalProcess(IFilePathResolver filePathResolver, ProcessConfiguration configuration,
+        ProcessExitConfiguration? exitConfiguration = null)
+    {
+        _filePathResolver = filePathResolver;
+        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        Configuration = configuration;
+        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
 
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
@@ -198,11 +215,11 @@ public class ExternalProcess : IExternalProcess
     public async Task<BufferedProcessResult> CaptureBufferedResultAsync(
         CancellationToken cancellationToken)
     {
-        Task<string> standardOutputString = Configuration.OutputRedirection == OutputRedirectionMode.Buffer
+        Task<string> standardOutputString = Configuration.OutputRedirection
             ? _processWrapper.StandardOutput.ReadToEndAsync(cancellationToken)
             : Task.FromResult(string.Empty);
 
-        Task<string> standardErrorString = Configuration.OutputRedirection == OutputRedirectionMode.Buffer
+        Task<string> standardErrorString = Configuration.OutputRedirection
             ? _processWrapper.StandardError.ReadToEndAsync(cancellationToken)
             : Task.FromResult(string.Empty);
 
@@ -237,11 +254,11 @@ public class ExternalProcess : IExternalProcess
     public async Task<PipedProcessResult> CapturePipedResultAsync(
         CancellationToken cancellationToken)
     {
-        Task<Stream> standardOutputStream = Configuration.OutputRedirection == OutputRedirectionMode.Pipe
+        Task<Stream> standardOutputStream = Configuration.OutputRedirection
             ? _processWrapper.PipeStandardOutputAsync(cancellationToken)
             : (Task<Stream>)Task.CompletedTask;
 
-        Task<Stream> standardErrorStream = Configuration.OutputRedirection == OutputRedirectionMode.Pipe
+        Task<Stream> standardErrorStream = Configuration.OutputRedirection
             ? _processWrapper.PipeStandardErrorAsync(cancellationToken)
             : (Task<Stream>)Task.CompletedTask;
 
