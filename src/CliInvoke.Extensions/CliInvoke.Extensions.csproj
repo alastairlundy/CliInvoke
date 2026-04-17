@@ -9,15 +9,16 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>3.0.0-alpha.1</Version>
+        <Version>3.0.0-alpha.2</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 3.0.0 Alpha 1 and CliInvoke 3.0.0 Alpha 1
-* Removed registration of ``IProcessConfigurationFactory`` and ``ProcessConfigurationFactory``</PackageReleaseNotes>
+        <PackageReleaseNotes>### Changed
+- **DependencyInjectionExtensions improvements** – refined how extensions integrate with Core package updates
+- **ProcessTimeoutPolicy alignment** – updated to reflect Core package changes</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -83,9 +84,5 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Invokation\" />
     </ItemGroup>
 </Project>
