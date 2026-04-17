@@ -29,7 +29,7 @@ public class FilePathResolverTests
             }
             else
             {
-                using ProcessConfiguration configuration = ProcessConfiguration.Create("where", "dotnet.exe");
+                using ProcessConfiguration configuration = ProcessConfigurationFactory.Create("where", "dotnet.exe");
 
                 IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver);
 

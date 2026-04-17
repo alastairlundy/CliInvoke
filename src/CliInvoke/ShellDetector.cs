@@ -66,7 +66,7 @@ public class ShellDetector : IShellDetector
     {
         cancellationToken.Register(() => throw new TaskCanceledException());
 
-        using ProcessConfiguration execConfiguration = ProcessConfiguration
+        using ProcessConfiguration execConfiguration = ProcessConfigurationFactory
             .Create("ps", "-p $$ -o comm=");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
@@ -75,7 +75,7 @@ public class ShellDetector : IShellDetector
         FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
             execResult.StandardOutput.Split(Environment.NewLine).First());
 
-        using ProcessConfiguration shellInfoProcessConfig = ProcessConfiguration
+        using ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
             .Create(shellExeInfo.FullName, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
@@ -105,7 +105,7 @@ public class ShellDetector : IShellDetector
         {
             FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
-            using ProcessConfiguration powershellConfig = ProcessConfiguration
+            using ProcessConfiguration powershellConfig = ProcessConfigurationFactory
                 .Create(powershell5PlusFileInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
@@ -127,7 +127,7 @@ public class ShellDetector : IShellDetector
         {
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
-            using ProcessConfiguration cmdConfig = ProcessConfiguration
+            using ProcessConfiguration cmdConfig = ProcessConfigurationFactory
                 .Create(cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
