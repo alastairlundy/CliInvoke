@@ -88,107 +88,32 @@ CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some
 
 For more details see the [list of supported platforms](docs/docs/Supported-OperatingSystems.md)
 
-## Getting started
+## Getting Started
 
-Install the packages you need (example: implementation and DI extensions):
-
-```bash
-dotnet add package CliInvoke
-dotnet add package CliInvoke.Extensions
-```
-
-Minimal Program.cs (console app) — registers services, builds a simple process configuration, and runs it buffered:
+Run a simple command with the quick‑start friendly/beginner freindly ``CliRun`` helper:
 
 ```csharp
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using CliInvoke;
 using CliInvoke.Core;
 
-class Program
-{
-    static async Task Main()
-    {
-        var services = new ServiceCollection();
-        services.AddCliInvoke(); // from CliInvoke.Extensions
-        var provider = services.BuildServiceProvider();
+using System;
 
-        var invoker = provider.GetRequiredService<IProcessInvoker>();
+ProcessResult result = await CliRun.RunAsync("dotnet", "--info");
 
-        // Create a simple configuration (adjust path/args for your OS)
-        var config = ProcessConfiguration.Create("dotnet", "--info");
-
-        // Run and get buffered output
-        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config, CancellationToken.None);
-
-        Console.WriteLine($"ExitCode: {result.ExitCode}");
-        Console.WriteLine("Stdout:");
-        Console.WriteLine(result.StandardOutput);
-        Console.WriteLine("Stderr:");
-        Console.WriteLine(result.StandardError);
-    }
+Console.WriteLine($"ExitCode: {result.ExitCode}");
+Console.WriteLine(result.StandardOutput);
 }
 ```
 
-Notes
-
-- Replace "dotnet --info" with the executable and arguments you need for your platform.
-- For non‑buffered/streaming scenarios, use ExecuteAsync/ExecuteBufferedAsync variants and builder options to redirect
-  streams instead of buffering everything in memory.
+The `RunAsync` helper uses `ProcessConfiguration.Create` internally and provides a faster path from declaration to Process running.
 
 ## Examples
 
-### Simple ``ProcessConfiguration`` creation with Factory Pattern
 
-This approach uses the ``IProcessConfigurationFactory`` interface factory to create a ``ProcessConfiguration``. It
-requires fewer parameters and sets up more defaults for you.
+### Advanced Usage (Optional)
 
-It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is
-desired.
+The builder pattern and factory interface are advanced features intended for developers needing fine‑grained control of process configuration. For most scenarios a simple quick‑start approach is sufficient. See the quick‑start examples for typical usage.
 
-#### Non-Buffered Execution Example
-
-This example gets a non buffered ``ProcessResult`` that contains basic process exit code, ID, and other information.
-
-```csharp
-using CliInvoke.Core;
-
-using Microsoft.Extensions.DependencyInjection;
-
-// Dependency Injection setup code omitted for clarity
-
- // Get services 
- var invoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-
- // Simply create the process configuration.
- using ProcessConfiguration configuration = ProcessConfiguration.Create("path/to/exe", "arguments");
-
- // Run the process configuration and get the results.
- ProcessResult result = await invoker.ExecuteAsync(configuration, CancellationToken.None);
-```
-
-#### Buffered Execution Example
-
-This example gets a ``BufferedProcessResult`` which contains redirected Standard Output and Standard Error as strings.
-
-```csharp
-using CliInvoke.Core;
-
-using Microsoft.Extensions.DependencyInjection;
-
-// Dependency Injection setup code omitted for clarity
-
- // Get services 
- var invoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-
- // Simply create the process configuration.
- using ProcessConfiguration configuration = ProcessConfiguration.Create("path/to/exe", "arguments");
-
- // Run the process configuration and get the results.
- BufferedProcessResult result = await invoker.ExecuteBufferedAsync(configuration, CancellationToken.None);
-```
 
 ### Advanced Configuration with Builders
 
