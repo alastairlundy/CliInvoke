@@ -5,7 +5,9 @@ internal class NullReturningFormattable : IFormattable
 {
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
-        return null!;
+#pragma warning disable CS8603 // Possible null reference return.
+        return null;
+#pragma warning restore CS8603 // Possible null reference return.
     }
 
     public override string ToString()
