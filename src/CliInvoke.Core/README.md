@@ -65,6 +65,14 @@ CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some
 For more details see
 the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/Supported-OperatingSystems.md)
 
+## Design Patterns & When to Use Them
+
+CliInvoke.Core provides abstractions and types used by different design patterns. For comprehensive documentation on design patterns, see [PATTERNS.md](../../PATTERNS.md).
+
+* **`CliRun`** – Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. (Requires `CliInvoke` package)
+* **`IProcessInvoker`** – DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
+* **`ExternalProcess` & `ExternalProcessFactory`** – Process-like API with greater flexibility. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
+
 ## Examples
 
 ### Simple ``ProcessConfiguration`` creation with Factory Pattern
@@ -193,6 +201,114 @@ using Microsoft.Extensions.DependencyInjection;
   
   // Execute the process through ProcessInvoker and get the results.
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
+```
+
+#### Cancellation and Timeout
+
+CliInvoke provides flexible timeout and cancellation support for process execution. By default, processes have a **30-minute timeout** with graceful exit behavior.
+
+##### Default Timeout Policy
+
+The default timeout policy is applied when creating a `ProcessExitConfiguration` without explicit parameters:
+
+```csharp
+using CliInvoke.Core;
+
+// Default ProcessExitConfiguration has 30-minute timeout with graceful exit
+ProcessExitConfiguration exitConfig = new ProcessExitConfiguration();
+ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
+```
+
+##### Custom Timeout Configuration
+
+You can customize the timeout by creating a `ProcessExitConfiguration` with a `ProcessTimeoutPolicy`:
+
+```csharp
+using CliInvoke.Core;
+
+// Create a custom timeout policy (5-minute timeout with graceful exit)
+ProcessTimeoutPolicy customTimeout = ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(5));
+ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(customTimeout);
+
+// Execute with custom timeout
+ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
+```
+
+##### Cancellation Support
+
+Cancel process execution using a `CancellationToken`:
+
+```csharp
+using CliInvoke.Core;
+using System.Threading;
+
+CancellationTokenSource cts = new CancellationTokenSource();
+
+// Cancel after 30 seconds
+cts.CancelAfter(TimeSpan.FromSeconds(30));
+
+try
+{
+    ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
+    ProcessResult result = await invoker.ExecuteAsync(config, exitConfig, cts.Token);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("Process was cancelled");
+}
+```
+
+##### Graceful vs Forceful Cancellation
+
+CliInvoke supports two cancellation strategies, controlled via `ProcessExitBehaviour`:
+
+* **Graceful Exit** (default) – Sends SIGTERM/SIGINT signals to allow the process to shut down cleanly and release resources. The process has an opportunity to handle the signal and exit gracefully.
+* **Forceful Exit** – Forcefully terminates the process and all child processes immediately without waiting for graceful shutdown.
+
+You can configure the cancellation behavior when a timeout occurs or when cancellation is requested:
+
+```csharp
+using CliInvoke.Core;
+
+// Configure forceful exit on timeout (immediate termination)
+ProcessTimeoutPolicy forcefulTimeout = new ProcessTimeoutPolicy(
+    timeoutThreshold: TimeSpan.FromSeconds(30), 
+    enabled: true, 
+    exitBehaviour: ProcessExitBehaviour.ForcefulExit);
+
+ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(forcefulTimeout);
+```
+
+##### Cancellation Exception Behavior
+
+By default, cancellations do not throw exceptions—the process simply exits and a result is returned. You can change this behavior with `CancellationThrowsException`:
+
+```csharp
+using CliInvoke.Core;
+
+// Configure to throw an exception on cancellation
+ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(
+    timeoutPolicy: ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
+    requestedCancellationExitBehaviour: ProcessExitBehaviour.GracefulExit,
+    cancellationThrowsException: true);
+
+try
+{
+    ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("Process was cancelled and exception was thrown");
+}
+```
+
+##### Disable Timeout
+
+To disable the timeout entirely, use `ProcessTimeoutPolicy.None`:
+
+```csharp
+ProcessExitConfiguration noTimeout = new ProcessExitConfiguration(ProcessTimeoutPolicy.None);
+// Process will wait indefinitely for completion
 ```
 
 ## Acknowledgements

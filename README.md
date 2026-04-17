@@ -88,34 +88,49 @@ CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some
 
 For more details see the [list of supported platforms](docs/docs/Supported-OperatingSystems.md)
 
-## Getting Started
+## Design Patterns & When to Use Them
 
-Run a simple command with the quick‑start friendly/beginner freindly ``CliRun`` helper:
+CliInvoke provides three distinct design patterns for invoking processes. See [PATTERNS.md](PATTERNS.md) for comprehensive documentation on each pattern.
+
+* **`CliRun`** – Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults.
+* **`IProcessInvoker`** – DI-centric pattern and support for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
+* **`IExternalProcess` & `IExternalProcessFactory`** – Process-like API with DI support, rich capability, stable and predictable behaviour. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
+
+## Examples
+
+### Beginner Friendly / Quickstart
+
+For simple use cases, the `CliRun` helper provides a straightforward API to execute commands with minimal boilerplate:
 
 ```csharp
 using CliInvoke;
 using CliInvoke.Core;
 
-using System;
-
-ProcessResult result = await CliRun.RunAsync("dotnet", "--info");
-
-Console.WriteLine($"ExitCode: {result.ExitCode}");
-Console.WriteLine(result.StandardOutput);
-}
+// Execute a command and get the result
+ProcessResult result = await CliRun.RunAsync("dotnet", "--version");
+Console.WriteLine($"Exit Code: {result.ExitCode}");
 ```
 
-The `RunAsync` helper uses `ProcessConfiguration.Create` internally and provides a faster path from declaration to Process running.
+For capturing output, use `RunBufferedAsync`:
 
-## Examples
+```csharp
+using CliInvoke;
+using CliInvoke.Core;
 
+// Execute and capture stdout/stderr
+BufferedProcessResult result = await CliRun.RunBufferedAsync("dotnet", "--info");
+Console.WriteLine(result.StandardOutput);
+Console.WriteLine(result.StandardError);
+```
 
-### Advanced Usage (Optional)
+`CliRun` is ideal for scripting, quick prototypes, and basic command execution where you don't need dependency injection or advanced configuration.
 
-The builder pattern and factory interface are advanced features intended for developers needing fine‑grained control of process configuration. For most scenarios a simple quick‑start approach is sufficient. See the quick‑start examples for typical usage.
-
+For detailed documentation on all available patterns and when to use them, see [PATTERNS.md](PATTERNS.md).
 
 ### Advanced Configuration with Builders
+CliInvoke features several builder interfaces with advanced features intended for developers needing fine‑grained control of process configuration. For most common scenarios creating a ``ProcessConfiguration`` directly or using the static ``ProcessConfigurationFactory`` is sufficient.
+
+These examples use ``IProcessInvoker`` but the ``IExternalProcess`` and ``IExternalProcessFactory`` pattern can be used instead as they both work with ``ProcessConfiguration`` objects.
 
 The following examples show how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the
 output is desired.
@@ -165,8 +180,7 @@ using CliInvoke.Core.Builders;
 using Microsoft.Extensions.DependencyInjection;
 
 
-  //Namespace and class code ommitted for clarity 
-
+  //Namespace and class code ommitted for clarity
   // ServiceProvider and Dependency Injection setup code ommitted for clarity
   
   IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
@@ -183,6 +197,123 @@ using Microsoft.Extensions.DependencyInjection;
   
   // Execute the process through ProcessInvoker and get the results.
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
+```
+
+### Cancellation and Timeout
+CliInvoke provides flexible timeout and cancellation support for process execution. By default, processes have a **10-minute timeout** with graceful exit behaviour.
+
+#### Default Timeout Policy
+
+The default timeout policy is used without explicit configuration:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Core;
+
+// Uses the default timeout with graceful exit
+ProcessResult result = await CliRun.RunAsync("dotnet", "build");
+```
+
+#### Custom Timeout Configuration
+
+You can customize the timeout by creating a `ProcessExitConfiguration` with a `ProcessTimeoutPolicy`:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Core;
+using CliInvoke.Builders;
+
+// Create a custom timeout policy (5-minute timeout with graceful exit)
+ProcessTimeoutPolicy customTimeout = ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(5));
+ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(customTimeout);
+
+IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("dotnet")
+    .SetArguments(["build"]);
+
+ProcessConfiguration config = builder.Build();
+
+// Execute with custom timeout
+IProcessInvoker invoker = new ProcessInvoker(FilePathResolver.Shared);
+ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
+```
+
+#### Disable Timeout
+
+To disable the timeout entirely, use `ProcessTimeoutPolicy.None`:
+
+```csharp
+ProcessExitConfiguration noTimeout = new ProcessExitConfiguration(ProcessTimeoutPolicy.None);
+// Process will wait indefinitely for completion
+```
+
+#### Cancellation Support
+Cancel process execution using a `CancellationToken`:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Core;
+using System.Threading;
+
+CancellationTokenSource cts = new CancellationTokenSource();
+
+// Cancel after 30 seconds
+cts.CancelAfter(TimeSpan.FromSeconds(30));
+
+try
+{
+    ProcessResult result = await CliRun.RunAsync("dotnet", "build", 
+        cancellationToken: cts.Token);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("Process was cancelled");
+}
+```
+
+##### Graceful vs Forceful Cancellation
+
+CliInvoke supports two cancellation strategies, controlled via `ProcessExitBehaviour`:
+
+* **Graceful Exit** (default) – Sends SIGTERM/SIGINT signals to allow the process to shut down cleanly and release resources. The process has an opportunity to handle the signal and exit gracefully.
+* **Forceful Exit** – Forcefully terminates the process and all child processes immediately without waiting for graceful shutdown.
+
+You can configure the cancellation behavior when a timeout occurs or when cancellation is requested:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Core;
+
+// Configure forceful exit on timeout (immediate termination)
+ProcessTimeoutPolicy forcefulTimeout = new ProcessTimeoutPolicy(
+    timeoutThreshold: TimeSpan.FromSeconds(30), 
+    enabled: true, 
+    exitBehaviour: ProcessExitBehaviour.ForcefulExit);
+
+ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(forcefulTimeout);
+```
+
+##### Cancellation Exception Behavior
+
+By default, cancellations do not throw exceptions—the process simply exits and a result is returned. You can change this behavior with `CancellationThrowsException`:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Core;
+
+// Configure to throw an exception on cancellation
+ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(
+    timeoutPolicy: ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
+    requestedCancellationExitBehaviour: ProcessExitBehaviour.GracefulExit,
+    cancellationThrowsException: true);
+
+try
+{
+    ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("Process was cancelled and exception was thrown");
+}
 ```
 
 ## How to Build CliInvoke's code
