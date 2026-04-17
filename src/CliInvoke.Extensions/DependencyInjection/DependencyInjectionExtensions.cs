@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Builders;
+using CliInvoke.Core.Builders;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility;
 using CliInvoke.Factories;
@@ -43,6 +45,8 @@ public static class DependencyInjectionExtensions
                     new ProcessResultValidator<PipedProcessResult>(
                         [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
 
+                services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
+                
                 services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddSingleton<IProcessInvoker, ProcessInvoker>();
 
@@ -60,6 +64,8 @@ public static class DependencyInjectionExtensions
                     new ProcessResultValidator<PipedProcessResult>(
                         [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
 
+                services.AddScoped<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
+
                 services.AddScoped<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddScoped<IProcessInvoker, ProcessInvoker>();
 
@@ -67,6 +73,7 @@ public static class DependencyInjectionExtensions
                 services.AddScoped<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Transient:
+                
                 services.TryAddTransient<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
@@ -76,6 +83,8 @@ public static class DependencyInjectionExtensions
                 services.TryAddTransient<IProcessResultValidator<PipedProcessResult>>(_ =>
                     new ProcessResultValidator<PipedProcessResult>(
                         [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
+
+                services.AddTransient<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
 
                 services.AddTransient<IExternalProcessFactory, ExternalProcessFactory>();
                 services.AddTransient<IProcessInvoker, ProcessInvoker>();
