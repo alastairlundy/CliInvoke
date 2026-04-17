@@ -1,5 +1,4 @@
 using System.Linq;
-using CliInvoke.Extensions;
 
 namespace CliInvoke.Tests.Resolvers;
 

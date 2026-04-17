@@ -1,4 +1,3 @@
-using CliInvoke.Extensions;
 using CliInvoke.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,7 +19,7 @@ public class ProcessInvokerTests
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         // A real file path is required here to avoid throwing FileNotFoundException.
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create(ProcessTestHelper.GetTargetFilePath());
+        ProcessConfiguration config = ProcessConfigurationFactory.Create(ProcessTestHelper.GetTargetFilePath());
 
         config.TargetFilePath = " ";
 
@@ -33,7 +32,7 @@ public class ProcessInvokerTests
     {
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create("FAKE/PATH");
+        ProcessConfiguration config = ProcessConfigurationFactory.Create("FAKE/PATH");
 
         config.TargetFilePath = string.Empty;
 
@@ -46,7 +45,7 @@ public class ProcessInvokerTests
     {
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create("FAKE.FILE");
+        ProcessConfiguration config = ProcessConfigurationFactory.Create("FAKE.FILE");
 
         await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.CreateGraceful(), cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();

@@ -107,7 +107,9 @@ public class ArgumentsBuilderTests
 
         IArgumentsBuilder result = builder.AddRange(values);
 
-        string expected = @"""1 2""";
+        string expected = """
+                          "1 2"
+                          """;
 
         await Assert.That(result.ToString()).IsEqualTo(expected);
     }

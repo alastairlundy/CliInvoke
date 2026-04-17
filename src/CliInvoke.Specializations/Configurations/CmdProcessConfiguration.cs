@@ -33,7 +33,6 @@ public class CmdProcessConfiguration : ProcessConfiguration
     ///     Initializes a new instance of the CmdCommandConfiguration class.
     /// </summary>
     /// <param name="arguments">The arguments to be passed to the command.</param>
-    /// <param name="outputRedirectionMode"></param>
     /// <param name="outputRedirection"></param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator">
