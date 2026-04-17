@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -86,7 +87,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddRange((IEnumerable<string>)null!)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddRange(Enumerable.Empty<string>())).Throws<ArgumentNullException>();
     }
 
     [Test]
@@ -103,7 +104,7 @@ public class ArgumentsBuilderTests
     public async Task AddEnumerable_IFormattable_JoinsValues()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
-        IFormattable[] values = { 1, 2 };
+        IFormattable[] values = [1, 2];
 
         IArgumentsBuilder result = builder.AddRange(values);
 
@@ -119,7 +120,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddRange((IEnumerable<string>)null)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddRange(Enumerable.Empty<string>())).Throws<ArgumentNullException>();
     }
 
     [Test]
