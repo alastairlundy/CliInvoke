@@ -316,6 +316,154 @@ catch (OperationCanceledException)
 }
 ```
 
+## Resource Cleanup
+
+CliInvoke uses several types that manage unmanaged resources and should be disposed after use. This section explains disposal patterns for the key artifacts:
+
+### ProcessConfiguration
+
+**Why**: Holds unmanaged resources including `StandardInput` (a `StreamWriter`) and optionally a `SecureString` credential that contain sensitive data.
+
+**Who**: The caller owns the `ProcessConfiguration` instance and is responsible for disposal.
+
+**When**: After the process has finished and the configuration is no longer needed.
+
+**How**: Use a `using` statement or explicit `Dispose()`:
+
+```csharp
+using var config = new ProcessConfiguration("cmd", "/c echo hello");
+await invoker.ExecuteAsync(config);
+// Disposed automatically when exiting the using block
+```
+
+### IExternalProcess
+
+**Why**: Wraps an underlying `System.Diagnostics.Process` which owns OS resources (pipes, handles, threads).
+
+**Who**: The caller who receives or creates the external process instance.
+
+**When**: Immediately after `CaptureBufferedResultAsync()` completes or when monitoring is complete.
+
+**How**: Use `await using` in async contexts:
+
+```csharp
+await using var process = invoker.StartAsync(config);
+var result = await process.CaptureBufferedResultAsync(cancellationToken);
+// Process is disposed automatically
+```
+
+Alternatively, call `Dispose()` explicitly:
+
+```csharp
+var process = invoker.StartAsync(config);
+try
+{
+    var result = await process.CaptureBufferedResultAsync(cancellationToken);
+}
+finally
+{
+    process.Dispose();
+}
+```
+
+### PipedProcessResult
+
+**Why**: Holds `StandardOutput` and `StandardError` streams that own OS resources and buffered data, which must be released.
+
+**Who**: The caller who receives the result from `CapturePipedResultAsync()`.
+
+**When**: After reading from the streams and before the application exits or the result is no longer needed.
+
+**How**: Use `await using` for async disposal (preferred on .NET 8+) or `using` for sync disposal:
+
+```csharp
+await using var result = await process.CapturePipedResultAsync(cancellationToken);
+using (var reader = new StreamReader(result.StandardOutput))
+{
+    string output = await reader.ReadToEndAsync();
+    // Use output...
+}
+// Streams are disposed automatically
+```
+
+Alternatively, call `Dispose()` explicitly:
+
+```csharp
+var result = await process.CapturePipedResultAsync(cancellationToken);
+try
+{
+    using (var reader = new StreamReader(result.StandardOutput))
+    {
+        string output = await reader.ReadToEndAsync();
+    }
+}
+finally
+{
+    result.Dispose();
+}
+```
+
+### UserCredential
+
+**Why**: Holds a `SecureString` containing a password, which is sensitive data that should be cleared from memory.
+
+**Who**: Shared responsibility — the library disposes the credential when the configuration is disposed. For standalone credentials, the caller is responsible.
+
+**When**: After the credential is no longer needed or when the parent configuration is disposed.
+
+**How**: Dispose directly or via the parent `ProcessConfiguration`:
+
+```csharp
+using var credential = new UserCredential("domain", "user", securePassword, false);
+// Use credential...
+// Disposed automatically; SecureString is cleared from memory
+```
+
+Or, rely on automatic disposal through the configuration:
+
+```csharp
+var config = new ProcessConfiguration("cmd", "/c echo hello");
+config.Credential = credential;
+using (config)
+{
+    // Use configuration; credential is disposed when config is disposed
+}
+```
+
+### UserCredentialBuilder
+
+**Why**: Holds a `SecureString` while building a credential, which owns sensitive data.
+
+**Who**: The caller who creates and uses the builder.
+
+**When**: Immediately after calling `Build()` if the builder is not needed for further mutations.
+
+**How**: Dispose both builder and built credential:
+
+```csharp
+UserCredential credential;
+using (var builder = new UserCredentialBuilder())
+{
+    credential = builder
+        .SetUsername("user")
+        .SetPassword(securePassword)
+        .Build();
+}
+// builder disposed; now dispose the credential
+using (credential)
+{
+    // Use credential...
+}
+```
+
+#### Common Disposal Tips
+
+* Prefer `await using` for `IExternalProcess` and `PipedProcessResult` in async contexts to ensure cleanup.
+* Never dispose a `StandardInput`, `StandardOutput`, `StandardError`, or `SecureString` twice — the library handles it when owning the resources.
+* If you reuse a `ProcessConfiguration` multiple times, call `Dispose()` manually after the final use.
+* Wrap builders and built credentials in `using` statements to ensure `SecureString` cleanup.
+* Only these five types require explicit disposal: `ProcessConfiguration`, `IExternalProcess`, `UserCredential`, `UserCredentialBuilder`, and `PipedProcessResult`. Other CliInvoke types do not implement `IDisposable`.
+
 ## How to Build CliInvoke's code
 
 Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
