@@ -38,7 +38,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         _argumentValidationLogic = ArgumentValidationLogic;
     }
 
-    private bool ArgumentValidationLogic(string arg)
+    private static bool ArgumentValidationLogic(string arg)
     {
         try
         {
