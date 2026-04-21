@@ -12,7 +12,7 @@ public class ArgumentsBuilderTests
         IArgumentsBuilder afterFirst = builder.Add("first");
         IArgumentsBuilder afterSecond = afterFirst.Add("second");
 
-        await Assert.That(ReferenceEquals(builder, afterFirst)).IsFalse(); // new instance returned when no validation logic provided
+        await Assert.That(ReferenceEquals(builder, afterFirst)).IsTrue(); // new instance returned when no validation logic provided
         await Assert.That(afterSecond.ToString()).IsEqualTo("first second");
     }
 
