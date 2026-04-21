@@ -109,6 +109,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder AddRange(IEnumerable<string> values)
     {
         ArgumentNullException.ThrowIfNull(values);
+
+        if (!values.Any())
+            throw new ArgumentNullException(nameof(values));
         
         // Do not escape individual values here when escaping is requested to avoid double-escaping.
         // Instead, join the raw values and perform escaping once at the final Add call.
@@ -152,6 +155,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder AddRange(IEnumerable<IFormattable> values)
     { 
         ArgumentNullException.ThrowIfNull(values);
+
+        if (!values.Any())
+            throw new ArgumentNullException(nameof(values));
 
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(null, 
             _formatProvider));
