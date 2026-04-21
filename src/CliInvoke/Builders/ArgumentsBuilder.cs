@@ -84,7 +84,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(value);
         
-        if (!IsValidArgument(value, _formatProvider))
+        if (!IsValidArgument(value))
+            throw new ArgumentNullException(nameof(value));
 
         if (_buffer.Length is > 0 and < int.MaxValue)
             // Add a space if it's missing before adding the new string.
