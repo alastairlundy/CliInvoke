@@ -179,9 +179,6 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
         StringBuilder stringBuilder = new();
 
-        if (!argument.StartsWith('"'))
-            stringBuilder.Append('"');
-
         foreach (char c in argument)
             switch (c)
             {
@@ -204,9 +201,6 @@ public class ArgumentsBuilder : IArgumentsBuilder
                     break;
             }
 
-        if (!argument.EndsWith('"'))
-            stringBuilder.Append('"');
-
         return stringBuilder.ToString();
     }
 
@@ -225,5 +219,5 @@ public class ArgumentsBuilder : IArgumentsBuilder
         =>  _argumentValidationLogic.Invoke(value.ToString(null, provider));
     
     private bool IsValidArgument(string value, IFormatProvider provider) 
-        =>  _argumentValidationLogic.Invoke(value.ToString(provider));
+        =>  _argumentValidationLogic.Invoke(value);
 }
