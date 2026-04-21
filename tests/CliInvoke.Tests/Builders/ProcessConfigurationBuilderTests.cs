@@ -100,7 +100,7 @@ public class ProcessConfigurationBuilderTests
         password.AppendChar('4');
 
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-            .SetUserCredential(new UserCredential("",
+            .SetUserCredential(new UserCredential(null,
                 "admin",
                 password,
                 false));
@@ -112,7 +112,7 @@ public class ProcessConfigurationBuilderTests
         password2.AppendChar('7');
         password2.AppendChar('6');
 
-        UserCredential userCredential = new UserCredential("",
+        UserCredential userCredential = new UserCredential(null,
             "root",
             password2,
             false);
@@ -169,7 +169,7 @@ public class ProcessConfigurationBuilderTests
     {
         //Act
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-            .SetWorkingDirectory("dir");
+            .SetWorkingDirectory(DirectoryInfo.GetRandomDirectory().FullName);
 
         //Arrange
         processConfigBuilder = processConfigBuilder.SetWorkingDirectory("dir2");
