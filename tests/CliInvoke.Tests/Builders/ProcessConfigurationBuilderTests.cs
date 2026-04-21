@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
+using DotExtensions.IO;
 
 namespace CliInvoke.Tests.Builders;
 
