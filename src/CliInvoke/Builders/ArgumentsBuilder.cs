@@ -220,6 +220,6 @@ public class ArgumentsBuilder : IArgumentsBuilder
     private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
         =>  _argumentValidationLogic.Invoke(value.ToString(null, provider));
     
-    private bool IsValidArgument(string value, IFormatProvider provider) 
+    private bool IsValidArgument(string value) 
         =>  _argumentValidationLogic.Invoke(value);
 }
