@@ -83,8 +83,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder Add(string value)
     {
         ArgumentNullException.ThrowIfNull(value);
-
-        if (! _argumentValidationLogic.Invoke(value)) return this;
+        
+        if (!IsValidArgument(value, _formatProvider))
 
         if (_buffer.Length is > 0 and < int.MaxValue)
             // Add a space if it's missing before adding the new string.
@@ -109,7 +109,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder AddRange(IEnumerable<string> values)
     {
         ArgumentNullException.ThrowIfNull(values);
-
+        
         // Do not escape individual values here when escaping is requested to avoid double-escaping.
         // Instead, join the raw values and perform escaping once at the final Add call.
         IEnumerable<string> filtered = values.Where(x =>  _argumentValidationLogic.Invoke(x));
@@ -217,4 +217,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     
     private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
         =>  _argumentValidationLogic.Invoke(value.ToString(null, provider));
+    
+    private bool IsValidArgument(string value, IFormatProvider provider) 
+        =>  _argumentValidationLogic.Invoke(value.ToString(provider));
 }
