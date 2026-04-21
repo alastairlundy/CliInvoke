@@ -35,6 +35,7 @@ public static class DependencyInjectionExtensions
         switch (lifetime)
         {
             case ServiceLifetime.Singleton:
+                services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
                 services.TryAddSingleton<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
@@ -54,6 +55,7 @@ public static class DependencyInjectionExtensions
                 services.AddSingleton<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Scoped:
+                services.TryAddScoped<IFilePathResolver, FilePathResolver>();
                 services.TryAddScoped<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
@@ -73,7 +75,7 @@ public static class DependencyInjectionExtensions
                 services.AddScoped<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Transient:
-                
+                services.TryAddTransient<IFilePathResolver, FilePathResolver>();
                 services.TryAddTransient<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
