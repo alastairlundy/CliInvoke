@@ -62,7 +62,7 @@ public class ArgumentsBuilderTests
 
         IArgumentsBuilder result = builder.Add("ok");
 
-        await Assert.That(ReferenceEquals(builder, result)).IsFalse();
+        await Assert.That(ReferenceEquals(builder, result)).IsTrue();
         await Assert.That(builder.ToString()).IsEqualTo("ok");
         await Assert.That(result.ToString()).IsEqualTo("ok");
     }
