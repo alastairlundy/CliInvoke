@@ -28,7 +28,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     private readonly StringBuilder _buffer;
 
     /// <summary>
-    ///     Initializes the ArgumentsBuilder.
+    ///     Initialises the ArgumentsBuilder.
     /// </summary>
     public ArgumentsBuilder()
     {
@@ -52,7 +52,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     }
 
     /// <summary>
-    ///     Initializes the ArgumentsBuilder with the specified Argument Validation Logic.
+    ///     Initialises the ArgumentsBuilder with the specified Argument Validation Logic.
     /// </summary>
     /// <param name="argumentValidationLogic">
     ///     The argument validation logic to use to decide whether to
