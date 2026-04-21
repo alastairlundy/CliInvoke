@@ -110,8 +110,11 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        if (!values.Any())
-            throw new ArgumentNullException(nameof(values));
+        if (values is ICollection<string> collection)
+        {
+            if (collection.Count == 0)
+                throw new ArgumentNullException(nameof(values));
+        }
         
         // Do not escape individual values here when escaping is requested to avoid double-escaping.
         // Instead, join the raw values and perform escaping once at the final Add call.
@@ -136,12 +139,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
         string valueActual = value.ToString(null, _formatProvider);
 
-        if (string.IsNullOrWhiteSpace(valueActual))
-            throw new NullReferenceException(
-                "IFormatProvider formated the IFormattable {x} which resulted in a null string."
-                    .Replace(
-                        "{x}",
-                        nameof(value)));
+        if (valueActual is null || string.IsNullOrWhiteSpace(valueActual))
+            throw new ArgumentNullException(nameof(value));
 
         return Add(valueActual);    
     }
@@ -156,9 +155,12 @@ public class ArgumentsBuilder : IArgumentsBuilder
     { 
         ArgumentNullException.ThrowIfNull(values);
 
-        if (!values.Any())
-            throw new ArgumentNullException(nameof(values));
-
+        if (values is ICollection<IFormattable> collection)
+        {
+            if (collection.Count == 0)
+                throw new ArgumentNullException(nameof(values));
+        }
+        
         IEnumerable<string> valuesStrings = values.Select(x => x.ToString(null, 
             _formatProvider));
 
