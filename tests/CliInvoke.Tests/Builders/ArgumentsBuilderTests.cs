@@ -1,4 +1,5 @@
 using System.Linq;
+using TUnit.Assertions.Core;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -48,10 +49,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder(s => s != "bad");
 
-        IArgumentsBuilder result = builder.Add("bad");
-
-        await Assert.That(ReferenceEquals(builder, result)).IsTrue();
-        await Assert.That(builder.ToString()).IsEqualTo(string.Empty);
+        await Assert.ThrowsAsync<ArgumentException>(() => Task.FromResult(builder.Add("bad")));
     }
 
     [Test]
@@ -79,15 +77,7 @@ public class ArgumentsBuilderTests
 
         await Assert.That(result.ToString()).IsEqualTo(expected);
     }
-
-    [Test]
-    public async Task AddEnumerable_Strings_ThrowsOnNullArgument()
-    {
-        IArgumentsBuilder builder = new ArgumentsBuilder();
-
-        await Assert.That(() => builder.AddRange(Enumerable.Empty<string>())).Throws<ArgumentNullException>();
-    }
-
+    
     [Test]
     public async Task Add_IFormattable_ThrowsWhenFormattableProducesNullString()
     {

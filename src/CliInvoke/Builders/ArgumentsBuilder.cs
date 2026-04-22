@@ -25,10 +25,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
     private readonly Func<string, bool> _argumentValidationLogic;
 
-    private StringBuilder _buffer;
+    private readonly StringBuilder _buffer;
 
     /// <summary>
-    ///     Initializes the ArgumentsBuilder.
+    ///     Initialises the ArgumentsBuilder.
     /// </summary>
     public ArgumentsBuilder()
     {
@@ -36,23 +36,24 @@ public class ArgumentsBuilder : IArgumentsBuilder
         _formatProvider = CultureInfo.InvariantCulture;
         
         _argumentValidationLogic = ArgumentValidationLogic;
-    }
+        return;
 
-    private bool ArgumentValidationLogic(string arg)
-    {
-        try
+        bool ArgumentValidationLogic(string arg)
         {
-            ArgumentNullException.ThrowIfNull(arg);
-            return true;
-        }
-        catch
-        {
-            return false;
+            try
+            {
+                ArgumentNullException.ThrowIfNull(arg);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 
     /// <summary>
-    ///     Initializes the ArgumentsBuilder with the specified Argument Validation Logic.
+    ///     Initialises the ArgumentsBuilder with the specified Argument Validation Logic.
     /// </summary>
     /// <param name="argumentValidationLogic">
     ///     The argument validation logic to use to decide whether to
@@ -65,6 +66,12 @@ public class ArgumentsBuilder : IArgumentsBuilder
         _formatProvider = CultureInfo.InvariantCulture;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="argumentValidationLogic"></param>
+    /// <param name="formatProvider"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     public ArgumentsBuilder(Func<string, bool> argumentValidationLogic,
         IFormatProvider formatProvider)
     {
@@ -84,6 +91,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(value);
 
+        if (!IsValidArgument(value))
+            throw new ArgumentException(
+                $"Argument '{value}' not permitted based on validation logic.");
 
         if (_buffer.Length is > 0 and < int.MaxValue)
             // Add a space if it's missing before adding the new string.
@@ -128,7 +138,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(value);
 
         if (!IsValidArgument(value, _formatProvider))
-            throw new ArgumentNullException(nameof(value));
+            throw new ArgumentException(
+                $"Argument '{value.ToString()}' not permitted based on validation logic.");
+
 
         string valueActual = value.ToString(null, _formatProvider);
 
@@ -216,4 +228,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     
     private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
         =>  _argumentValidationLogic.Invoke(value.ToString(null, provider));
+
+    private bool IsValidArgument(string value)
+        => _argumentValidationLogic.Invoke(value);
 }

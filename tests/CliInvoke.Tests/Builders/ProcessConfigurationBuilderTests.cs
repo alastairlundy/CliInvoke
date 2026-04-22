@@ -25,7 +25,7 @@ public class ProcessConfigurationBuilderTests
         await Assert.That(builtCommand.StandardInputEncoding.Equals(Encoding.Default) &&
                           builtCommand.StandardOutputEncoding.Equals(Encoding.Default) &&
                           builtCommand.StandardErrorEncoding.Equals(Encoding.Default)).IsTrue();
-        await Assert.That(builtCommand.Credential).IsEqualTo(UserCredential.Null);
+        await Assert.That(builtCommand.Credential.GetHashCode()).IsEqualTo(UserCredential.Null.GetHashCode());
         await Assert.That(builtCommand.StandardInput).IsEqualTo(StreamWriter.Null);
         await Assert.That(builtCommand.Credential).IsEqualTo(UserCredential.Null);
         await Assert.That(builtCommand.ResourcePolicy).IsEqualTo(ProcessResourcePolicy.Default);
@@ -154,7 +154,6 @@ public class ProcessConfigurationBuilderTests
         //Arrange
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
             .SetProcessResourcePolicy(ProcessResourcePolicy.Default);
-
 
         //Arrange
         ProcessResourcePolicy resourcePolicy = new ProcessResourcePolicy(null,

@@ -110,22 +110,32 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
         if (other is null)
             return false;
 
-        if (
-            other.UserName is null
-            || other.Domain is null
-            || other.Password is null
-            || other.LoadUserProfile is null
-        )
-            return false;
+        bool domainEquality, passwordEquality, userNameEquality, loadProfileEquality;
 
-        return Domain == other.Domain
-               && UserName == other.UserName
-               &&
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-               Password.Equals(other.Password)
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-               && LoadUserProfile == other.LoadUserProfile;
-#pragma warning restore CA1416
+        if (Domain is null || other.Domain is null)
+            domainEquality = Domain is null && other.Domain is null;
+        else
+            domainEquality = Domain.Equals(other.Domain);
+
+        if (Password is null || other.Password is null)
+            passwordEquality = Password is null && other.Password is null;
+        else
+            passwordEquality = Password.Equals(other.Password);
+
+        if (UserName is null || other.UserName is null)
+            userNameEquality = UserName is null && other.UserName is null;
+        else
+            userNameEquality = UserName.Equals(other.UserName);
+
+        if (LoadUserProfile is null || other.LoadUserProfile is null)
+            loadProfileEquality = LoadUserProfile is null && other.LoadUserProfile is null;
+        else
+            loadProfileEquality = LoadUserProfile == other.LoadUserProfile;
+        
+        return domainEquality &&
+               userNameEquality &&
+               passwordEquality &&
+               loadProfileEquality;
     }
 
     /// <summary>
