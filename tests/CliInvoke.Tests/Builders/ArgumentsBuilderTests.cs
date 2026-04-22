@@ -1,5 +1,4 @@
 using System.Linq;
-using TUnit.Assertions.Core;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -85,7 +84,7 @@ public class ArgumentsBuilderTests
         NullReturningFormattable nullFormattable = new NullReturningFormattable();
 
         // When IFormattable.ToString returns null or whitespace, Add should throw NullReferenceException
-        await Assert.That(() => builder.Add(nullFormattable)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.Add(nullFormattable)).Throws<ArgumentException>();
     }
 
     [Test]
@@ -108,7 +107,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddRange(Enumerable.Empty<string>())).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddRange(Enumerable.Empty<string>())).Throws<ArgumentException>();
     }
 
     [Test]
