@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
+using DotExtensions.IO;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -74,18 +75,18 @@ public class ProcessConfigurationBuilderTests
     }
 
     [Test]
-    public async Task TestArgumentsReplaced()
+    public async Task TestArgumentsNotReplaced()
     {
         //Arrange
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
             .SetArguments("--arg-value=value");
 
         //Act
-        ProcessConfiguration newArguments = processConfigBuilder.SetArguments("--flag")
+        ProcessConfiguration newArguments = processConfigBuilder
             .Build();
 
         //Assert
-        await Assert.That(newArguments).IsNotEqualTo(processConfigBuilder.Build());
+        await Assert.That(newArguments.Arguments).IsEqualTo("--arg-value=value");
     }
 
     [SupportedOSPlatform("windows")]
@@ -100,7 +101,7 @@ public class ProcessConfigurationBuilderTests
         password.AppendChar('4');
 
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-            .SetUserCredential(new UserCredential("",
+            .SetUserCredential(new UserCredential(null,
                 "admin",
                 password,
                 false));
@@ -112,7 +113,7 @@ public class ProcessConfigurationBuilderTests
         password2.AppendChar('7');
         password2.AppendChar('6');
 
-        UserCredential userCredential = new UserCredential("",
+        UserCredential userCredential = new UserCredential(null,
             "root",
             password2,
             false);
@@ -169,7 +170,7 @@ public class ProcessConfigurationBuilderTests
     {
         //Act
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-            .SetWorkingDirectory("dir");
+            .SetWorkingDirectory(DirectoryInfo.GetRandomDirectory().FullName);
 
         //Arrange
         processConfigBuilder = processConfigBuilder.SetWorkingDirectory("dir2");
