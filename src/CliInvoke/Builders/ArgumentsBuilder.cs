@@ -146,12 +146,8 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
         string valueActual = value.ToString(null, _formatProvider);
 
-        if (string.IsNullOrWhiteSpace(valueActual))
-            throw new NullReferenceException(
-                "IFormatProvider formated the IFormattable {x} which resulted in a null string."
-                    .Replace(
-                        "{x}",
-                        nameof(value)));
+        if (valueActual is null || string.IsNullOrWhiteSpace(valueActual))
+            throw new ArgumentNullException(nameof(value));
 
         return Add(valueActual);    
     }
@@ -190,37 +186,42 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(argument);
 
-        StringBuilder stringBuilder = new();
-
-        if (!argument.StartsWith('"'))
-            stringBuilder.Append('"');
+        StringBuilder contentBuilder = new();
 
         foreach (char c in argument)
             switch (c)
             {
-                case '\\': stringBuilder.Append(@"\\"); break;
-                case '\"': stringBuilder.Append("\\\""); break;
-                case '\n': stringBuilder.Append(@"\n"); break;
-                case '\r': stringBuilder.Append(@"\r"); break;
-                case '\t': stringBuilder.Append(@"\t"); break;
-                case '\b': stringBuilder.Append(@"\b"); break;
-                case '\f': stringBuilder.Append(@"\f"); break;
-                case '\v': stringBuilder.Append(@"\v"); break;
-                case '\a': stringBuilder.Append(@"\a"); break;
-                case '\e': stringBuilder.Append(@"\e"); break;
-                case '\0': stringBuilder.Append(@"\0"); break;
+                case '\\': contentBuilder.Append(@"\\"); break;
+                case '\"': contentBuilder.Append("\\\""); break;
+                case '\n': contentBuilder.Append(@"\n"); break;
+                case '\r': contentBuilder.Append(@"\r"); break;
+                case '\t': contentBuilder.Append(@"\t"); break;
+                case '\b': contentBuilder.Append(@"\b"); break;
+                case '\f': contentBuilder.Append(@"\f"); break;
+                case '\v': contentBuilder.Append(@"\v"); break;
+                case '\a': contentBuilder.Append(@"\a"); break;
+                case '\e': contentBuilder.Append(@"\e"); break;
+                case '\0': contentBuilder.Append(@"\0"); break;
                 default:
                     if (char.IsControl(c))
-                        stringBuilder.AppendFormat(@"\u{0:X4}", (int)c);
+                    {
+                        contentBuilder.AppendFormat(@"\u{0:X4}", (int)c);
+                    }
                     else
-                        stringBuilder.Append(c);
+                    {
+                        contentBuilder.Append(c);
+                    }
                     break;
             }
 
-        if (!argument.EndsWith('"'))
-            stringBuilder.Append('"');
+        string escapedContent = contentBuilder.ToString();
+        
+        if (!argument.StartsWith('"') || !argument.EndsWith('"'))
+        {
+            return "\"" + escapedContent + "\"";
+        }
 
-        return stringBuilder.ToString();
+        return escapedContent;
     }
 
     /// <summary>
