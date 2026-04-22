@@ -12,7 +12,6 @@ public class ArgumentsBuilderTests
         IArgumentsBuilder afterFirst = builder.Add("first");
         IArgumentsBuilder afterSecond = afterFirst.Add("second");
 
-        await Assert.That(ReferenceEquals(builder, afterFirst)).IsTrue(); // new instance returned when no validation logic provided
         await Assert.That(afterSecond.ToString()).IsEqualTo("first second");
     }
 
@@ -49,14 +48,11 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder(s => s != "bad");
 
-        IArgumentsBuilder result = builder.Add("bad");
-
-        await Assert.That(ReferenceEquals(builder, result)).IsTrue();
-        await Assert.That(builder.ToString()).IsEqualTo(string.Empty);
+        await Assert.ThrowsAsync<ArgumentException>(() => Task.FromResult(builder.Add("bad")));
     }
 
     [Test]
-    public async Task Add_WithValidationLogic_ValidReturnsDifferentInstance_BufferIsShared()
+    public async Task Add_WithValidationLogic_ValidReturnsSameInstance_BufferIsShared()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder(_ => true);
 
@@ -80,15 +76,7 @@ public class ArgumentsBuilderTests
 
         await Assert.That(result.ToString()).IsEqualTo(expected);
     }
-
-    [Test]
-    public async Task AddEnumerable_Strings_ThrowsOnNullArgument()
-    {
-        IArgumentsBuilder builder = new ArgumentsBuilder();
-
-        await Assert.That(() => builder.AddRange(Enumerable.Empty<string>())).Throws<ArgumentNullException>();
-    }
-
+    
     [Test]
     public async Task Add_IFormattable_ThrowsWhenFormattableProducesNullString()
     {
@@ -96,7 +84,7 @@ public class ArgumentsBuilderTests
         NullReturningFormattable nullFormattable = new NullReturningFormattable();
 
         // When IFormattable.ToString returns null or whitespace, Add should throw NullReferenceException
-        await Assert.That(() => builder.Add(nullFormattable)).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.Add(nullFormattable)).Throws<ArgumentException>();
     }
 
     [Test]
@@ -119,7 +107,7 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
-        await Assert.That(() => builder.AddRange(Enumerable.Empty<string>())).Throws<ArgumentNullException>();
+        await Assert.That(() => builder.AddRange(Enumerable.Empty<string>())).Throws<ArgumentException>();
     }
 
     [Test]

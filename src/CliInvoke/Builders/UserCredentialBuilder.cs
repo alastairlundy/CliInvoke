@@ -19,20 +19,20 @@ namespace CliInvoke.Builders;
 /// </summary>
 public class UserCredentialBuilder : IUserCredentialBuilder
 {
-    private string  _userName;
-    private string _domain;
-    private SecureString _userPassword;
-    private bool  _loadUserProfile;
+    private string? _userName;
+    private string? _domain;
+    private SecureString? _userPassword;
+    private bool? _loadUserProfile;
     
     /// <summary>
     ///     Instantiates the UserCredentialBuilder class.
     /// </summary>
     public UserCredentialBuilder()
     {
-        _userName = string.Empty;
-        _domain = string.Empty;
-        _userPassword = new SecureString();
-        _loadUserProfile = false;
+        _userName = null;
+        _domain = null;
+        _userPassword = null;
+        _loadUserProfile = null;
     }
 
     /// <summary>
@@ -90,9 +90,6 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     {
         ArgumentNullException.ThrowIfNull(password);
         
-        if(password.Length == 0)
-            throw new ArgumentException(Resources.Exceptions_Credentials_EmptyPassword,  nameof(password));
-        
         _userPassword = password;
         return this;
     }
@@ -118,7 +115,7 @@ public class UserCredentialBuilder : IUserCredentialBuilder
 
     public void Dispose()
     {
-        _userPassword.Dispose();
+        _userPassword?.Dispose();
         GC.SuppressFinalize(this);
     }
 }

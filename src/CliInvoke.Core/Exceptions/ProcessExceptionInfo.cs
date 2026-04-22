@@ -53,14 +53,14 @@ public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionI
     /// <summary>
     ///     Provides information about the configuration and parameters used to start the process.
     ///     This includes details such as the file name, arguments, and other properties related
-    ///     to the process initialization.
+    ///     to the process initialisation.
     /// </summary>
     public ProcessConfiguration? Configuration { get; }
 
     /// <summary>
     ///     Represents the unique identifier of the process associated with the exception.
     ///     This value corresponds to the process ID assigned by the operating system
-    ///     when the process was initiated.
+    ///     when the process was started.
     /// </summary>
     public int Id { get; }
 

@@ -44,7 +44,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     private readonly UserCredentialBuilder _userCredentialBuilder;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ProcessConfigurationBuilder" /> class,
+    ///     Initialises a new instance of the <see cref="ProcessConfigurationBuilder" /> class,
     ///     which is used to build and configure a process.
     /// </summary>
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
@@ -138,11 +138,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     }
 
     /// <summary>
-    /// 
+    /// Configures the environment variables for the process using the provided configuration action.
     /// </summary>
-    /// <param name="configureEnvironmentVariables"></param>
-    /// <returns></returns>
-    public IProcessConfigurationBuilder ConfigureEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configureEnvironmentVariables)
+    /// <param name="configureEnvironmentVariables">An action that accepts an <see cref="IEnvironmentVariablesBuilder" /> and is used to configure the environment variables.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> for further configuration.</returns>
+    public IProcessConfigurationBuilder ConfigureEnvironmentVariables(
+        Action<IEnvironmentVariablesBuilder> configureEnvironmentVariables)
     {
         configureEnvironmentVariables.Invoke(_environmentVariablesBuilder);
         
@@ -228,7 +229,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     {
         ArgumentNullException.ThrowIfNull(configureCredential);
         
-        configureCredential(_userCredentialBuilder);
+        configureCredential.Invoke(_userCredentialBuilder);
 
         return this;
     }
@@ -299,10 +300,17 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     }
 
     /// <summary>
-    /// 
+    /// Configures the resource policy for the process, adjusting settings such as
+    /// priority class, priority boost, working set, and processor affinity.
     /// </summary>
-    /// <param name="processResourcePolicy"></param>
-    /// <returns></returns>
+    /// <param name="processResourcePolicy">
+    /// An instance of <see cref="ProcessResourcePolicy" /> that specifies the configuration
+    /// details of the process's resource utilization.
+    /// </param>
+    /// <returns>
+    /// The current instance of <see cref="IProcessConfigurationBuilder" /> with the updated
+    /// resource policy configuration.
+    /// </returns>
     public IProcessConfigurationBuilder SetProcessResourcePolicy(
         ProcessResourcePolicy processResourcePolicy)
     {

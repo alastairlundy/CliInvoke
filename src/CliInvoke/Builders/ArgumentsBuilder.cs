@@ -36,18 +36,19 @@ public class ArgumentsBuilder : IArgumentsBuilder
         _formatProvider = CultureInfo.InvariantCulture;
         
         _argumentValidationLogic = ArgumentValidationLogic;
-    }
+        return;
 
-    private static bool ArgumentValidationLogic(string arg)
-    {
-        try
+        bool ArgumentValidationLogic(string arg)
         {
-            ArgumentNullException.ThrowIfNull(arg);
-            return true;
-        }
-        catch
-        {
-            return false;
+            try
+            {
+                ArgumentNullException.ThrowIfNull(arg);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 
@@ -65,6 +66,12 @@ public class ArgumentsBuilder : IArgumentsBuilder
         _formatProvider = CultureInfo.InvariantCulture;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="argumentValidationLogic"></param>
+    /// <param name="formatProvider"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     public ArgumentsBuilder(Func<string, bool> argumentValidationLogic,
         IFormatProvider formatProvider)
     {
@@ -83,9 +90,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
     public IArgumentsBuilder Add(string value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        
+
         if (!IsValidArgument(value))
-            throw new ArgumentNullException(nameof(value));
+            throw new ArgumentException(
+                $"Argument '{value}' not permitted based on validation logic.");
 
         if (_buffer.Length is > 0 and < int.MaxValue)
             // Add a space if it's missing before adding the new string.
@@ -93,7 +101,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
                 _buffer.Append(' ');
 
         if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
-            _buffer.Append(EscapeCharacters(value));
+            _buffer.Append(value);
         else
             throw new InvalidOperationException(Resources
                 .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
@@ -111,19 +119,15 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        if (values is ICollection<string> collection)
-        {
-            if (collection.Count == 0)
-                throw new ArgumentNullException(nameof(values));
-        }
+        var filteredList = values.Where(x =>  _argumentValidationLogic.Invoke(x)).ToList();
         
-        // Do not escape individual values here when escaping is requested to avoid double-escaping.
-        // Instead, join the raw values and perform escaping once at the final Add call.
-        IEnumerable<string> filtered = values.Where(x =>  _argumentValidationLogic.Invoke(x));
+        if (filteredList.Count == 0)
+            throw new ArgumentException("No valid arguments to add.");
 
-        string joinedValues = string.Join(" ", filtered);
+        string joinedValues = string.Join(" ", filteredList);
+        string escapedValue = EscapeCharacters(joinedValues);
 
-        return Add(joinedValues);
+        return Add(escapedValue);
     }
 
     /// <summary>
@@ -136,7 +140,9 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(value);
 
         if (!IsValidArgument(value, _formatProvider))
-            throw new ArgumentNullException(nameof(value));
+            throw new ArgumentException(
+                $"Argument '{value.ToString()}' not permitted based on validation logic.");
+
 
         string valueActual = value.ToString(null, _formatProvider);
 
@@ -156,18 +162,18 @@ public class ArgumentsBuilder : IArgumentsBuilder
     { 
         ArgumentNullException.ThrowIfNull(values);
 
-        if (values is ICollection<IFormattable> collection)
-        {
-            if (collection.Count == 0)
-                throw new ArgumentNullException(nameof(values));
-        }
+        var valuesList = values.ToList();
         
-        IEnumerable<string> valuesStrings = values.Select(x => x.ToString(null, 
+        if (valuesList.Count == 0)
+            throw new ArgumentException("No valid arguments to add.");
+
+        IEnumerable<string> valuesStrings = valuesList.Select(x => x.ToString(null, 
             _formatProvider));
 
         string value = string.Join(' ', valuesStrings);
+        string escapedValue = EscapeCharacters(value);
 
-        return Add(value);
+        return Add(escapedValue);
     }
 
     /// <summary>
@@ -231,7 +237,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     
     private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
         =>  _argumentValidationLogic.Invoke(value.ToString(null, provider));
-    
-    private bool IsValidArgument(string value) 
-        =>  _argumentValidationLogic.Invoke(value);
+
+    private bool IsValidArgument(string value)
+        => _argumentValidationLogic.Invoke(value);
 }

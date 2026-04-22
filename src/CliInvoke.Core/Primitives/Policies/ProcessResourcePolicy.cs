@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -165,11 +165,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     {
 #pragma warning disable CA1416
         return HashCode.Combine(
-            ProcessorAffinity ?? Default.ProcessorAffinity,
+            ProcessorAffinity,
             (int)PriorityClass,
             EnablePriorityBoost,
-            MinWorkingSet ?? Default.MinWorkingSet,
-            MaxWorkingSet ?? Default.MaxWorkingSet
+            MinWorkingSet,
+            MaxWorkingSet
         );
 #pragma warning restore CA1416
     }
@@ -182,6 +182,9 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <returns>True if both  Process Resource Policies are equal to each other; false otherwise.</returns>
     public static bool Equals(ProcessResourcePolicy? left, ProcessResourcePolicy? right)
     {
+        if (ReferenceEquals(left, right))
+            return true;
+
         if (left is null || right is null)
             return false;
 

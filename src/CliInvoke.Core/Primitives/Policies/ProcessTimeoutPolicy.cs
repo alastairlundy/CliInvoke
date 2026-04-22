@@ -50,7 +50,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     ///     Instantiates a default ProcessTimeoutPolicy which times out after 10 minutes.
     /// </summary>
     public static ProcessTimeoutPolicy Default { get; } =
-        new(TimeSpan.FromMinutes(10), true);
+        new(TimeSpan.FromMinutes(3), true);
 
     /// <summary>
     ///     Disables waiting for Process Timeout.
@@ -58,6 +58,9 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public static ProcessTimeoutPolicy None { get; } =
         new(TimeSpan.FromSeconds(0), false, ProcessExitBehaviour.WaitForExit);
 
+    /// <summary>
+    /// 
+    /// </summary>
     public ProcessExitBehaviour TimeoutExitBehaviour { get; }
     
     /// <summary>
@@ -143,7 +146,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// <returns>A hash code that represents the current <see cref="ProcessTimeoutPolicy" />.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine(TimeoutThreshold, Enabled);
+        return HashCode.Combine(TimeoutThreshold, Enabled, TimeoutExitBehaviour);
     }
 
     /// <summary>

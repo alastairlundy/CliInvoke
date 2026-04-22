@@ -110,22 +110,32 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
         if (other is null)
             return false;
 
-        if (
-            other.UserName is null
-            || other.Domain is null
-            || other.Password is null
-            || other.LoadUserProfile is null
-        )
-            return false;
+        bool domainEquality, passwordEquality, userNameEquality, loadProfileEquality;
 
-        return Domain == other.Domain
-               && UserName == other.UserName
-               &&
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-               Password.Equals(other.Password)
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-               && LoadUserProfile == other.LoadUserProfile;
-#pragma warning restore CA1416
+        if (Domain is null || other.Domain is null)
+            domainEquality = Domain is null && other.Domain is null;
+        else
+            domainEquality = Domain.Equals(other.Domain);
+
+        if (Password is null || other.Password is null)
+            passwordEquality = Password is null && other.Password is null;
+        else
+            passwordEquality = Password.Equals(other.Password);
+
+        if (UserName is null || other.UserName is null)
+            userNameEquality = UserName is null && other.UserName is null;
+        else
+            userNameEquality = UserName.Equals(other.UserName);
+
+        if (LoadUserProfile is null || other.LoadUserProfile is null)
+            loadProfileEquality = LoadUserProfile is null && other.LoadUserProfile is null;
+        else
+            loadProfileEquality = LoadUserProfile == other.LoadUserProfile;
+        
+        return domainEquality &&
+               userNameEquality &&
+               passwordEquality &&
+               loadProfileEquality;
     }
 
     /// <summary>
@@ -136,6 +146,9 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <returns>True if the two user credential objects are equal; false otherwise.</returns>
     public static bool Equals(UserCredential? left, UserCredential? right)
     {
+        if (left is null && right is null)
+            return true;
+
         if (left is null || right is null)
             return false;
 
@@ -149,11 +162,8 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <returns>True if the specified object is equal to the current user credential; false otherwise.</returns>
     public override bool Equals(object? obj)
     {
-        if (obj is null)
-            return false;
-
         if (obj is UserCredential other)
-            return Equals(other);
+            return Equals(this, other);
 
         return false;
     }
@@ -165,7 +175,16 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        return HashCode.Combine(Domain, UserName, Password, LoadUserProfile);
+        // If all fields are null, return a consistent hash code
+        if (Domain is null && UserName is null && Password is null && LoadUserProfile is null)
+            return 0;
+
+        HashCode hash = new HashCode();
+        hash.Add(Domain);
+        hash.Add(UserName);
+        hash.Add(Password);
+        hash.Add(LoadUserProfile);
+        return hash.ToHashCode();
 #pragma warning restore CA1416
     }
 

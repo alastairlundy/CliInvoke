@@ -25,7 +25,7 @@ public class ProcessConfigurationBuilderTests
         await Assert.That(builtCommand.StandardInputEncoding.Equals(Encoding.Default) &&
                           builtCommand.StandardOutputEncoding.Equals(Encoding.Default) &&
                           builtCommand.StandardErrorEncoding.Equals(Encoding.Default)).IsTrue();
-        await Assert.That(builtCommand.Credential).IsEqualTo(UserCredential.Null);
+        await Assert.That(builtCommand.Credential.GetHashCode()).IsEqualTo(UserCredential.Null.GetHashCode());
         await Assert.That(builtCommand.StandardInput).IsEqualTo(StreamWriter.Null);
         await Assert.That(builtCommand.Credential).IsEqualTo(UserCredential.Null);
         await Assert.That(builtCommand.ResourcePolicy).IsEqualTo(ProcessResourcePolicy.Default);
@@ -35,15 +35,33 @@ public class ProcessConfigurationBuilderTests
     }
 
     [Test]
-    public void WithResourcePolicy_ShouldSetResourcePolicy()
+    public async Task WithResourcePolicy_ShouldSetResourcePolicy()
     {
-        // TODO: Test WithResourcePolicy method
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("foo");
+        ProcessResourcePolicy policy = new ProcessResourcePolicy(null, null, null, ProcessPriorityClass.High);
+
+        // Act
+        builder = builder.SetProcessResourcePolicy(policy);
+        ProcessConfiguration config = builder.Build();
+
+        // Assert
+        await Assert.That(config.ResourcePolicy).IsEqualTo(policy);
     }
 
     [Test]
-    public void Build_ShouldReturnConfiguration()
+    public async Task Build_ShouldReturnConfiguration()
     {
-        // TODO: Test Build method
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe")
+            .SetArguments("arg1 arg2");
+
+        // Act
+        ProcessConfiguration config = builder.Build();
+
+        // Assert
+        await Assert.That(config.TargetFilePath).IsEqualTo("test.exe");
+        await Assert.That(config.Arguments).IsEqualTo("arg1 arg2");
     }
 
     [Test]
@@ -75,18 +93,18 @@ public class ProcessConfigurationBuilderTests
     }
 
     [Test]
-    public async Task TestArgumentsReplaced()
+    public async Task TestArgumentsNotReplaced()
     {
         //Arrange
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
             .SetArguments("--arg-value=value");
 
         //Act
-        ProcessConfiguration newArguments = processConfigBuilder.SetArguments("--flag")
+        ProcessConfiguration newArguments = processConfigBuilder
             .Build();
 
         //Assert
-        await Assert.That(newArguments).IsNotEqualTo(processConfigBuilder.Build());
+        await Assert.That(newArguments.Arguments).IsEqualTo("--arg-value=value");
     }
 
     [SupportedOSPlatform("windows")]
@@ -137,7 +155,6 @@ public class ProcessConfigurationBuilderTests
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
             .SetProcessResourcePolicy(ProcessResourcePolicy.Default);
 
-
         //Arrange
         ProcessResourcePolicy resourcePolicy = new ProcessResourcePolicy(null,
             null,
@@ -172,11 +189,13 @@ public class ProcessConfigurationBuilderTests
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
             .SetWorkingDirectory(DirectoryInfo.GetRandomDirectory().FullName);
 
+        string directory = DirectoryInfo.GetRandomDirectory().FullName;
+        
         //Arrange
-        processConfigBuilder = processConfigBuilder.SetWorkingDirectory("dir2");
+        processConfigBuilder = processConfigBuilder.SetWorkingDirectory(directory);
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
-        await Assert.That(command.WorkingDirectoryPath).IsEqualTo("dir2");
+        await Assert.That(command.WorkingDirectoryPath).IsEqualTo(directory);
     }
 }

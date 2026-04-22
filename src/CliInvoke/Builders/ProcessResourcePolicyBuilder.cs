@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -29,6 +29,9 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
         internalProcessorAffinity = ProcessResourcePolicy.Default.ProcessorAffinity;
 #pragma warning restore CA1416
 
+        internalMinWorkingSet = null;
+        internalMaxWorkingSet = null;
+        internalPriorityClass = ProcessPriorityClass.Normal;
         internalEnablePriorityBoost = false;
     }
 

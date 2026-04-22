@@ -8,7 +8,7 @@ public class GracefulCancellationTests
     [Test]
     public async Task GracefulCancel_InterruptSignals_Success()
     {
-        int sleepTimeSeconds = 500;
+        int sleepTimeSeconds = 30;
 
         int gracefulTimeoutSeconds = 10;
 
