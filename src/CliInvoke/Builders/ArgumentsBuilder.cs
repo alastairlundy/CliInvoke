@@ -25,7 +25,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
     private readonly Func<string, bool> _argumentValidationLogic;
 
-    private readonly StringBuilder _buffer;
+    private StringBuilder _buffer;
 
     /// <summary>
     ///     Initializes the ArgumentsBuilder.
@@ -84,7 +84,6 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        if (! _argumentValidationLogic.Invoke(value)) return this;
 
         if (_buffer.Length is > 0 and < int.MaxValue)
             // Add a space if it's missing before adding the new string.
@@ -92,7 +91,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
                 _buffer.Append(' ');
 
         if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
-            _buffer.Append(EscapeCharacters(value));
+            _buffer.Append(value);
         else
             throw new InvalidOperationException(Resources
                 .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
