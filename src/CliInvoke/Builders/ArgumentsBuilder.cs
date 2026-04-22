@@ -119,13 +119,15 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        // Do not escape individual values here when escaping is requested to avoid double-escaping.
-        // Instead, join the raw values and perform escaping once at the final Add call.
-        IEnumerable<string> filtered = values.Where(x =>  _argumentValidationLogic.Invoke(x));
+        var filteredList = values.Where(x =>  _argumentValidationLogic.Invoke(x)).ToList();
+        
+        if (filteredList.Count == 0)
+            throw new ArgumentException("No valid arguments to add.");
 
-        string joinedValues = string.Join(" ", filtered);
+        string joinedValues = string.Join(" ", filteredList);
+        string escapedValue = EscapeCharacters(joinedValues);
 
-        return Add(joinedValues);
+        return Add(escapedValue);
     }
 
     /// <summary>
@@ -164,12 +166,18 @@ public class ArgumentsBuilder : IArgumentsBuilder
     { 
         ArgumentNullException.ThrowIfNull(values);
 
-        IEnumerable<string> valuesStrings = values.Select(x => x.ToString(null, 
+        var valuesList = values.ToList();
+        
+        if (valuesList.Count == 0)
+            throw new ArgumentException("No valid arguments to add.");
+
+        IEnumerable<string> valuesStrings = valuesList.Select(x => x.ToString(null, 
             _formatProvider));
 
         string value = string.Join(' ', valuesStrings);
+        string escapedValue = EscapeCharacters(value);
 
-        return Add(value);
+        return Add(escapedValue);
     }
 
     /// <summary>

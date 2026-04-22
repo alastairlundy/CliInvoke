@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Linq;
 using CliInvoke.Builders;
 
 namespace CliInvoke;
@@ -99,8 +100,11 @@ public static class ProcessConfigurationFactory
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
 
-        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder()
-            .AddRange(arguments);
+        IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder();
+        
+        var argumentsList = arguments.ToList();
+        if (argumentsList.Count > 0)
+            argumentsBuilder.AddRange(argumentsList);
 
         workingDirectory ??= Environment.CurrentDirectory;
             

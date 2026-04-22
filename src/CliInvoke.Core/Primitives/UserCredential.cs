@@ -146,6 +146,9 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <returns>True if the two user credential objects are equal; false otherwise.</returns>
     public static bool Equals(UserCredential? left, UserCredential? right)
     {
+        if (left is null && right is null)
+            return true;
+
         if (left is null || right is null)
             return false;
 
@@ -159,11 +162,8 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <returns>True if the specified object is equal to the current user credential; false otherwise.</returns>
     public override bool Equals(object? obj)
     {
-        if (obj is null)
-            return false;
-
         if (obj is UserCredential other)
-            return Equals(other);
+            return Equals(this, other);
 
         return false;
     }
@@ -175,7 +175,16 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        return HashCode.Combine(Domain, UserName, Password, LoadUserProfile);
+        // If all fields are null, return a consistent hash code
+        if (Domain is null && UserName is null && Password is null && LoadUserProfile is null)
+            return 0;
+
+        HashCode hash = new HashCode();
+        hash.Add(Domain);
+        hash.Add(UserName);
+        hash.Add(Password);
+        hash.Add(LoadUserProfile);
+        return hash.ToHashCode();
 #pragma warning restore CA1416
     }
 
