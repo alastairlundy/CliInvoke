@@ -18,8 +18,9 @@ public class ProcessCancellationTests
     public async Task ProcessCancelled_TimeSpanOnlyOverload_Delay_Graceful_Success()
     {
         //Arrange 
-        string filePath = ProcessTestHelper.GetTargetFilePath();
-        ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
+        string filePath = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "/usr/bin/sleep" : "timeout";
+        string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "30" : "/T 30 /NOBREAK";
+        ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
         
         ProcessExitConfiguration processExitConfiguration = new(
             ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)));
@@ -83,11 +84,11 @@ public class ProcessCancellationTests
     {
         //Arrange 
         string filePath = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "/usr/bin/sleep" : "timeout";
-        string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "120" : "/T 120 /NOBREAK";
+        string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "60" : "/T 60 /NOBREAK";
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
 
         ProcessExitConfiguration processExitConfiguration = new(
-            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(30)), cancellationThrowsException: false);
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(15)), cancellationThrowsException: false);
 
         //Act
         process.Start();
