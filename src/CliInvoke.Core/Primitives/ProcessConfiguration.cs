@@ -202,6 +202,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     {
         Credential.Dispose();
         StandardInput?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>

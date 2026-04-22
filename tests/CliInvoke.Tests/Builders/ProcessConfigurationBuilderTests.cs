@@ -190,11 +190,13 @@ public class ProcessConfigurationBuilderTests
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
             .SetWorkingDirectory(DirectoryInfo.GetRandomDirectory().FullName);
 
+        string directory = DirectoryInfo.GetRandomDirectory().FullName;
+        
         //Arrange
-        processConfigBuilder = processConfigBuilder.SetWorkingDirectory("dir2");
+        processConfigBuilder = processConfigBuilder.SetWorkingDirectory(directory);
 
         //Assert
         ProcessConfiguration command = processConfigBuilder.Build();
-        await Assert.That(command.WorkingDirectoryPath).IsEqualTo("dir2");
+        await Assert.That(command.WorkingDirectoryPath).IsEqualTo(directory);
     }
 }
