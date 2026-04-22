@@ -37,7 +37,7 @@ public class ProcessInvokerTests
         config.TargetFilePath = string.Empty;
 
         await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config,
-            ProcessExitConfiguration.CreateGraceful(), cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();
+            ProcessExitConfiguration.CreateGraceful(), cancellationToken: CancellationToken.None)).Throws<ArgumentException>();
     }
 
     [Test]

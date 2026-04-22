@@ -12,7 +12,6 @@ public class ArgumentsBuilderTests
         IArgumentsBuilder afterFirst = builder.Add("first");
         IArgumentsBuilder afterSecond = afterFirst.Add("second");
 
-        await Assert.That(ReferenceEquals(builder, afterFirst)).IsFalse(); // new instance returned when no validation logic provided
         await Assert.That(afterSecond.ToString()).IsEqualTo("first second");
     }
 
@@ -56,13 +55,13 @@ public class ArgumentsBuilderTests
     }
 
     [Test]
-    public async Task Add_WithValidationLogic_ValidReturnsDifferentInstance_BufferIsShared()
+    public async Task Add_WithValidationLogic_ValidReturnsSameInstance_BufferIsShared()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder(_ => true);
 
         IArgumentsBuilder result = builder.Add("ok");
 
-        await Assert.That(ReferenceEquals(builder, result)).IsFalse();
+        await Assert.That(ReferenceEquals(builder, result)).IsTrue();
         await Assert.That(builder.ToString()).IsEqualTo("ok");
         await Assert.That(result.ToString()).IsEqualTo("ok");
     }

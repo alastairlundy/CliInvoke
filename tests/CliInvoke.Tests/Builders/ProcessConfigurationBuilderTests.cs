@@ -35,15 +35,33 @@ public class ProcessConfigurationBuilderTests
     }
 
     [Test]
-    public void WithResourcePolicy_ShouldSetResourcePolicy()
+    public async Task WithResourcePolicy_ShouldSetResourcePolicy()
     {
-        // TODO: Test WithResourcePolicy method
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("foo");
+        ProcessResourcePolicy policy = new ProcessResourcePolicy(null, null, null, ProcessPriorityClass.High);
+
+        // Act
+        builder = builder.SetProcessResourcePolicy(policy);
+        ProcessConfiguration config = builder.Build();
+
+        // Assert
+        await Assert.That(config.ResourcePolicy).IsEqualTo(policy);
     }
 
     [Test]
-    public void Build_ShouldReturnConfiguration()
+    public async Task Build_ShouldReturnConfiguration()
     {
-        // TODO: Test Build method
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe")
+            .SetArguments("arg1 arg2");
+
+        // Act
+        ProcessConfiguration config = builder.Build();
+
+        // Assert
+        await Assert.That(config.TargetFilePath).IsEqualTo("test.exe");
+        await Assert.That(config.Arguments).IsEqualTo("arg1 arg2");
     }
 
     [Test]
