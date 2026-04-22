@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -115,20 +115,22 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// </summary>
     /// <param name="values">The collection of string values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-    public IArgumentsBuilder AddRange(IEnumerable<string> values)
-    {
-        ArgumentNullException.ThrowIfNull(values);
+public IArgumentsBuilder AddRange(IEnumerable<string> values)
+{
+    ArgumentNullException.ThrowIfNull(values);
 
-        var filteredList = values.Where(x =>  _argumentValidationLogic.Invoke(x)).ToList();
-        
-        if (filteredList.Count == 0)
-            throw new ArgumentException("No valid arguments to add.");
+    var filteredList = values.Where(x =>  _argumentValidationLogic.Invoke(x)).ToList();
+    
+    if (filteredList.Count == 0)
+        throw new ArgumentException("No valid arguments to add.");
 
-        string joinedValues = string.Join(" ", filteredList);
-        string escapedValue = EscapeCharacters(joinedValues);
+    // Escape each individual argument then join with spaces
+    var escapedList = filteredList.Select(EscapeCharacters);
+    string joinedEscapedValues = string.Join(" ", escapedList);
 
-        return Add(escapedValue);
-    }
+    return Add(joinedEscapedValues);
+}
+
 
     /// <summary>
     ///     Appends a formattable value to the arguments builder.
@@ -191,7 +193,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         foreach (char c in argument)
             switch (c)
             {
-                case '\\': contentBuilder.Append(@"\\"); break;
+                case '\\': contentBuilder.Append("\\\\"); break;
                 case '\"': contentBuilder.Append("\\\""); break;
                 case '\n': contentBuilder.Append(@"\n"); break;
                 case '\r': contentBuilder.Append(@"\r"); break;
@@ -216,9 +218,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
         string escapedContent = contentBuilder.ToString();
         
+            // Escape and always wrap the result in double quotes
         if (!argument.StartsWith('"') || !argument.EndsWith('"'))
         {
-            return "\"" + escapedContent + "\"";
+            return $"\"{escapedContent}\"";
         }
 
         return escapedContent;
