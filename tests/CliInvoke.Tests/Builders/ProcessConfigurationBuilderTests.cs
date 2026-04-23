@@ -2,6 +2,7 @@
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
+using Assert = Xunit.Assert;
 
 namespace CliInvoke.Tests.Builders;
 

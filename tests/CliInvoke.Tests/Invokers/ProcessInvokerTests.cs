@@ -1,6 +1,8 @@
 using CliInvoke.Extensions;
 using CliInvoke.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
+using Assert = Xunit.Assert;
+using TestContext = Xunit.TestContext;
 
 namespace CliInvoke.Tests.Invokers;
 
@@ -19,7 +21,7 @@ public class ProcessInvokerTests : IClassFixture<TestFixture>
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         // A real file path is required here to avoid throwing FileNotFoundException.
-        using ProcessConfiguration config = ProcessConfiguration.Create(ProcessTestHelper.GetTargetFilePath());
+        using ProcessConfiguration config = new ProcessConfiguration(ProcessTestHelper.GetTargetFilePath());
         
         config.TargetFilePath = " ";
 
@@ -32,7 +34,7 @@ public class ProcessInvokerTests : IClassFixture<TestFixture>
     {
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config = ProcessConfiguration.Create("FAKE/PATH");
+        using ProcessConfiguration config = new ProcessConfiguration("FAKE/PATH");
         
         config.TargetFilePath = string.Empty;
 
@@ -45,7 +47,7 @@ public class ProcessInvokerTests : IClassFixture<TestFixture>
     {        
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
         
-        using ProcessConfiguration config = ProcessConfiguration.Create("FAKE.FILE");
+        using ProcessConfiguration config = new ProcessConfiguration("FAKE.FILE");
 
         await Assert.ThrowsAsync<FileNotFoundException>(() => processInvoker.ExecuteBufferedAsync(config, 
             ProcessExitConfiguration.DefaultNoException, cancellationToken: TestContext.Current.CancellationToken));

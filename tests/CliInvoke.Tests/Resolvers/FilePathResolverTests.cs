@@ -1,6 +1,8 @@
 using System.Linq;
 using CliInvoke.Extensions;
 using CliInvoke.Piping;
+using Assert = Xunit.Assert;
+using TestContext = Xunit.TestContext;
 
 namespace CliInvoke.Tests.Resolvers;
 
@@ -25,7 +27,7 @@ public class FilePathResolverTests
                 expected = winExpected;
             else
             {
-                using ProcessConfiguration configuration = ProcessConfiguration.Create("where", "dotnet.exe");
+                using ProcessConfiguration configuration = new ProcessConfiguration("where", "dotnet.exe");
 
                 IProcessInvoker processInvoker = new ProcessInvoker(new FilePathResolver(), ProcessPipeHandler.Shared);
 

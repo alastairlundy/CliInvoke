@@ -1,4 +1,5 @@
 using CliInvoke.Piping;
+using Assert = Xunit.Assert;
 
 namespace CliInvoke.Tests.Piping;
 
