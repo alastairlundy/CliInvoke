@@ -124,11 +124,25 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
     if (filteredList.Count == 0)
         throw new ArgumentException("No valid arguments to add.");
 
-    // Escape each individual argument then join with spaces
-    var escapedList = filteredList.Select(EscapeCharacters);
+    // Escape each individual argument (without wrapping), then join with spaces
+    var escapedList = filteredList.Select(v => EscapeCharactersWithoutWrapping(v)).ToList();
     string joinedEscapedValues = string.Join(" ", escapedList);
+    string wrappedValue = $"\"{joinedEscapedValues}\"";
 
-    return Add(joinedEscapedValues);
+    // Add space if buffer is not empty and doesn't already end with a space
+    if (_buffer.Length is > 0 and < int.MaxValue)
+        if (_buffer[^1] != ' ')
+            _buffer.Append(' ');
+
+    // Append the wrapped value directly to avoid re-wrapping by Add
+    if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
+        _buffer.Append(wrappedValue);
+    else
+        throw new InvalidOperationException(Resources
+            .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
+                int.MaxValue.ToString()));
+
+    return this;
 }
 
 
@@ -173,9 +187,23 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
             _formatProvider));
 
         string value = string.Join(' ', valuesStrings);
-        string escapedValue = EscapeCharacters(value);
+        string escapedValue = EscapeCharactersWithoutWrapping(value);
+        string wrappedValue = $"\"{escapedValue}\"";
 
-        return Add(escapedValue);
+        // Add space if buffer is not empty and doesn't already end with a space
+        if (_buffer.Length is > 0 and < int.MaxValue)
+            if (_buffer[^1] != ' ')
+                _buffer.Append(' ');
+
+        // Append the wrapped value directly to avoid re-wrapping by Add
+        if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
+            _buffer.Append(wrappedValue);
+        else
+            throw new InvalidOperationException(Resources
+                .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
+                    int.MaxValue.ToString()));
+
+        return this;
     }
 
     /// <summary>
@@ -185,6 +213,34 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
     /// <returns>The escaped string.</returns>
     [Pure]
     public string EscapeCharacters(string argument)
+    {
+        ArgumentNullException.ThrowIfNull(argument);
+
+        string escapedContent = EscapeCharactersWithoutWrapping(argument);
+        
+        // Only wrap if the original argument doesn't already start and end with quotes
+        if (argument.StartsWith('"') && argument.EndsWith('"'))
+        {
+            return escapedContent;
+        }
+
+        // If the escaped content ends with an escaped quote (\"), the quote is part of the content
+        // and we should not wrap with an additional quote
+        if (escapedContent.EndsWith("\\\""))
+        {
+            return $"\"{escapedContent}";
+        }
+
+        return $"\"{escapedContent}\"";
+    }
+
+    /// <summary>
+    ///     Escapes characters in a string without wrapping in quotes.
+    /// </summary>
+    /// <param name="argument">The string to escape.</param>
+    /// <returns>The escaped string (not wrapped in quotes).</returns>
+    [Pure]
+    private string EscapeCharactersWithoutWrapping(string argument)
     {
         ArgumentNullException.ThrowIfNull(argument);
 
@@ -216,15 +272,7 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
                     break;
             }
 
-        string escapedContent = contentBuilder.ToString();
-        
-            // Escape and always wrap the result in double quotes
-        if (!argument.StartsWith('"') || !argument.EndsWith('"'))
-        {
-            return $"\"{escapedContent}\"";
-        }
-
-        return escapedContent;
+        return contentBuilder.ToString();
     }
 
     /// <summary>
