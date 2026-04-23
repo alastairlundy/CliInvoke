@@ -23,7 +23,7 @@ public static class CliRun
     /// </summary>
     /// <param name="processInvoker">
     /// An implementation of the <see cref="IProcessInvoker"/> interface, which defines the logic for creating
-    /// and managing process executions. This parameter allows customization of process invocation behaviour.
+    /// and managing process executions. This parameter allows customisation of process invocation behaviour.
     /// </param>
     public static void UseProcessInvoker(IProcessInvoker processInvoker)
     {
