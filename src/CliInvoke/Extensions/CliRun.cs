@@ -71,20 +71,28 @@ public static class CliRun
         
         return await GetInvoker().ExecuteAsync(configuration, exitConfiguration, cancellationToken);
     }
-    
+
     /// <summary>
-    /// 
+    /// Executes a process asynchronously with the specified configuration.
     /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="configuration">
+    /// The process configuration defining how to run the process, including settings such as working directory, timeout, and other parameters.
+    /// </param>
+    /// <param name="exitConfiguration">
+    /// The configuration that determines how the process is terminated; defaults to a graceful configuration if not provided.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// A token that, if cancelled, will be used to cancel the operation.
+    /// </param>
+    /// <returns>
+    /// The result of the process execution.
+    /// </returns>
     public static async Task<ProcessResult> RunAsync(ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         exitConfiguration ??= ProcessExitConfiguration.CreateGraceful();
-        
+
         return await GetInvoker().ExecuteAsync(configuration, 
             exitConfiguration, cancellationToken);
     }
