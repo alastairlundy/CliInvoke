@@ -34,7 +34,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         _buffer = new StringBuilder();
         _formatProvider = CultureInfo.InvariantCulture;
-        
+
         _argumentValidationLogic = ArgumentValidationLogic;
         return;
 
@@ -78,7 +78,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         _buffer = new StringBuilder();
         _argumentValidationLogic = argumentValidationLogic;
         ArgumentNullException.ThrowIfNull(formatProvider);
-        
+
         _formatProvider = formatProvider;
     }
 
@@ -106,7 +106,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
             throw new InvalidOperationException(Resources
                 .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
                     int.MaxValue.ToString()));
-        
+
         return this;
     }
 
@@ -115,35 +115,35 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// </summary>
     /// <param name="values">The collection of string values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
-public IArgumentsBuilder AddRange(IEnumerable<string> values)
-{
-    ArgumentNullException.ThrowIfNull(values);
+    public IArgumentsBuilder AddRange(IEnumerable<string> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
 
-    var filteredList = values.Where(x =>  _argumentValidationLogic.Invoke(x)).ToList();
-    
-    if (filteredList.Count == 0)
-        throw new ArgumentException("No valid arguments to add.");
+        var filteredList = values.Where(x => _argumentValidationLogic.Invoke(x)).ToList();
 
-    // Escape each individual argument (without wrapping), then join with spaces
-    var escapedList = filteredList.Select(v => EscapeCharactersWithoutWrapping(v)).ToList();
-    string joinedEscapedValues = string.Join(" ", escapedList);
-    string wrappedValue = $"\"{joinedEscapedValues}\"";
+        if (filteredList.Count == 0)
+            throw new ArgumentException("No valid arguments to add.");
 
-    // Add space if buffer is not empty and doesn't already end with a space
-    if (_buffer.Length is > 0 and < int.MaxValue)
-        if (_buffer[^1] != ' ')
-            _buffer.Append(' ');
+        // Escape each individual argument (without wrapping), then join with spaces
+        var escapedList = filteredList.Select(v => EscapeCharactersWithoutWrapping(v)).ToList();
+        string joinedEscapedValues = string.Join(" ", escapedList);
+        string wrappedValue = $"\"{joinedEscapedValues}\"";
 
-    // Append the wrapped value directly to avoid re-wrapping by Add
-    if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
-        _buffer.Append(wrappedValue);
-    else
-        throw new InvalidOperationException(Resources
-            .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
-                int.MaxValue.ToString()));
+        // Add space if buffer is not empty and doesn't already end with a space
+        if (_buffer.Length is > 0 and < int.MaxValue)
+            if (_buffer[^1] != ' ')
+                _buffer.Append(' ');
 
-    return this;
-}
+        // Append the wrapped value directly to avoid re-wrapping by Add
+        if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
+            _buffer.Append(wrappedValue);
+        else
+            throw new InvalidOperationException(Resources
+                .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
+                    int.MaxValue.ToString()));
+
+        return this;
+    }
 
 
     /// <summary>
@@ -165,7 +165,7 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
         if (valueActual is null || string.IsNullOrWhiteSpace(valueActual))
             throw new ArgumentNullException(nameof(value));
 
-        return Add(valueActual);    
+        return Add(valueActual);
     }
 
     /// <summary>
@@ -175,15 +175,15 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
     /// <param name="values">The collection of formattable values to append.</param>
     /// <returns>A new instance of the IArgumentsBuilder with the updated arguments.</returns>
     public IArgumentsBuilder AddRange(IEnumerable<IFormattable> values)
-    { 
+    {
         ArgumentNullException.ThrowIfNull(values);
 
         var valuesList = values.ToList();
-        
+
         if (valuesList.Count == 0)
             throw new ArgumentException("No valid arguments to add.");
 
-        IEnumerable<string> valuesStrings = valuesList.Select(x => x.ToString(null, 
+        IEnumerable<string> valuesStrings = valuesList.Select(x => x.ToString(null,
             _formatProvider));
 
         string value = string.Join(' ', valuesStrings);
@@ -217,7 +217,7 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
         ArgumentNullException.ThrowIfNull(argument);
 
         string escapedContent = EscapeCharactersWithoutWrapping(argument);
-        
+
         // Only wrap if the original argument doesn't already start and end with quotes
         if (argument.StartsWith('"') && argument.EndsWith('"'))
         {
@@ -269,6 +269,7 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
                     {
                         contentBuilder.Append(c);
                     }
+
                     break;
             }
 
@@ -285,9 +286,9 @@ public IArgumentsBuilder AddRange(IEnumerable<string> values)
     ///     Clears the provided argument strings.
     /// </summary>
     public void Clear() => _buffer.Clear();
-    
-    private bool IsValidArgument(IFormattable value, IFormatProvider provider) 
-        =>  _argumentValidationLogic.Invoke(value.ToString(null, provider));
+
+    private bool IsValidArgument(IFormattable value, IFormatProvider provider)
+        => _argumentValidationLogic.Invoke(value.ToString(null, provider));
 
     private bool IsValidArgument(string value)
         => _argumentValidationLogic.Invoke(value);
