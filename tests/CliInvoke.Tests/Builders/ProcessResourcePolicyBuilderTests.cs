@@ -19,7 +19,7 @@ public class ProcessResourcePolicyBuilderTests
         for (int i = 2; i <= Environment.ProcessorCount * 2; i++)
         {
             // Act
-            nint processorAffinity = i; // upper bound but still valid
+            nint processorAffinity = i;
 
             IProcessResourcePolicyBuilder processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
                 .SetProcessorAffinity(processorAffinity);
@@ -42,12 +42,12 @@ public class ProcessResourcePolicyBuilderTests
         // Always invalid: zero mask
         await Assert.That(() => processResourcePolicyBuilder =
                 new ProcessResourcePolicyBuilder()
-                    .SetProcessorAffinity((nint)0))
+                    .SetProcessorAffinity(0))
             .Throws<ArgumentOutOfRangeException>();
 
         // Additionally, try an out-of-range value: greater than 2 x processor count
         int processorCount = Math.Max(1, Environment.ProcessorCount);
-        nint invalidOutOfRange = (nint)(2 * processorCount + 1);
+        nint invalidOutOfRange = 2 * processorCount + 1;
         await Assert.That(() => processResourcePolicyBuilder =
                 new ProcessResourcePolicyBuilder()
                     .SetProcessorAffinity(invalidOutOfRange))
