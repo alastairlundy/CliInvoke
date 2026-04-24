@@ -40,7 +40,15 @@ public class FilePathResolverTests
         }
         else
         {
-            expected = new FileInfo("/usr/bin/dotnet");
+            using ProcessConfiguration configuration = ProcessConfigurationFactory.Create("which", "dotnet");
+
+            IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver);
+
+            BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
+                cancellationToken: CancellationToken.None);
+
+            string resolvedPath = task.StandardOutput.Trim().Split(Environment.NewLine).First();
+            expected = new FileInfo(resolvedPath);
         }
 
         await Assert.That(actual.FullName).IsEqualTo(expected.FullName);
