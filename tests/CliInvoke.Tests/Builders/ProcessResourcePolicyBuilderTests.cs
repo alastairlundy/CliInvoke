@@ -185,11 +185,11 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("linux")]
     [Test]
-    [Arguments(2 * 16 - 1, 1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]
-    [Arguments(1 * 16 - 1, 8192, 1024, false, ProcessPriorityClass.Normal)]
-    [Arguments(1 * 8 - 1, 1024, 0, false, ProcessPriorityClass.Normal)]
-    [Arguments(2 * 8 - 1, 1024, 1024, true, ProcessPriorityClass.BelowNormal)]
-    public async Task Build_Successfully(nint processorAffinity, nint maxWorkingSet, nint minWorkingSet,
+    [Arguments(1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]
+    [Arguments(8192, 1024, false, ProcessPriorityClass.Normal)]
+    [Arguments(1024, 0, false, ProcessPriorityClass.Normal)]
+    [Arguments(1024, 1024, true, ProcessPriorityClass.BelowNormal)]
+    public async Task Build_Successfully(nint maxWorkingSet, nint minWorkingSet,
         bool priorityBoostEnabled, ProcessPriorityClass priorityClass)
     {
         // Arrange
@@ -208,7 +208,7 @@ public class ProcessResourcePolicyBuilderTests
 
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
             processResourcePolicyBuilder = processResourcePolicyBuilder
-                .SetProcessorAffinity(processorAffinity);
+                .SetProcessorAffinity(Environment.ProcessorCount);
 
         ProcessResourcePolicy resourcePolicy = processResourcePolicyBuilder.Build();
 
@@ -228,7 +228,7 @@ public class ProcessResourcePolicyBuilderTests
         }
 
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
-            await Assert.That(resourcePolicy.ProcessorAffinity).IsEqualTo(processorAffinity);
+            await Assert.That(resourcePolicy.ProcessorAffinity).IsEqualTo(Environment.ProcessorCount);
 
         await Assert.That(resourcePolicy.EnablePriorityBoost).IsEqualTo(priorityBoostEnabled);
 #pragma warning restore CA1416
