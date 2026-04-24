@@ -32,8 +32,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore src/CliInvoke.sln
     - name: Build
-      run: dotnet build --no-restore
-      working-directory: src/CliInvoke/
+      run: dotnet build --no-restore src/CliInvoke.sln
     - name: Test
       run: dotnet test --no-build
       working-directory: tests/CliInvoke.Tests/
