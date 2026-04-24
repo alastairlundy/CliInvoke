@@ -10,37 +10,48 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Test]
-    [Arguments(1 * 16 - 1)]
-    [Arguments(1 * 8 - 1)]
-    public async Task WithProcessorAffinity_ValidProcessorAffinity_Valid_Success(nint processorAffinity)
+    public async Task WithProcessorAffinity_ValidProcessorAffinity_Valid_Success()
     {
         // Arrange
-        IProcessResourcePolicyBuilder processResourcePolicyBuilder;
 
-        // Act
-        processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .SetProcessorAffinity(processorAffinity);
+        // Compute a valid processor affinity dynamically based on available CPUs
 
-        ProcessResourcePolicy resourcePolicy = processResourcePolicyBuilder.Build();
+        for (int i = 2; i <= Environment.ProcessorCount * 2; i++)
+        {
+            // Act
+            nint processorAffinity = i; // upper bound but still valid
 
-        await Assert.That(resourcePolicy.ProcessorAffinity).IsNotNull();
-        await Assert.That(resourcePolicy.ProcessorAffinity).IsEqualTo(processorAffinity);
+            IProcessResourcePolicyBuilder processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
+                .SetProcessorAffinity(processorAffinity);
+
+            ProcessResourcePolicy resourcePolicy = processResourcePolicyBuilder.Build();
+
+            await Assert.That(resourcePolicy.ProcessorAffinity).IsNotNull();
+            await Assert.That(resourcePolicy.ProcessorAffinity).IsEqualTo(processorAffinity);
+        }
     }
 
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Test]
-    [Arguments(2 * 24)]
-    [Arguments(0)]
-    public async Task WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail(nint processorAffinity)
+    public async Task WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail()
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
 
-        // Act and Assert
+        // Always invalid: zero mask
         await Assert.That(() => processResourcePolicyBuilder =
-            new ProcessResourcePolicyBuilder()
-                .SetProcessorAffinity(processorAffinity)).Throws<ArgumentOutOfRangeException>();
+                new ProcessResourcePolicyBuilder()
+                    .SetProcessorAffinity((nint)0))
+            .Throws<ArgumentOutOfRangeException>();
+
+        // Additionally, try an out-of-range value: greater than 2 x processor count
+        int processorCount = Math.Max(1, Environment.ProcessorCount);
+        nint invalidOutOfRange = (nint)(2 * processorCount + 1);
+        await Assert.That(() => processResourcePolicyBuilder =
+                new ProcessResourcePolicyBuilder()
+                    .SetProcessorAffinity(invalidOutOfRange))
+            .Throws<ArgumentOutOfRangeException>();
     }
 
     [Test]
