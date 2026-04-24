@@ -30,8 +30,7 @@ jobs:
       with:
         dotnet-version: 10.0.x
     - name: Restore dependencies
-      run: dotnet restore
-      working-directory: src/CliInvoke/
+      run: dotnet restore src/CliInvoke.sln
     - name: Build
       run: dotnet build --no-restore
       working-directory: src/CliInvoke/
