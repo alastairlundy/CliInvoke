@@ -28,6 +28,7 @@ namespace CliInvoke.Specializations;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("macos")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("freebsd")]
 public class PowershellProcessInvoker : RunnerProcessInvokerBase
 {
     /// <summary>
