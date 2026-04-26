@@ -522,6 +522,16 @@ CliInvoke's Icon is owned by and has all rights reserved to me (Alastair Lundy).
 
 If you fork CliInvoke and re-distribute it, please replace the icon unless you have prior written approval from me.
 
+## Star History
+
+<a href="https://www.star-history.com/?repos=alastairlundy%2Fcliinvoke&type=date&logscale=&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&legend=top-left" />
+ </picture>
+</a>
+
 ## Acknowledgements
 
 ### Projects
