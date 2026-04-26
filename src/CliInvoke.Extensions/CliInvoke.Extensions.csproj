@@ -17,7 +17,8 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageReleaseNotes>* Fixed dependency injection (DI) registration and resolution issue
-* Updated to use CliInvoke.Core 3.0.0 Alpha 3 and CliInvoke 3.0.0 Alpha 3</PackageReleaseNotes>
+* Updated to use CliInvoke.Core 3.0.0 Alpha 3 and CliInvoke 3.0.0 Alpha 3
+* Updated  Microsoft.Extensions.DependencyInjection.Abstractions version from 10.0.6 to 10.0.7</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
