@@ -21,8 +21,8 @@ namespace CliInvoke.Specializations;
 ///     methods to run processes in buffered, piped, or standard modes.
 /// </summary>
 /// <remarks>
-///     The <c>PowershellProcessInvoker</c> class specializes in executing commands via PowerShell,
-///     utilizing the
+///     The <c>PowershellProcessInvoker</c> class specialises in executing commands via PowerShell,
+///     utilising the
 ///     underlying process invoker functionality. It is designed for scenarios where
 ///     PowerShell-specific process
 ///     handling and configurations are required, such as redirecting outputs or managing window
