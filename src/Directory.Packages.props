@@ -5,10 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Polyfill" PrivateAssets="all" Version="[10.3.0, 11.0.0)" />
-    <PackageVersion Include="DotExtensions" Version="[10.2.1, 11.0.0)" />
+    <PackageVersion Include="DotExtensions" Version="[10.2.3, 11.0.0)" />
     <PackageVersion Include="DotPrimitives" Version="[4.4.0, 5.0.0)" />
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
   </ItemGroup>
   <PropertyGroup>
     <!-- default false, CI can set to true -->
