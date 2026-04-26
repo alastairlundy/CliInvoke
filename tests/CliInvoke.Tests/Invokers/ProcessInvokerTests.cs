@@ -2,6 +2,8 @@ using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
+using Assert = Xunit.Assert;
+using TestContext = Xunit.TestContext;
 
 namespace CliInvoke.Tests.Invokers;
 

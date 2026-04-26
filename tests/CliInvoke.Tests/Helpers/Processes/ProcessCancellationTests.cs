@@ -2,6 +2,8 @@ using System.Linq;
 using System.Runtime.Versioning;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
+using Assert = Xunit.Assert;
+using TestContext = Xunit.TestContext;
 
 namespace CliInvoke.Tests.Helpers.Processes;
 

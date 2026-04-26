@@ -1,6 +1,7 @@
 using System.Threading;
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes.Cancellation;
+using Assert = Xunit.Assert;
 
 namespace CliInvoke.Tests.Invokers.Cancellation;
 

@@ -2,6 +2,8 @@ using System.Linq;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Piping;
+using Assert = Xunit.Assert;
+using TestContext = Xunit.TestContext;
 
 namespace CliInvoke.Tests.Resolvers;
 
@@ -31,7 +33,8 @@ public class FilePathResolverTests
 
                 IProcessInvoker processInvoker = new ProcessInvoker(new FilePathResolver(), new ProcessPipeHandler());
 
-                BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration, cancellationToken: TestContext.Current.CancellationToken);
+                BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration, 
+                    cancellationToken: TestContext.Current.CancellationToken);
 
                 expected = task.StandardOutput.Split(Environment.NewLine).First();
             }

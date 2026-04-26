@@ -2,6 +2,8 @@
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
+using Assert = Xunit.Assert;
+
 #pragma warning disable CS0618 // Type or member is obsolete
 
 namespace CliInvoke.Tests.Builders;

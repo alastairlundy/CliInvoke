@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+using Assert = Xunit.Assert;
 
 // ReSharper disable JoinDeclarationAndInitializer
 // ReSharper disable NotAccessedVariable

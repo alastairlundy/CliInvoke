@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Security;
+using Assert = Xunit.Assert;
 
 // ReSharper disable JoinDeclarationAndInitializer
 

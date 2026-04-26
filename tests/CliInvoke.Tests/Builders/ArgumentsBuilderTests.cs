@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using Assert = Xunit.Assert;
 
 namespace CliInvoke.Tests.Builders;
 

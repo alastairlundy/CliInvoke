@@ -2,6 +2,8 @@
 
 // ReSharper disable NotAccessedVariable
 
+using Assert = Xunit.Assert;
+
 namespace CliInvoke.Tests.Primitives;
 
 public class ProcessTimeoutPolicyTests
