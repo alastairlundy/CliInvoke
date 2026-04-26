@@ -17,4 +17,15 @@ public static class ExecutedCommandHelper
             throw new PlatformNotSupportedException();
         }
     }
+
+    public static string WhichUnixPath
+    {
+        get
+        {
+            if (OperatingSystem.IsWindows() || OperatingSystem.IsIOS())
+                throw new PlatformNotSupportedException();
+
+            return "which";
+        }
+    }
 }
