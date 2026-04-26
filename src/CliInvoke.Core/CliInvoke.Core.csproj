@@ -22,20 +22,10 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-alpha.2</Version>
-        <PackageReleaseNotes>
-### Added
-- **ProcessResult helper extensions** (`ProcessResultHelperExtensions`) – new extensions providing utilities for working with `ProcessResult` objects
-- **ProcessExceptionInfo class** – moved from main package to Core to improve exception type accessibility
-
-### Changed
-- **Dropped .NET Standard 2.0 support** – now targets .NET 8.0, .NET 9.0, and .NET 10.0 only; removed conditional compilation for .NET Standard compatibility
-- **ProcessTimeoutPolicy improvements** – refined timeout handling and policy application logic
-- **ProcessExitConfiguration refactoring** – improved constructor design and static helper methods for clearer API
-- **ExceptionInfo moved to Core** – `ProcessExceptionInfo` moved to Core package to allow downstream packages to reference exception details without depending on main CliInvoke package
-
-### Removed
-- **.NET Standard 2.0 target framework** – no longer supported in CliInvoke v3</PackageReleaseNotes>
+        <Version>3.0.0-alpha.3</Version>
+        <PackageReleaseNotes>* Improved ``UserCredential`` equality checking in Equals methods
+* Improved ``ProcessResourcePolicy`` equality checking in Equals methods
+* Reduced default Timeout Threshold from 10 minutes to 2 minutes - This is probably close to as sane of a default Timeout Threshold as CliInvoke can provide without advanced knowledge of what program is being run. Users can easily specify a different Timeout Treshold with ``ProcessTimeoutPolicy.FromTimeSpan(TimeSpan)`` or ``new ProcessExitConfiguration(TimeSpan)` or use no timeout with ``ProcessTimeoutPolicy.None`` or ``new ProcessExitConfiguration(ProcessTimeoutPolicy.None)``. If you'd like to give feedback on this (or frankly any other aspect of CliInvoke), feel free to [create a discussion](https://github.com/alastairlundy/CliInvoke/discussions)</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>

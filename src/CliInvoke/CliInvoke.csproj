@@ -15,33 +15,15 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### Added
-- **CliRun facade** – new beginner-friendly entry point providing static `RunAsync` / `Run*Async` methods for simple process invocation without boilerplate (zero DI setup required)
-- **ProcessConfigurationFactory** – replaced extension methods with a dedicated static factory class for clearer, more discoverable API
-- **Output redirection mode enhancements** – refactored redirection to use boolean model with clearer semantics
-- **ProcessResult helper extensions** – convenience extensions for working with process results
-- **Design Patterns documentation** – comprehensive guide covering `CliRun`, `IProcessInvoker`, and `ExternalProcess` patterns with trade-off analysis
-
-### Changed
-- **Process cancellation improvements** – cleaner cancellation workflow and improved Unix graceful cancellation handling
-- **ExternalProcess refactoring** – improved code readability and consolidation of start logic; re-added support for custom file path resolver injection
-- **ExitConfiguration refactoring** – replaced static instances with new Create extensions and reworked constructors for better API clarity
-- **Factory method consolidation** – `ProcessConfigurationFactoryExtensions` replaced with static factory class `ProcessConfigurationFactory`
-- **Namespace adjustments** – extensions reorganized for better logical grouping (process piping, cancellation, exit configuration)
-- **Global usings cleanup** – removed redundant global usings to improve dependency clarity
-
-### Removed
-- **ConfigurationInvokationExtensions** – removed as part of factory consolidation and DI pattern improvements
-- **.NET Standard 2.0 conditional compilation** – simplified codebase by removing platform-specific guards
-
-### Fixed
-- **Cancellation warning cleanup** – addressed compiler warnings related to cancellation token handling
-- **Code readability improvements** – refactored process helper classes for clarity and maintainability
-</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated DotExtensions version from 10.1.1 to 10.3.0
+* Reworked ``ProcessInvoker`` to require the user to manage the disposal of the provided process configuration
+* Significant updates and refinements to ``ArgumentsBuilder`` for better argument handling and character escaping
+*  Significant updates and refinements to ``ArgumentsBuilder`` for better argument handling and character escaping
+* Fixed various spelling and grammar issues across the codebase</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.2</PackageVersion>
+        <PackageVersion>3.0.0-alpha.3</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
