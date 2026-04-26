@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="CliInvoke" Version="3.0.0-alpha.3"/>
+    
+    <PackageVersion Include="System.CommandLine" Version="2.0.7"/>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7"/>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7"/>
+  </ItemGroup>
+</Project>
