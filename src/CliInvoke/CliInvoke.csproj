@@ -15,15 +15,16 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated DotExtensions version from 10.0.0 to 10.1.1
-* Fixed a potential issue where Graceful cancellation on Windows would not free an allocated console leading to leaking memory
-* Fixed possible cancellation related race conditions
-* Fixed an issue where the wrong exception type was attempted to be caught in cancellation methods</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated DotExtensions to version 10.3.0
+* Switched to using DotExtensions' PATH Environment variable resolving code from DotPrimitives and removed dependency on DotPrimitives
+* Deprecated ``ProcessConfigurationFactory`` - This is replaced by a static Factory class in CliInvoke v3
+* Added a static ``Shared`` instance to ``FilePathResolver``
+* General formatting improvements and spelling corrections</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.5.2</PackageVersion>
-        <AssemblyVersion>2.5.2.0</AssemblyVersion>
+        <PackageVersion>2.6.0</PackageVersion>
+        <AssemblyVersion>2.6.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -33,7 +34,7 @@
         <PolyEnsure>true</PolyEnsure>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
-        <FileVersion>2.5.2.0</FileVersion>
+        <FileVersion>2.6.0.0</FileVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
