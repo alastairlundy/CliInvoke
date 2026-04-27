@@ -46,17 +46,13 @@ internal partial class ProcessWrapper : Process
 
     private void OnStarted(object? sender, EventArgs e)
     {
-        if (!HasExited && HasStarted)
-            try
-            {
+        SuspendProcess();
+        
 #pragma warning disable CA1416
-                this.SetResourcePolicy(ResourcePolicy);
+        this.SetResourcePolicy(ResourcePolicy);
 #pragma warning restore CA1416
-            }
-            catch
-            {
-                // ignored
-            }
+        
+        ResumeProcess();
     }
 
     private void OnExited(object? sender, EventArgs e)
@@ -103,7 +99,7 @@ internal partial class ProcessWrapper : Process
 
         if (OperatingSystem.IsWindows())
         {
-            SuspendProcessWindows(base.Handle);
+            SuspendProcessWindows(Handle);
         }
         else
         {
@@ -121,7 +117,7 @@ internal partial class ProcessWrapper : Process
 
         if (OperatingSystem.IsWindows())
         {
-            ResumeProcessWindows(base.Handle);
+            ResumeProcessWindows(Handle);
         }
         else
         {
@@ -129,31 +125,73 @@ internal partial class ProcessWrapper : Process
         }
     }
 
-    // Windows: use undocumented NtSuspendProcess/NtResumeProcess in ntdll.dll.
-    // This is pragmatic and works on many Windows versions, but it is undocumented.
-    // An alternative would be to enumerate threads and call SuspendThread/ResumeThread.
-    [LibraryImport("ntdll.dll")]
-    private static partial int NtSuspendProcess(IntPtr processHandle);
+    // Windows: enumerate threads and call SuspendThread/ResumeThread on each thread of the process.
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
 
-    [LibraryImport("ntdll.dll")]
-    private static partial int NtResumeProcess(IntPtr processHandle);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint SuspendThread(IntPtr hThread);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint ResumeThread(IntPtr hThread);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool CloseHandle(IntPtr hObject);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint GetProcessId(IntPtr hProcess);
+
+    [Flags]
+    private enum ThreadAccess : uint
+    {
+        THREAD_SUSPEND_RESUME = 0x0002,
+        THREAD_GET_CONTEXT = 0x0008,
+        THREAD_SET_CONTEXT = 0x0010,
+        THREAD_QUERY_INFORMATION = 0x0040,
+        THREAD_SET_INFORMATION = 0x0020,
+        THREAD_TERMINATE = 0x0001,
+        THREAD_ALL_ACCESS = 0x001F03FF
+    }
 
     private static void SuspendProcessWindows(IntPtr processHandle)
     {
-        // NtSuspendProcess returns an NTSTATUS. Zero indicates success.
-        int status = NtSuspendProcess(processHandle);
-        if (status != 0)
+        uint pid = GetProcessId(processHandle);
+        Process proc = Process.GetProcessById((int)pid);
+        foreach (ProcessThread pt in proc.Threads)
         {
-            throw new InvalidOperationException($"NtSuspendProcess failed with NTSTATUS 0x{status:X8}.");
+            IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
+            if (threadHandle == IntPtr.Zero) continue;
+
+            uint result = SuspendThread(threadHandle);
+            if (result == uint.MaxValue)
+            {
+                int err = Marshal.GetLastWin32Error();
+                CloseHandle(threadHandle);
+                throw new InvalidOperationException($"SuspendThread failed for thread {pt.Id} with error {err}.");
+            }
+
+            CloseHandle(threadHandle);
         }
     }
 
     private static void ResumeProcessWindows(IntPtr processHandle)
     {
-        int status = NtResumeProcess(processHandle);
-        if (status != 0)
+        uint pid = GetProcessId(processHandle);
+        Process proc = Process.GetProcessById((int)pid);
+        foreach (ProcessThread pt in proc.Threads)
         {
-            throw new InvalidOperationException($"NtResumeProcess failed with NTSTATUS 0x{status:X8}.");
+            IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
+            if (threadHandle == IntPtr.Zero) continue;
+
+            uint result = ResumeThread(threadHandle);
+            if (result == uint.MaxValue)
+            {
+                int err = Marshal.GetLastWin32Error();
+                CloseHandle(threadHandle);
+                throw new InvalidOperationException($"ResumeThread failed for thread {pt.Id} with error {err}.");
+            }
+
+            CloseHandle(threadHandle);
         }
     }
 
@@ -173,7 +211,7 @@ internal partial class ProcessWrapper : Process
 
     private static void ResumeProcessUnix(int pid)
     {
-        int SIGCONT = 18; // common value for SIGCONT
+        const int SIGCONT = 18; // common value for SIGCONT
         if (kill(pid, SIGCONT) != 0)
         {
             int errno = Marshal.GetLastWin32Error();
