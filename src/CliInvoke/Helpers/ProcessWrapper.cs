@@ -16,7 +16,7 @@ namespace CliInvoke.Helpers;
 
 internal partial class ProcessWrapper : Process
 {
-    // Synchronization primitive to prevent simultaneous cancellation attempts
+    // Synchronisation primitive to prevent simultaneous cancellation attempts
     internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
     internal ProcessWrapper(ProcessConfiguration configuration,
