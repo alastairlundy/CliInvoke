@@ -1,0 +1,18 @@
+{
+    "skill_name":"cliinvoke-v1-to-v2-migration",
+    "evals": 
+    [
+        {
+            "id": 1,
+            "prompt":"What is the CliInvoke v2 replacement for ICliCommandInvoker and IProcessFactory?",
+            "expected_output":"The replacement for ICliCommandInvoker is IProcessInvoker, and the replacement for IProcessFactory is to use IProcessConfigurationFactory to generate a ProcessConfiguration, and use IProcessInvoker to run it."
+        },
+        {
+            "id": 2,
+            "prompt": "Migrate my CliInvoke v1 code to CliInvoke v2 in Program.cs",
+            "expected_output":"",
+            "files":["evals/files/CliInvokeV2Expected/Program.cs"
+            ]
+        }
+    ]
+}
