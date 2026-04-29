@@ -246,9 +246,10 @@ public class ExternalProcess : IExternalProcess
     }
 
     /// <summary>
+    /// Asynchronously captures the result of an external pipe process, including its output streams.
     /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<PipedProcessResult> CapturePipedResultAsync(
