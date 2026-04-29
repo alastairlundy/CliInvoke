@@ -24,11 +24,11 @@ public class CmdProcessInvoker : ProcessInvoker
     private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
 
     /// <summary>
-    ///     Represents a process invoker specialized for running processes through CMD on Windows
+    ///     Represents a process invoker specialised for running processes through CMD on Windows
     ///     platforms.
     /// </summary>
     /// <remarks>
-    ///     This class provides a specialization of the <see cref="IProcessInvoker" /> for
+    ///     This class provides a specialisation of the <see cref="IProcessInvoker" /> for
     ///     executing
     ///     command-line processes through CMD with additional configuration options such as window
     ///     creation and output redirection.
