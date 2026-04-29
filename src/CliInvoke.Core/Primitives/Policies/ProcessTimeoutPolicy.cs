@@ -19,7 +19,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// </summary>
     public ProcessTimeoutPolicy()
     {
-        TimeoutThreshold = TimeSpan.FromMinutes(30);
+        TimeoutThreshold = TimeSpan.FromMinutes(10);
         CancellationMode = ProcessCancellationMode.Graceful;
     }
 
