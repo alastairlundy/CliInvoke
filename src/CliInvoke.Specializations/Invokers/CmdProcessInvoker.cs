@@ -15,16 +15,16 @@ using CliInvoke.Specializations.Configurations;
 namespace CliInvoke.Specializations;
 
 /// <summary>
-/// Represents a specialized invoker for executing command-line processes on Windows systems.
+/// Represents a specialised invoker for executing command-line processes on Windows systems.
 /// Provides functionality to execute processes either with raw output, buffered output, or piped streams.
 /// </summary>
 public class CmdProcessInvoker : RunnerProcessInvokerBase
 {
     /// <summary>
-    /// Represents a process invoker specialized for running processes through CMD on Windows platforms.
+    /// Represents a process invoker specialised for running processes through CMD on Windows platforms.
     /// </summary>
     /// <remarks>
-    /// This class provides a specialization of the <see cref="RunnerProcessInvokerBase"/> for executing
+    /// This class provides a specialisation of the <see cref="RunnerProcessInvokerBase"/> for executing
     /// command-line processes through CMD with additional configuration options such as window creation and output redirection.
     /// 
     /// This implementation is supported only on the Windows operating system and explicitly excludes
@@ -49,7 +49,7 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     /// Executes a process asynchronously with support for specific platform constraints.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behavior.</param>
+    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behaviour.</param>
     /// <param name="disposeOfConfig">Indicates whether the <paramref name="processConfiguration"/> should be disposed
     /// after the process execution is complete. Default is true.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
@@ -82,7 +82,7 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     /// Executes a process asynchronously with buffering for output and error streams.
     /// </summary>
     /// <param name="processConfiguration"> The configuration for the process to be executed. </param>
-    /// <param name="processExitConfiguration"> Optional configuration for handling the process exit behavior.</param>
+    /// <param name="processExitConfiguration"> Optional configuration for handling the process exit behaviour.</param>
     /// <param name="disposeOfConfig"> Indicates whether the <paramref name="processConfiguration"/> should be disposed
     /// after the process execution is complete. Default is true. </param>
     /// <param name="cancellationToken"> A token to monitor for cancellation requests. </param>
@@ -114,7 +114,7 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     /// Executes a process asynchronously while piping the output and error streams for processing.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behavior.</param>
+    /// <param name="processExitConfiguration">Optional configuration for handling the process exit behaviour.</param>
     /// <param name="disposeOfConfig">Indicates whether the <paramref name="processConfiguration"/> should be disposed
     /// after the process execution is complete. Default is true.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
