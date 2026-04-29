@@ -125,21 +125,22 @@ internal partial class ProcessWrapper : Process
         }
     }
 
-    // Windows: enumerate threads and call SuspendThread/ResumeThread on each thread of the process.
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+    // Windows: list threads and call SuspendThread/ResumeThread on each thread of the process.
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial IntPtr OpenThread(ThreadAccess dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwThreadId);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern uint SuspendThread(IntPtr hThread);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial uint SuspendThread(IntPtr hThread);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern uint ResumeThread(IntPtr hThread);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial uint ResumeThread(IntPtr hThread);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool CloseHandle(IntPtr hObject);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool CloseHandle(IntPtr hObject);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern uint GetProcessId(IntPtr hProcess);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial uint GetProcessId(IntPtr hProcess);
 
     [Flags]
     private enum ThreadAccess : uint
