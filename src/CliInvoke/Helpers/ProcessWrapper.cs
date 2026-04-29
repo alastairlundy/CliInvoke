@@ -47,11 +47,11 @@ internal partial class ProcessWrapper : Process
     private void OnStarted(object? sender, EventArgs e)
     {
         SuspendProcess();
-        
+
 #pragma warning disable CA1416
         this.SetResourcePolicy(ResourcePolicy);
 #pragma warning restore CA1416
-        
+
         ResumeProcess();
     }
 
@@ -81,6 +81,7 @@ internal partial class ProcessWrapper : Process
         }
 
         if (!HasStarted) return HasStarted;
+        
         StartTime = DateTime.UtcNow;
         Started.Invoke(this, EventArgs.Empty);
         Id = base.Id;
