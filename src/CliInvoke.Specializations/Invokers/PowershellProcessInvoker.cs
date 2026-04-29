@@ -8,9 +8,6 @@
 */
 
 
-using System.Threading;
-using System.Threading.Tasks;
-
 using CliInvoke.Specializations.Configurations;
 #pragma warning disable CS0618 // Type or member is obsolete
 
