@@ -1,6 +1,5 @@
 using System.Runtime.Versioning;
 using CliInvoke.Helpers;
-using CliInvoke.Helpers.Processes;
 
 namespace CliInvoke.Tests.Helpers.Processes;
 
@@ -41,7 +40,7 @@ public class ProcessSuspendResumeTests
             process.ResumeProcess();
 
             Task waitForExit = process.WaitForExitAsync(CancellationToken.None);
-            Task completed = await Task.WhenAny(waitForExit, Task.Delay(TimeSpan.FromSeconds(sleepTimeSeconds + 20)));
+            await Task.WhenAny(waitForExit, Task.Delay(TimeSpan.FromSeconds(sleepTimeSeconds + 20)));
 
             await Assert.That(process.HasExited).IsTrue();
         }

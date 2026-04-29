@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 using CliInvoke.Helpers.Processes;
+// ReSharper disable UnusedMember.Local
 
 namespace CliInvoke.Helpers;
 
@@ -138,6 +139,7 @@ internal partial class ProcessWrapper : Process
 
     [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
+    // ReSharper disable once UnusedMethodReturnValue.Local
     private static partial bool CloseHandle(IntPtr hObject);
 
     [LibraryImport("kernel32.dll", SetLastError = true)]
@@ -158,7 +160,7 @@ internal partial class ProcessWrapper : Process
     private static void SuspendProcessWindows(IntPtr processHandle)
     {
         uint pid = GetProcessId(processHandle);
-        Process proc = Process.GetProcessById((int)pid);
+        Process proc = GetProcessById((int)pid);
         foreach (ProcessThread pt in proc.Threads)
         {
             IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
