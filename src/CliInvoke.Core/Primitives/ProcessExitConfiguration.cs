@@ -18,7 +18,7 @@ namespace CliInvoke.Core;
 public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProcessExitConfiguration"/> class with default timeout policy and result validation.
+    /// Initialises a new instance of the <see cref="ProcessExitConfiguration"/> class with default timeout policy and result validation.
     /// </summary>
     public ProcessExitConfiguration()
     {
@@ -27,8 +27,15 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         CancellationExceptionBehavior = ProcessCancellationExceptionBehavior.AllowException;
     }
 
+    public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy)
+    {
+        TimeoutPolicy = timeoutPolicy;
+        ResultValidation = ProcessResultValidation.ExitCodeZero;
+        CancellationExceptionBehavior = ProcessCancellationExceptionBehavior.AllowException;
+    }
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProcessExitConfiguration"/> class with the specified timeout policy and result validation.
+    /// Initialises a new instance of the <see cref="ProcessExitConfiguration"/> class with the specified timeout policy and result validation.
     /// </summary>
     /// <param name="timeoutPolicy">The timeout policy to apply to the process.</param>
     /// <param name="resultValidation">The result validation strategy to use for the process exit.</param>
