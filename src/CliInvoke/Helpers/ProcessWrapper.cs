@@ -45,15 +45,20 @@ internal partial class ProcessWrapper : Process
 
     internal new string ProcessName { get; private set; }
 
+    
     private void OnStarted(object? sender, EventArgs e)
     {
-        SuspendProcess();
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
+            || OperatingSystem.IsFreeBSD())
+        {
+            SuspendProcess();
 
 #pragma warning disable CA1416
-        this.SetResourcePolicy(ResourcePolicy);
+            this.SetResourcePolicy(ResourcePolicy);
 #pragma warning restore CA1416
 
-        ResumeProcess();
+            ResumeProcess();
+        }
     }
 
     private void OnExited(object? sender, EventArgs e)
@@ -108,7 +113,7 @@ internal partial class ProcessWrapper : Process
     internal void SuspendProcess()
     {
         if (HasExited)
-            throw new InvalidOperationException("Cannot suspend a process that has already exited.");
+            throw new InvalidOperationException(Resources.Exceptions_Process_Suspension_CannotSuspendExited);
 
         if (OperatingSystem.IsWindows())
         {
@@ -127,7 +132,7 @@ internal partial class ProcessWrapper : Process
     /// Thrown when an attempt is made to resume a process that has already exited.
     /// </exception>
     /// <remarks>
-    /// This method utilizes platform-specific mechanisms to resume a suspended process
+    /// This method utilises platform-specific mechanisms to resume a suspended process
     /// and is supported on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
     /// </remarks>
     [SupportedOSPlatform("windows")]
@@ -137,7 +142,7 @@ internal partial class ProcessWrapper : Process
     internal void ResumeProcess()
     {
         if (HasExited)
-            throw new InvalidOperationException("Cannot resume a process that has already exited.");
+            throw new InvalidOperationException(Resources.Exceptions_Process_CannotResumeExited);
 
         if (OperatingSystem.IsWindows())
         {

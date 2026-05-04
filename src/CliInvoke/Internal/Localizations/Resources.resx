@@ -65,4 +65,10 @@
     <data name="Exceptions.Credentials.EmptyPassword" xml:space="preserve">
         <value>The provided passwor length cannot be zero.</value>
     </data>
+    <data name="Exceptions.Process.Suspension.CannotSuspendExited" xml:space="preserve">
+        <value>Cannot suspend a process that has already exited.</value>
+    </data>
+    <data name="Exceptions.Process.CannotResumeExited" xml:space="preserve">
+        <value>Cannot resume a process that has already exited</value>
+    </data>
 </root>

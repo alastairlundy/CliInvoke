@@ -289,6 +289,43 @@ public class ExternalProcess : IExternalProcess
         }
     }
 
+
+    /// <summary>
+    /// Suspends the external process that is currently running.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when an attempt is made to suspend a process that has already exited.
+    /// </exception>
+    /// <remarks>
+    /// <para> This method uses platform-specific mechanisms for process suspension and
+    /// is supported on Windows, macOS, Linux, and FreeBSD. </para>
+    /// <para>This operation is not supported on iOS, tvOS, or browser platforms. </para>
+    /// </remarks>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    public void Suspend()
+        => _processWrapper.SuspendProcess();
+
+    /// <summary>
+    /// Resumes the execution of a suspended external process.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the process has already exited and cannot be resumed.
+    /// </exception>
+    /// <remarks>
+    /// <para> This method uses platform-specific mechanisms for process suspension and
+    /// is supported on Windows, macOS, Linux, and FreeBSD. </para>
+    /// <para>This operation is not supported on iOS, tvOS, or browser platforms. </para>
+    /// </remarks>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    public void Resume()
+        => _processWrapper.ResumeProcess();
+    
     /// <summary>
     ///     Terminates the associated external process based on the specified exit configuration.
     /// </summary>

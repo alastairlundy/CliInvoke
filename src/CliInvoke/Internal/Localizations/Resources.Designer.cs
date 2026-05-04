@@ -132,6 +132,24 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot resume a process that has already exited.
+        /// </summary>
+        internal static string Exceptions_Process_CannotResumeExited {
+            get {
+                return ResourceManager.GetString("Exceptions.Process.CannotResumeExited", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot suspend a process that has already exited..
+        /// </summary>
+        internal static string Exceptions_Process_Suspension_CannotSuspendExited {
+            get {
+                return ResourceManager.GetString("Exceptions.Process.Suspension.CannotSuspendExited", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This feature or functionality is not supported on remote Processes (e.g. Processes not running on this machine)..
         /// </summary>
         internal static string Exceptions_Processes_NotSupportedOnRemoteProcess {
