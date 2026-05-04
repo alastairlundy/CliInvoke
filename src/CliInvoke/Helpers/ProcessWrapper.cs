@@ -94,6 +94,10 @@ internal partial class ProcessWrapper : Process
     /// <summary>
     /// Suspend this process. Routes to the platform-specific implementation.
     /// </summary>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
     internal void SuspendProcess()
     {
         if (HasExited)
@@ -112,6 +116,10 @@ internal partial class ProcessWrapper : Process
     /// <summary>
     /// Resume this process. Routes to the platform-specific implementation.
     /// </summary>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
     internal void ResumeProcess()
     {
         if (HasExited)
