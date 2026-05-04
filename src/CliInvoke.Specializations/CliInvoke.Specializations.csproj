@@ -18,15 +18,16 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.6.0
-* Fixed an issue with ``PowershellProcessInvoker`` that would cause it to throw an ArgumentException upon instantiation - This will be backported to 2.5.x</PackageReleaseNotes>
+        <PackageReleaseNotes>- General project cleanup and .gitignore updates.
+* Updated to use CliInvoke.Core 2.7.0 Alpha 1
+* Minor xml doc comment tweaks</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>2.6.0.0</AssemblyVersion>
-        <FileVersion>2.6.0.0</FileVersion>
+        <AssemblyVersion>2.7.0.0</AssemblyVersion>
+        <FileVersion>2.7.0.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
