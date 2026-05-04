@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using CliInvoke.Core.Internal;
@@ -26,7 +27,57 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <param name="workingDirectoryPath">The working directory to be used.</param>
-    /// <param name="redirectStandardOutput"></param>
+    /// <param name="redirectOutputs">Whether to redirect the Standard Output and Standard Error streams.</param>
+    /// <param name="standardInput">The standard input source to be used (if specified).</param>
+    /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
+    /// <exception cref="ArgumentException">Thrown if the target file path is empty.</exception>
+    [OverloadResolutionPriority(3)]
+    public ProcessConfiguration(
+        string targetFilePath,
+        string? arguments = null,
+        string? workingDirectoryPath = null,
+        bool redirectOutputs = true,
+        StreamWriter? standardInput = null,
+        bool windowCreation = false)
+    {
+        TargetFilePath = targetFilePath;
+        
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetFilePath);
+        
+        RequiresAdministrator = false;
+        Arguments = arguments ?? string.Empty;
+        WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
+        EnvironmentVariables = new Dictionary<string, string>();
+        Credential = UserCredential.Null;
+
+        ResourcePolicy = ProcessResourcePolicy.Default;
+
+        RedirectStandardOutput = redirectOutputs;
+        RedirectStandardError = redirectOutputs;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        StandardInput = standardInput ?? StreamWriter.Null;
+        StandardOutput = StreamReader.Null;
+        StandardError = StreamReader.Null;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        RedirectStandardInput = standardInput != StreamWriter.Null;
+        
+        UseShellExecution = false;
+        WindowCreation = windowCreation;
+
+        StandardInputEncoding = Encoding.Default;
+        StandardOutputEncoding = Encoding.Default;
+        StandardErrorEncoding = Encoding.Default;
+    }
+    
+    /// <summary>
+    /// Configures the Process configuration to be wrapped and executed.
+    /// </summary>
+    /// <param name="targetFilePath">The target file path of the command to be executed.</param>
+    /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
+    /// <param name="workingDirectoryPath">The working directory to be used.</param>
+    /// <param name="redirectStandardOutput">Whether to </param>
     /// <param name="redirectStandardError"></param>
     /// <param name="requiresAdministrator">Whether to run the Command with administrator privileges.</param>
     /// <param name="environmentVariables">The environment variables to be set (if specified).</param>
@@ -38,7 +89,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
     /// <param name="redirectStandardInput"></param>
-    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentException">Thrown if the target file path is empty.</exception>
+    [OverloadResolutionPriority(2)]
     public ProcessConfiguration(
         string targetFilePath,
         string? arguments = null,
@@ -104,13 +156,14 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processResourcePolicy">The process resource policy to be used (if specified).</param>
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <param name="useShellExecution">Whether to enable or disable executing the Command through Shell Execution.</param>
-    /// <param name="redirectStandardInput"></param>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="redirectStandardError"></param>
+    /// <param name="redirectStandardInput">Whether to redirect the standard input stream.</param>
+    /// <param name="redirectStandardOutput">Whether to redirect the standard output stream.</param>
+    /// <param name="redirectStandardError">Whether to redirect the standard error stream.</param>
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     [UnsupportedOSPlatform("browser")]
     [Obsolete(DeprecationMessages.DeprecationV3)]
+    [OverloadResolutionPriority(1)]
     public ProcessConfiguration(
         string targetFilePath,
         bool redirectStandardInput,
