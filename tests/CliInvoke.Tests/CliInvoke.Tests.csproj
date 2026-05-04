@@ -18,7 +18,6 @@
         <PackageReference Include="xunit.runner.visualstudio"/>
         <PackageReference Include="xunit.v3" />
         <PackageReference Include="Bogus" />
-        <PackageReference Include="TUnit"/>
     </ItemGroup>
 
     <ItemGroup>
