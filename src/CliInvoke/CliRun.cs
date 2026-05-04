@@ -164,12 +164,21 @@ public static class CliRun
 
 
     /// <summary>
-    /// 
+    /// Executes a process asynchronously with the specified configuration and returns the buffered process result.
     /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="configuration">
+    /// The process configuration defining how to run the process, including settings such as working directory, timeout, and other parameters.
+    /// </param>
+    /// <param name="exitConfiguration">
+    /// The configuration that determines how the process is terminated; defaults to a graceful configuration if not provided.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// A token that, if cancelled, will be used to cancel the operation.
+    /// </param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result is a <see cref="BufferedProcessResult"/>
+    /// object containing the full output of the process and execution details.
+    /// </returns>
     public static async Task<BufferedProcessResult> RunBufferedAsync(
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
