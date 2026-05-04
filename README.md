@@ -221,10 +221,9 @@ You can customize the timeout by creating a `ProcessExitConfiguration` with a `P
 ```csharp
 using CliInvoke;
 using CliInvoke.Core;
-using CliInvoke.Builders;
 
-// Create a custom timeout policy (5-minute timeout with graceful exit)
-ProcessTimeoutPolicy customTimeout = ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(5));
+// Create a custom timeout policy (5-minute timeout with graceful cancellation)
+ProcessTimeoutPolicy customTimeout = ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(5), ProcessCancellationMode.Graceful);
 ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(customTimeout);
 
 IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("dotnet")
@@ -272,39 +271,38 @@ catch (OperationCanceledException)
 
 ##### Graceful vs Forceful Cancellation
 
-CliInvoke supports two cancellation strategies, controlled via `ProcessExitBehaviour`:
+CliInvoke supports different cancellation strategies, controlled via `ProcessCancellationMode`:
 
-* **Graceful Exit** (default) – Sends SIGTERM/SIGINT signals to allow the process to shut down cleanly and release resources. The process has an opportunity to handle the signal and exit gracefully.
-* **Forceful Exit** – Forcefully terminates the process and all child processes immediately without waiting for graceful shutdown.
+* **Graceful** (default) – Sends SIGTERM/SIGINT signals to allow the process to shut down cleanly and release resources. The process has an opportunity to handle the signal and exit gracefully.
+* **Forceful** – Forcefully terminates the process and all child processes immediately without waiting for graceful shutdown.
 
-You can configure the cancellation behavior when a timeout occurs or when cancellation is requested:
+You can configure the cancellation behavior when a timeout occurs:
 
 ```csharp
 using CliInvoke;
 using CliInvoke.Core;
 
-// Configure forceful exit on timeout (immediate termination)
+// Configure forceful cancellation on timeout (immediate termination)
 ProcessTimeoutPolicy forcefulTimeout = new ProcessTimeoutPolicy(
     timeoutThreshold: TimeSpan.FromSeconds(30), 
-    enabled: true, 
-    exitBehaviour: ProcessExitBehaviour.ForcefulExit);
+    cancellationMode: ProcessCancellationMode.Forceful);
 
 ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(forcefulTimeout);
 ```
 
 ##### Cancellation Exception Behavior
 
-By default, cancellations do not throw exceptions—the process simply exits and a result is returned. You can change this behavior with `CancellationThrowsException`:
+By default, you can control whether cancellations throw exceptions using `ProcessCancellationExceptionBehavior`. You can configure this in the `ProcessExitConfiguration`:
 
 ```csharp
 using CliInvoke;
 using CliInvoke.Core;
 
-// Configure to throw an exception on cancellation
+// Configure to allow an exception on cancellation
 ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(
     timeoutPolicy: ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
-    requestedCancellationExitBehaviour: ProcessExitBehaviour.GracefulExit,
-    cancellationThrowsException: true);
+    resultValidation: ProcessResultValidation.ExitCodeZero,
+    cancellationValidation: ProcessCancellationExceptionBehavior.AllowException);
 
 try
 {
