@@ -1,4 +1,3 @@
-using CliInvoke.Extensions;
 using CliInvoke.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
 using Assert = Xunit.Assert;
