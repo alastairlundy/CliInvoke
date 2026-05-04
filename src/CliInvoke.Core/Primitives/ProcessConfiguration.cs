@@ -318,20 +318,29 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <returns>A string representation of the Command configuration.</returns>
     public override string ToString()
     {
-        string commandString = $"{TargetFilePath} {Arguments}";
-        string workingDirectory = string.IsNullOrEmpty(WorkingDirectoryPath)
-            ? ""
-            : $" ({Resources
-                .Labels_ProcessConfiguration_ToString_WorkingDirectory}: {WorkingDirectoryPath})";
-        string adminPrivileges = RequiresAdministrator
-            ? $"{Environment.NewLine} {Resources
-                .Labels_ProcessConfiguration_ToString_RequiresAdmin}"
-            : "";
-        string shellExecution = UseShellExecution
-            ? $"{Environment.NewLine} {Resources
-                .Labels_ProcessConfiguration_ToString_ShellExecution}"
-            : "";
+        StringBuilder stringBuilder = new StringBuilder();
 
-        return $"{commandString}{workingDirectory}{adminPrivileges}{shellExecution}";
+        stringBuilder.Append($"{TargetFilePath} {Arguments}");
+        
+        if (string.IsNullOrEmpty(WorkingDirectoryPath))
+        {
+            stringBuilder.Append($" ({Resources
+                .Labels_ProcessConfiguration_ToString_WorkingDirectory}: {WorkingDirectoryPath})");
+        }
+        
+        if (RequiresAdministrator)
+        {
+            stringBuilder.Append($"{Environment.NewLine} {Resources
+                .Labels_ProcessConfiguration_ToString_RequiresAdmin}");
+        }
+
+        if (UseShellExecution)
+        {
+            stringBuilder.Append($"{Environment.NewLine} {Resources
+                .Labels_ProcessConfiguration_ToString_ShellExecution}");
+        }
+        
+        
+        return stringBuilder.ToString();
     }
 }
