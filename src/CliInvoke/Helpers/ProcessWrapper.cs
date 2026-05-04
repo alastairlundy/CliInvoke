@@ -92,8 +92,15 @@ internal partial class ProcessWrapper : Process
     }
 
     /// <summary>
-    /// Suspend this process. Routes to the platform-specific implementation.
+    /// Suspends the current process. Routes to the platform-specific implementation.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when an attempt is made to suspend a process that has already exited.
+    /// </exception>
+    /// <remarks>
+    /// This method leverages platform-specific mechanisms to suspend a process and is supported
+    /// on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
+    /// </remarks>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
@@ -114,8 +121,15 @@ internal partial class ProcessWrapper : Process
     }
 
     /// <summary>
-    /// Resume this process. Routes to the platform-specific implementation.
+    /// Resumes the execution of the current process. Routes to the platform-specific implementation.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when an attempt is made to resume a process that has already exited.
+    /// </exception>
+    /// <remarks>
+    /// This method utilizes platform-specific mechanisms to resume a suspended process
+    /// and is supported on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
+    /// </remarks>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
