@@ -179,24 +179,17 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            await _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
+        await _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
 
-            ProcessResult result = new(
-                _processWrapper.StartInfo.FileName,
-                _processWrapper.ExitCode,
-                _processWrapper.Id,
-                _processWrapper.StartTime,
-                _processWrapper.ExitTime
-            );
+        ProcessResult result = new(
+            _processWrapper.StartInfo.FileName,
+            _processWrapper.ExitCode,
+            _processWrapper.Id,
+            _processWrapper.StartTime,
+            _processWrapper.ExitTime
+        );
 
-            return result;
-        }
-        finally
-        {
-            Dispose();
-        }
+        return result;
     }
 
     /// <summary>
@@ -241,7 +234,6 @@ public class ExternalProcess : IExternalProcess
         {
             standardOutputString.Dispose();
             standardErrorString.Dispose();
-            Dispose();
         }
     }
 
@@ -285,7 +277,6 @@ public class ExternalProcess : IExternalProcess
         {
             standardOutputStream.Dispose();
             standardErrorStream.Dispose();
-            Dispose();
         }
     }
 
