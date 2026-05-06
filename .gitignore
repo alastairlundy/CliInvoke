@@ -405,3 +405,5 @@ FodyWeavers.xsd
 /src/.idea
 /src/.ai/mcp
 /examples/.idea
+/docs/.lunet/build/cache
+/docs/.lunet/build
