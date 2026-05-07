@@ -16,7 +16,8 @@ namespace CliInvoke.Processes;
 /// <summary>
 ///     Represents an external process that can be run.
 /// </summary>
-public class ExternalProcess : IExternalProcess
+// ReSharper disable once RedundantExtendsListEntry
+public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 {
     private ProcessWrapper _processWrapper;
     
