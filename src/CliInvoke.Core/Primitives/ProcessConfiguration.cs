@@ -61,7 +61,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         StandardError = StreamReader.Null;
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        RedirectStandardInput = standardInput != StreamWriter.Null;
+        RedirectStandardInput = StandardInput != StreamWriter.Null;
         
         UseShellExecution = false;
         WindowCreation = windowCreation;
