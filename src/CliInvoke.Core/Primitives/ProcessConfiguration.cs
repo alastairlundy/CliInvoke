@@ -44,10 +44,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
         ResourcePolicy = ProcessResourcePolicy.Default;
 
-#pragma warning disable CS0618 // Type or member is obsolete
         StandardInput = StreamWriter.Null;
-#pragma warning restore CS0618 // Type or member is obsolete
 
+        RedirectStandardInput = StandardInput != StreamWriter.Null;
+        
         UseShellExecution = false;
         WindowCreation = false;
 
