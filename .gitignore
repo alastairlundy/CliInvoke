@@ -406,3 +406,4 @@ FodyWeavers.xsd
 /src/.ai/mcp
 /examples/.idea
 /docs/.lunet/build
+*.exe
