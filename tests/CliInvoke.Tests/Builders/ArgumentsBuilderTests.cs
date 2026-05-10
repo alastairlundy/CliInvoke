@@ -88,7 +88,11 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
         Assert.Throws<ArgumentNullException>(() => builder.AddEnumerable((IEnumerable<string>)null, true));
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
     }
 
     [Fact]
