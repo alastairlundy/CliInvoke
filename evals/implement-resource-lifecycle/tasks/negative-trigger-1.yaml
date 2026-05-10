@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
+name: ignore-lifecycle-disposal
+description: User thinks disposal is automatic.
+prompt: Since I am using .NET, do I still need to manually dispose of IDisposable implementing objects for my CliInvoke resources?
+expected: The response should clarify that disposal is still necessary for non-managed resources.

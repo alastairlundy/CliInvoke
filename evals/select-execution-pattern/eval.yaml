@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
+name: select-execution-pattern
+description: Evaluate the ability to choose the correct CliInvoke execution pattern.
+skill: skills/cliinvoke/select-execution-pattern/SKILL.md
+tasks:
+  - tasks/positive-trigger-1.yaml
+  - tasks/positive-trigger-2.yaml
+  - tasks/negative-trigger-1.yaml

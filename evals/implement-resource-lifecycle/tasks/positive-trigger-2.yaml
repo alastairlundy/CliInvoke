@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
+name: implement-lifecycle-timeout
+description: Handle timeouts in lifecycle.
+prompt: When implementing a resource lifecycle, how do I handle a case where the resource takes too long to shut down?
+expected: The response should recommend specifying a timeout and using a graceful-then-forceful shutdown pattern.

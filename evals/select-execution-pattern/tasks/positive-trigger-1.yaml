@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
+name: choose-clirun-for-simple-task
+description: User wants to run a simple command without DI.
+prompt: I need to run "git status" quickly in my tool. What is the simplest way to do this with CliInvoke?
+expected: The response should recommend using CliRun.RunAsync or CliRun.RunBufferedAsync.

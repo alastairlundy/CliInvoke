@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
+name: config-complex-env
+description: Advanced environment configuration.
+prompt: I need to run a process with a specific set of environment variables and a custom working directory. How do I configure this in CliInvoke?
+expected: The response should describe using the Environment variables collection in ProcessConfiguration.
