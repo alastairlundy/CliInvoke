@@ -407,3 +407,4 @@ FodyWeavers.xsd
 /examples/.idea
 /docs/.lunet/build/cache
 /docs/.lunet/build
+*.exe
