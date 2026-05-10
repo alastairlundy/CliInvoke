@@ -1,5 +1,4 @@
 using System.Linq;
-using CliInvoke.Extensions;
 using CliInvoke.Piping;
 using Assert = Xunit.Assert;
 using TestContext = Xunit.TestContext;
@@ -12,26 +11,32 @@ public class FilePathResolverTests
     public async Task Resolve_Dotnet_PathEnv_Executable()
     {
         string executable = OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet";
-
-        IFilePathResolver filePathResolver = new FilePathResolver();
-
-        string actual = filePathResolver.ResolveFilePath(executable);
+        
+        string actual = FilePathResolver.Shared.ResolveFilePath(executable);
 
         string expected;
 
         if (OperatingSystem.IsWindows())
         {
             string? winExpected = Environment.GetEnvironmentVariable("DOTNET_ROOT");
-            
-            if(winExpected is not null)
+
+            if (winExpected is not null)
+            {
                 expected = winExpected;
+                
+                if (OperatingSystem.IsWindows())
+                {
+                    expected = $"{expected}{Path.DirectorySeparatorChar}dotnet.exe";
+                }
+            }
             else
             {
-                using ProcessConfiguration configuration = new ProcessConfiguration("where", "dotnet.exe");
+                using ProcessConfiguration configuration = new ("where", "dotnet.exe");
 
-                IProcessInvoker processInvoker = new ProcessInvoker(new FilePathResolver(), ProcessPipeHandler.Shared);
+                IProcessInvoker processInvoker = new ProcessInvoker(FilePathResolver.Shared, ProcessPipeHandler.Shared);
 
-                BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration, cancellationToken: TestContext.Current.CancellationToken);
+                BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
+                    cancellationToken: TestContext.Current.CancellationToken);
 
                 expected = task.StandardOutput.Split(Environment.NewLine).First();
             }
@@ -48,10 +53,8 @@ public class FilePathResolverTests
     public void Resolve_CrossPlatform_PathEnv_Executable()
     {
         string expected = ProcessTestHelper.GetTargetFilePath();
-        
-        IFilePathResolver filePathResolver = new FilePathResolver();
 
-        string actual = filePathResolver.ResolveFilePath(expected);
+        string actual = FilePathResolver.Shared.ResolveFilePath(expected);
         
         Assert.Equal(expected, actual);
     }
