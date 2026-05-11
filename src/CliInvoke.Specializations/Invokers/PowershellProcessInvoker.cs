@@ -44,8 +44,13 @@ public class PowershellProcessInvoker : ProcessInvoker
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public PowershellProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, 
-        IFilePathResolver filePathResolver) : base(filePathResolver)
+    public PowershellProcessInvoker(IProcessInvoker processInvoker,
+        IRunnerProcessFactory runnerProcessFactory, IFilePathResolver filePathResolver,
+        bool windowCreation = true, bool redirectOutputs = true)
+        : base(processInvoker, runnerProcessFactory, new PowershellProcessConfiguration(
+            filePathResolver, arguments: "-NoProfile -NonInteractive -Command", false, redirectOutputs,
+            redirectOutputs,
+            windowCreation: windowCreation))
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;
         _filePathResolver = filePathResolver;
