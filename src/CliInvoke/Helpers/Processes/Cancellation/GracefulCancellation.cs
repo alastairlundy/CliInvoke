@@ -55,15 +55,32 @@ internal static partial class GracefulCancellation
                         timeoutThreshold + TimeSpan.FromSeconds(GracefulTimeoutWaitSeconds),
                         cancellationExceptionBehavior, expectedExitTime)
                 ];
-                
+
                 // Wait for any task to complete and get its index
                 Task completedTask = await Task.WhenAny(tasks);
                 int completedTaskIndex = Array.IndexOf(tasks, completedTask);
-                
-                // Only proceed with forceful exit if:
-                // 1. The completed task was the timeout task (index 2)
-                // 2. The process hasn't exited yet
-                // 3. Fallback to forceful is enabled
+
+                // If the process exited, we're done
+                if (completedTaskIndex == 0)
+                {
+                    return;
+                }
+
+                // If the graceful interrupt task completed, wait for the extended wait or process exit before forcing
+                if (completedTaskIndex == 1)
+                {
+                    // Wait for either the process to exit or the extended cancellation token task to finish
+                    await Task.WhenAny(tasks[0], tasks[2]).ConfigureAwait(false);
+
+                    if (!process.HasExited && fallbackToForceful)
+                    {
+                        await ProcessWrapper.SafeForcefulExit(process, cancellationExceptionBehavior).ConfigureAwait(false);
+                    }
+
+                    return;
+                }
+
+                // If the extended wait completed, and process is still running, fall back to forceful
                 if (completedTaskIndex == 2 && !process.HasExited && fallbackToForceful)
                 {
                     await ProcessWrapper.SafeForcefulExit(process, cancellationExceptionBehavior).ConfigureAwait(false);

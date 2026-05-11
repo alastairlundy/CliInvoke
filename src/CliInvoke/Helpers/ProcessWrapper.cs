@@ -200,8 +200,30 @@ internal
     private static void SuspendProcessWindows(IntPtr processHandle)
     {
         uint pid = GetProcessId(processHandle);
-        Process proc = GetProcessById((int)pid);
-        foreach (ProcessThread pt in proc.Threads)
+
+        Process proc;
+        try
+        {
+            proc = GetProcessById((int)pid);
+        }
+        catch (ArgumentException)
+        {
+            // Process was not found - probably exited already.
+            return;
+        }
+
+        ProcessThreadCollection threads;
+        try
+        {
+            threads = proc.Threads;
+        }
+        catch (InvalidOperationException)
+        {
+            // Process has exited; nothing to suspend.
+            return;
+        }
+
+        foreach (ProcessThread pt in threads)
         {
             IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
             if (threadHandle == IntPtr.Zero) continue;
@@ -211,6 +233,16 @@ internal
             {
                 int err = Marshal.GetLastWin32Error();
                 CloseHandle(threadHandle);
+                // ERROR_ACCESS_DENIED (5) can occur for certain systems or protected threads.
+                // Treat access denied as non-fatal and continue with other threads.
+                const int ERROR_ACCESS_DENIED = 5;
+                if (err == ERROR_ACCESS_DENIED)
+                    continue;
+
+                // If the process has exited since we started enumerating threads, treat that as benign and continue.
+                if (proc.HasExited)
+                    continue;
+
                 throw new InvalidOperationException($"SuspendThread failed for thread {pt.Id} with error {err}.");
             }
 
@@ -221,8 +253,30 @@ internal
     private static void ResumeProcessWindows(IntPtr processHandle)
     {
         uint pid = GetProcessId(processHandle);
-        Process proc = GetProcessById((int)pid);
-        foreach (ProcessThread pt in proc.Threads)
+
+        Process proc;
+        try
+        {
+            proc = GetProcessById((int)pid);
+        }
+        catch (ArgumentException)
+        {
+            // Process was not found - probably exited already.
+            return;
+        }
+
+        ProcessThreadCollection threads;
+        try
+        {
+            threads = proc.Threads;
+        }
+        catch (InvalidOperationException)
+        {
+            // Process has exited; nothing to resume.
+            return;
+        }
+
+        foreach (ProcessThread pt in threads)
         {
             IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
             if (threadHandle == IntPtr.Zero) continue;
@@ -232,6 +286,15 @@ internal
             {
                 int err = Marshal.GetLastWin32Error();
                 CloseHandle(threadHandle);
+                // ERROR_ACCESS_DENIED (5) can occur when resuming protected threads; ignore it.
+                const int ERROR_ACCESS_DENIED = 5;
+                if (err == ERROR_ACCESS_DENIED)
+                    continue;
+
+                // If the process has exited since we started enumerating threads, treat that as benign and continue.
+                if (proc.HasExited)
+                    continue;
+
                 throw new InvalidOperationException($"ResumeThread failed for thread {pt.Id} with error {err}.");
             }
 
@@ -254,6 +317,8 @@ internal
         if (kill(pid, SIGSTOP) != 0)
         {
             int errno = Marshal.GetLastWin32Error();
+            // No such process - indicates the process already exited; treat as no-op.
+            if (errno == 3) return;
             throw new InvalidOperationException($"kill(SIGSTOP) failed for pid {pid} with errno {errno}.");
         }
     }
@@ -264,6 +329,8 @@ internal
         if (kill(pid, SIGCONT) != 0)
         {
             int errno = Marshal.GetLastWin32Error();
+            // No such process - indicates the process already exited; treat as no-op.
+            if (errno == 3) return;
             throw new InvalidOperationException($"kill(SIGCONT) failed for pid {pid} with errno {errno}.");
         }
     }
