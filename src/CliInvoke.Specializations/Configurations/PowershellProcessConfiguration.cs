@@ -58,16 +58,17 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("",
-        redirectStandardInput, redirectStandardOutput, redirectStandardError,
-        arguments, workingDirectoryPath,
-        requiresAdministrator, environmentVariables,
-        credentials,
-        standardInput, standardOutput, standardError,
-        standardInputEncoding, standardOutputEncoding,
-        standardErrorEncoding, processResourcePolicy,
-        windowCreation: windowCreation,
-        useShellExecution: useShellExecution)
+        bool useShellExecution = false, bool windowCreation = false) : 
+        base(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
+            redirectStandardInput, redirectStandardOutput, redirectStandardError,
+            arguments, workingDirectoryPath,
+            requiresAdministrator, environmentVariables,
+            credentials,
+            standardInput, standardOutput, standardError,
+            standardInputEncoding, standardOutputEncoding,
+            standardErrorEncoding, processResourcePolicy,
+            windowCreation: windowCreation,
+            useShellExecution: useShellExecution)
     {
         string filePath;
 
