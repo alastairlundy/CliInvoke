@@ -37,7 +37,7 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("tvos")]
     public CmdProcessInvoker(IProcessInvoker processInvoker, IRunnerProcessFactory runnerProcessFactory, bool windowCreation = true,
         bool redirectOutputs = true) :
-        base(processInvoker, runnerProcessFactory, new CmdProcessConfiguration("", false,
+        base(processInvoker, runnerProcessFactory, new CmdProcessConfiguration(arguments: "", false,
             redirectOutputs, redirectOutputs, windowCreation: windowCreation))
     {
     }

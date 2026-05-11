@@ -44,7 +44,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
         IRunnerProcessFactory runnerProcessFactory, IFilePathResolver filePathResolver,
         bool windowCreation = true, bool redirectOutputs = true)
         : base(processInvoker, runnerProcessFactory, new PowershellProcessConfiguration(
-            filePathResolver, "pwsh", false, redirectOutputs, redirectOutputs,
+            filePathResolver, arguments: "", false, redirectOutputs, redirectOutputs,
             windowCreation: windowCreation))
     {
     }
