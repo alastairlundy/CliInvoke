@@ -52,7 +52,7 @@ public class PowershellInvokerTests : IDisposable
         ProcessConfiguration commandConfiguration = configurationBuilder.Build();
 
         ProcessResult result = await _powershellProcessInvoker.ExecuteAsync(commandConfiguration,
-            new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(1))),
+            new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(1)), ProcessResultValidation.None, ProcessCancellationExceptionBehavior.AllowException),
             false, CancellationToken.None);
 
         await Assert.That(Process.GetProcesses().Any(p => p.ProcessName.Contains("calculatorapp", 
