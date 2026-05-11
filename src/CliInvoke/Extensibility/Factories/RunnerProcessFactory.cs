@@ -31,8 +31,22 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
         
-        string combinedArgs = $"{runnerProcessConfig.Arguments} {processConfigToBeRun.TargetFilePath} {processConfigToBeRun.Arguments}"
-            .Trim();
+        string combinedArgs;
+        // If the runner process is PowerShell, invoke the target via the call operator (&) and quote the path.
+        if (!string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath) &&
+            (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0 ||
+             runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0))
+        {
+            string target = processConfigToBeRun.TargetFilePath;
+            string quotedTarget = $"& '{target}'";
+            string prefix = string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments) ? string.Empty : runnerProcessConfig.Arguments;
+            string suffix = string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments) ? string.Empty : processConfigToBeRun.Arguments;
+            combinedArgs = $"{prefix} {quotedTarget} {suffix}".Trim();
+        }
+        else
+        {
+            combinedArgs = $"{runnerProcessConfig.Arguments} {processConfigToBeRun.TargetFilePath} {processConfigToBeRun.Arguments}".Trim();
+        }
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath
