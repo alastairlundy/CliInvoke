@@ -58,7 +58,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false) : 
-        base("pwsh",
+        base(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
             redirectStandardInput, redirectStandardOutput, redirectStandardError,
             arguments, workingDirectoryPath,
             requiresAdministrator, environmentVariables,
