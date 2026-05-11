@@ -12,15 +12,15 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.6.0</PackageVersion>
+        <PackageVersion>2.7.0-beta.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>- General project cleanup and .gitignore updates.
-* Updated to use CliInvoke.Core 2.7.0 Alpha 1
-* Minor xml doc comment tweaks</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 10.3.0 to 10.5.1
+* Fixed an issue with Powershell Invoker not being instantiated
+* Updated to use CliInvoke.Core 2.7.0 Beta 1</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
