@@ -185,6 +185,31 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         return result;
     }
 
+    public int FireAndForget(CancellationToken cancellationToken)
+    {
+        Task task = new(() =>
+        {
+            try
+            {
+                Task startTask = StartAsync(cancellationToken);
+
+                startTask.Wait(cancellationToken);
+
+                Task<ProcessResult> waitForExitTask = WaitForExitOrTimeoutAsync(cancellationToken);
+
+                waitForExitTask.Wait(cancellationToken);
+            }
+            finally
+            {
+                Task.Run(()=> Kill(), cancellationToken);
+            }
+        }, CancellationToken.None);
+
+        task.Start();
+
+        return _processWrapper.Id;
+    }
+
     /// <summary>
     ///     Asynchronously waits for the external process to exit or a specified timeout period elapses.
     /// </summary>
