@@ -5,8 +5,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Bogus" Version="35.6.5" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
     <PackageVersion Include="TUnit" Version="1.37.36" />
-    <PackageVersion Include="DotExtensions" Version="10.3.0" />
+    <PackageVersion Include="DotExtensions" Version="10.3.2" />
   </ItemGroup>
 </Project>
