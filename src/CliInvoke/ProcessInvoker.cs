@@ -83,7 +83,7 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcess(process);
+            process.Dispose();
         }
     }
 
@@ -158,7 +158,7 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcess(process);
+            process.Dispose();
         }
     }
 
@@ -227,7 +227,7 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcess(process);
+            process.Dispose();
         }
     }
 
@@ -283,11 +283,6 @@ public class ProcessInvoker : IProcessInvoker
 
         return processExitConfiguration;
     }
-
-    private static void DisposeProcess(ProcessWrapper process)
-    {
-        process.Dispose();
-    }
-
+    
     #endregion
 }
