@@ -16,7 +16,8 @@ namespace CliInvoke.Processes;
 /// <summary>
 ///     Represents an external process that can be run.
 /// </summary>
-public class ExternalProcess : IExternalProcess
+// ReSharper disable once RedundantExtendsListEntry
+public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 {
     private ProcessWrapper _processWrapper;
     
@@ -179,24 +180,17 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            await _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
+        await _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
 
-            ProcessResult result = new(
-                _processWrapper.StartInfo.FileName,
-                _processWrapper.ExitCode,
-                _processWrapper.Id,
-                _processWrapper.StartTime,
-                _processWrapper.ExitTime
-            );
+        ProcessResult result = new(
+            _processWrapper.StartInfo.FileName,
+            _processWrapper.ExitCode,
+            _processWrapper.Id,
+            _processWrapper.StartTime,
+            _processWrapper.ExitTime
+        );
 
-            return result;
-        }
-        finally
-        {
-            Dispose();
-        }
+        return result;
     }
 
     /// <summary>
@@ -241,14 +235,14 @@ public class ExternalProcess : IExternalProcess
         {
             standardOutputString.Dispose();
             standardErrorString.Dispose();
-            Dispose();
         }
     }
 
     /// <summary>
+    /// Asynchronously captures the result of an external pipe process, including its output streams.
     /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<PipedProcessResult> CapturePipedResultAsync(
@@ -284,10 +278,46 @@ public class ExternalProcess : IExternalProcess
         {
             standardOutputStream.Dispose();
             standardErrorStream.Dispose();
-            Dispose();
         }
     }
 
+
+    /// <summary>
+    /// Suspends the external process that is currently running.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when an attempt is made to suspend a process that has already exited.
+    /// </exception>
+    /// <remarks>
+    /// <para> This method uses platform-specific mechanisms for process suspension and
+    /// is supported on Windows, macOS, Linux, and FreeBSD. </para>
+    /// <para>This operation is not supported on iOS, tvOS, or browser platforms. </para>
+    /// </remarks>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    public void Suspend()
+        => _processWrapper.SuspendProcess();
+
+    /// <summary>
+    /// Resumes the execution of a suspended external process.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the process has already exited and cannot be resumed.
+    /// </exception>
+    /// <remarks>
+    /// <para> This method uses platform-specific mechanisms for process suspension and
+    /// is supported on Windows, macOS, Linux, and FreeBSD. </para>
+    /// <para>This operation is not supported on iOS, tvOS, or browser platforms. </para>
+    /// </remarks>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    public void Resume()
+        => _processWrapper.ResumeProcess();
+    
     /// <summary>
     ///     Terminates the associated external process based on the specified exit configuration.
     /// </summary>

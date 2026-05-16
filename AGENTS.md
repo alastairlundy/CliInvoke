@@ -42,8 +42,11 @@ dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs
 dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json
 ```
 
+**Production Publishing** (CI/NuGet):
+Follow the sequence in `.github/workflows/publish.yml`. This requires packing `src/CliInvoke.Core` first, then restoring/building dependent projects while passing version properties: `/p:CliInvokeCoreVersion=<<corecore-version>` and `/p:CliInvokeVersion=<<mainmain-version>`.
+
 ## Important Conventions
-- **Working directory**: CI runs from `src/CliInvoke/` - match this when reproducing issues
+- **Working directory**: CI runs from `src/CliInvoke/` (see `.github/workflows/test.yml`) - match this when reproducing issues
 - **Target frameworks**: net8.0; net9.0; net10.0 (see csproj files)
 - **Testing**: Uses TUnit framework - `dotnet test` discovers and runs tests
 - **Resource disposal**: Key disposable types: `ProcessConfiguration`, `IExternalProcess`, `UserCredential`, `UserCredentialBuilder`, `PipedProcessResult`
@@ -52,7 +55,7 @@ dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json
 ## Common Gotchas
 - SDK mismatch: Check `dotnet --version` vs `global.json` if build fails with TFM errors
 - Packaging: When testing changes across projects, pack core first and restore others from local nupkg feed
-- External processes: Tests calling executables may behave differently across OSes
+- External processes: Tests calling executables may behave differently across OSes. Prefer running in Ubuntu-latest/containers to replicate CI failures accurately.
 - SourceLink / CI: release builds in CI expect SourceLink and symbol generation. Use `/p:ContinuousIntegrationBuild=true` to replicate CI/release behavior.
 
 ## Developer Expectations for PRs
