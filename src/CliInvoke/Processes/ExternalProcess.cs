@@ -140,7 +140,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     public async Task StartAsync(ProcessConfiguration configuration,
         CancellationToken cancellationToken)
     {
-        FileInfo filePath = await ValidateExecutableFile();
+        FileInfo filePath = await Task.FromResult(_filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
 
         Configuration.TargetFilePath = filePath.FullName;
 
@@ -155,14 +155,6 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         if (configuration.StandardInput is not null)
             await _processWrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
                 cancellationToken);
-    }
-
-    private Task<FileInfo> ValidateExecutableFile()
-    {
-        if (File.Exists(Configuration.TargetFilePath))
-            return Task.FromResult(new FileInfo(Configuration.TargetFilePath));
-        
-        return Task.FromResult(_filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
     }
 
     /// <summary>

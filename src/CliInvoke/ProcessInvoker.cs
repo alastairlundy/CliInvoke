@@ -275,28 +275,13 @@ public class ProcessInvoker : IProcessInvoker
     {
         ArgumentNullException.ThrowIfNull(processConfiguration);
 
-        if (!File.Exists(processConfiguration.TargetFilePath))
-        {
-            FileInfo fileInfo = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
+        FileInfo fileInfo = _filePathResolver.ResolveFilePath(processConfiguration.TargetFilePath);
 
-            processConfiguration.TargetFilePath = fileInfo.FullName;
-        }
+        processConfiguration.TargetFilePath = fileInfo.FullName;
 
         processExitConfiguration ??= ProcessExitConfiguration.CreateGraceful();
 
-        ThrowFileNotFoundException(processConfiguration);
         return processExitConfiguration;
-    }
-
-    private static void ThrowFileNotFoundException(ProcessConfiguration processConfiguration)
-    {
-        if (!File.Exists(processConfiguration.TargetFilePath))
-            throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace(
-                    "{file}",
-                    processConfiguration.TargetFilePath
-                )
-            );
     }
 
     private static void DisposeProcess(ProcessWrapper process)
