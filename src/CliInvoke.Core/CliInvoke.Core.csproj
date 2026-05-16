@@ -23,9 +23,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.7.0-beta.1</Version>
-        <PackageReleaseNotes>* Updated internal Polyfill version from 10.3.0 to 10.5.1
-* Fixed an issue that would cause Standard Input to be unintentionally redirected </PackageReleaseNotes>
+        <Version>2.7.0</Version>
+        <PackageReleaseNotes>- Added a simpler overload to ``ProcessConfiguration``
+- Added a simpler overload to `ProcessExitConfiguration`.
+- Reduced timeout threshold to 10 minutes - A future minor version may reduce this further
+- Improve ProcessConfiguration ``ToString`` method performance</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>2.7.0.0</AssemblyVersion>
         <FileVersion>2.7.0.0</FileVersion>

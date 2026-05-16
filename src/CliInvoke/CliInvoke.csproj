@@ -15,14 +15,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated DotExtensions from 10.3.0 to 10.3.1
-* Updated internal Polyfill version from 10.3.0 to 10.5.1
-* Fixed an issue with Process Suspend functionality
-* Fixed an issue with Process Resume functionality</PackageReleaseNotes>
+        <PackageReleaseNotes>- Ported `CliRun` facade to `CliInvoke` 2.7 – CliRun is a new beginner-friendly entry point providing static RunAsync / Run*Async methods for simple process invocation without boilerplate (zero DI setup required, but allows optional DI injection of some services)
+- Updated `ProcessWrapper` for improved handling.
+- Addressed potential Resource Policy setting race condition.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.7.0-beta.1</PackageVersion>
+        <PackageVersion>2.7.0</PackageVersion>
         <AssemblyVersion>2.7.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
