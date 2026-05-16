@@ -23,12 +23,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.6.0</Version>
-        <PackageReleaseNotes>- Deprecated ``IProcessConfigurationFactory`` - This will be removed in CliInvoke v3
-- Deprecated the original ProcessConfiguration constructor - This will be removed in CliInvoke v3</PackageReleaseNotes>
+        <Version>2.6.1</Version>
+        <PackageReleaseNotes>* Updated internal ``Polyfill`` version from 10.3.0 to 10.5.1</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.6.0.0</AssemblyVersion>
-        <FileVersion>2.6.0.0</FileVersion>
+        <AssemblyVersion>2.6.1.0</AssemblyVersion>
+        <FileVersion>2.6.1.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>

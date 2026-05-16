@@ -12,21 +12,22 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.6.0</PackageVersion>
+        <PackageVersion>2.6.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.6.0
-* Fixed an issue with ``PowershellProcessInvoker`` that would cause it to throw an ArgumentException upon instantiation - This will be backported to 2.5.x</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal ``Polyfill`` version from 10.3.0 to 10.5.1
+* Updated to use CliInvoke.Core 2.6.1
+* Fixed an issue with PowershellProcessInvoker</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>2.6.0.0</AssemblyVersion>
-        <FileVersion>2.6.0.0</FileVersion>
+        <AssemblyVersion>2.6.1.0</AssemblyVersion>
+        <FileVersion>2.6.1.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
