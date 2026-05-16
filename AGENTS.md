@@ -17,34 +17,6 @@ CliInvoke — a .NET/C# library for running and interacting with command-line pr
 - Tests: Located in `tests/` folder, use TUnit framework
 - .NET SDK: Respect `global.json` (currently .NET 10.0) - matches CI
 
-## Essential Commands
-**Restore/Build/Test** (from repo root):
-```bash
-dotnet restore src/CliInvoke/
-dotnet build --no-restore -c Debug src/CliInvoke/
-dotnet test --no-build src/CliInvoke/
-```
-
-**Full solution build**:
-```bash
-dotnet build src/CliInvoke.sln -c Debug
-```
-
-**Release build** (with SourceLink):
-```bash
-dotnet build -c Release /p:ContinuousIntegrationBuild=true
-```
-
-**Packaging** (for testing multi-project changes):
-```bash
-mkdir -p ./nupkgs
-dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs
-dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json
-```
-
-**Production Publishing** (CI/NuGet):
-Follow the sequence in `.github/workflows/publish.yml`. This requires packing `src/CliInvoke.Core` first, then restoring/building dependent projects while passing version properties: `/p:CliInvokeCoreVersion=<<corecore-version>` and `/p:CliInvokeVersion=<<mainmain-version>`.
-
 ## Important Conventions
 - **Working directory**: CI runs from `src/CliInvoke/` (see `.github/workflows/test.yml`) - match this when reproducing issues
 - **Target frameworks**: net8.0; net9.0; net10.0 (see csproj files)
@@ -78,4 +50,25 @@ Follow the sequence in `.github/workflows/publish.yml`. This requires packing `s
 - Tests: tests/ — test projects (run with dotnet test)
 - Other: benchmarks/, .assets/, THIRD_PARTY_NOTICES.txt
 
-When making changes, prefer to open/modify files under src/ and run tests targeting src/CliInvoke/ for fast feedback.
+## Specialized Workflows
+The following skills are available to handle specific operational tasks. Load them when the corresponding scenario arises:
+
+| Scenario | Skill to Load |
+|----------|--------------|
+| Daily development: restoring, building, and running tests | `cliinvoke-inner-loop` |
+| Local NuGet packing for cross-project testing | `cliinvoke-publish-and-package` |
+| Production release: versioning and publishing to NuGet | `cliinvoke-publish-and-package` |
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in the repo's GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Standard canonical labels are used. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout. See `docs/agents/domain.md`.
