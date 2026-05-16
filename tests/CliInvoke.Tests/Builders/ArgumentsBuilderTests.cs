@@ -123,7 +123,9 @@ public class ArgumentsBuilderTests
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
 
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         Assert.Throws<ArgumentNullException>(() => builder.AddEnumerable(null, CultureInfo.InvariantCulture));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
     }
 
     [Fact]

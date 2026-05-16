@@ -9,7 +9,6 @@ namespace CliInvoke.Tests.Helpers.Processes;
 
 public class ProcessCancellationTests
 {
-    
     [Fact]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
