@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+      uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
       with:
         egress-policy: audit
 
@@ -30,11 +30,9 @@ jobs:
       with:
         dotnet-version: 10.0.x
     - name: Restore dependencies
-      run: dotnet restore
-      working-directory: src/CliInvoke/
+      run: dotnet restore src/CliInvoke.sln
     - name: Build
-      run: dotnet build --no-restore
-      working-directory: src/CliInvoke/
+      run: dotnet build --no-restore src/CliInvoke.sln
     - name: Test
-      run: dotnet test --no-build --verbosity normal
-      working-directory: src/CliInvoke/
+      run: dotnet test --no-build
+      working-directory: tests/CliInvoke.Tests/
