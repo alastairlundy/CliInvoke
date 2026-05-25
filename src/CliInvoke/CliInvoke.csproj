@@ -15,15 +15,21 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated DotExtensions version from 10.2.0 to 10.3.0
-* Reworked ``ProcessInvoker`` to require the user to manage the disposal of the provided process configuration
-* Significant updates and refinements to ``ArgumentsBuilder`` for better argument handling and character escaping
-*  Significant updates and refinements to ``ArgumentsBuilder`` for better argument handling and character escaping
-* Fixed various spelling and grammar issues across the codebase</PackageReleaseNotes>
+        <PackageReleaseNotes>#### 🆕 Additions
+- Implemented process suspend and resume support via `ProcessWrapper`.
+- Added support for `FireAndForget` execution in `ExternalProcess`.
+#### 🗑️ Removals
+- Removed `BasicFilePathResolver.cs`.
+#### ⚙️ Modifications
+- Aligned `ExternalProcess` disposal logic with official documentation.
+- Fixed an issue where Standard Input was inadvertently redirected.
+- Simplified calls to the file path resolver.
+- Updated `ProcessInvoker` and `ExternalProcess` internal logic for stability.
+- Updated DotExtensions version from 10.3.0 to 10.3.2</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.3</PackageVersion>
+        <PackageVersion>3.0.0-alpha.4</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
