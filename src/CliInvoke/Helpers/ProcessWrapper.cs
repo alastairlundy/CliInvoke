@@ -51,13 +51,20 @@ internal partial class ProcessWrapper : Process
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
             || OperatingSystem.IsFreeBSD())
         {
-            SuspendProcess();
+            try
+            {
+                SuspendProcess();
 
 #pragma warning disable CA1416
-            this.SetResourcePolicy(ResourcePolicy);
+                this.SetResourcePolicy(ResourcePolicy);
 #pragma warning restore CA1416
 
-            ResumeProcess();
+                ResumeProcess();
+            }
+            catch
+            {
+                // Ignored
+            }
         }
     }
 
@@ -80,7 +87,7 @@ internal partial class ProcessWrapper : Process
 
             throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
         }
-
+        
         if (!HasStarted)
         {
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
