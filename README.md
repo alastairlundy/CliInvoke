@@ -492,7 +492,7 @@ Want your project added to this list? [Open an issue](https://github.com/alastai
 
 CliInvoke aims to make working with Commands and external processes easier.
 
-Whilst an initial set of features are available in version 1, there is room for more features and for modifications of
+Whilst there is a modest set of features are available today, there is room for more features and for modifications of
 existing features in future updates.
 
 Future updates may focus on one or more of the following:
@@ -504,7 +504,7 @@ Future updates may focus on one or more of the following:
 
 ## New vs Old Package and Namespace
 
-CliInvoke changed it's Nuget package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
+CliInvoke changed it's Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
 since been published directly under the ``CliInvoke`` package ID prefix and namespace.
 
 The previous packages Ids are marked as deprecated and will not receive future updates.
