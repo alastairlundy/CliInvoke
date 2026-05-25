@@ -51,6 +51,7 @@ internal partial class ProcessWrapper : Process
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
             || OperatingSystem.IsFreeBSD())
         {
+            // TODO: Replace with ProcessHandle CreateSuspended as part of .NET 11 support.
             try
             {
                 SuspendProcess();
