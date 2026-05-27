@@ -23,11 +23,11 @@ public static class CliRun
         ExternalProcessFactory();
 
     /// <summary>
-    /// Configures the process invoker to be used for executing command-line processes.
+    /// Configures the external process factory to be used for creating the command-line external processes.
     /// </summary>
     /// <param name="externalProcessFactory">
-    /// An implementation of the <see cref="IProcessInvoker"/> interface, which defines the logic for creating
-    /// and managing process executions. This parameter allows customisation of process invocation behaviour.
+    /// An implementation of the <see cref="IExternalProcessFactory"/> interface, which defines the logic for creating
+    /// and managing <see cref="IExternalProcess"/> objects. This parameter allows customisation of external process creation behaviour.
     /// </param>
     public static void UseExternalProcessFactory(IExternalProcessFactory externalProcessFactory)
     {
