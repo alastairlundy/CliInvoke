@@ -317,8 +317,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public void Suspend()
-        => _processWrapper.SuspendProcess();
+    public void Suspend() => _processWrapper.SuspendProcess();
 
     /// <summary>
     /// Resumes the execution of a suspended external process.
@@ -335,8 +334,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public void Resume()
-        => _processWrapper.ResumeProcess();
+    public void Resume() => _processWrapper.ResumeProcess();
     
     /// <summary>
     ///     Terminates the associated external process based on the specified exit configuration.
