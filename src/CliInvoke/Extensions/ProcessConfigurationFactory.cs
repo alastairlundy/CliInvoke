@@ -102,7 +102,7 @@ public static class ProcessConfigurationFactory
 
         IArgumentsBuilder argumentsBuilder = new ArgumentsBuilder();
         
-        var argumentsList = arguments.ToList();
+        List<string> argumentsList = arguments.ToList();
         if (argumentsList.Count > 0)
             argumentsBuilder.AddRange(argumentsList);
 
