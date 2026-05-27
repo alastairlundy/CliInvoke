@@ -437,9 +437,6 @@ internal class ProcessWrapper : Process
     private async Task<bool> CancelWithInterrupt(TimeSpan timeoutThreshold,
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
     {
-        if (!OperatingSystem.IsWindows())
-            throw new PlatformNotSupportedException();
-
         // Use semaphore to prevent simultaneous cancellation attempts
         if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
         {
@@ -482,8 +479,7 @@ internal class ProcessWrapper : Process
                 DateTime currentExpectedExitTime =
                     CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
                 
-                if(!OperatingSystem.IsWindows())
-                    cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason);
+                cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason);
                 
                 CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
                     cancellationReason,

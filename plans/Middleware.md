@@ -1,7 +1,7 @@
 # Proposal: Middleware System for CliInvoke
 
 ## Preamble
-Following the separation of result validation logic from `ProcessInvoker` in v3, CliInvoke will introduce an optional middleware system for `ProcessInvoker` and potentially `ExternalProcess`. 
+Following the separation of result validation logic from `ProcessInvoker` in v3, CliInvoke will introduce an optional middleware system for `ProcessInvoker` and `ExternalProcess`. 
 
 The primary goals of this system are:
 - **Decoupling**: Move cross-cutting concerns (logging, diagnostics, resilience) out of the core invoker.
