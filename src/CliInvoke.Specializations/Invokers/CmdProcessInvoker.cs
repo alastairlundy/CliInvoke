@@ -7,9 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Threading;
-using System.Threading.Tasks;
-
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 using CliInvoke.Specializations.Configurations;
@@ -17,7 +14,7 @@ using CliInvoke.Specializations.Configurations;
 namespace CliInvoke.Specializations;
 
 /// <summary>
-///     Represents a specialized invoker for executing command-line processes on Windows systems.
+///     Represents a specialised invoker for executing command-line processes on Windows systems.
 ///     Provides functionality to execute processes either with raw output, buffered output, or piped
 ///     streams.
 /// </summary>
