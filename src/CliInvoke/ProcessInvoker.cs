@@ -9,6 +9,7 @@
 
 using CliInvoke.Helpers;
 using CliInvoke.Helpers.Processes;
+using CliInvoke.Processes.Internal;
 
 namespace CliInvoke;
 
