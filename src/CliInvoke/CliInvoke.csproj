@@ -57,9 +57,9 @@
 
     <ItemGroup>
         <PackageReference Include="DotExtensions"/>
-       <!-- <PackageReference Include="Polyfill" PrivateAssets="all">
+       <PackageReference Include="Polyfill" PrivateAssets="all">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>-->
+        </PackageReference>
     </ItemGroup>
 
     <PropertyGroup>

@@ -230,23 +230,19 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     public async Task<BufferedProcessResult> CaptureBufferedResultAsync(
         CancellationToken cancellationToken)
     {
-        Task<string> standardOutputString = Configuration.OutputRedirection
-            ? _processWrapper.StandardOutput.ReadToEndAsync(cancellationToken)
-            : Task.FromResult(string.Empty);
-
-        Task<string> standardErrorString = Configuration.OutputRedirection
-            ? _processWrapper.StandardError.ReadToEndAsync(cancellationToken)
-            : Task.FromResult(string.Empty);
+        Task<(string StandardOutput, string StandardError)> outputStrings = Configuration.OutputRedirection ?
+            _processWrapper.ReadAllTextAsync(cancellationToken)
+            : Task.FromResult((string.Empty, string.Empty));
 
         try
         {
             await Task.WhenAll(
                 _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputString, standardErrorString);
+                outputStrings);
 
             BufferedProcessResult result = new BufferedProcessResult(_processWrapper.StartInfo.FileName,
                 _processWrapper.ExitCode,
-                _processWrapper.Id, await standardOutputString, await standardErrorString,
+                _processWrapper.Id, outputStrings.Result.StandardOutput, outputStrings.Result.StandardError,
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime);
 
@@ -254,8 +250,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         }
         finally
         {
-            standardOutputString.Dispose();
-            standardErrorString.Dispose();
+            outputStrings.Dispose();
         }
     }
 
