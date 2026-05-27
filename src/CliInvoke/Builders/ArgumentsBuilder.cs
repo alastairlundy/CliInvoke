@@ -119,13 +119,13 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        var filteredList = values.Where(x => _argumentValidationLogic.Invoke(x)).ToList();
+        List<string> filteredList = values.Where(x => _argumentValidationLogic.Invoke(x)).ToList();
 
         if (filteredList.Count == 0)
             throw new ArgumentException("No valid arguments to add.");
 
         // Escape each individual argument (without wrapping), then join with spaces
-        var escapedList = filteredList.Select(v => EscapeCharactersWithoutWrapping(v)).ToList();
+        List<string> escapedList = filteredList.Select(v => EscapeCharactersWithoutWrapping(v)).ToList();
         string joinedEscapedValues = string.Join(" ", escapedList);
         string wrappedValue = $"\"{joinedEscapedValues}\"";
 
@@ -178,7 +178,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        var valuesList = values.ToList();
+        List<IFormattable> valuesList = values.ToList();
 
         if (valuesList.Count == 0)
             throw new ArgumentException("No valid arguments to add.");

@@ -44,9 +44,7 @@ internal static class CancellationHelper
     /// <param name="exitConfiguration">The exit configuration to use.</param>
     /// <returns>The calculated expected exit time for a process.</returns>
     internal static DateTime CalculateExpectedExitTime(ProcessExitConfiguration exitConfiguration)
-    {
-        return DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
-    }
+        => DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
 
 
     /// <summary>

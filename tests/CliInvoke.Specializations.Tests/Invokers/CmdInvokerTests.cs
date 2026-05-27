@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility;
+using CliInvoke.Core.Factories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Specializations.Tests.Invokers;
@@ -18,10 +19,10 @@ public class CmdInvokerTests
     public CmdInvokerTests(TestFixture testFixture)
     {
         IRunnerConfigurationFactory runnerProcessFactory = testFixture.ServiceProvider.GetRequiredService<IRunnerConfigurationFactory>();
-
-        IFilePathResolver executableFileResolver = testFixture.ServiceProvider.GetRequiredService<IFilePathResolver>();
         
-        cmdProcessInvoker = new CmdProcessInvoker(runnerProcessFactory, executableFileResolver);
+        IExternalProcessFactory externalProcessFactory = testFixture.ServiceProvider.GetRequiredService<IExternalProcessFactory>();
+        
+        cmdProcessInvoker = new CmdProcessInvoker(runnerProcessFactory, externalProcessFactory);
     }
 
     [Test]
