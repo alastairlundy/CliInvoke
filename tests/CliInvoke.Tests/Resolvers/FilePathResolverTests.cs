@@ -1,9 +1,14 @@
 using System.Linq;
+using CliInvoke.Core.Factories;
+using CliInvoke.Factories;
 
 namespace CliInvoke.Tests.Resolvers;
 
 public class FilePathResolverTests
 {
+    public static IExternalProcessFactory CreateExternalProcessFactory()
+        => new ExternalProcessFactory();
+    
     public static IFilePathResolver CreateFileResolver()
         => new FilePathResolver();
 
@@ -13,6 +18,7 @@ public class FilePathResolverTests
         string executable = OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet";
 
         IFilePathResolver filePathResolver = CreateFileResolver();
+        IExternalProcessFactory externalProcessFactory = CreateExternalProcessFactory();
 
         FileInfo actual = filePathResolver.ResolveFilePath(executable);
 
@@ -30,7 +36,7 @@ public class FilePathResolverTests
             {
                 using ProcessConfiguration configuration = ProcessConfigurationFactory.Create("where", "dotnet.exe");
 
-                IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver);
+                IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
 
                 BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
                     cancellationToken: CancellationToken.None);
@@ -42,7 +48,7 @@ public class FilePathResolverTests
         {
             using ProcessConfiguration configuration = ProcessConfigurationFactory.Create("which", "dotnet");
 
-            IProcessInvoker processInvoker = new ProcessInvoker(filePathResolver);
+            IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
 
             BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
                 cancellationToken: CancellationToken.None);
