@@ -349,7 +349,8 @@ internal class ProcessWrapper : Process
                 Task.Delay(500, cancellationToken), WaitForExitAsync(cancellationToken)
             ]);
 
-            if (!HasExited && fallbackToForceful) ForcefulExit();
+            if (!HasExited && fallbackToForceful) 
+                ForcefulExit();
         }
         finally
         {
