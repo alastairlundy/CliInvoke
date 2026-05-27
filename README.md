@@ -4,7 +4,7 @@
 [![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.svg?style=flat-square&label=Latest%20Stable%20Release)](https://www.nuget.org/packages/CliInvoke/)
 [![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.svg?style=flat-square&label=Latest%20Pre-Release)](https://www.nuget.org/packages/CliInvoke/)
 [![Downloads](https://img.shields.io/nuget/dt/CliInvoke.svg?style=flat-square)](https://www.nuget.org/packages/CliInvoke/)
-[![GitHub License](https://img.shields.io/github/license/alastairlundy/CliInvoke?style=flat-square&color=6a0dad)](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt)
+[![GitHub License](https://img.shields.io/github/license/alastairlundy/CliInvoke?style=flat-square)](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt)
 ![OpenSSF Scorecard Score](https://img.shields.io/ossf-scorecard/github.com/alastairlundy/CliInvoke?style=flat-square&label=OpenSSF%20Scorecard%20Score)
 
 <img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
