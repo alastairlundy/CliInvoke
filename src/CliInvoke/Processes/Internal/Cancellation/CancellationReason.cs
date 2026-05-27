@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-namespace CliInvoke.Helpers;
+namespace CliInvoke.Processes.Internal.Cancellation;
 
 internal enum CancellationReason
 {

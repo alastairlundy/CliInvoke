@@ -9,7 +9,7 @@
 
 using System.Runtime.InteropServices;
 
-using CliInvoke.Helpers;
+using CliInvoke.Processes.Internal.Cancellation;
 
 namespace CliInvoke.Processes.Internal.ControlAdapters;
 

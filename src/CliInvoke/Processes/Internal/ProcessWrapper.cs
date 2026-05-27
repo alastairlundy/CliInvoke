@@ -9,8 +9,7 @@
 
 using System.ComponentModel;
 
-using CliInvoke.Helpers;
-using CliInvoke.Helpers.Processes.Cancellation;
+using CliInvoke.Processes.Internal.Cancellation;
 using CliInvoke.Processes.Internal.ControlAdapters;
 
 namespace CliInvoke.Processes.Internal;
