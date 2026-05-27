@@ -301,8 +301,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
             standardErrorStream.Dispose();
         }
     }
-
-
+    
     /// <summary>
     /// Suspends the external process that is currently running.
     /// </summary>
