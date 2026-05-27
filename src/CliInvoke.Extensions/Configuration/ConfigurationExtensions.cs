@@ -16,7 +16,6 @@ using System.Linq;
 
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
-using CliInvoke.Helpers.Processes;
 
 namespace CliInvoke.Extensions;
 

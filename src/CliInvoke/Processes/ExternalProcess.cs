@@ -8,8 +8,6 @@
    */
 
 using CliInvoke.Core.Processes;
-using CliInvoke.Helpers;
-using CliInvoke.Helpers.Processes;
 using CliInvoke.Processes.Internal;
 
 namespace CliInvoke.Processes;
@@ -186,6 +184,11 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         return result;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public int FireAndForget(CancellationToken cancellationToken)
     {
         Task task = new(() =>

@@ -1,5 +1,4 @@
-﻿using CliInvoke.Core;
-using CliInvoke.Core.Factories;
+﻿using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 
 namespace CliInvoke.Benchmarking.Helpers;
