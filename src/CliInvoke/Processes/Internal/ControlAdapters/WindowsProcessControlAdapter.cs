@@ -123,6 +123,59 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         }
     }
 
+    internal override void SetResourcePolicy(ProcessWrapper process, ProcessResourcePolicy?  resourcePolicy)
+    {
+        resourcePolicy ??= ProcessResourcePolicy.Default;
+
+        if (!process.HasStarted)
+            throw new InvalidOperationException(
+                Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
+            );
+
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+            if (resourcePolicy.ProcessorAffinity is not null)
+                process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
+
+        if (OperatingSystem.IsMacOS()
+            || OperatingSystem.IsMacCatalyst()
+            || OperatingSystem.IsFreeBSD()
+            || OperatingSystem.IsWindows()
+           )
+        {
+            if (resourcePolicy.MinWorkingSet is not null)
+                process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
+
+            if (resourcePolicy.MaxWorkingSet is not null)
+                process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
+        }
+
+        process.PriorityClass = resourcePolicy.PriorityClass;
+        process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
+    }
+
+    [SupportedOSPlatform("windows")]
+    internal override void RequireRunningAsAdmin(Process process)
+    {
+        if(OperatingSystem.IsWindows())
+            process.StartInfo.Verb = "runas";
+    }
+
+    [SupportedOSPlatform("windows")]
+    internal override void SetUserCredential(Process process, UserCredential credential)
+    {
+        if (credential.Domain is not null && OperatingSystem.IsWindows())
+            process.StartInfo.Domain = credential.Domain;
+
+        if (credential.UserName is not null)  
+            process.StartInfo.UserName = credential.UserName;
+
+        if (credential.Password is not null && OperatingSystem.IsWindows())
+            process.StartInfo.Password = credential.Password;
+
+        if (credential.LoadUserProfile is not null && OperatingSystem.IsWindows())
+            process.StartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
+    }
+
     internal override async Task<bool> SendInterruptSignalAsync(Process process,
         CancellationReason cancellationReason,
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)

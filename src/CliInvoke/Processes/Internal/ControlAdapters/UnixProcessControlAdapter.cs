@@ -10,7 +10,6 @@
 using System.Runtime.InteropServices;
 
 using CliInvoke.Helpers;
-using CliInvoke.Helpers.Processes.Cancellation;
 
 namespace CliInvoke.Processes.Internal.ControlAdapters;
 
@@ -51,6 +50,55 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
             if (errno == 3) return;
             throw new InvalidOperationException($"kill(SIGSTOP) failed for pid {process} with errno {errno}.");
         }
+    }
+
+    internal override void SetResourcePolicy(ProcessWrapper process, ProcessResourcePolicy? resourcePolicy)
+    {
+        resourcePolicy ??= ProcessResourcePolicy.Default;
+
+        if (!process.HasStarted)
+            throw new InvalidOperationException(
+                Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
+            );
+
+        if (OperatingSystem.IsLinux())
+            if (resourcePolicy.ProcessorAffinity is not null)
+                process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
+
+        if (OperatingSystem.IsMacOS()
+            || OperatingSystem.IsMacCatalyst()
+            || OperatingSystem.IsFreeBSD()
+            || OperatingSystem.IsWindows()
+           )
+        {
+            if (resourcePolicy.MinWorkingSet is not null)
+                process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
+
+            if (resourcePolicy.MaxWorkingSet is not null)
+                process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
+        }
+
+        process.PriorityClass = resourcePolicy.PriorityClass;
+        process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
+    }
+
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    [UnsupportedOSPlatform("browser")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("windows")]
+    internal override void RequireRunningAsAdmin(Process process)
+    {
+        if (OperatingSystem.IsLinux() ||
+            OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
+            OperatingSystem.IsFreeBSD())
+            process.StartInfo.Verb = "sudo";
+    }
+
+    internal override void SetUserCredential(Process process, UserCredential credential)
+    {
     }
 
     [UnsupportedOSPlatform("browser")]

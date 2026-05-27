@@ -10,7 +10,6 @@
 using System.ComponentModel;
 
 using CliInvoke.Helpers;
-using CliInvoke.Helpers.Processes;
 using CliInvoke.Helpers.Processes.Cancellation;
 using CliInvoke.Processes.Internal.ControlAdapters;
 
@@ -29,15 +28,15 @@ internal class ProcessWrapper : Process
     internal ProcessWrapper(ProcessConfiguration configuration,
         ProcessResourcePolicy? resourcePolicy)
     {
-        StartInfo = configuration.ToProcessStartInfo();
+        ProcessControlAdapter = ProcessControlAdapterFactory.Create();
+        ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
+        ProcessControlAdapter.ApplyConfiguration(this, configuration);
         ProcessName = StartInfo.FileName;
         EnableRaisingEvents = true;
         Exited += OnExited;
         Started += OnStarted;
 
         HasStarted = false;
-        ProcessControlAdapter = ProcessControlAdapterFactory.Create();
-        ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
     }
     
     internal BaseProcessControlAdapter ProcessControlAdapter { get; }
@@ -66,7 +65,7 @@ internal class ProcessWrapper : Process
                 SuspendProcess();
 
 #pragma warning disable CA1416
-                this.SetResourcePolicy(ResourcePolicy);
+                ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
 #pragma warning restore CA1416
 
                 ResumeProcess();
@@ -85,43 +84,6 @@ internal class ProcessWrapper : Process
 
     internal event EventHandler Started;
     
-    /// <summary>
-    ///     Applies a ProcessResourcePolicy to a Process.
-    /// </summary>
-    /// <param name="resourcePolicy">The process resource policy to be applied.</param>
-    /// <exception cref="InvalidOperationException"></exception>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    private void SetResourcePolicy(ProcessResourcePolicy? resourcePolicy)
-    {
-        resourcePolicy ??= ProcessResourcePolicy.Default;
-
-        if (!HasStarted)
-            throw new InvalidOperationException(
-                Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
-            );
-
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
-            if (resourcePolicy.ProcessorAffinity is not null)
-                ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
-
-        if (OperatingSystem.IsMacOS()
-            || OperatingSystem.IsMacCatalyst()
-            || OperatingSystem.IsFreeBSD()
-            || OperatingSystem.IsWindows()
-           )
-        {
-            if (resourcePolicy.MinWorkingSet is not null)
-                MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
-
-            if (resourcePolicy.MaxWorkingSet is not null)
-                MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
-        }
-
-        PriorityClass = resourcePolicy.PriorityClass;
-        PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
-    }
-
     public new bool Start()
     {
         try
