@@ -104,7 +104,7 @@ public class FilePathResolver : IFilePathResolver
 
                     if (File.Exists(filePath))
                     {
-                        resolvedFilePath = new(filePath);
+                        resolvedFilePath = new FileInfo(filePath);
                         return true;
                     }
                 }
@@ -115,7 +115,7 @@ public class FilePathResolver : IFilePathResolver
 
                 if (File.Exists(filePath))
                 {
-                    resolvedFilePath = new(filePath);
+                    resolvedFilePath = new FileInfo(filePath);
                     return true;
                 }
             }
