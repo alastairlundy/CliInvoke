@@ -30,7 +30,7 @@ namespace CliInvoke.Specializations.Configurations;
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
-    /// Initializes a new instance of the PowershellCommandConfiguration class.
+    /// Initialises a new instance of the PowershellCommandConfiguration class.
     /// </summary>
     /// <param name="filePathResolver"></param>
     /// <param name="arguments">The arguments to be passed to the command.</param>
