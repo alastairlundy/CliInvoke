@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Runtime.CompilerServices;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 using CliInvoke.Factories;
@@ -25,16 +26,16 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="filePathResolver">The file path resolver to be used.</param>
     /// <param name="processPipeHandler">The pipe handler to be used for managing the input/output streams of the processes.</param>
+    [Obsolete("Use the constructor that takes IExternalProcessFactory instead. This code is deprecated and will be removed in CliInvoke v3.")]
+    [OverloadResolutionPriority(1)]
     public ProcessInvoker(
         IFilePathResolver filePathResolver,
         IProcessPipeHandler processPipeHandler)
     {
-        IFilePathResolver filePathResolver1 = filePathResolver;
-        IProcessPipeHandler processPipeHandler1 = processPipeHandler;
-
-        _externalProcessFactory = new ExternalProcessFactory(filePathResolver1, processPipeHandler1);
+        _externalProcessFactory = new ExternalProcessFactory(filePathResolver, processPipeHandler);
     }
     
+    [OverloadResolutionPriority(0)]
     public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
     {
         _externalProcessFactory = externalProcessFactory;

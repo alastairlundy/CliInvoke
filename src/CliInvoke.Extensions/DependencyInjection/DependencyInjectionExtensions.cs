@@ -47,7 +47,8 @@ public static partial class DependencyInjectionExtensions
                 
                 services.AddSingleton<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
-                services.AddSingleton<IProcessInvoker, ProcessInvoker>();
+                services.AddSingleton<IProcessInvoker>(sp => 
+                    new ProcessInvoker(sp.GetRequiredService<IExternalProcessFactory>()));
                 
                 services.AddSingleton<IRunnerProcessFactory, RunnerProcessFactory>();
                 services.AddSingleton<IShellDetector, ShellDetector>();
@@ -65,7 +66,8 @@ public static partial class DependencyInjectionExtensions
                 
                 services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddScoped<IExternalProcessFactory, ExternalProcessFactory>();
-                services.AddScoped<IProcessInvoker, ProcessInvoker>();
+                services.AddScoped<IProcessInvoker>(sp => 
+                    new ProcessInvoker(sp.GetRequiredService<IExternalProcessFactory>()));
 
                 services.AddScoped<IRunnerProcessFactory, RunnerProcessFactory>();
                 services.AddScoped<IShellDetector, ShellDetector>();
@@ -83,7 +85,8 @@ public static partial class DependencyInjectionExtensions
                 
                 services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
                 services.AddTransient<IExternalProcessFactory, ExternalProcessFactory>();
-                services.AddTransient<IProcessInvoker, ProcessInvoker>();
+                services.AddTransient<IProcessInvoker>(sp => 
+                    new ProcessInvoker(sp.GetRequiredService<IExternalProcessFactory>()));
 
                 services.AddTransient<IRunnerProcessFactory, RunnerProcessFactory>();
                 services.AddTransient<IShellDetector, ShellDetector>();
