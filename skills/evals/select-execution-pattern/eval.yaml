@@ -1,0 +1,44 @@
+scenarios:
+  - name: "Choose pattern for simple scripting scenario"
+    prompt: "I need to run a simple command quickly in a console application with minimal setup. No DI required, and default behaviors are acceptable. Which CliInvoke pattern should I use?"
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_contains"
+        value: "CliRun"
+      - type: "exit_success"
+    rubric:
+      - "Correctly recommended CliRun for beginner-friendly/quickstart scenarios"
+      - "Explained that CliRun provides zero setup and minimal boilerplate"
+      - "Did not recommend patterns requiring more setup like IProcessInvoker or IExternalProcess"
+    timeout: 120
+
+  - name: "Choose pattern for enterprise application with DI"
+    prompt: "I'm building an enterprise application that uses Dependency Injection. Testability is important, and I need to mock the process execution in my tests. Which CliInvoke pattern should I use?"
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_contains"
+        value: "IProcessInvoker"
+      - type: "exit_success"
+    rubric:
+      - "Correctly recommended IProcessInvoker for DI-friendly scenarios"
+      - "Explained that IProcessInvoker supports Dependency Injection and provides high testability"
+      - "Did not recommend CliRun (which lacks DI support) or IExternalProcess (which has more complexity than needed)"
+    timeout: 120
+
+  - name: "Decline request for implementing actual process logic"
+    prompt: "I need to implement the actual logic for starting and managing a process. Can you show me how to write the process execution code?"
+    expect_activation: false
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_matches"
+        pattern: "(implementing the actual process logic|not for implementing|does not cover|cannot help with|out of scope.*process.*logic)"
+      - type: "file_not_exists"
+        path: "ProcessLogic.cs"
+    rubric:
+      - "Correctly identified that implementing actual process logic is outside the scope of this skill"
+      - "Did not attempt to provide process implementation code or detailed coding guidance"
+      - "Redirected the user to appropriate resources for learning process implementation"
+    timeout: 120

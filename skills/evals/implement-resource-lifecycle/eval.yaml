@@ -1,0 +1,48 @@
+scenarios:
+  - name: "Dispose ProcessConfiguration correctly"
+    prompt: "I've created a ProcessConfiguration object using ProcessConfigurationBuilder. What's the correct way to dispose of it to prevent resource leaks?"
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_contains"
+        value: "using"
+      - type: "output_contains"
+        value: "ProcessConfiguration"
+      - type: "exit_success"
+    rubric:
+      - "Correctly recommended using a 'using' or 'await using' block to dispose of ProcessConfiguration"
+      - "Explained that the creator of the configuration is responsible for its disposal"
+      - "Did not suggest ignoring disposal or disposing it at the wrong time"
+    timeout: 120
+
+  - name: "Dispose IExternalProcess in async methods"
+    prompt: "I'm working with IExternalProcess in an async method. Should I use 'using' or 'await using' to dispose of it properly?"
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_contains"
+        value: "await using"
+      - type: "output_contains"
+        value: "IExternalProcess"
+      - type: "exit_success"
+    rubric:
+      - "Correctly recommended using 'await using' for IExternalProcess in async contexts"
+      - "Explained that this ensures non-blocking resource cleanup"
+      - "Did not suggest using 'using' instead of 'await using' for async methods"
+    timeout: 120
+
+  - name: "Decline request for general C# memory management"
+    prompt: "I'm having issues with memory management in my C# application. Can you help me identify and fix memory leaks?"
+    expect_activation: false
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_matches"
+        pattern: "(general C# memory management|not for general memory|does not cover|cannot help with|out of scope.*memory.*management)"
+      - type: "file_not_exists"
+        path: "MemoryManagement.cs"
+    rubric:
+      - "Correctly identified that general C# memory management is outside the scope of this skill"
+      - "Did not attempt to provide general memory management guidance"
+      - "Redirected the user to appropriate resources for learning general C# memory management"
+    timeout: 120

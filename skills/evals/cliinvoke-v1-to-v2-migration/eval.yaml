@@ -1,0 +1,44 @@
+scenarios:
+  - name: "Map V1 invoker interface to V2 equivalent"
+    prompt: "In CliInvoke V1, I was using ICliCommandInvoker. What is the equivalent interface in V2?"
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_contains"
+        value: "IProcessInvoker"
+      - type: "exit_success"
+    rubric:
+      - "Correctly identified that ICliCommandInvoker maps to IProcessInvoker in V2"
+      - "Provided the clear and direct mapping between V1 and V2 interfaces"
+      - "Did not confuse the mapping with other similar interfaces like IProcessFactory"
+    timeout: 120
+
+  - name: "Map V1 WithArguments method to V2 equivalent"
+    prompt: "I'm upgrading from CliInvoke V1 to V2. In V1, I used WithArguments(...) on the configuration builder. What method should I use in V2?"
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_contains"
+        value: "SetArguments"
+      - type: "exit_success"
+    rubric:
+      - "Correctly identified that WithArguments maps to SetArguments in V2"
+      - "Explained the general pattern that With* methods in V1 become Set* or Configure* methods in V2"
+      - "Did not suggest an incorrect method like AddArguments or WithArguments (V1 method name)"
+    timeout: 120
+
+  - name: "Decline request for writing new V2 code without V1 reference"
+    prompt: "I'm starting a new project and want to write CliInvoke V2 code from scratch without referencing V1. Can you help me?"
+    expect_activation: false
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_matches"
+        pattern: "(writing new V2 code|from scratch without referencing V1|not for writing new code|does not cover|out of scope)"
+      - type: "file_not_exists"
+        path: "V1Code.cs"
+    rubric:
+      - "Correctly identified that this skill is for mapping V1 to V2, not for writing new V2 code from scratch"
+      - "Did not attempt to provide V2 coding guidance unrelated to V1 mapping"
+      - "Redirected the user to appropriate resources for learning V2 development"
+    timeout: 120

@@ -1,0 +1,50 @@
+scenarios:
+  - name: "Select packages for library abstraction"
+    prompt: "I'm creating a NuGet library that defines process interactions but doesn't want to force a concrete implementation on consumers. Which CliInvoke packages should I install?"
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_contains"
+        value: "CliInvoke.Core"
+      - type: "output_not_contains"
+        value: "CliInvoke.Extensions"
+      - type: "exit_success"
+    rubric:
+      - "Correctly identified that only CliInvoke.Core is needed for abstraction-only libraries"
+      - "Explained that this avoids introducing concrete dependencies into abstraction-only libraries"
+      - "Did not recommend installing the implementation package (CliInvoke) or extensions package"
+    timeout: 120
+
+  - name: "Select packages for desktop application"
+    prompt: "I'm building a desktop application and want to use CliInvoke with DI registration and convenience helpers for easy setup. What packages do I need?"
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_contains"
+        value: "CliInvoke.Core"
+      - type: "output_contains"
+        value: "CliInvoke"
+      - type: "output_contains"
+        value: "CliInvoke.Extensions"
+      - type: "exit_success"
+    rubric:
+      - "Correctly identified the full application setup: CliInvoke.Core, CliInvoke, and CliInvoke.Extensions"
+      - "Explained that this includes DI registration and convenience extensions for easy setup"
+      - "Did not forget any of the three required packages for the recommended desktop application setup"
+    timeout: 120
+
+  - name: "Decline NuGet restore error fixing request"
+    prompt: "I'm getting NuGet restore errors when trying to build my project. Can you help me fix these errors?"
+    expect_activation: false
+    setup:
+      copy_test_files: true
+    assertions:
+      - type: "output_matches"
+        pattern: "(fixing NuGet restore errors|not for fixing|does not cover|cannot help with|out of scope.*NuGet.*restore)"
+      - type: "file_not_exists"
+        path: "nuget.config"
+    rubric:
+      - "Correctly identified that fixing NuGet restore errors is outside the scope of this skill"
+      - "Did not attempt to modify any configuration files or suggest specific fixes for NuGet restore errors"
+      - "Redirected the user to appropriate resources for resolving NuGet restore issues"
+    timeout: 120
