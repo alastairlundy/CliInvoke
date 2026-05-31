@@ -1,5 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
-name: migrate-v1-to-v2-basic
-description: Basic migration request.
-prompt: I am upgrading from CliInvoke v1 to v2. What are the most critical changes I need to be aware of?
-expected: The response should mention the move to IProcessInvoker and the new ProcessConfiguration model.

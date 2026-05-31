@@ -1,5 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
-name: migrate-v1-to-v2-wrong-approach
-description: User thinks they can just update NuGet and not change code.
-prompt: If I update the CliInvoke NuGet package to v2, will my v1 code still work without changes?
-expected: The response should explain that there are breaking changes and a migration is required.

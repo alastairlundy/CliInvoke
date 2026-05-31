@@ -1,5 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
-name: choose-iprocessinvoker-for-di
-description: User needs to integrate CliInvoke into a DI-based application.
-prompt: I am building an enterprise app with Dependency Injection. How should I invoke processes using CliInvoke to make it testable?
-expected: The response should recommend registering IProcessInvoker in the DI container.

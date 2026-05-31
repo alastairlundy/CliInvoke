@@ -1,8 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
-name: generate-process-configuration
-description: Evaluate the ability to generate correct process configurations.
-skill: skills/cliinvoke-core/generate-process-configuration/SKILL.md
-tasks:
-  - tasks/positive-trigger-1.yaml
-  - tasks/positive-trigger-2.yaml
-  - tasks/negative-trigger-1.yaml

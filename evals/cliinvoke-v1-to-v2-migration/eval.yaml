@@ -1,8 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
-name: cliinvoke-v1-to-v2-migration
-description: Evaluate the ability to guide users through V1 to V2 migration.
-skill: skills/cliinvoke/cliinvoke-v1-to-v2-migration/SKILL.md
-tasks:
-  - tasks/positive-trigger-1.yaml
-  - tasks/positive-trigger-2.yaml
-  - tasks/negative-trigger-1.yaml

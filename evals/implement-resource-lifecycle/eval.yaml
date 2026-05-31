@@ -1,8 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
-name: implement-resource-lifecycle
-description: Evaluate the ability to implement the resource lifecycle in CliInvoke.
-skill: skills/cliinvoke-core/implement-resource-lifecycle/SKILL.md
-tasks:
-  - tasks/positive-trigger-1.yaml
-  - tasks/positive-trigger-2.yaml
-  - tasks/negative-trigger-1.yaml

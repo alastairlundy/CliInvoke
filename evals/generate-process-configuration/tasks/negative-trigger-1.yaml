@@ -1,5 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
-name: config-incorrect-property
-description: User tries to set a property that doesn't exist in ProcessConfiguration.
-prompt: Can I set the 'Priority' of the process directly inside the ProcessConfiguration object?
-expected: The response should explain the current limitations of ProcessConfiguration and suggest alternative ways if possible.

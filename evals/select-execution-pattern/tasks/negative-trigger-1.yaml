@@ -1,5 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/task.schema.json
-name: choose-clirun-for-interactive-shell
-description: User incorrectly asks for CliRun for an interactive shell.
-prompt: I need to implement a real-time interactive shell. Should I use CliRun.RunAsync for this?
-expected: The response should warn against using CliRun and instead recommend IExternalProcess.
