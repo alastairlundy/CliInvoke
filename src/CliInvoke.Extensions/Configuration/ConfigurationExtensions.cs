@@ -18,6 +18,7 @@ using System.Runtime.CompilerServices;
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
 using CliInvoke.Helpers.Processes;
+using CliInvoke.Internal;
 
 namespace CliInvoke.Extensions;
 
@@ -133,6 +134,7 @@ public static class ConfigurationExtensions
         /// </summary>
         /// <returns>An instance of <see cref="ProcessStartInfo"/> with the configuration applied from
         /// the provided <see cref="ProcessConfiguration"/>.</returns>
+        [Obsolete(DeprecationMessages.DeprecationV3)]
         public ProcessStartInfo ToProcessStartInfo()
         {
             return processConfiguration.ToProcessStartInfo(processConfiguration.RedirectStandardOutput,
