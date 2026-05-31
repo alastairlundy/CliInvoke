@@ -52,5 +52,6 @@ public class CmdInvokerTests : IDisposable
     public void Dispose()
     {
         cmdProcessInvoker.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
