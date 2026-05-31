@@ -20,7 +20,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     private readonly Dictionary<string, string> _environmentVariables;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="EnvironmentVariablesBuilder"/> class.
+    /// Initialises a new instance of the <see cref="EnvironmentVariablesBuilder"/> class.
     /// </summary>
     /// <param name="throwExceptionIfDuplicateKeyFound">Whether to throw an exception if a duplicate key is found or suppress the exception and override the previous value.</param>
     public EnvironmentVariablesBuilder(bool throwExceptionIfDuplicateKeyFound = true)
@@ -31,7 +31,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="EnvironmentVariablesBuilder"/> class.
+    /// Initialises a new instance of the <see cref="EnvironmentVariablesBuilder"/> class.
     /// </summary>
     /// <param name="stringComparer">The <see cref="StringComparer"/> to use for the internal dictionary.</param>
     /// <param name="throwExceptionIfDuplicateKeyFound">Whether to throw an exception if a duplicate key is found or suppress the exception and override the previous value.</param>

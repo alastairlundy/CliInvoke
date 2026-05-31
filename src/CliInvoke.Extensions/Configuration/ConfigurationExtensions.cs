@@ -30,7 +30,7 @@ public static class ConfigurationExtensions
 {
     /// <summary>
     /// Provides extension methods for configuring and transforming process-related settings
-    /// to create reusable and standardized process configurations.
+    /// to create reusable and standardised process configurations.
     /// </summary>
     extension(ProcessConfiguration)
     {

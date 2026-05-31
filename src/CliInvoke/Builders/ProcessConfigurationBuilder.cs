@@ -25,7 +25,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     private readonly ProcessConfiguration _configuration;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
+    /// Initialises a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
     /// which is used to build and configure a process.
     /// </summary>
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
@@ -37,7 +37,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
+    /// Initialises a new instance of the <see cref="ProcessConfigurationBuilder"/> class,
     /// which is used to build and configure a process.
     /// </summary>
     /// <param name="configuration">A process configuration to update.</param>
