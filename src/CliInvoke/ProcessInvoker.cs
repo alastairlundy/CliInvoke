@@ -20,7 +20,7 @@ public class ProcessInvoker : IProcessInvoker
     private readonly IProcessPipeHandler _processPipeHandler;
 
     private readonly IFilePathResolver _filePathResolver;
-
+    
     /// <summary>
     /// Instantiates a <see cref="ProcessInvoker"/> for creating and executing processes.
     /// </summary>
@@ -164,8 +164,9 @@ public class ProcessInvoker : IProcessInvoker
                 ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
 
-            DisposeCompletedStreams(standardOut, standardError);
-
+            standardOut.Dispose();
+            standardError.Dispose();
+            
             return result;
         }
         finally
@@ -234,7 +235,8 @@ public class ProcessInvoker : IProcessInvoker
                 ThrowProcessNotSuccessfulException(result, processConfiguration);
             }
             
-            DisposeCompletedStreams(standardOutput, standardError);
+            standardOutput.Dispose();
+            standardError.Dispose();
 
             return result;
         }
@@ -245,23 +247,6 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     #region Class private helpers
-    private static void DisposeCompletedStreams(Task<string> standardOut, Task<string> standardError)
-    {
-        if (standardOut.IsCompleted)
-            standardOut.Dispose();
-
-        if (standardError.IsCompleted)
-            standardError.Dispose();
-    }
-    
-    private void DisposeCompletedStreams(Task<Stream> standardOutput, Task<Stream> standardError)
-    {
-        if (standardOutput.IsCompleted)
-            standardOutput.Dispose();
-
-        if (standardError.IsCompleted)
-            standardError.Dispose();
-    }
 
     private static void ThrowProcessNotSuccessfulException(ProcessResult result,
         ProcessConfiguration configuration)
