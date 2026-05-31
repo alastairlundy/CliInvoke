@@ -186,11 +186,11 @@ public class ExternalProcess : IExternalProcess
     {
         Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
                 PipeStandardOutputAsync(_processWrapper, cancellationToken) 
-            : (Task<Stream>)Task.CompletedTask;
+            : Task.FromResult(Stream.Null);
         
         Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
                 PipeStandardErrorAsync(_processWrapper, cancellationToken) 
-            : (Task<Stream>)Task.CompletedTask;
+            : Task.FromResult(Stream.Null);
         
         try
         {
@@ -207,6 +207,12 @@ public class ExternalProcess : IExternalProcess
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime
             );
+
+            if(Configuration.StandardOutput is not null)
+                await standardOutputStream.Result.CopyToAsync(Configuration.StandardOutput.BaseStream, cancellationToken);
+            
+            if(Configuration.StandardError is not null)
+                await standardErrorStream.Result.CopyToAsync(Configuration.StandardError.BaseStream, cancellationToken);
 
             ThrowIfProcessNotSuccessful(result);
 
@@ -229,7 +235,8 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("tvos")]
     public async Task<BufferedProcessResult> WaitForBufferedExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
-        Task<string> standardOutputString = Configuration.RedirectStandardOutput ? _processWrapper.StandardOutput.ReadToEndAsync(cancellationToken) 
+        Task<string> standardOutputString = Configuration.RedirectStandardOutput ? _processWrapper.StandardOutput
+                .ReadToEndAsync(cancellationToken) 
             : Task.FromResult(string.Empty);
 
         Task<string> standardErrorString = Configuration.RedirectStandardError
