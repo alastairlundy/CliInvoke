@@ -10,6 +10,7 @@
 using System.Runtime.InteropServices;
 
 using CliInvoke.Processes.Internal.Cancellation;
+// ReSharper disable UnusedMember.Local
 
 namespace CliInvoke.Processes.Internal.ControlAdapters;
 
@@ -176,7 +177,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
             process.StartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
     }
 
-    internal override async Task<bool> SendInterruptSignalAsync(Process process,
+    internal override Task<bool> SendInterruptSignalAsync(Process process,
         CancellationReason cancellationReason,
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
     {
@@ -186,7 +187,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         successfulAttachment =
             successfulAttachment && AttachConsoleWin((uint)process.Id);
 
-        return successfulAttachment && SendCtrlCToConsoleWin(CtrlCSignalEvent, 0);
+        return Task.FromResult(successfulAttachment && SendCtrlCToConsoleWin(CtrlCSignalEvent, 0));
     }
 
     #region P/Invoke code for Graceful Cancellation of Processes on Windows

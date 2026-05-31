@@ -40,7 +40,7 @@ internal class ProcessWrapper : Process
     
     internal BaseProcessControlAdapter ProcessControlAdapter { get; }
 
-    internal ProcessResourcePolicy ResourcePolicy { get; set; }
+    internal ProcessResourcePolicy ResourcePolicy { get; }
 
     internal bool HasStarted { get; private set; }
 
@@ -55,6 +55,7 @@ internal class ProcessWrapper : Process
     
     private void OnStarted(object? sender, EventArgs e)
     {
+        // ReSharper disable once InvertIf
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
             || OperatingSystem.IsFreeBSD())
         {
@@ -461,7 +462,7 @@ internal class ProcessWrapper : Process
                         cancellationToken);
             });
 
-            bool cancellationSuccess = false;
+            bool cancellationSuccess;
 
             try
             {
