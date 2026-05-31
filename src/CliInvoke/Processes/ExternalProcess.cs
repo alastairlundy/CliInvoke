@@ -244,7 +244,7 @@ public class ExternalProcess : IExternalProcess
                 standardErrorString
             ]);
             
-            BufferedProcessResult result = new BufferedProcessResult(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
+            BufferedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
                 _processWrapper.ExitTime);
 
@@ -256,6 +256,48 @@ public class ExternalProcess : IExternalProcess
         {
             standardOutputString.Dispose();
             standardErrorString.Dispose();
+            Dispose();
+        }
+    }
+    
+    /// <summary>
+    /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains the piped process result when the method completes.</returns>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    public async Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(
+        CancellationToken cancellationToken)
+    {
+        Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler
+                .PipeStandardOutputAsync(_processWrapper, cancellationToken)
+            : Task.FromResult(Stream.Null);
+
+        Task<Stream> standardErrorStream = Configuration.RedirectStandardError
+            ? _processPipeHandler.PipeStandardErrorAsync(_processWrapper, cancellationToken)
+            : Task.FromResult(Stream.Null);
+        
+        try
+        {
+            await Task.WhenAll([
+                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
+                standardOutputStream,
+                standardErrorStream
+            ]);
+            
+            PipedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
+                _processWrapper.Id, _processWrapper.StartTime, _processWrapper.ExitTime,
+                await standardOutputStream, await standardErrorStream);
+
+            ThrowIfProcessNotSuccessful(result);
+
+            return result;
+        }
+        finally
+        {
+            standardOutputStream.Dispose();
+            standardErrorStream.Dispose();
             Dispose();
         }
     }
@@ -291,6 +333,8 @@ public class ExternalProcess : IExternalProcess
     {
         Configuration.Dispose();
         _processWrapper.Dispose();
+        
+        GC.SuppressFinalize(this);
     }
 
     private void ThrowIfProcessNotSuccessful(ProcessResult result)

@@ -79,4 +79,12 @@ public interface IExternalProcess : IDisposable
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when an invalid value is provided for ExitConfiguration.TimeoutPolicy.CancellationMode.</exception>
     Task Kill();
+
+    /// <summary>
+    /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains the piped process result when the method completes.</returns>
+    Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(
+        CancellationToken cancellationToken);
 }
