@@ -90,7 +90,10 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
+            process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
 
@@ -171,7 +174,10 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
+            process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
 
@@ -242,7 +248,10 @@ public class ProcessInvoker : IProcessInvoker
         }
         finally
         {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
+            process.Dispose();
+            
+            if(disposeOfConfig)
+                processConfiguration.Dispose();
         }
     }
 
@@ -286,12 +295,6 @@ public class ProcessInvoker : IProcessInvoker
 
         processExitConfiguration ??= ProcessExitConfiguration.Default;
 
-        ThrowFileNotFoundException(processConfiguration);
-        return processExitConfiguration;
-    }
-
-    private void ThrowFileNotFoundException(ProcessConfiguration processConfiguration)
-    {
         if (!File.Exists(processConfiguration.TargetFilePath))
         {
             throw new FileNotFoundException(
@@ -301,16 +304,8 @@ public class ProcessInvoker : IProcessInvoker
                 )
             );
         }
-    }
-    
-    private static void DisposeProcessAndConfig(ProcessConfiguration processConfiguration,
-        bool disposeOfConfig,
-        ProcessWrapper process)
-    {
-        process.Dispose();
-
-        if (disposeOfConfig)
-            processConfiguration.Dispose();
+        
+        return processExitConfiguration;
     }
     #endregion
 }
