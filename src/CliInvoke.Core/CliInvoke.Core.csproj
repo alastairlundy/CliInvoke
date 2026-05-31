@@ -23,14 +23,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.7.0</Version>
-        <PackageReleaseNotes>- Added a simpler overload to ``ProcessConfiguration``
-- Added a simpler overload to `ProcessExitConfiguration`.
-- Reduced timeout threshold to 10 minutes - A future minor version may reduce this further
-- Improve ProcessConfiguration ``ToString`` method performance</PackageReleaseNotes>
+        <Version>2.7.1</Version>
+        <PackageReleaseNotes>- Update internal Polyfill version from 10.5.1 to 10.7.0</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.7.0.0</AssemblyVersion>
-        <FileVersion>2.7.0.0</FileVersion>
+        <AssemblyVersion>2.7.1.0</AssemblyVersion>
+        <FileVersion>2.7.1.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
