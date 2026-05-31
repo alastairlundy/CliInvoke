@@ -35,14 +35,14 @@ public static partial class DependencyInjectionExtensions
         switch (lifetime)
         {
             case ServiceLifetime.Singleton:
-                services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
-                services.TryAddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
+                services.AddSingleton<IFilePathResolver, FilePathResolver>();
+                services.AddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
                 
-                services.TryAddSingleton<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(
+                services.AddSingleton<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(
                     [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
-                services.TryAddSingleton<IProcessResultValidator<BufferedProcessResult>>(_ => new  ProcessResultValidator<BufferedProcessResult>(
+                services.AddSingleton<IProcessResultValidator<BufferedProcessResult>>(_ => new  ProcessResultValidator<BufferedProcessResult>(
                     [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
-                services.TryAddSingleton<IProcessResultValidator<PipedProcessResult>>(_ => new ProcessResultValidator<PipedProcessResult>(
+                services.AddSingleton<IProcessResultValidator<PipedProcessResult>>(_ => new ProcessResultValidator<PipedProcessResult>(
                     [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
                 
                 services.AddSingleton<IProcessConfigurationFactory, ProcessConfigurationFactory>();
@@ -53,14 +53,14 @@ public static partial class DependencyInjectionExtensions
                 services.AddSingleton<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Scoped:
-                services.TryAddScoped<IFilePathResolver, FilePathResolver>();
-                services.TryAddScoped<IProcessPipeHandler, ProcessPipeHandler>();
+                services.AddScoped<IFilePathResolver, FilePathResolver>();
+                services.AddScoped<IProcessPipeHandler, ProcessPipeHandler>();
                 
-                services.TryAddScoped<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(
+                services.AddScoped<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(
                     [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
-                services.TryAddScoped<IProcessResultValidator<BufferedProcessResult>>(_ => new  ProcessResultValidator<BufferedProcessResult>(
+                services.AddScoped<IProcessResultValidator<BufferedProcessResult>>(_ => new  ProcessResultValidator<BufferedProcessResult>(
                     [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
-                services.TryAddScoped<IProcessResultValidator<PipedProcessResult>>(_ => new ProcessResultValidator<PipedProcessResult>(
+                services.AddScoped<IProcessResultValidator<PipedProcessResult>>(_ => new ProcessResultValidator<PipedProcessResult>(
                     [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
                 
                 services.AddScoped<IProcessConfigurationFactory, ProcessConfigurationFactory>();
@@ -71,14 +71,14 @@ public static partial class DependencyInjectionExtensions
                 services.AddScoped<IShellDetector, ShellDetector>();
                 break;
             case ServiceLifetime.Transient:
-                services.TryAddTransient<IFilePathResolver, FilePathResolver>();
-                services.TryAddTransient<IProcessPipeHandler, ProcessPipeHandler>();
+                services.AddTransient<IFilePathResolver, FilePathResolver>();
+                services.AddTransient<IProcessPipeHandler, ProcessPipeHandler>();
 
-                services.TryAddTransient<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(
+                services.AddTransient<IProcessResultValidator<ProcessResult>>(_ => new ProcessResultValidator<ProcessResult>(
                     [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
-                services.TryAddTransient<IProcessResultValidator<BufferedProcessResult>>(_ => new  ProcessResultValidator<BufferedProcessResult>(
+                services.AddTransient<IProcessResultValidator<BufferedProcessResult>>(_ => new  ProcessResultValidator<BufferedProcessResult>(
                     [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
-                services.TryAddTransient<IProcessResultValidator<PipedProcessResult>>(_ => new ProcessResultValidator<PipedProcessResult>(
+                services.AddTransient<IProcessResultValidator<PipedProcessResult>>(_ => new ProcessResultValidator<PipedProcessResult>(
                     [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
                 
                 services.AddTransient<IProcessConfigurationFactory, ProcessConfigurationFactory>();
