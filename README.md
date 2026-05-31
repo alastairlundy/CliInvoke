@@ -4,7 +4,7 @@
 [![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.svg?style=flat-square&label=Latest%20Stable%20Release)](https://www.nuget.org/packages/CliInvoke/)
 [![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.svg?style=flat-square&label=Latest%20Pre-Release)](https://www.nuget.org/packages/CliInvoke/)
 [![Downloads](https://img.shields.io/nuget/dt/CliInvoke.svg?style=flat-square)](https://www.nuget.org/packages/CliInvoke/)
-[![GitHub License](https://img.shields.io/github/license/alastairlundy/CliInvoke?style=flat-square&color=6a0dad)](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt)
+[![GitHub License](https://img.shields.io/github/license/alastairlundy/CliInvoke?style=flat-square)](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt)
 ![OpenSSF Scorecard Score](https://img.shields.io/ossf-scorecard/github.com/alastairlundy/CliInvoke?style=flat-square&label=OpenSSF%20Scorecard%20Score)
 
 <img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
@@ -492,7 +492,7 @@ Want your project added to this list? [Open an issue](https://github.com/alastai
 
 CliInvoke aims to make working with Commands and external processes easier.
 
-Whilst an initial set of features are available in version 1, there is room for more features and for modifications of
+Whilst there is a modest set of features are available today, there is room for more features and for modifications of
 existing features in future updates.
 
 Future updates may focus on one or more of the following:
@@ -504,7 +504,7 @@ Future updates may focus on one or more of the following:
 
 ## New vs Old Package and Namespace
 
-CliInvoke changed it's Nuget package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
+CliInvoke changed it's Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
 since been published directly under the ``CliInvoke`` package ID prefix and namespace.
 
 The previous packages Ids are marked as deprecated and will not receive future updates.

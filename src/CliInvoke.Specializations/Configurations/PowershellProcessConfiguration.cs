@@ -8,7 +8,6 @@
    */
 
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -56,9 +55,16 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("pwsh",arguments, redirectStandardInput, outputRedirection,
-        workingDirectoryPath, requiresAdministrator, environmentVariables, credentials, standardInput, standardInputEncoding, standardOutputEncoding,
-        standardErrorEncoding, processResourcePolicy, windowCreation, useShellExecution)
+        bool useShellExecution = false, bool windowCreation = false) : 
+        base(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
+            arguments, redirectStandardInput, outputRedirection, workingDirectoryPath,
+            requiresAdministrator, environmentVariables,
+            credentials,
+            standardInput,
+            standardInputEncoding, standardOutputEncoding,
+            standardErrorEncoding, processResourcePolicy,
+            windowCreation: windowCreation,
+            useShellExecution: useShellExecution)
     {
         string filePath;
 

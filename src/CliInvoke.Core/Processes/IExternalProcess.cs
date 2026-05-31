@@ -84,6 +84,8 @@ public interface IExternalProcess : IDisposable
     ///     The result contains the buffered process result when the method completes.
     /// </returns>
     Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken);
+    
+    int FireAndForget(CancellationToken cancellationToken);
 
     /// <summary>
     ///     Asynchronously captures output and waits for the external process to exit or a specified
