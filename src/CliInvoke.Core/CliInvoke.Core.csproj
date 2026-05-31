@@ -23,12 +23,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.8.0</Version>
-        <PackageReleaseNotes>- Reduced timeout threshold to 3 minutes
-- Added ``WaitForPipedExitOrTimeoutAsync`` to ``IExternalProcess``</PackageReleaseNotes>
+        <Version>2.8.1</Version>
+        <PackageReleaseNotes>- Fixed an issue where timeout threshold wasn't Reduced to 3 minutes</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.8.0.0</AssemblyVersion>
-        <FileVersion>2.8.0.0</FileVersion>
+        <AssemblyVersion>2.8.1.0</AssemblyVersion>
+        <FileVersion>2.8.1.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
