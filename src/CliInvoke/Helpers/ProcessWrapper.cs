@@ -57,13 +57,20 @@ internal
 
     private void OnStarted(object? sender, EventArgs e)
     {
-        SuspendProcess();
+        try
+        {
+            SuspendProcess();
 
-#pragma warning disable CA1416
-        this.SetResourcePolicy(ResourcePolicy);
-#pragma warning restore CA1416
+        #pragma warning disable CA1416
+            this.SetResourcePolicy(ResourcePolicy);
+        #pragma warning restore CA1416
 
-        ResumeProcess();
+            ResumeProcess();
+        }
+        catch (InvalidOperationException)
+        {
+            // Process may have exited between starting and applying policy
+        }
     }
 
     private void OnExited(object? sender, EventArgs e)
