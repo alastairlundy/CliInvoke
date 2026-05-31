@@ -63,16 +63,32 @@ internal class ProcessWrapper : Process
             try
             {
                 SuspendProcess();
-
-#pragma warning disable CA1416
-                ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
-#pragma warning restore CA1416
-
-                ResumeProcess();
             }
             catch
             {
-                // Ignored
+                // Ignored - process suspension may not be supported on all platforms
+            }
+
+            try
+            {
+#pragma warning disable CA1416
+                ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
+#pragma warning restore CA1416
+            }
+            catch
+            {
+                // Ignored - resource policy application may fail on some platforms
+            }
+            finally
+            {
+                try
+                {
+                    ResumeProcess();
+                }
+                catch
+                {
+                    // Ignored - process resumption may fail if process was never suspended
+                }
             }
         }
     }
