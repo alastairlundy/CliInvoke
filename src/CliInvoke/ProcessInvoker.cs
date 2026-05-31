@@ -7,8 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Helpers;
-using CliInvoke.Helpers.Processes;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core.Processes;
+using CliInvoke.Factories;
 
 namespace CliInvoke;
 
@@ -17,9 +18,7 @@ namespace CliInvoke;
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
-    private readonly IProcessPipeHandler _processPipeHandler;
-
-    private readonly IFilePathResolver _filePathResolver;
+    private readonly IExternalProcessFactory _externalProcessFactory;
     
     /// <summary>
     /// Instantiates a <see cref="ProcessInvoker"/> for creating and executing processes.
@@ -30,8 +29,15 @@ public class ProcessInvoker : IProcessInvoker
         IFilePathResolver filePathResolver,
         IProcessPipeHandler processPipeHandler)
     {
-        _filePathResolver = filePathResolver;
-        _processPipeHandler = processPipeHandler;
+        IFilePathResolver filePathResolver1 = filePathResolver;
+        IProcessPipeHandler processPipeHandler1 = processPipeHandler;
+
+        _externalProcessFactory = new ExternalProcessFactory(filePathResolver1, processPipeHandler1);
+    }
+    
+    public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
+    {
+        _externalProcessFactory = externalProcessFactory;
     }
 
     /// <summary>
@@ -53,45 +59,14 @@ public class ProcessInvoker : IProcessInvoker
         bool disposeOfConfig = false,
         CancellationToken cancellationToken = default)
     {
-        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
+        processExitConfiguration ??= ProcessExitConfiguration.Default;
+        
+        using IExternalProcess externalProcess = _externalProcessFactory
+            .CreateExternalProcess(processConfiguration, processExitConfiguration);
+        
+        await externalProcess.StartAsync(cancellationToken);
 
-        ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
-
-        if (processConfiguration.StandardInput is not null
-            && processConfiguration.StandardInput != StreamWriter.Null)
-        {
-            process.StartInfo.RedirectStandardInput = true;
-        }
-
-        try
-        {
-            process.Start();
-
-            if(processConfiguration.RedirectStandardInput)
-                await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
-
-            await process.WaitForExitOrTimeoutAsync(processExitConfiguration, cancellationToken);
-
-            ProcessResult result = new(
-                process.ProcessName,
-                process.ExitCode, process.Id,
-                process.StartTime,
-                process.ExitTime
-            );
-
-            if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
-                !=  ProcessCancellationExceptionBehavior.SuppressException)
-            {
-                ThrowProcessNotSuccessfulException(result, processConfiguration);
-            }
-
-            return result;
-        }
-        finally
-        {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
-        }
+        return await externalProcess.WaitForExitOrTimeoutAsync(cancellationToken);
     }
 
     /// <summary>
@@ -111,68 +86,16 @@ public class ProcessInvoker : IProcessInvoker
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
-        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
+        processExitConfiguration ??= ProcessExitConfiguration.Default;
+        
+        using IExternalProcess externalProcess = _externalProcessFactory
+            .CreateExternalProcess(processConfiguration, processExitConfiguration);
+        
+        await externalProcess.StartAsync(cancellationToken);
 
-        ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
-
-        if (
-            processConfiguration.StandardInput is not null
-            && processConfiguration.StandardInput != StreamWriter.Null
-        )
-        {
-            process.StartInfo.RedirectStandardInput = true;
-        }
-
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        try
-        {
-            process.Start();
-            
-            if(processConfiguration.RedirectStandardInput)
-                await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
-
-            Task<string> standardOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
-            Task<string> standardError = process.StandardError.ReadToEndAsync(cancellationToken);
-
-            Task waitForExit = process.WaitForExitOrTimeoutAsync(
-                processExitConfiguration,
-                cancellationToken
-            );
-
-            await Task.WhenAll(standardOut, standardError, waitForExit);
-
-            BufferedProcessResult result = new(
-                process.ProcessName,
-                process.ExitCode,
-                process.Id,
-                await standardOut,
-                await standardError,
-                process.StartTime,
-                process.ExitTime
-            );
-
-            if (
-                processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0 && processExitConfiguration.CancellationExceptionBehavior
-                != ProcessCancellationExceptionBehavior.SuppressException
-            )
-            {
-                ThrowProcessNotSuccessfulException(result, processConfiguration);
-            }
-
-            standardOut.Dispose();
-            standardError.Dispose();
-            
-            return result;
-        }
-        finally
-        {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
-        }
+        return await externalProcess.WaitForBufferedExitOrTimeoutAsync(cancellationToken);
     }
 
     /// <summary>
@@ -192,125 +115,15 @@ public class ProcessInvoker : IProcessInvoker
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         bool disposeOfConfig = false,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
-        processExitConfiguration = ValidateConfigurations(processConfiguration, processExitConfiguration);
-
-        ProcessWrapper process = new(processConfiguration, processConfiguration.ResourcePolicy);
-
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        
-        try
-        {
-            process.Start();
-            
-            await PipeStandardInputAsync(processConfiguration, process, cancellationToken);
-
-            Task<Stream> standardOutput = _processPipeHandler.PipeStandardOutputAsync(process, cancellationToken);
-            Task<Stream> standardError = _processPipeHandler.PipeStandardErrorAsync(process, cancellationToken);
-
-            Task waitForExit = process.WaitForExitOrTimeoutAsync(
-                processExitConfiguration,
-                cancellationToken
-            );
-
-            await Task.WhenAll(standardOutput, standardError, waitForExit);
-
-            PipedProcessResult result = new(
-                process.ProcessName,
-                process.ExitCode,
-                process.Id,
-                process.StartTime,
-                process.ExitTime,
-                await standardOutput,
-                await standardError
-            );
-
-            if (processExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-                && process.ExitCode != 0 && processExitConfiguration.
-                    CancellationExceptionBehavior != ProcessCancellationExceptionBehavior.SuppressException)
-            {
-                ThrowProcessNotSuccessfulException(result, processConfiguration);
-            }
-            
-            standardOutput.Dispose();
-            standardError.Dispose();
-
-            return result;
-        }
-        finally
-        {
-            DisposeProcessAndConfig(processConfiguration, disposeOfConfig, process);
-        }
-    }
-
-    #region Class private helpers
-
-    private static void ThrowProcessNotSuccessfulException(ProcessResult result,
-        ProcessConfiguration configuration)
-    {
-        throw new ProcessNotSuccessfulException(
-            new ProcessExceptionInfo(result, configuration)
-        );
-    }
-
-    private async Task PipeStandardInputAsync(ProcessConfiguration processConfiguration,
-        ProcessWrapper process, CancellationToken cancellationToken)
-    {
-        if (
-            processConfiguration.StandardInput is not null
-            && processConfiguration.StandardInput != StreamWriter.Null
-        )
-        {
-            process.StartInfo.RedirectStandardInput = true;
-        }
-
-        if (process.StartInfo.RedirectStandardInput
-            && processConfiguration.StandardInput is not null)
-        {
-            await _processPipeHandler.PipeStandardInputAsync(
-                processConfiguration.StandardInput.BaseStream,
-                process, cancellationToken);
-        }
-    }
-    
-    private ProcessExitConfiguration ValidateConfigurations(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration)
-    {
-        ArgumentNullException.ThrowIfNull(processConfiguration);
-        
-        processConfiguration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            processConfiguration.TargetFilePath);
-
         processExitConfiguration ??= ProcessExitConfiguration.Default;
+        
+        using IExternalProcess externalProcess = _externalProcessFactory
+            .CreateExternalProcess(processConfiguration, processExitConfiguration);
+        
+        await externalProcess.StartAsync(cancellationToken);
 
-        ThrowFileNotFoundException(processConfiguration);
-        return processExitConfiguration;
+        return await externalProcess.WaitForPipedExitOrTimeoutAsync(cancellationToken);
     }
-
-    private void ThrowFileNotFoundException(ProcessConfiguration processConfiguration)
-    {
-        if (!File.Exists(processConfiguration.TargetFilePath))
-        {
-            throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace(
-                    "{file}",
-                    processConfiguration.TargetFilePath
-                )
-            );
-        }
-    }
-    
-    private static void DisposeProcessAndConfig(ProcessConfiguration processConfiguration,
-        bool disposeOfConfig,
-        ProcessWrapper process)
-    {
-        process.Dispose();
-
-        if (disposeOfConfig)
-            processConfiguration.Dispose();
-    }
-    #endregion
 }
