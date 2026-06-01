@@ -10,7 +10,7 @@ This is the Lunet-based documentation site skeleton for the CliInvoke project.
 Use this folder as the Lunet "site" content root. Expand pages, assets, and templates here.
 
 - Home: this page
-- Getting started: getting-started.md
+- Getting started: docs/docs/getting-started-readme.md
 
 
 ## Local preview
