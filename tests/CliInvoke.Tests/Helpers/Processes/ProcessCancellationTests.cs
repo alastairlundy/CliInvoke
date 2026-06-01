@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Runtime.Versioning;
-using CliInvoke.Helpers;
-using CliInvoke.Helpers.Processes;
+using CliInvoke.Processes.Internal;
 
 namespace CliInvoke.Tests.Helpers.Processes;
 

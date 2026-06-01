@@ -405,6 +405,6 @@ FodyWeavers.xsd
 /src/.idea
 /src/.ai/mcp
 /examples/.idea
-/docs/.lunet/build/cache/.lunet/resources/npm
+/docs/.lunet/build/cache
 /docs/.lunet/build
-waza.exe
+*.exe

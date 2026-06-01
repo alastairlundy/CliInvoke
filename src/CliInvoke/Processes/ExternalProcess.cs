@@ -8,15 +8,15 @@
    */
 
 using CliInvoke.Core.Processes;
-using CliInvoke.Helpers;
-using CliInvoke.Helpers.Processes;
+using CliInvoke.Processes.Internal;
 
 namespace CliInvoke.Processes;
 
 /// <summary>
 ///     Represents an external process that can be run.
 /// </summary>
-public class ExternalProcess : IExternalProcess
+// ReSharper disable once RedundantExtendsListEntry
+public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 {
     private ProcessWrapper _processWrapper;
     
@@ -139,7 +139,7 @@ public class ExternalProcess : IExternalProcess
     public async Task StartAsync(ProcessConfiguration configuration,
         CancellationToken cancellationToken)
     {
-        FileInfo filePath = await ValidateExecutableFile();
+        FileInfo filePath = await Task.FromResult(_filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
 
         Configuration.TargetFilePath = filePath.FullName;
 
@@ -154,14 +154,6 @@ public class ExternalProcess : IExternalProcess
         if (configuration.StandardInput is not null)
             await _processWrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
                 cancellationToken);
-    }
-
-    private Task<FileInfo> ValidateExecutableFile()
-    {
-        if (File.Exists(Configuration.TargetFilePath))
-            return Task.FromResult(new FileInfo(Configuration.TargetFilePath));
-        
-        return Task.FromResult(_filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
     }
 
     /// <summary>
@@ -193,6 +185,36 @@ public class ExternalProcess : IExternalProcess
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public int FireAndForget(CancellationToken cancellationToken)
+    {
+        Task task = new(() =>
+        {
+            try
+            {
+                Task startTask = StartAsync(cancellationToken);
+
+                startTask.Wait(cancellationToken);
+
+                Task<ProcessResult> waitForExitTask = WaitForExitOrTimeoutAsync(cancellationToken);
+
+                waitForExitTask.Wait(cancellationToken);
+            }
+            finally
+            {
+                Task.Run(()=> Kill(), cancellationToken);
+            }
+        }, CancellationToken.None);
+
+        task.Start();
+
+        return _processWrapper.Id;
+    }
+
+    /// <summary>
     ///     Asynchronously waits for the external process to exit or a specified timeout period elapses.
     /// </summary>
     /// <param name="cancellationToken">
@@ -208,23 +230,19 @@ public class ExternalProcess : IExternalProcess
     public async Task<BufferedProcessResult> CaptureBufferedResultAsync(
         CancellationToken cancellationToken)
     {
-        Task<string> standardOutputString = Configuration.OutputRedirection
-            ? _processWrapper.StandardOutput.ReadToEndAsync(cancellationToken)
-            : Task.FromResult(string.Empty);
-
-        Task<string> standardErrorString = Configuration.OutputRedirection
-            ? _processWrapper.StandardError.ReadToEndAsync(cancellationToken)
-            : Task.FromResult(string.Empty);
+        Task<(string StandardOutput, string StandardError)> outputStrings = Configuration.OutputRedirection ?
+            _processWrapper.ReadAllTextAsync(cancellationToken)
+            : Task.FromResult((string.Empty, string.Empty));
 
         try
         {
             await Task.WhenAll(
                 _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputString, standardErrorString);
+                outputStrings);
 
             BufferedProcessResult result = new BufferedProcessResult(_processWrapper.StartInfo.FileName,
                 _processWrapper.ExitCode,
-                _processWrapper.Id, await standardOutputString, await standardErrorString,
+                _processWrapper.Id, outputStrings.Result.StandardOutput, outputStrings.Result.StandardError,
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime);
 
@@ -232,8 +250,7 @@ public class ExternalProcess : IExternalProcess
         }
         finally
         {
-            standardOutputString.Dispose();
-            standardErrorString.Dispose();
+            outputStrings.Dispose();
         }
     }
 
@@ -279,8 +296,7 @@ public class ExternalProcess : IExternalProcess
             standardErrorStream.Dispose();
         }
     }
-
-
+    
     /// <summary>
     /// Suspends the external process that is currently running.
     /// </summary>
@@ -296,8 +312,7 @@ public class ExternalProcess : IExternalProcess
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public void Suspend()
-        => _processWrapper.SuspendProcess();
+    public void Suspend() => _processWrapper.SuspendProcess();
 
     /// <summary>
     /// Resumes the execution of a suspended external process.
@@ -314,8 +329,7 @@ public class ExternalProcess : IExternalProcess
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public void Resume()
-        => _processWrapper.ResumeProcess();
+    public void Resume() => _processWrapper.ResumeProcess();
     
     /// <summary>
     ///     Terminates the associated external process based on the specified exit configuration.

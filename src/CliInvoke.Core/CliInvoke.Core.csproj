@@ -22,10 +22,13 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-alpha.3</Version>
-        <PackageReleaseNotes>* Improved ``UserCredential`` equality checking in Equals methods
-* Improved ``ProcessResourcePolicy`` equality checking in Equals methods
-* Reduced default Timeout Threshold from 10 minutes to 2 minutes - This is probably close to as sane of a default Timeout Threshold as CliInvoke can provide without advanced knowledge of what program is being run. Users can easily specify a different Timeout Treshold with ``ProcessTimeoutPolicy.FromTimeSpan(TimeSpan)`` or ``new ProcessExitConfiguration(TimeSpan)` or use no timeout with ``ProcessTimeoutPolicy.None`` or ``new ProcessExitConfiguration(ProcessTimeoutPolicy.None)``. If you'd like to give feedback on this (or frankly any other aspect of CliInvoke), feel free to [create a discussion](https://github.com/alastairlundy/CliInvoke/discussions)</PackageReleaseNotes>
+        <Version>3.0.0-alpha.4</Version>
+        <PackageReleaseNotes>#### 🆕 Additions
+- Introduced `ISuspendableExternalProcess` to support pausing and resuming external processes.
+- Added `FireAndForget` method to `IExternalProcess`.
+
+#### ⚙️ Modifications
+- Improved `ProcessConfiguration.ToString` performance.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>

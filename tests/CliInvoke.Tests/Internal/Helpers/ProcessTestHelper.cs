@@ -1,4 +1,4 @@
-using CliInvoke.Helpers;
+using CliInvoke.Processes.Internal;
 using CliInvoke.Tests.Internal.Constants;
 
 namespace CliInvoke.Tests.Internal.Helpers;

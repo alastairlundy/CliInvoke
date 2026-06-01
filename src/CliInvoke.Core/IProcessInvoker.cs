@@ -55,15 +55,13 @@ public interface IProcessInvoker
     ///     returning.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="processExitConfiguration">The process exiting configuration information to use.</param>
+    /// <param name="exitConfiguration"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Piped Process Result that is returned from running the process.</returns>
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
-    Task<PipedProcessResult> ExecutePipedAsync(
-        ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null,
-        CancellationToken cancellationToken = default
-    );
+    Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
+        ProcessExitConfiguration? exitConfiguration = null,
+        CancellationToken cancellationToken = default);
 }

@@ -7,6 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Factories;
+using CliInvoke.Core.Processes;
+using CliInvoke.Factories;
+
 namespace CliInvoke;
 
 /// <summary>
@@ -15,23 +19,23 @@ namespace CliInvoke;
 /// </summary>
 public static class CliRun
 {
-    private static Func<IProcessInvoker> _processInvokerFactory = () => new 
-        ProcessInvoker(FilePathResolver.Shared);
+    private static Func<IExternalProcessFactory> _externalProcessFactory = () => new 
+        ExternalProcessFactory();
 
     /// <summary>
-    /// Configures the process invoker to be used for executing command-line processes.
+    /// Configures the external process factory to be used for creating the command-line external processes.
     /// </summary>
-    /// <param name="processInvoker">
-    /// An implementation of the <see cref="IProcessInvoker"/> interface, which defines the logic for creating
-    /// and managing process executions. This parameter allows customisation of process invocation behaviour.
+    /// <param name="externalProcessFactory">
+    /// An implementation of the <see cref="IExternalProcessFactory"/> interface, which defines the logic for creating
+    /// and managing <see cref="IExternalProcess"/> objects. This parameter allows customisation of external process creation behaviour.
     /// </param>
-    public static void UseProcessInvoker(IProcessInvoker processInvoker)
+    public static void UseExternalProcessFactory(IExternalProcessFactory externalProcessFactory)
     {
-        _processInvokerFactory = () => processInvoker;
+        _externalProcessFactory = () => externalProcessFactory;
     }
     
-    private static IProcessInvoker GetInvoker() 
-        => _processInvokerFactory.Invoke();
+    private static IExternalProcessFactory GetExternalProcessFactory() 
+        => _externalProcessFactory.Invoke();
 
     /// <summary>
     /// Executes a specified process with the provided parameters asynchronously and returns the resulting process data.
@@ -68,8 +72,8 @@ public static class CliRun
 
         ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
             ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
-        
-        return await GetInvoker().ExecuteAsync(configuration, exitConfiguration, cancellationToken);
+
+        return await RunAsync(configuration, exitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -91,10 +95,12 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        exitConfiguration ??= ProcessExitConfiguration.CreateGraceful();
+        using IExternalProcess externalProcess = GetExternalProcessFactory()
+            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
 
-        return await GetInvoker().ExecuteAsync(configuration, 
-            exitConfiguration, cancellationToken);
+        await externalProcess.StartAsync(cancellationToken);
+        
+        return await externalProcess.WaitForExitOrTimeoutAsync(cancellationToken);
     }
 
     /// <summary>
@@ -133,7 +139,7 @@ public static class CliRun
         ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
             ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
         
-        return await GetInvoker().ExecuteBufferedAsync(configuration, exitConfiguration, cancellationToken);
+        return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
     }
 
 
@@ -148,10 +154,12 @@ public static class CliRun
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        exitConfiguration ??= ProcessExitConfiguration.CreateGraceful();
+        using IExternalProcess externalProcess = GetExternalProcessFactory()
+            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
 
-        return await GetInvoker().ExecuteBufferedAsync(configuration, 
-            exitConfiguration, cancellationToken);
+        await externalProcess.StartAsync(cancellationToken);
+        
+        return await externalProcess.CaptureBufferedResultAsync(cancellationToken);
     }
 
     /// <summary>
@@ -190,7 +198,7 @@ public static class CliRun
         ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
             ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
         
-        return await GetInvoker().ExecutePipedAsync(configuration, exitConfiguration, cancellationToken);
+        return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -214,9 +222,11 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        exitConfiguration ??= ProcessExitConfiguration.CreateGraceful();
+        using IExternalProcess externalProcess = GetExternalProcessFactory()
+            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
+
+        await externalProcess.StartAsync(cancellationToken);
         
-        return await GetInvoker().ExecutePipedAsync(configuration,
-            exitConfiguration, cancellationToken);
+        return await externalProcess.CapturePipedResultAsync(cancellationToken);
     }
 }
