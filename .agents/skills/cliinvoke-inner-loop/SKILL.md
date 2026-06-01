@@ -1,6 +1,6 @@
 ---
 name: cliinvoke-inner-loop
-description: Daily development workflow for CliInvoke (restore, build, test)
+description: Daily development workflow for CliInvoke (restore, build, test).Use when implementing new features or fixing bugs in CliInvoke, or verifiying code changes. Do not use when publishing or releasing packages.
 ---
 
 # CliInvoke Inner Loop
