@@ -20,3 +20,7 @@ jobs:
       - id: lunet
         name: Build and deploy Lunet site
         uses: lunet-io/actions/lunet-build@v1
+        with:
+          site_path: docs/site
+        with:
+          site_path: docs/site
