@@ -51,6 +51,7 @@ When deciding which pattern to use, evaluate the requirements against the follow
 
 For detailed implementation examples on creating external processes, see the following references:
 * [IExternalProcess](./references/IExternalProcessCreation.md)
+* [IProcessInvoker](./references/IProcessInvoker.md)
 
 ## Common Pitfalls
 

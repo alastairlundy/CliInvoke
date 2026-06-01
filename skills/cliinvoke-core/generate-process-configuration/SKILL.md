@@ -38,6 +38,8 @@ If you intend to capture output, you must explicitly configure redirection:
 | Missing Redirection | Set `SetOutputRedirection(true)` in the configuration when using `ExecuteBufferedAsync` to avoid empty outputs or errors. |
 | Improper String Concatenation | Use `IEnumerable<string>` for arguments instead of manually concatenating them into a single string to ensure safer and more idiomatic platform-handling. |
 
-For implementation examples, see the [references](./references/) directory.
+For implementation examples, see:
+* [How to configure using Builders](./references/ConfiguringWithBuilders.md)
+* [How to set values](./references/SettingValues.md)
 
 This is a pure knowledge skill and does not invoke external tools.
