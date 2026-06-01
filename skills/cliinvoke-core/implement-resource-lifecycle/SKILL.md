@@ -1,6 +1,6 @@
 ---
 name: implement-resource-lifecycle
-description: Guidance on auditing and managing the lifecycle of disposable types in CliInvoke to prevent resource leaks and secure sensitive data. USE FOR: auditing and managing disposable types (ProcessConfiguration, IExternalProcess, etc.) to prevent resource leaks. DO NOT USE FOR: general C# memory management.
+description: Guidance on auditing and managing the lifecycle of disposable types in CliInvoke to prevent resource leaks and secure sensitive data. USE FOR auditing and managing disposable types (ProcessConfiguration, IExternalProcess, etc.) to prevent resource leaks. DO NOT USE FOR general C# memory management.
 compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, or CliInvoke.Specialization)
 ---
 # Implement Resource Lifecycle
@@ -46,7 +46,12 @@ The following five types MUST be disposed of. Failure to do so can lead to handl
 - [ ] `UserCredentialBuilder` is disposed of after `.Build()` is called.
 - [ ] `ProcessConfiguration` is disposed of after the process has completed and results are processed.
 
-For detailed usage examples, see the [references](./references/) directory.
+For detailed usage examples, see the following references:
+* [IExternalProcess example](./references/IExternalProcess.md)
+* [PipedProcessResult examples](./references/PipedProcessResult.md)
+* [ProcessConfiguration examples](./references/ProcessConfiguration.md)
+* [UserCredential examples](./references/UserCredential.md)
+* [UserCredentialBuilder examples](./references//UserCredentialBuilder.md)
 
 ## Common Pitfalls
 

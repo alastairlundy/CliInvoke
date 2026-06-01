@@ -1,7 +1,8 @@
 ---
 name: select-execution-pattern
-description: Guidance on choosing between CliRun, IProcessInvoker, and IExternalProcess based on requirements for simplicity, control, and testability. USE FOR: choosing between CliRun, IProcessInvoker, or IExternalProcess based on DI needs, testability, or lifecycle control. DO NOT USE FOR: implementing the actual process logic.
+description: Guidance on choosing between CliRun, IProcessInvoker, and IExternalProcess based on requirements for simplicity, control, and testability. USE FOR choosing between CliRun, IProcessInvoker, or IExternalProcess based on DI needs, testability, or lifecycle control. DO NOT USE FOR implementing the actual process logic.
 ---
+
 # Select Execution Pattern
 
 ## Decision Logic
@@ -48,7 +49,8 @@ When deciding which pattern to use, evaluate the requirements against the follow
 | **Lifecycle Control** | Low | Moderate | High |
 | **Ideal For** | Scripting/Prototypes | Enterprise Apps | Power Users/Complex Lifecycles |
 
-For detailed implementation examples on creating external processes, see the [references](./references/) directory.
+For detailed implementation examples on creating external processes, see the following references:
+* [IExternalProcess](./references/IExternalProcessCreation.md)
 
 ## Common Pitfalls
 

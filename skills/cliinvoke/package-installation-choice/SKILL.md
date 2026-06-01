@@ -1,6 +1,6 @@
 ---
 name: package-installation-choice
-description: Guides the selection and installation of the correct CliInvoke NuGet packages based on project type and requirements (Library vs App, Abstractions vs Implementation). USE FOR: selecting the correct NuGet packages (Core, Implementation, Extensions, Specializations) based on project type (Library vs App). DO NOT USE FOR: fixing NuGet restore errors.
+description: Guides the selection and installation of the correct CliInvoke NuGet packages based on project type and requirements (Library vs App, Abstractions vs Implementation). USE FOR selecting the correct NuGet packages (Core, Implementation, Extensions, Specializations) based on project type (Library vs App). DO NOT USE FOR fixing NuGet restore errors.
 ---
 
 # Package Installation Choice

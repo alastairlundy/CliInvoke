@@ -1,6 +1,6 @@
 ---
 name: generate-process-configuration
-description: Guidance on correctly utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, ensuring proper build and redirection setup. USE FOR: guidelines on utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, including build and redirection setup. DO NOT USE FOR: executing the resulting configuration.
+description: Guidance on correctly utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, ensuring proper build and redirection setup. USE FOR guidelines on utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, including build and redirection setup. DO NOT USE FOR executing the resulting configuration.
 compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, or CliInvoke.Specialization)
 ---
 # Generate Process Configuration

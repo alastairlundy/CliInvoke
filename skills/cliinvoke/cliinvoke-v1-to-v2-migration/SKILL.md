@@ -1,8 +1,9 @@
 ---
 name: cliinvoke-v1-to-v2-migration
-description: Mapping of V1 types and methods to their V2 equivalents to assist in upgrading CliInvoke installations. USE FOR: mapping V1 types and methods to V2 equivalents during an upgrade. DO NOT USE FOR: writing new V2 code from scratch without referencing V1.
+description: Mapping of V1 types and methods to their V2 equivalents to assist in upgrading CliInvoke installations. USE FOR mapping V1 types and methods to V2 equivalents during an upgrade. DO NOT USE FOR writing new V2 code from scratch without referencing V1.
 compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, CliInvoke.Specialization, or CliInvoke.Extensions)
 ---
+
 # CliInvoke V1 to V2 Migration
 
 ## Core Type Mapping
