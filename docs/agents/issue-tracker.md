@@ -1,22 +1,18 @@
-# Issue tracker: GitHub
+# Issue Tracker Configuration
 
-Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+This repository uses GitHub Issues for tracking work.
 
-## Conventions
+## Workflow
 
-- **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
-- **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
-- **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
-- **Comment on an issue**: `gh issue comment <number> --body "..."`
-- **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
-- **Close**: `gh issue close <number> --comment "..."`
+- Issues are created and managed via GitHub Issues
+- The `gh` CLI is used for issue operations from the command line
+- Standard GitHub issue labels and workflows apply
 
-Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
+## Integration with Skills
 
-## When a skill says "publish to the issue tracker"
+Skills like `to-issues`, `triage`, `to-prd`, and `qa` interact with this issue tracker using:
+- `gh issue create` for creating new issues
+- `gh issue list` with filters for querying issues
+- `gh issue edit` and `gh issue comment` for updates
 
-Create a GitHub issue.
-
-## When a skill says "fetch the relevant ticket"
-
-Run `gh issue view <number> --comments`.
+This configuration assumes standard GitHub Issues functionality. If you use GitHub Projects or other GitHub-native features, they will work alongside this setup.

@@ -1,51 +1,41 @@
-# Domain Docs
+# Domain Documentation Layout
 
-How the engineering skills should consume this repo's domain documentation when exploring the codebase.
+This repository follows a single-context layout for domain documentation.
 
-## Before exploring, read these
+## Structure
 
-- **`CONTEXT.md`** at the repo root, or
-- **`CONTEXT-MAP.md`** at the repo root if it exists — it points at one `CONTEXT.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`** — read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+- `CONTEXT.md` at the repository root contains the core domain language and concepts
+- `docs/adr/` directory at the repository root contains Architectural Decision Records
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The producer skill (`/grill-with-docs`) creates them lazily when terms or decisions actually get resolved.
+## How Skills Use This
 
-## File structure
+Skills that read domain documentation expect this layout:
+- `improve-codebase-architecture` reads `CONTEXT.md` to understand domain terminology
+- `diagnose` consults `CONTEXT.md` for context during troubleshooting
+- Skills that work with architectural decisions look in `docs/adr/` for ADRs
 
-Single-context repo (most repos):
+## File Contents
 
-```
-/
-├── CONTEXT.md
-├── docs/adr/
-│   ├── 0001-event-sourced-orders.md
-│   └── 0002-postgres-for-write-model.md
-└── src/
-```
+### CONTEXT.md
+Should contain:
+- Domain glossary (key terms and their meanings)
+- Core business concepts
+- Important domain rules and constraints
+- Shared vocabulary for team communication
 
-Multi-context repo (presence of `CONTEXT-MAP.md` at the root):
+### docs/adr/
+Should contain ADR files (typically Markdown) following a standard format:
+- Title: Clear, descriptive title
+- Status: Proposed, Accepted, Superseded, etc.
+- Context: The problem or situation driving the decision
+- Decision: What was decided
+- Consequences: Outcomes, both positive and negative
 
-```
-/
-├── CONTEXT-MAP.md
-├── docs/adr/                          ← system-wide decisions
-└── src/
-    ├── ordering/
-    │   ├── CONTEXT.md
-    │   └── docs/adr/                  ← context-specific decisions
-    └── billing/
-        ├── CONTEXT.md
-        └── docs/adr/
-```
+## Multi-Context Alternative
 
-## Use the glossary's vocabulary
+If this were a multi-context repo (monorepo), there would be:
+- `CONTEXT-MAP.md` at the root mapping context names to paths
+- Per-context `CONTEXT.md` files in subdirectories
+- Per-context `docs/adir/` directories
 
-When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `CONTEXT.md`. Don't drift to synonyms the glossary explicitly avoids.
-
-If the concept you need isn't in the glossary yet, that's a signal — either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/grill-with-docs`).
-
-## Flag ADR conflicts
-
-If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
-
-> _Contradicts ADR-0007 (event-sourced orders) — but worth reopening because…_
+But this repository uses the simpler single-context approach.

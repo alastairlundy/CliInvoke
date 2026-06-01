@@ -50,6 +50,7 @@ CliInvoke — a .NET/C# library for running and interacting with command-line pr
 - Tests: tests/ — test projects (run with dotnet test)
 - Other: benchmarks/, .assets/, THIRD_PARTY_NOTICES.txt
 
+When making changes, prefer to open/modify files under src/ and run tests targeting src/CliInvoke/ for fast feedback.
 ## Specialized Workflows
 The following skills are available to handle specific operational tasks. Load them when the corresponding scenario arises:
 
@@ -63,12 +64,12 @@ The following skills are available to handle specific operational tasks. Load th
 
 ### Issue tracker
 
-Issues live in the repo's GitHub Issues. See `docs/agents/issue-tracker.md`.
+Issues live in GitHub Issues (uses the gh CLI). See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-Standard canonical labels are used. See `docs/agents/triage-labels.md`.
+Uses default label names: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Single-context layout. See `docs/agents/domain.md`.
+Single-context: one CONTEXT.md + docs/adr/ at repo root. See `docs/agents/domain.md`.
