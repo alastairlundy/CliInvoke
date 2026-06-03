@@ -1,4 +1,8 @@
-scenarios:
+---
+name: select-execution-pattern
+description: Guidance on choosing between CliRun, IProcessInvoker, and IExternalProcess based on requirements for simplicity, control, and testability. USE FOR choosing between CliRun, IProcessInvoker, or IExternalProcess based on DI needs, testability, or lifecycle control. DO NOT USE FOR implementing the actual process logic.
+---
+tasks:
   - name: "Choose pattern for simple scripting scenario"
     prompt: "I need to run a simple command quickly in a console application with minimal setup. No DI required, and default behaviors are acceptable. Which CliInvoke pattern should I use?"
     setup:

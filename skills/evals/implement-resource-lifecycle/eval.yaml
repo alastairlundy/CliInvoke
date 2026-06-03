@@ -1,4 +1,9 @@
-scenarios:
+---
+name: implement-resource-lifecycle
+description: Guidance on auditing and managing the lifecycle of disposable types in CliInvoke to prevent resource leaks and secure sensitive data. USE FOR auditing and managing disposable types (ProcessConfiguration, IExternalProcess, etc.) to prevent resource leaks. DO NOT USE FOR general C# memory management.
+compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, or CliInvoke.Specialization)
+---
+tasks:
   - name: "Dispose ProcessConfiguration correctly"
     prompt: "I've created a ProcessConfiguration object using ProcessConfigurationBuilder. What's the correct way to dispose of it to prevent resource leaks?"
     setup:
