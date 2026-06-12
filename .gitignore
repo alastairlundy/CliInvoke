@@ -408,3 +408,4 @@ FodyWeavers.xsd
 /docs/.lunet/build/cache
 /docs/.lunet/build
 *.exe
+/.agents/skills
