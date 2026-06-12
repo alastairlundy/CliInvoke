@@ -1,3 +1,7 @@
+---
+title: "How to Build CliInvoke's code"
+---
+
 ## How to Build CliInvoke's code
 
 ### Requirements
@@ -54,3 +58,4 @@ If you use this package in your project please make an exact copy of the content
 CliInvoke's Icon is NOT licensed under the MPL 2.0 license and are licensed under Copyright with all rights reserved to me (Alastair Lundy).
 
 If you fork CliInvoke and re-distribute it, please replace the usage of the icon unless you have prior written agreements from me.
+
