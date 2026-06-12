@@ -1,3 +1,7 @@
+---
+title: "Supported Operating Systems"
+---
+
 ## Supported Operating Systems
 CliInvoke can currently be added to .NET Standard 2.0, .NET 8, or .NET 9 or newer supported projects.
 

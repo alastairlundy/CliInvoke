@@ -1,3 +1,7 @@
+---
+title: "CliInvoke v1 to v2 Method Signature Changes"
+---
+
 # Method Signature Changes
 
 These cover common use cases and are NOT an exhaustive list of method signature changes.

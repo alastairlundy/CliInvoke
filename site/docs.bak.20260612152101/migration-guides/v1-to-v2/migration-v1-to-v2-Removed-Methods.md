@@ -1,3 +1,7 @@
+---
+title: "CliInvoke v1 to v2 Removed Methods"
+---
+
 # Removed Methods
 
 These cover common use cases and are NOT an exhaustive list of method removals.

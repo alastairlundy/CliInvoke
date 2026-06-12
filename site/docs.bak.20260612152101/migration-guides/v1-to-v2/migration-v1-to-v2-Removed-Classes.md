@@ -1,3 +1,7 @@
+---
+title: "CliInvoke v1 to v2 Removed Classes"
+---
+
 # Removed Interfaces and Classes
 
 CliInvoke v2 removes a number of interfaces and classes from v1. Below is a non-exhaustive list of the main removed interfaces and classes.
