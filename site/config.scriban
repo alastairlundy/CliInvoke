@@ -27,7 +27,8 @@ with api.dotnet
   projects = [
     { name: "CliInvoke", path: "../src/CliInvoke/CliInvoke.csproj" },
     { name: "CliInvoke.Extensions", path: "../src/CliInvoke.Extensions/CliInvoke.Extensions.csproj" },
-    { name: "CliInvoke.Specializations", path: "../src/CliInvoke.Specializations/CliInvoke.Specializations.csproj" }
+    { name: "CliInvoke.Specializations", path: "../src/CliInvoke.Specializations/CliInvoke.Specializations.csproj" },
+    { name: "CliInvoke.Core", path: "../src/CliInvoke.Core/CliInvoke.Core.csproj" }
   ]
 end
 
