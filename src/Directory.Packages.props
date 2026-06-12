@@ -4,10 +4,10 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Polyfill" Version="10.7.0" />
-    <PackageVersion Include="DotExtensions" Version="10.3.2" />
+    <PackageVersion Include="Polyfill" Version="10.8.1" />
+    <PackageVersion Include="DotExtensions" Version="10.3.3" />
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
   </ItemGroup>
   <PropertyGroup>
     <!-- default false, CI can set to true -->
