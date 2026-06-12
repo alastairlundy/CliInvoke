@@ -2,5 +2,6 @@
   <PropertyGroup>
     <!-- Allow running MTP-based tests with dotnet test (VSTest mode) for SDKs that require it -->
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>

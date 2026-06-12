@@ -1,5 +1,5 @@
 ---
-title: "CliInvoke v1 to v2 Removed Methods"
+title: "Removed Methods"
 ---
 
 # Removed Methods
@@ -106,3 +106,4 @@ IArgumentsBuilder Add(IEnumerable<IFormattable> values, CultureInfo cultureInfo,
 ```csharp
 IArgumentsBuilder Add(IFormattable value);
 ```
+

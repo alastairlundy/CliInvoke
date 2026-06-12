@@ -1,3 +1,7 @@
+---
+title: "CliInvoke v1 to v2 Migration Guide."
+---
+
 # CliInvoke v1 to v2 Migration Guide.
 
 CliInvoke v2 contains a number of breaking changes from CliInvoke v1. This document aims to detail alternatives to removed interfaces and classes.

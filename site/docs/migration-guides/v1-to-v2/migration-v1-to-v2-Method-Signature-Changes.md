@@ -1,5 +1,5 @@
 ---
-title: "CliInvoke v1 to v2 Method Signature Changes"
+title: "Method Signature Changes"
 ---
 
 # Method Signature Changes
@@ -390,3 +390,4 @@ Task PipeStandardErrorAsync(Process source, Stream destination);
 ```csharp
 Task<Stream> PipeStandardErrorAsync(Process source);
 ```
+

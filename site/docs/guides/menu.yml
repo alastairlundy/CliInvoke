@@ -1,0 +1,5 @@
+doc:
+  - {path: readme.md, title: "Overview"}
+  - {path: architecture.md, title: "Architecture"}
+  - {path: configuration.md, title: "Configuration"}
+  - {path: troubleshooting.md, title: "Troubleshooting"}

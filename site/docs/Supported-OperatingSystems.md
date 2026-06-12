@@ -25,3 +25,4 @@ The following table details which target platforms are supported for executing c
 <sup>4</sup> - Lack of watchOS support is implied by lack of IOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 
 **Note:** This library has not been tested on Android or Tizen.
+

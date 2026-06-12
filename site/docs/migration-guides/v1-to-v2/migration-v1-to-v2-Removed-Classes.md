@@ -1,5 +1,5 @@
 ---
-title: "CliInvoke v1 to v2 Removed Classes"
+title: "Removed Interfaces and Classes"
 ---
 
 # Removed Interfaces and Classes
@@ -40,3 +40,4 @@ CliInvoke v2 removes a number of interfaces and classes from v1. Below is a non-
 
 **Replacement**:
 * ``ProcessConfiguration``
+
