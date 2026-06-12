@@ -1,6 +1,6 @@
 doc:
   - {path: readme.md, title: "<i class='bi bi-book' aria-hidden='true'></i> Documentation"}
   - {path: getting-started.md, title: "<i class='bi bi-rocket-takeoff' aria-hidden='true'></i> Getting Started"}
-  - {path: guides-readme.md, title: "<i class='bi bi-journal-text' aria-hidden='true'></i> Guides", folder: true}
+  - {path: guides/readme.md, title: "<i class='bi bi-journal-text' aria-hidden='true'></i> Guides", folder: true}
   - {path: building-cliinvoke.md, title: "<i class='bi bi-tools' aria-hidden='true'></i> Building CliInvoke"}
-  - {path: migration-guides, title: "<i class='bi bi-arrow-repeat' aria-hidden='true'></i> Migration Guides", folder: true}
+  - {path: migration-guides/readme.md, title: "<i class='bi bi-arrow-repeat' aria-hidden='true'></i> Migration Guides", folder: true}
