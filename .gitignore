@@ -409,3 +409,4 @@ FodyWeavers.xsd
 /docs/.lunet/build
 *.exe
 /.agents/skills
+/.lunet/build
