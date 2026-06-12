@@ -1,3 +1,7 @@
+---
+title: "Removed Methods"
+---
+
 # Removed Methods
 
 These cover common use cases and are NOT an exhaustive list of method removals.
@@ -102,3 +106,4 @@ IArgumentsBuilder Add(IEnumerable<IFormattable> values, CultureInfo cultureInfo,
 ```csharp
 IArgumentsBuilder Add(IFormattable value);
 ```
+

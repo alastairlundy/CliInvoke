@@ -1,3 +1,7 @@
+---
+title: "Method Signature Changes"
+---
+
 # Method Signature Changes
 
 These cover common use cases and are NOT an exhaustive list of method signature changes.
@@ -386,3 +390,4 @@ Task PipeStandardErrorAsync(Process source, Stream destination);
 ```csharp
 Task<Stream> PipeStandardErrorAsync(Process source);
 ```
+
