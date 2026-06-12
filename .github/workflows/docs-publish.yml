@@ -13,9 +13,6 @@ permissions:
 jobs:
   site:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.lunet.outputs.page_url }}
     steps:
       - id: lunet
         name: Build and deploy Lunet site
