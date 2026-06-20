@@ -15,21 +15,42 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### 🆕 Additions
-- Implemented process suspend and resume support via `ProcessWrapper`.
-- Added support for `FireAndForget` execution in `ExternalProcess`.
-#### 🗑️ Removals
-- Removed `BasicFilePathResolver.cs`.
-#### ⚙️ Modifications
-- Aligned `ExternalProcess` disposal logic with official documentation.
-- Fixed an issue where Standard Input was inadvertently redirected.
-- Simplified calls to the file path resolver.
-- Updated `ProcessInvoker` and `ExternalProcess` internal logic for stability.
-- Updated DotExtensions version from 10.3.0 to 10.3.2</PackageReleaseNotes>
+        <PackageReleaseNotes>
+### Added
+- New `ProcessControlAdapter` abstraction (`BaseProcessControlAdapter`, `WindowsProcessControlAdapter`, `UnixProcessControlAdapter`) to decouple OS-specific process control logic (suspend, resume, resource policy) from `ProcessWrapper`
+- `ProcessControlAdapterFactory` for platform-specific adapter creation
+- `src/global.json` pinning .NET SDK 10.0.0 with `latestMajor` roll-forward and prerelease support
+- Re-enabled `Polyfill` NuGet package reference (was previously commented out)
+
+### Changed
+* Updated internal Polyfill version from 10.7.0 to 10.10.0
+* Updated DotExtensions version from 10.3.2 to 10.3.3
+- **Architecture rework**: `ProcessInvoker` and `CliRun` now delegate to `IExternalProcess` via `IExternalProcessFactory` instead of directly constructing and managing `ProcessWrapper` instances
+- `ProcessWrapper` moved from `CliInvoke.Helpers` to `CliInvoke.Processes.Internal` namespace
+- Process cancellation and piping code consolidated into the internal `ProcessWrapper`
+- Cancellation helpers (`CancellationHelper`, `CancellationReason`) moved to `CliInvoke.Processes.Internal.Cancellation`
+- `ExternalProcess.CaptureBufferedResultAsync` reworked to use `ProcessWrapper.ReadAllTextAsync` instead of separate `StandardOutput.ReadToEndAsync` / `StandardError.ReadToEndAsync` calls
+- Enabled `GenerateDocumentationFile` globally in `Directory.Build.props`
+- `ArgumentsBuilder`: replaced `var` with explicit `List&lt;string&gt;` / `List&lt;IFormattable&gt;` types for clarity
+- Fixed trailing semicolon in `TargetFrameworks` (`net10.0;net8.0;net9.0;` → `net10.0;net8.0;net9.0`)
+
+### Fixed
+- **Process exit semaphore leak on Unix systems** — the cancellation semaphore was not being released in all exit paths
+- Buffered output reading race condition in `ExternalProcess` by consolidating stdout/stderr reads into a single `ReadAllTextAsync` call
+
+### Removed
+- `CliInvoke.Helpers.ProcessWrapper` (replaced by `CliInvoke.Processes.Internal.ProcessWrapper`)
+- `CliInvoke.Helpers.Processes.ProcessCancellationExtensions` (consolidated into internal `ProcessWrapper`)
+- `CliInvoke.Helpers.Processes.ProcessPipingHelper` (consolidated into internal `ProcessWrapper`)
+- `CliInvoke.Helpers.Processes.ToStartInfoExtensions` (moved to internal usage)
+- `CliInvoke.Helpers.Processes.ApplyInfos.ApplyConfigurationToProcessStartInfo` (moved to `ProcessControlAdapters`)
+- `CliInvoke.Helpers.Processes.ApplyInfos.ProcessSetPolicyExtensions` (moved to `ProcessControlAdapters`)
+- `CliInvoke.Helpers.Processes.Cancellation.UnixGracefulCancellation` (consolidated into `UnixProcessControlAdapter`)
+- `CliInvoke.Helpers.Processes.Cancellation.WindowsGracefulCancellation` (consolidated into `WindowsProcessControlAdapter`)</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.4</PackageVersion>
+        <PackageVersion>3.0.0-alpha.5</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
