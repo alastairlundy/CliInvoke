@@ -1,15 +1,26 @@
-# Triage Labels
+# Triage Label Mappings
 
-The skills speak in terms of five canonical triage roles. This file maps those roles to the actual label strings used in this repo's issue tracker.
+This file defines how the triage skill maps internal state names to actual labels in your issue tracker.
 
-| Label in mattpocock/skills | Label in our tracker | Meaning                                  |
-| -------------------------- | -------------------- | ---------------------------------------- |
-| `needs-triage`             | `needs-triage`       | Maintainer needs to evaluate this issue  |
-| `needs-info`               | `needs-info`         | Waiting on reporter for more information |
-| `ready-for-agent`          | `ready-for-agent`    | Fully specified, ready for an AFK agent  |
-| `ready-for-human`          | `ready-for-human`    | Requires human implementation            |
-| `wontfix`                  | `wontfix`            | Will not be actioned                     |
+## Default Mappings (1:1)
 
-When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
+The triage skill uses these label names directly:
+- `needs-triage` → `needs-triage`
+- `needs-info` → `needs-info`
+- `ready-for-agent` → `ready-for-agent`
+- `ready-for-human` → `ready-for-human`
+- `wontfix` → `wontfix`
 
-Edit the right-hand column to match whatever vocabulary you actually use.
+## Customization
+
+If your issue tracker uses different label names for these states, you would modify this file to create the appropriate mappings.
+
+For example, if your tracker uses:
+- `triage` instead of `needs-triage`
+- `info-needed` instead of `needs-info`
+
+You would change the mappings accordingly.
+
+## Usage
+
+The triage skill reads this file to determine which labels to apply when moving issues through its state machine.

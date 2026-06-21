@@ -1,0 +1,5 @@
+doc:
+  - {path: readme.md, title: "Overview"}
+  - {path: v1-to-v2/migration-v1-to-v2-Method-Signature-Changes.md, title: "Method Signature Changes"}
+  - {path: v1-to-v2/migration-v1-to-v2-Removed-Classes.md, title: "Removed Classes"}
+  - {path: v1-to-v2/migration-v1-to-v2-Removed-Methods.md, title: "Removed Methods"}

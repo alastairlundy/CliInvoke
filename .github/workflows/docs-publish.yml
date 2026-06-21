@@ -1,0 +1,21 @@
+name: site
+
+on:
+  workflow_dispatch: {}
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - id: lunet
+        name: Build and deploy Lunet site
+        uses: lunet-io/actions/lunet-build@v1
+        with:
+          site_path: site
