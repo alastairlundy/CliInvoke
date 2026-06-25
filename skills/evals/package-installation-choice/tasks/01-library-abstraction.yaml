@@ -1,0 +1,43 @@
+id: library-abstraction
+name: "Select packages for library abstraction"
+description: Verify the agent recommends only CliInvoke.Core for an abstraction-only library.
+tags:
+  - positive
+  - package-selection
+inputs:
+  prompt: "I'm creating a NuGet library that defines process interactions but doesn't want to force a concrete implementation on consumers. Which CliInvoke packages should I install?"
+  context:
+    fixture: "fixtures"
+expected:
+  output_contains:
+    - "CliInvoke.Core"
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: mentions_core
+    config:
+      contains:
+        - "CliInvoke.Core"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly identified that only CliInvoke.Core is needed for abstraction-only libraries.
+        2. Explained that this avoids introducing concrete dependencies into abstraction-only libraries.
+        3. Did not recommend installing the implementation package (CliInvoke) or extensions package (CliInvoke.Extensions) as required for this scenario.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.

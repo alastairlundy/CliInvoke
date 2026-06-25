@@ -1,0 +1,38 @@
+id: enterprise-di
+name: "Choose pattern for enterprise application with DI"
+description: Verify the agent recommends IProcessInvoker for an enterprise DI scenario.
+tags:
+  - positive
+  - pattern-selection
+inputs:
+  prompt: "I'm building an enterprise application that uses Dependency Injection. Testability is important, and I need to mock the process execution in my tests. Which CliInvoke pattern should I use?"
+  context:
+    fixture: "fixtures"
+expected:
+  output_contains:
+    - "IProcessInvoker"
+  outcomes:
+    - type: task_completed
+graders:
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly recommended IProcessInvoker for DI-friendly scenarios.
+        2. Explained that IProcessInvoker supports Dependency Injection and provides high testability.
+        3. Did not recommend CliRun (which lacks DI support) or IExternalProcess (which has more complexity than needed) as the primary choice for this scenario.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.
