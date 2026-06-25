@@ -1,51 +1,16 @@
----
-name: generate-process-configuration
-description: Guidance on correctly utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, ensuring proper build and redirection setup. USE FOR guidelines on utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, including build and redirection setup. DO NOT USE FOR executing the resulting configuration.
-compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, or CliInvoke.Specialization)
----
+name: generate-process-configuration-eval
+description: Evaluation suite for the generate-process-configuration skill
+skill: generate-process-configuration
+version: "1.0"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: gpt-5-mini
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
 tasks:
-  - name: "Set arguments correctly for process configuration"
-    prompt: "I'm creating a ProcessConfiguration using IProcessConfigurationBuilder. What's the correct way to specify command-line arguments to ensure proper escaping and quoting?"
-    setup:
-      copy_test_files: true
-    assertions:
-      - type: "output_contains"
-        value: "SetArguments"
-      - type: "output_contains"
-        value: "IEnumerable<string>"
-      - type: "exit_success"
-    rubric:
-      - "Correctly recommended using SetArguments with IEnumerable<string> for safer argument handling"
-      - "Explained that this approach ensures proper platform-specific escaping and quoting"
-      - "Did not recommend manually concatenating arguments into a single string"
-    timeout: 120
-
-  - name: "Configure output redirection for buffered results"
-    prompt: "I want to capture the output of a process using ExecuteBufferedAsync. How do I configure the ProcessConfiguration to redirect output properly?"
-    setup:
-      copy_test_files: true
-    assertions:
-      - type: "output_contains"
-        value: "SetOutputRedirection(true)"
-      - type: "exit_success"
-    rubric:
-      - "Correctly identified that SetOutputRedirection(true) is required for capturing buffered output"
-      - "Explained that without this setting, ExecuteBufferedAsync may return empty outputs or errors"
-      - "Did not suggest incorrect methods like SetStandardOutputPipe for buffered scenarios"
-    timeout: 120
-
-  - name: "Decline request for executing the configuration"
-    prompt: "I've created a ProcessConfiguration using IProcessConfigurationBuilder. How do I actually execute this configuration to run a process?"
-    expect_activation: false
-    setup:
-      copy_test_files: true
-    assertions:
-      - type: "output_matches"
-        pattern: "(executing the resulting configuration|not for executing|does not cover|cannot help with|out of scope.*execution)"
-      - type: "file_not_exists"
-        path: "ExecutionCode.cs"
-    rubric:
-      - "Correctly identified that executing the configuration is outside the scope of this skill"
-      - "Did not attempt to provide execution guidance or invoke any execution methods"
-      - "Redirected the user to appropriate resources for learning how to execute configurations"
-    timeout: 120
+  - "tasks/*.yaml"
