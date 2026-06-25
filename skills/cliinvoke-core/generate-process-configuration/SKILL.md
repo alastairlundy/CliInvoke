@@ -5,6 +5,17 @@ compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.
 ---
 # Generate Process Configuration
 
+## When to Use
+- When building a `ProcessConfiguration` instance via `IProcessConfigurationBuilder` to pass to an invoker.
+- When configuring arguments, working directory, target file path, encoding, or output redirection.
+- When the user is unsure how to set up piped (`SetStandardOutputPipe`) versus buffered (`SetOutputRedirection(true)`) result capture.
+- When auditing existing builder code for missing `.Build()` calls or missing redirection setup.
+
+## When not to use
+- When executing the resulting configuration — this skill covers *building* the configuration, not running it. For execution, load `select-execution-pattern` to choose an invoker.
+- When managing disposal of `ProcessConfiguration` — load `implement-resource-lifecycle` instead.
+- When migrating from V1 builder methods (`With*`) to V2 (`Set*`/`Configure*`) — load `cliinvoke-v1-to-v2-migration`.
+
 ## Core Workflow
 
 The standard workflow for creating a configuration is:

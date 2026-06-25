@@ -5,7 +5,16 @@ description: Guides the selection and installation of the correct CliInvoke NuGe
 
 # Package Installation Choice
 
-This SKILL guides the selection of CliInvoke NuGet packages based on the project type and specific needs.
+## When to Use
+- When starting a new CliInvoke-based project and deciding which NuGet packages to install.
+- When you need to determine the correct package set for a Library author versus an application (Console/Desktop).
+- When deciding whether to include `CliInvoke.Extensions` (DI helpers) or `CliInvoke.Specializations` (shell-specific features).
+- When auditing an existing project's package references against the recommended installation matrix.
+
+## When not to use
+- When fixing NuGet restore errors, version conflicts, or feed/source issues — this skill does not address package resolution problems.
+- When the question is about how to *use* a package after installation — load a skill specific to the API surface (e.g., `generate-process-configuration`, `select-execution-pattern`).
+- When migrating between major versions of CliInvoke — load `cliinvoke-v1-to-v2-migration` instead.
 
 ## Installation Matrix
 

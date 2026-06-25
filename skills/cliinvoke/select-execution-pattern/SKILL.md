@@ -5,6 +5,17 @@ description: Guidance on choosing between CliRun, IProcessInvoker, and IExternal
 
 # Select Execution Pattern
 
+## When to Use
+- When starting a new CliInvoke integration and choosing between `CliRun`, `IProcessInvoker`, and `IExternalProcess`.
+- When refactoring existing code that uses the wrong pattern (e.g., `CliRun` in a DI-heavy service, or `IProcessInvoker` for an interactive shell).
+- When evaluating trade-offs around testability, DI support, boilerplate, and lifecycle control.
+- When the user's requirements mention scripting/prototyping, enterprise DI, or interactive process control.
+
+## When not to use
+- When implementing the actual process logic — this skill only guides the choice of pattern. Once chosen, load a skill specific to the pattern (e.g., `generate-process-configuration` for building configurations, or the execution reference docs).
+- When the choice is already made and the question is about a specific API call or builder method.
+- When the user wants to migrate between CliInvoke major versions — load `cliinvoke-v1-to-v2-migration` instead.
+
 ## Decision Logic
 
 When deciding which pattern to use, evaluate the requirements against the following criteria:

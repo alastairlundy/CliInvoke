@@ -6,6 +6,16 @@ compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.
 
 # CliInvoke V1 to V2 Migration
 
+## When to Use
+- When migrating an existing V1-based CliInvoke project to V2.
+- When you need to map a V1 type or method (e.g., `ICliCommandInvoker`, `CliCommandConfiguration`, `WithArguments`) to its V2 equivalent.
+- When auditing a codebase for V1 patterns that need to be renamed or refactored.
+
+## When not to use
+- When writing new V2 code from scratch with no V1 references — the type and method names in V2 are self-describing and do not require a mapping table.
+- When the project has no V1 dependency and the task is unrelated to migration.
+- When the question is about general CliInvoke usage, configuration, or execution — load a more specific skill (e.g., `select-execution-pattern`, `generate-process-configuration`) instead.
+
 ## Core Type Mapping
 
 | V1 Type | V2 Replacement | Notes |

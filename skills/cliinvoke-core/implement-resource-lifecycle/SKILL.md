@@ -5,6 +5,17 @@ compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.
 ---
 # Implement Resource Lifecycle
 
+## When to Use
+- When auditing code for proper disposal of CliInvoke's five mandatory disposable types: `ProcessConfiguration`, `IExternalProcess`, `PipedProcessResult`, `UserCredential`, and `UserCredentialBuilder`.
+- When deciding between `using` and `await using` in async methods.
+- When investigating a suspected handle leak, memory pressure, or `SecureString` retention issue.
+- When the user asks about `SecureString` cleanup or process/stream lifetime in CliInvoke.
+
+## When not to use
+- When the question is about general C#/.NET memory management, GC tuning, or `IDisposable` mechanics outside CliInvoke's specific types.
+- When building or executing a configuration — load `generate-process-configuration` or `select-execution-pattern` instead.
+- When migrating from V1 to V2 — load `cliinvoke-v1-to-v2-migration` for any disposal-related API renames.
+
 ## Mandatory Disposable Types
 
 The following five types MUST be disposed of. Failure to do so can lead to handle leaks, memory pressure, or sensitive data remaining in memory.
