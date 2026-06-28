@@ -59,6 +59,11 @@ internal class ProcessWrapper : Process
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
             || OperatingSystem.IsFreeBSD())
         {
+            // Fast-exiting processes (e.g. `which`, `echo`) may have already exited
+            // between base.Start() returning and this handler running. Skip the
+            // suspend/resume cycle in that case to avoid races on process handles.
+            if (HasExited) return;
+
             // TODO: Replace with ProcessHandle CreateSuspended as part of .NET 11 support.
             try
             {

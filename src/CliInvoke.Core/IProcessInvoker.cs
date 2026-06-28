@@ -13,7 +13,7 @@ namespace CliInvoke.Core;
 ///     Defines an interface that creates and runs Processes from <see cref="ProcessConfiguration" />
 ///     objects.
 /// </summary>
-public interface IProcessInvoker
+public interface IProcessInvoker : IDisposable
 {
     /// <summary>
     ///     Runs the process asynchronously, waits for exit, and safely disposes of the Process before

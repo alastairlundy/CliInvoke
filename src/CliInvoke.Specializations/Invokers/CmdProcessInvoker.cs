@@ -50,6 +50,17 @@ public class CmdProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
+    /// Disposes the <see cref="IExternalProcessFactory"/> held by this invoker if it is disposable.
+    /// </summary>
+    public void Dispose()
+    {
+        if (_externalProcessFactory is IDisposable disposableFactory)
+            disposableFactory.Dispose();
+
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
     ///     Executes a process asynchronously with support for specific platform constraints.
     /// </summary>
     /// <param name="processConfiguration">The configuration for the process to be executed.</param>
