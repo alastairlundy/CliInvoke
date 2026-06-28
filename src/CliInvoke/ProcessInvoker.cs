@@ -29,17 +29,6 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    /// Disposes the <see cref="IExternalProcessFactory"/> held by this invoker if it is disposable.
-    /// </summary>
-    public void Dispose()
-    {
-        if (_externalProcessFactory is IDisposable disposableFactory)
-            disposableFactory.Dispose();
-
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
     ///     Runs the process asynchronously, waits for exit, and safely disposes of the Process before
     ///     returning.
     /// </summary>

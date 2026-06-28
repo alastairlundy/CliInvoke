@@ -16,7 +16,7 @@ public class ProcessInvokerTests
     [Test]
     public async Task Invoker_WhiteSpaceFilePath_ShouldThrow()
     {
-        using IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
+        IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         // A real file path is required here to avoid throwing FileNotFoundException.
         using ProcessConfiguration config = ProcessConfigurationFactory.Create(ProcessTestHelper.GetTargetFilePath());
@@ -30,7 +30,7 @@ public class ProcessInvokerTests
     [Test]
     public async Task Invoker_EmptyFilePath_ShouldThrow()
     {
-        using IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
+        IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("FAKE/PATH");
 
@@ -43,7 +43,7 @@ public class ProcessInvokerTests
     [Test]
     public async Task Invoker_InvalidFilePath_ShouldThrow()
     {
-        using IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
+        IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("FAKE.FILE");
 

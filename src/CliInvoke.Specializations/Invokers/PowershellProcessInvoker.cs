@@ -63,17 +63,6 @@ public class PowershellProcessInvoker : IProcessInvoker
         _externalProcessFactory = externalProcessFactory;
     }
 
-    /// <summary>
-    /// Disposes the <see cref="IExternalProcessFactory"/> held by this invoker if it is disposable.
-    /// </summary>
-    public void Dispose()
-    {
-        if (_externalProcessFactory is IDisposable disposableFactory)
-            disposableFactory.Dispose();
-
-        GC.SuppressFinalize(this);
-    }
-
     private ProcessConfiguration GetPowershellProcessConfiguration(bool redirectOutputs)
     {
         return new PowershellProcessConfiguration(

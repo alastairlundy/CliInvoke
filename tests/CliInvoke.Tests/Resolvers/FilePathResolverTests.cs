@@ -48,7 +48,7 @@ public class FilePathResolverTests
         {
             using ProcessConfiguration configuration = ProcessConfigurationFactory.Create("which", "dotnet");
 
-            using IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
+            IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
 
             BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
                 cancellationToken: CancellationToken.None);
