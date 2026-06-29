@@ -16,11 +16,11 @@ public class ProcessCancellationTests
     [Test]
     public async Task ProcessCancelled_TimeSpanOnlyOverload_Delay_Graceful_Success()
     {
-        //Arrange 
+        //Arrange
         string filePath = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "/usr/bin/sleep" : "timeout";
         string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "30" : "/T 30 /NOBREAK";
         ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
-        
+
         ProcessExitConfiguration processExitConfiguration = new(
             ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)));
 
@@ -30,14 +30,26 @@ public class ProcessCancellationTests
 
         int processId = process.Id;
 
-        await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
+        try
+        {
+            await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
 
-        await Task.Delay(1000, CancellationToken.None);
+            await Task.Delay(1000, CancellationToken.None);
 
-        bool actual = Process.GetProcesses().Any(x => x.Id == processId);
+            bool actual = Process.GetProcesses().Any(x => x.Id == processId);
 
-        //Assert
-        await Assert.That(actual).IsFalse();
+            //Assert
+            await Assert.That(actual).IsFalse();
+        }
+        finally
+        {
+            if (!process.HasExited)
+            {
+                try { process.Kill(true); } catch { process.Kill(); }
+            }
+
+            process.Dispose();
+        }
     }
 
     /*[Fact]
