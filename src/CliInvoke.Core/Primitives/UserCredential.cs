@@ -32,7 +32,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
         Domain = null;
         UserName = null;
         Password = null;
-        LoadUserProfile = false;
+        LoadUserProfile = null;
 #pragma warning restore CA1416
     }
 
