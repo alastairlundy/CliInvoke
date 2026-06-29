@@ -2,4 +2,5 @@ doc:
   - {path: readme.md, title: "Overview"}
   - {path: architecture.md, title: "Architecture"}
   - {path: configuration.md, title: "Configuration"}
+  - {path: resource-disposal.md, title: "Resource Disposal"}
   - {path: troubleshooting.md, title: "Troubleshooting"}
