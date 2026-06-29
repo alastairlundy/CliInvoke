@@ -53,7 +53,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
     /// </summary>
     public static ProcessTimeoutPolicy Default { get; } =
-        new(TimeSpan.FromMinutes(30));
+        new();
 
     /// <summary>
     /// Disables waiting for Process Timeout.
