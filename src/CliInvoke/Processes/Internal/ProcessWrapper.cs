@@ -101,18 +101,49 @@ internal class ProcessWrapper : Process
 
             throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
         }
-        
+
         if (!HasStarted)
         {
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
         }
 
         if (!HasStarted) return HasStarted;
-        
+
+        // Cache StandardOutput/StandardError StreamReaders while the process is still
+        // guaranteed alive. These properties internally call EnsureState, which in
+        // .NET 10 throws InvalidOperationException("process has exited") on
+        // fast-exiting processes (e.g. `which dotnet`) that exit before the next
+        // line of code runs. Touching them here means downstream code that reads
+        // from the cached readers works even if the process has already exited.
+        try
+        {
+            _ = base.StandardOutput;
+            _ = base.StandardError;
+        }
+        catch (InvalidOperationException)
+        {
+            // Process exited before we could cache the stream readers.
+            // Downstream code must tolerate an exited process (see HasExited guards).
+        }
+
+        // Capture Id (safe after Start) and ProcessName (throws if exited).
+        // base.Id does not throw on exit; base.ProcessName does.
+        Id = base.Id;
+
+        // Fast-exiting processes (e.g. `which dotnet`) can exit between the
+        // HasExited check and the base.ProcessName call, so guard with a
+        // try/catch as well. Fall back to StartInfo.FileName in that case.
+        try
+        {
+            ProcessName = base.ProcessName;
+        }
+        catch (InvalidOperationException)
+        {
+            ProcessName = StartInfo.FileName;
+        }
+
         StartTime = DateTime.UtcNow;
         Started.Invoke(this, EventArgs.Empty);
-        Id = base.Id;
-        ProcessName = base.ProcessName;
 
         return HasStarted;
     }
