@@ -410,3 +410,5 @@ FodyWeavers.xsd
 /.agents/skills
 /.lunet/build
 /site/.lunet/build
+/waza-results
+skills-lock.json
