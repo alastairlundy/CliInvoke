@@ -47,7 +47,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [SupportedOSPlatform("linux")]
     public IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 0x0001);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(processorAffinity,
             2 * Environment.ProcessorCount);
 

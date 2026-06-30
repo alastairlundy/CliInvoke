@@ -59,7 +59,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         if (processorAffinity is not null)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan((nint)processorAffinity, 1);
+            ArgumentOutOfRangeException.ThrowIfLessThan((nint)processorAffinity, 0x0001);
             
             ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity,
                 (nint)2 * Environment.ProcessorCount);
