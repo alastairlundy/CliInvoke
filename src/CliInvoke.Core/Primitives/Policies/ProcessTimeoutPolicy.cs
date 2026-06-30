@@ -50,7 +50,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         new(timeoutThreshold, cancellationMode);
 
     /// <summary>
-    /// Instantiates a default ProcessTimeoutPolicy which times out after 30 minutes.
+    /// Instantiates a default ProcessTimeoutPolicy which times out after 3 minutes.
     /// </summary>
     public static ProcessTimeoutPolicy Default { get; } =
         new();
