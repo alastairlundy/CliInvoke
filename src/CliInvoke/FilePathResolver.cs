@@ -35,7 +35,6 @@ public class FilePathResolver : IFilePathResolver
     [UnsupportedOSPlatform("tvos")]
     public FileInfo ResolveFilePath(string filePathToResolve)
     {
-        ArgumentException.ThrowIfNullOrEmpty(filePathToResolve);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
         
         if (Path.IsPathRooted(filePathToResolve))
