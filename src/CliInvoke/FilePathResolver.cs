@@ -52,12 +52,26 @@ public class FilePathResolver : IFilePathResolver
         return LocateFileFromDirectory(filePathToResolve);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     protected IEnumerable<string>? GetPathInfo()
         => PathEnvironmentVariable.EnumerateDirectories();
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     protected string[] GetPathExtensionsInfo()
         => PathEnvironmentVariable.GetPathFileExtensions();
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePathToResolve"></param>
+    /// <param name="resolvedFilePath"></param>
+    /// <returns></returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     protected bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
@@ -121,6 +135,13 @@ public class FilePathResolver : IFilePathResolver
         return false;
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePathToResolve"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    /// <exception cref="FileNotFoundException"></exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     protected FileInfo LocateFileFromDirectory(string filePathToResolve)

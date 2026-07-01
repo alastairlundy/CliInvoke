@@ -85,6 +85,11 @@ public interface IExternalProcess : IDisposable
     /// </returns>
     Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     int FireAndForget(CancellationToken cancellationToken);
 
     /// <summary>
