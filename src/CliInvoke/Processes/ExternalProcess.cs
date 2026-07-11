@@ -39,13 +39,20 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     }
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="ExternalProcess"/> class and
+    ///     allocates a default <see cref="FilePathResolver"/> internally to resolve
+    ///     the target executable path. This constructor performs an implicit
+    ///     <see cref="FilePathResolver"/> allocation; callers that need a custom
+    ///     resolver should use the
+    ///     <see cref="ExternalProcess(IFilePathResolver, ProcessConfiguration, ProcessExitConfiguration?)"/>
+    ///     overload instead.
     /// </summary>
     /// <param name="configuration"></param>
     /// <param name="exitConfiguration"></param>
     public ExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null)
     {
-        _filePathResolver = FilePathResolver.Shared;
+        _filePathResolver = new FilePathResolver();
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();

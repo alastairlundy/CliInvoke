@@ -17,7 +17,7 @@ public class BufferedTestHelper
 
         try
         {
-            FileInfo fileResult = FilePathResolver.Shared.ResolveFilePath(mockDataToolExe);
+            FileInfo fileResult = new FilePathResolver().ResolveFilePath(mockDataToolExe);
 
             return fileResult.FullName;
         }
