@@ -122,7 +122,7 @@ finally
 `ExternalProcess.StartAsync` performs three things in order:
 
 1. Resolves the target file path through the injected
-   `IFilePathResolver` (defaults to `FilePathResolver.Shared`).
+   `IFilePathResolver` (defaulting to a fresh `FilePathResolver` instance).
 2. Constructs a new `ProcessWrapper` and calls `Start()` on it.
 3. If a `StandardInput` stream was supplied, copies it into the
    process's stdin asynchronously.
