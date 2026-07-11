@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 using CliInvoke.Factories;
@@ -22,6 +23,9 @@ public static class CliRun
     private static Func<IExternalProcessFactory> _externalProcessFactory = () => new 
         ExternalProcessFactory();
 
+    private static IFilePathResolver? _filePathResolver;
+    private static readonly object _syncRoot = new();
+
     /// <summary>
     /// Configures the external process factory to be used for creating the command-line external processes.
     /// </summary>
@@ -32,6 +36,37 @@ public static class CliRun
     public static void UseExternalProcessFactory(IExternalProcessFactory externalProcessFactory)
     {
         _externalProcessFactory = () => externalProcessFactory;
+    }
+
+    /// <summary>
+    /// Configures the file path resolver to be used by the static <see cref="CliRun"/> methods for resolving
+    /// executable file paths. This method is optional; if not called, <see cref="CliRun"/> will construct a
+    /// default <see cref="FilePathResolver"/> on first use.
+    /// </summary>
+    /// <param name="resolver">
+    /// An implementation of the <see cref="IFilePathResolver"/> interface to be used for resolving file paths.
+    /// </param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="resolver"/> is <see langword="null"/>.</exception>
+    public static void UseFilePathResolver(IFilePathResolver resolver)
+    {
+        ArgumentNullException.ThrowIfNull(resolver);
+        lock (_syncRoot)
+        {
+            _filePathResolver = resolver;
+        }
+    }
+
+    private static IFilePathResolver GetFilePathResolver()
+    {
+        if (_filePathResolver is not null)
+        {
+            return _filePathResolver;
+        }
+
+        lock (_syncRoot)
+        {
+            return _filePathResolver ??= new FilePathResolver();
+        }
     }
     
     private static IExternalProcessFactory GetExternalProcessFactory() 
@@ -95,7 +130,8 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        using IExternalProcess externalProcess = GetExternalProcessFactory()
+        IFilePathResolver resolver = GetFilePathResolver();
+        using IExternalProcess externalProcess = new ExternalProcessFactory(resolver)
             .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
 
         await externalProcess.StartAsync(cancellationToken);
@@ -154,7 +190,8 @@ public static class CliRun
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        using IExternalProcess externalProcess = GetExternalProcessFactory()
+        IFilePathResolver resolver = GetFilePathResolver();
+        using IExternalProcess externalProcess = new ExternalProcessFactory(resolver)
             .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
 
         await externalProcess.StartAsync(cancellationToken);
@@ -222,7 +259,8 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        using IExternalProcess externalProcess = GetExternalProcessFactory()
+        IFilePathResolver resolver = GetFilePathResolver();
+        using IExternalProcess externalProcess = new ExternalProcessFactory(resolver)
             .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
 
         await externalProcess.StartAsync(cancellationToken);
