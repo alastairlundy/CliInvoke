@@ -45,7 +45,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     public ExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null)
     {
-        _filePathResolver = FilePathResolver.Shared;
+        _filePathResolver = new FilePathResolver();
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();

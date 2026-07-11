@@ -24,7 +24,7 @@ public class ExternalProcessFactory : IExternalProcessFactory
     /// </summary>
     public ExternalProcessFactory()
     {
-        _filePathResolver = FilePathResolver.Shared;
+        _filePathResolver = new FilePathResolver();
     }
 
     public ExternalProcessFactory(IFilePathResolver filePathResolver)

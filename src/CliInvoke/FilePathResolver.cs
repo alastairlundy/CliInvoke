@@ -10,61 +10,41 @@
 using System.Linq;
 using System.Text;
 
+using CliInvoke.Core;
+
 using DotExtensions.IO;
 
 namespace CliInvoke;
 
 /// <summary>
-/// An implementation of IFilePathResolver, a service that resolves file paths.
+/// The default implementation of <see cref="IFilePathResolver"/>, providing
+/// the standard PATH-lookup and directory-recursion strategies on top of
+/// the shared algorithm in <see cref="FilePathResolverBase"/>.
 /// </summary>
-public class FilePathResolver : IFilePathResolver
+public class FilePathResolver : FilePathResolverBase
 {
-    /// <summary>
-    /// A shared static instance of the <see cref="FilePathResolver"/> class.
-    /// </summary>
-    public static FilePathResolver Shared { get; } = new();
-    
-    /// <summary>
-    /// Resolves a file path by checking if the file path exists or if it's a directory.
-    /// </summary>
-    /// <param name="filePathToResolve">The file path to resolve.</param>
-    /// <returns>The resolved file path if successful, otherwise throws a FileNotFoundException.</returns>
-    /// <exception cref="FileNotFoundException">Thrown if the file path does not exist or cannot be located.</exception>
-    /// <exception cref="PlatformNotSupportedException">Thrown if run on an unsupported platform.</exception>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    public FileInfo ResolveFilePath(string filePathToResolve)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
-        
-        if (Path.IsPathRooted(filePathToResolve))
-        {
-            return new FileInfo(filePathToResolve);
-        }
-
-        bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out FileInfo? filePath);
-
-        if (filePath is not null && resolveFromPath)
-        {
-            return filePath;
-        }
-        
-        return LocateFileFromDirectory(filePathToResolve);
-    }
-
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    protected IEnumerable<string>? GetPathInfo()
+    protected override IEnumerable<string>? EnumeratePathDirectories()
         => PathEnvironmentVariable.EnumerateDirectories();
     
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    protected string[] GetPathExtensionsInfo()
-        => PathEnvironmentVariable.GetPathFileExtensions();
+    protected override string[] GetPathFileExtensions()
+    {
+        string[] pathExtensions = PathEnvironmentVariable.GetPathFileExtensions();
+
+        for (int i = 0; i < pathExtensions.Length; i++)
+        {
+            pathExtensions[i] = pathExtensions[i].ToLowerInvariant();
+        }
+
+        return pathExtensions;
+    }
     
     /// <summary>
     /// 
@@ -74,7 +54,7 @@ public class FilePathResolver : IFilePathResolver
     /// <returns></returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    protected bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
+    protected override bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
         out FileInfo? resolvedFilePath)
     {
         if (filePathToResolve.Contains(Path.DirectorySeparatorChar)
@@ -86,8 +66,8 @@ public class FilePathResolver : IFilePathResolver
             return fileExists;
         }
 
-        string[] pathExtensions = GetPathExtensionsInfo();
-        IEnumerable<string>? pathContents = GetPathInfo();
+        string[] pathExtensions = GetPathFileExtensions();
+        IEnumerable<string>? pathContents = EnumeratePathDirectories();
         
         if(pathContents is null)
         {
@@ -110,7 +90,7 @@ public class FilePathResolver : IFilePathResolver
                 foreach (string pathExtension in pathExtensions)
                 {
                     string filePath =
-                        Path.Combine(pathEntry, $"{fileName}{pathExtension.ToLower()}");
+                        Path.Combine(pathEntry, $"{fileName}{pathExtension}");
 
                     if (File.Exists(filePath))
                     {
@@ -144,7 +124,7 @@ public class FilePathResolver : IFilePathResolver
     /// <exception cref="FileNotFoundException"></exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    protected FileInfo LocateFileFromDirectory(string filePathToResolve)
+    protected override FileInfo LocateFileFromDirectory(string filePathToResolve)
     {
         string fileName = Path.GetFileName(filePathToResolve);
 

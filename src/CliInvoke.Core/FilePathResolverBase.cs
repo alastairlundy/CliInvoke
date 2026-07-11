@@ -34,6 +34,8 @@ public abstract class FilePathResolverBase : IFilePathResolver
     /// <returns>The resolved <see cref="FileInfo"/>.</returns>
     public FileInfo ResolveFilePath(string filePathToResolve)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
+
         if (Path.IsPathRooted(filePathToResolve))
         {
             return new FileInfo(filePathToResolve);
