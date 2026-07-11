@@ -24,6 +24,34 @@ namespace CliInvoke;
 public class FilePathResolver : FilePathResolverBase
 {
     /// <summary>
+    /// Resolves a file path by checking if the file path exists or if it's a directory.
+    /// </summary>
+    /// <param name="filePathToResolve">The file path to resolve.</param>
+    /// <returns>The resolved file path if successful, otherwise throws a FileNotFoundException.</returns>
+    /// <exception cref="FileNotFoundException">Thrown if the file path does not exist or cannot be located.</exception>
+    /// <exception cref="PlatformNotSupportedException">Thrown if run on an unsupported platform.</exception>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    public FileInfo ResolveFilePath(string filePathToResolve)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
+        
+        if (Path.IsPathRooted(filePathToResolve))
+        {
+            return new FileInfo(filePathToResolve);
+        }
+
+        bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out FileInfo? filePath);
+
+        if (filePath is not null && resolveFromPath)
+        {
+            return filePath;
+        }
+        
+        return LocateFileFromDirectory(filePathToResolve);
+    }
+
+    /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
