@@ -423,6 +423,21 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     }
 }
 
+/// <summary>
+/// An internal subclass of <see cref="ProcessConfiguration"/> used by <see cref="ProcessConfigurationBuilder"/> to invoke the protected multi-parameter constructor.
+/// </summary>
+/// <remarks>
+/// <para>
+/// The builder lives in the <c>CliInvoke</c> assembly, while <see cref="ProcessConfiguration"/> and its multi-parameter protected constructor reside in the <c>CliInvoke.Core</c> assembly.
+/// Cross-assembly access to the protected constructor requires this internal wrapper class as the legitimate access path.
+/// </para>
+/// <para>
+/// Do not delete this class without first choosing a long-term replacement.
+/// </para>
+/// <para>
+/// A long-term solution to eliminate this wrapper is being developed. See <see cref="ProcessConfigurationBuilder"/> for the current consumer.
+/// </para>
+/// </remarks>
 internal class BuilderProcessConfiguration : ProcessConfiguration
 {
     internal BuilderProcessConfiguration(string targetFilePath, string arguments,
