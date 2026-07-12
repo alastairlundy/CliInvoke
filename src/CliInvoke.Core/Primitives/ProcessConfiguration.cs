@@ -28,32 +28,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <exception cref="ArgumentNullException"></exception>
     public ProcessConfiguration(string targetFilePath, string arguments = "", 
         bool outputRedirection = true)
+        : this(targetFilePath, arguments, redirectStandardInput: false, outputRedirection: outputRedirection)
     {
-        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
-        ArgumentNullException.ThrowIfNull(arguments);
-        
-        TargetFilePath = targetFilePath;
-        Arguments = arguments;
-        RedirectStandardInput = false;
-        OutputRedirection = outputRedirection;
-        
-        RequiresAdministrator = false;
-        WorkingDirectoryPath = Directory.GetCurrentDirectory();
-        EnvironmentVariables = new Dictionary<string, string>();
-        Credential = UserCredential.Null;
-
-        ResourcePolicy = ProcessResourcePolicy.Default;
-
-        StandardInput = StreamWriter.Null;
-
-        RedirectStandardInput = StandardInput != StreamWriter.Null;
-        
-        UseShellExecution = false;
-        WindowCreation = false;
-
-        StandardInputEncoding = Encoding.Default;
-        StandardOutputEncoding = Encoding.Default;
-        StandardErrorEncoding = Encoding.Default;
     }
 
     protected ProcessConfiguration(
@@ -74,6 +50,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         bool useShellExecution = false)
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
+        ArgumentNullException.ThrowIfNull(arguments);
 
         TargetFilePath = targetFilePath;
         
@@ -118,7 +95,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     ///     The arguments to be provided to the executable to be run.
     /// </summary>
-    public string Arguments { get; protected set; }
+    public string Arguments { get; }
 
     /// <summary>
     ///     Whether to enable window creation or not when the Command's Process is run.
@@ -165,7 +142,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// 
     /// </summary>
-    public bool OutputRedirection { get; protected set; }
+    public bool OutputRedirection { get; }
 
     /// <summary>
     ///     The Process Resource Policy to be used for executing the Command.
