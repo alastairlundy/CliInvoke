@@ -95,7 +95,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     ///     The arguments to be provided to the executable to be run.
     /// </summary>
-    public string Arguments { get; protected set; }
+    public string Arguments { get; }
 
     /// <summary>
     ///     Whether to enable window creation or not when the Command's Process is run.
@@ -142,7 +142,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// 
     /// </summary>
-    public bool OutputRedirection { get; protected set; }
+    public bool OutputRedirection { get; }
 
     /// <summary>
     ///     The Process Resource Policy to be used for executing the Command.
