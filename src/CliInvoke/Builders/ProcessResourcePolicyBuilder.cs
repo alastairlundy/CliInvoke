@@ -68,7 +68,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <exception cref="ArgumentOutOfRangeException">
     ///     Thrown if <see cref="internalMinWorkingSet" /> is less than 0.
     /// </exception>
-    /// <exception cref="ArgumentException">Thrown if the <see cref="minWorkingSet"/> is greater than or equal to the maximum working set.</exception>
+    /// <exception cref="ArgumentException">Thrown if the <paramref name="minWorkingSet"/> is greater than or equal to the maximum working set.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]

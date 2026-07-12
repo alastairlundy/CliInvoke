@@ -78,7 +78,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="arguments">The process arguments to be added or updated.</param>
     /// <param name="escapeArguments">Whether the arguments should be escaped.</param>
     /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref cref="arguments" /> is null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="arguments" /> is null.</exception>
     public IProcessConfigurationBuilder SetArguments(
         IEnumerable<string> arguments,
         bool escapeArguments = true)
