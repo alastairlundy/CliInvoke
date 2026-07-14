@@ -39,7 +39,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ExternalProcess"/> class and
+    ///     Initialises a new instance of the <see cref="ExternalProcess"/> class and
     ///     allocates a default <see cref="FilePathResolver"/> internally to resolve
     ///     the target executable path. This constructor performs an implicit
     ///     <see cref="FilePathResolver"/> allocation; callers that need a custom
