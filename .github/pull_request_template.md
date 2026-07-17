@@ -10,10 +10,9 @@ or removed. Be specific and factual.
 ## Why it was changed
 
 <!--
-Explain the motivation for this change.
-What problem does it solve, which issue does it close, or which design
-decision does it implement? If the rationale is not obvious from the
-diff, explain it here.
+State the motivation: the problem solved, the issue closed, or the
+design decision implemented. Expand if the diff alone does not make
+the rationale obvious.
 -->
 
 
