@@ -30,7 +30,7 @@ public class FilePathResolver : FilePathResolverBase
     /// <exception cref="PlatformNotSupportedException">Thrown if run on an unsupported platform.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public FileInfo ResolveFilePath(string filePathToResolve)
+    public new FileInfo ResolveFilePath(string filePathToResolve)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
         
