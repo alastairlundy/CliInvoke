@@ -39,12 +39,9 @@
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
-<!--    <ItemGroup>
-        <InternalsVisibleTo Include="CliInvoke"/>
-    </ItemGroup>-->
-    
     <ItemGroup>
-        <PackageReference Include="DotExtensions"/>
+        <InternalsVisibleTo Include="CliInvoke"/>
+        <PackageReference Include="Polyfill" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
