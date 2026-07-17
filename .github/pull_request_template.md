@@ -64,3 +64,8 @@ trust and accountability. Check the option that applies.
 - [ ] This PR was Co-Authored by AI (the human author reviewed,
       edited, and takes responsibility for the final code; commits
       include the appropriate `Co-authored-by:` trailer(s))
+
+If this PR was Co-Authored by AI, please also fill in the following:
+
+- **AI agent used:** <!-- e.g. GitHub Copilot CLI, Cursor, Claude Code, Aider, ... -->
+- **AI model used:** <!-- e.g. GPT-4o, Claude 3.5 Sonnet, o1, ... -->
