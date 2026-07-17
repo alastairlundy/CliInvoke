@@ -10,9 +10,7 @@
 using System.Linq;
 using System.Text;
 
-using CliInvoke.Core;
-
-using DotExtensions.IO;
+using CliInvoke.Core.Internal.IO;
 
 namespace CliInvoke;
 
@@ -64,7 +62,7 @@ public class FilePathResolver : FilePathResolverBase
     /// <returns></returns>
     protected override string[] GetPathFileExtensions()
     {
-        string[] pathExtensions = PathEnvironmentVariable.GetPathFileExtensions();
+        string[] pathExtensions = PathEnvironmentVariable.EnumerateFileExtensions().ToArray();
 
         for (int i = 0; i < pathExtensions.Length; i++)
         {

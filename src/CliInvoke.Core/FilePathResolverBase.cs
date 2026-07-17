@@ -7,7 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using DotExtensions.IO;
+
+using System.Linq;
+
+using CliInvoke.Core.Internal.IO;
 
 namespace CliInvoke.Core;
 
@@ -125,7 +128,7 @@ public abstract class FilePathResolverBase : IFilePathResolver
     /// </remarks>
     protected virtual string[] GetPathFileExtensions()
     {
-        string[] extensions = PathEnvironmentVariable.GetPathFileExtensions();
+        string[] extensions = PathEnvironmentVariable.EnumerateFileExtensions().ToArray();
 
         for (int i = 0; i < extensions.Length; i++)
         {
