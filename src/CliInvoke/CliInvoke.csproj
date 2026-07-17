@@ -76,12 +76,12 @@
         <InternalsVisibleTo Include="CliInvoke.Extensions"/>
     </ItemGroup>
 
-    <ItemGroup>
+<!--    <ItemGroup>
         <PackageReference Include="DotExtensions"/>
        <PackageReference Include="Polyfill" PrivateAssets="all">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-    </ItemGroup>
+    </ItemGroup>-->
 
     <PropertyGroup>
         <!-- default false, CI can set to true -->
