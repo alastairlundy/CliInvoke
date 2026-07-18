@@ -5,9 +5,8 @@ layout: simple
 
 Guide collection: conceptual guides describing architecture, configuration, and troubleshooting.
 
-- [Architecture](guides-architecture.md)
-- [Configuration](guides-configuration.md)
-- [Resource Disposal](guides-resource-disposal.md)
-- [Troubleshooting](guides-troubleshooting.md)
-
-(These pages are placeholders created during migration. Detailed content will be migrated from DocFX pages.)
+- [Choosing your Invocation Pattern](choosing-invocation-pattern.md) — decision tree and guidance for picking between `CliRun`, `IProcessInvoker`, and `IExternalProcess`.
+- [Architecture](architecture.md)
+- [Configuration](configuration.md)
+- [Resource Disposal](resource-disposal.md)
+- [Troubleshooting](troubleshooting.md)
