@@ -16,7 +16,7 @@ CliInvoke — a .NET/C# library for running and interacting with command-line pr
 - **Tests**: Located in `tests/` folder, uses TUnit framework.
 - **Infrastructure**:
   - Root: `README.md`, `CONTRIBUTING.md`
-  - Build Guidance: `docs/docs/building-cliinvoke.md`
+  - Build Guidance: `site/docs/building-cliinvoke.md`
   - CI Workflows: `.github/workflows/*` (test.yml, publish.yml, scorecard.yml)
   - Other: `benchmarks/`, `.assets/`, `THIRD_PARTY_NOTICES.txt`
 - **SDK**: Respect `global.json` (currently .NET 10.0) - matches CI.
