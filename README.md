@@ -19,7 +19,9 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Comparison vs Alternatives](#comparison-vs-alternatives)
 * [Installing CliInvoke](#installing-cliinvoke)
     * [Supported Platforms](#supported-platforms)
-* [CliInvoke Examples](#examples)
+* [Examples](#examples)
+* [Resource Disposal](#resource-disposal)
+* [Documentation](#documentation)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
 * [Used By](#used-by)
 * [Roadmap](#cliinvokes-roadmap)
@@ -86,7 +88,7 @@ The package(s) to install depends on your use case:
 
 CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
 
-For more details see the [list of supported platforms](docs/docs/Supported-OperatingSystems.md)
+For more details see the [list of supported platforms](site/docs/Supported-OperatingSystems.md)
 
 ## Design Patterns & When to Use Them
 
@@ -127,346 +129,42 @@ Console.WriteLine(result.StandardError);
 
 For detailed documentation on all available patterns and when to use them, see [PATTERNS.md](PATTERNS.md).
 
-### Advanced Configuration with Builders
-CliInvoke features several builder interfaces with advanced features intended for developers needing fine‑grained control of process configuration. For most common scenarios creating a ``ProcessConfiguration`` directly or using the static ``ProcessConfigurationFactory`` is sufficient.
+### Advanced Configuration
 
-These examples use ``IProcessInvoker`` but the ``IExternalProcess`` and ``IExternalProcessFactory`` pattern can be used instead as they both work with ``ProcessConfiguration`` objects.
+For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](site/docs/guides/configuration.md)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
 
-The following examples show how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the
-output is desired.
+## Resource Disposal
 
-#### Non-Buffered Execution Example
+> [!IMPORTANT]
+> CliInvoke has exactly **five Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
+>
+> | # | Type | What it owns |
+> |---|------|-------------|
+> | 1 | `ProcessConfiguration` | `StreamWriter` (StandardInput), optional `UserCredential` |
+> | 2 | `IExternalProcess` | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
+> | 3 | `PipedProcessResult` | `StandardOutput` and `StandardError` streams |
+> | 4 | `UserCredential` | `SecureString` password buffer |
+> | 5 | `UserCredentialBuilder` | `SecureString` password buffer staged for `Build()` |
+>
+> No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 
-This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
+For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](site/docs/guides/resource-disposal.md)**.
 
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
+## Documentation
 
-using CliInvoke.Builders;
-using CliInvoke.Core.Builders;
+Full documentation is available in the [CliInvoke Developer Portal](site/docs/readme.md). Pick the path that fits you:
 
-using Microsoft.Extensions.DependencyInjection;
+| Who you are | Start here |
+|---|---|
+| **Beginner** — "I just need to run a command" | [Quickstart](site/docs/getting-started-quickstart.md) → [Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md) |
+| **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](site/docs/getting-started.md) → [Configuration](site/docs/guides/configuration.md) |
+| **Power User** — "I need full lifecycle control" | [Choosing your Invocation Pattern → IExternalProcess](site/docs/guides/choosing-invocation-pattern.md#iexternalprocess--power-user-lifecycle-control) → [Architecture](site/docs/guides/architecture.md) |
 
-  //Namespace and class code ommitted for clarity 
-
-  // ServiceProvider and Dependency Injection setup code oomittedfor clarity
-  
-  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-
-  // Fluently configure your Command.
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
-                            .SetArguments(["arg1", "arg2"])
-                            .SetWorkingDirectory("/Path/To/Directory");
-  
-  // Build it as a ProcessConfiguration object when you're ready to use it.
-  ProcessConfiguration config = builder.Build();
-  
-  // Execute the process through ProcessInvoker and get the results.
-ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
-```
-
-#### Buffered Execution Example
-
-This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
-
-```csharp
-using CliInvoke;
-using CliInvoke.Builders;
-
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
-
-using Microsoft.Extensions.DependencyInjection;
-
-
-  //Namespace and class code ommitted for clarity
-  // ServiceProvider and Dependency Injection setup code ommitted for clarity
-  
-  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-
-  // Fluently configure your Command.
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
-                            .SetArguments(["arg1", "arg2"])
-                            .SetWorkingDirectory("/Path/To/Directory")
-                            .RedirectStandardOutput(true)
-                           .RedirectStandardError(true);
-  
-  // Build it as a ProcessConfiguration object when you're ready to use it.
-  ProcessConfiguration config = builder.Build();
-  
-  // Execute the process through ProcessInvoker and get the results.
-BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
-```
-
-### Cancellation and Timeout
-CliInvoke provides flexible timeout and cancellation support for process execution. By default, processes have a **10-minute timeout** with graceful exit behaviour.
-
-#### Default Timeout Policy
-
-The default timeout policy is used without explicit configuration:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
-
-// Uses the default timeout with graceful exit
-ProcessResult result = await CliRun.RunAsync("dotnet", "build");
-```
-
-#### Custom Timeout Configuration
-
-You can customize the timeout by creating a `ProcessExitConfiguration` with a `ProcessTimeoutPolicy`:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
-using CliInvoke.Builders;
-
-// Create a custom timeout policy (5-minute timeout with graceful exit)
-ProcessTimeoutPolicy customTimeout = ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(5));
-ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(customTimeout);
-
-IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("dotnet")
-    .SetArguments(["build"]);
-
-ProcessConfiguration config = builder.Build();
-
-// Execute with custom timeout
-IProcessInvoker invoker = new ProcessInvoker(FilePathResolver.Shared);
-ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
-```
-
-#### Disable Timeout
-
-To disable the timeout entirely, use `ProcessTimeoutPolicy.None`:
-
-```csharp
-ProcessExitConfiguration noTimeout = new ProcessExitConfiguration(ProcessTimeoutPolicy.None);
-// Process will wait indefinitely for completion
-```
-
-#### Cancellation Support
-Cancel process execution using a `CancellationToken`:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
-using System.Threading;
-
-CancellationTokenSource cts = new CancellationTokenSource();
-
-// Cancel after 30 seconds
-cts.CancelAfter(TimeSpan.FromSeconds(30));
-
-try
-{
-    ProcessResult result = await CliRun.RunAsync("dotnet", "build", 
-        cancellationToken: cts.Token);
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("Process was cancelled");
-}
-```
-
-##### Graceful vs Forceful Cancellation
-
-CliInvoke supports two cancellation strategies, controlled via `ProcessExitBehaviour`:
-
-* **Graceful Exit** (default) – Sends SIGTERM/SIGINT signals to allow the process to shut down cleanly and release resources. The process has an opportunity to handle the signal and exit gracefully.
-* **Forceful Exit** – Forcefully terminates the process and all child processes immediately without waiting for graceful shutdown.
-
-You can configure the cancellation behavior when a timeout occurs or when cancellation is requested:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
-
-// Configure forceful exit on timeout (immediate termination)
-ProcessTimeoutPolicy forcefulTimeout = new ProcessTimeoutPolicy(
-    timeoutThreshold: TimeSpan.FromSeconds(30), 
-    enabled: true, 
-    exitBehaviour: ProcessExitBehaviour.ForcefulExit);
-
-ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(forcefulTimeout);
-```
-
-##### Cancellation Exception Behavior
-
-By default, cancellations do not throw exceptions—the process simply exits and a result is returned. You can change this behavior with `CancellationThrowsException`:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
-
-// Configure to throw an exception on cancellation
-ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(
-    timeoutPolicy: ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
-    requestedCancellationExitBehaviour: ProcessExitBehaviour.GracefulExit,
-    cancellationThrowsException: true);
-
-try
-{
-    ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("Process was cancelled and exception was thrown");
-}
-```
-
-## Resource Cleanup
-
-CliInvoke uses several types that manage unmanaged resources and should be disposed after use. This section explains disposal patterns for the key artifacts:
-
-### ProcessConfiguration
-
-**Why**: Holds unmanaged resources including `StandardInput` (a `StreamWriter`) and optionally a `SecureString` credential that contain sensitive data.
-
-**Who**: The caller owns the `ProcessConfiguration` instance and is responsible for disposal.
-
-**When**: After the process has finished and the configuration is no longer needed.
-
-**How**: Use a `using` statement or explicit `Dispose()`:
-
-```csharp
-using var config = new ProcessConfiguration("cmd", "/c echo hello");
-await invoker.ExecuteAsync(config);
-// Disposed automatically when exiting the using block
-```
-
-### IExternalProcess
-
-**Why**: Wraps an underlying `System.Diagnostics.Process` which owns OS resources (pipes, handles, threads).
-
-**Who**: The caller who receives or creates the external process instance.
-
-**When**: Immediately after `CaptureBufferedResultAsync()` completes or when monitoring is complete.
-
-**How**: Use `await using` in async contexts:
-
-```csharp
-await using var process = invoker.StartAsync(config);
-var result = await process.CaptureBufferedResultAsync(cancellationToken);
-// Process is disposed automatically
-```
-
-Alternatively, call `Dispose()` explicitly:
-
-```csharp
-var process = invoker.StartAsync(config);
-try
-{
-    var result = await process.CaptureBufferedResultAsync(cancellationToken);
-}
-finally
-{
-    process.Dispose();
-}
-```
-
-### PipedProcessResult
-
-**Why**: Holds `StandardOutput` and `StandardError` streams that own OS resources and buffered data, which must be released.
-
-**Who**: The caller who receives the result from `CapturePipedResultAsync()`.
-
-**When**: After reading from the streams and before the application exits or the result is no longer needed.
-
-**How**: Use `await using` for async disposal (preferred on .NET 8+) or `using` for sync disposal:
-
-```csharp
-await using var result = await process.CapturePipedResultAsync(cancellationToken);
-using (var reader = new StreamReader(result.StandardOutput))
-{
-    string output = await reader.ReadToEndAsync();
-    // Use output...
-}
-// Streams are disposed automatically
-```
-
-Alternatively, call `Dispose()` explicitly:
-
-```csharp
-var result = await process.CapturePipedResultAsync(cancellationToken);
-try
-{
-    using (var reader = new StreamReader(result.StandardOutput))
-    {
-        string output = await reader.ReadToEndAsync();
-    }
-}
-finally
-{
-    result.Dispose();
-}
-```
-
-### UserCredential
-
-**Why**: Holds a `SecureString` containing a password, which is sensitive data that should be cleared from memory.
-
-**Who**: Shared responsibility — the library disposes the credential when the configuration is disposed. For standalone credentials, the caller is responsible.
-
-**When**: After the credential is no longer needed or when the parent configuration is disposed.
-
-**How**: Dispose directly or via the parent `ProcessConfiguration`:
-
-```csharp
-using var credential = new UserCredential("domain", "user", securePassword, false);
-// Use credential...
-// Disposed automatically; SecureString is cleared from memory
-```
-
-Or, rely on automatic disposal through the configuration:
-
-```csharp
-var config = new ProcessConfiguration("cmd", "/c echo hello");
-config.Credential = credential;
-using (config)
-{
-    // Use configuration; credential is disposed when config is disposed
-}
-```
-
-### UserCredentialBuilder
-
-**Why**: Holds a `SecureString` while building a credential, which owns sensitive data.
-
-**Who**: The caller who creates and uses the builder.
-
-**When**: Immediately after calling `Build()` if the builder is not needed for further mutations.
-
-**How**: Dispose both builder and built credential:
-
-```csharp
-UserCredential credential;
-using (var builder = new UserCredentialBuilder())
-{
-    credential = builder
-        .SetUsername("user")
-        .SetPassword(securePassword)
-        .Build();
-}
-// builder disposed; now dispose the credential
-using (credential)
-{
-    // Use credential...
-}
-```
-
-#### Common Disposal Tips
-
-* Prefer `await using` for `IExternalProcess` and `PipedProcessResult` in async contexts to ensure cleanup.
-* Never dispose a `StandardInput`, `StandardOutput`, `StandardError`, or `SecureString` twice — the library handles it when owning the resources.
-* If you reuse a `ProcessConfiguration` multiple times, call `Dispose()` manually after the final use.
-* Wrap builders and built credentials in `using` statements to ensure `SecureString` cleanup.
-* Only these five types require explicit disposal: `ProcessConfiguration`, `IExternalProcess`, `UserCredential`, `UserCredentialBuilder`, and `PipedProcessResult`. Other CliInvoke types do not implement `IDisposable`.
+Other guides: [Troubleshooting](site/docs/guides/troubleshooting.md) · [Migration Guides](site/docs/migration-guides/readme.md) · [Building from Source](site/docs/building-cliinvoke.md)
 
 ## How to Build CliInvoke's code
 
-Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
+Please see [building-cliinvoke.md](site/docs/building-cliinvoke.md) for how to build CliInvoke from source.
 
 ## How to Contribute to CliInvoke
 
