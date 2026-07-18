@@ -1,6 +1,5 @@
 ---
 title: Documentation
-layout: simple
 ---
 
 # CliInvoke Documentation
