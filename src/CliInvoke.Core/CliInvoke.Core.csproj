@@ -22,15 +22,19 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-alpha.5</Version>
-        <PackageReleaseNotes>### Changed
-* Updated internal Polyfill version from 10.7.0 to 10.10.0
-- `IProcessInvoker.ExecutePipedAsync`: parameter renamed from `processExitConfiguration` to `exitConfiguration` for consistency
+        <Version>3.0.0-alpha.6</Version>
+        <PackageReleaseNotes>#### Additions
+- Introduced `FilePathResolverBase` as a base class for file path resolution
+- Added `TryResolveFilePath` method to `IFilePathResolver` interface
+- Moved `PathEnvironmentVariable` class from DotExtensions into CliInvoke.Core
 
-## CliInvoke.Extensions
-
-### Removed
-- `ProcessConfiguration.ToProcessStartInfo()` extension method (moved to internal `ProcessControlAdapters`)</PackageReleaseNotes>
+#### Modifications
+- Updated Polyfill from 10.11.2 to 11.0.1
+- Refactored `ProcessConfiguration` constructors: moved arguments null check to 15-param ctor and delegated 3-param ctor
+- Removed dead protected setters on `Arguments` and `OutputRedirection` properties
+- Fixed `ProcessorAffinity` upper limit enforcement in `ProcessResourcePolicy`
+- Fixed `ProcessTimeoutPolicy` issue (#362)
+- Fixed `UserCredential` issue (#361)</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>

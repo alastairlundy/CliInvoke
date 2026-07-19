@@ -15,42 +15,27 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>
-### Added
-- New `ProcessControlAdapter` abstraction (`BaseProcessControlAdapter`, `WindowsProcessControlAdapter`, `UnixProcessControlAdapter`) to decouple OS-specific process control logic (suspend, resume, resource policy) from `ProcessWrapper`
-- `ProcessControlAdapterFactory` for platform-specific adapter creation
-- `src/global.json` pinning .NET SDK 10.0.0 with `latestMajor` roll-forward and prerelease support
-- Re-enabled `Polyfill` NuGet package reference (was previously commented out)
+        <PackageReleaseNotes>#### Additions
+- Added `VersionParseExtensions` with span-based parsing (migrated from DotExtensions)
+- Wired `CliRun.UseFilePathResolver` with lazy default and lock
 
-### Changed
-* Updated internal Polyfill version from 10.7.0 to 10.10.0
-* Updated DotExtensions version from 10.3.2 to 10.3.3
-- **Architecture rework**: `ProcessInvoker` and `CliRun` now delegate to `IExternalProcess` via `IExternalProcessFactory` instead of directly constructing and managing `ProcessWrapper` instances
-- `ProcessWrapper` moved from `CliInvoke.Helpers` to `CliInvoke.Processes.Internal` namespace
-- Process cancellation and piping code consolidated into the internal `ProcessWrapper`
-- Cancellation helpers (`CancellationHelper`, `CancellationReason`) moved to `CliInvoke.Processes.Internal.Cancellation`
-- `ExternalProcess.CaptureBufferedResultAsync` reworked to use `ProcessWrapper.ReadAllTextAsync` instead of separate `StandardOutput.ReadToEndAsync` / `StandardError.ReadToEndAsync` calls
-- Enabled `GenerateDocumentationFile` globally in `Directory.Build.props`
-- `ArgumentsBuilder`: replaced `var` with explicit `List&lt;string&gt;` / `List&lt;IFormattable&gt;` types for clarity
-- Fixed trailing semicolon in `TargetFrameworks` (`net10.0;net8.0;net9.0;` → `net10.0;net8.0;net9.0`)
+#### Modifications
+- Updated Polyfill from 10.11.2 to 11.0.1
+- Reworked `VersionParseExtensions` to use `ReadOnlySpan&lt;char&gt;`-based parsing instead of `StringSegment`/`StringTokenizer`
+- Migrated library constructors to construct local `FilePathResolver` instances
+- Migrated benchmark files off `FilePathResolver.Shared`
+- Renamed `ProcessConfigurationWrapper` to `BuilderProcessConfiguration`
+- Fixed `InvalidOperationException` on fast-exiting processes in `ProcessWrapper.Start()`
+- Fixed test runner hang by tightening process disposal and adding job timeout
+- Escalated cref warnings as errors in `Directory.Build.props`
+- Added remarks block to `BuilderProcessConfiguration` class
 
-### Fixed
-- **Process exit semaphore leak on Unix systems** — the cancellation semaphore was not being released in all exit paths
-- Buffered output reading race condition in `ExternalProcess` by consolidating stdout/stderr reads into a single `ReadAllTextAsync` call
-
-### Removed
-- `CliInvoke.Helpers.ProcessWrapper` (replaced by `CliInvoke.Processes.Internal.ProcessWrapper`)
-- `CliInvoke.Helpers.Processes.ProcessCancellationExtensions` (consolidated into internal `ProcessWrapper`)
-- `CliInvoke.Helpers.Processes.ProcessPipingHelper` (consolidated into internal `ProcessWrapper`)
-- `CliInvoke.Helpers.Processes.ToStartInfoExtensions` (moved to internal usage)
-- `CliInvoke.Helpers.Processes.ApplyInfos.ApplyConfigurationToProcessStartInfo` (moved to `ProcessControlAdapters`)
-- `CliInvoke.Helpers.Processes.ApplyInfos.ProcessSetPolicyExtensions` (moved to `ProcessControlAdapters`)
-- `CliInvoke.Helpers.Processes.Cancellation.UnixGracefulCancellation` (consolidated into `UnixProcessControlAdapter`)
-- `CliInvoke.Helpers.Processes.Cancellation.WindowsGracefulCancellation` (consolidated into `WindowsProcessControlAdapter`)</PackageReleaseNotes>
+#### Removals
+- Removed `FilePathResolver.Shared` singleton</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.5</PackageVersion>
+        <PackageVersion>3.0.0-alpha.6</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

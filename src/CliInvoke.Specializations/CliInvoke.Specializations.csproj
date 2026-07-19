@@ -12,18 +12,14 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.5</PackageVersion>
+        <PackageVersion>3.0.0-alpha.6</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>### Changed
-* Updated internal Polyfill version from 10.7.0 to 10.10.0
-- `CmdProcessInvoker` now implements `IProcessInvoker` directly instead of extending `ProcessInvoker`
-- `PowershellProcessInvoker` now implements `IProcessInvoker` directly instead of extending `ProcessInvoker`
-- Both invokers now accept `IExternalProcessFactory` as a constructor dependency
-- Added global usings for cleaner imports</PackageReleaseNotes>
+        <PackageReleaseNotes>- Updated Polyfill from 10.11.2 to 11.0.1
+- Updated to use CliInvoke.Core 3.0.0 Alpha 6 and CliInvoke 3.0.0 Alpha 6</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
