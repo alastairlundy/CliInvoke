@@ -5,7 +5,7 @@ template_theme_default_mode = "system"
 
 # Project metadata - set these before calling site_project_init.
 site_project_name = "CliInvoke"
-site_project_description = "A website built with Lunet."
+site_project_description = "CliInvoke is a .NET library for running and interacting with external command-line processes, with three invocation patterns, configuration builders, and cross-platform support."
 site_project_baseurl = "https://alastairlundy.github.io/CliInvoke"
 site_project_basepath = "/CliInvoke"
 site_project_github_user = "alastairlundy"
