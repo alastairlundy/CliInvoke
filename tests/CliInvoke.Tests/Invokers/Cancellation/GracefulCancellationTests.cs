@@ -42,7 +42,8 @@ public class GracefulCancellationTests
 
         long elapsedTimeSeconds = stopwatch.ElapsedMilliseconds / 1000;
 
-        Assert.InRange(elapsedTimeSeconds, 0, Math.Min(gracefulTimeoutSeconds * 3, 60));
+        Assert.InRange(elapsedTimeSeconds, 0,
+            Math.Min(GracefulCancellation.CalculateGracefulTimeoutWaitSeconds(gracefulTimeoutSeconds) + 5, 60));
         
         Assert.True(process.HasExited);
 
