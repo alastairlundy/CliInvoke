@@ -24,6 +24,7 @@ public class FilePathResolver : IFilePathResolver
     /// Provides a globally accessible and thread-safe way to resolve file paths
     /// across different parts of the application.
     /// </summary>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static FilePathResolver Shared { get; } = new(); 
     
     /// <summary>
