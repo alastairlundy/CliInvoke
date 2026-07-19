@@ -15,12 +15,26 @@ using CliInvoke.Processes.Internal.ControlAdapters;
 namespace CliInvoke.Processes.Internal;
 
 /// <summary>
-/// 
+///
 /// </summary>
 internal class ProcessWrapper : Process
 {
-    internal const int GracefulTimeoutWaitSeconds = 5;
-    
+    /// <summary>
+    /// Computes how long, in seconds, the graceful cancellation path should wait after the
+    /// timeout threshold before giving up on the interrupt signal and falling back to
+    /// (optionally) a forceful exit.
+    /// </summary>
+    /// <param name="timeoutSeconds">The user-supplied timeout threshold, in whole seconds.</param>
+    /// <returns>
+    /// <c>min(10 + floor(timeoutSeconds * 0.05), 20)</c> — i.e. a fixed 10s base plus 5% of the
+    /// requested timeout (rounded down to an integer), capped at 20s.
+    /// </returns>
+    internal static int CalculateGracefulTimeoutWaitSeconds(int timeoutSeconds)
+    {
+        int waitSeconds = 10 + (int)Math.Floor(timeoutSeconds * 0.05);
+        return Math.Min(waitSeconds, 20);
+    }
+
     // Synchronisation primitive to prevent simultaneous cancellation attempts
     internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
@@ -382,7 +396,11 @@ internal class ProcessWrapper : Process
             ]);
 
             await Task.WhenAny([
-                Task.Delay(500, cancellationToken), WaitForExitAsync(cancellationToken)
+                Task.Delay(
+                    TimeSpan.FromSeconds(
+                        CalculateGracefulTimeoutWaitSeconds((int)exitConfiguration.TimeoutPolicy.TimeoutThreshold.TotalSeconds)),
+                    cancellationToken),
+                WaitForExitAsync(cancellationToken)
             ]);
 
             if (!HasExited && fallbackToForceful) 

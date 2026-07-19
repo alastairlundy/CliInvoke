@@ -34,7 +34,11 @@ public class GracefulCancellationTests
 
         long elapsedTimeSeconds = stopwatch.ElapsedMilliseconds / 1000;
 
-        await Assert.That(elapsedTimeSeconds).IsBetween(0, Math.Min(gracefulTimeoutSeconds * 3, 60));
+        int waitSeconds =
+            ProcessWrapper.CalculateGracefulTimeoutWaitSeconds(gracefulTimeoutSeconds);
+
+        await Assert.That(elapsedTimeSeconds)
+            .IsBetween(0, Math.Min(gracefulTimeoutSeconds + waitSeconds + 5, 60));
 
         await Assert.That(process.HasExited).IsTrue();
 
