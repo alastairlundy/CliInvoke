@@ -4,7 +4,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Polyfill" Version="[10.11.2, 11.0.0)" />
+    <PackageVersion Include="Polyfill" Version="11.0.1" />
     <PackageVersion Include="DotExtensions" Version="10.4.0" />
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
