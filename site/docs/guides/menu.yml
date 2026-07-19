@@ -1,6 +1,7 @@
 doc:
   - {path: readme.md, title: "Overview"}
-  - {path: architecture.md, title: "Architecture"}
+  - {path: choosing-invocation-pattern.md, title: "Choosing your Invocation Pattern"}
   - {path: configuration.md, title: "Configuration"}
   - {path: resource-disposal.md, title: "Resource Disposal"}
+  - {path: architecture.md, title: "Architecture"}
   - {path: troubleshooting.md, title: "Troubleshooting"}

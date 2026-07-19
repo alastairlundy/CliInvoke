@@ -11,7 +11,8 @@ helps you pick the right pattern for your scenario and understand how to
 migrate between them as your needs grow.
 
 If you need the full API-level detail for each pattern, see
-[PATTERNS.md](../../../PATTERNS.md). For the internal data-flow, see
+[`PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/PATTERNS.md).
+For the internal data-flow, see
 [Architecture](architecture.md).
 
 ## The three patterns at a glance
@@ -292,7 +293,7 @@ controlling start/stop sequences, or building process-aware libraries.
 
 ## Further reading
 
-- [PATTERNS.md](../../../PATTERNS.md) — full API reference for each pattern.
+- [`PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/PATTERNS.md) — full API reference for each pattern.
 - [Architecture](architecture.md) — internal data-flow and implementation mapping.
 - [Configuration](configuration.md) — configuration model reference and builders.
 - [Resource Disposal](resource-disposal.md) — ownership and disposal rules.
