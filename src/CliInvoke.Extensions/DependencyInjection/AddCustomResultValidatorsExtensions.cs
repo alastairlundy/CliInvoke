@@ -13,7 +13,7 @@ using CliInvoke.Validation;
 namespace CliInvoke.Extensions;
 
 /// <summary>
-/// Provides extension methods to customize result validators for CliInvoke.
+/// Provides extension methods to customise result validators for CliInvoke.
 /// </summary>
 public static class AddCustomResultValidatorsExtensions
 {
