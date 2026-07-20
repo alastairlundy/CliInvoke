@@ -72,6 +72,29 @@ public static class CliRun
     private static IExternalProcessFactory GetExternalProcessFactory() 
         => _externalProcessFactory.Invoke();
 
+    // D006: out parameter is intentional; do not convert to tuple, the using declaration depends on it
+    private static ProcessConfiguration BuildStringArgsConfig(
+        string targetFilePath,
+        string arguments,
+        string? workingDirectory,
+        bool redirectStandardOutput,
+        TimeSpan? timeoutTimeSpan,
+        out ProcessExitConfiguration exitConfiguration)
+    {
+        // T006: helper is pure; resolution happens at the factory level; do not pre-resolve in the helper
+        workingDirectory ??= Environment.CurrentDirectory;
+
+        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
+            arguments, workingDirectory, redirectStandardOutput);
+
+        timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
+
+        exitConfiguration = ProcessExitConfiguration.CreateGraceful(
+            ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
+
+        return configuration;
+    }
+
     /// <summary>
     /// Executes a specified process with the provided parameters asynchronously and returns the resulting process data.
     /// </summary>
@@ -98,15 +121,8 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
-
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory, false);
-        
-        timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
-
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
+        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: false, timeoutTimeSpan, out var exitConfiguration);
 
         return await RunAsync(configuration, exitConfiguration, cancellationToken);
     }
@@ -165,16 +181,9 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
+        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: true, timeoutTimeSpan, out var exitConfiguration);
 
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory);
-        
-        timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
-
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
-        
         return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
     }
 
@@ -225,16 +234,9 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
-        
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory);
-        
-        timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
+        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: true, timeoutTimeSpan, out var exitConfiguration);
 
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
-        
         return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
     }
 
