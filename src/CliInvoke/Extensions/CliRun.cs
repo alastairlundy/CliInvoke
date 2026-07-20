@@ -95,6 +95,21 @@ public static class CliRun
         return configuration;
     }
 
+    private static async Task<T> RunInternalAsync<T>(
+        ProcessConfiguration configuration,
+        ProcessExitConfiguration? exitConfiguration,
+        Func<IExternalProcess, CancellationToken, Task<T>> capture,
+        CancellationToken cancellationToken)
+    {
+        // F1 follow-up: when the Process Invocation Pipeline ships, route through _pipeline.ExecuteAsync.
+        using IExternalProcess externalProcess = GetExternalProcessFactory()
+            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
+
+        await externalProcess.StartAsync(cancellationToken);
+
+        return await capture(externalProcess, cancellationToken);
+    }
+
     /// <summary>
     /// Executes a specified process with the provided parameters asynchronously and returns the resulting process data.
     /// </summary>
@@ -142,18 +157,11 @@ public static class CliRun
     /// <returns>
     /// The result of the process execution.
     /// </returns>
-    public static async Task<ProcessResult> RunAsync(ProcessConfiguration configuration,
+    public static Task<ProcessResult> RunAsync(ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
-    {
-        IFilePathResolver resolver = GetFilePathResolver();
-        using IExternalProcess externalProcess = new ExternalProcessFactory(resolver)
-            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
-
-        await externalProcess.StartAsync(cancellationToken);
-        
-        return await externalProcess.WaitForExitOrTimeoutAsync(cancellationToken);
-    }
+        => RunInternalAsync(configuration, exitConfiguration,
+            (p, t) => p.WaitForExitOrTimeoutAsync(t), cancellationToken);
 
     /// <summary>
     /// Executes a specified process asynchronously with the provided parameters and returns the buffered process result.
@@ -195,18 +203,11 @@ public static class CliRun
     /// <param name="exitConfiguration"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task<BufferedProcessResult> RunBufferedAsync(
+    public static Task<BufferedProcessResult> RunBufferedAsync(
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
-    {
-        IFilePathResolver resolver = GetFilePathResolver();
-        using IExternalProcess externalProcess = new ExternalProcessFactory(resolver)
-            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
-
-        await externalProcess.StartAsync(cancellationToken);
-        
-        return await externalProcess.CaptureBufferedResultAsync(cancellationToken);
-    }
+        => RunInternalAsync(configuration, exitConfiguration,
+            (p, t) => p.CaptureBufferedResultAsync(t), cancellationToken);
 
     /// <summary>
     /// Executes a process with the specified parameters and returns a result containing the process's piped data and exit information.
@@ -256,17 +257,10 @@ public static class CliRun
     /// A task representing the asynchronous operation. The task result contains a <see cref="PipedProcessResult"/> object
     /// with details about the executed process, including piped output and exit information.
     /// </returns>
-    public static async Task<PipedProcessResult> RunPipedAsync(
+    public static Task<PipedProcessResult> RunPipedAsync(
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
-    {
-        IFilePathResolver resolver = GetFilePathResolver();
-        using IExternalProcess externalProcess = new ExternalProcessFactory(resolver)
-            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
-
-        await externalProcess.StartAsync(cancellationToken);
-        
-        return await externalProcess.CapturePipedResultAsync(cancellationToken);
-    }
+        => RunInternalAsync(configuration, exitConfiguration,
+            (p, t) => p.CapturePipedResultAsync(t), cancellationToken);
 }
