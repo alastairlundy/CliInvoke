@@ -17,6 +17,7 @@ namespace CliInvoke.Processes.Internal.ControlAdapters;
 internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
 {
     private const uint CtrlCSignalEvent = 0;
+    private const uint CtrlBreakSignalEvent = 1;
     
     internal override void ResumeProcess(Process process)
     {
@@ -181,27 +182,53 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         CancellationReason cancellationReason,
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
     {
-        // Allocate a Console to the Process so that it has one it can use.
-        bool successfulAttachment = AllocConsoleWin();
-        // Attach the allocated console to the process.
-        successfulAttachment =
-            successfulAttachment && AttachConsoleWin((uint)process.Id);
+        // Try to share the child process's console so we can send it control events.
+        // If the child has no console (started with CreateNoWindow=true), this will fail
+        // with ERROR_INVALID_HANDLE — Fix #2: give up cleanly instead of sending no-op signals.
+        bool attached = AttachConsoleWin((uint)process.Id);
 
-        return Task.FromResult(successfulAttachment && SendCtrlCToConsoleWin(CtrlCSignalEvent, 0));
+        bool signalSent = false;
+        if (attached)
+        {
+            // Fix #3: CTRL_BREAK_EVENT (1) CAN target a specific process group, unlike
+            // CTRL_C_EVENT which is a documented no-op with a non-zero group id.
+            // Fix #4: use GetProcessGroupId which returns the PID — the correct group id
+            // for processes started without CREATE_NEW_PROCESS_GROUP.
+            signalSent = SendCtrlCToConsoleWin(CtrlBreakSignalEvent, GetProcessGroupId(process));
+
+            if (!signalSent)
+            {
+                // Fall back to broadcasting CTRL_C_EVENT to all processes sharing this console.
+                signalSent = SendCtrlCToConsoleWin(CtrlCSignalEvent, 0);
+            }
+
+            // Detach from the child's console to avoid interfering.
+            FreeConsoleWin();
+        }
+
+        return Task.FromResult(signalSent);
     }
+
+    /// <summary>
+    ///     Returns the process group ID for use with GenerateConsoleCtrlEvent.
+    ///     For processes started without <c>CREATE_NEW_PROCESS_GROUP</c>, the process ID is the
+    ///     correct group identifier. Fix #4: returns the PID directly instead of querying the
+    ///     EPROCESS-level group id which GenerateConsoleCtrlEvent does not interpret.
+    /// </summary>
+    private static uint GetProcessGroupId(Process process) => (uint)process.Id;
 
     #region P/Invoke code for Graceful Cancellation of Processes on Windows
     [LibraryImport("Kernel32.dll", EntryPoint = "GenerateConsoleCtrlEvent", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SendCtrlCToConsoleWin(uint ctrlEvent, uint processGroupEventId);
 
-    [LibraryImport("Kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool AllocConsoleWin();
-
     [LibraryImport("Kernel32.dll", EntryPoint = "AttachConsole", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool AttachConsoleWin(uint processId);
+
+    [LibraryImport("Kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool FreeConsoleWin();
     
     
     // Windows: list threads and call SuspendThread/ResumeThread on each thread of the process.
