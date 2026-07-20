@@ -78,20 +78,37 @@ internal class ProcessWrapper : Process
             // suspend/resume cycle in that case to avoid races on process handles.
             if (HasExited) return;
 
-            // TODO: Replace with ProcessHandle CreateSuspended as part of .NET 11 support.
+            // TODO: Replace with ProcessStartInfo.StartSuspended + SafeProcessHandle.Resume()
+            // on Windows and macOS when .NET 11 is added as a target framework.
             try
             {
                 SuspendProcess();
-
-#pragma warning disable CA1416
-                ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
-#pragma warning restore CA1416
-
-                ResumeProcess();
             }
             catch
             {
-                // Ignored
+                // Process exited before we could suspend it, or suspend failed.
+                return;
+            }
+
+            try
+            {
+#pragma warning disable CA1416
+                ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
+#pragma warning restore CA1416
+            }
+            finally
+            {
+                // Always resume the process — even if SetResourcePolicy throws —
+                // to prevent leaving it permanently suspended.
+                try
+                {
+                    ResumeProcess();
+                }
+                catch
+                {
+                    // The process may have already exited during SetResourcePolicy.
+                    // Swallow the exception — the process is gone, nothing to resume.
+                }
             }
         }
     }
