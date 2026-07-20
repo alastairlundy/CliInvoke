@@ -42,6 +42,10 @@ CliInvoke — a .NET/C# library for running and interacting with command-line pr
 
 When making changes, prefer to open/modify files under src/ and run tests targeting src/CliInvoke/ for fast feedback.
 
+## Contributing and PR workflow
+- **Follow `CONTRIBUTING.md`** for all contributions. Read it before making non-trivial changes; it defines branching, commit, and review expectations.
+- **Use `.github/pull_request_template.md`** whenever you open or draft a pull request on behalf of a user. Fill in every section (What changed, Why it was changed, Testing, Documentation, Contribution Policy compliance, Authorship) so the PR is ready for review without further editing.
+
 ## Specialized Workflows
 The following skills are available to handle specific operational tasks. Load them when the corresponding scenario arises:
 
