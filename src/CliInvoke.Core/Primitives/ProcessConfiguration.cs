@@ -38,37 +38,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         string? workingDirectoryPath = null,
         bool redirectOutputs = true,
         StreamWriter? standardInput = null,
-        bool windowCreation = false)
+        bool windowCreation = false) 
+        : this(targetFilePath, arguments, workingDirectoryPath, standardInput is not null && standardInput != StreamWriter.Null, redirectOutputs, redirectOutputs,
+            false,new Dictionary<string, string>(), null, standardInput, windowCreation: windowCreation)
     {
-        TargetFilePath = targetFilePath;
-        
-        ArgumentException.ThrowIfNullOrWhiteSpace(targetFilePath);
-        
-        RequiresAdministrator = false;
-        Arguments = arguments ?? string.Empty;
-        WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
-        EnvironmentVariables = new Dictionary<string, string>();
-        Credential = UserCredential.Null;
-
-        ResourcePolicy = ProcessResourcePolicy.Default;
-
-        RedirectStandardOutput = redirectOutputs;
-        RedirectStandardError = redirectOutputs;
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        StandardInput = standardInput ?? StreamWriter.Null;
-        StandardOutput = StreamReader.Null;
-        StandardError = StreamReader.Null;
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        RedirectStandardInput = StandardInput != StreamWriter.Null;
-        
-        UseShellExecution = false;
-        WindowCreation = windowCreation;
-
-        StandardInputEncoding = Encoding.Default;
-        StandardOutputEncoding = Encoding.Default;
-        StandardErrorEncoding = Encoding.Default;
+     
     }
     
     /// <summary>
