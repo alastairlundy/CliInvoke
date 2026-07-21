@@ -10,6 +10,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 
+using CliInvoke.Core.Builders;
 using CliInvoke.Core.Internal;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
@@ -25,6 +26,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// 
     /// </summary>
     /// <param name="targetFilePath"></param>
+    /// <param name="argumentsBuilder"></param>
     /// <param name="arguments"></param>
     /// <param name="workingDirectoryPath"></param>
     /// <param name="redirectOutputs"></param>
@@ -33,12 +35,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     [OverloadResolutionPriority(3)]
     public ProcessConfiguration(
         string targetFilePath,
+        IArgumentsBuilder argumentsBuilder,
         IEnumerable<string>? arguments = null,
         string? workingDirectoryPath = null,
         bool redirectOutputs = true,
         StreamWriter? standardInput = null,
         bool windowCreation = false)
-        : this(targetFilePath, string.Join(' ', arguments ?? []),  workingDirectoryPath, redirectOutputs, standardInput, windowCreation)
+        : this(targetFilePath, string.Join(' ', argumentsBuilder.AddEnumerable(arguments ?? []).ToString()),  workingDirectoryPath, redirectOutputs, standardInput, windowCreation)
     {
     }
 
