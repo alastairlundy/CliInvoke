@@ -41,7 +41,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         bool redirectOutputs = true,
         StreamWriter? standardInput = null,
         bool windowCreation = false)
-        : this(targetFilePath, string.Join(' ', argumentsBuilder.AddEnumerable(arguments ?? []).ToString()),  workingDirectoryPath, redirectOutputs, standardInput, windowCreation)
+        : this(targetFilePath, string.Join(' ', argumentsBuilder.AddEnumerable(arguments ?? [], true).ToString()),  workingDirectoryPath, redirectOutputs, standardInput, windowCreation)
     {
     }
 
