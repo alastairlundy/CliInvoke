@@ -40,7 +40,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         bool windowCreation = false)
         : this(targetFilePath, string.Join(' ', arguments ?? []),  workingDirectoryPath, redirectOutputs, standardInput, windowCreation)
     {
-        
     }
 
     /// <summary>
@@ -64,7 +63,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         : this(targetFilePath, arguments, workingDirectoryPath, standardInput is not null && standardInput != StreamWriter.Null, redirectOutputs, redirectOutputs,
             false,new Dictionary<string, string>(), null, standardInput, windowCreation: windowCreation)
     {
-     
     }
     
     /// <summary>
