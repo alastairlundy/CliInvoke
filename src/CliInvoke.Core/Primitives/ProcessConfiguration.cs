@@ -22,6 +22,28 @@ namespace CliInvoke.Core;
 public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposable
 {
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="targetFilePath"></param>
+    /// <param name="arguments"></param>
+    /// <param name="workingDirectoryPath"></param>
+    /// <param name="redirectOutputs"></param>
+    /// <param name="standardInput"></param>
+    /// <param name="windowCreation"></param>
+    [OverloadResolutionPriority(3)]
+    public ProcessConfiguration(
+        string targetFilePath,
+        IEnumerable<string>? arguments = null,
+        string? workingDirectoryPath = null,
+        bool redirectOutputs = true,
+        StreamWriter? standardInput = null,
+        bool windowCreation = false)
+        : this(targetFilePath, string.Join(' ', arguments ?? []),  workingDirectoryPath, redirectOutputs, standardInput, windowCreation)
+    {
+        
+    }
+
+    /// <summary>
     /// Configures the Process configuration to be wrapped and executed.
     /// </summary>
     /// <param name="targetFilePath">The target file path of the command to be executed.</param>
@@ -31,7 +53,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="standardInput">The standard input source to be used (if specified).</param>
     /// <param name="windowCreation">Whether to enable or disable Window Creation of the Command's Process.</param>
     /// <exception cref="ArgumentException">Thrown if the target file path is empty.</exception>
-    [OverloadResolutionPriority(3)]
+    [OverloadResolutionPriority(4)]
     public ProcessConfiguration(
         string targetFilePath,
         string? arguments = null,
