@@ -28,17 +28,17 @@ public class GracefulCancellationTests
         ProcessExitConfiguration exitConfiguration = new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan
             (TimeSpan.FromSeconds(gracefulTimeoutSeconds)), cancellationThrowsException: false);
 
-        await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None, true);
+        await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None, false);
 
         stopwatch.Stop();
 
         long elapsedTimeSeconds = stopwatch.ElapsedMilliseconds / 1000;
 
-        int waitSeconds =
+        int expectedMaxSeconds =
             ProcessWrapper.CalculateGracefulTimeoutWaitSeconds(gracefulTimeoutSeconds);
 
         await Assert.That(elapsedTimeSeconds)
-            .IsBetween(0, Math.Min(gracefulTimeoutSeconds + waitSeconds + 5, 60));
+            .IsBetween(0, expectedMaxSeconds + 10);
 
         await Assert.That(process.HasExited).IsTrue();
 

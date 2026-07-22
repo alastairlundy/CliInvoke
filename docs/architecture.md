@@ -135,7 +135,7 @@ exit-handling strategy:
 - `ProcessExitBehaviour.GracefulExit` → race a `Task.Delay` against
   `WaitForExitAsync`; on timeout, send an interrupt signal via
   `BaseProcessControlAdapter.SendInterruptSignalAsync`; after a
-  `CalculateGracefulTimeoutWaitSeconds(timeoutSeconds)` grace period
+  `CalculatePostInterruptGracePeriodSeconds(timeoutSeconds)` grace period
   (10s + 5% of the timeout, capped at 20s), fall back to `Kill()`.
 - `ProcessExitBehaviour.ForcefulExit` → `Kill()` after the timeout.
 
