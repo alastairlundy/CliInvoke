@@ -46,6 +46,13 @@ public interface IExternalProcess : IDisposable
     event EventHandler Exited;
 
     /// <summary>
+    ///     Synchronously starts the external process and returns its process ID.
+    ///     Stdin piping is not performed by this method.
+    /// </summary>
+    /// <returns>The process ID of the started process.</returns>
+    int Start();
+
+    /// <summary>
     ///     Asynchronously starts the external process using the specified configuration.
     /// </summary>
     /// <param name="cancellationToken">
@@ -85,13 +92,6 @@ public interface IExternalProcess : IDisposable
     /// </returns>
     Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken);
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    int FireAndForget(CancellationToken cancellationToken);
-
     /// <summary>
     ///     Asynchronously captures output and waits for the external process to exit or a specified
     ///     timeout period to elapse.
