@@ -319,19 +319,23 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
     internal sealed class StubExternalProcess : IExternalProcess
     {
         private readonly Exception? _throwOnStart;
+        private readonly Action? _onDisposed;
         private bool _throwOnStartConsumed;
 
-        public StubExternalProcess(ProcessConfiguration configuration, Exception? throwOnStart)
-            : this(configuration, ProcessExitConfiguration.CreateGraceful(), throwOnStart)
+        public StubExternalProcess(ProcessConfiguration configuration, Exception? throwOnStart,
+            Action? onDisposed = null)
+            : this(configuration, ProcessExitConfiguration.CreateGraceful(), throwOnStart, onDisposed)
         {
         }
 
         public StubExternalProcess(ProcessConfiguration configuration,
-            ProcessExitConfiguration exitConfiguration, Exception? throwOnStart)
+            ProcessExitConfiguration exitConfiguration, Exception? throwOnStart,
+            Action? onDisposed = null)
         {
             Configuration = configuration;
             ExitConfiguration = exitConfiguration;
             _throwOnStart = throwOnStart;
+            _onDisposed = onDisposed;
         }
 
         public ProcessConfiguration Configuration { get; set; }
@@ -408,6 +412,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
         public void Dispose()
         {
             IsDisposed = true;
+            _onDisposed?.Invoke();
             Exited?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -431,63 +436,11 @@ internal sealed class DisposalTrackingFactory : IExternalProcessFactory
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration exitConfiguration)
     {
-        var stub = new CountingExternalProcessFactory.StubExternalProcess(configuration, exitConfiguration, ThrowOnStart);
-        var tracked = new DisposalTrackedStub(stub, this);
-        _created.Add(tracked);
-        return tracked;
-    }
-
-    private sealed class DisposalTrackedStub : IExternalProcess
-    {
-        private readonly CountingExternalProcessFactory.StubExternalProcess _inner;
-        private readonly DisposalTrackingFactory _owner;
-
-        public DisposalTrackedStub(CountingExternalProcessFactory.StubExternalProcess inner, DisposalTrackingFactory owner)
-        {
-            _inner = inner;
-            _owner = owner;
-        }
-
-        public ProcessConfiguration Configuration
-        {
-            get => _inner.Configuration;
-            set => _inner.Configuration = value;
-        }
-
-        public ProcessExitConfiguration ExitConfiguration
-        {
-            get => _inner.ExitConfiguration;
-            set => _inner.ExitConfiguration = value;
-        }
-
-        public bool HasExited => _inner.HasExited;
-        public bool HasStarted => _inner.HasStarted;
-
-        public event EventHandler? Started
-        {
-            add => _inner.Started += value;
-            remove => _inner.Started -= value;
-        }
-
-        public event EventHandler? Exited
-        {
-            add => _inner.Exited += value;
-            remove => _inner.Exited -= value;
-        }
-
-        public int Start() => _inner.Start();
-        public Task StartAsync(CancellationToken cancellationToken) => _inner.StartAsync(cancellationToken);
-        public Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken) => _inner.StartAsync(configuration, cancellationToken);
-        public Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken) => _inner.WaitForExitOrTimeoutAsync(cancellationToken);
-        public Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken) => _inner.CaptureBufferedResultAsync(cancellationToken);
-        public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken) => _inner.CapturePipedResultAsync(cancellationToken);
-        public Task Kill() => _inner.Kill();
-
-        public void Dispose()
-        {
-            _owner.WasDisposed = true;
-            _inner.Dispose();
-        }
+        var stub = new CountingExternalProcessFactory.StubExternalProcess(
+            configuration, exitConfiguration, ThrowOnStart,
+            onDisposed: () => WasDisposed = true);
+        _created.Add(stub);
+        return stub;
     }
 }
 
