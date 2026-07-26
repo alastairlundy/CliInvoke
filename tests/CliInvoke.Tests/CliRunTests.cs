@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Collections.Generic;
 using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
@@ -186,6 +187,76 @@ public class CliRunTests : IDisposable
         secondFactory.Dispose();
         thirdFactory.Dispose();
     }
+
+    [Test]
+    public async Task FireAndForget_WithConfig_RoutesThroughFactory()
+    {
+        using ProcessConfiguration configuration =
+            ProcessConfigurationFactory.Create(_targetFilePath);
+
+        CliRun.FireAndForget(configuration);
+
+        await Assert.That(_factory.CreateCount).IsEqualTo(1);
+        await Assert.That(_factory.LastConfiguration).IsSameReferenceAs(configuration);
+    }
+
+    [Test]
+    public async Task FireAndForget_WithStringArgs_BuildsConfigAndRoutesThroughFactory()
+    {
+        CliRun.FireAndForget(_targetFilePath);
+
+        await Assert.That(_factory.CreateCount).IsEqualTo(1);
+        await Assert.That(_factory.LastConfiguration).IsNotNull();
+        await Assert.That(_factory.LastConfiguration!.TargetFilePath).IsEqualTo(_targetFilePath);
+    }
+
+    [Test]
+    public async Task FireAndForget_DisposesProcessAfterStart()
+    {
+        var disposalFactory = new DisposalTrackingFactory();
+
+        try
+        {
+            CliRun.UseExternalProcessFactory(disposalFactory);
+
+            using ProcessConfiguration configuration =
+                ProcessConfigurationFactory.Create(_targetFilePath);
+
+            CliRun.FireAndForget(configuration);
+
+            await Assert.That(disposalFactory.WasDisposed).IsTrue();
+        }
+        finally
+        {
+            CliRun.UseExternalProcessFactory(_factory);
+        }
+    }
+
+    [Test]
+    public async Task FireAndForget_DisposesProcessOnStartFailure()
+    {
+        var disposalFactory = new DisposalTrackingFactory
+        {
+            ThrowOnStart = new InvalidOperationException("simulated start failure")
+        };
+
+        try
+        {
+            CliRun.UseExternalProcessFactory(disposalFactory);
+
+            using ProcessConfiguration configuration =
+                ProcessConfigurationFactory.Create(_targetFilePath);
+
+            await Assert.That(() => CliRun.FireAndForget(configuration))
+                .Throws<InvalidOperationException>();
+
+            await Assert.That(disposalFactory.WasDisposed).IsTrue();
+        }
+        finally
+        {
+            CliRun.UseExternalProcessFactory(_factory);
+        }
+    }
 }
 
 /// <summary>
@@ -245,7 +316,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
     /// <see cref="StartAsync(System.Threading.CancellationToken)"/> was called and
     /// returns sentinel result objects for the capture methods.
     /// </summary>
-    private sealed class StubExternalProcess : IExternalProcess
+    internal sealed class StubExternalProcess : IExternalProcess
     {
         private readonly Exception? _throwOnStart;
         private bool _throwOnStartConsumed;
@@ -271,9 +342,24 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 
         public bool HasStarted { get; private set; }
 
+        public bool IsDisposed { get; internal set; }
+
         public event EventHandler? Started;
 
         public event EventHandler? Exited;
+
+        public int Start()
+        {
+            if (_throwOnStart is not null && !_throwOnStartConsumed)
+            {
+                _throwOnStartConsumed = true;
+                throw _throwOnStart;
+            }
+
+            HasStarted = true;
+            Started?.Invoke(this, EventArgs.Empty);
+            return 0;
+        }
 
         public Task StartAsync(CancellationToken cancellationToken)
             => StartAsync(Configuration, cancellationToken);
@@ -299,9 +385,6 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
                 startTime: now, exitTime: now));
         }
 
-        public int FireAndForget(CancellationToken cancellationToken)
-            => 0;
-
         public Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken)
         {
             DateTime now = DateTime.UtcNow;
@@ -324,7 +407,86 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 
         public void Dispose()
         {
+            IsDisposed = true;
             Exited?.Invoke(this, EventArgs.Empty);
+        }
+    }
+}
+
+/// <summary>
+/// Factory that tracks whether the created <see cref="IExternalProcess"/> was disposed.
+/// Used by the FireAndForget disposal tests.
+/// </summary>
+internal sealed class DisposalTrackingFactory : IExternalProcessFactory
+{
+    private readonly List<IExternalProcess> _created = new();
+
+    public bool WasDisposed { get; private set; }
+
+    public Exception? ThrowOnStart { get; set; }
+
+    public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration)
+        => CreateExternalProcess(configuration, ProcessExitConfiguration.CreateGraceful());
+
+    public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
+        ProcessExitConfiguration exitConfiguration)
+    {
+        var stub = new CountingExternalProcessFactory.StubExternalProcess(configuration, exitConfiguration, ThrowOnStart);
+        var tracked = new DisposalTrackedStub(stub, this);
+        _created.Add(tracked);
+        return tracked;
+    }
+
+    private sealed class DisposalTrackedStub : IExternalProcess
+    {
+        private readonly CountingExternalProcessFactory.StubExternalProcess _inner;
+        private readonly DisposalTrackingFactory _owner;
+
+        public DisposalTrackedStub(CountingExternalProcessFactory.StubExternalProcess inner, DisposalTrackingFactory owner)
+        {
+            _inner = inner;
+            _owner = owner;
+        }
+
+        public ProcessConfiguration Configuration
+        {
+            get => _inner.Configuration;
+            set => _inner.Configuration = value;
+        }
+
+        public ProcessExitConfiguration ExitConfiguration
+        {
+            get => _inner.ExitConfiguration;
+            set => _inner.ExitConfiguration = value;
+        }
+
+        public bool HasExited => _inner.HasExited;
+        public bool HasStarted => _inner.HasStarted;
+
+        public event EventHandler? Started
+        {
+            add => _inner.Started += value;
+            remove => _inner.Started -= value;
+        }
+
+        public event EventHandler? Exited
+        {
+            add => _inner.Exited += value;
+            remove => _inner.Exited -= value;
+        }
+
+        public int Start() => _inner.Start();
+        public Task StartAsync(CancellationToken cancellationToken) => _inner.StartAsync(cancellationToken);
+        public Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken) => _inner.StartAsync(configuration, cancellationToken);
+        public Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken) => _inner.WaitForExitOrTimeoutAsync(cancellationToken);
+        public Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken) => _inner.CaptureBufferedResultAsync(cancellationToken);
+        public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken) => _inner.CapturePipedResultAsync(cancellationToken);
+        public Task Kill() => _inner.Kill();
+
+        public void Dispose()
+        {
+            _owner.WasDisposed = true;
+            _inner.Dispose();
         }
     }
 }
