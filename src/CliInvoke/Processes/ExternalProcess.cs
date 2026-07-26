@@ -125,6 +125,10 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 
         _processWrapper.Dispose();
         _processWrapper = new ProcessWrapper(Configuration, Configuration.ResourcePolicy);
+
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+
         _processWrapper.Start();
 
         return _processWrapper.Id;
