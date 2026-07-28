@@ -51,6 +51,11 @@ public class ProcessCancellationTests
         }
         finally
         {
+            if (!process.HasExited)
+            {
+                try { process.Kill(true); } catch { process.Kill(); }
+            }
+
             process.Dispose();
 
             if (File.Exists(markerPath))
@@ -103,6 +108,11 @@ public class ProcessCancellationTests
         }
         finally
         {
+            if (!process.HasExited)
+            {
+                try { process.Kill(true); } catch { process.Kill(); }
+            }
+
             process.Dispose();
 
             if (File.Exists(markerPath))
@@ -112,7 +122,9 @@ public class ProcessCancellationTests
 
     private static string GetCeilingDiagnostic(string markerPath, ProcessWrapper process, int timeoutSeconds)
     {
-        if (!File.Exists(markerPath))
+        bool markerExists = File.Exists(markerPath);
+
+        if (!markerExists)
         {
             return $"Process did not receive the interrupt signal within {timeoutSeconds}s; " +
                    $"marker file {markerPath} is missing.";
@@ -124,7 +136,8 @@ public class ProcessCancellationTests
                    $"{timeoutSeconds}s after cancellation.";
         }
 
-        return "Process exited naturally without receiving the interrupt signal; " +
-               "the test was supposed to exercise the cancellation path.";
+        return $"Process exited and marker file exists (signal was delivered), but " +
+               $"WaitForExitOrTimeoutAsync did not complete within the ceiling. " +
+               $"Possible race in wait-task completion after process exit.";
     }
 }

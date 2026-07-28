@@ -55,9 +55,13 @@ internal class ProcessTestHelper
             ? "CliInvoke.Tests.Helpers.exe"
             : "CliInvoke.Tests.Helpers";
 
+        string config = AppContext.BaseDirectory.Contains("Release", StringComparison.OrdinalIgnoreCase)
+            ? "Release"
+            : "Debug";
+
         string binaryPath = Path.Combine(
             dir, "tests", "CliInvoke.Tests.Helpers", "bin",
-            "Debug", "net10.0", binaryName);
+            config, "net10.0", binaryName);
 
         if (!File.Exists(binaryPath))
         {

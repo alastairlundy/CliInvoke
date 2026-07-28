@@ -39,6 +39,11 @@ public class GracefulCancellationTests
         }
         finally
         {
+            if (!process.HasExited)
+            {
+                try { process.Kill(true); } catch { process.Kill(); }
+            }
+
             process.Dispose();
 
             if (File.Exists(markerPath))
