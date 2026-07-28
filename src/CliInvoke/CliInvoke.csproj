@@ -15,27 +15,27 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### Additions
-- Added `VersionParseExtensions` with span-based parsing (migrated from DotExtensions)
-- Wired `CliRun.UseFilePathResolver` with lazy default and lock
+        <PackageReleaseNotes>### 🆕 Additions
+- **Added new `FireAndForget` methods to `CliRun`** (the static facade in `src/CliInvoke/Extensions/CliRun.cs`):
+  - `FireAndForget(ProcessConfiguration configuration)` — disposes the spawned `IExternalProcess` after starting it.
+  - `FireAndForget(string targetFilePath, string arguments = "", string? workingDirectory = null)` — builds the configuration via the new `BuildStringArgsConfig` helper and returns the spawned process ID.
 
-#### Modifications
-- Updated Polyfill from 10.11.2 to 11.0.1
-- Reworked `VersionParseExtensions` to use `ReadOnlySpan&lt;char&gt;`-based parsing instead of `StringSegment`/`StringTokenizer`
-- Migrated library constructors to construct local `FilePathResolver` instances
-- Migrated benchmark files off `FilePathResolver.Shared`
-- Renamed `ProcessConfigurationWrapper` to `BuilderProcessConfiguration`
-- Fixed `InvalidOperationException` on fast-exiting processes in `ProcessWrapper.Start()`
-- Fixed test runner hang by tightening process disposal and adding job timeout
-- Escalated cref warnings as errors in `Directory.Build.props`
-- Added remarks block to `BuilderProcessConfiguration` class
+### ⚙️ Modifications
+- Extracted `BuildStringArgsConfig` as a private static helper in `CliRun` to eliminate the duplicated 5-line configuration-build block that previously appeared in each of the three string-argument `Run*Async` overloads.
+- Routed the three configuration-argument public overloads (`RunAsync`, `RunBufferedAsync`, `RunPipedAsync`) through a single `RunInternalAsync&lt;T&gt;` funnel that calls the (possibly user-supplied) `IExternalProcessFactory`, starts the process, and applies the chosen capture delegate.
+- Switched the default `_externalProcessFactory` field to construct an `ExternalProcessFactory` per call (capturing the current static file-path resolver), so changes to `UseFilePathResolver` take effect on subsequent calls instead of being frozen at first access.
+- Implemented a synchronous `int Start()` method on `ExternalProcess` that resolves the target file path, swaps the process wrapper if needed, and starts the process; added matching `HasStarted` guards to both `StartAsync` overloads.
+- **Removed** the original (broken) `FireAndForget(CancellationToken)` method implementation from `ExternalProcess`, since the FireAndForget surface has moved up to `CliRun` and the `IExternalProcess` declaration has been removed.
+- Wired up the new synchronous `Start()` so that the `Started` and `Exited` events on `ExternalProcess` are raised as the process transitions through the started and exited states.
+- Collapsed `ProcessWrapper`'s semaphore-driven critical section into a single `WaitForExitCoreAsync` method that owns the semaphore acquire/release pair; the two wrapper methods now delegate to it with `isGraceful: true` and `isGraceful: false`, respectively. Removed the inner `_cancellationSemaphore.WaitAsync(0)` and `Release()` calls from `CancelWithInterrupt`.
 
-#### Removals
-- Removed `FilePathResolver.Shared` singleton</PackageReleaseNotes>
+### 🐛 Bug Fixes
+- Restructured `ProcessWrapper.OnStarted` with nested `try-catch-finally` blocks so that `ResumeProcess()` is always called — even when `SetResourcePolicy()` throws after `SuspendProcess()` succeeded — preventing the child process from being permanently suspended. Also fixed the suspended-resume TODO to reference the actual .NET 11 API names (`ProcessStartInfo.StartSuspended` and `SafeProcessHandle.Resume`).
+- Fixed the Windows graceful-cancellation cascade in `WindowsProcessControlAdapter`: replaced `AllocConsole` with `AttachConsole` targeting the child PID, switched from `CTRL_C_EVENT` (a documented no-op for non-zero group IDs) to `CTRL_BREAK_EVENT` targeted at the correct process group, added `FreeConsole` cleanup, and used the PID directly as the process-group ID since `CreateNewProcessGroup` is not set. The fallback path now exits cleanly with `ERROR_INVALID_HANDLE` instead of sending a no-op signal.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.6</PackageVersion>
+        <PackageVersion>3.0.0-alpha.7</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

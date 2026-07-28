@@ -12,14 +12,13 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.6</PackageVersion>
+        <PackageVersion>3.0.0-alpha.7</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>- Updated Polyfill from 10.11.2 to 11.0.1
-- Updated to use CliInvoke.Core 3.0.0 Alpha 6 and CliInvoke 3.0.0 Alpha 6</PackageReleaseNotes>
+        <PackageReleaseNotes>- Updated to use CliInvoke.Core 3.0.0 Alpha 7 and CliInvoke 3.0.0 Alpha 7</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>

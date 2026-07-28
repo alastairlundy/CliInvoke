@@ -22,19 +22,10 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-alpha.6</Version>
-        <PackageReleaseNotes>#### Additions
-- Introduced `FilePathResolverBase` as a base class for file path resolution
-- Added `TryResolveFilePath` method to `IFilePathResolver` interface
-- Moved `PathEnvironmentVariable` class from DotExtensions into CliInvoke.Core
-
-#### Modifications
-- Updated Polyfill from 10.11.2 to 11.0.1
-- Refactored `ProcessConfiguration` constructors: moved arguments null check to 15-param ctor and delegated 3-param ctor
-- Removed dead protected setters on `Arguments` and `OutputRedirection` properties
-- Fixed `ProcessorAffinity` upper limit enforcement in `ProcessResourcePolicy`
-- Fixed `ProcessTimeoutPolicy` issue (#362)
-- Fixed `UserCredential` issue (#361)</PackageReleaseNotes>
+        <Version>3.0.0-alpha.7</Version>
+        <PackageReleaseNotes>### ⚙️ Modifications
+- Added a synchronous `int Start()` method declaration (with XML doc) to `IExternalProcess`, between the `Exited` event and the `StartAsync` overloads.
+- **Removed** the original `FireAndForget(CancellationToken)` method declaration from `IExternalProcess` in a single step (no `[Obsolete]` shim), as the FireAndForget concept has moved up to the `CliRun` facade in the main `CliInvoke` package.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
