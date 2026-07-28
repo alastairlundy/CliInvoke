@@ -22,6 +22,7 @@
 ### 2.8
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.8.3 | June 30th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.8.3 |
 | 2.8.2 | June 12th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.8.2 |
 | 2.8.1 | May 31st 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.8.1 |
 | 2.8.0 | May 31st 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.8.0 |
