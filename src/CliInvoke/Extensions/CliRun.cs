@@ -73,7 +73,7 @@ public static class CliRun
     private static IExternalProcessFactory GetExternalProcessFactory() 
         => _externalProcessFactory.Invoke();
 
-    // D006: out parameter is intentional; do not convert to tuple, the using declaration depends on it
+    // Out parameter is intentional; do not convert to tuple, the using declaration depends on it
     private static ProcessConfiguration BuildStringArgsConfig(
         string targetFilePath,
         string arguments,
@@ -82,7 +82,7 @@ public static class CliRun
         TimeSpan? timeoutTimeSpan,
         out ProcessExitConfiguration exitConfiguration)
     {
-        // T006: helper is pure; resolution happens at the factory level; do not pre-resolve in the helper
+        // Helper is pure; resolution happens at the factory level; do not pre-resolve in the helper
         workingDirectory ??= Environment.CurrentDirectory;
 
         ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
@@ -287,9 +287,9 @@ public static class CliRun
     /// <returns>The process ID of the started process.</returns>
     public static int FireAndForget(string targetFilePath, string arguments = "", string? workingDirectory = null)
     {
-        // T004: exitConfiguration is unused by FireAndForget
+        // ExitConfiguration is unused by FireAndForget
         using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
-            redirectStandardOutput: false, timeoutTimeSpan: null, out var exitConfiguration);
+            redirectStandardOutput: false, timeoutTimeSpan: null, out ProcessExitConfiguration _);
 
         return FireAndForget(configuration);
     }
