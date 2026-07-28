@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 string markerPath = args.Length >= 1 ? args[0] : throw new ArgumentException(
@@ -21,11 +22,25 @@ if (!string.IsNullOrEmpty(parentDir) && !Directory.Exists(parentDir))
         $"Marker file parent directory does not exist: {parentDir}");
 }
 
+Action writeMarker = () =>
+    File.WriteAllText(markerPath, DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture));
+
 Console.CancelKeyPress += (sender, e) =>
 {
-    File.WriteAllText(markerPath, DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture));
+    writeMarker();
     e.Cancel = false;
 };
+
+// On Unix, ProcessWrapper.SendInterruptSignalAsync sends SIGTERM first, not SIGINT.
+// Register a POSIX handler so the marker is written regardless of signal type.
+if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+{
+    PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
+    {
+        writeMarker();
+        context.Cancel = false;
+    });
+}
 
 Thread.Sleep(TimeSpan.FromSeconds(sleepSeconds));
 
