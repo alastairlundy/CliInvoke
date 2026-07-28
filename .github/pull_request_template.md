@@ -19,8 +19,8 @@ the rationale obvious.
 ## Testing
 
 <!--
-Describe how you verified the change. Mention the TFMs you tested on
-(net8.0, net9.0, net10.0), the test framework (TUnit), and any new or
+Describe how you verified the change. Mention the TFM you tested on
+(net10.0), the test framework (TUnit), and any new or
 updated tests added under tests/. If you could not run the full suite
 locally, say so and call out which platforms still need verification.
 -->

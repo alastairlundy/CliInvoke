@@ -16,11 +16,8 @@ namespace CliInvoke.Core;
 public class PipedProcessResult
     : ProcessResult,
         IEquatable<PipedProcessResult>,
-        IDisposable
-#if NET8_0_OR_GREATER
-        ,
+        IDisposable,
         IAsyncDisposable
-#endif
 {
     /// <summary>
     ///     Initializes the PipedProcessResult with process information.
@@ -62,7 +59,6 @@ public class PipedProcessResult
     /// </summary>
     public Stream StandardError { get; }
 
-#if NET8_0_OR_GREATER
     /// <summary>
     ///     Disposes of the <see cref="StandardOutput" /> and <see cref="StandardError" /> streams
     ///     asynchronously.
@@ -74,7 +70,6 @@ public class PipedProcessResult
 
         GC.SuppressFinalize(this);
     }
-#endif
 
     /// <summary>
     ///     Disposes of the <see cref="StandardOutput" /> and <see cref="StandardError" /> streams.
