@@ -264,4 +264,33 @@ public static class CliRun
         CancellationToken cancellationToken = default)
         => RunInternalAsync(configuration, exitConfiguration,
             (p, t) => p.CapturePipedResultAsync(t), cancellationToken);
+
+    /// <summary>
+    ///     Starts a process using the specified configuration and returns its process ID without
+    ///     waiting for it to exit. The process handle is disposed after starting.
+    /// </summary>
+    /// <param name="configuration">The configuration settings for starting the process.</param>
+    /// <returns>The process ID of the started process.</returns>
+    public static int FireAndForget(ProcessConfiguration configuration)
+    {
+        using IExternalProcess p = GetExternalProcessFactory().CreateExternalProcess(configuration);
+        return p.Start();
+    }
+
+    /// <summary>
+    ///     Starts a process using the specified file path and returns its process ID without
+    ///     waiting for it to exit.
+    /// </summary>
+    /// <param name="targetFilePath">The path of the executable file to start.</param>
+    /// <param name="arguments">Command-line arguments for the executable. Defaults to an empty string if not specified.</param>
+    /// <param name="workingDirectory">The working directory for the process. If null, the current directory is used.</param>
+    /// <returns>The process ID of the started process.</returns>
+    public static int FireAndForget(string targetFilePath, string arguments = "", string? workingDirectory = null)
+    {
+        // T004: exitConfiguration is unused by FireAndForget
+        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: false, timeoutTimeSpan: null, out var exitConfiguration);
+
+        return FireAndForget(configuration);
+    }
 }
