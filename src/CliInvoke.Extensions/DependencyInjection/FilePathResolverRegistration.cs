@@ -34,9 +34,7 @@ public static class FilePathResolverRegistration
         ///     specified.
         /// </exception>
         public IServiceCollection UseCustomFilePathResolver<
-#if NET8_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             TResolver>(
             ServiceLifetime serviceLifetime)
             where TResolver : class, IFilePathResolver
