@@ -23,11 +23,17 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.9.0</Version>
-        <PackageReleaseNotes>-Updated Polyfill from 10.11.2 to 11.0.1</PackageReleaseNotes>
+        <Version>2.10.0</Version>
+        <PackageReleaseNotes>#### 🆕 Additions
+- Added a constructor overload that accepts ``IEnumerable&lt;string&gt;`` in ``ProcessConfiguration``.
+
+#### ⚙️ Modifications
+- Reduced code duplication in ``ProcessConfiguration`` constructors.
+- Improved formatting in ``ProcessConfiguration``.
+- Updated ``ProcessConfiguration``.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.9.0.0</AssemblyVersion>
-        <FileVersion>2.9.0.0</FileVersion>
+        <AssemblyVersion>2.10.0.0</AssemblyVersion>
+        <FileVersion>2.10.0.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>

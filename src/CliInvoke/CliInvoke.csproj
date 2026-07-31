@@ -15,17 +15,12 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>##### ⚠️ Deprecations
-- Deprecated FilePathResolver.Shared static property (marked [Obsolete] ahead of removal in v3)
-
-#### ⚙️ Modifications
--Updated Polyfill from 10.11.2 to 11.0.1
-- Updated DotExtensions from 10.3.3 to 10.4.0
-- 🐛 Scaled the graceful-cancellation wait with the configured timeout, replacing the fixed 30-second `GracefulTimeoutWaitSeconds` constant with `CalculateGracefulTimeoutWaitSeconds(timeout)` (returns `min(10 + floor(timeout * 0.05), 20)`). A 10s timeout now waits 10s (was 30s); a 200s timeout is capped at 20s. The `GracefulCancel_InterruptSignals_Success` test bound is now derived from the same formula (wait + 5s, capped at 60s) so it stays in sync if the formula changes again.</PackageReleaseNotes>
+        <PackageReleaseNotes>#### ⚙️ Modifications
+- Updated DotExtensions from 10.4.0 to 10.5.0</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.9.0</PackageVersion>
+        <PackageVersion>2.10.0</PackageVersion>
         <AssemblyVersion>2.9.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
