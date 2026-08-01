@@ -144,6 +144,31 @@ internal
         }
     }
 
+    /// <summary>
+    ///     Waits for the process to exit without blocking on stream EOF.
+    ///     <para>
+    ///     The base-class <see cref="Process.WaitForExitAsync(CancellationToken)"/> always calls
+    ///     <c>WaitUntilOutputEOF</c> after exit detection, which blocks indefinitely when
+    ///     redirected stdout/stderr pipes are held open by grandchild or unrelated processes
+    ///     (see dotnet/runtime#51277). This method avoids that by polling <see cref="Process.HasExited"/>
+    ///     via <see cref="Task.Delay(int, CancellationToken)"/>, which never blocks on stream EOF.
+    ///     </para>
+    /// </summary>
+    internal async Task WaitForExitSafeAsync(CancellationToken cancellationToken)
+    {
+        const int pollIntervalMs = 200;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (HasExited)
+                return;
+
+            await Task.Delay(pollIntervalMs, cancellationToken).ConfigureAwait(false);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+    }
+
     // Windows: list threads and call SuspendThread/ResumeThread on each thread of the process.
 #if NET8_0_OR_GREATER
     [LibraryImport("kernel32.dll", SetLastError = true)]
