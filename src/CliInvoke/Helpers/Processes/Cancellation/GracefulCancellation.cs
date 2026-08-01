@@ -63,7 +63,7 @@ internal static partial class GracefulCancellation
                 // Wait for any of the three tasks to complete
                 Task[] tasks =
                 [
-                    process.WaitForExitAsync(cancellationToken),
+                    process.WaitForExitSafeAsync(cancellationToken),
                     gracefulInterruptCancellation,
                     process.GracefulCancellationWithCancelToken(
                         timeoutThreshold + TimeSpan.FromSeconds(
@@ -126,7 +126,7 @@ internal static partial class GracefulCancellation
 
             try
             {
-                await process.WaitForExitAsync(cts.Token);
+                await process.WaitForExitSafeAsync(cts.Token);
             }
             catch (TaskCanceledException)
             {

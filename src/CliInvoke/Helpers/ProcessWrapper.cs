@@ -71,6 +71,10 @@ internal
         {
             // Process may have exited between starting and applying policy
         }
+        catch (Win32Exception)
+        {
+            // Process may have exited between starting and applying resource policy
+        }
     }
 
     private void OnExited(object? sender, EventArgs e)
@@ -103,7 +107,15 @@ internal
         StartTime = DateTime.UtcNow;
         Started.Invoke(this, EventArgs.Empty);
         Id = base.Id;
-        ProcessName = base.ProcessName;
+        try
+        {
+            ProcessName = base.ProcessName;
+        }
+        catch (InvalidOperationException)
+        {
+            // Process may have exited before ProcessName could be read
+            ProcessName = StartInfo.FileName;
+        }
 
         return HasStarted;
     }
@@ -142,6 +154,31 @@ internal
         {
             ResumeProcessUnix(base.Id);
         }
+    }
+
+    /// <summary>
+    ///     Waits for the process to exit without blocking on stream EOF.
+    ///     <para>
+    ///     The base-class <see cref="Process.WaitForExitAsync(CancellationToken)"/> always calls
+    ///     <c>WaitUntilOutputEOF</c> after exit detection, which blocks indefinitely when
+    ///     redirected stdout/stderr pipes are held open by grandchild or unrelated processes
+    ///     (see dotnet/runtime#51277). This method avoids that by polling <see cref="Process.HasExited"/>
+    ///     via <see cref="Task.Delay(int, CancellationToken)"/>, which never blocks on stream EOF.
+    ///     </para>
+    /// </summary>
+    internal async Task WaitForExitSafeAsync(CancellationToken cancellationToken)
+    {
+        const int pollIntervalMs = 200;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (HasExited)
+                return;
+
+            await Task.Delay(pollIntervalMs, cancellationToken).ConfigureAwait(false);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
     }
 
     // Windows: list threads and call SuspendThread/ResumeThread on each thread of the process.
