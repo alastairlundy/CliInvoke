@@ -71,6 +71,10 @@ internal
         {
             // Process may have exited between starting and applying policy
         }
+        catch (Win32Exception)
+        {
+            // Process may have exited between starting and applying resource policy
+        }
     }
 
     private void OnExited(object? sender, EventArgs e)
@@ -103,7 +107,15 @@ internal
         StartTime = DateTime.UtcNow;
         Started.Invoke(this, EventArgs.Empty);
         Id = base.Id;
-        ProcessName = base.ProcessName;
+        try
+        {
+            ProcessName = base.ProcessName;
+        }
+        catch (InvalidOperationException)
+        {
+            // Process may have exited before ProcessName could be read
+            ProcessName = StartInfo.FileName;
+        }
 
         return HasStarted;
     }
