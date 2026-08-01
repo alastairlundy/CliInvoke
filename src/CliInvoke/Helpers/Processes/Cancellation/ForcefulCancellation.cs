@@ -46,7 +46,7 @@ internal static class ForcefulCancellation
 
             try
             {
-                Task waitForExit = process.WaitForExitAsync(cancellationToken);
+                Task waitForExit = process.WaitForExitSafeAsync(cancellationToken);
                 Task delay = Task.Delay(timeoutThreshold, cancellationToken);
 
                 await Task.WhenAny(delay, waitForExit);

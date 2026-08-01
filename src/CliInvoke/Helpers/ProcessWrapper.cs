@@ -101,11 +101,46 @@ internal
         if (!HasStarted) return HasStarted;
         
         StartTime = DateTime.UtcNow;
-        Started.Invoke(this, EventArgs.Empty);
         Id = base.Id;
-        ProcessName = base.ProcessName;
+        Started.Invoke(this, EventArgs.Empty);
+
+        try
+        {
+            ProcessName = base.ProcessName;
+        }
+        catch (InvalidOperationException)
+        {
+            // Process may have exited between Start() and accessing ProcessName
+            // (e.g. Windows 'timeout' exits immediately when stdout is redirected).
+            ProcessName = StartInfo.FileName;
+        }
 
         return HasStarted;
+    }
+
+    /// <summary>
+    ///     Waits for the process to exit without blocking on stream EOF.
+    ///     <para>
+    ///     The base-class <see cref="Process.WaitForExitAsync(CancellationToken)"/> always calls
+    ///     <c>WaitUntilOutputEOF</c> after exit detection, which blocks indefinitely when
+    ///     redirected stdout/stderr pipes are held open by grandchild or unrelated processes
+    ///     (see dotnet/runtime#51277). This method avoids that by polling <see cref="Process.HasExited"/>
+    ///     via <see cref="Task.Delay(int, CancellationToken)"/>, which never blocks on stream EOF.
+    ///     </para>
+    /// </summary>
+    internal async Task WaitForExitSafeAsync(CancellationToken cancellationToken)
+    {
+        const int pollIntervalMs = 200;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (HasExited)
+                return;
+
+            await Task.Delay(pollIntervalMs, cancellationToken).ConfigureAwait(false);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
     }
 
     /// <summary>

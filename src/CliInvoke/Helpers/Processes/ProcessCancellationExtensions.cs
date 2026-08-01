@@ -57,7 +57,7 @@ internal static class ProcessCancellationExtensions
         {
             try
             {
-                await process.WaitForExitAsync(cancellationToken);
+                await process.WaitForExitSafeAsync(cancellationToken);
             }
             catch (OperationCanceledException)
             {
