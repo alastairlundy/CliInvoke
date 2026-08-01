@@ -380,6 +380,31 @@ internal class ProcessWrapper : Process
     }
 
     /// <summary>
+    ///     Waits for the process to exit without blocking on stream EOF.
+    ///     <para>
+    ///     The base-class <see cref="Process.WaitForExitAsync(CancellationToken)"/> always calls
+    ///     <c>WaitUntilOutputEOF</c> after exit detection, which blocks indefinitely when
+    ///     redirected stdout/stderr pipes are held open by grandchild or unrelated processes
+    ///     (see dotnet/runtime#51277). This method avoids that by polling <see cref="Process.HasExited"/>
+    ///     via <see cref="Task.Delay(int, CancellationToken)"/>, which never blocks on stream EOF.
+    ///     </para>
+    /// </summary>
+    private async Task WaitForExitSafeAsync(CancellationToken cancellationToken)
+    {
+        const int pollIntervalMs = 200;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (HasExited)
+                return;
+
+            await Task.Delay(pollIntervalMs, cancellationToken).ConfigureAwait(false);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+    }
+
+    /// <summary>
     ///     Unified critical section for wait+cancel flows. Owns the semaphore acquire/release pair.
     ///     <paramref name="isGraceful"/> selects between pure-cancellation and graceful-timeout behaviour.
     /// </summary>
@@ -393,7 +418,7 @@ internal class ProcessWrapper : Process
         if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
         {
             // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitAsync(cancellationToken);
+            await WaitForExitSafeAsync(cancellationToken);
             return;
         }
 
@@ -402,7 +427,7 @@ internal class ProcessWrapper : Process
             if (isGraceful)
             {
                 await Task.WhenAny([
-                    WaitForExitAsync(cancellationToken),
+                    WaitForExitSafeAsync(cancellationToken),
                     CancelWithInterrupt(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
                         processExitConfiguration, cancellationToken)
                 ]);
@@ -412,7 +437,7 @@ internal class ProcessWrapper : Process
                         TimeSpan.FromSeconds(
                             CalculatePostInterruptGracePeriodSeconds((int)processExitConfiguration.TimeoutPolicy.TimeoutThreshold.TotalSeconds)),
                         cancellationToken),
-                    WaitForExitAsync(cancellationToken)
+                    WaitForExitSafeAsync(cancellationToken)
                 ]);
 
                 if (!HasExited && fallbackToForceful)
@@ -420,7 +445,7 @@ internal class ProcessWrapper : Process
             }
             else
             {
-                await WaitForExitAsync(cancellationToken);
+                await WaitForExitSafeAsync(cancellationToken);
             }
         }
         catch (OperationCanceledException) when (!isGraceful)
@@ -488,7 +513,7 @@ internal class ProcessWrapper : Process
         if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
         {
             // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitAsync(cancellationToken);
+            await WaitForExitSafeAsync(cancellationToken);
             // Dispose of the linked CTS to prevent resource leaks
             cts.Dispose();
             return;
@@ -496,7 +521,7 @@ internal class ProcessWrapper : Process
 
         try
         {
-            await WaitForExitAsync(actualCancellationToken);
+            await WaitForExitSafeAsync(actualCancellationToken);
         }
         catch (Exception exception)
         {
