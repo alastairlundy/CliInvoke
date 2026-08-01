@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+using CliInvoke.Core;
 using CliInvoke.Processes.Internal;
 
 namespace CliInvoke.Tests.Helpers.Processes;
@@ -21,7 +22,13 @@ public class ProcessSuspendResumeTests
             OperatingSystem.IsFreeBSD())
             process = ProcessTestHelper.CreateProcess("sleep", $"{sleepTimeSeconds}");
         else if (OperatingSystem.IsWindows())
-            process = ProcessTestHelper.CreateProcess("timeout", $"/t {sleepTimeSeconds} /nobreak");
+        {
+            // Windows 'timeout' exits immediately when any standard stream is redirected.
+            // Disable output redirection so stdout/stderr stay connected to the console.
+            ProcessConfiguration configuration = new ProcessConfiguration("timeout",
+                $"/t {sleepTimeSeconds} /nobreak", outputRedirection: false);
+            process = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        }
         else
             throw new PlatformNotSupportedException();
 
