@@ -370,16 +370,18 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 
         public Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken)
         {
-            if (_throwOnStart is not null && !_throwOnStartConsumed)
-            {
-                _throwOnStartConsumed = true;
-                throw _throwOnStart;
-            }
+                cancellationToken.ThrowIfCancellationRequested();
 
-            HasStarted = true;
-            Started?.Invoke(this, EventArgs.Empty);
-            return Task.CompletedTask;
-        }
+                if (_throwOnStart is not null && !_throwOnStartConsumed)
+                {
+                    _throwOnStartConsumed = true;
+                    throw _throwOnStart;
+                }
+
+                HasStarted = true;
+                Started?.Invoke(this, EventArgs.Empty);
+                return Task.CompletedTask;
+            }
 
         public Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
         {
