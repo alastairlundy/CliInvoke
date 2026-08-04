@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 
@@ -18,6 +19,7 @@ namespace CliInvoke;
 public class ProcessInvoker : IProcessInvoker
 {
     private readonly IExternalProcessFactory _externalProcessFactory;
+    private readonly ProcessInvocationPipeline _pipeline;
 
     /// <summary>
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes.
@@ -26,6 +28,7 @@ public class ProcessInvoker : IProcessInvoker
     public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
     {
         _externalProcessFactory = externalProcessFactory;
+        _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
 
     /// <summary>
@@ -54,19 +57,13 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default);
+        var ctx = new ProcessInvocationContext(
+            processConfiguration,
+            processExitConfiguration ?? ProcessExitConfiguration.Default,
+            InvocationMode.Raw,
+            cancellationToken);
 
-        try
-        {
-            await externalProcess.StartAsync(cancellationToken);
-
-            return await externalProcess.WaitForExitOrTimeoutAsync(cancellationToken);
-        }
-        finally
-        {
-            externalProcess.Dispose();
-        }
+        return await _pipeline.InvokeAsync<ProcessResult>(ctx);
     }
 
     /// <summary>
@@ -93,19 +90,13 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default);
-        
-        try
-        {
-            await externalProcess.StartAsync(cancellationToken);
+        var ctx = new ProcessInvocationContext(
+            processConfiguration,
+            processExitConfiguration ?? ProcessExitConfiguration.Default,
+            InvocationMode.Buffered,
+            cancellationToken);
 
-            return await externalProcess.CaptureBufferedResultAsync(cancellationToken);
-        }
-        finally
-        {
-            externalProcess.Dispose();
-        }
+        return await _pipeline.InvokeAsync<BufferedProcessResult>(ctx);
     }
 
     /// <summary>
@@ -128,18 +119,12 @@ public class ProcessInvoker : IProcessInvoker
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
-            processConfiguration, exitConfiguration ??  ProcessExitConfiguration.Default);
+        var ctx = new ProcessInvocationContext(
+            processConfiguration,
+            exitConfiguration ?? ProcessExitConfiguration.Default,
+            InvocationMode.Piped,
+            cancellationToken);
 
-        try
-        {
-            await externalProcess.StartAsync(cancellationToken);
-
-            return await externalProcess.CapturePipedResultAsync(cancellationToken);
-        }
-        finally
-        {
-            externalProcess.Dispose();
-        }
+        return await _pipeline.InvokeAsync<PipedProcessResult>(ctx);
     }
 }

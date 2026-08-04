@@ -8,6 +8,7 @@
 */
 
 
+using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 using CliInvoke.Specializations.Configurations;
@@ -33,11 +34,12 @@ namespace CliInvoke.Specializations;
 public class PowershellProcessInvoker : IProcessInvoker
 {
     private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
-    
+
     private readonly bool _windowCreation;
     private readonly bool _useShellExecution;
     private readonly IFilePathResolver _filePathResolver;
     private readonly IExternalProcessFactory _externalProcessFactory;
+    private readonly ProcessInvocationPipeline _pipeline;
 
     /// <summary>
     /// </summary>
@@ -61,6 +63,7 @@ public class PowershellProcessInvoker : IProcessInvoker
 
         _filePathResolver = filePathResolver;
         _externalProcessFactory = externalProcessFactory;
+        _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
 
     private ProcessConfiguration GetPowershellProcessConfiguration(bool redirectOutputs)
@@ -107,17 +110,18 @@ public class PowershellProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
-        
+
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(false));
 
-        using IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default);
+        var ctx = new ProcessInvocationContext(
+            processConfiguration,
+            processExitConfiguration ?? ProcessExitConfiguration.Default,
+            InvocationMode.Raw,
+            cancellationToken);
 
-        await externalProcess.StartAsync(cancellationToken);
-
-        return await externalProcess.WaitForExitOrTimeoutAsync(cancellationToken);
+        return await _pipeline.InvokeAsync<ProcessResult>(ctx);
     }
 
     /// <summary>
@@ -150,17 +154,18 @@ public class PowershellProcessInvoker : IProcessInvoker
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
-        
+
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(true));
 
-        using IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default);
+        var ctx = new ProcessInvocationContext(
+            processConfiguration,
+            processExitConfiguration ?? ProcessExitConfiguration.Default,
+            InvocationMode.Buffered,
+            cancellationToken);
 
-        await externalProcess.StartAsync(cancellationToken);
-
-        return await externalProcess.CaptureBufferedResultAsync(cancellationToken);
+        return await _pipeline.InvokeAsync<BufferedProcessResult>(ctx);
     }
 
     /// <summary>
@@ -188,20 +193,21 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, 
+        ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
         ThrowIfUnsupported();
-        
+
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(true));
 
-        using IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default);
+        var ctx = new ProcessInvocationContext(
+            processConfiguration,
+            processExitConfiguration ?? ProcessExitConfiguration.Default,
+            InvocationMode.Piped,
+            cancellationToken);
 
-        await externalProcess.StartAsync(cancellationToken);
-
-        return await externalProcess.CapturePipedResultAsync(cancellationToken);
+        return await _pipeline.InvokeAsync<PipedProcessResult>(ctx);
     }
 }
