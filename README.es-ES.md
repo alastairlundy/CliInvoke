@@ -17,11 +17,11 @@ Inicie procesos, redireccione las entradas y salidas estándar, espere la finali
 
 ## Tabla de Contenidos
 
-* [Características](#features)
-* [Comparación con Alternativas](#comparison-vs-alternatives)
-* [Instalación de CliInvoke](#installing-cliinvoke)
-    * [Plataformas Compatibles](#supported-platforms)
-* [Ejemplos](#examples)
+* [Características](#características)
+* [Comparación con Alternativas](#comparación-con-alternativas)
+* [Instalación de CliInvoke](#instalación-de-cliinvoke)
+    * [Plataformas Compatibles](#plataformas-compatibles)
+* [Ejemplos](#ejemplos)
 * [Liberación de Recursos](#resource-disposal)
 * [Documentación](#documentation)
 * [Cómo Contribuir a CliInvoke](#how-to-contribute-to-cliinvoke)
