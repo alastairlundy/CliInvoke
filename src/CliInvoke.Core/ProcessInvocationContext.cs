@@ -10,7 +10,7 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-///     The single state-bearing object the process invocation pipeline accepts and mutates during execution.
+///     The state-bearing object the process invocation pipeline accepts during execution.
 /// </summary>
 public class ProcessInvocationContext
 {
@@ -52,9 +52,4 @@ public class ProcessInvocationContext
     ///     Gets the cancellation token.
     /// </summary>
     public CancellationToken CancellationToken { get; }
-
-    /// <summary>
-    ///     Gets or sets the process result, set by the pipeline after execution.
-    /// </summary>
-    public ProcessResult? Result { get; set; }
 }

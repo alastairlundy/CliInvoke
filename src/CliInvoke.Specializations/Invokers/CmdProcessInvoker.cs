@@ -22,7 +22,6 @@ namespace CliInvoke.Specializations;
 public class CmdProcessInvoker : IProcessInvoker
 {
     private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
-    private readonly IExternalProcessFactory _externalProcessFactory;
     private readonly ProcessInvocationPipeline _pipeline;
 
     /// <summary>
@@ -48,7 +47,6 @@ public class CmdProcessInvoker : IProcessInvoker
     public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, IExternalProcessFactory externalProcessFactory)
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;
-        _externalProcessFactory = externalProcessFactory;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
 

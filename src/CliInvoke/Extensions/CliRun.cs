@@ -25,7 +25,7 @@ public static class CliRun
         ExternalProcessFactory(GetFilePathResolver());
 
     private static IFilePathResolver? _filePathResolver;
-    private static ProcessInvocationPipeline? _pipeline;
+    private static volatile ProcessInvocationPipeline? _pipeline;
     private static readonly object _syncRoot = new();
 
     /// <summary>
@@ -59,6 +59,7 @@ public static class CliRun
         lock (_syncRoot)
         {
             _filePathResolver = resolver;
+            _pipeline = null;
         }
     }
 

@@ -45,8 +45,20 @@ internal class ProcessInvocationPipeline
         {
             if (ctx.Mode == InvocationMode.FireAndForget)
             {
+                if (typeof(TResult) != typeof(ProcessResult))
+                {
+                    throw new InvalidOperationException(
+                        $"FireAndForget mode only supports {nameof(ProcessResult)} results, not {typeof(TResult).Name}.");
+                }
+
                 int processId = externalProcess.Start();
-                return CreateStubResult<TResult>(externalProcess.Configuration.TargetFilePath, processId);
+
+                return (TResult)(object)new ProcessResult(
+                    externalProcess.Configuration.TargetFilePath,
+                    0,
+                    processId,
+                    DateTime.UtcNow,
+                    DateTime.UtcNow);
             }
 
             await externalProcess.StartAsync(ctx.CancellationToken);
@@ -63,17 +75,5 @@ internal class ProcessInvocationPipeline
         {
             externalProcess.Dispose();
         }
-    }
-
-    private static TResult CreateStubResult<TResult>(string executableFilePath, int processId) where TResult : ProcessResult
-    {
-        var stub = (TResult)Activator.CreateInstance(typeof(TResult),
-            executableFilePath,
-            0,
-            processId,
-            DateTime.UtcNow,
-            DateTime.UtcNow)!;
-
-        return stub;
     }
 }

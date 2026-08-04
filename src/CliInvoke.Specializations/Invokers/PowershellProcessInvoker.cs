@@ -38,7 +38,6 @@ public class PowershellProcessInvoker : IProcessInvoker
     private readonly bool _windowCreation;
     private readonly bool _useShellExecution;
     private readonly IFilePathResolver _filePathResolver;
-    private readonly IExternalProcessFactory _externalProcessFactory;
     private readonly ProcessInvocationPipeline _pipeline;
 
     /// <summary>
@@ -62,7 +61,6 @@ public class PowershellProcessInvoker : IProcessInvoker
         _useShellExecution = useShellExecution;
 
         _filePathResolver = filePathResolver;
-        _externalProcessFactory = externalProcessFactory;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
 

@@ -18,7 +18,6 @@ namespace CliInvoke;
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
-    private readonly IExternalProcessFactory _externalProcessFactory;
     private readonly ProcessInvocationPipeline _pipeline;
 
     /// <summary>
@@ -27,7 +26,6 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="externalProcessFactory"></param>
     public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
     {
-        _externalProcessFactory = externalProcessFactory;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
 
