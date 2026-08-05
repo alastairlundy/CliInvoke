@@ -15,12 +15,12 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### ⚙️ Modifications
-- Updated DotExtensions from 10.4.0 to 10.5.0</PackageReleaseNotes>
+        <PackageReleaseNotes>* Fixed potential race conditions in ``ProcessWrapper``'s ``Start`` method for fast exiting processes. ( #395 )
+* Fixed an issue where ``WaitForExitAsync`` waiting for End Of File would block indefinitely on piped outputs (#395 )</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.10.0</PackageVersion>
+        <PackageVersion>2.10.1</PackageVersion>
         <AssemblyVersion>2.9.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
