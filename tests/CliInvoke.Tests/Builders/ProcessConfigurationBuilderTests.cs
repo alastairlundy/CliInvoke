@@ -36,19 +36,7 @@ public class ProcessConfigurationBuilderTests
                 Assert.False(builtCommand.UseShellExecution);
                 Assert.False(builtCommand.RequiresAdministrator);
         }
-
-        [Fact]
-        public void WithResourcePolicy_ShouldSetResourcePolicy()
-        {
-                // TODO: Test WithResourcePolicy method
-        }
-
-        [Fact]
-        public void Build_ShouldReturnConfiguration()
-        {
-                // TODO: Test Build method
-        }
-
+        
         [Fact]
         public void TestIncompatiblePipingOptionsThrowsException()
         {
