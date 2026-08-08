@@ -113,7 +113,7 @@ public class PowershellProcessInvoker : IProcessInvoker
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(false));
 
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Raw,
@@ -157,7 +157,7 @@ public class PowershellProcessInvoker : IProcessInvoker
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(true));
 
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Buffered,
@@ -200,7 +200,7 @@ public class PowershellProcessInvoker : IProcessInvoker
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(true));
 
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Piped,

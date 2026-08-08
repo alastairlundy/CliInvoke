@@ -36,7 +36,7 @@ internal class ProcessInvocationPipeline
     /// <typeparam name="TResult">The type of process result to return.</typeparam>
     /// <param name="ctx">The process invocation context containing configuration and mode.</param>
     /// <returns>The process result of type <typeparamref name="TResult"/>.</returns>
-    public async Task<TResult> InvokeAsync<TResult>(ProcessInvocationContext ctx) where TResult : ProcessResult
+    public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx) where TResult : ProcessResult
     {
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
             ctx.Configuration, ctx.ExitConfiguration);

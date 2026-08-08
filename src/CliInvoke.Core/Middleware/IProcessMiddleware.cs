@@ -23,5 +23,5 @@ public interface IProcessMiddleware
     /// <param name="context">The current invocation context.</param>
     /// <param name="next">The delegate to invoke the next middleware or the terminal pipeline.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task InvokeAsync(ProcessInvocationContext context, Func<ProcessInvocationContext, CancellationToken, Task> next);
+    Task InvokeAsync(InvocationContext context, Func<InvocationContext, CancellationToken, Task> next);
 }

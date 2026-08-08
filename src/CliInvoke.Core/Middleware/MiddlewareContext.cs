@@ -21,7 +21,7 @@ public sealed class MiddlewareContext
     /// <param name="next">The delegate to invoke the next middleware or terminal.</param>
     /// <param name="cancellationToken">The cancellation token for this step.</param>
     public MiddlewareContext(
-        Func<ProcessInvocationContext, CancellationToken, Task> next,
+        Func<InvocationContext, CancellationToken, Task> next,
         CancellationToken cancellationToken)
     {
         Next = next;
@@ -32,7 +32,7 @@ public sealed class MiddlewareContext
     /// <summary>
     ///     Gets the delegate to invoke the next middleware or the terminal pipeline.
     /// </summary>
-    public Func<ProcessInvocationContext, CancellationToken, Task> Next { get; }
+    public Func<InvocationContext, CancellationToken, Task> Next { get; }
 
     /// <summary>
     ///     Gets the cancellation token for this middleware step.

@@ -7,21 +7,26 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Middleware;
+
 namespace CliInvoke.Core;
 
 /// <summary>
 ///     The single state-bearing object the process invocation pipeline accepts and mutates during execution.
 /// </summary>
-public class ProcessInvocationContext
+/// <remarks>
+///     Renamed from <c>ProcessInvocationContext</c> for traceability.
+/// </remarks>
+public class InvocationContext
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ProcessInvocationContext"/> class.
+    ///     Initializes a new instance of the <see cref="InvocationContext"/> class.
     /// </summary>
     /// <param name="configuration">The process configuration.</param>
     /// <param name="exitConfiguration">The process exit configuration.</param>
     /// <param name="mode">The invocation mode that determines the capture path.</param>
     /// <param name="cancellationToken">An optional cancellation token.</param>
-    public ProcessInvocationContext(
+    public InvocationContext(
         ProcessConfiguration configuration,
         ProcessExitConfiguration exitConfiguration,
         InvocationMode mode,
@@ -57,4 +62,9 @@ public class ProcessInvocationContext
     ///     Gets or sets the process result, set by the pipeline after execution.
     /// </summary>
     public ProcessResult? Result { get; set; }
+
+    /// <summary>
+    ///     Gets the middleware context for the current invocation chain, if available.
+    /// </summary>
+    public MiddlewareContext? Middleware { get; init; }
 }

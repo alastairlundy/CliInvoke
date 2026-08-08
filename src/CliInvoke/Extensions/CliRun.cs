@@ -166,7 +166,7 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             configuration,
             exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Raw,
@@ -227,7 +227,7 @@ public static class CliRun
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             configuration,
             exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Buffered,
@@ -289,7 +289,7 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             configuration,
             exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Piped,

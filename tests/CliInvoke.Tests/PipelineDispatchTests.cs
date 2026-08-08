@@ -36,20 +36,20 @@ internal class PipelineDispatchTests : IDisposable
         _factory.Dispose();
     }
 
-    private ProcessInvocationContext CreateContext(InvocationMode mode,
+    private InvocationContext CreateContext(InvocationMode mode,
         CancellationToken cancellationToken = default)
     {
         ProcessConfiguration config = ProcessConfigurationFactory.Create(_targetFilePath);
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
         _configurations.Add(config);
-        return new ProcessInvocationContext(config, exitConfig, mode, cancellationToken);
+        return new InvocationContext(config, exitConfig, mode, cancellationToken);
     }
 
     [Test]
     public async Task InvokeAsync_Raw_ReturnsProcessResult()
     {
         var pipeline = new ProcessInvocationPipeline(_factory);
-        ProcessInvocationContext ctx = CreateContext(InvocationMode.Raw);
+        InvocationContext ctx = CreateContext(InvocationMode.Raw);
 
         ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(ctx);
 
@@ -62,7 +62,7 @@ internal class PipelineDispatchTests : IDisposable
     public async Task InvokeAsync_Buffered_ReturnsBufferedProcessResult()
     {
         var pipeline = new ProcessInvocationPipeline(_factory);
-        ProcessInvocationContext ctx = CreateContext(InvocationMode.Buffered);
+        InvocationContext ctx = CreateContext(InvocationMode.Buffered);
 
         BufferedProcessResult result =
             await pipeline.InvokeAsync<BufferedProcessResult>(ctx);
@@ -76,7 +76,7 @@ internal class PipelineDispatchTests : IDisposable
     public async Task InvokeAsync_Piped_ReturnsPipedProcessResult()
     {
         var pipeline = new ProcessInvocationPipeline(_factory);
-        ProcessInvocationContext ctx = CreateContext(InvocationMode.Piped);
+        InvocationContext ctx = CreateContext(InvocationMode.Piped);
 
         PipedProcessResult result =
             await pipeline.InvokeAsync<PipedProcessResult>(ctx);
@@ -90,7 +90,7 @@ internal class PipelineDispatchTests : IDisposable
     public async Task InvokeAsync_FireAndForget_ReturnsProcessResult()
     {
         var pipeline = new ProcessInvocationPipeline(_factory);
-        ProcessInvocationContext ctx = CreateContext(InvocationMode.FireAndForget);
+        InvocationContext ctx = CreateContext(InvocationMode.FireAndForget);
 
         ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(ctx);
 
@@ -102,7 +102,7 @@ internal class PipelineDispatchTests : IDisposable
     public async Task InvokeAsync_PreCancelledToken_ThrowsOperationCanceledException()
     {
         var pipeline = new ProcessInvocationPipeline(_factory);
-        ProcessInvocationContext ctx = CreateContext(InvocationMode.Raw,
+        InvocationContext ctx = CreateContext(InvocationMode.Raw,
             new CancellationToken(true));
 
         await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(ctx))
@@ -115,7 +115,7 @@ internal class PipelineDispatchTests : IDisposable
         _factory.ThrowOnStart =
             new InvalidOperationException("simulated start failure");
         var pipeline = new ProcessInvocationPipeline(_factory);
-        ProcessInvocationContext ctx = CreateContext(InvocationMode.Raw);
+        InvocationContext ctx = CreateContext(InvocationMode.Raw);
 
         await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(ctx))
             .Throws<InvalidOperationException>();

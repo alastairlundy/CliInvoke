@@ -55,7 +55,7 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Raw,
@@ -88,7 +88,7 @@ public class ProcessInvoker : IProcessInvoker
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Buffered,
@@ -117,7 +117,7 @@ public class ProcessInvoker : IProcessInvoker
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        var ctx = new ProcessInvocationContext(
+        var ctx = new InvocationContext(
             processConfiguration,
             exitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Piped,
