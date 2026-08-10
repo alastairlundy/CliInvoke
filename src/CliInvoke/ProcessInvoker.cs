@@ -1,14 +1,16 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
-   */
+*/
 
+using System.Linq;
 using CliInvoke.Core;
 using CliInvoke.Core.Factories;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Processes;
 
 namespace CliInvoke;
@@ -19,6 +21,7 @@ namespace CliInvoke;
 public class ProcessInvoker : IProcessInvoker
 {
     private readonly ProcessInvocationPipeline _pipeline;
+    private readonly MiddlewareChain? _chain;
 
     /// <summary>
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes.
@@ -27,6 +30,62 @@ public class ProcessInvoker : IProcessInvoker
     public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
     {
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
+    }
+
+    /// <summary>
+    ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes
+    ///     with middleware applied to every invocation.
+    /// </summary>
+    /// <param name="externalProcessFactory">The factory used to create external processes.</param>
+    /// <param name="middlewares">The ordered middleware to apply before the terminal pipeline.</param>
+    public ProcessInvoker(
+        IExternalProcessFactory externalProcessFactory,
+        IEnumerable<IProcessMiddleware> middlewares)
+    {
+        ArgumentNullException.ThrowIfNull(middlewares);
+
+        IReadOnlyList<IProcessMiddleware> materialized = middlewares.ToList();
+
+        foreach (IProcessMiddleware? middleware in materialized)
+        {
+            ArgumentNullException.ThrowIfNull(middleware);
+        }
+
+        _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
+        _chain = new MiddlewareChain(materialized, RunPipelineThroughContext);
+    }
+
+    /// <summary>
+    ///     Terminal delegate that bridges the middleware chain to the pipeline.
+    ///     Stores the typed result on the <see cref="InvocationContext.Result"/> property
+    ///     so the caller can read it back after the chain completes.
+    /// </summary>
+    private async Task RunPipelineThroughContext(InvocationContext ctx, CancellationToken cancellationToken)
+    {
+        ProcessResult result = ctx.Mode switch
+        {
+            InvocationMode.Raw => await _pipeline.InvokeAsync<ProcessResult>(ctx),
+            InvocationMode.Buffered => await _pipeline.InvokeAsync<BufferedProcessResult>(ctx),
+            InvocationMode.Piped => await _pipeline.InvokeAsync<PipedProcessResult>(ctx),
+            _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
+        };
+
+        ctx.Result = result;
+    }
+
+    /// <summary>
+    ///     Executes the invocation through the middleware chain when middleware is present,
+    ///     or directly through the pipeline when no middleware is configured.
+    /// </summary>
+    private async Task<TResult> InvokeThroughChainAsync<TResult>(InvocationContext ctx) where TResult : ProcessResult
+    {
+        if (_chain is not null)
+        {
+            await _chain.RunAsync(ctx, ctx.CancellationToken);
+            return (TResult)ctx.Result!;
+        }
+
+        return await _pipeline.InvokeAsync<TResult>(ctx);
     }
 
     /// <summary>
@@ -61,7 +120,7 @@ public class ProcessInvoker : IProcessInvoker
             InvocationMode.Raw,
             cancellationToken);
 
-        return await _pipeline.InvokeAsync<ProcessResult>(ctx);
+        return await InvokeThroughChainAsync<ProcessResult>(ctx);
     }
 
     /// <summary>
@@ -94,7 +153,7 @@ public class ProcessInvoker : IProcessInvoker
             InvocationMode.Buffered,
             cancellationToken);
 
-        return await _pipeline.InvokeAsync<BufferedProcessResult>(ctx);
+        return await InvokeThroughChainAsync<BufferedProcessResult>(ctx);
     }
 
     /// <summary>
@@ -123,6 +182,6 @@ public class ProcessInvoker : IProcessInvoker
             InvocationMode.Piped,
             cancellationToken);
 
-        return await _pipeline.InvokeAsync<PipedProcessResult>(ctx);
+        return await InvokeThroughChainAsync<PipedProcessResult>(ctx);
     }
 }
