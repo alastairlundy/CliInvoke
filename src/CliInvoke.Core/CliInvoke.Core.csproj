@@ -39,6 +39,7 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="CliInvoke"/>
+        <InternalsVisibleTo Include="CliInvoke.Tests"/>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
     </ItemGroup>
 
