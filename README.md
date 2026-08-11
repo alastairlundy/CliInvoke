@@ -20,6 +20,7 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Installing CliInvoke](#installing-cliinvoke)
     * [Supported Platforms](#supported-platforms)
 * [Examples](#examples)
+* [Middleware](#middleware)
 * [Resource Disposal](#resource-disposal)
 * [Documentation](#documentation)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
@@ -133,6 +134,84 @@ For detailed documentation on all available patterns and when to use them, see [
 
 For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](site/docs/guides/configuration.md)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
 
+## Middleware
+
+CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns (logging, validation, platform selection, retries, …) around the terminal process pipeline without changing how you call it. The pipeline remains the "leaf" that actually starts and waits on the process; middleware wraps it in the order you register.
+
+### When to use middleware, and the two constructors
+
+`ProcessInvoker` has two constructors:
+
+```csharp
+// 1. No middleware — the classic, unchanged behavior.
+public ProcessInvoker(IExternalProcessFactory externalProcessFactory);
+
+// 2. With middleware — every invocation runs through the chain, in order,
+//    before the terminal pipeline executes.
+public ProcessInvoker(
+    IExternalProcessFactory externalProcessFactory,
+    IEnumerable<IProcessMiddleware> middlewares);
+```
+
+Both constructors accept an optional `MiddlewareItems? sharedItems` parameter that seeds the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
+
+```csharp
+var items = new MiddlewareItems();
+items.Set("Logger", myLogger);
+var invoker = new ProcessInvoker(factory, items).UseLogging();
+```
+
+Use the first constructor when you don't need middleware. Use the second (or one of the `Use…` extension methods below) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
+
+### The `IProcessMiddleware` contract
+
+A middleware is any `IProcessMiddleware` implementation. It receives the `InvocationContext` and a `next` delegate; calling `next` continues the chain (or the terminal pipeline), omitting it short-circuits:
+
+```csharp
+public interface IProcessMiddleware
+{
+    Task InvokeAsync(
+        InvocationContext context,
+        Func<InvocationContext, CancellationToken, Task> next);
+}
+```
+
+Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag). For example, `LoggingMiddleware` resolves an `ILogger` from that bag under the well-known key `"Logger"`.
+
+### Built-in middleware
+
+The public API is the **extension methods**, not the middleware classes (which are internal). All of them return a *new* `ProcessInvoker`, so they compose fluently:
+
+```csharp
+using CliInvoke;                       // ProcessInvoker
+using CliInvoke.Extensions.Middleware;            // UseLogging
+using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation
+using CliInvoke.Specializations.Middleware;        // UsePowerShell, UseCmd
+
+// Log entry/exit (and each stdout/stderr line at Debug) for every invocation:
+ProcessInvoker loggingInvoker = new ProcessInvoker(factory).UseLogging();
+
+// Validate the result after exit (throws ProcessValidationException on failure):
+ProcessInvoker validatedInvoker = new ProcessInvoker(factory)
+    .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero());
+
+// Run the command inside PowerShell Core / Windows cmd.exe:
+ProcessInvoker psInvoker = new ProcessInvoker(factory).UsePowerShell();
+ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
+```
+
+* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug`. Sensitive flags (`--password`, `--token`, `--api-key`, `-p`, `-t`, `-k`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used (see [T024](.specs/middleware/MIDDLEWARE-SPEC.md) for the design).
+* `UsePostExitValidation(options)` — runs a rule against the `ProcessResult` and throws `ProcessValidationException` when it fails. Helpers: `PostExitValidationOptions.ExitCodeIsZero()`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` / `cmd.exe`. These are drop-in replacements for `PowershellProcessInvoker` / `CmdProcessInvoker`.
+
+### Result-ownership and disposal through the chain
+
+Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. See **[Resource Disposal](#resource-disposal)** for the full ownership rules and checklist.
+
+### The result-swap rule
+
+By default, middleware does **not** modify the `ProcessResult`. Logging, post-exit validation, and platform selection all pass the original result through unchanged. Transforming or replacing the result is a deliberate, niche operation: a middleware that does so should write the new result onto `InvocationContext.Result` so the caller receives it.
+
 ## Resource Disposal
 
 > [!IMPORTANT]
@@ -149,6 +228,9 @@ For fine-grained control over process execution — custom timeouts, cancellatio
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 
 For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](site/docs/guides/resource-disposal.md)**.
+
+> [!NOTE]
+> Middleware does not change these rules. A middleware chain returns the process result **un-disposed** to the caller, so the disposal contract described above applies exactly as it does without middleware. See **[Middleware](#middleware)** for the result-ownership note.
 
 ## Documentation
 
