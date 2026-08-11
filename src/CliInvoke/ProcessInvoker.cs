@@ -20,7 +20,9 @@ namespace CliInvoke;
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
+    private readonly IExternalProcessFactory _externalProcessFactory;
     private readonly ProcessInvocationPipeline _pipeline;
+    private readonly IReadOnlyList<IProcessMiddleware> _middlewares;
     private readonly MiddlewareChain? _chain;
 
     /// <summary>
@@ -29,8 +31,20 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="externalProcessFactory"></param>
     public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
     {
+        _externalProcessFactory = externalProcessFactory;
+        _middlewares = Array.Empty<IProcessMiddleware>();
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
+
+    /// <summary>
+    ///     Gets the external process factory used by this invoker.
+    /// </summary>
+    internal IExternalProcessFactory ExternalProcessFactory => _externalProcessFactory;
+
+    /// <summary>
+    ///     Gets the ordered middleware list applied to every invocation.
+    /// </summary>
+    internal IReadOnlyList<IProcessMiddleware> Middlewares => _middlewares;
 
     /// <summary>
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes
@@ -51,6 +65,8 @@ public class ProcessInvoker : IProcessInvoker
             ArgumentNullException.ThrowIfNull(middleware);
         }
 
+        _externalProcessFactory = externalProcessFactory;
+        _middlewares = materialized;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
         _chain = new MiddlewareChain(materialized, RunPipelineThroughContext);
     }

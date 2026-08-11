@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using CliInvoke.Core.Middleware;
 
 namespace CliInvoke.Core;
@@ -67,4 +68,25 @@ public class InvocationContext
     ///     Gets the middleware context for the current invocation chain, if available.
     /// </summary>
     public MiddlewareContext? Middleware { get; init; }
+
+    /// <summary>
+    ///     Creates a new <see cref="InvocationContext"/> with the specified configuration
+    ///     while preserving all other context state.
+    /// </summary>
+    /// <param name="configuration">The new process configuration to use.</param>
+    /// <returns>A new invocation context with the updated configuration.</returns>
+    public InvocationContext WithConfiguration(ProcessConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        return new InvocationContext(
+            configuration,
+            ExitConfiguration,
+            Mode,
+            CancellationToken)
+        {
+            Result = Result,
+            Middleware = Middleware
+        };
+    }
 }
