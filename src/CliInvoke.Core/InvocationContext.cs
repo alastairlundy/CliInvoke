@@ -64,9 +64,6 @@ public class InvocationContext
     /// </summary>
     public ProcessResult? Result { get; set; }
 
-    /// <summary>
-    ///     Gets or sets the middleware context for the current invocation chain, if available.
-    /// </summary>
     /// <remarks>
     ///     The chain walker assigns this before invoking the first middleware so that
     ///     middleware can read framework-level services (such as a logger)
