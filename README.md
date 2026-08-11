@@ -153,7 +153,7 @@ public ProcessInvoker(
     IEnumerable<IProcessMiddleware> middlewares);
 ```
 
-Both constructors accept an optional `MiddlewareItems? sharedItems` parameter that seeds the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
+Each constructor has an overload that also accepts a `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
 
 ```csharp
 using CliInvoke.Core.Middleware; // MiddlewareItems
@@ -202,7 +202,7 @@ ProcessInvoker psInvoker = new ProcessInvoker(factory).UsePowerShell();
 ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
 ```
 
-* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug`. Sensitive flags (`--password`, `--token`, `--api-key`, `-p`, `-t`, `-k`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used (see [T024](.specs/middleware/MIDDLEWARE-SPEC.md) for the design).
+* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used (see [T024](.specs/middleware/MIDDLEWARE-SPEC.md) for the design).
 * `UsePostExitValidation(options)` — runs a rule against the `ProcessResult` and throws `ProcessValidationException` when it fails. Helpers: `PostExitValidationOptions.ExitCodeIsZero()`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
 * `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` / `cmd.exe`. These are drop-in replacements for `PowershellProcessInvoker` / `CmdProcessInvoker`.
 
