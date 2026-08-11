@@ -17,18 +17,25 @@ internal sealed class MiddlewareChain
 {
     private readonly IReadOnlyList<IProcessMiddleware> _middleware;
     private readonly Func<InvocationContext, CancellationToken, Task> _terminal;
+    private readonly MiddlewareItems? _initialItems;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MiddlewareChain"/> class.
     /// </summary>
     /// <param name="middleware">The ordered list of middleware to execute.</param>
     /// <param name="terminal">The terminal delegate (the pipeline) invoked after all middleware.</param>
+    /// <param name="initialItems">
+    ///     Optional pre-seeded items shared across every middleware step. Use this to inject
+    ///     framework-level services (such as a logger) into the chain before it runs.
+    /// </param>
     public MiddlewareChain(
         IReadOnlyList<IProcessMiddleware> middleware,
-        Func<InvocationContext, CancellationToken, Task> terminal)
+        Func<InvocationContext, CancellationToken, Task> terminal,
+        MiddlewareItems? initialItems = null)
     {
         _middleware = middleware;
         _terminal = terminal;
+        _initialItems = initialItems;
     }
 
     /// <summary>
@@ -50,6 +57,11 @@ internal sealed class MiddlewareChain
             Func<InvocationContext, CancellationToken, Task> currentNext = next;
             next = (ctx, ct) => middleware.InvokeAsync(ctx, currentNext);
         }
+
+        // Expose a per-step MiddlewareContext (with any seeded items) to every middleware
+        // through InvocationContext.Middleware, so services such as an ILogger injected via
+        // MiddlewareItems are reachable from within the chain.
+        context.Middleware = new MiddlewareContext(next, cancellationToken, _initialItems);
 
         // Invoke the outermost middleware (or the terminal if no middleware registered).
         await next(context, cancellationToken);

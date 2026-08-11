@@ -20,13 +20,19 @@ public sealed class MiddlewareContext
     /// </summary>
     /// <param name="next">The delegate to invoke the next middleware or terminal.</param>
     /// <param name="cancellationToken">The cancellation token for this step.</param>
+    /// <param name="items">
+    ///     Optional pre-seeded items. When provided, the context shares this instance so
+    ///     values injected before the chain runs (e.g. a logger) are visible
+    ///     to every middleware. When omitted, a fresh <see cref="MiddlewareItems"/> is created.
+    /// </param>
     public MiddlewareContext(
         Func<InvocationContext, CancellationToken, Task> next,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        MiddlewareItems? items = null)
     {
         Next = next;
         CancellationToken = cancellationToken;
-        Items = new MiddlewareItems();
+        Items = items ?? new MiddlewareItems();
     }
 
     /// <summary>

@@ -8,7 +8,10 @@
    */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
+using CliInvoke;
 using CliInvoke.Core.Middleware;
 
 namespace CliInvoke.Extensions.Middleware.Validation;
@@ -37,5 +40,27 @@ public static class PostExitValidationExtensions
         builder.Use(new PostExitValidationMiddleware(options));
 
         return builder;
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="ProcessInvoker"/> with <see cref="PostExitValidationMiddleware"/>
+    ///     prepended so that every invocation validates the resulting <see cref="ProcessResult"/>.
+    /// </summary>
+    /// <param name="invoker">The existing process invoker.</param>
+    /// <param name="options">The validation options applied to the process result.</param>
+    /// <returns>A new process invoker with post-exit validation middleware applied.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when <paramref name="invoker"/> or <paramref name="options"/> is <c>null</c>.
+    /// </exception>
+    public static ProcessInvoker UsePostExitValidation(
+        this ProcessInvoker invoker,
+        PostExitValidationOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(invoker);
+        ArgumentNullException.ThrowIfNull(options);
+
+        IEnumerable<IProcessMiddleware> newList =
+            invoker.Middlewares.Prepend(new PostExitValidationMiddleware(options));
+        return new ProcessInvoker(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
     }
 }
