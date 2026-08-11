@@ -156,6 +156,8 @@ public ProcessInvoker(
 Both constructors accept an optional `MiddlewareItems? sharedItems` parameter that seeds the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
 
 ```csharp
+using CliInvoke.Core.Middleware; // MiddlewareItems
+
 var items = new MiddlewareItems();
 items.Set("Logger", myLogger);
 var invoker = new ProcessInvoker(factory, items).UseLogging();

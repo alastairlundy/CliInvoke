@@ -31,8 +31,8 @@ namespace CliInvoke.Extensions.Middleware;
 ///         <see cref="NullLogger.Instance"/> is used as a no-op fallback.
 ///     </para>
 ///     <para>
-///         Sensitive argument values following the flags <c>--password</c>, <c>-p</c>,
-///         <c>--token</c>, <c>-t</c>, <c>--api-key</c>, and <c>-k</c> are automatically
+///     Sensitive argument values following the flags <c>--password</c>,
+///         <c>--token</c>, and <c>--api-key</c> are automatically
 ///         redacted to <c>***</c> in log output.
 ///     </para>
 /// </remarks>
@@ -45,7 +45,7 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
     public const string LoggerKey = "Logger";
 
     private static readonly Regex SensitiveArgPattern = new(
-        @"(--password|--token|--api-key|-p|-t|-k)(\s+|=)\S+",
+        @"(--password|--token|--api-key)(\s+|=)\S+",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>
@@ -76,6 +76,9 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
             context.Configuration.TargetFilePath,
             context.Result.ExitCode);
 
+        // Stdout/stderr Debug logging is only available for BufferedProcessResult,
+        // where the output is captured as strings. For Raw and Piped modes the
+        // streams are not read here — use BufferedProcessResult to see per-line logs.
         if (context.Result is BufferedProcessResult bufferedResult)
         {
             if (!string.IsNullOrEmpty(bufferedResult.StandardOutput))
@@ -119,8 +122,8 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
     ///     Redacts sensitive values from the argument string.
     /// </summary>
     /// <remarks>
-    ///     Redacts values following <c>--password</c>, <c>-p</c>, <c>--token</c>,
-    ///     <c>-t</c>, <c>--api-key</c>, and <c>-k</c> flags. Both space-separated
+    ///     Redacts values following <c>--password</c>, <c>--token</c>,
+    ///     and <c>--api-key</c> flags. Both space-separated
     ///     (<c>--password secret</c>) and equals-form (<c>--token=secret</c>) are handled.
     /// </remarks>
     /// <param name="args">The raw argument string.</param>

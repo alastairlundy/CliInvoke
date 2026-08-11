@@ -30,14 +30,24 @@ public class ProcessInvoker : IProcessInvoker
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes.
     /// </summary>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
+    public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
+        : this(externalProcessFactory, sharedItems: null)
+    {
+    }
+
+    /// <summary>
+    ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes,
+    ///     with pre-seeded middleware items shared across every invocation's chain.
+    /// </summary>
+    /// <param name="externalProcessFactory">The factory used to create external processes.</param>
     /// <param name="sharedItems">
-    ///     Optional pre-seeded middleware items shared across every invocation's chain. Use this
+    ///     Pre-seeded middleware items shared across every invocation's chain. Use this
     ///     to inject framework-level services (such as a logger)
     ///     that middleware can read from <see cref="InvocationContext.Middleware"/>.
     /// </param>
     public ProcessInvoker(
         IExternalProcessFactory externalProcessFactory,
-        MiddlewareItems? sharedItems = null)
+        MiddlewareItems? sharedItems)
     {
         _externalProcessFactory = externalProcessFactory;
         _middlewares = Array.Empty<IProcessMiddleware>();
@@ -69,15 +79,29 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
     /// <param name="middlewares">The ordered middleware to apply before the terminal pipeline.</param>
+    public ProcessInvoker(
+        IExternalProcessFactory externalProcessFactory,
+        IEnumerable<IProcessMiddleware> middlewares)
+        : this(externalProcessFactory, middlewares, sharedItems: null)
+    {
+    }
+
+    /// <summary>
+    ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes
+    ///     with middleware applied to every invocation, and pre-seeded middleware items
+    ///     shared across every invocation's chain.
+    /// </summary>
+    /// <param name="externalProcessFactory">The factory used to create external processes.</param>
+    /// <param name="middlewares">The ordered middleware to apply before the terminal pipeline.</param>
     /// <param name="sharedItems">
-    ///     Optional pre-seeded middleware items shared across every invocation's chain. Use this
+    ///     Pre-seeded middleware items shared across every invocation's chain. Use this
     ///     to inject framework-level services (such as a logger)
     ///     that middleware can read from <see cref="InvocationContext.Middleware"/>.
     /// </param>
     public ProcessInvoker(
         IExternalProcessFactory externalProcessFactory,
         IEnumerable<IProcessMiddleware> middlewares,
-        MiddlewareItems? sharedItems = null)
+        MiddlewareItems? sharedItems)
     {
         ArgumentNullException.ThrowIfNull(middlewares);
 

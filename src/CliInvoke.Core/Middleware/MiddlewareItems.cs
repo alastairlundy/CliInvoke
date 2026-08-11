@@ -27,7 +27,7 @@ public sealed class MiddlewareItems
     /// <exception cref="InvalidOperationException">
     ///     Thrown when the value cannot be cast to <typeparamref name="T"/>.
     /// </exception>
-    public T Get<T>(string key)
+    public T? Get<T>(string key)
     {
         if (!_items.TryGetValue(key, out object? value))
             throw new KeyNotFoundException($"Key '{key}' not found in middleware items.");
