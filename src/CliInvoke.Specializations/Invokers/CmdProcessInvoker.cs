@@ -9,6 +9,7 @@
 
 using CliInvoke.Core.Factories;
 using CliInvoke.Specializations.Configurations;
+using CliInvoke.Specializations.Middleware;
 
 namespace CliInvoke.Specializations;
 
@@ -17,10 +18,17 @@ namespace CliInvoke.Specializations;
 ///     Provides functionality to execute processes either with raw output, buffered output, or piped
 ///     streams.
 /// </summary>
+/// <remarks>
+///     The <c>CmdProcessInvoker</c> is now a thin convenience wrapper around
+///     <see cref="CliInvoke.ProcessInvoker"/> with <see cref="CliInvoke.Specializations.Middleware.CmdMiddleware"/>
+///     applied. The middleware (which delegates shell-flag and target resolution to
+///     <see cref="CmdProcessConfiguration"/>) is the single source of truth for CMD wrapping; this
+///     class simply forwards each invocation. This implementation is supported only on the Windows
+///     operating system and explicitly excludes support for other platforms.
+/// </remarks>
 public class CmdProcessInvoker : IProcessInvoker
 {
-    private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
-    private readonly ProcessInvocationPipeline _pipeline;
+    private readonly ProcessInvoker _processInvoker;
 
     /// <summary>
     ///     Represents a process invoker specialised for running processes through CMD on Windows
@@ -42,11 +50,9 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, 
-        IExternalProcessFactory externalProcessFactory)
+    public CmdProcessInvoker(IExternalProcessFactory externalProcessFactory)
     {
-        _runnerConfigurationFactory = runnerConfigurationFactory;
-        _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
+        _processInvoker = new ProcessInvoker(externalProcessFactory).UseCmd();
     }
 
     /// <summary>
@@ -74,32 +80,12 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public async Task<ProcessResult> ExecuteAsync(
+    public Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        ThrowIfUnsupported();
-
-        using ProcessConfiguration runnerConfiguration =
-            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
-                    false));
-
-        InvocationContext ctx = new(
-            processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default,
-            InvocationMode.Raw,
-            cancellationToken);
-
-        return await _pipeline.InvokeAsync<ProcessResult>(ctx);
-    }
-
-    private static void ThrowIfUnsupported()
-    {
-        if (!OperatingSystem.IsWindows())
-            throw new PlatformNotSupportedException(Resources
-                .Exceptions_Cmd_OnlySupportedOnWindows);
+        return _processInvoker.ExecuteAsync(processConfiguration, processExitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -127,24 +113,12 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
+    public Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        ThrowIfUnsupported();
-
-        using ProcessConfiguration runnerConfiguration =
-            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput));
-
-        InvocationContext ctx = new(
-            processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default,
-            InvocationMode.Buffered,
-            cancellationToken);
-
-        return await _pipeline.InvokeAsync<BufferedProcessResult>(ctx);
+        return _processInvoker.ExecuteBufferedAsync(processConfiguration, processExitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -171,23 +145,11 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public async Task<PipedProcessResult> ExecutePipedAsync(
+    public Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        ThrowIfUnsupported();
-
-        using ProcessConfiguration runnerConfiguration =
-            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput));
-
-        InvocationContext ctx = new(
-            processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default,
-            InvocationMode.Piped,
-            cancellationToken);
-
-        return await _pipeline.InvokeAsync<PipedProcessResult>(ctx);
+        return _processInvoker.ExecutePipedAsync(processConfiguration, processExitConfiguration, cancellationToken);
     }
 }

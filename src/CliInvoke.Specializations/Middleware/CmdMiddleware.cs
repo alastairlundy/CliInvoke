@@ -8,19 +8,20 @@
    */
 
 using CliInvoke.Core.Middleware;
+using CliInvoke.Specializations.Configurations;
 
 namespace CliInvoke.Specializations.Middleware;
 
 /// <summary>
 ///     Middleware that rewrites the <see cref="InvocationContext.Configuration"/> to execute the
 ///     original command inside a Windows Command Processor (<c>cmd.exe</c>) process using the
-///     <c>/c</c> switch, matching the flag used by
-///     <see cref="CliInvoke.Specializations.CmdProcessInvoker"/>.
+///     <c>/c</c> switch. This is the single source of truth for CMD wrapping;
+///     <see cref="CliInvoke.Specializations.CmdProcessInvoker"/> is now a thin wrapper around
+///     <see cref="CliInvoke.ProcessInvoker"/> with this middleware applied.
 /// </summary>
 /// <remarks>
 ///     Windows-only. Calls on any non-Windows platform throw
-///     <see cref="PlatformNotSupportedException"/> at runtime, mirroring
-///     <see cref="CliInvoke.Specializations.CmdProcessInvoker"/>.
+///     <see cref="PlatformNotSupportedException"/> at runtime.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]
@@ -57,9 +58,11 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             ? $"\"{originalPath}\""
             : $"\"{originalPath}\" {originalArgs}";
 
-        string newArguments = $"/c {wrappedCommand}";
-
-        ProcessConfiguration newConfig = new("cmd.exe", newArguments);
+        // The specialization configuration class is the single source of truth for the cmd.exe
+        // target and the /c switch; this middleware just supplies the wrapped command.
+        ProcessConfiguration newConfig = new CmdProcessConfiguration(
+            wrappedCommand,
+            context.Configuration.RedirectStandardInput);
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
         await next(newContext, context.CancellationToken);

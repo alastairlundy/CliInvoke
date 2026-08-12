@@ -7,19 +7,21 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core;
 using CliInvoke.Core.Middleware;
+using CliInvoke.Specializations.Configurations;
 
 namespace CliInvoke.Specializations.Middleware;
 
 /// <summary>
 ///     Middleware that rewrites the <see cref="InvocationContext.Configuration"/> to execute the
 ///     original command inside a PowerShell (<c>pwsh</c> / <c>pwsh.exe</c>) process using
-///     <c>-NoProfile -NonInteractive -Command</c>, matching the flag set used by
-///     <see cref="CliInvoke.Specializations.PowershellProcessInvoker"/>.
+///     <c>-NoProfile -NonInteractive -Command</c>. This is the single source of truth for PowerShell
+///     wrapping; <see cref="CliInvoke.Specializations.PowershellProcessInvoker"/> is now a thin wrapper
+///     around <see cref="CliInvoke.ProcessInvoker"/> with this middleware applied.
 /// </summary>
 /// <remarks>
-///     Supports the same platforms as <see cref="CliInvoke.Specializations.PowershellProcessInvoker"/>:
-///     Windows, macOS, macCatalyst, Linux, and FreeBSD. Calls on Android, iOS, tvOS, watchOS,
+///     Supports Windows, macOS, macCatalyst, Linux, and FreeBSD. Calls on Android, iOS, tvOS, watchOS,
 ///     or browser throw <see cref="PlatformNotSupportedException"/> at runtime.
 /// </remarks>
 [SupportedOSPlatform("windows")]
@@ -34,16 +36,21 @@ namespace CliInvoke.Specializations.Middleware;
 [UnsupportedOSPlatform("watchos")]
 internal sealed class PowerShellMiddleware : IProcessMiddleware
 {
+    private readonly IFilePathResolver _filePathResolver;
     private readonly bool _windowCreation;
     private readonly bool _useShellExecution;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with the
     ///     default options (<c>windowCreation = false</c>, <c>useShellExecution = false</c>),
-    ///     matching the defaults used by <see cref="CliInvoke.Specializations.PowershellProcessInvoker"/>.
+    ///     matching the unified defaults used by <see cref="ProcessConfiguration"/>.
     /// </summary>
-    public PowerShellMiddleware()
-        : this(windowCreation: false, useShellExecution: false)
+    /// <param name="filePathResolver">
+    ///     The resolver used to locate the <c>pwsh</c> / <c>pwsh.exe</c> executable. A default
+    ///     <see cref="CliInvoke.FilePathResolver"/> is used when omitted.
+    /// </param>
+    public PowerShellMiddleware(IFilePathResolver? filePathResolver = null)
+        : this(filePathResolver, windowCreation: false, useShellExecution: false)
     {
     }
 
@@ -51,14 +58,19 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
     ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with the
     ///     supplied window-creation and shell-execution flags.
     /// </summary>
+    /// <param name="filePathResolver">
+    ///     The resolver used to locate the <c>pwsh</c> / <c>pwsh.exe</c> executable. A default
+    ///     <see cref="CliInvoke.FilePathResolver"/> is used when omitted.
+    /// </param>
     /// <param name="windowCreation">
     ///     Whether PowerShell should create a new window when launched.
     /// </param>
     /// <param name="useShellExecution">
     ///     Whether to use shell execution semantics for the wrapped process.
     /// </param>
-    public PowerShellMiddleware(bool windowCreation, bool useShellExecution)
+    public PowerShellMiddleware(IFilePathResolver? filePathResolver, bool windowCreation, bool useShellExecution)
     {
+        _filePathResolver = filePathResolver ?? new CliInvoke.FilePathResolver();
         _windowCreation = windowCreation;
         _useShellExecution = useShellExecution;
     }
@@ -85,16 +97,18 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
         string originalArgs = context.Configuration.Arguments;
 
         string wrappedCommand = string.IsNullOrWhiteSpace(originalArgs)
-            ? originalPath
+            ? $"\"{originalPath}\""
             : $"\"{originalPath}\" {originalArgs}";
 
-        string newArguments = $"-NoProfile -NonInteractive -Command \"{wrappedCommand}\"";
+        string newArguments = $"-NoProfile -NonInteractive -Command {wrappedCommand}";
 
-        string targetFilePath = OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh";
-
-        ProcessConfiguration newConfig = new MiddlewareProcessConfiguration(
-            targetFilePath,
+        // The specialization configuration class is the single source of truth for the
+        // pwsh target path and shell flags; this middleware just supplies the wrapped command.
+        ProcessConfiguration newConfig = new PowershellProcessConfiguration(
+            _filePathResolver,
             newArguments,
+            context.Configuration.RedirectStandardInput,
+            outputRedirection: context.Mode != InvocationMode.Raw,
             windowCreation: _windowCreation,
             useShellExecution: _useShellExecution);
 

@@ -29,8 +29,9 @@ public static class PlatformMiddlewareExtensions
         /// </summary>
         /// <remarks>
         ///     Equivalent to <c>UsePowerShell(windowCreation: false, useShellExecution: false)</c>.
-        ///     Use the overload when you need to match a <see cref="PowershellProcessInvoker"/>'s
-        ///     window-creation or shell-execution settings.
+        ///     This is the same behaviour <see cref="PowershellProcessInvoker"/> provides as a thin
+        ///     wrapper. Use the overload when you need non-default window-creation or shell-execution
+        ///     settings.
         /// </remarks>
         /// <returns>A new process invoker with PowerShell wrapping middleware applied.</returns>
         [SupportedOSPlatform("windows")]
@@ -47,7 +48,7 @@ public static class PlatformMiddlewareExtensions
         {
             ArgumentNullException.ThrowIfNull(invoker);
 
-            return invoker.UsePowerShell(windowCreation: false, useShellExecution: false);
+            return invoker.UsePowerShell(new CliInvoke.FilePathResolver());
         }
 
         /// <summary>
@@ -79,8 +80,45 @@ public static class PlatformMiddlewareExtensions
         {
             ArgumentNullException.ThrowIfNull(invoker);
 
+            return invoker.UsePowerShell(new CliInvoke.FilePathResolver(), windowCreation, useShellExecution);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="ProcessInvoker"/> with a <see cref="PowerShellMiddleware"/>
+        ///     prepended and configured with the supplied resolver, window-creation, and shell-execution
+        ///     flags, so that every invocation executes inside <c>pwsh</c> / <c>pwsh.exe</c>.
+        /// </summary>
+        /// <param name="filePathResolver">
+        ///     The resolver used to locate the <c>pwsh</c> / <c>pwsh.exe</c> executable.
+        /// </param>
+        /// <param name="windowCreation">
+        ///     Whether PowerShell should create a new window when launched. Defaults to <c>false</c>
+        ///     to match <see cref="PowershellProcessInvoker"/>.
+        /// </param>
+        /// <param name="useShellExecution">
+        ///     Whether to use shell execution semantics. Defaults to <c>false</c> to match
+        ///     <see cref="PowershellProcessInvoker"/>.
+        /// </param>
+        /// <returns>A new process invoker with PowerShell wrapping middleware applied.</returns>
+        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("macos")]
+        [SupportedOSPlatform("maccatalyst")]
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("freebsd")]
+        [UnsupportedOSPlatform("browser")]
+        [UnsupportedOSPlatform("android")]
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("watchos")]
+        public ProcessInvoker UsePowerShell(IFilePathResolver filePathResolver,
+            bool windowCreation = false,
+            bool useShellExecution = false)
+        {
+            ArgumentNullException.ThrowIfNull(invoker);
+            ArgumentNullException.ThrowIfNull(filePathResolver);
+
             IEnumerable<IProcessMiddleware> newList =
-                invoker.Middlewares.Prepend(new PowerShellMiddleware(windowCreation, useShellExecution));
+                invoker.Middlewares.Prepend(new PowerShellMiddleware(filePathResolver, windowCreation, useShellExecution));
             return new ProcessInvoker(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
         }
 
