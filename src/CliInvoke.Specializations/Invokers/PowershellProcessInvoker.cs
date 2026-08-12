@@ -25,16 +25,25 @@ namespace CliInvoke.Specializations;
 ///     PowerShell-specific process
 ///     handling and configurations are required, such as redirecting outputs or managing window
 ///     creation.
+///     <para>
+///         Window creation and shell-execution semantics on the generated <c>pwsh</c> wrapper
+///         use the same unified defaults as <see cref="CliInvoke.Specializations.Middleware.PowerShellMiddleware"/>
+///         and <see cref="ProcessConfiguration"/> (<c>windowCreation = false</c>,
+///         <c>useShellExecution = false</c>). To run a command inside PowerShell with non-default
+///         window-creation or shell-execution behaviour, use the
+///         <see cref="CliInvoke.ProcessInvoker"/> middleware path with
+///         <c>UsePowerShell(windowCreation, useShellExecution)</c>.
+///     </para>
 /// </remarks>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("macos")]
 [SupportedOSPlatform("linux")]
 public class PowershellProcessInvoker : IProcessInvoker
 {
-    private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
+    private const bool WindowCreation = false;
+    private const bool UseShellExecution = false;
 
-    private readonly bool _windowCreation;
-    private readonly bool _useShellExecution;
+    private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
     private readonly IFilePathResolver _filePathResolver;
     private readonly ProcessInvocationPipeline _pipeline;
 
@@ -43,21 +52,15 @@ public class PowershellProcessInvoker : IProcessInvoker
     /// <param name="runnerConfigurationFactory"></param>
     /// <param name="filePathResolver"></param>
     /// <param name="externalProcessFactory"></param>
-    /// <param name="windowCreation"></param>
-    /// <param name="useShellExecution"></param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     public PowershellProcessInvoker(
         IRunnerConfigurationFactory runnerConfigurationFactory, IFilePathResolver filePathResolver,
-        IExternalProcessFactory externalProcessFactory,
-        bool windowCreation = true, bool useShellExecution = false)
+        IExternalProcessFactory externalProcessFactory)
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;
-        _windowCreation = windowCreation;
-        _useShellExecution = useShellExecution;
-
         _filePathResolver = filePathResolver;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
@@ -67,7 +70,7 @@ public class PowershellProcessInvoker : IProcessInvoker
         return new PowershellProcessConfiguration(
             _filePathResolver, arguments: "-NoProfile -NonInteractive -Command", false, redirectOutputs,
             Directory.GetCurrentDirectory(),
-            windowCreation: _windowCreation, useShellExecution: _useShellExecution);
+            windowCreation: WindowCreation, useShellExecution: UseShellExecution);
     }
     
     private static void ThrowIfUnsupported()
@@ -153,7 +156,7 @@ public class PowershellProcessInvoker : IProcessInvoker
 
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                GetPowershellProcessConfiguration(!_useShellExecution));
+                GetPowershellProcessConfiguration(true));
 
         InvocationContext ctx = new(
             processConfiguration,
@@ -196,7 +199,7 @@ public class PowershellProcessInvoker : IProcessInvoker
 
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                GetPowershellProcessConfiguration(!_useShellExecution));
+                GetPowershellProcessConfiguration(true));
 
         InvocationContext ctx = new(
             processConfiguration,
