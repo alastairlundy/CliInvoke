@@ -38,7 +38,7 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
     private readonly bool _useShellExecution;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PowerShellMiddleware"/> class with the
+    ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with the
     ///     default options (<c>windowCreation = false</c>, <c>useShellExecution = false</c>),
     ///     matching the defaults used by <see cref="CliInvoke.Specializations.PowershellProcessInvoker"/>.
     /// </summary>
@@ -48,7 +48,7 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PowerShellMiddleware"/> class with the
+    ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with the
     ///     supplied window-creation and shell-execution flags.
     /// </summary>
     /// <param name="windowCreation">

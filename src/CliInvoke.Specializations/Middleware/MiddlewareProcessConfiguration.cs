@@ -18,7 +18,7 @@ namespace CliInvoke.Specializations.Middleware;
 internal sealed class MiddlewareProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MiddlewareProcessConfiguration"/> class.
+    ///     Initialises a new instance of the <see cref="MiddlewareProcessConfiguration"/> class.
     /// </summary>
     /// <param name="targetFilePath">The path to the executable to run.</param>
     /// <param name="arguments">The arguments to pass to the executable.</param>

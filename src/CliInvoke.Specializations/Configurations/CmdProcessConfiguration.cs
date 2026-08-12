@@ -29,7 +29,7 @@ namespace CliInvoke.Specializations.Configurations;
 public class CmdProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
-    ///     Initializes a new instance of the CmdCommandConfiguration class.
+    ///     Initialises a new instance of the CmdCommandConfiguration class.
     /// </summary>
     /// <param name="arguments">The arguments to be passed to the command.</param>
     /// <param name="outputRedirection"></param>
