@@ -42,10 +42,11 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, IExternalProcessFactory externalProcessFactory)
+    public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, 
+        IExternalProcessFactory externalProcessFactory)
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;
-        _pipeline = new(externalProcessFactory);
+        _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
 
     /// <summary>
