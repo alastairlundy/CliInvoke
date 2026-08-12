@@ -45,7 +45,7 @@ public class CmdProcessInvoker : IProcessInvoker
     public CmdProcessInvoker(IRunnerConfigurationFactory runnerConfigurationFactory, IExternalProcessFactory externalProcessFactory)
     {
         _runnerConfigurationFactory = runnerConfigurationFactory;
-        _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
+        _pipeline = new(externalProcessFactory);
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public class CmdProcessInvoker : IProcessInvoker
                 new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput,
                     false));
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Raw,
@@ -137,7 +137,7 @@ public class CmdProcessInvoker : IProcessInvoker
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput));
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Buffered,
@@ -181,7 +181,7 @@ public class CmdProcessInvoker : IProcessInvoker
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 new CmdProcessConfiguration(processConfiguration.Arguments, processConfiguration.RedirectStandardInput));
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Piped,

@@ -59,7 +59,7 @@ internal sealed class CmdMiddleware : IProcessMiddleware
 
         string newArguments = $"/c {wrappedCommand}";
 
-        ProcessConfiguration newConfig = new ProcessConfiguration("cmd.exe", newArguments);
+        ProcessConfiguration newConfig = new("cmd.exe", newArguments);
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
         await next(newContext, context.CancellationToken);

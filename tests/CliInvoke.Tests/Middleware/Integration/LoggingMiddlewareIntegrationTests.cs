@@ -74,12 +74,12 @@ public class LoggingMiddlewareIntegrationTests
     [Test]
     public async Task UseLogging_CapturesEntryAndExitLogs_ForRealInvocation()
     {
-        var logger = new CapturingLogger();
+        CapturingLogger logger = new CapturingLogger();
 
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         items.Set(LoggingMiddleware.LoggerKey, (ILogger)logger);
 
-        var invoker = new ProcessInvoker(new ExternalProcessFactory(), items).UseLogging();
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), items).UseLogging();
 
         (string filePath, string arguments) = ResolveEchoCommand();
 

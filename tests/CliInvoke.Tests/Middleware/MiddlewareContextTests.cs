@@ -8,14 +8,14 @@ public class MiddlewareContextTests
     [Test]
     public async Task Next_IsTheSuppliedDelegate()
     {
-        var called = false;
+        bool called = false;
         Func<InvocationContext, CancellationToken, Task> nextDelegate = (ctx, ct) =>
         {
             called = true;
             return Task.CompletedTask;
         };
 
-        var context = new MiddlewareContext(nextDelegate, CancellationToken.None);
+        MiddlewareContext context = new MiddlewareContext(nextDelegate, CancellationToken.None);
 
         await Assert.That(context.Next).IsEqualTo(nextDelegate);
     }
@@ -23,10 +23,10 @@ public class MiddlewareContextTests
     [Test]
     public async Task CancellationToken_IsPreserved()
     {
-        using var cts = new CancellationTokenSource();
+        using CancellationTokenSource cts = new CancellationTokenSource();
         cts.Cancel();
 
-        var context = new MiddlewareContext(
+        MiddlewareContext context = new MiddlewareContext(
             (ctx, ct) => Task.CompletedTask,
             cts.Token);
 
@@ -36,10 +36,10 @@ public class MiddlewareContextTests
     [Test]
     public async Task Items_IsSharedAcrossMiddlewareSteps()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         items.Set("shared", "value1");
 
-        var context = new MiddlewareContext(
+        MiddlewareContext context = new MiddlewareContext(
             (ctx, ct) => Task.CompletedTask,
             CancellationToken.None);
 
@@ -53,10 +53,10 @@ public class MiddlewareContextTests
     [Test]
     public async Task Items_IsInitializedForEachContext()
     {
-        var context1 = new MiddlewareContext(
+        MiddlewareContext context1 = new MiddlewareContext(
             (ctx, ct) => Task.CompletedTask,
             CancellationToken.None);
-        var context2 = new MiddlewareContext(
+        MiddlewareContext context2 = new MiddlewareContext(
             (ctx, ct) => Task.CompletedTask,
             CancellationToken.None);
 

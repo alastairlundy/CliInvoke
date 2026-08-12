@@ -8,15 +8,15 @@ public class MiddlewareChainTests
     [Test]
     public async Task RunAsync_InvokesMiddlewareInRegistrationOrder()
     {
-        var callLog = new List<string>();
-        var middlewareA = new FakeMiddleware("A", callLog);
-        var middlewareB = new FakeMiddleware("B", callLog);
+        List<string> callLog = new List<string>();
+        FakeMiddleware middlewareA = new FakeMiddleware("A", callLog);
+        FakeMiddleware middlewareB = new FakeMiddleware("B", callLog);
         
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA, middlewareB },
             (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
@@ -29,15 +29,15 @@ public class MiddlewareChainTests
     [Test]
     public async Task RunAsync_ShortCircuitsWhenMiddlewareDoesNotCallNext()
     {
-        var callLog = new List<string>();
-        var middlewareA = new FakeMiddleware("A", callLog, FakeMiddlewareMode.NeverInvokeNext);
-        var middlewareB = new FakeMiddleware("B", callLog);
+        List<string> callLog = new List<string>();
+        FakeMiddleware middlewareA = new FakeMiddleware("A", callLog, FakeMiddlewareMode.NeverInvokeNext);
+        FakeMiddleware middlewareB = new FakeMiddleware("B", callLog);
 
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA, middlewareB },
             (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
@@ -50,20 +50,20 @@ public class MiddlewareChainTests
     [Test]
     public async Task RunAsync_PropagatesExceptionFromTerminal()
     {
-        var callLog = new List<string>();
-        var expectedException = new InvalidOperationException("terminal failed");
-        var middlewareA = new FakeMiddleware("A", callLog);
+        List<string> callLog = new List<string>();
+        InvalidOperationException expectedException = new InvalidOperationException("terminal failed");
+        FakeMiddleware middlewareA = new FakeMiddleware("A", callLog);
 
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA },
             (ctx, ct) => throw expectedException);
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
 
-        var thrown = await Assert.That(() => chain.RunAsync(ctx, CancellationToken.None))
+        InvalidOperationException? thrown = await Assert.That(() => chain.RunAsync(ctx, CancellationToken.None))
             .Throws<InvalidOperationException>();
         
         await Assert.That(thrown.Message).IsEqualTo("terminal failed");
@@ -72,21 +72,21 @@ public class MiddlewareChainTests
     [Test]
     public async Task RunAsync_PropagatesExceptionFromUpstreamMiddleware()
     {
-        var callLog = new List<string>();
-        var expectedException = new InvalidOperationException("upstream failed");
-        var middlewareA = new FakeMiddleware("A", callLog, FakeMiddlewareMode.ThrowOnInvoke, expectedException);
-        var middlewareB = new FakeMiddleware("B", callLog);
+        List<string> callLog = new List<string>();
+        InvalidOperationException expectedException = new InvalidOperationException("upstream failed");
+        FakeMiddleware middlewareA = new FakeMiddleware("A", callLog, FakeMiddlewareMode.ThrowOnInvoke, expectedException);
+        FakeMiddleware middlewareB = new FakeMiddleware("B", callLog);
 
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA, middlewareB },
             (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
 
-        var thrown = await Assert.That(() => chain.RunAsync(ctx, CancellationToken.None))
+        InvalidOperationException? thrown = await Assert.That(() => chain.RunAsync(ctx, CancellationToken.None))
             .Throws<InvalidOperationException>();
 
         await Assert.That(thrown.Message).IsEqualTo("upstream failed");
@@ -96,10 +96,10 @@ public class MiddlewareChainTests
     [Test]
     public async Task RunAsync_PropagatesCancelledToken()
     {
-        var callLog = new List<string>();
-        var middlewareA = new FakeMiddleware("A", callLog);
+        List<string> callLog = new List<string>();
+        FakeMiddleware middlewareA = new FakeMiddleware("A", callLog);
 
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA },
             (ctx, ct) =>
             {
@@ -108,10 +108,10 @@ public class MiddlewareChainTests
                 return Task.CompletedTask;
             });
 
-        using var cts = new CancellationTokenSource();
+        using CancellationTokenSource cts = new CancellationTokenSource();
         cts.Cancel();
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Raw,
@@ -124,15 +124,15 @@ public class MiddlewareChainTests
     [Test]
     public async Task RunAsync_TerminalPipelineIsAlwaysLastStep()
     {
-        var callLog = new List<string>();
-        var middlewareA = new FakeMiddleware("A", callLog);
-        var middlewareB = new FakeMiddleware("B", callLog);
+        List<string> callLog = new List<string>();
+        FakeMiddleware middlewareA = new FakeMiddleware("A", callLog);
+        FakeMiddleware middlewareB = new FakeMiddleware("B", callLog);
 
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA, middlewareB },
             (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
@@ -145,13 +145,13 @@ public class MiddlewareChainTests
     [Test]
     public async Task RunAsync_EmptyMiddlewareList_InvokesTerminalDirectly()
     {
-        var callLog = new List<string>();
+        List<string> callLog = new List<string>();
 
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
             (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);

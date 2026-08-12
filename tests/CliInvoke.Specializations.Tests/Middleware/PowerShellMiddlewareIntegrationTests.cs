@@ -54,7 +54,7 @@ public class PowerShellMiddlewareIntegrationTests
                 "PowerShell Core (pwsh) is not available on PATH; skipping PowerShell middleware integration test.");
         }
 
-        var invoker = new ProcessInvoker(new ExternalProcessFactory()).UsePowerShell();
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory()).UsePowerShell();
 
         // The original target is `dotnet`, but PowerShellMiddleware rewrites the configuration
         // to run the command inside `pwsh -NoProfile -Command "..."`.

@@ -59,7 +59,7 @@ public class PowershellProcessInvoker : IProcessInvoker
         _useShellExecution = useShellExecution;
 
         _filePathResolver = filePathResolver;
-        _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
+        _pipeline = new(externalProcessFactory);
     }
 
     private ProcessConfiguration GetPowershellProcessConfiguration(bool redirectOutputs)
@@ -111,7 +111,7 @@ public class PowershellProcessInvoker : IProcessInvoker
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(false));
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Raw,
@@ -155,7 +155,7 @@ public class PowershellProcessInvoker : IProcessInvoker
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(true));
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Buffered,
@@ -198,7 +198,7 @@ public class PowershellProcessInvoker : IProcessInvoker
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
                 GetPowershellProcessConfiguration(true));
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new(
             processConfiguration,
             processExitConfiguration ?? ProcessExitConfiguration.Default,
             InvocationMode.Piped,

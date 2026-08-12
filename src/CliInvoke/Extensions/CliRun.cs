@@ -140,8 +140,8 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
-            redirectStandardOutput: false, timeoutTimeSpan, out var exitConfiguration);
+        using ProcessConfiguration configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: false, timeoutTimeSpan, out ProcessExitConfiguration exitConfiguration);
 
         return await RunAsync(configuration, exitConfiguration, cancellationToken);
     }
@@ -165,7 +165,7 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             configuration,
             exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Raw,
@@ -200,8 +200,8 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
-            redirectStandardOutput: true, timeoutTimeSpan, out var exitConfiguration);
+        using ProcessConfiguration configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: true, timeoutTimeSpan, out ProcessExitConfiguration exitConfiguration);
 
         return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
     }
@@ -226,7 +226,7 @@ public static class CliRun
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             configuration,
             exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Buffered,
@@ -261,8 +261,8 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
-            redirectStandardOutput: true, timeoutTimeSpan, out var exitConfiguration);
+        using ProcessConfiguration configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: true, timeoutTimeSpan, out ProcessExitConfiguration exitConfiguration);
 
         return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
     }
@@ -288,7 +288,7 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             configuration,
             exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Piped,
@@ -320,7 +320,7 @@ public static class CliRun
     public static int FireAndForget(string targetFilePath, string arguments = "", string? workingDirectory = null)
     {
         // ExitConfiguration is unused by FireAndForget
-        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+        using ProcessConfiguration configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
             redirectStandardOutput: false, timeoutTimeSpan: null, out ProcessExitConfiguration _);
 
         return FireAndForget(configuration);

@@ -82,7 +82,7 @@ public static class PlatformMiddlewareExtensions
 
         IEnumerable<IProcessMiddleware> newList =
             invoker.Middlewares.Prepend(new PowerShellMiddleware(windowCreation, useShellExecution));
-        return new ProcessInvoker(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
+        return new(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
     }
 
     /// <summary>
@@ -105,6 +105,6 @@ public static class PlatformMiddlewareExtensions
         ArgumentNullException.ThrowIfNull(invoker);
 
         IEnumerable<IProcessMiddleware> newList = invoker.Middlewares.Prepend(new CmdMiddleware());
-        return new ProcessInvoker(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
+        return new(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
     }
 }

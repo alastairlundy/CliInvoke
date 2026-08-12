@@ -8,11 +8,11 @@ public class ChainDisposalTests
     [Test]
     public async Task Chain_ReturnsPipedProcessResult_WithoutDisposing()
     {
-        var stdout = new MemoryStream();
-        var stderr = new MemoryStream();
-        var pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr);
+        MemoryStream stdout = new MemoryStream();
+        MemoryStream stderr = new MemoryStream();
+        PipedProcessResult pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr);
 
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
             (ctx, ct) =>
             {
@@ -20,7 +20,7 @@ public class ChainDisposalTests
                 return Task.CompletedTask;
             });
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Piped);
@@ -35,11 +35,11 @@ public class ChainDisposalTests
     [Test]
     public async Task UserCanDisposeResult_AfterChainReturns()
     {
-        var stdout = new MemoryStream();
-        var stderr = new MemoryStream();
-        var pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr);
+        MemoryStream stdout = new MemoryStream();
+        MemoryStream stderr = new MemoryStream();
+        PipedProcessResult pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr);
 
-        var chain = new MiddlewareChain(
+        MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
             (ctx, ct) =>
             {
@@ -47,7 +47,7 @@ public class ChainDisposalTests
                 return Task.CompletedTask;
             });
 
-        var ctx = new InvocationContext(
+        InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
             InvocationMode.Piped);
@@ -55,7 +55,7 @@ public class ChainDisposalTests
         await chain.RunAsync(ctx, CancellationToken.None);
 
         // User disposes after chain returns
-        var result = (PipedProcessResult)ctx.Result!;
+        PipedProcessResult result = (PipedProcessResult)ctx.Result!;
         result.Dispose();
 
         await Assert.That(stdout.CanRead).IsEqualTo(false);

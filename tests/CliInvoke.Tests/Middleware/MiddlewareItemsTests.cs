@@ -8,10 +8,10 @@ public class MiddlewareItemsTests
     [Test]
     public async Task Get_ReturnsValueSetBySet_ForMatchingType()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         items.Set("key", 42);
 
-        var result = items.Get<int>("key");
+        int result = items.Get<int>("key");
 
         await Assert.That(result).IsEqualTo(42);
     }
@@ -19,10 +19,10 @@ public class MiddlewareItemsTests
     [Test]
     public async Task Get_ReturnsStringValue_ForStringKey()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         items.Set("name", "hello");
 
-        var result = items.Get<string>("name");
+        string? result = items.Get<string>("name");
 
         await Assert.That(result).IsEqualTo("hello");
     }
@@ -30,10 +30,10 @@ public class MiddlewareItemsTests
     [Test]
     public async Task Get_RoundTrips_BoolValue()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         items.Set("flag", true);
 
-        var result = items.Get<bool>("flag");
+        bool result = items.Get<bool>("flag");
 
         await Assert.That(result).IsEqualTo(true);
     }
@@ -41,7 +41,7 @@ public class MiddlewareItemsTests
     [Test]
     public async Task Get_ThrowsKeyNotFoundException_ForMissingKey()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
 
         await Assert.That(() => items.Get<int>("missing"))
             .Throws<KeyNotFoundException>();
@@ -50,7 +50,7 @@ public class MiddlewareItemsTests
     [Test]
     public async Task Get_ThrowsInvalidOperationException_OnTypeMismatch()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         items.Set("key", "string value");
 
         await Assert.That(() => items.Get<int>("key"))
@@ -60,11 +60,11 @@ public class MiddlewareItemsTests
     [Test]
     public async Task Get_OverwritesPreviousValue_ForSameKey()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         items.Set("key", 1);
         items.Set("key", 2);
 
-        var result = items.Get<int>("key");
+        int result = items.Get<int>("key");
 
         await Assert.That(result).IsEqualTo(2);
     }

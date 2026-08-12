@@ -19,7 +19,7 @@ public class PostExitValidationMiddlewareIntegrationTests
     public async Task UsePostExitValidation_ZeroExit_DoesNotThrow()
     {
         // `dotnet --version` is a portable command that exits 0.
-        var invoker = new ProcessInvoker(new ExternalProcessFactory())
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory())
             .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero());
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
@@ -35,7 +35,7 @@ public class PostExitValidationMiddlewareIntegrationTests
     public async Task UsePostExitValidation_NonZeroExit_ThrowsProcessValidationException()
     {
         // `dotnet --this-flag-does-not-exist` is a portable command that exits non-zero.
-        var invoker = new ProcessInvoker(new ExternalProcessFactory())
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory())
             .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero());
 
         using ProcessConfiguration config =
