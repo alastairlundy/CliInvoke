@@ -224,7 +224,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
             return escapedContent;
         }
 
-        // If the escaped content ends with an escaped quote (\"), the quote is part of the content
+        // If the escaped content ends with an escaped quote (\"), the quote is part of the content,
         // and we should not wrap with an additional quote
         if (escapedContent.EndsWith("\\\""))
         {

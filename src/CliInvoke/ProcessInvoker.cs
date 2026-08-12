@@ -106,7 +106,7 @@ public class ProcessInvoker : IProcessInvoker
 
         IReadOnlyList<IProcessMiddleware> materialized = middlewares.ToList();
 
-        foreach (IProcessMiddleware? middleware in materialized)
+        foreach (IProcessMiddleware middleware in materialized)
         {
             ArgumentNullException.ThrowIfNull(middleware);
         }
