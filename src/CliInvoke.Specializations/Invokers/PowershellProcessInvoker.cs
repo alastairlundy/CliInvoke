@@ -62,7 +62,7 @@ public class PowershellProcessInvoker : IProcessInvoker
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
     }
 
-    private ProcessConfiguration GetPowershellProcessConfiguration(bool redirectOutputs)
+    private PowershellProcessConfiguration GetPowershellProcessConfiguration(bool redirectOutputs)
     {
         return new PowershellProcessConfiguration(
             _filePathResolver, arguments: "-NoProfile -NonInteractive -Command", false, redirectOutputs,
