@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using CliInvoke.Processes.Internal;
 using CliInvoke.Tests.Internal.Constants;
 

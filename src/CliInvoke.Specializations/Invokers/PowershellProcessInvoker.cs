@@ -8,9 +8,7 @@
 */
 
 
-using CliInvoke.Core;
 using CliInvoke.Core.Factories;
-using CliInvoke.Core.Processes;
 using CliInvoke.Specializations.Configurations;
 
 namespace CliInvoke.Specializations;

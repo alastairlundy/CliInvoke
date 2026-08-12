@@ -7,22 +7,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CliInvoke;
-using CliInvoke.Core;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Extensions.Middleware;
 using CliInvoke.Factories;
 
 using Microsoft.Extensions.Logging;
-
-using TUnit.Core;
 
 namespace CliInvoke.Tests.Middleware.Integration;
 

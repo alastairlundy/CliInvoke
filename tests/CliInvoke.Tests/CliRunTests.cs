@@ -8,7 +8,6 @@
  */
 
 using System.Collections.Generic;
-using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 

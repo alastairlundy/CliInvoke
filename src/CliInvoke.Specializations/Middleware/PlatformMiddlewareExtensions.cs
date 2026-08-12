@@ -7,13 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke;
 using CliInvoke.Core.Middleware;
-using CliInvoke.Specializations;
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Versioning;
 
 namespace CliInvoke.Specializations.Middleware;
 

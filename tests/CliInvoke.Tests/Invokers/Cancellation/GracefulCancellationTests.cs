@@ -1,5 +1,4 @@
 using CliInvoke.Processes.Internal;
-using CliInvoke.Tests.Internal.Helpers;
 
 namespace CliInvoke.Tests.Invokers.Cancellation;
 

@@ -7,9 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Core;
 using CliInvoke.Core.Factories;
-using CliInvoke.Core.Processes;
 using CliInvoke.Specializations.Configurations;
 
 namespace CliInvoke.Specializations;

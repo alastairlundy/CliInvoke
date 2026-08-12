@@ -8,10 +8,9 @@
 */
 
 using System.Linq;
-using CliInvoke.Core;
+
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Middleware;
-using CliInvoke.Core.Processes;
 
 namespace CliInvoke;
 
