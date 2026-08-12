@@ -19,13 +19,13 @@ namespace CliInvoke;
 /// </summary>
 public static class CliRun
 {
-    // T005: per-call allocation is intentional to honor UseFilePathResolver; do not cache without invalidation.
+    // per-call allocation is intentional to honour UseFilePathResolver; do not cache without invalidation.
     private static Func<IExternalProcessFactory> _externalProcessFactory = () => new
         ExternalProcessFactory(GetFilePathResolver());
 
     private static IFilePathResolver? _filePathResolver;
     private static volatile ProcessInvocationPipeline? _pipeline;
-    private static readonly object _syncRoot = new();
+    private static readonly Lock _syncRoot = new();
 
     /// <summary>
     /// Configures the external process factory to be used for creating the command-line external processes.
