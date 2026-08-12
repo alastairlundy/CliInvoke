@@ -63,7 +63,7 @@ Notes:
 
 ## Installing CliInvoke
 
-CliInvoke is available on [the NuGet Gallery](https://nuget.org) but call be also installed via the ``dotnet`` SDK CLI.
+CliInvoke is available on [the NuGet Gallery](https://nuget.org) but can be also installed via the ``dotnet`` SDK CLI.
 
 The package(s) to install depends on your use case:
 
@@ -202,9 +202,9 @@ ProcessInvoker psInvoker = new ProcessInvoker(factory).UsePowerShell();
 ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
 ```
 
-* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used (see [T024](.specs/middleware/MIDDLEWARE-SPEC.md) for the design).
+* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
 * `UsePostExitValidation(options)` — runs a rule against the `ProcessResult` and throws `ProcessValidationException` when it fails. Helpers: `PostExitValidationOptions.ExitCodeIsZero()`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
-* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` / `cmd.exe`. These are drop-in replacements for `PowershellProcessInvoker` / `CmdProcessInvoker`.
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell` also has an overload `UsePowerShell(windowCreation, useShellExecution)` that matches the corresponding constructor flags on `PowershellProcessInvoker`; the parameterless form defaults both to `false`. `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behavior mirrors `CmdProcessInvoker`.
 
 ### Result-ownership and disposal through the chain
 
@@ -212,7 +212,7 @@ Middleware does **not** dispose the process result — the result is returned to
 
 ### The result-swap rule
 
-By default, middleware does **not** modify the `ProcessResult`. Logging, post-exit validation, and platform selection all pass the original result through unchanged. Transforming or replacing the result is a deliberate, niche operation: a middleware that does so should write the new result onto `InvocationContext.Result` so the caller receives it.
+By default, middleware does **not** mutate the `ProcessResult` object. Logging and post-exit validation pass the result through unchanged. Platform-selection middleware (`UsePowerShell` / `UseCmd`) substitutes the result of the wrapped `pwsh` / `cmd.exe` invocation — the caller still sees a normal `ProcessResult`, but the data comes from the wrapped shell, not from the original command. Transforming or replacing the result is a deliberate, niche operation: a middleware that does so should write the new result onto `InvocationContext.Result` so the caller receives it.
 
 ## Resource Disposal
 
@@ -274,7 +274,7 @@ Want your project added to this list? [Open an issue](https://github.com/alastai
 
 CliInvoke aims to make working with Commands and external processes easier.
 
-Whilst there is a modest set of features are available today, there is room for more features and for modifications of
+Whilst there is a modest set of features available today, there is room for more features and for modifications of
 existing features in future updates.
 
 Future updates may focus on one or more of the following:
@@ -286,10 +286,10 @@ Future updates may focus on one or more of the following:
 
 ## New vs Old Package and Namespace
 
-CliInvoke changed it's Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
+CliInvoke changed its Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
 since been published directly under the ``CliInvoke`` package ID prefix and namespace.
 
-The previous packages Ids are marked as deprecated and will not receive future updates.
+The previous package IDs are marked as deprecated and will not receive future updates.
 
 ## License
 
