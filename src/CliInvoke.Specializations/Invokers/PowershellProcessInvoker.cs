@@ -153,7 +153,7 @@ public class PowershellProcessInvoker : IProcessInvoker
 
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                GetPowershellProcessConfiguration(true));
+                GetPowershellProcessConfiguration(!_useShellExecution));
 
         InvocationContext ctx = new(
             processConfiguration,
@@ -196,7 +196,7 @@ public class PowershellProcessInvoker : IProcessInvoker
 
         using ProcessConfiguration runnerConfiguration =
             _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                GetPowershellProcessConfiguration(true));
+                GetPowershellProcessConfiguration(!_useShellExecution));
 
         InvocationContext ctx = new(
             processConfiguration,
