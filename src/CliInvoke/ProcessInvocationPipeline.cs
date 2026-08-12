@@ -22,7 +22,7 @@ internal class ProcessInvocationPipeline
     private readonly IExternalProcessFactory _externalProcessFactory;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ProcessInvocationPipeline"/> class.
+    ///     Initialises a new instance of the <see cref="ProcessInvocationPipeline"/> class.
     /// </summary>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
     internal ProcessInvocationPipeline(IExternalProcessFactory externalProcessFactory)
@@ -53,7 +53,7 @@ internal class ProcessInvocationPipeline
 
                 int processId = externalProcess.Start();
 
-                return (TResult)(object)new ProcessResult(
+                return (TResult)new ProcessResult(
                     externalProcess.Configuration.TargetFilePath,
                     0,
                     processId,
@@ -65,7 +65,7 @@ internal class ProcessInvocationPipeline
 
             return ctx.Mode switch
             {
-                InvocationMode.Raw => (TResult)(object)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
+                InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
                 InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(ctx.CancellationToken),
                 InvocationMode.Piped => (TResult)(object)await externalProcess.CapturePipedResultAsync(ctx.CancellationToken),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
