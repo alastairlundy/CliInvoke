@@ -36,9 +36,11 @@ public sealed class MiddlewareContext
     }
 
     /// <summary>
-    ///     Gets the delegate to invoke the next middleware or the terminal pipeline.
+    ///     Gets or sets the delegate to invoke the next middleware or the terminal pipeline.
+    ///     Updated by the chain walker before each middleware invocation so that
+    ///     <c>context.Middleware.Next</c> always references the correct downstream stage.
     /// </summary>
-    public Func<InvocationContext, CancellationToken, Task> Next { get; }
+    public Func<InvocationContext, CancellationToken, Task> Next { get; internal set; }
 
     /// <summary>
     ///     Gets the cancellation token for this middleware step.

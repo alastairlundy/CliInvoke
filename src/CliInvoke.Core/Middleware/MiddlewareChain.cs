@@ -55,7 +55,13 @@ internal sealed class MiddlewareChain
         {
             IProcessMiddleware middleware = _middleware[i];
             Func<InvocationContext, CancellationToken, Task> currentNext = next;
-            next = (ctx, _) => middleware.InvokeAsync(ctx, currentNext);
+            next = (ctx, _) =>
+            {
+                // Update context.Middleware.Next so the current middleware sees the
+                // correct downstream delegate, not the outermost stage.
+                ctx.Middleware!.Next = currentNext;
+                return middleware.InvokeAsync(ctx, currentNext);
+            };
         }
 
         // Expose a per-step MiddlewareContext (with any seeded items) to every middleware
