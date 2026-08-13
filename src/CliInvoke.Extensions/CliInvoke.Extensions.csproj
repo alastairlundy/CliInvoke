@@ -9,16 +9,21 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>3.0.0-alpha.7</Version>
+        <Version>3.0.0-alpha.8</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>### ⚠️ Breaking Changes
-- **Removed** support for `net8.0` and `net9.0`. This package now targets `net10.0` only.
-- Updated project to use CliInvoke.Core 3.0.0 Alpha 7 and CliInvoke 3.0.0 Alpha 7</PackageReleaseNotes>
+        <PackageReleaseNotes>🆕 **Additions**
+- Added `LoggingMiddleware` and the `UseLogging` extension.
+- Added `PostExitValidationMiddleware` and the `UsePostExitValidation` extension.
+- Added `PowerShellMiddleware` and `CmdMiddleware` with `UsePowerShell`/`UseCmd` extensions.
+- Added integration tests for the built-in middleware.
+
+🐛 **Bug Fixes**
+- Fixed sensitive-argument redaction to handle quoted values containing spaces.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
