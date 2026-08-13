@@ -63,12 +63,14 @@ public sealed class PostExitValidationOptions
     {
         ArgumentException.ThrowIfNullOrEmpty(regex);
 
+        Regex compiled = new Regex(regex, RegexOptions.Compiled, TimeSpan.FromSeconds(2));
+
         return new PostExitValidationOptions(result =>
         {
             if (result is not BufferedProcessResult bufferedResult)
                 return "Result does not expose standard output text.";
 
-            if (Regex.IsMatch(bufferedResult.StandardOutput, regex))
+            if (compiled.IsMatch(bufferedResult.StandardOutput))
                 return null;
 
             return "Standard output does not match the expected pattern.";
