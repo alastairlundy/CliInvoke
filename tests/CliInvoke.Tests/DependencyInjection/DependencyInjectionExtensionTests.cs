@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware;
+using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Factories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -132,7 +133,9 @@ public class DependencyInjectionExtensionTests
         IServiceCollection services = new ServiceCollection();
         services.AddCliInvoke(invoker =>
         {
-            ProcessInvoker result = invoker.UseLogging();
+            ProcessInvoker result = invoker
+                .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero())
+                .UseLogging();
             return result;
         });
         IServiceProvider provider = services.BuildServiceProvider();
@@ -143,8 +146,9 @@ public class DependencyInjectionExtensionTests
         await Assert.That(invoker).IsNotNull();
 
         ProcessInvoker concreteInvoker = (ProcessInvoker)invoker;
-        await Assert.That(concreteInvoker.Middlewares.Count).IsEqualTo(1);
+        await Assert.That(concreteInvoker.Middlewares.Count).IsEqualTo(2);
         await Assert.That(concreteInvoker.Middlewares[0]).IsTypeOf<LoggingMiddleware>();
+        await Assert.That(concreteInvoker.Middlewares[1]).IsTypeOf<PostExitValidationMiddleware>();
     }
 
     [Test]
