@@ -17,7 +17,7 @@ namespace CliInvoke.Core.Validation;
 ///     The type of the process result being validated, which must inherit from the 'ProcessResult'
 ///     class.
 /// </typeparam>
-public interface IProcessResultValidator<in TProcessResult> where TProcessResult : ProcessResult
+public interface IProcessResultValidator<TProcessResult> where TProcessResult : ProcessResult
 {
     /// <summary>
     ///     The validation rules to be applied to the process result. Each rule is a function
@@ -36,4 +36,14 @@ public interface IProcessResultValidator<in TProcessResult> where TProcessResult
     ///     Returns true if all validation rules pass, otherwise false.
     /// </returns>
     bool Validate(TProcessResult result);
+
+    /// <summary>
+    ///     Validates the given process result and returns the collection of rules that failed.
+    /// </summary>
+    /// <param name="result">The result of the process to be validated.</param>
+    /// <returns>
+    ///     A collection of <see cref="ValidationFailure{TProcessResult}" /> instances, one per failed rule.
+    ///     The collection is empty when all rules pass.
+    /// </returns>
+    ValidationFailure<TProcessResult>[] GetValidationFailures(TProcessResult result);
 }

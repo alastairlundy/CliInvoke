@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using CliInvoke.Core.Middleware;
+using CliInvoke.Core.Validation;
 
 namespace CliInvoke.Extensions.Middleware.Validation;
 
@@ -19,46 +20,48 @@ namespace CliInvoke.Extensions.Middleware.Validation;
 /// </summary>
 public static class PostExitValidationExtensions
 {
-    /// <summary>
-    ///     Adds post-exit validation middleware to the process pipeline.
-    /// </summary>
     /// <param name="builder">The middleware builder.</param>
-    /// <param name="options">The validation options applied to the process result.</param>
-    /// <returns>The builder for fluent chaining.</returns>
-    /// <exception cref="ArgumentNullException">
-    ///     Thrown when <paramref name="builder"/> or <paramref name="options"/> is <c>null</c>.
-    /// </exception>
-    public static IProcessMiddlewareBuilder UsePostExitValidation(
-        this IProcessMiddlewareBuilder builder,
-        PostExitValidationOptions options)
+    extension(IProcessMiddlewareBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(builder);
-        ArgumentNullException.ThrowIfNull(options);
+        /// <summary>
+        ///     Adds post-exit validation middleware to the process pipeline.
+        /// </summary>
+        /// <param name="validator">The validator applied to the process result.</param>
+        /// <returns>The builder for fluent chaining.</returns>
+        /// <exception cref="ArgumentNullException">
+        ///     Thrown when <paramref name="builder"/> or <paramref name="validator"/> is <c>null</c>.
+        /// </exception>
+        public IProcessMiddlewareBuilder UsePostExitValidation(IProcessResultValidator<ProcessResult> validator)
+        {
+            ArgumentNullException.ThrowIfNull(builder);
+            ArgumentNullException.ThrowIfNull(validator);
 
-        builder.Use(new PostExitValidationMiddleware(options));
+            builder.Use(new PostExitValidationMiddleware(validator));
 
-        return builder;
+            return builder;
+        }
     }
 
-    /// <summary>
-    ///     Creates a new <see cref="ProcessInvoker"/> with <see cref="PostExitValidationMiddleware"/>
-    ///     prepended so that every invocation validates the resulting <see cref="ProcessResult"/>.
-    /// </summary>
     /// <param name="invoker">The existing process invoker.</param>
-    /// <param name="options">The validation options applied to the process result.</param>
-    /// <returns>A new process invoker with post-exit validation middleware applied.</returns>
-    /// <exception cref="ArgumentNullException">
-    ///     Thrown when <paramref name="invoker"/> or <paramref name="options"/> is <c>null</c>.
-    /// </exception>
-    public static ProcessInvoker UsePostExitValidation(
-        this ProcessInvoker invoker,
-        PostExitValidationOptions options)
+    extension(ProcessInvoker invoker)
     {
-        ArgumentNullException.ThrowIfNull(invoker);
-        ArgumentNullException.ThrowIfNull(options);
+        /// <summary>
+        ///     Creates a new <see cref="ProcessInvoker"/> with <see cref="PostExitValidationMiddleware"/>
+        ///     prepended so that every invocation validates the resulting <see cref="ProcessResult"/>.
+        /// </summary>
+        /// <param name="validator">The validator applied to the process result.</param>
+        /// <returns>A new process invoker with post-exit validation middleware applied.</returns>
+        /// <exception cref="ArgumentNullException">
+        ///     Thrown when <paramref name="invoker"/> or <paramref name="validator"/> is <c>null</c>.
+        /// </exception>
+        public ProcessInvoker UsePostExitValidation(IProcessResultValidator<ProcessResult> validator)
+        {
+            ArgumentNullException.ThrowIfNull(invoker);
+            ArgumentNullException.ThrowIfNull(validator);
 
-        IEnumerable<IProcessMiddleware> newList =
-            invoker.Middlewares.Prepend(new PostExitValidationMiddleware(options));
-        return new ProcessInvoker(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
+            IEnumerable<IProcessMiddleware> newList =
+                invoker.Middlewares.Prepend(new PostExitValidationMiddleware(validator));
+            return new ProcessInvoker(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
+        }
     }
 }

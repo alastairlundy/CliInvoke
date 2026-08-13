@@ -20,7 +20,7 @@ namespace CliInvoke.Core;
 public class InvocationContext
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="InvocationContext"/> class.
+    ///     Initialises a new instance of the <see cref="InvocationContext"/> class.
     /// </summary>
     /// <param name="configuration">The process configuration.</param>
     /// <param name="exitConfiguration">The process exit configuration.</param>

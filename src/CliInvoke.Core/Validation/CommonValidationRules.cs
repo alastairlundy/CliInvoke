@@ -9,6 +9,7 @@
  */
 
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CliInvoke.Core.Validation;
 
@@ -82,4 +83,81 @@ public static class CommonValidationRules<TProcessResult>
     {
         return result => exitCodes.Any(code => result.ExitCode == code);
     }
+
+    /// <summary>
+    ///     A validation rule that checks whether the process result's standard output matches the
+    ///     supplied regular expression. Only meaningful when the result is a
+    ///     <see cref="BufferedProcessResult" />; results that do not expose standard output text fail the rule.
+    /// </summary>
+    /// <param name="regex">
+    ///     The regular expression pattern to evaluate against
+    ///     <see cref="BufferedProcessResult.StandardOutput" />.
+    /// </param>
+    /// <returns>
+    ///     A function that takes an instance of <see cref="BufferedProcessResult" /> as input and evaluates to
+    ///     true if the standard output matches the pattern; otherwise, false.
+    /// </returns>
+    public static Func<BufferedProcessResult, bool> RequiresStandardOutputMatches(string regex)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(regex);
+
+        Regex compiled = new Regex(regex, RegexOptions.Compiled, TimeSpan.FromSeconds(2));
+
+        return result => result is BufferedProcessResult buffered
+                         && compiled.IsMatch(buffered.StandardOutput);
+    }
+
+    /// <summary>
+    ///     A validation rule that checks whether the process result's standard error output is empty or
+    ///     contains only whitespace. Only meaningful when the result is a
+    ///     <see cref="BufferedProcessResult" />; results that do not expose standard error text pass the rule.
+    /// </summary>
+    /// <returns>
+    ///     A function that takes an instance of <see cref="BufferedProcessResult" /> as input and evaluates to
+    ///     true if the standard error is empty; otherwise, false.
+    /// </returns>
+    public static Func<BufferedProcessResult, bool> RequiresStandardErrorIsEmpty()
+    {
+        return result => result is not BufferedProcessResult buffered
+                         || string.IsNullOrWhiteSpace(buffered.StandardError);
+    }
+
+    /// <summary>
+    ///     A self-describing validation rule that ensures the process exited with a zero exit code.
+    /// </summary>
+    /// <returns>A <see cref="ValidationRule{TProcessResult}" /> enforcing a zero exit code.</returns>
+    public static ValidationRule<TProcessResult> ExitCodeZeroRule()
+        => new(
+            RequiresExitCodeZero,
+            nameof(RequiresExitCodeZero),
+            "The process did not exit with code 0.");
+
+    /// <summary>
+    ///     A self-describing validation rule that ensures the process result's standard output matches the
+    ///     supplied regular expression.
+    /// </summary>
+    /// <param name="regex">
+    ///     The regular expression pattern to evaluate against
+    ///     <see cref="BufferedProcessResult.StandardOutput" />.
+    /// </param>
+    /// <returns>A <see cref="ValidationRule{TProcessResult}" /> enforcing a standard output match.</returns>
+    public static ValidationRule<BufferedProcessResult> StandardOutputMatchesRule(string regex)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(regex);
+
+        return new ValidationRule<BufferedProcessResult>(
+            RequiresStandardOutputMatches(regex),
+            nameof(RequiresStandardOutputMatches),
+            $"Standard output did not match the expected pattern '{regex}'.");
+    }
+
+    /// <summary>
+    ///     A self-describing validation rule that ensures the process result's standard error is empty.
+    /// </summary>
+    /// <returns>A <see cref="ValidationRule{TProcessResult}" /> enforcing empty standard error.</returns>
+    public static ValidationRule<BufferedProcessResult> StandardErrorIsEmptyRule()
+        => new(
+            RequiresStandardErrorIsEmpty(),
+            nameof(RequiresStandardErrorIsEmpty),
+            "Standard error was not empty.");
 }
