@@ -34,7 +34,11 @@ public class PowerShellMiddlewareIntegrationTests
 
         foreach (string directory in pathEnv.Split(Path.PathSeparator))
         {
-            string candidate = Path.Combine(directory.Trim(), fileName);
+            string trimmed = directory.Trim();
+            if (trimmed.Length == 0)
+                continue;
+
+            string candidate = Path.Combine(trimmed, fileName);
             if (File.Exists(candidate))
                 return candidate;
         }
