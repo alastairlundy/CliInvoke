@@ -25,7 +25,7 @@ public static class PostExitValidation
     public static IProcessResultValidator<ProcessResult> ExitCodeIsZero()
     {
         return new ProcessResultValidator<ProcessResult>(
-            new[] { CommonValidationRules<ProcessResult>.ExitCodeZeroRule() });
+            [CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]);
     }
 
     /// <summary>
@@ -36,13 +36,12 @@ public static class PostExitValidation
     public static IProcessResultValidator<ProcessResult> ExitCodeIs(int exitCode)
     {
         return new ProcessResultValidator<ProcessResult>(
-            new[]
-            {
-                new ValidationRule<ProcessResult>(
-                    CommonValidationRules<ProcessResult>.RequiresExitCode(exitCode),
-                    nameof(CommonValidationRules<ProcessResult>.RequiresExitCode),
-                    $"The process did not exit with code {exitCode}.")
-            });
+        [
+            new ValidationRule<ProcessResult>(
+                CommonValidationRules<ProcessResult>.RequiresExitCode(exitCode),
+                nameof(CommonValidationRules<ProcessResult>.RequiresExitCode),
+                $"The process did not exit with code {exitCode}.")
+        ]);
     }
 
     /// <summary>
@@ -55,13 +54,12 @@ public static class PostExitValidation
         ArgumentNullException.ThrowIfNull(exitCodes);
 
         return new ProcessResultValidator<ProcessResult>(
-            new[]
-            {
-                new ValidationRule<ProcessResult>(
-                    CommonValidationRules<ProcessResult>.RequiresAllowedExitCode(exitCodes),
-                    nameof(CommonValidationRules<ProcessResult>.RequiresAllowedExitCode),
-                    $"The process did not exit with one of the allowed codes [{string.Join(", ", exitCodes)}].")
-            });
+        [
+            new ValidationRule<ProcessResult>(
+                CommonValidationRules<ProcessResult>.RequiresAllowedExitCode(exitCodes),
+                nameof(CommonValidationRules<ProcessResult>.RequiresAllowedExitCode),
+                $"The process did not exit with one of the allowed codes [{string.Join(", ", exitCodes)}].")
+        ]);
     }
 
     /// <summary>
@@ -81,7 +79,7 @@ public static class PostExitValidation
             CommonValidationRules<BufferedProcessResult>.StandardOutputMatchesRule(regex);
 
         return new ProcessResultValidator<ProcessResult>(
-            new[] { ToProcessResultRule(rule) });
+            [ToProcessResultRule(rule)]);
     }
 
     /// <summary>
@@ -95,7 +93,7 @@ public static class PostExitValidation
             CommonValidationRules<BufferedProcessResult>.StandardErrorIsEmptyRule();
 
         return new ProcessResultValidator<ProcessResult>(
-            new[] { ToProcessResultRule(rule) });
+            [ToProcessResultRule(rule)]);
     }
 
     /// <summary>

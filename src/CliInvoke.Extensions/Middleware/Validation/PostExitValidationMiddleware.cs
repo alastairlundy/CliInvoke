@@ -23,7 +23,7 @@ namespace CliInvoke.Extensions.Middleware.Validation;
 internal sealed class PostExitValidationMiddleware : IProcessMiddleware
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PostExitValidationMiddleware"/> class.
+    ///     Initialises a new instance of the <see cref="PostExitValidationMiddleware"/> class.
     /// </summary>
     /// <param name="validator">The validator applied to the process result.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="validator"/> is <c>null</c>.</exception>
