@@ -39,15 +39,18 @@ public class MiddlewareContextTests
         MiddlewareItems items = new MiddlewareItems();
         items.Set("shared", "value1");
 
-        MiddlewareContext context = new MiddlewareContext(
+        MiddlewareContext firstContext = new MiddlewareContext(
             (ctx, ct) => Task.CompletedTask,
-            CancellationToken.None);
+            CancellationToken.None,
+            items);
+        MiddlewareContext secondContext = new MiddlewareContext(
+            (ctx, ct) => Task.CompletedTask,
+            CancellationToken.None,
+            items);
 
-        // Items is a new instance per MiddlewareContext, but can be used to share data
-        // when the same Items instance is passed across middleware
-        context.Items.Set("shared", "value2");
+        firstContext.Items.Set("shared", "value2");
 
-        await Assert.That(context.Items.Get<string>("shared")).IsEqualTo("value2");
+        await Assert.That(secondContext.Items.Get<string>("shared")).IsEqualTo("value2");
     }
 
     [Test]
