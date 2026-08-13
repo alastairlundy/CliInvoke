@@ -8,11 +8,10 @@ Where multiple major versions are supported, only the latest minor release may b
 ### Currently Supported Versions
 Versions that are currently supported with Bug Fixes and/or Security Fixes.
 
-| Version series | Supported with Bug Fixes | Supported with Security Fixes |
+| Version series | Versions Supported with Bug Fixes | Versions Supported with Security Fixes |
 |--| --|--|
-| 2.8 | Until 3.0 | Until 3.0 |
-| 2.7 | Until 2.9 | Until 3.0 |
-| < 2.7 | :x: | :x: |
+| 2.x | 2.9, 2.10 | 2.8, 2.9, 2.10 |
+| 1.x | :x: | :x: |
 
 ## Reporting a Security Vulnerability
 

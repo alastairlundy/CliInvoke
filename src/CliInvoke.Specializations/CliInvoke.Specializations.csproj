@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net10.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -12,18 +12,15 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.5</PackageVersion>
+        <PackageVersion>3.0.0-alpha.7</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>### Changed
-* Updated internal Polyfill version from 10.7.0 to 10.10.0
-- `CmdProcessInvoker` now implements `IProcessInvoker` directly instead of extending `ProcessInvoker`
-- `PowershellProcessInvoker` now implements `IProcessInvoker` directly instead of extending `ProcessInvoker`
-- Both invokers now accept `IExternalProcessFactory` as a constructor dependency
-- Added global usings for cleaner imports</PackageReleaseNotes>
+        <PackageReleaseNotes>### ⚠️ Breaking Changes
+- **Removed** support for `net8.0` and `net9.0`. This package now targets `net10.0` only.
+- Updated to use CliInvoke.Core 3.0.0 Alpha 7 and CliInvoke 3.0.0 Alpha 7</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>

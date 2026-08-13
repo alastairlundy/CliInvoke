@@ -39,13 +39,20 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     }
 
     /// <summary>
+    ///     Initialises a new instance of the <see cref="ExternalProcess"/> class and
+    ///     allocates a default <see cref="FilePathResolver"/> internally to resolve
+    ///     the target executable path. This constructor performs an implicit
+    ///     <see cref="FilePathResolver"/> allocation; callers that need a custom
+    ///     resolver should use the
+    ///     <see cref="ExternalProcess(IFilePathResolver, ProcessConfiguration, ProcessExitConfiguration?)"/>
+    ///     overload instead.
     /// </summary>
     /// <param name="configuration"></param>
     /// <param name="exitConfiguration"></param>
     public ExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null)
     {
-        _filePathResolver = FilePathResolver.Shared;
+        _filePathResolver = new FilePathResolver();
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
@@ -103,6 +110,31 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     public event EventHandler? Exited;
 
     /// <summary>
+    ///     Synchronously starts the external process and returns its process ID.
+    ///     Stdin piping is not performed by this method.
+    /// </summary>
+    /// <returns>The process ID of the started process.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the process has already been started.</exception>
+    public int Start()
+    {
+        if (HasStarted)
+            throw new InvalidOperationException("The process has already been started.");
+
+        FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
+        Configuration.TargetFilePath = filePath.FullName;
+
+        _processWrapper.Dispose();
+        _processWrapper = new ProcessWrapper(Configuration, Configuration.ResourcePolicy);
+
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+
+        _processWrapper.Start();
+
+        return _processWrapper.Id;
+    }
+
+    /// <summary>
     ///     Asynchronously starts the external process using the specified configuration.
     /// </summary>
     /// <param name="cancellationToken">
@@ -118,6 +150,9 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     [UnsupportedOSPlatform("browser")]
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        if (HasStarted)
+            throw new InvalidOperationException("The process has already been started.");
+
         await StartAsync(Configuration, cancellationToken);
     }
 
@@ -139,6 +174,9 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     public async Task StartAsync(ProcessConfiguration configuration,
         CancellationToken cancellationToken)
     {
+        if (HasStarted)
+            throw new InvalidOperationException("The process has already been started.");
+
         FileInfo filePath = await Task.FromResult(_filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
 
         Configuration.TargetFilePath = filePath.FullName;
@@ -182,36 +220,6 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         );
 
         return result;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public int FireAndForget(CancellationToken cancellationToken)
-    {
-        Task task = new(() =>
-        {
-            try
-            {
-                Task startTask = StartAsync(cancellationToken);
-
-                startTask.Wait(cancellationToken);
-
-                Task<ProcessResult> waitForExitTask = WaitForExitOrTimeoutAsync(cancellationToken);
-
-                waitForExitTask.Wait(cancellationToken);
-            }
-            finally
-            {
-                Task.Run(()=> Kill(), cancellationToken);
-            }
-        }, CancellationToken.None);
-
-        task.Start();
-
-        return _processWrapper.Id;
     }
 
     /// <summary>

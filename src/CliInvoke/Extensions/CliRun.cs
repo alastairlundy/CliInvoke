@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 using CliInvoke.Factories;
@@ -19,8 +20,13 @@ namespace CliInvoke;
 /// </summary>
 public static class CliRun
 {
-    private static Func<IExternalProcessFactory> _externalProcessFactory = () => new 
-        ExternalProcessFactory();
+    // T005: per-call allocation is intentional to honor UseFilePathResolver; do not cache without invalidation.
+    private static Func<IExternalProcessFactory> _externalProcessFactory = () => new
+        ExternalProcessFactory(GetFilePathResolver());
+
+    private static IFilePathResolver? _filePathResolver;
+    private static volatile ProcessInvocationPipeline? _pipeline;
+    private static readonly object _syncRoot = new();
 
     /// <summary>
     /// Configures the external process factory to be used for creating the command-line external processes.
@@ -31,11 +37,83 @@ public static class CliRun
     /// </param>
     public static void UseExternalProcessFactory(IExternalProcessFactory externalProcessFactory)
     {
-        _externalProcessFactory = () => externalProcessFactory;
+        lock (_syncRoot)
+        {
+            _externalProcessFactory = () => externalProcessFactory;
+            _pipeline = null;
+        }
     }
-    
-    private static IExternalProcessFactory GetExternalProcessFactory() 
+
+    /// <summary>
+    /// Configures the file path resolver to be used by the static <see cref="CliRun"/> methods for resolving
+    /// executable file paths. This method is optional; if not called, <see cref="CliRun"/> will construct a
+    /// default <see cref="FilePathResolver"/> on first use.
+    /// </summary>
+    /// <param name="resolver">
+    /// An implementation of the <see cref="IFilePathResolver"/> interface to be used for resolving file paths.
+    /// </param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="resolver"/> is <see langword="null"/>.</exception>
+    public static void UseFilePathResolver(IFilePathResolver resolver)
+    {
+        ArgumentNullException.ThrowIfNull(resolver);
+        lock (_syncRoot)
+        {
+            _filePathResolver = resolver;
+            _pipeline = null;
+        }
+    }
+
+    private static IFilePathResolver GetFilePathResolver()
+    {
+        if (_filePathResolver is not null)
+        {
+            return _filePathResolver;
+        }
+
+        lock (_syncRoot)
+        {
+            return _filePathResolver ??= new FilePathResolver();
+        }
+    }
+
+    private static ProcessInvocationPipeline GetPipeline()
+    {
+        if (_pipeline is not null)
+        {
+            return _pipeline;
+        }
+
+        lock (_syncRoot)
+        {
+            return _pipeline ??= new ProcessInvocationPipeline(GetExternalProcessFactory());
+        }
+    }
+
+    private static IExternalProcessFactory GetExternalProcessFactory()
         => _externalProcessFactory.Invoke();
+
+    // Out parameter is intentional; do not convert to tuple, the using declaration depends on it
+    private static ProcessConfiguration BuildStringArgsConfig(
+        string targetFilePath,
+        string arguments,
+        string? workingDirectory,
+        bool redirectStandardOutput,
+        TimeSpan? timeoutTimeSpan,
+        out ProcessExitConfiguration exitConfiguration)
+    {
+        // Helper is pure; resolution happens at the factory level; do not pre-resolve in the helper
+        workingDirectory ??= Environment.CurrentDirectory;
+
+        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
+            arguments, workingDirectory, redirectStandardOutput);
+
+        timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
+
+        exitConfiguration = ProcessExitConfiguration.CreateGraceful(
+            ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
+
+        return configuration;
+    }
 
     /// <summary>
     /// Executes a specified process with the provided parameters asynchronously and returns the resulting process data.
@@ -63,15 +141,8 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
-
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory, false);
-        
-        timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
-
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
+        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: false, timeoutTimeSpan, out var exitConfiguration);
 
         return await RunAsync(configuration, exitConfiguration, cancellationToken);
     }
@@ -91,16 +162,17 @@ public static class CliRun
     /// <returns>
     /// The result of the process execution.
     /// </returns>
-    public static async Task<ProcessResult> RunAsync(ProcessConfiguration configuration,
+    public static Task<ProcessResult> RunAsync(ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        using IExternalProcess externalProcess = GetExternalProcessFactory()
-            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
+        var ctx = new ProcessInvocationContext(
+            configuration,
+            exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
+            InvocationMode.Raw,
+            cancellationToken);
 
-        await externalProcess.StartAsync(cancellationToken);
-        
-        return await externalProcess.WaitForExitOrTimeoutAsync(cancellationToken);
+        return GetPipeline().InvokeAsync<ProcessResult>(ctx);
     }
 
     /// <summary>
@@ -129,37 +201,39 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
+        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: true, timeoutTimeSpan, out var exitConfiguration);
 
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory);
-        
-        timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
-
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
-        
         return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
     }
 
 
     /// <summary>
-    /// 
+    /// Executes a process asynchronously with the specified configuration and returns buffered results.
     /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public static async Task<BufferedProcessResult> RunBufferedAsync(
+    /// <param name="configuration">
+    /// The process configuration defining how to run the process.
+    /// </param>
+    /// <param name="exitConfiguration">
+    /// The configuration that determines how the process is terminated; defaults to a graceful configuration if not provided.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// A token that, if cancelled, will be used to cancel the operation.
+    /// </param>
+    /// <returns>
+    /// The buffered result of the process execution.
+    /// </returns>
+    public static Task<BufferedProcessResult> RunBufferedAsync(
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        using IExternalProcess externalProcess = GetExternalProcessFactory()
-            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
+        var ctx = new ProcessInvocationContext(
+            configuration,
+            exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
+            InvocationMode.Buffered,
+            cancellationToken);
 
-        await externalProcess.StartAsync(cancellationToken);
-        
-        return await externalProcess.CaptureBufferedResultAsync(cancellationToken);
+        return GetPipeline().InvokeAsync<BufferedProcessResult>(ctx);
     }
 
     /// <summary>
@@ -188,16 +262,9 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
-        
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory);
-        
-        timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
+        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: true, timeoutTimeSpan, out var exitConfiguration);
 
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan((TimeSpan)timeoutTimeSpan));
-        
         return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
     }
 
@@ -217,16 +284,46 @@ public static class CliRun
     /// A task representing the asynchronous operation. The task result contains a <see cref="PipedProcessResult"/> object
     /// with details about the executed process, including piped output and exit information.
     /// </returns>
-    public static async Task<PipedProcessResult> RunPipedAsync(
+    public static Task<PipedProcessResult> RunPipedAsync(
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        using IExternalProcess externalProcess = GetExternalProcessFactory()
-            .CreateExternalProcess(configuration, exitConfiguration ?? ProcessExitConfiguration.CreateGraceful());
+        var ctx = new ProcessInvocationContext(
+            configuration,
+            exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
+            InvocationMode.Piped,
+            cancellationToken);
 
-        await externalProcess.StartAsync(cancellationToken);
-        
-        return await externalProcess.CapturePipedResultAsync(cancellationToken);
+        return GetPipeline().InvokeAsync<PipedProcessResult>(ctx);
+    }
+
+    /// <summary>
+    ///     Starts a process using the specified configuration and returns its process ID without
+    ///     waiting for it to exit. The process handle is disposed after starting.
+    /// </summary>
+    /// <param name="configuration">The configuration settings for starting the process.</param>
+    /// <returns>The process ID of the started process.</returns>
+    public static int FireAndForget(ProcessConfiguration configuration)
+    {
+        using IExternalProcess p = GetExternalProcessFactory().CreateExternalProcess(configuration);
+        return p.Start();
+    }
+
+    /// <summary>
+    ///     Starts a process using the specified file path and returns its process ID without
+    ///     waiting for it to exit.
+    /// </summary>
+    /// <param name="targetFilePath">The path of the executable file to start.</param>
+    /// <param name="arguments">Command-line arguments for the executable. Defaults to an empty string if not specified.</param>
+    /// <param name="workingDirectory">The working directory for the process. If null, the current directory is used.</param>
+    /// <returns>The process ID of the started process.</returns>
+    public static int FireAndForget(string targetFilePath, string arguments = "", string? workingDirectory = null)
+    {
+        // ExitConfiguration is unused by FireAndForget
+        using var configuration = BuildStringArgsConfig(targetFilePath, arguments, workingDirectory,
+            redirectStandardOutput: false, timeoutTimeSpan: null, out ProcessExitConfiguration _);
+
+        return FireAndForget(configuration);
     }
 }

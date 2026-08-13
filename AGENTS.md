@@ -3,7 +3,7 @@
 ## What this repo is
 CliInvoke — a .NET/C# library for running and interacting with command-line processes (builders, configuration models, invokers, DI helpers and optional specializations).
 
-- Languages & targets: C#/.NET. Primary targets: .NET 8, .NET 9, and .NET 10. 
+- Languages & targets: C#/.NET. Primary target: .NET 10. 
 - Structure: Small-to-medium .NET library with multiple projects under src/.
 
 ## Codebase Organization
@@ -16,14 +16,14 @@ CliInvoke — a .NET/C# library for running and interacting with command-line pr
 - **Tests**: Located in `tests/` folder, uses TUnit framework.
 - **Infrastructure**:
   - Root: `README.md`, `CONTRIBUTING.md`
-  - Build Guidance: `docs/docs/building-cliinvoke.md`
+  - Build Guidance: `site/docs/building-cliinvoke.md`
   - CI Workflows: `.github/workflows/*` (test.yml, publish.yml, scorecard.yml)
   - Other: `benchmarks/`, `.assets/`, `THIRD_PARTY_NOTICES.txt`
 - **SDK**: Respect `global.json` (currently .NET 10.0) - matches CI.
 
 ## Important Conventions
 - **Working directory**: CI tests are executed from `tests/CliInvoke.Tests/` (see `.github/workflows/test.yml`). Match this when reproducing issues.
-- **Target frameworks**: net8.0; net9.0; net10.0 (see csproj files)
+- **Target framework**: net10.0 (see csproj files)
 - **Testing**: Uses TUnit framework - `dotnet test` discovers and runs tests.
 - **Resource disposal**: Refer to the `dotnet-best-practices` skill and the Resource Cleanup section in `README.md` for guidance on disposing key types: `ProcessConfiguration`, `IExternalProcess`, `UserCredential`, `UserCredentialBuilder`, `PipedProcessResult`.
 - **Versioning**: Update csproj version and changelog for releases.
@@ -41,6 +41,10 @@ CliInvoke — a .NET/C# library for running and interacting with command-line pr
 - If modifying core that other projects consume, validate by packing core and restoring the other projects from that local feed.
 
 When making changes, prefer to open/modify files under src/ and run tests targeting src/CliInvoke/ for fast feedback.
+
+## Contributing and PR workflow
+- **Follow `CONTRIBUTING.md`** for all contributions. Read it before making non-trivial changes; it defines branching, commit, and review expectations.
+- **Use `.github/pull_request_template.md`** whenever you open or draft a pull request on behalf of a user. Fill in every section (What changed, Why it was changed, Testing, Documentation, Contribution Policy compliance, Authorship) so the PR is ready for review without further editing.
 
 ## Specialized Workflows
 The following skills are available to handle specific operational tasks. Load them when the corresponding scenario arises:

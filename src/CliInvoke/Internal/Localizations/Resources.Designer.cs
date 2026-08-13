@@ -202,5 +202,14 @@ namespace CliInvoke.Internal.Localizations {
                 return ResourceManager.GetString("Exceptions.TargetFile.NullOrEmpty", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to An invalid version string of {0} was provided..
+        /// </summary>
+        internal static string Exceptions_VersionParsing_InvalidVersionString {
+            get {
+                return ResourceManager.GetString("Exceptions.VersionParsing.InvalidVersionString", resourceCulture);
+            }
+        }
     }
 }

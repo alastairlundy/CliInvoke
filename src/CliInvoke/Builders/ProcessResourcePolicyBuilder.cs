@@ -47,7 +47,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [SupportedOSPlatform("linux")]
     public IProcessResourcePolicyBuilder SetProcessorAffinity(nint processorAffinity)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 0x0001);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(processorAffinity,
             2 * Environment.ProcessorCount);
 
@@ -68,7 +68,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <exception cref="ArgumentOutOfRangeException">
     ///     Thrown if <see cref="internalMinWorkingSet" /> is less than 0.
     /// </exception>
-    /// <exception cref="ArgumentException">Thrown if the <see cref="minWorkingSet"/> is greater than or equal to the maximum working set.</exception>
+    /// <exception cref="ArgumentException">Thrown if the <paramref name="minWorkingSet"/> is greater than or equal to the maximum working set.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]

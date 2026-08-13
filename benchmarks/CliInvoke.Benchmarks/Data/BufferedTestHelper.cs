@@ -17,7 +17,7 @@ public class BufferedTestHelper
 
         try
         {
-            FileInfo fileResult = FilePathResolver.Shared.ResolveFilePath(mockDataToolExe);
+            FileInfo fileResult = new FilePathResolver().ResolveFilePath(mockDataToolExe);
 
             return fileResult.FullName;
         }
@@ -50,8 +50,6 @@ public class BufferedTestHelper
                                         f.FullName.Contains("Release", StringComparison.OrdinalIgnoreCase))
                                     .ThenByDescending(f =>
                                         f.FullName.Contains("net10.0", StringComparison.OrdinalIgnoreCase))
-                                    .ThenByDescending(f =>
-                                        f.FullName.Contains("net9.0", StringComparison.OrdinalIgnoreCase))
                                     .First().FullName;
                         }
                     }

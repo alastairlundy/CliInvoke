@@ -71,4 +71,7 @@
     <data name="Exceptions.Process.CannotResumeExited" xml:space="preserve">
         <value>Cannot resume a process that has already exited</value>
     </data>
+    <data name="Exceptions.VersionParsing.InvalidVersionString" xml:space="preserve">
+        <value>An invalid version string of {0} was provided.</value>
+    </data>
 </root>

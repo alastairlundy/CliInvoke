@@ -22,7 +22,7 @@ To maintain state across the pipeline, a `ProcessInvocationContext` object will 
 - **`ProcessConfiguration Configuration`**: The configuration to be used for the process (modifiable by pre-processing middleware).
 - **`ProcessExitConfiguration? ExitConfiguration`**: The exit behavior configuration.
 - **`CancellationToken CancellationToken`**: The active cancellation token.
-- **`InvocationMode Mode`**: An enum (`Basic`, `Buffered`, `Piped`) indicating which `Execute` method was triggered, allowing middleware to adjust behavior before the result exists.
+- **`InvocationMode Mode`**: An enum (`Raw`, `Buffered`, `Piped`, `FireAndForget`) indicating how the process output is captured (none, buffered strings, piped streams, or fire-and-forget), allowing middleware to adjust behavior before the result exists.
 - **`ProcessResult? Result`**: The resulting process data, set after the "leaf" execution.
 
 ### 3. Type Handling and Polymorphism
@@ -35,14 +35,14 @@ To avoid introducing complex new interfaces, the system will utilize the existin
 ## Implementation Strategy
 
 ### 1. Integration in `ProcessInvoker`
-Middleware support will be integrated directly into the `ProcessInvoker` class while remaining completely optional for non-middleware users.
+Middleware support will be added optionally to ProcessInvoker while remaining invisible to non-middleware users. The terminal of the middleware chain is the internal F1 `ProcessInvocationPipeline` (see decision ledger `DECISIONS-CliInvoke-process-invocation-pipeline.md`).
 
-- **Constructor Overloading**: 
-    - Existing users continue using `ProcessInvoker(IFilePathResolver filePathResolver)`.
-    - Middleware users use `ProcessInvoker(IFilePathResolver filePathResolver, IEnumerable<IProcessMiddleware>? middlewares = null)`.
-- **Private Method Delegation**: 
-    - The public `Execute...` methods will initialize the `ProcessInvocationContext` and trigger the middleware chain.
-    - The final step (the "leaf") of the pipeline will delegate to a private `ExecuteCoreAsync` method containing the actual OS process orchestration logic.
+- **Constructor Overloading**:
+    - Existing users continue using `ProcessInvoker(IExternalProcessFactory factory)`.
+    - Middleware users use `ProcessInvoker(IExternalProcessFactory factory, IEnumerable<IProcessMiddleware>? middlewares = null)`.
+- **Pipeline Delegation**:
+    - The public `Execute...` methods will initialize the `ProcessInvocationContext` and trigger the middleware chain (or call the pipeline directly when no middleware is configured).
+    - The final step (the "leaf") of the middleware chain will delegate to the `ProcessInvocationPipeline`, which owns the OS process orchestration logic (factory → start → wait/capture → dispose).
 
 ### 2. Distribution and Packaging
 - **Core Logic**: The middleware interfaces and `ProcessInvocationContext` will reside in the core package to ensure fundamental compatibility.

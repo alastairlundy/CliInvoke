@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net10.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <PackageId>CliInvoke.Core</PackageId>
@@ -22,15 +22,13 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-alpha.5</Version>
-        <PackageReleaseNotes>### Changed
-* Updated internal Polyfill version from 10.7.0 to 10.10.0
-- `IProcessInvoker.ExecutePipedAsync`: parameter renamed from `processExitConfiguration` to `exitConfiguration` for consistency
+        <Version>3.0.0-alpha.7</Version>
+        <PackageReleaseNotes>### ⚠️ Breaking Changes
+- **Removed** support for `net8.0` and `net9.0`. This package now targets `net10.0` only.
 
-## CliInvoke.Extensions
-
-### Removed
-- `ProcessConfiguration.ToProcessStartInfo()` extension method (moved to internal `ProcessControlAdapters`)</PackageReleaseNotes>
+### ⚙️ Modifications
+- Added a synchronous `int Start()` method declaration (with XML doc) to `IExternalProcess`, between the `Exited` event and the `StartAsync` overloads.
+- **Removed** the original `FireAndForget(CancellationToken)` method declaration from `IExternalProcess` in a single step (no `[Obsolete]` shim), as the FireAndForget concept has moved up to the `CliRun` facade in the main `CliInvoke` package.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
@@ -39,10 +37,11 @@
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
-<!--    <ItemGroup>
+    <ItemGroup>
         <InternalsVisibleTo Include="CliInvoke"/>
-    </ItemGroup>-->
-    
+        <PackageReference Include="Polyfill" PrivateAssets="all"/>
+    </ItemGroup>
+
     <ItemGroup>
         <Content Include="README.md">
             <Link>README.md</Link>

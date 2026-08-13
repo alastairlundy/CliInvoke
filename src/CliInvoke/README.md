@@ -13,7 +13,7 @@ Launch processes, redirect standard input and output streams, await process comp
 ## Features
 
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
-* Supports .NET Standard 2.0, .NET 8 and newer TFMs, and has few dependencies.
+* Supports .NET 10 and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
   Windows <sup>1</sup>

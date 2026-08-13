@@ -15,12 +15,40 @@ using CliInvoke.Processes.Internal.ControlAdapters;
 namespace CliInvoke.Processes.Internal;
 
 /// <summary>
-/// 
+///
 /// </summary>
 internal class ProcessWrapper : Process
 {
-    internal const int GracefulTimeoutWaitSeconds = 5;
-    
+    /// <summary>
+    /// Computes how long, in seconds, the graceful cancellation path should wait after the
+    /// interrupt signal has been sent before giving up and falling back to
+    /// (optionally) a forceful exit.
+    /// </summary>
+    /// <param name="timeoutSeconds">The user-supplied timeout threshold, in whole seconds.</param>
+    /// <returns>
+    /// <c>min(10 + floor(timeoutSeconds * 0.05), 20)</c> — i.e. a fixed 10s base plus 5% of the
+    /// requested timeout (rounded down to an integer), capped at 20s.
+    /// </returns>
+    internal static int CalculatePostInterruptGracePeriodSeconds(int timeoutSeconds)
+    {
+        int waitSeconds = 10 + (int)Math.Floor(timeoutSeconds * 0.05);
+        return Math.Min(waitSeconds, 20);
+    }
+
+    /// <summary>
+    /// Computes the total maximum time, in seconds, that a graceful cancellation may take.
+    /// This includes the initial timeout before the interrupt is sent, plus the grace period
+    /// after the interrupt.
+    /// </summary>
+    /// <param name="timeoutSeconds">The user-supplied timeout threshold, in whole seconds.</param>
+    /// <returns>
+    /// <c>timeoutSeconds + CalculatePostInterruptGracePeriodSeconds(timeoutSeconds)</c>.
+    /// </returns>
+    internal static int CalculateGracefulTimeoutWaitSeconds(int timeoutSeconds)
+    {
+        return timeoutSeconds + CalculatePostInterruptGracePeriodSeconds(timeoutSeconds);
+    }
+
     // Synchronisation primitive to prevent simultaneous cancellation attempts
     internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
@@ -59,20 +87,42 @@ internal class ProcessWrapper : Process
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
             || OperatingSystem.IsFreeBSD())
         {
-            // TODO: Replace with ProcessHandle CreateSuspended as part of .NET 11 support.
+            // Fast-exiting processes (e.g. `which`, `echo`) may have already exited
+            // between base.Start() returning and this handler running. Skip the
+            // suspend/resume cycle in that case to avoid races on process handles.
+            if (HasExited) return;
+
+            // TODO: Replace with ProcessStartInfo.StartSuspended + SafeProcessHandle.Resume()
+            // on Windows and macOS when .NET 11 is added as a target framework.
             try
             {
                 SuspendProcess();
-
-#pragma warning disable CA1416
-                ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
-#pragma warning restore CA1416
-
-                ResumeProcess();
             }
             catch
             {
-                // Ignored
+                // Process exited before we could suspend it, or suspend failed.
+                return;
+            }
+
+            try
+            {
+#pragma warning disable CA1416
+                ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
+#pragma warning restore CA1416
+            }
+            finally
+            {
+                // Always resume the process — even if SetResourcePolicy throws —
+                // to prevent leaving it permanently suspended.
+                try
+                {
+                    ResumeProcess();
+                }
+                catch
+                {
+                    // The process may have already exited during SetResourcePolicy.
+                    // Swallow the exception — the process is gone, nothing to resume.
+                }
             }
         }
     }
@@ -96,18 +146,49 @@ internal class ProcessWrapper : Process
 
             throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
         }
-        
+
         if (!HasStarted)
         {
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
         }
 
         if (!HasStarted) return HasStarted;
-        
+
+        // Cache StandardOutput/StandardError StreamReaders while the process is still
+        // guaranteed alive. These properties internally call EnsureState, which in
+        // .NET 10 throws InvalidOperationException("process has exited") on
+        // fast-exiting processes (e.g. `which dotnet`) that exit before the next
+        // line of code runs. Touching them here means downstream code that reads
+        // from the cached readers works even if the process has already exited.
+        try
+        {
+            _ = base.StandardOutput;
+            _ = base.StandardError;
+        }
+        catch (InvalidOperationException)
+        {
+            // Process exited before we could cache the stream readers.
+            // Downstream code must tolerate an exited process (see HasExited guards).
+        }
+
+        // Capture Id (safe after Start) and ProcessName (throws if exited).
+        // base.Id does not throw on exit; base.ProcessName does.
+        Id = base.Id;
+
+        // Fast-exiting processes (e.g. `which dotnet`) can exit between the
+        // HasExited check and the base.ProcessName call, so guard with a
+        // try/catch as well. Fall back to StartInfo.FileName in that case.
+        try
+        {
+            ProcessName = base.ProcessName;
+        }
+        catch (InvalidOperationException)
+        {
+            ProcessName = StartInfo.FileName;
+        }
+
         StartTime = DateTime.UtcNow;
         Started.Invoke(this, EventArgs.Empty);
-        Id = base.Id;
-        ProcessName = base.ProcessName;
 
         return HasStarted;
     }
@@ -274,41 +355,7 @@ internal class ProcessWrapper : Process
         ProcessExitConfiguration processExitConfiguration,
         CancellationToken cancellationToken = default)
     {
-        // Use semaphore to prevent simultaneous cancellation attempts
-        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
-        {
-            // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitAsync(cancellationToken);
-            return;
-        }
-
-        try
-        {
-            await WaitForExitAsync(cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            await CancelWithInterrupt(TimeSpan.Zero,
-                processExitConfiguration, cancellationToken);
-        }
-        catch (Exception exception)
-        {
-            // Recalculate values in exception handler to avoid using stale values
-            DateTime currentExpectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
-                
-            CancellationHelper.HandleCancellationExceptions(
-                currentExpectedExitTime
-                , CancellationReason.RequestedCancellation, processExitConfiguration,
-                exception);
-        }
-        finally
-        {
-            if (!HasExited) 
-                ForcefulExit();
-                
-            _cancellationSemaphore.Release();
-        }
+        await WaitForExitCoreAsync(processExitConfiguration, cancellationToken, isGraceful: false);
     }
     
     /// <summary>
@@ -329,31 +376,99 @@ internal class ProcessWrapper : Process
         ArgumentOutOfRangeException.ThrowIfLessThan(
             exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
 
+        await WaitForExitCoreAsync(exitConfiguration, cancellationToken, isGraceful: true, fallbackToForceful);
+    }
+
+    /// <summary>
+    ///     Waits for the process to exit without blocking on stream EOF.
+    ///     <para>
+    ///     The base-class <see cref="Process.WaitForExitAsync(CancellationToken)"/> always calls
+    ///     <c>WaitUntilOutputEOF</c> after exit detection, which blocks indefinitely when
+    ///     redirected stdout/stderr pipes are held open by grandchild or unrelated processes
+    ///     (see dotnet/runtime#51277). This method avoids that by polling <see cref="Process.HasExited"/>
+    ///     via <see cref="Task.Delay(int, CancellationToken)"/>, which never blocks on stream EOF.
+    ///     </para>
+    /// </summary>
+    private async Task WaitForExitSafeAsync(CancellationToken cancellationToken)
+    {
+        const int pollIntervalMs = 200;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (HasExited)
+                return;
+
+            await Task.Delay(pollIntervalMs, cancellationToken).ConfigureAwait(false);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+    }
+
+    /// <summary>
+    ///     Unified critical section for wait+cancel flows. Owns the semaphore acquire/release pair.
+    ///     <paramref name="isGraceful"/> selects between pure-cancellation and graceful-timeout behaviour.
+    /// </summary>
+    private async Task WaitForExitCoreAsync(
+        ProcessExitConfiguration processExitConfiguration,
+        CancellationToken cancellationToken,
+        bool isGraceful,
+        bool fallbackToForceful = true)
+    {
         // Use semaphore to prevent simultaneous cancellation attempts
         if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
         {
             // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitAsync(cancellationToken);
+            await WaitForExitSafeAsync(cancellationToken);
             return;
         }
 
         try
         {
-            await Task.WhenAny([
-                WaitForExitAsync(cancellationToken),
-                CancelWithInterrupt(exitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                    exitConfiguration, cancellationToken)
-            ]);
+            if (isGraceful)
+            {
+                await Task.WhenAny([
+                    WaitForExitSafeAsync(cancellationToken),
+                    CancelWithInterrupt(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                        processExitConfiguration, cancellationToken)
+                ]);
 
-            await Task.WhenAny([
-                Task.Delay(500, cancellationToken), WaitForExitAsync(cancellationToken)
-            ]);
+                await Task.WhenAny([
+                    Task.Delay(
+                        TimeSpan.FromSeconds(
+                            CalculatePostInterruptGracePeriodSeconds((int)processExitConfiguration.TimeoutPolicy.TimeoutThreshold.TotalSeconds)),
+                        cancellationToken),
+                    WaitForExitSafeAsync(cancellationToken)
+                ]);
 
-            if (!HasExited && fallbackToForceful) 
-                ForcefulExit();
+                if (!HasExited && fallbackToForceful)
+                    ForcefulExit();
+            }
+            else
+            {
+                await WaitForExitSafeAsync(cancellationToken);
+            }
+        }
+        catch (OperationCanceledException) when (!isGraceful)
+        {
+            await CancelWithInterrupt(TimeSpan.Zero,
+                processExitConfiguration, cancellationToken);
+        }
+        catch (Exception exception) when (!isGraceful)
+        {
+            // Recalculate values in exception handler to avoid using stale values
+            DateTime currentExpectedExitTime =
+                CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
+
+            CancellationHelper.HandleCancellationExceptions(
+                currentExpectedExitTime,
+                CancellationReason.RequestedCancellation, processExitConfiguration,
+                exception);
         }
         finally
         {
+            if (!HasExited && !isGraceful)
+                ForcefulExit();
+
             _cancellationSemaphore.Release();
         }
     }
@@ -398,7 +513,7 @@ internal class ProcessWrapper : Process
         if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
         {
             // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitAsync(cancellationToken);
+            await WaitForExitSafeAsync(cancellationToken);
             // Dispose of the linked CTS to prevent resource leaks
             cts.Dispose();
             return;
@@ -406,7 +521,7 @@ internal class ProcessWrapper : Process
 
         try
         {
-            await WaitForExitAsync(actualCancellationToken);
+            await WaitForExitSafeAsync(actualCancellationToken);
         }
         catch (Exception exception)
         {
@@ -427,6 +542,8 @@ internal class ProcessWrapper : Process
     }
     
     /// <summary>
+    ///     Sends an interrupt signal to the child process.
+    ///     <remarks>Caller must already hold <c>_cancellationSemaphore</c>.</remarks>
     /// </summary>
     /// <param name="timeoutThreshold"></param>
     /// <param name="exitConfiguration"></param>
@@ -438,66 +555,51 @@ internal class ProcessWrapper : Process
     private async Task<bool> CancelWithInterrupt(TimeSpan timeoutThreshold,
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
     {
-        // Use semaphore to prevent simultaneous cancellation attempts
-        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
+        DateTime expectedExitTime =
+            CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
+
+        // Use a local variable to store the cancellation reason to avoid race conditions
+        CancellationReason cancellationReason = CancellationReason.NotKnown;
+
+        // Register the callback to update the cancellation reason
+        cancellationToken.Register(() =>
         {
-            // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitAsync(cancellationToken);
-            return HasExited;
-        }
+            cancellationReason =
+                CancellationHelper.GetCancellationReason(expectedExitTime,
+                    cancellationToken);
+        });
+
+        bool cancellationSuccess;
 
         try
         {
-            DateTime expectedExitTime =
+            await Task.Delay(timeoutThreshold, cancellationToken);
+
+            if (HasExited)
+                return true;
+
+            return  await ProcessControlAdapter.SendInterruptSignalAsync(this,
+                cancellationReason, exitConfiguration, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            // Recalculate expected exit time in exception handler to avoid using stale values
+            DateTime currentExpectedExitTime =
                 CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-
-            // Use a local variable to store the cancellation reason to avoid race conditions
-            CancellationReason cancellationReason = CancellationReason.NotKnown;
-
-            // Register the callback to update the cancellation reason
-            cancellationToken.Register(() =>
-            {
-                cancellationReason =
-                    CancellationHelper.GetCancellationReason(expectedExitTime,
-                        cancellationToken);
-            });
-
-            bool cancellationSuccess;
-
-            try
-            {
-                await Task.Delay(timeoutThreshold, cancellationToken);
-
-                if (HasExited)
-                    return true;
-
-                return  await ProcessControlAdapter.SendInterruptSignalAsync(this,
-                    cancellationReason, exitConfiguration, cancellationToken);
-            }
-            catch (Exception exception)
-            {
-                // Recalculate expected exit time in exception handler to avoid using stale values
-                DateTime currentExpectedExitTime =
-                    CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-                
-                cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason);
-                
-                CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
-                    cancellationReason,
-                    exitConfiguration, exception);
-            }
-            finally
-            {
-                if (!HasExited)
-                    ForcefulExit();
-            }
-
-            return cancellationSuccess;
+            
+            cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason);
+            
+            CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
+                cancellationReason,
+                exitConfiguration, exception);
         }
         finally
         {
-            _cancellationSemaphore.Release();
+            if (!HasExited)
+                ForcefulExit();
         }
+
+        return cancellationSuccess;
     }
     
     [UnsupportedOSPlatform("browser")]

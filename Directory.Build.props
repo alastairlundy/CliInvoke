@@ -3,5 +3,6 @@
     <!-- Allow running MTP-based tests with dotnet test (VSTest mode) for SDKs that require it -->
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>CS1574;CS1580;CS1581;CS1584;CS1658;CS1734;CS1762</WarningsAsErrors>
   </PropertyGroup>
 </Project>

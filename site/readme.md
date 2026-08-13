@@ -4,156 +4,132 @@ layout: simple
 og_type: website
 ---
 
-# New Website Quickstart
+# CliInvoke
 
-This is the default landing page created by `lunet init`.
+CliInvoke is a .NET library for running and interacting with external
+command-line processes. It is built for .NET developers who need to launch
+an executable, redirect its standard streams, capture its output, and reason
+about its lifetime — without hand-rolling `System.Diagnostics.Process` for
+every project.
 
-Use it as a setup checklist, then replace it with your real homepage content.
+## What CliInvoke is
 
-## 1) Edit `config.scriban`
+Every .NET codebase that shells out to another tool eventually needs the same
+things: a way to describe the command, a way to start it, a way to capture
+its output, a way to dispose of its handles, and a way to test the code that
+does all of that. `System.Diagnostics.Process` provides the primitives; the
+boilerplate — pipe setup, output buffering, exit-code handling, disposal,
+thread-safety, cross-platform path lookup — is left to you. CliInvoke
+provides the layer on top.
 
-Your site already references the [default Lunet template](https://github.com/lunet-io/templates). Open `config.scriban` and set your project values:
+The library targets .NET 8, .NET 9, and .NET 10, runs on Windows, macOS,
+Linux, and BSD, and ships with first-class dependency-integration helpers
+through `CliInvoke.Extensions`.
 
-```scriban
-extend "lunet-io/templates"
+## What it offers
 
-site_project_name = "MyProject"
-site_project_description = "Short project description."
-site_project_baseurl = "https://example.com"
-site_project_github_user = "org"
-site_project_github_repo = "myproject"
-site_project_owner_name = "Your Name"
+CliInvoke exposes **three invocation patterns** that cover the spectrum from
+scripting to long-running process control:
 
-# Optional - set a logo, social banner, favicon, etc.:
-# site_project_logo_path = "/img/myproject-logo.png"
-# site_project_social_banner_path = "/img/myproject-banner.png"
-# site_project_banner_background_path = "/img/myproject-banner-background.png"
-# site_project_favicon_path = "/favicon.ico"
-# site_project_basepath = "/myproject"  # only if hosted under a sub-path
+- **[`CliRun`](docs/guides/choosing-invocation-pattern.md#cirun--quickstart-scripting)** —
+  a static façade for one-line command execution. The right entry point when
+  you just need to run a command and read its output.
+- **[`IProcessInvoker`](docs/guides/choosing-invocation-pattern.md#iprocessinvoker--di-centric-applications)** —
+  an interface for DI-centric applications. Takes a `ProcessConfiguration`
+  and returns a typed result, with full support for test doubles and per-call
+  configuration.
+- **[`IExternalProcess`](docs/guides/choosing-invocation-pattern.md#iexternalprocess--power-user-lifecycle-control)** —
+  a power-user API for granular lifecycle control. Splits start, capture,
+  and kill into separate calls so you can interact with the process while
+  it runs.
 
-site_project_init
-```
+Underneath those patterns sit the capabilities that make the library
+practical to use day-to-day:
 
-Notes:
+- **Configuration builders and models** — fluent builders assemble
+  immutable `ProcessConfiguration` and `ProcessExitConfiguration` models
+  with sensible defaults. See the
+  [Configuration guide](docs/guides/configuration.md) for the full
+  reference.
+- **Resource disposal** — five
+  [Resource-Owning Types](docs/guides/resource-disposal.md) own every
+  unmanaged handle and `SecureString` buffer; the
+  [Resource Disposal guide](docs/guides/resource-disposal.md) documents
+  the disposal contract for each one.
+- **Cross-platform support** — Windows, macOS, Linux, and BSD with
+  consistent behaviour; see
+  [Supported Operating Systems](docs/Supported-OperatingSystems.md).
+- **Dependency-injection extensions** — `AddCliInvoke()` registers the
+  invoker, factory, and file-path resolver with the container of your
+  choice. See
+  [Getting Started](docs/getting-started.md#setting-up-cliinvoke).
+- **Specializations** — first-class wrappers for running commands through
+  PowerShell or CMD on Windows via
+  [`CliInvoke.Specializations`](https://www.nuget.org/packages/CliInvoke.Specializations).
 
-- `site_project_logo_path` defaults to the Lunet logo if not set.
-- Favicon defaults to `/favicon.ico`. Keep a file there, or override `site_project_favicon_path`.
+If you are unsure which pattern fits your scenario, the
+[Choosing your Invocation Pattern](docs/guides/choosing-invocation-pattern.md)
+guide walks through the decision tree and the trade-offs of each option.
 
-### Theme defaults
+## Where to go next
 
-```scriban
-template_theme_default_mode = "system" # system, light, dark
-template_theme_storage_key = "lunet-theme"
-```
+Different readers arrive here with different needs. Pick the path that
+matches yours and follow it in order.
 
-Use the navbar theme button to switch mode at runtime.
+### If you are new to CliInvoke
 
-## Theme configuration and customization
+Start with a runnable example, then read the pattern-decision guide.
 
-The template provides layouts, CSS/JS assets, a theme switcher, search, and more. Treat theme internals as read-only - customize through your own files and `config.scriban` only.
+1. [Quickstart](docs/getting-started-quickstart.md) — install the package
+   and run your first `CliRun` command in under five minutes.
+2. [Choosing your Invocation Pattern](docs/guides/choosing-invocation-pattern.md)
+   — the decision tree for picking between `CliRun`, `IProcessInvoker`,
+   and `IExternalProcess`.
+3. [Configuration](docs/guides/configuration.md) — every knob on
+   `ProcessConfiguration` and `ProcessExitConfiguration`.
 
-### Naming conventions
+### If you are building a testable app with DI
 
-- `site_project_*`: **project inputs** you set in your `config.scriban` (name, repo, owner, assets…).
-- `template_*`: **theme customization** knobs (labels, theme mode, extra override styles…).
-- `project_*`: **resolved values** computed by `site_project_init` (don't set these manually).
-- Lunet core variables like `baseurl`, `basepath`, `title`, `description`, `author` are set by `site_project_init`.
+You work in a codebase that uses dependency injection and you need to
+unit-test code that shells out to processes.
 
-### Theme variables
+1. [Getting Started](docs/getting-started.md#setting-up-cliinvoke) —
+   register `IProcessInvoker` with your DI container.
+2. [Choosing your Invocation Pattern](docs/guides/choosing-invocation-pattern.md)
+   — confirm `IProcessInvoker` is the right pattern for your scenario.
+3. [Configuration](docs/guides/configuration.md) — the
+   `ProcessConfiguration` model, the builder lifecycle, and the
+   default-value reference appendix.
 
-Set these before calling `site_project_init`:
+### If you need full lifecycle control
 
-{.table}
-| Variable | Type | Default | Meaning |
-|---|---:|---:|---|
-| `template_theme_default_mode` | string | `"system"` | Initial theme mode (`"system"`, `"light"`, `"dark"`). |
-| `template_theme_storage_key` | string | `"lunet-theme"` | LocalStorage key used by the theme switcher. |
-| `template_theme_override_styles` | list of strings | `[]` | Site-owned stylesheet paths bundled **after** the theme CSS. |
+You need to interact with the process while it runs — pipe input, monitor
+output, send signals, or replace components for advanced scenarios.
 
-### Project variables
+1. [Choosing your Invocation Pattern](docs/guides/choosing-invocation-pattern.md)
+   — when and how to use the `IExternalProcess` factory and lifecycle
+   API.
+2. [Architecture](docs/guides/architecture.md) — the internal data-flow
+   and the Process Invocation Pipeline so you can reason about where a
+   customisation belongs.
+3. [Resource Disposal](docs/guides/resource-disposal.md) — the disposal
+   contract for the five Resource-Owning Types, including
+   `IExternalProcess` and `PipedProcessResult`.
 
-{.table}
-| Variable | Example | Used for |
-|---|---:|---|
-| `site_project_name` | `"MyProject"` | Site title/branding. |
-| `site_project_description` | `"Short description"` | Homepage and social metadata. |
-| `site_project_logo_path` | `"/img/myproject-logo.png"` | Navbar logo. |
-| `site_project_social_banner_path` | `"/img/myproject-banner.png"` | Social/OG image. |
-| `site_project_banner_background_path` | `"/img/myproject-banner.png"` | Homepage banner background. |
-| `site_project_package_id` | `"MyProject"` | Package display/links. |
-| `site_project_baseurl` | `"https://example.com"` | Canonical URL for `lunet build`. |
-| `site_project_github_user` | `"org"` | GitHub org/user. |
-| `site_project_github_repo` | `"myproject"` | GitHub repo name. |
-| `site_project_basepath` | `"/myproject"` | Base path (sub-path hosting). |
-| `site_project_favicon_path` | `"/favicon.ico"` | Favicon path. |
-| `site_project_owner_name` | `"Your Name"` | Footer ownership + author. |
-| `site_project_owner_alias` | `"your-handle"` | Footer ownership alias. |
-| `site_project_owner_url` | `"https://example.com"` | Footer ownership link. |
-| `site_project_content_license_name` | `"CC BY 2.5"` | Footer content license. |
-| `site_project_content_license_url` | `"http://creativecommons.org/licenses/by/2.5/"` | License link. |
-| `site_project_twitter_user` | `"your-handle"` | Twitter card metadata. |
+### If you have a specific task
 
-### Custom styles
+If you know what you need to accomplish but not which page it lives on,
+jump straight to the relevant guide.
 
-Add `template_theme_override_styles` to load your own CSS/SCSS after the theme:
+| I want to … | Go to |
+|---|---|
+| Debug a leak, hang, or wrong exit code | [Troubleshooting](docs/guides/troubleshooting.md) |
+| Tune how a process starts or exits | [Configuration](docs/guides/configuration.md) |
+| Understand the internal data-flow | [Architecture](docs/guides/architecture.md) |
+| Pick between `CliRun`, `IProcessInvoker`, and `IExternalProcess` | [Choosing your Invocation Pattern](docs/guides/choosing-invocation-pattern.md) |
+| Dispose the Resource-Owning Types correctly | [Resource Disposal](docs/guides/resource-disposal.md) |
+| Install and set up the library | [Getting Started](docs/getting-started.md) · [Quickstart](docs/getting-started-quickstart.md) |
+| Look up a specific API | [API Reference](api/) |
 
-```scriban
-template_theme_override_styles = ["/css/theme-overrides.scss"]
-```
-
-Then create `css/theme-overrides.scss` in your site folder:
-
-```scss
-:root[data-bs-theme="dark"] {
-  --lunet-color-background: #0b1020;
-  --lunet-color-blue: #6ea8ff;
-  --lunet-code-bg: #0b1426;
-}
-```
-
-The theme exposes `--lunet-*` CSS custom properties for colors, code highlighting, and more. Override these instead of targeting internal selectors.
-
-## 2) Edit navigation
-
-### Top bar (`menu.yml`)
-
-Your site includes a `menu.yml` with Home and Docs entries. Add right-side links:
-
-```yml
-home:
-  - {path: readme.md, title: "<i class='bi bi-house-door' aria-hidden='true'></i> Home", self: true}
-  - {path: docs/readme.md, title: "<i class='bi bi-book' aria-hidden='true'></i> Docs", folder: true}
-
-home2:
-  - {url: "https://github.com/org/repo/", title: '<i class="bi bi-github"></i> GitHub', link_class: btn btn-info}
-```
-
-### Docs sidebar (`docs/menu.yml`)
-
-Add pages to the docs section:
-
-```yml
-doc:
-  - {path: readme.md, title: "<i class='bi bi-book' aria-hidden='true'></i> Documentation"}
-  - {path: getting-started.md, title: "<i class='bi bi-rocket-takeoff' aria-hidden='true'></i> Getting Started"}
-```
-
-## 3) Replace this homepage
-
-This `readme.md` is the homepage (`/`). Keep the front matter and replace the body with your project content.
-
-## Build locally
-
-```shell-session
-lunet serve
-```
-
-Your site is live at `http://localhost:4000`. Edit pages and see changes reload instantly.
-
-Build for production:
-
-```shell-session
-lunet build
-```
-
-Output goes to `.lunet/build/www/`.
+For a flat index of every page, see the
+[Documentation hub](docs/readme.md).
