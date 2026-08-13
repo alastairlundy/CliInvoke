@@ -8,7 +8,6 @@
  */
 
 using System.Collections.Generic;
-using CliInvoke.Core;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 
@@ -213,7 +212,7 @@ public class CliRunTests : IDisposable
     [Test]
     public async Task FireAndForget_DisposesProcessAfterStart()
     {
-        var disposalFactory = new DisposalTrackingFactory();
+        DisposalTrackingFactory disposalFactory = new DisposalTrackingFactory();
 
         try
         {
@@ -235,7 +234,7 @@ public class CliRunTests : IDisposable
     [Test]
     public async Task FireAndForget_DisposesProcessOnStartFailure()
     {
-        var disposalFactory = new DisposalTrackingFactory
+        DisposalTrackingFactory disposalFactory = new DisposalTrackingFactory
         {
             ThrowOnStart = new InvalidOperationException("simulated start failure")
         };
@@ -438,7 +437,7 @@ internal sealed class DisposalTrackingFactory : IExternalProcessFactory
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
         ProcessExitConfiguration exitConfiguration)
     {
-        var stub = new CountingExternalProcessFactory.StubExternalProcess(
+        CountingExternalProcessFactory.StubExternalProcess stub = new CountingExternalProcessFactory.StubExternalProcess(
             configuration, exitConfiguration, ThrowOnStart,
             onDisposed: () => WasDisposed = true);
         _created.Add(stub);

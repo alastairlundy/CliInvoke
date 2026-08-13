@@ -4,7 +4,6 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using CliInvoke.Builders;
-using CliInvoke.Core.Extensibility;
 using CliInvoke.Core.Factories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,11 +17,9 @@ public class CmdInvokerTests
     [SupportedOSPlatform("windows")]
     public CmdInvokerTests(TestFixture testFixture)
     {
-        IRunnerConfigurationFactory runnerProcessFactory = testFixture.ServiceProvider.GetRequiredService<IRunnerConfigurationFactory>();
-        
         IExternalProcessFactory externalProcessFactory = testFixture.ServiceProvider.GetRequiredService<IExternalProcessFactory>();
-        
-        cmdProcessInvoker = new CmdProcessInvoker(runnerProcessFactory, externalProcessFactory);
+
+        cmdProcessInvoker = new CmdProcessInvoker(externalProcessFactory);
     }
 
     [Test]

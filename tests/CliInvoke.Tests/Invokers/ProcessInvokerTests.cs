@@ -1,3 +1,5 @@
+using CliInvoke.Core.Factories;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +13,40 @@ public class ProcessInvokerTests
     public ProcessInvokerTests(TestFixture testFixture)
     {
         _testFixture = testFixture;
+    }
+
+    [Test]
+    public async Task Invoker_ResultPropagatesFromConfigurationChangingMiddleware()
+    {
+        IExternalProcessFactory externalProcessFactory =
+            _testFixture.ServiceProvider.GetRequiredService<IExternalProcessFactory>();
+
+        // Middleware that rewrites the configuration via WithConfiguration before calling next.
+        IProcessMiddleware configMiddleware = new ConfigRewritingMiddleware();
+
+        ProcessInvoker invoker = new ProcessInvoker(externalProcessFactory, new[] { configMiddleware });
+
+        using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+
+        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
+            config,
+            ProcessExitConfiguration.CreateGraceful());
+
+        await Assert.That(result.ExitCode).IsEqualTo(0);
+    }
+
+    private sealed class ConfigRewritingMiddleware : IProcessMiddleware
+    {
+        public async Task InvokeAsync(
+            InvocationContext context,
+            Func<InvocationContext, CancellationToken, Task> next)
+        {
+            InvocationContext rewritten = context.WithConfiguration(
+                new ProcessConfiguration(
+                    context.Configuration.TargetFilePath,
+                    context.Configuration.Arguments));
+            await next(rewritten, context.CancellationToken);
+        }
     }
 
     [Test]

@@ -115,6 +115,9 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     /// </summary>
     /// <returns>The process ID of the started process.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the process has already been started.</exception>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("browser")]
     public int Start()
     {
         if (HasStarted)

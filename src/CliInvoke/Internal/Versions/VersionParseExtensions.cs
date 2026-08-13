@@ -22,8 +22,6 @@
        SOFTWARE.
    */
 
-using System.Globalization;
-
 namespace CliInvoke.Internal.Versions;
 
 /// <summary>

@@ -20,6 +20,7 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Installing CliInvoke](#installing-cliinvoke)
     * [Supported Platforms](#supported-platforms)
 * [Examples](#examples)
+* [Middleware](#middleware)
 * [Resource Disposal](#resource-disposal)
 * [Documentation](#documentation)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
@@ -62,7 +63,7 @@ Notes:
 
 ## Installing CliInvoke
 
-CliInvoke is available on [the NuGet Gallery](https://nuget.org) but call be also installed via the ``dotnet`` SDK CLI.
+CliInvoke is available on [the NuGet Gallery](https://nuget.org) but can also be installed via the ``dotnet`` SDK CLI.
 
 The package(s) to install depends on your use case:
 
@@ -133,6 +134,86 @@ For detailed documentation on all available patterns and when to use them, see [
 
 For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](site/docs/guides/configuration.md)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
 
+## Middleware
+
+CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns (logging, validation, platform selection, retries, …) around the terminal process pipeline without changing how you call it. The pipeline remains the "leaf" that actually starts and waits on the process; middleware wraps it in the order you register.
+
+### When to use middleware, and the two constructors
+
+`ProcessInvoker` has two constructors:
+
+```csharp
+// 1. No middleware — the classic, unchanged behavior.
+public ProcessInvoker(IExternalProcessFactory externalProcessFactory);
+
+// 2. With middleware — every invocation runs through the chain, in order,
+//    before the terminal pipeline executes.
+public ProcessInvoker(
+    IExternalProcessFactory externalProcessFactory,
+    IEnumerable<IProcessMiddleware> middlewares);
+```
+
+Each constructor has an overload that also accepts a `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
+
+```csharp
+using CliInvoke.Core.Middleware; // MiddlewareItems
+
+var items = new MiddlewareItems();
+items.Set("Logger", myLogger);
+var invoker = new ProcessInvoker(factory, items).UseLogging();
+```
+
+Use the first constructor when you don't need middleware. Use the second (or one of the `Use…` extension methods below) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
+
+### The `IProcessMiddleware` contract
+
+A middleware is any `IProcessMiddleware` implementation. It receives the `InvocationContext` and a `next` delegate; calling `next` continues the chain (or the terminal pipeline), omitting it short-circuits:
+
+```csharp
+public interface IProcessMiddleware
+{
+    Task InvokeAsync(
+        InvocationContext context,
+        Func<InvocationContext, CancellationToken, Task> next);
+}
+```
+
+Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag). For example, `LoggingMiddleware` resolves an `ILogger` from that bag under the well-known key `"Logger"`.
+
+### Built-in middleware
+
+The public API is the **extension methods**, not the middleware classes (which are internal). All of them return a *new* `ProcessInvoker`, so they compose fluently:
+
+```csharp
+using CliInvoke;                       // ProcessInvoker
+using CliInvoke.Extensions.Middleware;            // UseLogging
+using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation
+using CliInvoke.Specializations.Middleware;        // UsePowerShell, UseCmd
+
+// Log entry/exit (and each stdout/stderr line at Debug) for every invocation:
+ProcessInvoker loggingInvoker = new ProcessInvoker(factory).UseLogging();
+
+// Validate the result after exit (throws ProcessValidationException on failure):
+ProcessInvoker validatedInvoker = new ProcessInvoker(factory)
+    .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero());
+
+// Run the command inside PowerShell Core / Windows cmd.exe:
+ProcessInvoker psInvoker = new ProcessInvoker(factory).UsePowerShell();
+ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
+```
+
+* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
+* `UsePostExitValidation(options)` — runs a rule against the `ProcessResult` and throws `ProcessValidationException` when it fails. Helpers: `PostExitValidationOptions.ExitCodeIsZero()`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell` also has an overload `UsePowerShell(windowCreation, useShellExecution)` for non-default behaviour; the parameterless form defaults both to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behavior mirrors `CmdProcessInvoker`.
+
+### Result-ownership and disposal through the chain
+
+Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. See **[Resource Disposal](#resource-disposal)** for the full ownership rules and checklist.
+
+### The result-swap rule
+
+By default, middleware does **not** mutate the `ProcessResult` object. Logging and post-exit validation pass the result through unchanged. Platform-selection middleware (`UsePowerShell` / `UseCmd`) substitutes the result of the wrapped `pwsh` / `cmd.exe` invocation — the caller still sees a normal `ProcessResult`, but the data comes from the wrapped shell, not from the original command. Transforming or replacing the result is a deliberate, niche operation: a middleware that does so should write the new result onto `InvocationContext.Result` so the caller receives it.
+
 ## Resource Disposal
 
 > [!IMPORTANT]
@@ -149,6 +230,9 @@ For fine-grained control over process execution — custom timeouts, cancellatio
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 
 For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](site/docs/guides/resource-disposal.md)**.
+
+> [!NOTE]
+> Middleware does not change these rules. A middleware chain returns the process result **un-disposed** to the caller, so the disposal contract described above applies exactly as it does without middleware. See **[Middleware](#middleware)** for the result-ownership note.
 
 ## Documentation
 
@@ -190,7 +274,7 @@ Want your project added to this list? [Open an issue](https://github.com/alastai
 
 CliInvoke aims to make working with Commands and external processes easier.
 
-Whilst there is a modest set of features are available today, there is room for more features and for modifications of
+Whilst there is a modest set of features available today, there is room for more features and for modifications of
 existing features in future updates.
 
 Future updates may focus on one or more of the following:
@@ -202,10 +286,10 @@ Future updates may focus on one or more of the following:
 
 ## New vs Old Package and Namespace
 
-CliInvoke changed it's Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
+CliInvoke changed its NuGet package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
 since been published directly under the ``CliInvoke`` package ID prefix and namespace.
 
-The previous packages Ids are marked as deprecated and will not receive future updates.
+The previous package IDs are marked as deprecated and will not receive future updates.
 
 ## License
 

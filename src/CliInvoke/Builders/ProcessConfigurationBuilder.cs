@@ -305,7 +305,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="processResourcePolicy">
     /// An instance of <see cref="ProcessResourcePolicy" /> that specifies the configuration
-    /// details of the process's resource utilization.
+    /// details of the process's resource utilisation.
     /// </param>
     /// <returns>
     /// The current instance of <see cref="IProcessConfigurationBuilder" /> with the updated

@@ -23,7 +23,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     private readonly bool _throwExceptionIfDuplicateKeyFound;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EnvironmentVariablesBuilder" /> class.
+    ///     Initialises a new instance of the <see cref="EnvironmentVariablesBuilder" /> class.
     /// </summary>
     /// <param name="throwExceptionIfDuplicateKeyFound">
     ///     Whether to throw an exception if a duplicate key is
@@ -37,7 +37,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EnvironmentVariablesBuilder" /> class.
+    ///     Initialises a new instance of the <see cref="EnvironmentVariablesBuilder" /> class.
     /// </summary>
     /// <param name="stringComparer">The <see cref="StringComparer" /> to use for the internal dictionary.</param>
     /// <param name="throwExceptionIfDuplicateKeyFound">
@@ -55,7 +55,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     }
 
     /// <summary>
-    ///     Initializes a new instance of the EnvironmentVariablesBuilder class.
+    ///     Initialises a new instance of the EnvironmentVariablesBuilder class.
     /// </summary>
     /// <param name="vars">The initial environment variables to use.</param>
     /// <param name="stringComparer">The string comparer to use.</param>

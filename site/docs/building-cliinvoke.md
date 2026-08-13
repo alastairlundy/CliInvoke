@@ -36,6 +36,22 @@ You can build for testing by building the desired project within your IDE or VS 
 
 If you encounter any bugs or issues, try running the ``CliInvoke.Tests`` project and setting breakpoints in the affected CliInvoke project's code where appropriate. Failing that, please [report the issue](https://github.com/alastairlundy/CliInvoke/issues/new/) if one doesn't already exist for the bug(s).
 
+#### Middleware feature
+
+CliInvoke now ships an optional middleware system for ``ProcessInvoker``. The chain wraps the existing ``ProcessInvocationPipeline`` (the terminal) so built-in concerns — logging, post-exit validation, and platform selection (`PowerShell`/`cmd.exe`) — can be applied to every invocation through the public ``UseLogging``, ``UsePostExitValidation``, ``UsePowerShell``, and ``UseCmd`` extension methods.
+
+Coverage for the middleware feature lives in:
+* ``tests/CliInvoke.Tests/Middleware/`` — unit tests for the chain semantics and items bag.
+* ``tests/CliInvoke.Tests/Middleware/Integration/`` — real-process integration tests for ``LoggingMiddleware`` and ``PostExitValidationMiddleware``.
+* ``tests/CliInvoke.Specializations.Tests/Middleware/`` — a real-process integration test for ``PowerShellMiddleware`` (skipped automatically when ``pwsh`` is not on ``PATH``, e.g. on Windows CI).
+
+Run the middleware integration tests with:
+
+```bash
+dotnet test tests/CliInvoke.Tests/CliInvoke.Tests.csproj -c Debug
+dotnet test tests/CliInvoke.Specializations.Tests/CliInvoke.Specializations.Tests.csproj -c Debug
+```
+
 ### Building for Release
 Before building a release build, ensure you apply the relevant changes to the relevant ``.csproj`` file corresponding to the package you are trying to build:
 * Update the Package Version variable 
