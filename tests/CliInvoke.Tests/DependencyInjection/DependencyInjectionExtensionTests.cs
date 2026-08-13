@@ -103,12 +103,15 @@ public class DependencyInjectionExtensionTests
         using IServiceScope scope1 = provider.CreateScope();
         using IServiceScope scope2 = provider.CreateScope();
 
-        IProcessInvoker? invoker1 = scope1.ServiceProvider.GetService<IProcessInvoker>();
+        IProcessInvoker? invoker1a = scope1.ServiceProvider.GetService<IProcessInvoker>();
+        IProcessInvoker? invoker1b = scope1.ServiceProvider.GetService<IProcessInvoker>();
         IProcessInvoker? invoker2 = scope2.ServiceProvider.GetService<IProcessInvoker>();
 
-        await Assert.That(invoker1).IsNotNull();
+        await Assert.That(invoker1a).IsNotNull();
+        await Assert.That(invoker1b).IsNotNull();
         await Assert.That(invoker2).IsNotNull();
-        await Assert.That(invoker1).IsNotSameReferenceAs(invoker2);
+        await Assert.That(invoker1a).IsSameReferenceAs(invoker1b);
+        await Assert.That(invoker1a).IsNotSameReferenceAs(invoker2);
     }
 
     [Test]
