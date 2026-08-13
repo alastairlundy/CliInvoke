@@ -32,7 +32,7 @@ using CliInvoke;
 using CliInvoke.Core.Processes;
 
 // Resolve factory manually from service provider
-IExternalProcessFactory factory = serviceProvider.GetRequiredService<<IIExternalProcessFactory>();
+IExternalProcessFactory factory = serviceProvider.GetRequiredService<<IExternalProcessFactory>();
 
 using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 await using IExternalProcess process = factory.CreateExternalProcess(config);
