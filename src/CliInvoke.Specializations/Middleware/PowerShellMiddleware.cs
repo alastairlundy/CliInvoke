@@ -103,12 +103,23 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
         string newArguments = $"-NoProfile -NonInteractive -Command {wrappedCommand}";
 
         // The specialization configuration class is the single source of truth for the
-        // pwsh target path and shell flags; this middleware just supplies the wrapped command.
+        // pwsh target path and shell flags; this middleware just supplies the wrapped command and
+        // forwards the full original configuration.
+        ProcessConfiguration src = context.Configuration;
         ProcessConfiguration newConfig = new PowershellProcessConfiguration(
             _filePathResolver,
             newArguments,
-            context.Configuration.RedirectStandardInput,
+            src.RedirectStandardInput,
             outputRedirection: context.Mode != InvocationMode.Raw,
+            workingDirectoryPath: src.WorkingDirectoryPath,
+            requiresAdministrator: src.RequiresAdministrator,
+            environmentVariables: new Dictionary<string, string>(src.EnvironmentVariables),
+            credentials: src.Credential,
+            standardInput: src.StandardInput,
+            standardInputEncoding: src.StandardInputEncoding,
+            standardOutputEncoding: src.StandardOutputEncoding,
+            standardErrorEncoding: src.StandardErrorEncoding,
+            processResourcePolicy: src.ResourcePolicy,
             windowCreation: _windowCreation,
             useShellExecution: _useShellExecution);
 
