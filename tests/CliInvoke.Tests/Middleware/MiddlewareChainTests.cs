@@ -23,7 +23,7 @@ public class MiddlewareChainTests
 
         await chain.RunAsync(ctx, CancellationToken.None);
 
-        await Assert.That(callLog).IsEquivalentTo(new List<string> { "A", "B", "terminal" });
+        await Assert.That(callLog).IsEquivalentTo(new List<string> { "A", "B", "terminal" }, CollectionOrdering.Matching);
     }
 
     [Test]
