@@ -62,7 +62,8 @@ internal sealed class CmdMiddleware : IProcessMiddleware
         // target and the /c switch; this middleware just supplies the wrapped command.
         ProcessConfiguration newConfig = new CmdProcessConfiguration(
             wrappedCommand,
-            context.Configuration.RedirectStandardInput);
+            context.Configuration.RedirectStandardInput,
+            outputRedirection: context.Mode != InvocationMode.Raw);
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
         await next(newContext, context.CancellationToken);
