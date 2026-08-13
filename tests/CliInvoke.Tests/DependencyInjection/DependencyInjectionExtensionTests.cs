@@ -153,16 +153,23 @@ public class DependencyInjectionExtensionTests
         // Arrange
         CapturingLogger logger = new CapturingLogger();
 
-        MiddlewareItems items = new MiddlewareItems();
-        items.Set(LoggingMiddleware.LoggerKey, (Microsoft.Extensions.Logging.ILogger)logger);
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvoke(invoker =>
+        {
+            MiddlewareItems items = new MiddlewareItems();
+            items.Set(LoggingMiddleware.LoggerKey, (Microsoft.Extensions.Logging.ILogger)logger);
+            return new ProcessInvoker(invoker.ExternalProcessFactory, items).UseLogging();
+        });
+        IServiceProvider provider = services.BuildServiceProvider();
 
-        ProcessInvoker configuredInvoker = new ProcessInvoker(new ExternalProcessFactory(), items).UseLogging();
+        // Act
+        using IServiceScope scope = provider.CreateScope();
+        IProcessInvoker invoker = scope.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         (string filePath, string arguments) = ResolveEchoCommand();
         using ProcessConfiguration config = ProcessConfigurationFactory.Create(filePath, arguments);
 
-        // Act
-        BufferedProcessResult result = await configuredInvoker.ExecuteBufferedAsync(
+        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,
             ProcessExitConfiguration.CreateGraceful());
 
