@@ -63,11 +63,7 @@ Notes:
 
 ## Installing CliInvoke
 
-<<<<<<< Updated upstream
-CliInvoke is available on [the NuGet Gallery](https://nuget.org) but can be also installed via the ``dotnet`` SDK CLI.
-=======
 CliInvoke is available on [the NuGet Gallery](https://nuget.org) but can also be installed via the ``dotnet`` SDK CLI.
->>>>>>> Stashed changes
 
 The package(s) to install depends on your use case:
 
@@ -290,7 +286,7 @@ Future updates may focus on one or more of the following:
 
 ## New vs Old Package and Namespace
 
-CliInvoke changed its Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
+CliInvoke changed its NuGet package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
 since been published directly under the ``CliInvoke`` package ID prefix and namespace.
 
 The previous package IDs are marked as deprecated and will not receive future updates.
