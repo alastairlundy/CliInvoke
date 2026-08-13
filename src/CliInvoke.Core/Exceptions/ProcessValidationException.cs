@@ -12,6 +12,11 @@ namespace CliInvoke.Core.Exceptions;
 /// <summary>
 ///     An exception thrown when a post-exit validation rule fails.
 /// </summary>
+/// <remarks>
+///     The exception retains the <see cref="Result"/> so callers can inspect it. When
+///     <see cref="Result"/> is a <c>PipedProcessResult</c>, the exception handler must dispose it
+///     to release the underlying output streams.
+/// </remarks>
 public sealed class ProcessValidationException : Exception
 {
     /// <summary>
