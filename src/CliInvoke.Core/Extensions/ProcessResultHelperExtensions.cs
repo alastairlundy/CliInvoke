@@ -46,7 +46,7 @@ public static class ProcessResultHelperExtensions
             if (!success)
             {
                 ProcessExceptionInfo<TProcessResult> exceptionInfo = configuration is not null
-                    ? new(processResult, configuration)
+                    ? new ProcessExceptionInfo<TProcessResult>(processResult, configuration)
                     : new ProcessExceptionInfo<TProcessResult>(processResult);
                 
                 throw new ProcessNotSuccessfulException<TProcessResult>(exceptionInfo);

@@ -1,7 +1,6 @@
 ﻿using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
-using DotExtensions.IO;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -187,9 +186,9 @@ public class ProcessConfigurationBuilderTests
     {
         //Act
         IProcessConfigurationBuilder processConfigBuilder = new ProcessConfigurationBuilder("foo")
-            .SetWorkingDirectory(DirectoryInfo.GetRandomDirectory().FullName);
+            .SetWorkingDirectory(Path.GetTempPath());
 
-        string directory = DirectoryInfo.GetRandomDirectory().FullName;
+        string directory = Path.GetTempPath();
         
         //Arrange
         processConfigBuilder = processConfigBuilder.SetWorkingDirectory(directory);

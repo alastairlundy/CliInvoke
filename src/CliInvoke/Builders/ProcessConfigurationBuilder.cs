@@ -78,7 +78,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <param name="arguments">The process arguments to be added or updated.</param>
     /// <param name="escapeArguments">Whether the arguments should be escaped.</param>
     /// <returns>A reference to this builder with the added arguments, allowing method chaining.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref cref="arguments" /> is null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="arguments" /> is null.</exception>
     public IProcessConfigurationBuilder SetArguments(
         IEnumerable<string> arguments,
         bool escapeArguments = true)
@@ -305,7 +305,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// </summary>
     /// <param name="processResourcePolicy">
     /// An instance of <see cref="ProcessResourcePolicy" /> that specifies the configuration
-    /// details of the process's resource utilization.
+    /// details of the process's resource utilisation.
     /// </param>
     /// <returns>
     /// The current instance of <see cref="IProcessConfigurationBuilder" /> with the updated
@@ -405,7 +405,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         ProcessResourcePolicy resourcePolicy = _processResourcePolicyBuilder.Build();
         UserCredential credential = _userCredentialBuilder.Build();
 
-        ProcessConfigurationWrapper configuration = new(_targetFilePath, arguments,
+        BuilderProcessConfiguration configuration = new(_targetFilePath, arguments,
             _redirectStandardInput, _outputRedirection,
             _workingDirectoryPath, _requiresAdministratorPrivileges, environmentVariables,
             credential, _standardInput, _standardInputEncoding, _standardOutputEncoding, _standardErrorEncoding, resourcePolicy, _enableWindowCreation,
@@ -423,9 +423,24 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     }
 }
 
-internal class ProcessConfigurationWrapper : ProcessConfiguration
+/// <summary>
+/// An internal subclass of <see cref="ProcessConfiguration"/> used by <see cref="ProcessConfigurationBuilder"/> to invoke the protected multi-parameter constructor.
+/// </summary>
+/// <remarks>
+/// <para>
+/// The builder lives in the <c>CliInvoke</c> assembly, while <see cref="ProcessConfiguration"/> and its multi-parameter protected constructor reside in the <c>CliInvoke.Core</c> assembly.
+/// Cross-assembly access to the protected constructor requires this internal wrapper class as the legitimate access path.
+/// </para>
+/// <para>
+/// Do not delete this class without first choosing a long-term replacement.
+/// </para>
+/// <para>
+/// A long-term solution to eliminate this wrapper is being developed. See <see cref="ProcessConfigurationBuilder"/> for the current consumer.
+/// </para>
+/// </remarks>
+internal class BuilderProcessConfiguration : ProcessConfiguration
 {
-    internal ProcessConfigurationWrapper(string targetFilePath, string arguments,
+    internal BuilderProcessConfiguration(string targetFilePath, string arguments,
         bool redirectStandardInput,
         bool outputRedirection = false,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,

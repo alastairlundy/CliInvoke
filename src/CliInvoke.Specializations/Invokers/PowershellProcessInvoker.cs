@@ -9,8 +9,7 @@
 
 
 using CliInvoke.Core.Factories;
-using CliInvoke.Core.Processes;
-using CliInvoke.Specializations.Configurations;
+using CliInvoke.Specializations.Middleware;
 
 namespace CliInvoke.Specializations;
 
@@ -20,64 +19,48 @@ namespace CliInvoke.Specializations;
 ///     methods to run processes in buffered, piped, or standard modes.
 /// </summary>
 /// <remarks>
-///     The <c>PowershellProcessInvoker</c> class specialises in executing commands via PowerShell,
-///     utilising the
-///     underlying process invoker functionality. It is designed for scenarios where
-///     PowerShell-specific process
-///     handling and configurations are required, such as redirecting outputs or managing window
-///     creation.
+///     The <c>PowershellProcessInvoker</c> is now a thin convenience wrapper around
+///     <see cref="CliInvoke.ProcessInvoker"/> with <see cref="CliInvoke.Specializations.Middleware.PowerShellMiddleware"/>
+///     applied. The middleware (which delegates shell-flag and target resolution to
+///     <see cref="CliInvoke.Specializations.Configurations.PowershellProcessConfiguration"/>) is the single source of truth for PowerShell
+///     wrapping; this class simply forwards each invocation.
+///     <para>
+///         Window creation and shell-execution semantics use the unified defaults
+///         (<c>windowCreation = false</c>, <c>useShellExecution = false</c>), matching
+///         <see cref="CliInvoke.Specializations.Middleware.PowerShellMiddleware"/> and
+///         <see cref="ProcessConfiguration"/>. To run a command inside PowerShell with non-default
+///         window-creation or shell-execution behaviour, prefer the
+///         <see cref="CliInvoke.ProcessInvoker"/> middleware path directly via
+///         <c>UsePowerShell(windowCreation, useShellExecution)</c>.
+///     </para>
 /// </remarks>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("macos")]
 [SupportedOSPlatform("linux")]
 public class PowershellProcessInvoker : IProcessInvoker
 {
-    private readonly IRunnerConfigurationFactory _runnerConfigurationFactory;
-    
-    private readonly bool _windowCreation;
-    private readonly bool _useShellExecution;
-    private readonly IFilePathResolver _filePathResolver;
-    private readonly IExternalProcessFactory _externalProcessFactory;
+    private readonly ProcessInvoker _processInvoker;
 
     /// <summary>
+    ///     Initialises a new instance of the <see cref="PowershellProcessInvoker"/> class.
     /// </summary>
-    /// <param name="runnerConfigurationFactory"></param>
-    /// <param name="filePathResolver"></param>
-    /// <param name="externalProcessFactory"></param>
-    /// <param name="windowCreation"></param>
-    /// <param name="useShellExecution"></param>
+    /// <param name="filePathResolver">
+    ///     The resolver used to locate the <c>pwsh</c> / <c>pwsh.exe</c> executable.
+    /// </param>
+    /// <param name="externalProcessFactory">The factory used to create external processes.</param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     public PowershellProcessInvoker(
-        IRunnerConfigurationFactory runnerConfigurationFactory, IFilePathResolver filePathResolver,
-        IExternalProcessFactory externalProcessFactory,
-        bool windowCreation = true, bool useShellExecution = false)
+        IFilePathResolver filePathResolver,
+        IExternalProcessFactory externalProcessFactory)
     {
-        _runnerConfigurationFactory = runnerConfigurationFactory;
-        _windowCreation = windowCreation;
-        _useShellExecution = useShellExecution;
-
-        _filePathResolver = filePathResolver;
-        _externalProcessFactory = externalProcessFactory;
+        _processInvoker =
+            new ProcessInvoker(externalProcessFactory)
+                .UsePowerShell(filePathResolver, windowCreation: false, useShellExecution: false);
     }
 
-    private ProcessConfiguration GetPowershellProcessConfiguration(bool redirectOutputs)
-    {
-        return new PowershellProcessConfiguration(
-            _filePathResolver, arguments: "-NoProfile -NonInteractive -Command", false, redirectOutputs,
-            Directory.GetCurrentDirectory(),
-            windowCreation: _windowCreation, useShellExecution: _useShellExecution);
-    }
-    
-    private static void ThrowIfUnsupported()
-    {
-        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS() ||
-            OperatingSystem.IsBrowser())
-            throw new PlatformNotSupportedException();
-    }
-    
     /// <summary>
     ///     Executes a PowerShell process asynchronously using the specified configuration.
     /// </summary>
@@ -102,22 +85,11 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public async Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
+    public Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        ThrowIfUnsupported();
-        
-        using ProcessConfiguration runnerConfiguration =
-            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                GetPowershellProcessConfiguration(false));
-
-        using IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default);
-
-        await externalProcess.StartAsync(cancellationToken);
-
-        return await externalProcess.WaitForExitOrTimeoutAsync(cancellationToken);
+        return _processInvoker.ExecuteAsync(processConfiguration, processExitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -144,23 +116,12 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public async Task<BufferedProcessResult> ExecuteBufferedAsync(
+    public Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        ThrowIfUnsupported();
-        
-        using ProcessConfiguration runnerConfiguration =
-            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                GetPowershellProcessConfiguration(true));
-
-        using IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default);
-
-        await externalProcess.StartAsync(cancellationToken);
-
-        return await externalProcess.CaptureBufferedResultAsync(cancellationToken);
+        return _processInvoker.ExecuteBufferedAsync(processConfiguration, processExitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -187,21 +148,10 @@ public class PowershellProcessInvoker : IProcessInvoker
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null, 
+    public Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
+        ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        ThrowIfUnsupported();
-        
-        using ProcessConfiguration runnerConfiguration =
-            _runnerConfigurationFactory.CreateRunnerConfiguration(processConfiguration,
-                GetPowershellProcessConfiguration(true));
-
-        using IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(processConfiguration,
-            processExitConfiguration ?? ProcessExitConfiguration.Default);
-
-        await externalProcess.StartAsync(cancellationToken);
-
-        return await externalProcess.CapturePipedResultAsync(cancellationToken);
+        return _processInvoker.ExecutePipedAsync(processConfiguration, processExitConfiguration, cancellationToken);
     }
 }

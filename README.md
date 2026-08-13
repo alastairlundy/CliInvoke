@@ -1,9 +1,9 @@
 # CliInvoke
 
 <!-- Badges -->
-[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke.svg?style=flat-square&label=Latest%20Stable%20Release)](https://www.nuget.org/packages/CliInvoke/)
-[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke.svg?style=flat-square&label=Latest%20Pre-Release)](https://www.nuget.org/packages/CliInvoke/)
-[![Downloads](https://img.shields.io/nuget/dt/CliInvoke.svg?style=flat-square)](https://www.nuget.org/packages/CliInvoke/)
+[![Latest NuGet](https://img.shields.io/nuget/v/CliInvoke?style=flat-square&label=Latest%20Stable%20Release)](https://www.nuget.org/packages/CliInvoke/)
+[![Latest Pre-release NuGet](https://img.shields.io/nuget/vpre/CliInvoke?style=flat-square&label=Latest%20Pre-Release)](https://www.nuget.org/packages/CliInvoke/)
+[![Downloads](https://img.shields.io/nuget/dt/CliInvoke?style=flat-square)](https://www.nuget.org/packages/CliInvoke/)
 [![GitHub License](https://img.shields.io/github/license/alastairlundy/CliInvoke?style=flat-square)](https://github.com/alastairlundy/CliInvoke/blob/main/LICENSE.txt)
 ![OpenSSF Scorecard Score](https://img.shields.io/ossf-scorecard/github.com/alastairlundy/CliInvoke?style=flat-square&label=OpenSSF%20Scorecard%20Score)
 
@@ -19,7 +19,10 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Comparison vs Alternatives](#comparison-vs-alternatives)
 * [Installing CliInvoke](#installing-cliinvoke)
     * [Supported Platforms](#supported-platforms)
-* [CliInvoke Examples](#examples)
+* [Examples](#examples)
+* [Middleware](#middleware)
+* [Resource Disposal](#resource-disposal)
+* [Documentation](#documentation)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
 * [Used By](#used-by)
 * [Roadmap](#cliinvokes-roadmap)
@@ -29,7 +32,7 @@ Launch processes, redirect standard input and output streams, await process comp
 ## Features
 
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
-* Supports .NET 8 and newer TFMs and has few dependencies.
+* Supports .NET 10 and has few dependencies.
 * Has Dependency Injection extensions to make using it a breeze.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
   Windows <sup>1</sup>
@@ -60,7 +63,7 @@ Notes:
 
 ## Installing CliInvoke
 
-CliInvoke is available on [the NuGet Gallery](https://nuget.org) but call be also installed via the ``dotnet`` SDK CLI.
+CliInvoke is available on [the NuGet Gallery](https://nuget.org) but can also be installed via the ``dotnet`` SDK CLI.
 
 The package(s) to install depends on your use case:
 
@@ -86,7 +89,7 @@ The package(s) to install depends on your use case:
 
 CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
 
-For more details see the [list of supported platforms](docs/docs/Supported-OperatingSystems.md)
+For more details see the [list of supported platforms](site/docs/Supported-OperatingSystems.md)
 
 ## Design Patterns & When to Use Them
 
@@ -127,346 +130,125 @@ Console.WriteLine(result.StandardError);
 
 For detailed documentation on all available patterns and when to use them, see [PATTERNS.md](PATTERNS.md).
 
-### Advanced Configuration with Builders
-CliInvoke features several builder interfaces with advanced features intended for developers needing fine‑grained control of process configuration. For most common scenarios creating a ``ProcessConfiguration`` directly or using the static ``ProcessConfigurationFactory`` is sufficient.
+### Advanced Configuration
 
-These examples use ``IProcessInvoker`` but the ``IExternalProcess`` and ``IExternalProcessFactory`` pattern can be used instead as they both work with ``ProcessConfiguration`` objects.
+For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](site/docs/guides/configuration.md)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
 
-The following examples show how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the
-output is desired.
+## Middleware
 
-#### Non-Buffered Execution Example
+CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns (logging, validation, platform selection, retries, …) around the terminal process pipeline without changing how you call it. The pipeline remains the "leaf" that actually starts and waits on the process; middleware wraps it in the order you register.
 
-This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
+### When to use middleware, and the two constructors
+
+`ProcessInvoker` has two constructors:
 
 ```csharp
-using CliInvoke;
-using CliInvoke.Core;
+// 1. No middleware — the classic, unchanged behavior.
+public ProcessInvoker(IExternalProcessFactory externalProcessFactory);
 
-using CliInvoke.Builders;
-using CliInvoke.Core.Builders;
-
-using Microsoft.Extensions.DependencyInjection;
-
-  //Namespace and class code ommitted for clarity 
-
-  // ServiceProvider and Dependency Injection setup code oomittedfor clarity
-  
-  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-
-  // Fluently configure your Command.
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
-                            .SetArguments(["arg1", "arg2"])
-                            .SetWorkingDirectory("/Path/To/Directory");
-  
-  // Build it as a ProcessConfiguration object when you're ready to use it.
-  ProcessConfiguration config = builder.Build();
-  
-  // Execute the process through ProcessInvoker and get the results.
-ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
+// 2. With middleware — every invocation runs through the chain, in order,
+//    before the terminal pipeline executes.
+public ProcessInvoker(
+    IExternalProcessFactory externalProcessFactory,
+    IEnumerable<IProcessMiddleware> middlewares);
 ```
 
-#### Buffered Execution Example
-
-This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
+Each constructor has an overload that also accepts a `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
 
 ```csharp
-using CliInvoke;
-using CliInvoke.Builders;
+using CliInvoke.Core.Middleware; // MiddlewareItems
 
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
-
-using Microsoft.Extensions.DependencyInjection;
-
-
-  //Namespace and class code ommitted for clarity
-  // ServiceProvider and Dependency Injection setup code ommitted for clarity
-  
-  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-
-  // Fluently configure your Command.
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
-                            .SetArguments(["arg1", "arg2"])
-                            .SetWorkingDirectory("/Path/To/Directory")
-                            .RedirectStandardOutput(true)
-                           .RedirectStandardError(true);
-  
-  // Build it as a ProcessConfiguration object when you're ready to use it.
-  ProcessConfiguration config = builder.Build();
-  
-  // Execute the process through ProcessInvoker and get the results.
-BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
+var items = new MiddlewareItems();
+items.Set("Logger", myLogger);
+var invoker = new ProcessInvoker(factory, items).UseLogging();
 ```
 
-### Cancellation and Timeout
-CliInvoke provides flexible timeout and cancellation support for process execution. By default, processes have a **10-minute timeout** with graceful exit behaviour.
+Use the first constructor when you don't need middleware. Use the second (or one of the `Use…` extension methods below) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
 
-#### Default Timeout Policy
+### The `IProcessMiddleware` contract
 
-The default timeout policy is used without explicit configuration:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
-
-// Uses the default timeout with graceful exit
-ProcessResult result = await CliRun.RunAsync("dotnet", "build");
-```
-
-#### Custom Timeout Configuration
-
-You can customize the timeout by creating a `ProcessExitConfiguration` with a `ProcessTimeoutPolicy`:
+A middleware is any `IProcessMiddleware` implementation. It receives the `InvocationContext` and a `next` delegate; calling `next` continues the chain (or the terminal pipeline), omitting it short-circuits:
 
 ```csharp
-using CliInvoke;
-using CliInvoke.Core;
-using CliInvoke.Builders;
-
-// Create a custom timeout policy (5-minute timeout with graceful exit)
-ProcessTimeoutPolicy customTimeout = ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(5));
-ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(customTimeout);
-
-IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("dotnet")
-    .SetArguments(["build"]);
-
-ProcessConfiguration config = builder.Build();
-
-// Execute with custom timeout
-IProcessInvoker invoker = new ProcessInvoker(FilePathResolver.Shared);
-ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
-```
-
-#### Disable Timeout
-
-To disable the timeout entirely, use `ProcessTimeoutPolicy.None`:
-
-```csharp
-ProcessExitConfiguration noTimeout = new ProcessExitConfiguration(ProcessTimeoutPolicy.None);
-// Process will wait indefinitely for completion
-```
-
-#### Cancellation Support
-Cancel process execution using a `CancellationToken`:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
-using System.Threading;
-
-CancellationTokenSource cts = new CancellationTokenSource();
-
-// Cancel after 30 seconds
-cts.CancelAfter(TimeSpan.FromSeconds(30));
-
-try
+public interface IProcessMiddleware
 {
-    ProcessResult result = await CliRun.RunAsync("dotnet", "build", 
-        cancellationToken: cts.Token);
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("Process was cancelled");
+    Task InvokeAsync(
+        InvocationContext context,
+        Func<InvocationContext, CancellationToken, Task> next);
 }
 ```
 
-##### Graceful vs Forceful Cancellation
+Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag). For example, `LoggingMiddleware` resolves an `ILogger` from that bag under the well-known key `"Logger"`.
 
-CliInvoke supports two cancellation strategies, controlled via `ProcessExitBehaviour`:
+### Built-in middleware
 
-* **Graceful Exit** (default) – Sends SIGTERM/SIGINT signals to allow the process to shut down cleanly and release resources. The process has an opportunity to handle the signal and exit gracefully.
-* **Forceful Exit** – Forcefully terminates the process and all child processes immediately without waiting for graceful shutdown.
-
-You can configure the cancellation behavior when a timeout occurs or when cancellation is requested:
+The public API is the **extension methods**, not the middleware classes (which are internal). All of them return a *new* `ProcessInvoker`, so they compose fluently:
 
 ```csharp
-using CliInvoke;
-using CliInvoke.Core;
+using CliInvoke;                       // ProcessInvoker
+using CliInvoke.Extensions.Middleware;            // UseLogging
+using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation
+using CliInvoke.Specializations.Middleware;        // UsePowerShell, UseCmd
 
-// Configure forceful exit on timeout (immediate termination)
-ProcessTimeoutPolicy forcefulTimeout = new ProcessTimeoutPolicy(
-    timeoutThreshold: TimeSpan.FromSeconds(30), 
-    enabled: true, 
-    exitBehaviour: ProcessExitBehaviour.ForcefulExit);
+// Log entry/exit (and each stdout/stderr line at Debug) for every invocation:
+ProcessInvoker loggingInvoker = new ProcessInvoker(factory).UseLogging();
 
-ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(forcefulTimeout);
+// Validate the result after exit (throws ProcessValidationException on failure):
+ProcessInvoker validatedInvoker = new ProcessInvoker(factory)
+    .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero());
+
+// Run the command inside PowerShell Core / Windows cmd.exe:
+ProcessInvoker psInvoker = new ProcessInvoker(factory).UsePowerShell();
+ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
 ```
 
-##### Cancellation Exception Behavior
+* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
+* `UsePostExitValidation(options)` — runs a rule against the `ProcessResult` and throws `ProcessValidationException` when it fails. Helpers: `PostExitValidationOptions.ExitCodeIsZero()`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell` also has an overload `UsePowerShell(windowCreation, useShellExecution)` for non-default behaviour; the parameterless form defaults both to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behavior mirrors `CmdProcessInvoker`.
 
-By default, cancellations do not throw exceptions—the process simply exits and a result is returned. You can change this behavior with `CancellationThrowsException`:
+### Result-ownership and disposal through the chain
 
-```csharp
-using CliInvoke;
-using CliInvoke.Core;
+Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. See **[Resource Disposal](#resource-disposal)** for the full ownership rules and checklist.
 
-// Configure to throw an exception on cancellation
-ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(
-    timeoutPolicy: ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)),
-    requestedCancellationExitBehaviour: ProcessExitBehaviour.GracefulExit,
-    cancellationThrowsException: true);
+### The result-swap rule
 
-try
-{
-    ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("Process was cancelled and exception was thrown");
-}
-```
+By default, middleware does **not** mutate the `ProcessResult` object. Logging and post-exit validation pass the result through unchanged. Platform-selection middleware (`UsePowerShell` / `UseCmd`) substitutes the result of the wrapped `pwsh` / `cmd.exe` invocation — the caller still sees a normal `ProcessResult`, but the data comes from the wrapped shell, not from the original command. Transforming or replacing the result is a deliberate, niche operation: a middleware that does so should write the new result onto `InvocationContext.Result` so the caller receives it.
 
-## Resource Cleanup
+## Resource Disposal
 
-CliInvoke uses several types that manage unmanaged resources and should be disposed after use. This section explains disposal patterns for the key artifacts:
+> [!IMPORTANT]
+> CliInvoke has exactly **five Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
+>
+> | # | Type | What it owns |
+> |---|------|-------------|
+> | 1 | `ProcessConfiguration` | `StreamWriter` (StandardInput), optional `UserCredential` |
+> | 2 | `IExternalProcess` | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
+> | 3 | `PipedProcessResult` | `StandardOutput` and `StandardError` streams |
+> | 4 | `UserCredential` | `SecureString` password buffer |
+> | 5 | `UserCredentialBuilder` | `SecureString` password buffer staged for `Build()` |
+>
+> No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 
-### ProcessConfiguration
+For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](site/docs/guides/resource-disposal.md)**.
 
-**Why**: Holds unmanaged resources including `StandardInput` (a `StreamWriter`) and optionally a `SecureString` credential that contain sensitive data.
+> [!NOTE]
+> Middleware does not change these rules. A middleware chain returns the process result **un-disposed** to the caller, so the disposal contract described above applies exactly as it does without middleware. See **[Middleware](#middleware)** for the result-ownership note.
 
-**Who**: The caller owns the `ProcessConfiguration` instance and is responsible for disposal.
+## Documentation
 
-**When**: After the process has finished and the configuration is no longer needed.
+Full documentation is available in the [CliInvoke Developer Portal](site/docs/readme.md). Pick the path that fits you:
 
-**How**: Use a `using` statement or explicit `Dispose()`:
+| Who you are | Start here |
+|---|---|
+| **Beginner** — "I just need to run a command" | [Quickstart](site/docs/getting-started-quickstart.md) → [Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md) |
+| **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](site/docs/getting-started.md) → [Configuration](site/docs/guides/configuration.md) |
+| **Power User** — "I need full lifecycle control" | [Choosing your Invocation Pattern → IExternalProcess](site/docs/guides/choosing-invocation-pattern.md#iexternalprocess--power-user-lifecycle-control) → [Architecture](site/docs/guides/architecture.md) |
 
-```csharp
-using var config = new ProcessConfiguration("cmd", "/c echo hello");
-await invoker.ExecuteAsync(config);
-// Disposed automatically when exiting the using block
-```
-
-### IExternalProcess
-
-**Why**: Wraps an underlying `System.Diagnostics.Process` which owns OS resources (pipes, handles, threads).
-
-**Who**: The caller who receives or creates the external process instance.
-
-**When**: Immediately after `CaptureBufferedResultAsync()` completes or when monitoring is complete.
-
-**How**: Use `await using` in async contexts:
-
-```csharp
-await using var process = invoker.StartAsync(config);
-var result = await process.CaptureBufferedResultAsync(cancellationToken);
-// Process is disposed automatically
-```
-
-Alternatively, call `Dispose()` explicitly:
-
-```csharp
-var process = invoker.StartAsync(config);
-try
-{
-    var result = await process.CaptureBufferedResultAsync(cancellationToken);
-}
-finally
-{
-    process.Dispose();
-}
-```
-
-### PipedProcessResult
-
-**Why**: Holds `StandardOutput` and `StandardError` streams that own OS resources and buffered data, which must be released.
-
-**Who**: The caller who receives the result from `CapturePipedResultAsync()`.
-
-**When**: After reading from the streams and before the application exits or the result is no longer needed.
-
-**How**: Use `await using` for async disposal (preferred on .NET 8+) or `using` for sync disposal:
-
-```csharp
-await using var result = await process.CapturePipedResultAsync(cancellationToken);
-using (var reader = new StreamReader(result.StandardOutput))
-{
-    string output = await reader.ReadToEndAsync();
-    // Use output...
-}
-// Streams are disposed automatically
-```
-
-Alternatively, call `Dispose()` explicitly:
-
-```csharp
-var result = await process.CapturePipedResultAsync(cancellationToken);
-try
-{
-    using (var reader = new StreamReader(result.StandardOutput))
-    {
-        string output = await reader.ReadToEndAsync();
-    }
-}
-finally
-{
-    result.Dispose();
-}
-```
-
-### UserCredential
-
-**Why**: Holds a `SecureString` containing a password, which is sensitive data that should be cleared from memory.
-
-**Who**: Shared responsibility — the library disposes the credential when the configuration is disposed. For standalone credentials, the caller is responsible.
-
-**When**: After the credential is no longer needed or when the parent configuration is disposed.
-
-**How**: Dispose directly or via the parent `ProcessConfiguration`:
-
-```csharp
-using var credential = new UserCredential("domain", "user", securePassword, false);
-// Use credential...
-// Disposed automatically; SecureString is cleared from memory
-```
-
-Or, rely on automatic disposal through the configuration:
-
-```csharp
-var config = new ProcessConfiguration("cmd", "/c echo hello");
-config.Credential = credential;
-using (config)
-{
-    // Use configuration; credential is disposed when config is disposed
-}
-```
-
-### UserCredentialBuilder
-
-**Why**: Holds a `SecureString` while building a credential, which owns sensitive data.
-
-**Who**: The caller who creates and uses the builder.
-
-**When**: Immediately after calling `Build()` if the builder is not needed for further mutations.
-
-**How**: Dispose both builder and built credential:
-
-```csharp
-UserCredential credential;
-using (var builder = new UserCredentialBuilder())
-{
-    credential = builder
-        .SetUsername("user")
-        .SetPassword(securePassword)
-        .Build();
-}
-// builder disposed; now dispose the credential
-using (credential)
-{
-    // Use credential...
-}
-```
-
-#### Common Disposal Tips
-
-* Prefer `await using` for `IExternalProcess` and `PipedProcessResult` in async contexts to ensure cleanup.
-* Never dispose a `StandardInput`, `StandardOutput`, `StandardError`, or `SecureString` twice — the library handles it when owning the resources.
-* If you reuse a `ProcessConfiguration` multiple times, call `Dispose()` manually after the final use.
-* Wrap builders and built credentials in `using` statements to ensure `SecureString` cleanup.
-* Only these five types require explicit disposal: `ProcessConfiguration`, `IExternalProcess`, `UserCredential`, `UserCredentialBuilder`, and `PipedProcessResult`. Other CliInvoke types do not implement `IDisposable`.
+Other guides: [Troubleshooting](site/docs/guides/troubleshooting.md) · [Migration Guides](site/docs/migration-guides/readme.md) · [Building from Source](site/docs/building-cliinvoke.md)
 
 ## How to Build CliInvoke's code
 
-Please see [building-cliinvoke.md](docs/docs/building-cliinvoke.md) for how to build CliInvoke from source.
+Please see [building-cliinvoke.md](site/docs/building-cliinvoke.md) for how to build CliInvoke from source.
 
 ## How to Contribute to CliInvoke
 
@@ -492,7 +274,7 @@ Want your project added to this list? [Open an issue](https://github.com/alastai
 
 CliInvoke aims to make working with Commands and external processes easier.
 
-Whilst there is a modest set of features are available today, there is room for more features and for modifications of
+Whilst there is a modest set of features available today, there is room for more features and for modifications of
 existing features in future updates.
 
 Future updates may focus on one or more of the following:
@@ -504,10 +286,10 @@ Future updates may focus on one or more of the following:
 
 ## New vs Old Package and Namespace
 
-CliInvoke changed it's Nuget package Id and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
+CliInvoke changed its NuGet package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
 since been published directly under the ``CliInvoke`` package ID prefix and namespace.
 
-The previous packages Ids are marked as deprecated and will not receive future updates.
+The previous package IDs are marked as deprecated and will not receive future updates.
 
 ## License
 

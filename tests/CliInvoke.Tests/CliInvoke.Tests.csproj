@@ -21,6 +21,7 @@
     <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />
     <ProjectReference Include="..\..\src\CliInvoke.Extensions\CliInvoke.Extensions.csproj" />
     <ProjectReference Include="..\..\src\CliInvoke\CliInvoke.csproj" />
+    <ProjectReference Include="..\CliInvoke.Tests.Helpers\CliInvoke.Tests.Helpers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Invokers\Cancellation\" />

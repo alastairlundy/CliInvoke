@@ -113,6 +113,9 @@ public class UserCredentialBuilder : IUserCredentialBuilder
     public UserCredential Build() =>
         new(_domain, _userName, _userPassword, _loadUserProfile);
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void Dispose()
     {
         _userPassword?.Dispose();

@@ -83,9 +83,7 @@ public static class ConfigurationExtensions
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
                 .SetStandardInputPipe(StreamWriter.Null)
                 .SetEncoding(
-#if NET8_0_OR_GREATER
-                    processStartInfo.StandardInputEncoding, 
-#endif
+                    processStartInfo.StandardInputEncoding,
                     processStartInfo.StandardOutputEncoding, processStartInfo.StandardErrorEncoding);
             
             

@@ -9,7 +9,7 @@
 
 using System.Linq;
 
-using DotExtensions.Versions;
+using CliInvoke.Internal.Versions;
 
 namespace CliInvoke;
 

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net10.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
@@ -15,42 +15,30 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>
-### Added
-- New `ProcessControlAdapter` abstraction (`BaseProcessControlAdapter`, `WindowsProcessControlAdapter`, `UnixProcessControlAdapter`) to decouple OS-specific process control logic (suspend, resume, resource policy) from `ProcessWrapper`
-- `ProcessControlAdapterFactory` for platform-specific adapter creation
-- `src/global.json` pinning .NET SDK 10.0.0 with `latestMajor` roll-forward and prerelease support
-- Re-enabled `Polyfill` NuGet package reference (was previously commented out)
+        <PackageReleaseNotes>### ⚠️ Breaking Changes
+- **Removed** support for `net8.0` and `net9.0`. This package now targets `net10.0` only.
 
-### Changed
-* Updated internal Polyfill version from 10.7.0 to 10.10.0
-* Updated DotExtensions version from 10.3.2 to 10.3.3
-- **Architecture rework**: `ProcessInvoker` and `CliRun` now delegate to `IExternalProcess` via `IExternalProcessFactory` instead of directly constructing and managing `ProcessWrapper` instances
-- `ProcessWrapper` moved from `CliInvoke.Helpers` to `CliInvoke.Processes.Internal` namespace
-- Process cancellation and piping code consolidated into the internal `ProcessWrapper`
-- Cancellation helpers (`CancellationHelper`, `CancellationReason`) moved to `CliInvoke.Processes.Internal.Cancellation`
-- `ExternalProcess.CaptureBufferedResultAsync` reworked to use `ProcessWrapper.ReadAllTextAsync` instead of separate `StandardOutput.ReadToEndAsync` / `StandardError.ReadToEndAsync` calls
-- Enabled `GenerateDocumentationFile` globally in `Directory.Build.props`
-- `ArgumentsBuilder`: replaced `var` with explicit `List&lt;string&gt;` / `List&lt;IFormattable&gt;` types for clarity
-- Fixed trailing semicolon in `TargetFrameworks` (`net10.0;net8.0;net9.0;` → `net10.0;net8.0;net9.0`)
+### 🆕 Additions
+- **Added new `FireAndForget` methods to `CliRun`** (the static facade in `src/CliInvoke/Extensions/CliRun.cs`):
+  - `FireAndForget(ProcessConfiguration configuration)` — disposes the spawned `IExternalProcess` after starting it.
+  - `FireAndForget(string targetFilePath, string arguments = "", string? workingDirectory = null)` — builds the configuration via the new `BuildStringArgsConfig` helper and returns the spawned process ID.
 
-### Fixed
-- **Process exit semaphore leak on Unix systems** — the cancellation semaphore was not being released in all exit paths
-- Buffered output reading race condition in `ExternalProcess` by consolidating stdout/stderr reads into a single `ReadAllTextAsync` call
+### ⚙️ Modifications
+- Extracted `BuildStringArgsConfig` as a private static helper in `CliRun` to eliminate the duplicated 5-line configuration-build block that previously appeared in each of the three string-argument `Run*Async` overloads.
+- Routed the three configuration-argument public overloads (`RunAsync`, `RunBufferedAsync`, `RunPipedAsync`) through a single `RunInternalAsync&lt;T&gt;` funnel that calls the (possibly user-supplied) `IExternalProcessFactory`, starts the process, and applies the chosen capture delegate.
+- Switched the default `_externalProcessFactory` field to construct an `ExternalProcessFactory` per call (capturing the current static file-path resolver), so changes to `UseFilePathResolver` take effect on subsequent calls instead of being frozen at first access.
+- Implemented a synchronous `int Start()` method on `ExternalProcess` that resolves the target file path, swaps the process wrapper if needed, and starts the process; added matching `HasStarted` guards to both `StartAsync` overloads.
+- **Removed** the original (broken) `FireAndForget(CancellationToken)` method implementation from `ExternalProcess`, since the FireAndForget surface has moved up to `CliRun` and the `IExternalProcess` declaration has been removed.
+- Wired up the new synchronous `Start()` so that the `Started` and `Exited` events on `ExternalProcess` are raised as the process transitions through the started and exited states.
+- Collapsed `ProcessWrapper`'s semaphore-driven critical section into a single `WaitForExitCoreAsync` method that owns the semaphore acquire/release pair; the two wrapper methods now delegate to it with `isGraceful: true` and `isGraceful: false`, respectively. Removed the inner `_cancellationSemaphore.WaitAsync(0)` and `Release()` calls from `CancelWithInterrupt`.
 
-### Removed
-- `CliInvoke.Helpers.ProcessWrapper` (replaced by `CliInvoke.Processes.Internal.ProcessWrapper`)
-- `CliInvoke.Helpers.Processes.ProcessCancellationExtensions` (consolidated into internal `ProcessWrapper`)
-- `CliInvoke.Helpers.Processes.ProcessPipingHelper` (consolidated into internal `ProcessWrapper`)
-- `CliInvoke.Helpers.Processes.ToStartInfoExtensions` (moved to internal usage)
-- `CliInvoke.Helpers.Processes.ApplyInfos.ApplyConfigurationToProcessStartInfo` (moved to `ProcessControlAdapters`)
-- `CliInvoke.Helpers.Processes.ApplyInfos.ProcessSetPolicyExtensions` (moved to `ProcessControlAdapters`)
-- `CliInvoke.Helpers.Processes.Cancellation.UnixGracefulCancellation` (consolidated into `UnixProcessControlAdapter`)
-- `CliInvoke.Helpers.Processes.Cancellation.WindowsGracefulCancellation` (consolidated into `WindowsProcessControlAdapter`)</PackageReleaseNotes>
+### 🐛 Bug Fixes
+- Restructured `ProcessWrapper.OnStarted` with nested `try-catch-finally` blocks so that `ResumeProcess()` is always called — even when `SetResourcePolicy()` throws after `SuspendProcess()` succeeded — preventing the child process from being permanently suspended. Also fixed the suspended-resume TODO to reference the actual .NET 11 API names (`ProcessStartInfo.StartSuspended` and `SafeProcessHandle.Resume`).
+- Fixed the Windows graceful-cancellation cascade in `WindowsProcessControlAdapter`: replaced `AllocConsole` with `AttachConsole` targeting the child PID, switched from `CTRL_C_EVENT` (a documented no-op for non-zero group IDs) to `CTRL_BREAK_EVENT` targeted at the correct process group, added `FreeConsole` cleanup, and used the PID directly as the process-group ID since `CreateNewProcessGroup` is not set. The fallback path now exits cleanly with `ERROR_INVALID_HANDLE` instead of sending a no-op signal.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.5</PackageVersion>
+        <PackageVersion>3.0.0-alpha.7</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -76,12 +64,12 @@
         <InternalsVisibleTo Include="CliInvoke.Extensions"/>
     </ItemGroup>
 
-    <ItemGroup>
+<!--    <ItemGroup>
         <PackageReference Include="DotExtensions"/>
        <PackageReference Include="Polyfill" PrivateAssets="all">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-    </ItemGroup>
+    </ItemGroup>-->
 
     <PropertyGroup>
         <!-- default false, CI can set to true -->

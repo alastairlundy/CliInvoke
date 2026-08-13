@@ -6,71 +6,61 @@ namespace CliInvoke.Tests.Helpers.Processes;
 
 public class ProcessCancellationTests
 {
-    //[Test]
+    [Test]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    [Test]
     public async Task ProcessCancelled_TimeSpanOnlyOverload_Delay_Graceful_Success()
     {
-        //Arrange 
-        string filePath = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "/usr/bin/sleep" : "timeout";
-        string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "30" : "/T 30 /NOBREAK";
-        ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
-        
+        string markerPath = Path.Combine(Path.GetTempPath(),
+            $"cliinvoke-process-cancel-timespan-{Guid.NewGuid():N}.marker");
+
+        const int timeoutSeconds = 3;
+        const int ceilingSeconds = timeoutSeconds * 2;
+
+        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 10);
+
         ProcessExitConfiguration processExitConfiguration = new(
-            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(10)));
-
-        //Act
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(timeoutSeconds)));
 
         process.Start();
 
         int processId = process.Id;
 
-        await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
+        try
+        {
+            Task waitTask = process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
+            Task ceiling = Task.Delay(TimeSpan.FromSeconds(ceilingSeconds));
+            Task completed = await Task.WhenAny(waitTask, ceiling);
 
-        await Task.Delay(1000, CancellationToken.None);
+            if (completed == ceiling)
+            {
+                string diagnostic = GetCeilingDiagnostic(markerPath, process, timeoutSeconds);
+                Assert.Fail(diagnostic);
+            }
 
-        bool actual = Process.GetProcesses().Any(x => x.Id == processId);
+            await Task.Delay(1000, CancellationToken.None);
 
-        //Assert
-        await Assert.That(actual).IsFalse();
+            bool actual = Process.GetProcesses().Any(x => x.Id == processId);
+
+            await Assert.That(actual).IsFalse();
+        }
+        finally
+        {
+            if (!process.HasExited)
+            {
+                try { process.Kill(true); } catch { process.Kill(); }
+            }
+
+            process.Dispose();
+
+            if (File.Exists(markerPath))
+                File.Delete(markerPath);
+        }
     }
-
-    /*[Fact]
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    public async Task ProcessCancelled_Normal_Delay_DefaultTimeOutPolicy_Success()
-    {
-        //Arrange
-        string filePath = ProcessTestHelper.GetTargetFilePath();
-        ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, "");
-
-        ProcessExitConfiguration processExitConfiguration = new(ProcessTimeoutPolicy.Default,
-            ProcessResultValidation.None, ProcessCancellationExceptionBehavior.SuppressException);
-
-        //Act
-
-        process.Start();
-
-        int processId = process.Id;
-
-        await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
-
-        await Task.Delay(1000, TestContext.Current.CancellationToken);
-
-        bool actual = Process.GetProcesses().Any(x => x.Id == processId);
-
-        //Assert
-        Assert.False(actual);
-    }*/
 
     [Test]
     [SupportedOSPlatform("windows")]
@@ -81,31 +71,72 @@ public class ProcessCancellationTests
     [UnsupportedOSPlatform("tvos")]
     public async Task ProcessCancelled_Normal_Delay_CancelAfter30Seconds_Success()
     {
-        //Arrange 
-        string filePath = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "/usr/bin/sleep" : "timeout";
-        string args = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() ? "60" : "/T 60 /NOBREAK";
-        ProcessWrapper process = ProcessTestHelper.CreateProcess(filePath, args);
+        string markerPath = Path.Combine(Path.GetTempPath(),
+            $"cliinvoke-process-cancel-normal-{Guid.NewGuid():N}.marker");
+
+        const int timeoutSeconds = 3;
+        const int ceilingSeconds = timeoutSeconds * 2;
+
+        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 10);
 
         ProcessExitConfiguration processExitConfiguration = new(
-            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(15)), cancellationThrowsException: false);
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(timeoutSeconds)),
+            cancellationThrowsException: false);
 
-        //Act
         process.Start();
 
         int processId = process.Id;
+
         try
         {
-            await process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
+            Task waitTask = process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
+            Task ceiling = Task.Delay(TimeSpan.FromSeconds(ceilingSeconds));
+            Task completed = await Task.WhenAny(waitTask, ceiling);
+
+            if (completed == ceiling)
+            {
+                string diagnostic = GetCeilingDiagnostic(markerPath, process, timeoutSeconds);
+                Assert.Fail(diagnostic);
+            }
 
             await Task.Delay(1000, CancellationToken.None);
 
             bool actual = Process.GetProcesses().Any(x => x.Id == processId);
-            //Assert
+
             await Assert.That(actual).IsFalse();
         }
         finally
         {
+            if (!process.HasExited)
+            {
+                try { process.Kill(true); } catch { process.Kill(); }
+            }
+
             process.Dispose();
+
+            if (File.Exists(markerPath))
+                File.Delete(markerPath);
         }
+    }
+
+    private static string GetCeilingDiagnostic(string markerPath, ProcessWrapper process, int timeoutSeconds)
+    {
+        bool markerExists = File.Exists(markerPath);
+
+        if (!markerExists)
+        {
+            return $"Process did not receive the interrupt signal within {timeoutSeconds}s; " +
+                   $"marker file {markerPath} is missing.";
+        }
+
+        if (!process.HasExited)
+        {
+            return $"Process received the interrupt signal but did not exit within " +
+                   $"{timeoutSeconds}s after cancellation.";
+        }
+
+        return $"Process exited and marker file exists (signal was delivered), but " +
+               $"WaitForExitOrTimeoutAsync did not complete within the ceiling. " +
+               $"Possible race in wait-task completion after process exit.";
     }
 }

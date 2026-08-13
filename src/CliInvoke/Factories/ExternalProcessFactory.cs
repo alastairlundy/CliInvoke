@@ -21,12 +21,21 @@ public class ExternalProcessFactory : IExternalProcessFactory
     private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>
+    ///     Initialises a new instance of the <see cref="ExternalProcessFactory"/> class
+    ///     and allocates a default <see cref="FilePathResolver"/> internally. This
+    ///     constructor performs an implicit <see cref="FilePathResolver"/> allocation;
+    ///     callers that need a custom resolver should use the
+    ///     <see cref="ExternalProcessFactory(IFilePathResolver)"/> overload instead.
     /// </summary>
     public ExternalProcessFactory()
     {
-        _filePathResolver = FilePathResolver.Shared;
+        _filePathResolver = new FilePathResolver();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePathResolver"></param>
     public ExternalProcessFactory(IFilePathResolver filePathResolver)
     {
         _filePathResolver = filePathResolver;

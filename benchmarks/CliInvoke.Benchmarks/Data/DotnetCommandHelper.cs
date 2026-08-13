@@ -4,7 +4,7 @@ public class DotnetCommandHelper
 {
     public DotnetCommandHelper()
     {
-        FileInfo fileResult = FilePathResolver.Shared.ResolveFilePath(
+        FileInfo fileResult = new FilePathResolver().ResolveFilePath(
             OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet");
         
         DotnetExecutableTargetFilePath = fileResult.FullName;
