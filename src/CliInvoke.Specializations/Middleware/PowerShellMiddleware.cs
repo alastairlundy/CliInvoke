@@ -97,8 +97,8 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
         string originalArgs = context.Configuration.Arguments;
 
         string wrappedCommand = string.IsNullOrWhiteSpace(originalArgs)
-            ? $"\"{originalPath}\""
-            : $"\"{originalPath}\" {originalArgs}";
+            ? $"& \"{originalPath}\""
+            : $"& \"{originalPath}\" {originalArgs}";
 
         string newArguments = $"-NoProfile -NonInteractive -Command {wrappedCommand}";
 
