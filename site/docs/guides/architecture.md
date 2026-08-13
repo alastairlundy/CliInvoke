@@ -399,10 +399,16 @@ runs the rewritten configuration as if it were the original.
 
 `IProcessResultValidator<TProcessResult>` answers the question
 *“is this result acceptable, or should we raise a failure?”*. The
-default implementation evaluates a set of `Func<TProcessResult, bool>`
-rules; if any rule returns `false`, the result is considered invalid.
-The invoker raises a `ProcessNotSuccessfulException` when a validator
-configured for "must succeed" mode returns invalid.
+default implementation (`ProcessResultValidator<TProcessResult>`)
+evaluates a set of self-describing `ValidationRule<TProcessResult>`
+rules. `Validate` returns a `bool` (all rules pass), while
+`GetValidationFailures` returns the per-rule `ValidationFailure`
+instances so callers can surface detailed, rule-by-rule messages. The
+invoker raises a `ProcessNotSuccessfulException` when a validator
+configured for "must succeed" mode returns invalid. The post-exit
+validation middleware (`UsePostExitValidation`) consumes the same
+validator stack and throws `ProcessValidationException` with the
+joined per-rule failure messages.
 
 Custom validators are the supported way to add domain-specific
 post-execution checks — for example, asserting that captured output

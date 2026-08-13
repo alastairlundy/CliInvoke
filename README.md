@@ -42,17 +42,17 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Comparison vs Alternatives
 
-| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   |    [ProcessX](https://github.com/Cysharp/ProcessX)     |                             .NET Process class                             |
-|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------:|:--------------------------------------------------------------------------:|
-| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                           ❌                            | ⚠️, offers limited separation of concerns via ProcessStartInfo model class |
-| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                         |                           ❌                            |                                     ❌                                      |
-| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                           ✅                            |                            ✅ , Built into .NET                             |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                           ❌*                           |                                     ✅                                      |  
-| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                           ✅                            |           ⚠️, can lead to deadlocks or exceptions if not careful           |
+| Feature / Criterion                                                        |  CliInvoke   |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   |    [ProcessX](https://github.com/Cysharp/ProcessX)     |                             .NET Process class                             |
+|----------------------------------------------------------------------------|:------------:|:----------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------:|:--------------------------------------------------------------------------:|
+| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                        |                           ❌                           | ⚠️, offers limited separation of concerns via ProcessStartInfo model class |
+| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                        |                           ❌                           |                                     ❌                                     |
+| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                        |                           ✅                           |                            ✅ , Built into .NET                            |
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                       ✅*                                                        |                          ❌*                           |                                     ✅                                     |  
+| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                        |                           ✅                           |           ⚠️, can lead to deadlocks or exceptions if not careful           |
 | Support for Process/Command Timeout                                        |      ✅      |                              :warning:, limited to cancelling via CancellationToken                              | :warning:, limited to cancelling via CancellationToken |           :warning:, limited to cancelling via CancellationToken           |
-| Graceful Cancellation Support via SIGTERM/SIGINT Signals                   |  ✅, 2.3.0+  |                                                        ✅                                                         |                           ❌                            |                                     ❌                                      |
-| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                           ✅                            |                                     ✅                                      |  
-| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                        ✅ (MIT)                         |                    ✅ (.NET Runtime licensed under MIT)                     |
+| Graceful Cancellation Support via SIGTERM/SIGINT Signals                   |  ✅, 2.3.0+  |                                                        ✅                                                        |                           ❌                           |                                     ❌                                     |
+| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                        |                           ✅                           |                                     ✅                                     |  
+| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                        ✅ (MIT)                        |                    ✅ (.NET Runtime licensed under MIT)                    |
 
 Notes:
 
@@ -195,7 +195,7 @@ ProcessInvoker loggingInvoker = new ProcessInvoker(factory).UseLogging();
 
 // Validate the result after exit (throws ProcessValidationException on failure):
 ProcessInvoker validatedInvoker = new ProcessInvoker(factory)
-    .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero());
+    .UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
 
 // Run the command inside PowerShell Core / Windows cmd.exe:
 ProcessInvoker psInvoker = new ProcessInvoker(factory).UsePowerShell();
@@ -203,8 +203,8 @@ ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
 ```
 
 * `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
-* `UsePostExitValidation(options)` — runs a rule against the `ProcessResult` and throws `ProcessValidationException` when it fails. Helpers: `PostExitValidationOptions.ExitCodeIsZero()`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
-* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell` also has an overload `UsePowerShell(windowCreation, useShellExecution)` for non-default behaviour; the parameterless form defaults both to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behavior mirrors `CmdProcessInvoker`.
+* `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell` also has an overload `UsePowerShell(windowCreation, useShellExecution)` for non-default behaviour; the parameterless form defaults both to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
 
 ### Result-ownership and disposal through the chain
 
@@ -219,13 +219,13 @@ By default, middleware does **not** mutate the `ProcessResult` object. Logging a
 > [!IMPORTANT]
 > CliInvoke has exactly **five Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
 >
-> | # | Type | What it owns |
-> |---|------|-------------|
-> | 1 | `ProcessConfiguration` | `StreamWriter` (StandardInput), optional `UserCredential` |
-> | 2 | `IExternalProcess` | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
-> | 3 | `PipedProcessResult` | `StandardOutput` and `StandardError` streams |
-> | 4 | `UserCredential` | `SecureString` password buffer |
-> | 5 | `UserCredentialBuilder` | `SecureString` password buffer staged for `Build()` |
+> | # | Type                    | What it owns                                                      |
+> |---|-------------------------|-------------------------------------------------------------------|
+> | 1 | `ProcessConfiguration`  | `StreamWriter` (StandardInput), optional `UserCredential`         |
+> | 2 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
+> | 3 | `PipedProcessResult`    | `StandardOutput` and `StandardError` streams                      |
+> | 4 | `UserCredential`        | `SecureString` password buffer                                    |
+> | 5 | `UserCredentialBuilder` | `SecureString` password buffer staged for `Build()`               |
 >
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 
@@ -238,11 +238,11 @@ For the full disposal reference — ownership rules, disposal patterns, and a ch
 
 Full documentation is available in the [CliInvoke Developer Portal](site/docs/readme.md). Pick the path that fits you:
 
-| Who you are | Start here |
-|---|---|
-| **Beginner** — "I just need to run a command" | [Quickstart](site/docs/getting-started-quickstart.md) → [Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md) |
-| **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](site/docs/getting-started.md) → [Configuration](site/docs/guides/configuration.md) |
-| **Power User** — "I need full lifecycle control" | [Choosing your Invocation Pattern → IExternalProcess](site/docs/guides/choosing-invocation-pattern.md#iexternalprocess--power-user-lifecycle-control) → [Architecture](site/docs/guides/architecture.md) |
+| Who you are                                                        | Start here                                                                                                                                                                                               |
+|--------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Beginner** — "I just need to run a command"                      | [Quickstart](site/docs/getting-started-quickstart.md) → [Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)                                                              |
+| **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](site/docs/getting-started.md) → [Configuration](site/docs/guides/configuration.md)                                                                                                     |
+| **Power User** — "I need full lifecycle control"                   | [Choosing your Invocation Pattern → IExternalProcess](site/docs/guides/choosing-invocation-pattern.md#iexternalprocess--power-user-lifecycle-control) → [Architecture](site/docs/guides/architecture.md) |
 
 Other guides: [Troubleshooting](site/docs/guides/troubleshooting.md) · [Migration Guides](site/docs/migration-guides/readme.md) · [Building from Source](site/docs/building-cliinvoke.md)
 
@@ -252,7 +252,7 @@ Please see [building-cliinvoke.md](site/docs/building-cliinvoke.md) for how to b
 
 ## How to Contribute to CliInvoke
 
-Please see the [CONTRIBUTING.md file](CONTRIBUTING.md) for code and localization contributions.
+Please see the [CONTRIBUTING.md file](CONTRIBUTING.md) for code and localisation contributions.
 
 If you want to file a bug report or suggest a potential feature to add, please check out
 the [GitHub issues page](https://github.com/alastairlundy/CliInvoke/issues/) to see if a similar or identical issue is
@@ -265,17 +265,11 @@ the appropriate issue template.
 
 CliInvoke is used by these projects:
 
-* [WCountLib.Providers.wc](https://github.com/alastairlundy/WCount/tree/main/src/lib/WCountLib.Providers.wc) –
-  Implements WCountLib.Abstractions using the Unix ``wc`` command.
-
 Want your project added to this list? [Open an issue](https://github.com/alastairlundy/cliinvoke/issues/new/)
 
 ## CliInvoke's Roadmap
 
 CliInvoke aims to make working with Commands and external processes easier.
-
-Whilst there is a modest set of features available today, there is room for more features and for modifications of
-existing features in future updates.
 
 Future updates may focus on one or more of the following:
 

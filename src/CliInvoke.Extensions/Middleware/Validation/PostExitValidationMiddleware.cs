@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 using CliInvoke.Core.Exceptions;
 using CliInvoke.Core.Middleware;
+using CliInvoke.Core.Validation;
 
 namespace CliInvoke.Extensions.Middleware.Validation;
 
@@ -24,16 +25,16 @@ internal sealed class PostExitValidationMiddleware : IProcessMiddleware
     /// <summary>
     ///     Initializes a new instance of the <see cref="PostExitValidationMiddleware"/> class.
     /// </summary>
-    /// <param name="options">The validation options applied to the process result.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="options"/> is <c>null</c>.</exception>
-    public PostExitValidationMiddleware(PostExitValidationOptions options)
+    /// <param name="validator">The validator applied to the process result.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="validator"/> is <c>null</c>.</exception>
+    public PostExitValidationMiddleware(IProcessResultValidator<ProcessResult> validator)
     {
-        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(validator);
 
-        _options = options;
+        _validator = validator;
     }
 
-    private readonly PostExitValidationOptions _options;
+    private readonly IProcessResultValidator<ProcessResult> _validator;
 
     /// <summary>
     ///     Executes the middleware pipeline and validates the resulting process result.
@@ -53,9 +54,22 @@ internal sealed class PostExitValidationMiddleware : IProcessMiddleware
         if (result is null)
             return;
 
-        string? message = _options.Rule(result);
+        ValidationFailure<ProcessResult>[] failures = _validator.GetValidationFailures(result);
 
-        if (message is not null)
-            throw new ProcessValidationException(result, message);
+        if (failures.Length > 0)
+            throw new ProcessValidationException(result, BuildFailureMessage(failures));
+    }
+
+    private static string BuildFailureMessage(ValidationFailure<ProcessResult>[] failures)
+    {
+        string[] lines = new string[failures.Length];
+
+        for (int i = 0; i < failures.Length; i++)
+        {
+            ValidationFailure<ProcessResult> failure = failures[i];
+            lines[i] = $"{failure.Rule.Name}: {failure.FailureMessage}";
+        }
+
+        return "Process result failed validation: " + string.Join("; ", lines);
     }
 }

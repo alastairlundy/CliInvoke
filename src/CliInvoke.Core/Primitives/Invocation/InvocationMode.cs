@@ -9,10 +9,25 @@
 
 namespace CliInvoke.Core;
 
-public enum InvocationMode : int
+/// <summary>
+/// 
+/// </summary>
+public enum InvocationMode
 {
+    /// <summary>
+    /// 
+    /// </summary>
     Raw,
+    /// <summary>
+    /// 
+    /// </summary>
     Buffered,
+    /// <summary>
+    /// 
+    /// </summary>
     Piped,
+    /// <summary>
+    /// 
+    /// </summary>
     FireAndForget
 }

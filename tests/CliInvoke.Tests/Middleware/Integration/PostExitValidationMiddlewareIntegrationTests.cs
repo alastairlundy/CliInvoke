@@ -20,7 +20,7 @@ public class PostExitValidationMiddlewareIntegrationTests
     {
         // `dotnet --version` is a portable command that exits 0.
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory())
-            .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero());
+            .UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 
@@ -36,14 +36,34 @@ public class PostExitValidationMiddlewareIntegrationTests
     {
         // `dotnet --this-flag-does-not-exist` is a portable command that exits non-zero.
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory())
-            .UsePostExitValidation(PostExitValidationOptions.ExitCodeIsZero());
+            .UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
 
         using ProcessConfiguration config =
             ProcessConfigurationFactory.Create("dotnet", "--this-flag-does-not-exist");
 
-        await Assert.That(async () => await invoker.ExecuteAsync(
+        ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(
                 config,
                 ProcessExitConfiguration.CreateGraceful()))
             .Throws<ProcessValidationException>();
+
+        await Assert.That(exception.Message).Contains("exit", StringComparison.OrdinalIgnoreCase);
+        await Assert.That(exception.Result).IsNotNull();
+    }
+
+    [Test]
+    public async Task UsePostExitValidation_StdoutMatches_ValidatesBufferedOutput()
+    {
+        // `dotnet --version` writes a version string (e.g. "8.0.100") to standard output.
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory())
+            .UsePostExitValidation(PostExitValidation.StdoutMatches(@"\d+\.\d+"));
+
+        using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+
+        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
+            config,
+            ProcessExitConfiguration.CreateGraceful());
+
+        await Assert.That(result.ExitCode).IsEqualTo(0);
+        await Assert.That(result.StandardOutput).Contains(".");
     }
 }
