@@ -108,7 +108,7 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
 
         try
         {
-            return context.Middleware.Items.Get<ILogger>(LoggerKey);
+            return context.Middleware.Items.Get<ILogger>(LoggerKey) ?? throw new InvalidOperationException();
         }
         catch (Exception)
         {
