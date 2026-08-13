@@ -63,7 +63,11 @@ Notes:
 
 ## Installing CliInvoke
 
+<<<<<<< Updated upstream
 CliInvoke is available on [the NuGet Gallery](https://nuget.org) but can be also installed via the ``dotnet`` SDK CLI.
+=======
+CliInvoke is available on [the NuGet Gallery](https://nuget.org) but can also be installed via the ``dotnet`` SDK CLI.
+>>>>>>> Stashed changes
 
 The package(s) to install depends on your use case:
 
