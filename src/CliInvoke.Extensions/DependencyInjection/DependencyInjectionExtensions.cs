@@ -32,6 +32,44 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddCliInvoke(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
+        return AddCliInvokeCore(services, configure: null, lifetime);
+    }
+
+    /// <summary>
+    ///     Sets up Dependency Injection for CliInvoke's main interface-able types,
+    ///     allowing fluent configuration of the <see cref="ProcessInvoker"/> via a callback.
+    /// </summary>
+    /// <remarks>
+    ///     The callback receives a bare <see cref="ProcessInvoker"/> and must return a configured instance.
+    ///     Typical usage chains middleware extensions such as <c>UseLogging()</c>, <c>UsePostExitValidation()</c>,
+    ///     or <c>UsePowerShell()</c>.
+    /// </remarks>
+    /// <param name="services">The service collection to add to.</param>
+    /// <param name="configure">
+    ///     A delegate that receives a bare <see cref="ProcessInvoker"/> and returns a configured instance.
+    /// </param>
+    /// <param name="lifetime">The service lifetime to use if specified; Scoped otherwise.</param>
+    /// <returns>The updated service collection with the added CliInvoke services set up.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when <paramref name="configure"/> is <c>null</c>.
+    /// </exception>
+    public static IServiceCollection AddCliInvoke(this IServiceCollection services,
+        Func<ProcessInvoker, ProcessInvoker> configure,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return AddCliInvokeCore(services, configure, lifetime);
+    }
+
+    /// <summary>
+    ///     Core implementation shared by both <see cref="AddCliInvoke(IServiceCollection, ServiceLifetime)"/>
+    ///     and <see cref="AddCliInvoke(IServiceCollection, Func{ProcessInvoker, ProcessInvoker}, ServiceLifetime)"/>.
+    /// </summary>
+    private static IServiceCollection AddCliInvokeCore(this IServiceCollection services,
+        Func<ProcessInvoker, ProcessInvoker>? configure,
+        ServiceLifetime lifetime)
+    {
         switch (lifetime)
         {
             case ServiceLifetime.Singleton:
@@ -49,7 +87,20 @@ public static class DependencyInjectionExtensions
                 services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
                 
                 services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
-                services.AddSingleton<IProcessInvoker, ProcessInvoker>();
+
+                if (configure is not null)
+                {
+                    services.AddSingleton<IProcessInvoker>(sp =>
+                    {
+                        IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
+                        ProcessInvoker invoker = new ProcessInvoker(factory);
+                        return configure(invoker);
+                    });
+                }
+                else
+                {
+                    services.AddSingleton<IProcessInvoker, ProcessInvoker>();
+                }
 
                 services.AddSingleton<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
                 services.AddSingleton<IShellDetector, ShellDetector>();
@@ -69,7 +120,20 @@ public static class DependencyInjectionExtensions
                 services.AddScoped<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
 
                 services.AddScoped<IExternalProcessFactory, ExternalProcessFactory>();
-                services.AddScoped<IProcessInvoker, ProcessInvoker>();
+
+                if (configure is not null)
+                {
+                    services.AddScoped<IProcessInvoker>(sp =>
+                    {
+                        IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
+                        ProcessInvoker invoker = new ProcessInvoker(factory);
+                        return configure(invoker);
+                    });
+                }
+                else
+                {
+                    services.AddScoped<IProcessInvoker, ProcessInvoker>();
+                }
 
                 services.AddScoped<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
                 services.AddScoped<IShellDetector, ShellDetector>();
@@ -89,7 +153,20 @@ public static class DependencyInjectionExtensions
                 services.AddTransient<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
 
                 services.AddTransient<IExternalProcessFactory, ExternalProcessFactory>();
-                services.AddTransient<IProcessInvoker, ProcessInvoker>();
+
+                if (configure is not null)
+                {
+                    services.AddTransient<IProcessInvoker>(sp =>
+                    {
+                        IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
+                        ProcessInvoker invoker = new ProcessInvoker(factory);
+                        return configure(invoker);
+                    });
+                }
+                else
+                {
+                    services.AddTransient<IProcessInvoker, ProcessInvoker>();
+                }
 
                 services.AddTransient<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
                 services.AddTransient<IShellDetector, ShellDetector>();
