@@ -32,9 +32,20 @@ public sealed class MiddlewareItems
         if (!_items.TryGetValue(key, out object? value))
             throw new KeyNotFoundException($"Key '{key}' not found in middleware items.");
 
+        if (value is null)
+        {
+            // default(T) is null for reference types and nullable value types,
+            // but non-null for non-nullable value types like int.
+            if (default(T) is not null)
+                throw new InvalidOperationException(
+                    $"Value for key '{key}' is null, but '{typeof(T).Name}' does not accept null.");
+
+            return default;
+        }
+
         if (value is not T typedValue)
             throw new InvalidOperationException(
-                $"Value for key '{key}' is of type '{value?.GetType().Name ?? "null"}', not '{typeof(T).Name}'.");
+                $"Value for key '{key}' is of type '{value.GetType().Name}', not '{typeof(T).Name}'.");
 
         return typedValue;
     }
