@@ -39,6 +39,21 @@ public class InvocationContext
     }
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="InvocationContext"/> class, sharing the
+    ///     result state with another context.
+    /// </summary>
+    private InvocationContext(
+        ProcessConfiguration configuration,
+        ProcessExitConfiguration exitConfiguration,
+        InvocationMode mode,
+        CancellationToken cancellationToken,
+        SharedResult sharedResult)
+        : this(configuration, exitConfiguration, mode, cancellationToken)
+    {
+        _sharedResult = sharedResult;
+    }
+
+    /// <summary>
     ///     Gets the process configuration.
     /// </summary>
     public ProcessConfiguration Configuration { get; }
@@ -59,9 +74,29 @@ public class InvocationContext
     public CancellationToken CancellationToken { get; }
 
     /// <summary>
+    ///     A shared holder for the execution result so that derived contexts produced by
+    ///     <see cref="WithConfiguration"/> observe the same result state as the original context.
+    /// </summary>
+    private readonly SharedResult _sharedResult = new();
+
+    /// <summary>
     ///     Gets or sets the process result, set by the pipeline after execution.
     /// </summary>
-    public ProcessResult? Result { get; set; }
+    /// <remarks>
+    ///     Derived contexts (created via <see cref="WithConfiguration"/>) share this value,
+    ///     so a result set by the terminal pipeline on a derived context is visible to the
+    ///     original context that the invoker reads from.
+    /// </remarks>
+    public ProcessResult? Result
+    {
+        get => _sharedResult.Value;
+        set => _sharedResult.Value = value;
+    }
+
+    private sealed class SharedResult
+    {
+        public ProcessResult? Value { get; set; }
+    }
 
     /// <remarks>
     ///     The chain walker assigns this before invoking the first middleware so that
@@ -84,9 +119,9 @@ public class InvocationContext
             configuration,
             ExitConfiguration,
             Mode,
-            CancellationToken)
+            CancellationToken,
+            _sharedResult)
         {
-            Result = Result,
             Middleware = Middleware
         };
     }
