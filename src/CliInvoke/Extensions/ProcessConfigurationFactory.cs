@@ -101,16 +101,13 @@ public static class ProcessConfigurationFactory
         ArgumentNullException.ThrowIfNull(arguments);
 
         List<string> argumentsList = arguments.ToList();
-        string argumentsString = argumentsList.Count > 0
-            ? string.Join(" ", argumentsList)
-            : string.Empty;
 
         workingDirectory ??= Environment.CurrentDirectory;
             
         IProcessConfigurationBuilder processConfigurationBuilder =
             new ProcessConfigurationBuilder(
                     targetFilePath)
-                .SetArguments(argumentsString)
+                .SetArguments(argumentsList)
                 .SetWorkingDirectory(workingDirectory)
                 .SetOutputRedirection(outputRedirection)
                 .EnableWindowCreation(enableWindowCreation);
