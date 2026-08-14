@@ -28,7 +28,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -----------------------------------------------------------------------------
- CliInvoke uses Polyfill to enable easier support for .NET Standard 2.0 and .NET Standard 2.1
+ CliInvoke uses Polyfill to enable easier polyfilling of newer .NET features.
  
 Polyfill is licensed under the MIT license.
 -----------------------------------------------------
