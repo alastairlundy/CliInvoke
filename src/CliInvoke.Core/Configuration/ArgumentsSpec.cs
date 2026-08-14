@@ -65,6 +65,14 @@ public sealed class ArgumentsSpec
     }
 
     /// <summary>
+    ///     Removes all argument values previously appended to the spec.
+    /// </summary>
+    public void Clear()
+    {
+        _buffer.Clear();
+    }
+
+    /// <summary>
     ///     Appends a string value to the arguments spec.
     /// </summary>
     /// <param name="value">The string value to append.</param>

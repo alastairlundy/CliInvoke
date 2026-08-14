@@ -39,21 +39,29 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     private Encoding _standardErrorEncoding;
 
     private StreamWriter _standardInput;
-    
-    private ArgumentsSpec _argumentsSpec;
-    private EnvironmentVariablesSpec _environmentVariablesSpec;
-    private ProcessResourcePolicySpec _processResourcePolicySpec;
-    private UserCredentialSpec _userCredentialSpec;
+
+    private readonly ArgumentsSpec _argumentsSpec;
+    private readonly EnvironmentVariablesSpec _environmentVariablesSpec;
+    private readonly ProcessResourcePolicySpec _processResourcePolicySpec;
+    private readonly UserCredentialSpec _userCredentialSpec;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="ProcessConfigurationBuilder" /> class,
     ///     which is used to build and configure a process.
     /// </summary>
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
-    public ProcessConfigurationBuilder(string targetFilePath)
+    /// <param name="argumentValidationLogic">
+    ///     Optional validation logic applied to each argument added to the configuration.
+    ///     When omitted, a default null-check validation is used.
+    /// </param>
+    public ProcessConfigurationBuilder(
+        string targetFilePath,
+        Func<string, bool>? argumentValidationLogic = null)
     {
         _targetFilePath = targetFilePath;
-        _argumentsSpec = new ArgumentsSpec();
+        _argumentsSpec = argumentValidationLogic is not null
+            ? new ArgumentsSpec(argumentValidationLogic)
+            : new ArgumentsSpec();
         _environmentVariablesSpec = new EnvironmentVariablesSpec();
         _processResourcePolicySpec = new ProcessResourcePolicySpec();
         _userCredentialSpec = new UserCredentialSpec();
@@ -87,8 +95,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     {
         ArgumentNullException.ThrowIfNull(arguments);
 
-        _argumentsSpec = new ArgumentsSpec();
-        _argumentsSpec.AddEnumerable(arguments, escape: true);
+        _argumentsSpec.Clear();
+
+        if (escapeArguments)
+            _argumentsSpec.AddEnumerable(arguments, escape: true);
+        else
+            _argumentsSpec.AddEnumerable(arguments, escape: false);
 
         return this;
     }
@@ -97,26 +109,29 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     Sets process arguments to the Process Configuration builder.
     /// </summary>
     /// <param name="arguments">The argument string to be added.</param>
-    /// <param name="escapeArguments"></param>
+    /// <param name="escapeArguments">Whether the argument should be escaped.</param>
     /// <returns>A reference to this builder with the added string arguments, allowing method chaining.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="arguments" /> is null or empty.</exception>
     public IProcessConfigurationBuilder SetArguments(string arguments, bool escapeArguments = true)
     {
         ArgumentNullException.ThrowIfNull(arguments);
 
-        _argumentsSpec = new ArgumentsSpec();
+        _argumentsSpec.Clear();
+
+        // A single raw string is treated as ready-to-use command-line text and is
+        // not wrapped/escaped, matching the former ArgumentsBuilder behaviour.
         _argumentsSpec.Add(arguments, escape: false);
+
         return this;
     }
 
     /// <summary>
-    /// 
+    ///     Configures the process arguments using the provided configuration action.
     /// </summary>
-    /// <param name="configureArguments"></param>
-    /// <returns></returns>
+    /// <param name="configureArguments">An action that accepts an <see cref="ArgumentsSpec" /> and is used to configure the arguments.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> for further configuration.</returns>
     public IProcessConfigurationBuilder ConfigureArguments(Action<ArgumentsSpec> configureArguments)
     {
-        _argumentsSpec = new ArgumentsSpec();
         configureArguments.Invoke(_argumentsSpec);
 
         return this;
@@ -148,7 +163,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public IProcessConfigurationBuilder ConfigureEnvironmentVariables(
         Action<EnvironmentVariablesSpec> configureEnvironmentVariables)
     {
-        _environmentVariablesSpec = new EnvironmentVariablesSpec();
         configureEnvironmentVariables.Invoke(_environmentVariablesSpec);
 
         return this;
@@ -233,7 +247,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     {
         ArgumentNullException.ThrowIfNull(configureCredential);
 
-        _userCredentialSpec = new UserCredentialSpec();
         configureCredential.Invoke(_userCredentialSpec);
 
         return this;
@@ -299,7 +312,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     {
         ArgumentNullException.ThrowIfNull(configureResourcePolicy);
 
-        _processResourcePolicySpec = new ProcessResourcePolicySpec();
         configureResourcePolicy.Invoke(_processResourcePolicySpec);
 
         return this;
