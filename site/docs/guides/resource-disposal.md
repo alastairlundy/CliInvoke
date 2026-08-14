@@ -196,7 +196,7 @@ public void Dispose()
 Defined in `src/CliInvoke.Core/Configuration/UserCredentialSpec.cs`.
 
 ```csharp
-public class UserCredentialSpec
+public sealed class UserCredentialSpec : IDisposable
 ```
 
 **What it owns**
