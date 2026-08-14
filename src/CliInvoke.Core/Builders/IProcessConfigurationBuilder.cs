@@ -27,12 +27,14 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments, bool escapeArguments = true);
 
     /// <summary>
-    ///     Sets the arguments to pass to the executable.
+    ///     Sets the arguments to pass to the executable from a single raw command-line string.
+    ///     The input is treated as ready-to-use command-line text and is stored verbatim, without
+    ///     any additional quoting or escaping. Use <see cref="SetArguments(IEnumerable{string}, bool)"/>
+    ///     when passing individual argument tokens that should be escaped.
     /// </summary>
-    /// <param name="arguments">The arguments to pass to the executable.</param>
-    /// <param name="escapeArguments"></param>
+    /// <param name="arguments">The raw command-line text to pass to the executable.</param>
     /// <returns>The new IProcessConfigurationBuilder object with the specified arguments.</returns>
-    IProcessConfigurationBuilder SetArguments(string arguments, bool escapeArguments = true);
+    IProcessConfigurationBuilder SetArguments(string arguments);
 
     /// <summary>
     /// 

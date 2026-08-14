@@ -108,11 +108,10 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <summary>
     ///     Sets process arguments to the Process Configuration builder.
     /// </summary>
-    /// <param name="arguments">The argument string to be added.</param>
-    /// <param name="escapeArguments">Whether the argument should be escaped.</param>
+    /// <param name="arguments">The raw command-line text to be added, stored verbatim without additional quoting or escaping.</param>
     /// <returns>A reference to this builder with the added string arguments, allowing method chaining.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="arguments" /> is null or empty.</exception>
-    public IProcessConfigurationBuilder SetArguments(string arguments, bool escapeArguments = true)
+    public IProcessConfigurationBuilder SetArguments(string arguments)
     {
         ArgumentNullException.ThrowIfNull(arguments);
 
