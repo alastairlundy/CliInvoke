@@ -53,9 +53,6 @@ public static class ConfigurationExtensions
                 processStartInfo.Verb.StartsWith("runas", StringComparison.OrdinalIgnoreCase)
                 || processStartInfo.Verb.StartsWith("sudo", StringComparison.OrdinalIgnoreCase);
 
-            IEnvironmentVariablesBuilder environmentVariablesBuilder =
-                new EnvironmentVariablesBuilder();
-
             IEnumerable<KeyValuePair<string, string>> kvp = processStartInfo.Environment
                 .Where(kv => kv.Value is not null)
                 // Suppression is okay here because we check for null before Select.
@@ -63,18 +60,13 @@ public static class ConfigurationExtensions
                 // ReSharper disable once NullableWarningSuppressionIsUsed
                 .Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value!));
 
-            environmentVariablesBuilder = environmentVariablesBuilder.SetEnumerable(kvp);
-
-            IReadOnlyDictionary<string, string> environmentVars =
-                environmentVariablesBuilder.Build();
-
             IProcessConfigurationBuilder processConfigurationBuilder =
                 new ProcessConfigurationBuilder(processStartInfo.FileName);
 
             processConfigurationBuilder = processConfigurationBuilder
                 .ConfigureEnvironmentVariables(envSpec =>
                 {
-                    envSpec.SetReadOnlyDictionary(environmentVars);
+                    envSpec.SetEnumerable(kvp);
                 })
                 .UseShellExecution(processStartInfo.UseShellExecute)
                 .EnableWindowCreation(!processStartInfo.CreateNoWindow)
@@ -86,28 +78,26 @@ public static class ConfigurationExtensions
                 .SetEncoding(
                     processStartInfo.StandardInputEncoding,
                     processStartInfo.StandardOutputEncoding, processStartInfo.StandardErrorEncoding);
-            
-            
+
+
             if (requiresAdministrator)
                 processConfigurationBuilder.RequireAdministratorPrivileges();
 
-            IUserCredentialBuilder userCredentialBuilder = new UserCredentialBuilder();
-
 #pragma warning disable CA1416
-            if (processStartInfo.Domain != string.Empty)
-                userCredentialBuilder = userCredentialBuilder.SetDomain(processStartInfo.Domain);
-
-            if (processStartInfo.Password is not null)
-                userCredentialBuilder.SetPassword(processStartInfo.Password);
-
-            if (processStartInfo.UserName != string.Empty)
-                userCredentialBuilder.SetUsername(processStartInfo.UserName);
-
-            userCredentialBuilder.LoadUserProfile(processStartInfo.LoadUserProfile);
-
             processConfigurationBuilder =
-                processConfigurationBuilder.SetUserCredential(userCredentialBuilder.Build());
+                processConfigurationBuilder.ConfigureUserCredential(credentialSpec =>
+                {
+                    if (processStartInfo.Domain != string.Empty)
+                        credentialSpec.SetDomain(processStartInfo.Domain);
 
+                    if (processStartInfo.Password is not null)
+                        credentialSpec.SetPassword(processStartInfo.Password);
+
+                    if (processStartInfo.UserName != string.Empty)
+                        credentialSpec.SetUsername(processStartInfo.UserName);
+
+                    credentialSpec.SetUserProfileLoading(processStartInfo.LoadUserProfile);
+                });
 #pragma warning restore CA1416
             return processConfigurationBuilder.Build();
         }
