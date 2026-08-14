@@ -58,7 +58,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
             ArgumentOutOfRangeException.ThrowIfLessThan((nint)processorAffinity, 0x0001);
             
             ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity,
-                (1 << Environment.ProcessorCount) - 1);
+                ((nint)1 << Environment.ProcessorCount) - 1);
         }
 
         if (maxWorkingSet is not null)
@@ -70,7 +70,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 #if NETSTANDARD2_0
                             (nint)
 #endif
-                            (1 << Environment.ProcessorCount) - 1;
+                            ((nint)1 << Environment.ProcessorCount) - 1;
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -125,7 +125,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 #if NETSTANDARD2_0
         (nint)
 #endif
-        (1 << Environment.ProcessorCount) - 1
+        ((nint)1 << Environment.ProcessorCount) - 1
     );
 
     /// <summary>
