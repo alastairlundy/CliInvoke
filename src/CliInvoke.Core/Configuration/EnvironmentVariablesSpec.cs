@@ -139,7 +139,7 @@ public sealed class EnvironmentVariablesSpec
     /// <returns>A read-only dictionary containing the configured environment variables.</returns>
     public IReadOnlyDictionary<string, string> Build()
     {
-        return _environmentVariables;
+        return new Dictionary<string, string>(_environmentVariables, _environmentVariables.Comparer);
     }
 
     /// <summary>
