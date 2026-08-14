@@ -542,13 +542,12 @@ public class ProcessConfigurationBuilderTests
                 spec.SetProcessorAffinity(0));
         }).Throws<ArgumentOutOfRangeException>();
 
-        // Additionally, out-of-range value
-        int processorCount = Math.Max(1, Environment.ProcessorCount);
-        nint invalidOutOfRange = 2 * processorCount + 1;
+        // Additionally, negative values are invalid (no upper bound: a mask is a bitmask)
+        nint invalidNegative = -1;
         await Assert.That(() =>
         {
             builder.ConfigureProcessResourcePolicy(spec =>
-                spec.SetProcessorAffinity(invalidOutOfRange));
+                spec.SetProcessorAffinity(invalidNegative));
         }).Throws<ArgumentOutOfRangeException>();
     }
 

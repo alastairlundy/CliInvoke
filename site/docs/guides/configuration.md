@@ -150,13 +150,11 @@ same model** for the same input. Concretely:
   `Arguments` string is stored verbatim. For most real inputs the
   escaping is a no-op, but the two paths can differ for arguments
   containing `\\`, `"`, or control characters.
-- **`ProcessorAffinity` bounds differ.** The model's
-  `ProcessResourcePolicy` requires `processorAffinity > 1` and
-  `processorAffinity < 2 * Environment.ProcessorCount`. The builder's
-  `SetProcessorAffinity` requires `>= 1` and `<= 2 * Environment.ProcessorCount`.
-  Value `1` is accepted by the builder and rejected by the model;
-  value `2 * Environment.ProcessorCount` is accepted by the builder
-  and rejected by the model.
+- **`ProcessorAffinity` lower bound.** Both the model's
+  `ProcessResourcePolicy` and the builder's `SetProcessorAffinity`
+  require `processorAffinity >= 1` (a value of `0` selects no processor
+  and is rejected). There is no upper bound because a processor affinity
+  mask is a bitmask over processors, so any positive value is accepted.
 - **Working-set pairing in `ProcessResourcePolicySpec`.** Calling
   `SetMinWorkingSet` without a prior `SetMaxWorkingSet` fabricates
   `Max = Min + 1` so the resulting policy is internally consistent.
