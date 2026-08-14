@@ -34,13 +34,6 @@
 | TK009 | Replace sub-builder tests with deepened-interface coverage | ✅ committed | `7f423d15` | 0 |
 | TK007 | Delete removed sub-builder interfaces and classes | ✅ committed | `210068d6` | 0 |
 
-## Judge Reviews
-
-| Ticket | Verdict | Model | Evidence |
-|--------|---------|-------|----------|
-| TK009 | ✅ approve | hy3 | All 4 criteria met. 29 ConfigureXxx tests cover args/env/resource/credential. TUnit conventions correct. 148/148 tests pass. |
-| TK007 | ✅ approve | hy3 | All 3 criteria met. 8 files deleted. Zero code references remain (only comments/XML-doc). Build succeeds with 0 errors. |
-
 ## Failures
 
 No failures recorded.
