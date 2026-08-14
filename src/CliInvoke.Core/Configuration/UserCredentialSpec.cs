@@ -72,7 +72,8 @@ public sealed class UserCredentialSpec : IDisposable
     {
         ArgumentNullException.ThrowIfNull(password);
 
-        _password = password;
+        _password?.Dispose();
+        _password = password.Copy();
         return this;
     }
 
@@ -92,7 +93,7 @@ public sealed class UserCredentialSpec : IDisposable
     /// </summary>
     /// <returns>The built <see cref="UserCredential" />.</returns>
     public UserCredential Build() =>
-        new(_domain, _userName, _password, _loadUserProfile);
+        new(_domain, _userName, _password?.Copy(), _loadUserProfile);
 
     /// <summary>
     ///     Disposes of the held <see cref="SecureString" /> and suppresses finalization.

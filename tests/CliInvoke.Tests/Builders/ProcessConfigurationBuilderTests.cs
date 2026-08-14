@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
@@ -670,7 +671,7 @@ public class ProcessConfigurationBuilderTests
 
         // Assert
         ProcessConfiguration config = builder.Build();
-        await Assert.That(config.Credential.Password).IsEqualTo(password);
+        await Assert.That(ReadSecureString(config.Credential.Password)).IsEqualTo("fake");
     }
 
     [SupportedOSPlatform("windows")]
@@ -734,7 +735,20 @@ public class ProcessConfigurationBuilderTests
         await Assert.That(config.Credential).IsNotNull();
         await Assert.That(config.Credential.Domain).IsEqualTo(domain);
         await Assert.That(config.Credential.UserName).IsEqualTo(userName);
-        await Assert.That(config.Credential.Password).IsEqualTo(password);
+        await Assert.That(ReadSecureString(config.Credential.Password)).IsEqualTo("fake");
         await Assert.That(config.Credential.LoadUserProfile).IsTrue();
+    }
+
+    private static string ReadSecureString(SecureString secureString)
+    {
+        IntPtr ptr = Marshal.SecureStringToBSTR(secureString);
+        try
+        {
+            return Marshal.PtrToStringBSTR(ptr)!;
+        }
+        finally
+        {
+            Marshal.ZeroFreeBSTR(ptr);
+        }
     }
 }
