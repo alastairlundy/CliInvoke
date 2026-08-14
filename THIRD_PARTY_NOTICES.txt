@@ -55,9 +55,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -----------------------------------------------------------------------------
 
- CliInvoke uses DotExtensions for useful extension methods.
+ CliInvoke.Internal.Versions.VersionParseExtensions.cs and
+ CliInvoke.Core.Internal.IO.PathEnvironmentVariable.cs are derived from DotExtensions.
  
-DotExtensions is licensed under the MIT license.
+ DotExtensions is licensed under the MIT license.
 -----------------------------------------------------
 MIT License
 
