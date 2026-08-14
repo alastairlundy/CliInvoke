@@ -477,8 +477,8 @@ readability. Callers that need to configure anything beyond
 | One-off command with a small fixed set of arguments | `CliRun.RunAsync(...)` (no model), or direct constructor on `ProcessConfiguration` |
 | Process with many optional properties set conditionally | `IProcessConfigurationBuilder` |
 | Need a per-invocation timeout but a shared process configuration | Direct constructor on `ProcessExitConfiguration` passed alongside |
-| Running as a different Windows user | `UserCredentialSpec` or `UserCredential` assigned to `ProcessConfiguration.Credential` |
-| Constraining CPU or memory | `ProcessResourcePolicySpec` or `ProcessResourcePolicy` assigned to `ProcessConfiguration.ResourcePolicy` |
+| Running as a different Windows user | Configure a `UserCredentialSpec` through the builder or call `Build()` to produce a `UserCredential`, then assign the model to `ProcessConfiguration.Credential` |
+| Constraining CPU or memory | Configure a `ProcessResourcePolicySpec` through the builder or call `Build()` to produce a `ProcessResourcePolicy`, then assign the model to `ProcessConfiguration.ResourcePolicy` |
 | Need to observe `Started`/`Exited` events or stream output while the process runs | `IExternalProcess` (via `IExternalProcessFactory`) |
 | Run from a static context without DI | `CliRun` |
 
