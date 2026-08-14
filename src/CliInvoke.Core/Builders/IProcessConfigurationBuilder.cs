@@ -9,6 +9,8 @@
 
 using System.Text;
 
+using CliInvoke.Core.Configuration;
+
 namespace CliInvoke.Core.Builders;
 
 /// <summary>
@@ -37,7 +39,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="configureArguments"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder ConfigureArguments(Action<IArgumentsBuilder> configureArguments);
+    IProcessConfigurationBuilder ConfigureArguments(Action<ArgumentsSpec> configureArguments);
     
     /// <summary>
     ///     Sets the Target File Path of the Process Executable.
@@ -51,7 +53,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="configure"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder ConfigureEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configure);
+    IProcessConfigurationBuilder ConfigureEnvironmentVariables(Action<EnvironmentVariablesSpec> configure);
 
     /// <summary>
     ///     Enables using Administrator Privileges.
@@ -71,7 +73,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="configure"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder ConfigureUserCredential(Action<IUserCredentialBuilder> configure);
+    IProcessConfigurationBuilder ConfigureUserCredential(Action<UserCredentialSpec> configure);
 
     /// <summary>
     ///     Sets the credentials for the Process to be executed.
@@ -100,7 +102,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="processResourcePolicy"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder ConfigureProcessResourcePolicy(Action<IProcessResourcePolicyBuilder> processResourcePolicy);
+    IProcessConfigurationBuilder ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec> processResourcePolicy);
 
     /// <summary>
     ///     Sets the Process Resource Policy to be used for this Process.

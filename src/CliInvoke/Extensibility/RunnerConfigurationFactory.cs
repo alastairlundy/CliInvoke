@@ -10,6 +10,7 @@
 #pragma warning disable CA1416
 
 using CliInvoke.Builders;
+using CliInvoke.Core.Configuration;
 using CliInvoke.Core.Extensibility;
 
 namespace CliInvoke.Extensibility;
@@ -42,25 +43,22 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                 runnerProcessConfig.TargetFilePath
             )
             .SetArguments(combinedArgs)
-            .ConfigureEnvironmentVariables(envConfigure =>
+            .ConfigureEnvironmentVariables(envSpec =>
             {
-                envConfigure.SetReadOnlyDictionary(processConfigToBeRun.EnvironmentVariables);
+                envSpec.SetReadOnlyDictionary(processConfigToBeRun.EnvironmentVariables);
             })
-            .ConfigureProcessResourcePolicy(resourcePolicyConfig =>
+            .ConfigureProcessResourcePolicy(resourceSpec =>
             {
-                resourcePolicyConfig.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
+                resourceSpec.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
                 
-                if(processConfigToBeRun.ResourcePolicy.MinWorkingSet is not null)
-                    resourcePolicyConfig.SetMinWorkingSet((nint)processConfigToBeRun.ResourcePolicy.MinWorkingSet);
-                
-                if(processConfigToBeRun.ResourcePolicy.MaxWorkingSet is not null)
-                    resourcePolicyConfig.SetMaxWorkingSet((nint)processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                if(processConfigToBeRun.ResourcePolicy.MinWorkingSet is not null && processConfigToBeRun.ResourcePolicy.MaxWorkingSet is not null)
+                    resourceSpec.SetWorkingSet((nint)processConfigToBeRun.ResourcePolicy.MinWorkingSet, (nint)processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
 
-                resourcePolicyConfig.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
+                resourceSpec.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
                     .EnablePriorityBoost);
                 
                 if(processConfigToBeRun.ResourcePolicy.ProcessorAffinity is not null)
-                    resourcePolicyConfig.SetProcessorAffinity((nint)processConfigToBeRun.ResourcePolicy.ProcessorAffinity);
+                    resourceSpec.SetProcessorAffinity((nint)processConfigToBeRun.ResourcePolicy.ProcessorAffinity);
             })
             .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)

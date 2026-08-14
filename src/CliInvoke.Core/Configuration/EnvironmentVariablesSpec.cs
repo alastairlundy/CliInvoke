@@ -83,6 +83,57 @@ public sealed class EnvironmentVariablesSpec
     }
 
     /// <summary>
+    ///     Sets a single environment variable.
+    /// </summary>
+    /// <param name="name">The name of the environment variable to set.</param>
+    /// <param name="value">The value of the environment variable to set.</param>
+    /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
+    public EnvironmentVariablesSpec SetPair(string name, string value)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(value);
+
+        if (_throwExceptionIfDuplicateKeyFound)
+        {
+            _environmentVariables.Add(name, value);
+        }
+        else
+        {
+            bool result = _environmentVariables.TryAdd(name, value);
+
+            if (!result)
+                _environmentVariables[name] = value;
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets multiple environment variables from a dictionary.
+    /// </summary>
+    /// <param name="variables">The dictionary of environment variables to set.</param>
+    /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
+    public EnvironmentVariablesSpec SetDictionary(IDictionary<string, string> variables)
+    {
+        ArgumentNullException.ThrowIfNull(variables);
+
+        return SetEnumerable(variables);
+    }
+
+    /// <summary>
+    ///     Sets multiple environment variables from a read-only dictionary.
+    /// </summary>
+    /// <param name="variables">The read-only dictionary of environment variables to set.</param>
+    /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
+    public EnvironmentVariablesSpec SetReadOnlyDictionary(
+        IReadOnlyDictionary<string, string> variables)
+    {
+        ArgumentNullException.ThrowIfNull(variables);
+
+        return SetEnumerable(variables);
+    }
+
+    /// <summary>
     ///     Builds the dictionary of configured environment variables.
     /// </summary>
     /// <returns>A read-only dictionary containing the configured environment variables.</returns>

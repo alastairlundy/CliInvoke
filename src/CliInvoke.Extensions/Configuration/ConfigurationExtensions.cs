@@ -16,6 +16,7 @@ using System.Linq;
 
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
+using CliInvoke.Core.Configuration;
 
 namespace CliInvoke.Extensions;
 
@@ -71,9 +72,9 @@ public static class ConfigurationExtensions
                 new ProcessConfigurationBuilder(processStartInfo.FileName);
 
             processConfigurationBuilder = processConfigurationBuilder
-                .ConfigureEnvironmentVariables(envConfig =>
+                .ConfigureEnvironmentVariables(envSpec =>
                 {
-                    envConfig.SetReadOnlyDictionary(environmentVars);
+                    envSpec.SetReadOnlyDictionary(environmentVars);
                 })
                 .UseShellExecution(processStartInfo.UseShellExecute)
                 .EnableWindowCreation(!processStartInfo.CreateNoWindow)
