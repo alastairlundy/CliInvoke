@@ -39,7 +39,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     /// <param name="processorAffinity">The processor affinity to be used.</param>
     /// <returns>The newly created ProcessResourcePolicyBuilder with the updated ProcessorAffinity.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if processor affinity is less than 1 or greater than 2x Processor Count.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if processor affinity is less than 1 or greater than (1 << ProcessorCount) - 1.</exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Pure]
@@ -47,7 +47,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 0x0001);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(processorAffinity,
-            2 * Environment.ProcessorCount);
+            (nint)((1 << Environment.ProcessorCount) - 1));
         
         return new ProcessResourcePolicyBuilder(
             new ProcessResourcePolicy(

@@ -11,8 +11,8 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(1 * 16 - 1)]
-    [InlineData(1 * 8 - 1)]
+    [InlineData((1 << 16) - 1)]
+    [InlineData((1 << 8) - 1)]
     public void WithProcessorAffinity_ValidProcessorAffinity_Valid_Success(nint processorAffinity)
     {
         // Arrange
@@ -31,7 +31,7 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(2 * 24)]
+    [InlineData(1 << 24)]
     [InlineData(0)]
     public void WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail(nint processorAffinity)
     {
