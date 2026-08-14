@@ -310,8 +310,9 @@ constructor that bypasses the builder entirely. See
 `Action<TBuilder>` so the caller can configure a nested builder
 inline. For example,
 `IProcessConfigurationBuilder.ConfigureArguments(Action<ArgumentsSpec>)`
-runs the action against a fresh `ArgumentsSpec` and folds the
-result into the configuration being built.
+runs the action against the shared `ArgumentsSpec` instance held by the
+builder and folds the result into the configuration being built. Repeated
+calls update the same staged arguments rather than starting from empty.
 
 ## The Consumers
 
