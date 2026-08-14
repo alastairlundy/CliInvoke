@@ -225,7 +225,7 @@ By default, middleware does **not** mutate the `ProcessResult` object. Logging a
 > | 2 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
 > | 3 | `PipedProcessResult`    | `StandardOutput` and `StandardError` streams                      |
 > | 4 | `UserCredential`        | `SecureString` password buffer                                    |
-> | 5 | `UserCredentialBuilder` | `SecureString` password buffer staged for `Build()`               |
+> | 5 | `UserCredentialSpec` | `SecureString` password buffer staged for `Build()`               |
 >
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 

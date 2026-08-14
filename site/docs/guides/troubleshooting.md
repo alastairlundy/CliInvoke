@@ -26,7 +26,7 @@ detection method.
 CliInvoke exposes exactly five [Resource-Owning Types](guides-resource-disposal.md#terminology)
 that hold unmanaged handles or sensitive memory: `ProcessConfiguration`,
 `IExternalProcess`, `PipedProcessResult`, `UserCredential`, and
-`UserCredentialBuilder`. Every reported leak in this library traces back
+`UserCredentialSpec`. Every reported leak in this library traces back
 to one of these five.
 
 ### Symptoms
@@ -52,7 +52,7 @@ to one of these five.
    `ProcessConfiguration`, and `StandardOutput` / `StandardError` on
    `IExternalProcess`, are owned by the library. Disposing them
    independently corrupts the parent's state.
-4. **`UserCredential` or `UserCredentialBuilder` is not disposed.** Both
+4. **`UserCredential` or `UserCredentialSpec` is not disposed.** Both
    hold a `SecureString`; the library only disposes the credential when
    the owning `ProcessConfiguration` is disposed. Standalone credentials
    require explicit disposal.

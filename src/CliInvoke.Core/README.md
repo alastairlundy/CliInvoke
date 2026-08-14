@@ -19,12 +19,12 @@ Key Abstractions:
     * ``IProcessPipeHandler``
 
 * Fluent Builders:
-    * ``IArgumentsBuilder`` - An interface to help with Argument Building and argument escaping.
-    * ``IEnvironmentVariablesBuilder`` - An interface to help with setting Environment variables.
+    * ``ArgumentsSpec`` - A spec for Argument Building and argument escaping.
+    * ``EnvironmentVariablesSpec`` - A spec for setting Environment variables.
     * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
-    * ``IProcessResourcePolicyBuilder`` - An interface to fluently configure and build ``ProcessResourcePolicy``
+    * ``ProcessResourcePolicySpec`` - A spec for fluently configuring and building ``ProcessResourcePolicy``
       objects.
-    * ``IUserCredentialBuilder``
+    * ``UserCredentialSpec``
 
 ## Features
 

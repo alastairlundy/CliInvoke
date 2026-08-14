@@ -145,7 +145,7 @@ same model** for the same input. Concretely:
   use, this means the builder rejects all-null argument lists where
   the model accepts them.
 - **Argument escaping is applied by the builder.** `Add` and
-  `AddRange` on `IArgumentsBuilder` apply character escaping (quotes,
+  `AddRange` on `ArgumentsSpec` apply character escaping (quotes,
   backslashes, control characters) before joining. The model's
   `Arguments` string is stored verbatim. For most real inputs the
   escaping is a no-op, but the two paths can differ for arguments
@@ -157,14 +157,14 @@ same model** for the same input. Concretely:
   Value `1` is accepted by the builder and rejected by the model;
   value `2 * Environment.ProcessorCount` is accepted by the builder
   and rejected by the model.
-- **Working-set pairing in `ProcessResourcePolicyBuilder`.** Calling
+- **Working-set pairing in `ProcessResourcePolicySpec`.** Calling
   `SetMinWorkingSet` without a prior `SetMaxWorkingSet` fabricates
   `Max = Min + 1` so the resulting policy is internally consistent.
   The model allows `Min` and `Max` to be set independently and will
   accept a configuration with `Min = 100, Max = null`.
 - **`UserCredential.LoadUserProfile` default differs.** The model's
   `new UserCredential()` defaults `LoadUserProfile` to `false`; the
-  builder's `new UserCredentialBuilder().Build()` defaults it to
+  spec's `new UserCredentialSpec().Build()` defaults it to
   `null`. This difference is invisible through `ProcessConfiguration`,
   whose default `Credential` is the all-null `UserCredential.Null`
   singleton, and which the builder also produces by default. It only
@@ -299,10 +299,10 @@ properties.
 | Builder | Produces | Defined in |
 |---------|----------|------------|
 | `IProcessConfigurationBuilder` | `ProcessConfiguration` | `src/CliInvoke.Core/Builders/IProcessConfigurationBuilder.cs` |
-| `IArgumentsBuilder` | `string` (joined arguments) | `src/CliInvoke.Core/Builders/IArgumentsBuilder.cs` |
-| `IEnvironmentVariablesBuilder` | `IReadOnlyDictionary<string, string>` | `src/CliInvoke.Core/Builders/IEnvironmentVariablesBuilder.cs` |
-| `IProcessResourcePolicyBuilder` | `ProcessResourcePolicy` | `src/CliInvoke.Core/Builders/IProcessResourcePolicyBuilder.cs` |
-| `IUserCredentialBuilder` | `UserCredential` | `src/CliInvoke.Core/Builders/IUserCredentialBuilder.cs` |
+| `ArgumentsSpec` | `string` (joined arguments) | `src/CliInvoke.Core/Configuration/ArgumentsSpec.cs` |
+| `EnvironmentVariablesSpec` | `IReadOnlyDictionary<string, string>` | `src/CliInvoke.Core/Configuration/EnvironmentVariablesSpec.cs` |
+| `ProcessResourcePolicySpec` | `ProcessResourcePolicy` | `src/CliInvoke.Core/Configuration/ProcessResourcePolicySpec.cs` |
+| `UserCredentialSpec` | `UserCredential` | `src/CliInvoke.Core/Configuration/UserCredentialSpec.cs` |
 
 All builders are **optional**. Every model they produce has a public
 constructor that bypasses the builder entirely. See
@@ -311,8 +311,8 @@ constructor that bypasses the builder entirely. See
 **The `Configure*` pattern**: Several builder methods accept an
 `Action<TBuilder>` so the caller can configure a nested builder
 inline. For example,
-`IProcessConfigurationBuilder.ConfigureArguments(Action<IArgumentsBuilder>)`
-runs the action against a fresh `IArgumentsBuilder` and folds the
+`IProcessConfigurationBuilder.ConfigureArguments(Action<ArgumentsSpec>)`
+runs the action against a fresh `ArgumentsSpec` and folds the
 result into the configuration being built.
 
 ## The Consumers
@@ -478,8 +478,8 @@ readability. Callers that need to configure anything beyond
 | One-off command with a small fixed set of arguments | `CliRun.RunAsync(...)` (no model), or direct constructor on `ProcessConfiguration` |
 | Process with many optional properties set conditionally | `IProcessConfigurationBuilder` |
 | Need a per-invocation timeout but a shared process configuration | Direct constructor on `ProcessExitConfiguration` passed alongside |
-| Running as a different Windows user | `IUserCredentialBuilder` or `UserCredential` assigned to `ProcessConfiguration.Credential` |
-| Constraining CPU or memory | `IProcessResourcePolicyBuilder` or `ProcessResourcePolicy` assigned to `ProcessConfiguration.ResourcePolicy` |
+| Running as a different Windows user | `UserCredentialSpec` or `UserCredential` assigned to `ProcessConfiguration.Credential` |
+| Constraining CPU or memory | `ProcessResourcePolicySpec` or `ProcessResourcePolicy` assigned to `ProcessConfiguration.ResourcePolicy` |
 | Need to observe `Started`/`Exited` events or stream output while the process runs | `IExternalProcess` (via `IExternalProcessFactory`) |
 | Run from a static context without DI | `CliRun` |
 
