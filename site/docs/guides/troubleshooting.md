@@ -26,7 +26,7 @@ detection method.
 CliInvoke exposes exactly five [Resource-Owning Types](guides-resource-disposal.md#terminology)
 that hold unmanaged handles or sensitive memory: `ProcessConfiguration`,
 `IExternalProcess`, `PipedProcessResult`, `UserCredential`, and
-`UserCredentialBuilder`. Every reported leak in this library traces back
+`UserCredentialSpec`. Every reported leak in this library traces back
 to one of these five.
 
 ### Symptoms
@@ -52,10 +52,12 @@ to one of these five.
    `ProcessConfiguration`, and `StandardOutput` / `StandardError` on
    `IExternalProcess`, are owned by the library. Disposing them
    independently corrupts the parent's state.
-4. **`UserCredential` or `UserCredentialBuilder` is not disposed.** Both
-   hold a `SecureString`; the library only disposes the credential when
-   the owning `ProcessConfiguration` is disposed. Standalone credentials
-   require explicit disposal.
+4. **A `UserCredential`, a standalone `UserCredentialSpec`, or a builder-owned `UserCredentialSpec` is not disposed.**
+   All three hold a `SecureString`. A standalone `UserCredential` or a `UserCredentialSpec` you create
+   and own must be wrapped in `using` (the spec and the `UserCredential` it builds have independent
+   lifetimes). A `UserCredentialSpec` configured through `ProcessConfigurationBuilder.ConfigureUserCredential`
+   is owned and disposed by the builder, so do not dispose it yourself; the library disposes any
+   credential it places on the `ProcessConfiguration` when that configuration is disposed.
 5. **Reusing a `ProcessConfiguration` after `Dispose()`.** Once disposed,
    the internal `StreamWriter` is closed. Create a new configuration for
    each invocation.

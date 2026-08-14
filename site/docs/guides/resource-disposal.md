@@ -39,7 +39,7 @@ requires no disposal.
 | 2 | [`IExternalProcess`](#2-iexternalprocess) | `IDisposable` | The underlying `System.Diagnostics.Process` (pipes, handles, threads) |
 | 3 | [`PipedProcessResult`](#3-pipedprocessresult) | `IDisposable` + `IAsyncDisposable` | `StandardOutput` and `StandardError` streams |
 | 4 | [`UserCredential`](#4-usercredential) | `IDisposable` | `SecureString` password buffer |
-| 5 | [`UserCredentialBuilder`](#5-usercredentialbuilder) | `IDisposable` | `SecureString` password buffer staged for `Build()` |
+| 5 | [`UserCredentialSpec`](#5-usercredentialspec) | `IDisposable` | `SecureString` password buffer staged for `Build()` |
 
 No other public CliInvoke type implements `IDisposable`. If a type is
 not in the table above, it does not need to be disposed.
@@ -191,12 +191,12 @@ public void Dispose()
 2. The credential is used standalone (e.g., returned from a factory).
    The caller must dispose it.
 
-### 5. `UserCredentialBuilder`
+### 5. `UserCredentialSpec`
 
-Defined in `src/CliInvoke/Builders/UserCredentialBuilder.cs`.
+Defined in `src/CliInvoke.Core/Configuration/UserCredentialSpec.cs`.
 
 ```csharp
-public class UserCredentialBuilder : IUserCredentialBuilder
+public sealed class UserCredentialSpec : IDisposable
 ```
 
 **What it owns**
@@ -275,7 +275,7 @@ resources in CliInvoke.
 ### Pattern A — synchronous `using`
 
 Use for `ProcessConfiguration`, `UserCredential`, and
-`UserCredentialBuilder`.
+`UserCredentialSpec`.
 
 ```csharp
 using var config = new ProcessConfiguration("cmd", "/c echo hello");
@@ -317,21 +317,21 @@ finally
 }
 ```
 
-### Pattern D — builder + built credential
+### Pattern D — spec + built credential
 
-`UserCredentialBuilder` and the `UserCredential` it produces have
+`UserCredentialSpec` and the `UserCredential` it produces have
 **independent lifetimes**. Both must be disposed.
 
 ```csharp
 UserCredential credential;
-using (var builder = new UserCredentialBuilder())
+using (var spec = new UserCredentialSpec())
 {
-    credential = builder
+    credential = spec
         .SetUsername("user")
         .SetPassword(securePassword)
         .Build();
 }
-// builder disposed; now dispose the credential
+// spec disposed; now dispose the credential
 using (credential)
 {
     // use credential
@@ -377,8 +377,10 @@ following:
   `CapturePipedResultAsync` is wrapped in `await using` or
   `try/finally`.
 - [ ] Every standalone `UserCredential` is wrapped in `using`.
-- [ ] Every `UserCredentialBuilder` is wrapped in `using`, and the
-  `UserCredential` it produces is wrapped in a separate `using`.
+- [ ] Every standalone `UserCredentialSpec` you create and own is wrapped in `using`, and the
+  `UserCredential` it produces is wrapped in a separate `using`. A `UserCredentialSpec` configured
+  through `ProcessConfigurationBuilder.ConfigureUserCredential` is owned and disposed by the
+  builder, so do not dispose it yourself.
 - [ ] No `StreamWriter`, `SecureString`, `StandardOutput`, or
   `StandardError` is disposed directly — only their parents.
 - [ ] `IDisposable` is not implemented on any custom wrapper that
@@ -394,4 +396,4 @@ following:
   - `src/CliInvoke.Core/Processes/IExternalProcess.cs`
   - `src/CliInvoke.Core/Primitives/Results/PipedProcessResult.cs`
   - `src/CliInvoke.Core/Primitives/UserCredential.cs`
-  - `src/CliInvoke/Builders/UserCredentialBuilder.cs`
+  - `src/CliInvoke.Core/Configuration/UserCredentialSpec.cs`

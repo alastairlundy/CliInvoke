@@ -9,6 +9,8 @@
 
 using System.Text;
 
+using CliInvoke.Core.Configuration;
+
 namespace CliInvoke.Core.Builders;
 
 /// <summary>
@@ -25,19 +27,21 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetArguments(IEnumerable<string> arguments, bool escapeArguments = true);
 
     /// <summary>
-    ///     Sets the arguments to pass to the executable.
+    ///     Sets the arguments to pass to the executable from a single raw command-line string.
+    ///     The input is treated as ready-to-use command-line text and is stored verbatim, without
+    ///     any additional quoting or escaping. Use <see cref="SetArguments(IEnumerable{string}, bool)"/>
+    ///     when passing individual argument tokens that should be escaped.
     /// </summary>
-    /// <param name="arguments">The arguments to pass to the executable.</param>
-    /// <param name="escapeArguments"></param>
+    /// <param name="arguments">The raw command-line text to pass to the executable.</param>
     /// <returns>The new IProcessConfigurationBuilder object with the specified arguments.</returns>
-    IProcessConfigurationBuilder SetArguments(string arguments, bool escapeArguments = true);
+    IProcessConfigurationBuilder SetArguments(string arguments);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="configureArguments"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder ConfigureArguments(Action<IArgumentsBuilder> configureArguments);
+    IProcessConfigurationBuilder ConfigureArguments(Action<ArgumentsSpec> configureArguments);
     
     /// <summary>
     ///     Sets the Target File Path of the Process Executable.
@@ -51,7 +55,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="configure"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder ConfigureEnvironmentVariables(Action<IEnvironmentVariablesBuilder> configure);
+    IProcessConfigurationBuilder ConfigureEnvironmentVariables(Action<EnvironmentVariablesSpec> configure);
 
     /// <summary>
     ///     Enables using Administrator Privileges.
@@ -71,7 +75,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="configure"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder ConfigureUserCredential(Action<IUserCredentialBuilder> configure);
+    IProcessConfigurationBuilder ConfigureUserCredential(Action<UserCredentialSpec> configure);
 
     /// <summary>
     ///     Sets the credentials for the Process to be executed.
@@ -100,7 +104,7 @@ public interface IProcessConfigurationBuilder
     /// </summary>
     /// <param name="processResourcePolicy"></param>
     /// <returns></returns>
-    IProcessConfigurationBuilder ConfigureProcessResourcePolicy(Action<IProcessResourcePolicyBuilder> processResourcePolicy);
+    IProcessConfigurationBuilder ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec> processResourcePolicy);
 
     /// <summary>
     ///     Sets the Process Resource Policy to be used for this Process.

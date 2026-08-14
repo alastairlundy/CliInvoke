@@ -39,8 +39,8 @@ A **Builder** is a fluent, mutable object used to assemble a configuration
 model. Each builder is a short-lived staging area whose only job is to
 produce exactly one model via `Build()`. The produced model is independent
 of the builder — they do not share lifetime. Examples:
-`ProcessConfigurationBuilder`, `ArgumentsBuilder`, `EnvironmentVariablesBuilder`,
-`UserCredentialBuilder`.
+`ProcessConfigurationBuilder`, `ArgumentsSpec`, `EnvironmentVariablesSpec`,
+`UserCredentialSpec`.
 
 A **Configuration Model** is an immutable, value-bearing object that
 describes one aspect of how a process should be run. Models in this
@@ -121,11 +121,11 @@ independent of it.
 Key types in this stage:
 
 - `ProcessConfigurationBuilder` — assembles `ProcessConfiguration`.
-- `ArgumentsBuilder` — assembles the argument list.
-- `EnvironmentVariablesBuilder` — assembles the environment-variable
+- `ArgumentsSpec` — assembles the argument list.
+- `EnvironmentVariablesSpec` — assembles the environment-variable
   dictionary.
-- `ProcessResourcePolicyBuilder` — assembles `ProcessResourcePolicy`.
-- `UserCredentialBuilder` — assembles `UserCredential`.
+- `ProcessResourcePolicySpec` — assembles `ProcessResourcePolicy`.
+- `UserCredentialSpec` — assembles `UserCredential`.
 
 **Invariant:** the builder is single-use-per-stage. Calling `Build()`
 produces a model; calling `Build()` again produces a *new* model

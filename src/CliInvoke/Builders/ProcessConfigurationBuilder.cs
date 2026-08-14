@@ -11,7 +11,10 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
+using System.Linq;
 using System.Text;
+
+using CliInvoke.Core.Configuration;
 
 namespace CliInvoke.Builders;
 
@@ -37,24 +40,32 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     private Encoding _standardErrorEncoding;
 
     private StreamWriter _standardInput;
-    
-    private readonly ArgumentsBuilder _argumentsBuilder;
-    private readonly EnvironmentVariablesBuilder _environmentVariablesBuilder;
-    private readonly ProcessResourcePolicyBuilder _processResourcePolicyBuilder;
-    private readonly UserCredentialBuilder _userCredentialBuilder;
+
+    private readonly ArgumentsSpec _argumentsSpec;
+    private readonly EnvironmentVariablesSpec _environmentVariablesSpec;
+    private readonly ProcessResourcePolicySpec _processResourcePolicySpec;
+    private readonly UserCredentialSpec _userCredentialSpec;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="ProcessConfigurationBuilder" /> class,
     ///     which is used to build and configure a process.
     /// </summary>
     /// <param name="targetFilePath">The file path of the target file to be executed.</param>
-    public ProcessConfigurationBuilder(string targetFilePath)
+    /// <param name="argumentValidationLogic">
+    ///     Optional validation logic applied to each argument added to the configuration.
+    ///     When omitted, a default null-check validation is used.
+    /// </param>
+    public ProcessConfigurationBuilder(
+        string targetFilePath,
+        Func<string, bool>? argumentValidationLogic = null)
     {
         _targetFilePath = targetFilePath;
-        _argumentsBuilder = new ArgumentsBuilder();
-        _environmentVariablesBuilder = new EnvironmentVariablesBuilder();
-        _processResourcePolicyBuilder = new ProcessResourcePolicyBuilder();
-        _userCredentialBuilder =  new UserCredentialBuilder();
+        _argumentsSpec = argumentValidationLogic is not null
+            ? new ArgumentsSpec(argumentValidationLogic)
+            : new ArgumentsSpec();
+        _environmentVariablesSpec = new EnvironmentVariablesSpec();
+        _processResourcePolicySpec = new ProcessResourcePolicySpec();
+        _userCredentialSpec = new UserCredentialSpec();
 
         _outputRedirection = false;
 
@@ -84,38 +95,49 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         bool escapeArguments = true)
     {
         ArgumentNullException.ThrowIfNull(arguments);
-        
-        _argumentsBuilder.Clear();
-        _argumentsBuilder.AddRange(arguments);
-        
+
+        _argumentsSpec.Clear();
+
+        List<string> argumentsList = arguments.ToList();
+        if (argumentsList.Count == 0)
+            return this;
+
+        if (escapeArguments)
+            _argumentsSpec.AddEnumerable(argumentsList, escape: true);
+        else
+            _argumentsSpec.AddEnumerable(argumentsList, escape: false);
+
         return this;
     }
 
     /// <summary>
     ///     Sets process arguments to the Process Configuration builder.
     /// </summary>
-    /// <param name="arguments">The argument string to be added.</param>
-    /// <param name="escapeArguments"></param>
+    /// <param name="arguments">The raw command-line text to be added, stored verbatim without additional quoting or escaping.</param>
     /// <returns>A reference to this builder with the added string arguments, allowing method chaining.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="arguments" /> is null or empty.</exception>
-    public IProcessConfigurationBuilder SetArguments(string arguments, bool escapeArguments = true)
+    public IProcessConfigurationBuilder SetArguments(string arguments)
     {
         ArgumentNullException.ThrowIfNull(arguments);
 
-        _argumentsBuilder.Clear();
-        _argumentsBuilder.Add(arguments);
+        _argumentsSpec.Clear();
+
+        // A single raw string is treated as ready-to-use command-line text and is
+        // not wrapped/escaped, matching the former ArgumentsBuilder behaviour.
+        _argumentsSpec.Add(arguments, escape: false);
+
         return this;
     }
 
     /// <summary>
-    /// 
+    ///     Configures the process arguments using the provided configuration action.
     /// </summary>
-    /// <param name="configureArguments"></param>
-    /// <returns></returns>
-    public IProcessConfigurationBuilder ConfigureArguments(Action<IArgumentsBuilder> configureArguments)
+    /// <param name="configureArguments">An action that accepts an <see cref="ArgumentsSpec" /> and is used to configure the arguments.</param>
+    /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> for further configuration.</returns>
+    public IProcessConfigurationBuilder ConfigureArguments(Action<ArgumentsSpec> configureArguments)
     {
-        configureArguments.Invoke(_argumentsBuilder);
-        
+        configureArguments.Invoke(_argumentsSpec);
+
         return this;
     }
 
@@ -140,13 +162,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <summary>
     /// Configures the environment variables for the process using the provided configuration action.
     /// </summary>
-    /// <param name="configureEnvironmentVariables">An action that accepts an <see cref="IEnvironmentVariablesBuilder" /> and is used to configure the environment variables.</param>
+    /// <param name="configureEnvironmentVariables">An action that accepts an <see cref="EnvironmentVariablesSpec" /> and is used to configure the environment variables.</param>
     /// <returns>An instance of <see cref="IProcessConfigurationBuilder" /> for further configuration.</returns>
     public IProcessConfigurationBuilder ConfigureEnvironmentVariables(
-        Action<IEnvironmentVariablesBuilder> configureEnvironmentVariables)
+        Action<EnvironmentVariablesSpec> configureEnvironmentVariables)
     {
-        configureEnvironmentVariables.Invoke(_environmentVariablesBuilder);
-        
+        configureEnvironmentVariables.Invoke(_environmentVariablesSpec);
+
         return this;
     }
 
@@ -194,19 +216,19 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [UnsupportedOSPlatform("android")]
     public IProcessConfigurationBuilder SetUserCredential(UserCredential credential)
     {
-        return ConfigureUserCredential(configureCredential =>
+        return ConfigureUserCredential(spec =>
         {
             if(credential.LoadUserProfile is not null)
-                configureCredential.LoadUserProfile((bool)credential.LoadUserProfile);
+                spec.SetUserProfileLoading((bool)credential.LoadUserProfile);
             
             if(credential.Domain is not null)
-                configureCredential.SetDomain(credential.Domain);
+                spec.SetDomain(credential.Domain);
             
             if(credential.UserName is not null)
-                configureCredential.SetUsername(credential.UserName);
+                spec.SetUsername(credential.UserName);
             
             if(credential.Password is not null)
-                configureCredential.SetPassword(credential.Password);
+                spec.SetPassword(credential.Password);
         });
     }
 
@@ -225,11 +247,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [UnsupportedOSPlatform("linux")]
     [UnsupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("android")]
-    public IProcessConfigurationBuilder ConfigureUserCredential(Action<IUserCredentialBuilder> configureCredential)
+    public IProcessConfigurationBuilder ConfigureUserCredential(Action<UserCredentialSpec> configureCredential)
     {
         ArgumentNullException.ThrowIfNull(configureCredential);
-        
-        configureCredential.Invoke(_userCredentialBuilder);
+
+        configureCredential.Invoke(_userCredentialSpec);
 
         return this;
     }
@@ -290,12 +312,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     allowing method chaining.
     /// </returns>
     public IProcessConfigurationBuilder ConfigureProcessResourcePolicy(
-        Action<IProcessResourcePolicyBuilder> configureResourcePolicy)
+        Action<ProcessResourcePolicySpec> configureResourcePolicy)
     {
         ArgumentNullException.ThrowIfNull(configureResourcePolicy);
-        
-        configureResourcePolicy.Invoke(_processResourcePolicyBuilder);
-        
+
+        configureResourcePolicy.Invoke(_processResourcePolicySpec);
+
         return this;
     }
 
@@ -314,19 +336,17 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public IProcessConfigurationBuilder SetProcessResourcePolicy(
         ProcessResourcePolicy processResourcePolicy)
     {
-        return ConfigureProcessResourcePolicy(configureResourcePolicy =>
+        return ConfigureProcessResourcePolicy(spec =>
         {
-            configureResourcePolicy.SetPriorityClass(processResourcePolicy.PriorityClass)
+            spec.SetPriorityClass(processResourcePolicy.PriorityClass)
                 .ConfigurePriorityBoost(processResourcePolicy.EnablePriorityBoost);
 
-            if (processResourcePolicy.MinWorkingSet is not null)
-                configureResourcePolicy.SetMinWorkingSet((nint)processResourcePolicy.MinWorkingSet);
-            
-            if(processResourcePolicy.MaxWorkingSet is not null)
-                configureResourcePolicy.SetMaxWorkingSet((nint)processResourcePolicy.MaxWorkingSet);
-            
-            if(processResourcePolicy.ProcessorAffinity is not null)
-                configureResourcePolicy.SetProcessorAffinity((nint)processResourcePolicy.ProcessorAffinity);
+            spec.SetMinWorkingSet((nint?)processResourcePolicy.MinWorkingSet);
+            spec.SetMaxWorkingSet((nint?)processResourcePolicy.MaxWorkingSet);
+
+            spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity is not null
+                ? (nint)processResourcePolicy.ProcessorAffinity
+                : (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
         });
     }
 
@@ -395,15 +415,22 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     Builds and returns a ProcessConfiguration object with the specified properties.
     /// </summary>
     /// <returns>The configured ProcessConfiguration object.</returns>
+    /// <exception cref="ArgumentException">
+    ///     Thrown if shell execution is enabled while standard input is redirected.
+    /// </exception>
     [Pure]
     public ProcessConfiguration Build()
     {
-        string arguments = _argumentsBuilder.ToString();
+        if (_useShellExecution && (_redirectStandardInput || _standardInput != StreamWriter.Null))
+            throw new ArgumentException(
+                "Using shell execution whilst also redirecting standard input is not supported.");
+
+        string arguments = _argumentsSpec.Build();
         
-        IReadOnlyDictionary<string, string> environmentVariables = _environmentVariablesBuilder.Build();
+        IReadOnlyDictionary<string, string> environmentVariables = _environmentVariablesSpec.Build();
         
-        ProcessResourcePolicy resourcePolicy = _processResourcePolicyBuilder.Build();
-        UserCredential credential = _userCredentialBuilder.Build();
+        ProcessResourcePolicy resourcePolicy = _processResourcePolicySpec.Build();
+        UserCredential credential = _userCredentialSpec.Build();
 
         BuilderProcessConfiguration configuration = new(_targetFilePath, arguments,
             _redirectStandardInput, _outputRedirection,
@@ -417,7 +444,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     /// <inheritdoc/>
     public void Dispose()
     {
-        _userCredentialBuilder.Dispose();
+        _userCredentialSpec.Dispose();
         _standardInput.Dispose();
         GC.SuppressFinalize(this);
     }
