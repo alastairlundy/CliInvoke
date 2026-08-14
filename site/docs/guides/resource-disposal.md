@@ -377,8 +377,10 @@ following:
   `CapturePipedResultAsync` is wrapped in `await using` or
   `try/finally`.
 - [ ] Every standalone `UserCredential` is wrapped in `using`.
-- [ ] Every `UserCredentialSpec` is wrapped in `using`, and the
-  `UserCredential` it produces is wrapped in a separate `using`.
+- [ ] Every standalone `UserCredentialSpec` you create and own is wrapped in `using`, and the
+  `UserCredential` it produces is wrapped in a separate `using`. A `UserCredentialSpec` configured
+  through `ProcessConfigurationBuilder.ConfigureUserCredential` is owned and disposed by the
+  builder, so do not dispose it yourself.
 - [ ] No `StreamWriter`, `SecureString`, `StandardOutput`, or
   `StandardError` is disposed directly — only their parents.
 - [ ] `IDisposable` is not implemented on any custom wrapper that
