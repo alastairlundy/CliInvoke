@@ -22,6 +22,8 @@
     SOFTWARE.
  */
 
+// Derived from DotExtensions (MIT License) - See THIRD_PARTY_NOTICES.txt for full details.
+
 using System.Linq;
 
 namespace CliInvoke.Core.Internal.IO;

@@ -43,7 +43,7 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
     public const string LoggerKey = "Logger";
 
     private static readonly Regex SensitiveArgPattern = new(
-        @"(--password|--token|--api-key)(\s+|=)(""[^""]*""|'[^']*'|\S+)",
+        @"(--password|--token|--api-key)(\s+|=)(""[^""]*""|'[^']*'|[^-\s]\S*)",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>

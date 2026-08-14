@@ -6,6 +6,7 @@
 ### 3.0
 | Version | Release Date | Changelog |
 |-|-|-|
+| 3.0.0 Alpha 8 | August 13th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.8 |
 | 3.0.0 Alpha 7 | July 28th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.7 |
 | 3.0.0 Alpha 6 | July 19th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.6 |
 | 3.0.0 Alpha 5 | June 20th 2026 |  https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.5 |
