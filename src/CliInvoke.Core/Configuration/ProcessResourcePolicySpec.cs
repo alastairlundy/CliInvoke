@@ -45,13 +45,20 @@ public sealed class ProcessResourcePolicySpec
     /// <returns>The current <see cref="ProcessResourcePolicySpec" /> instance.</returns>
     /// <remarks>Process objects only support Processor Affinity on Windows and Linux operating systems.</remarks>
     /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if processor affinity is less than 1 (no processor selected).
+    ///     Thrown if processor affinity is less than 1 (no processor selected) or greater than the
+    ///     maximum valid bitmask for the available processors.
     /// </exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     public ProcessResourcePolicySpec SetProcessorAffinity(nint processorAffinity)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 0x0001);
+        ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 1);
+
+        nint maxAffinityMask = Environment.ProcessorCount >= (nint.Size * 8) - 1
+            ? nint.MaxValue
+            : ((nint)1 << Environment.ProcessorCount) - 1;
+
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(processorAffinity, maxAffinityMask);
 
         _processorAffinity = processorAffinity;
 

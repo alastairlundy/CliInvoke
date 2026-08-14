@@ -535,19 +535,21 @@ public class ProcessConfigurationBuilderTests
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
 
-        // Act & Assert — zero mask is always invalid
+        // Act & Assert — zero mask is invalid (less than 1)
         await Assert.That(() =>
         {
             builder.ConfigureProcessResourcePolicy(spec =>
                 spec.SetProcessorAffinity(0));
         }).Throws<ArgumentOutOfRangeException>();
 
-        // Additionally, negative values are invalid (no upper bound: a mask is a bitmask)
-        nint invalidNegative = -1;
+        // A value beyond the valid bitmask for the available processors is invalid
+        int processorCount = Math.Max(1, Environment.ProcessorCount);
+        nint maxAffinityMask = ((nint)1 << processorCount) - 1;
+        nint invalidBeyondMax = maxAffinityMask + 1;
         await Assert.That(() =>
         {
             builder.ConfigureProcessResourcePolicy(spec =>
-                spec.SetProcessorAffinity(invalidNegative));
+                spec.SetProcessorAffinity(invalidBeyondMax));
         }).Throws<ArgumentOutOfRangeException>();
     }
 
