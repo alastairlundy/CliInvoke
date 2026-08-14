@@ -28,7 +28,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         if (processorCount >= nativeWidth)
         {
-            return (nint)IntPtr.MaxValue;
+            return (nint)(((long)1 << (nativeWidth - 1)) - 1);
         }
 
         return ((nint)1 << processorCount) - 1;
