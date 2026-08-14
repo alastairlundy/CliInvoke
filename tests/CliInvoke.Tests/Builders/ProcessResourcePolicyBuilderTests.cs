@@ -11,8 +11,8 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(1 * 16 - 1)]
-    [InlineData(1 * 8 - 1)]
+    [InlineData(0x000F)]  // 0b1111 - valid for 4+ processor systems
+    [InlineData(0x0007)]  // 0b0111 - valid for 3+ processor systems
     public void WithProcessorAffinity_ValidProcessorAffinity_Valid_Success(nint processorAffinity)
     {
         // Arrange
@@ -31,7 +31,7 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(2 * 24)]
+    [InlineData(0x10000)]  // 0b10000000000000000 - exceeds max for most systems
     [InlineData(0)]
     public void WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail(nint processorAffinity)
     {
@@ -174,10 +174,10 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(2 * 16 - 1,1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]
-    [InlineData(1 * 16 -1, 8192, 1024, false, ProcessPriorityClass.Normal)]
-    [InlineData(1 * 8 - 1, 1024, 0, false,  ProcessPriorityClass.Normal)]
-    [InlineData(2 * 8 - 1, 1024, 1024, true,   ProcessPriorityClass.BelowNormal)]
+    [InlineData(0x000F, 1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]   // 0b1111
+    [InlineData(0x0007, 8192, 1024, false, ProcessPriorityClass.Normal)]           // 0b0111
+    [InlineData(0x0003, 1024, 0, false, ProcessPriorityClass.Normal)]              // 0b0011
+    [InlineData(0x000F, 1024, 1024, true, ProcessPriorityClass.BelowNormal)]       // 0b1111
     public void Build_Successfully(nint processorAffinity, nint maxWorkingSet, nint minWorkingSet,
         bool priorityBoostEnabled, ProcessPriorityClass priorityClass)
     {
