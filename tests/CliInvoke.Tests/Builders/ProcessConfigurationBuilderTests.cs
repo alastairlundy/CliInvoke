@@ -566,7 +566,10 @@ public class ProcessConfigurationBuilderTests
 
         // Act
         builder.ConfigureProcessResourcePolicy(spec =>
-            spec.SetWorkingSet(minWorkingSet, minWorkingSet + 1));
+        {
+            spec.SetMinWorkingSet(minWorkingSet);
+            spec.SetMaxWorkingSet(minWorkingSet + 1);
+        });
 
         // Assert
         ProcessConfiguration config = builder.Build();
@@ -589,7 +592,10 @@ public class ProcessConfigurationBuilderTests
         await Assert.That(() =>
         {
             builder.ConfigureProcessResourcePolicy(spec =>
-                spec.SetWorkingSet(minWorkingSet, minWorkingSet + 1));
+            {
+                spec.SetMinWorkingSet(minWorkingSet);
+                spec.SetMaxWorkingSet(minWorkingSet + 1);
+            });
         }).Throws<ArgumentOutOfRangeException>();
     }
 

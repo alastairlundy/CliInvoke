@@ -337,11 +337,12 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
             spec.SetPriorityClass(processResourcePolicy.PriorityClass)
                 .ConfigurePriorityBoost(processResourcePolicy.EnablePriorityBoost);
 
-            if (processResourcePolicy.MinWorkingSet is not null && processResourcePolicy.MaxWorkingSet is not null)
-                spec.SetWorkingSet((nint)processResourcePolicy.MinWorkingSet, (nint)processResourcePolicy.MaxWorkingSet);
-            
-            if(processResourcePolicy.ProcessorAffinity is not null)
-                spec.SetProcessorAffinity((nint)processResourcePolicy.ProcessorAffinity);
+            spec.SetMinWorkingSet((nint?)processResourcePolicy.MinWorkingSet);
+            spec.SetMaxWorkingSet((nint?)processResourcePolicy.MaxWorkingSet);
+
+            spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity is not null
+                ? (nint)processResourcePolicy.ProcessorAffinity
+                : (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
         });
     }
 

@@ -51,14 +51,15 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
             {
                 resourceSpec.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
                 
-                if(processConfigToBeRun.ResourcePolicy.MinWorkingSet is not null && processConfigToBeRun.ResourcePolicy.MaxWorkingSet is not null)
-                    resourceSpec.SetWorkingSet((nint)processConfigToBeRun.ResourcePolicy.MinWorkingSet, (nint)processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                resourceSpec.SetMinWorkingSet((nint?)processConfigToBeRun.ResourcePolicy.MinWorkingSet);
+                resourceSpec.SetMaxWorkingSet((nint?)processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
 
                 resourceSpec.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
                     .EnablePriorityBoost);
                 
-                if(processConfigToBeRun.ResourcePolicy.ProcessorAffinity is not null)
-                    resourceSpec.SetProcessorAffinity((nint)processConfigToBeRun.ResourcePolicy.ProcessorAffinity);
+                resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity is not null
+                    ? (nint)processConfigToBeRun.ResourcePolicy.ProcessorAffinity
+                    : (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
             })
             .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)

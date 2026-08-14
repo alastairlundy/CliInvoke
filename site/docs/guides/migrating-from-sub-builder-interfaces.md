@@ -146,8 +146,8 @@ The lambda parameter changes from `IProcessResourcePolicyBuilder` to
 
 Key differences in the spec API:
 
-- `SetMinWorkingSet` and `SetMaxWorkingSet` are replaced by a single
-  `SetWorkingSet(min, max)` method.
+- `SetMinWorkingSet(nint?)` and `SetMaxWorkingSet(nint?)` are independent,
+  nullable-aware setters so a policy can set only one working-set bound.
 - `SetProcessorAffinity` accepts values ≥ 1 (the old builder
   required ≥ 1 as well, but the bounds were documented differently).
 - `ConfigurePriorityBoost` and `SetPriorityClass` remain unchanged.
@@ -200,7 +200,7 @@ Key differences:
 |---|---|---|---|
 | Arguments | `IArgumentsBuilder` | `ArgumentsSpec` | `EscapeCharacters` removed (internal) |
 | Environment variables | `IEnvironmentVariablesBuilder` | `EnvironmentVariablesSpec` | `Set()` → `SetPair()` |
-| Process resource policy | `IProcessResourcePolicyBuilder` | `ProcessResourcePolicySpec` | `SetMinWorkingSet`/`SetMaxWorkingSet` → `SetWorkingSet`; `ConfigureResourcePolicy` → `ConfigureProcessResourcePolicy` |
+| Process resource policy | `IProcessResourcePolicyBuilder` | `ProcessResourcePolicySpec` | `SetMinWorkingSet(nint?)`/`SetMaxWorkingSet(nint?)` independent setters; `ConfigureResourcePolicy` → `ConfigureProcessResourcePolicy` |
 | User credential | `IUserCredentialBuilder` | `UserCredentialSpec` | None — method names preserved |
 
 ## Further reading

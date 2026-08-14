@@ -69,18 +69,50 @@ public sealed class ProcessResourcePolicySpec
     /// <exception cref="ArgumentOutOfRangeException">
     ///     Thrown if minWorkingSet is negative, or maxWorkingSet is less than minWorkingSet.
     /// </exception>
+    /// <summary>
+    ///     Sets the minimum working set size for the process resource policy.
+    /// </summary>
+    /// <param name="minWorkingSet">The minimum working set to be used, or null to leave it unset.</param>
+    /// <returns>The current <see cref="ProcessResourcePolicySpec" /> instance.</returns>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
-    public ProcessResourcePolicySpec SetWorkingSet(nint minWorkingSet, nint maxWorkingSet)
+    public ProcessResourcePolicySpec SetMinWorkingSet(nint? minWorkingSet)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet);
-        ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, minWorkingSet);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet, maxWorkingSet);
-        ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 1);
+        if (minWorkingSet is not null)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet.Value);
+
+            if (_maxWorkingSet is not null)
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet.Value, _maxWorkingSet.Value);
+        }
 
         _minWorkingSet = minWorkingSet;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets the maximum working set size for the process resource policy.
+    /// </summary>
+    /// <param name="maxWorkingSet">The maximum working set to be used, or null to leave it unset.</param>
+    /// <returns>The current <see cref="ProcessResourcePolicySpec" /> instance.</returns>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("freebsd")]
+    public ProcessResourcePolicySpec SetMaxWorkingSet(nint? maxWorkingSet)
+    {
+        if (maxWorkingSet is not null)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(maxWorkingSet.Value);
+            ArgumentOutOfRangeException.ThrowIfZero(maxWorkingSet.Value);
+
+            if (_minWorkingSet is not null)
+                ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet.Value, _minWorkingSet.Value);
+        }
+
         _maxWorkingSet = maxWorkingSet;
 
         return this;
