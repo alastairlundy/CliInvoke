@@ -421,7 +421,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     [Pure]
     public ProcessConfiguration Build()
     {
-        if (_useShellExecution && _standardInput != StreamWriter.Null)
+        if (_useShellExecution && (_redirectStandardInput || _standardInput != StreamWriter.Null))
             throw new ArgumentException(
                 "Using shell execution whilst also redirecting standard input is not supported.");
 
