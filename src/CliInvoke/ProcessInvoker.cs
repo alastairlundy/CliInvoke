@@ -145,7 +145,15 @@ public class ProcessInvoker : IProcessInvoker
         if (_chain is not null)
         {
             await _chain.RunAsync(ctx, ctx.CancellationToken);
-            return (TResult)ctx.Result!;
+
+            if (ctx.Result is null)
+            {
+                throw new InvalidOperationException(
+                    "The middleware chain completed without setting a result. " +
+                    "Short-circuiting middleware must assign InvocationContext.Result before returning.");
+            }
+
+            return (TResult)ctx.Result;
         }
 
         return await _pipeline.InvokeAsync<TResult>(ctx);
