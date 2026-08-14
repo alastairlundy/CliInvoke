@@ -32,6 +32,25 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     {
     }
 
+    /// <summary>
+    ///     Initialises a new instance of the <see cref="ProcessConfiguration" /> class
+    ///     with full control over all process configuration parameters.
+    /// </summary>
+    /// <param name="targetFilePath">The file path of the executable to be run.</param>
+    /// <param name="arguments">The arguments to pass to the executable.</param>
+    /// <param name="redirectStandardInput">Whether to redirect standard input.</param>
+    /// <param name="outputRedirection">Whether to redirect standard output and error.</param>
+    /// <param name="workingDirectoryPath">The working directory path to use, or <c>null</c> for the current directory.</param>
+    /// <param name="requiresAdministrator">Whether administrator privileges are required.</param>
+    /// <param name="environmentVariables">Environment variables to set, or <c>null</c> for none.</param>
+    /// <param name="credential">The user credential for execution, or <c>null</c> for none.</param>
+    /// <param name="standardInput">The standard input stream, or <c>null</c> for <see cref="StreamWriter.Null"/>.</param>
+    /// <param name="standardInputEncoding">The encoding for standard input.</param>
+    /// <param name="standardOutputEncoding">The encoding for standard output.</param>
+    /// <param name="standardErrorEncoding">The encoding for standard error.</param>
+    /// <param name="processResourcePolicy">The process resource policy, or <c>null</c> for defaults.</param>
+    /// <param name="windowCreation">Whether to enable window creation.</param>
+    /// <param name="useShellExecution">Whether to use shell execution.</param>
     protected ProcessConfiguration(
         string targetFilePath,
         string arguments,

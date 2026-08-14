@@ -66,19 +66,13 @@ public sealed class ProcessResourcePolicySpec
     }
 
     /// <summary>
-    ///     Configures the minimum and maximum working set for the process resource policy.
-    /// </summary>
-    /// <param name="minWorkingSet">The minimum working set to be used.</param>
-    /// <param name="maxWorkingSet">The maximum working set to be used.</param>
-    /// <returns>The current <see cref="ProcessResourcePolicySpec" /> instance.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if minWorkingSet is negative, or maxWorkingSet is less than minWorkingSet.
-    /// </exception>
-    /// <summary>
     ///     Sets the minimum working set size for the process resource policy.
     /// </summary>
-    /// <param name="minWorkingSet">The minimum working set to be used, or null to leave it unset.</param>
+    /// <param name="minWorkingSet">The minimum working set to be used, or <c>null</c> to leave it unset.</param>
     /// <returns>The current <see cref="ProcessResourcePolicySpec" /> instance.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     Thrown if <paramref name="minWorkingSet" /> is negative or exceeds the configured maximum working set.
+    /// </exception>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("maccatalyst")]

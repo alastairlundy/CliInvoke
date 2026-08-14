@@ -11,6 +11,7 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
+using System.Linq;
 using System.Text;
 
 using CliInvoke.Core.Configuration;
@@ -97,10 +98,14 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
 
         _argumentsSpec.Clear();
 
+        List<string> argumentsList = arguments.ToList();
+        if (argumentsList.Count == 0)
+            return this;
+
         if (escapeArguments)
-            _argumentsSpec.AddEnumerable(arguments, escape: true);
+            _argumentsSpec.AddEnumerable(argumentsList, escape: true);
         else
-            _argumentsSpec.AddEnumerable(arguments, escape: false);
+            _argumentsSpec.AddEnumerable(argumentsList, escape: false);
 
         return this;
     }
@@ -410,9 +415,16 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     ///     Builds and returns a ProcessConfiguration object with the specified properties.
     /// </summary>
     /// <returns>The configured ProcessConfiguration object.</returns>
+    /// <exception cref="ArgumentException">
+    ///     Thrown if shell execution is enabled while standard input is redirected.
+    /// </exception>
     [Pure]
     public ProcessConfiguration Build()
     {
+        if (_useShellExecution && _standardInput != StreamWriter.Null)
+            throw new ArgumentException(
+                "Using shell execution whilst also redirecting standard input is not supported.");
+
         string arguments = _argumentsSpec.Build();
         
         IReadOnlyDictionary<string, string> environmentVariables = _environmentVariablesSpec.Build();
