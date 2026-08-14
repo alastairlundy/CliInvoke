@@ -151,7 +151,7 @@ same model** for the same input. Concretely:
   escaping is a no-op, but the two paths can differ for arguments
   containing `\\`, `"`, or control characters.
 - **`ProcessorAffinity` lower bound.** Both the model's
-  `ProcessResourcePolicy` and the builder's `SetProcessorAffinity`
+  `ProcessResourcePolicy` and `ProcessResourcePolicySpec.SetProcessorAffinity`
   require `processorAffinity >= 1` (a value of `0` selects no processor
   and is rejected). There is no upper bound because a processor affinity
   mask is a bitmask over processors, so any positive value is accepted.
@@ -294,7 +294,7 @@ The model is value-equal and immutable.
 There is one builder per model that has a non-trivial set of optional
 properties.
 
-| Builder | Produces | Defined in |
+| Configuration type | Produces | Defined in |
 |---------|----------|------------|
 | `IProcessConfigurationBuilder` | `ProcessConfiguration` | `src/CliInvoke.Core/Builders/IProcessConfigurationBuilder.cs` |
 | `ArgumentsSpec` | `string` (joined arguments) | `src/CliInvoke.Core/Configuration/ArgumentsSpec.cs` |
@@ -306,8 +306,8 @@ All builders are **optional**. Every model they produce has a public
 constructor that bypasses the builder entirely. See
 [Builders Are Optional](#builders-are-optional) above.
 
-**The `Configure*` pattern**: Several builder methods accept an
-`Action<TBuilder>` so the caller can configure a nested builder
+**The `Configure*` pattern**: Several `Configure*` methods accept an
+`Action<TSpec>` so the caller can configure a nested spec
 inline. For example,
 `IProcessConfigurationBuilder.ConfigureArguments(Action<ArgumentsSpec>)`
 runs the action against the shared `ArgumentsSpec` instance held by the
