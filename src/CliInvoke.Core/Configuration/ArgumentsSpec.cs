@@ -173,8 +173,13 @@ public sealed class ArgumentsSpec
         if (valuesList.Count == 0)
             throw new ArgumentException("No valid arguments to add.");
 
-        IEnumerable<string> valuesStrings = valuesList.Select(x => x.ToString(null,
-            _formatProvider));
+        List<string> valuesStrings = valuesList
+            .Select(x => x.ToString(null, _formatProvider)!)
+            .Where(x => _argumentValidationLogic.Invoke(x))
+            .ToList();
+
+        if (valuesStrings.Count == 0)
+            throw new ArgumentException("No valid arguments to add.");
 
         string value = string.Join(' ', valuesStrings);
         string processedValue = escape ? EscapeCharactersWithoutWrapping(value) : value;
