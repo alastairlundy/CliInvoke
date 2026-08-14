@@ -17,6 +17,24 @@ namespace CliInvoke.Core;
 public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 {
     /// <summary>
+    /// Computes the maximum valid processor-affinity bitmask for the current system,
+    /// handling processor counts that equal or exceed the native integer bit width.
+    /// </summary>
+    /// <returns>The maximum processor-affinity mask.</returns>
+    public static nint ComputeMaxProcessorAffinity()
+    {
+        int processorCount = Environment.ProcessorCount;
+        int nativeWidth = IntPtr.Size * 8;
+
+        if (processorCount >= nativeWidth)
+        {
+            return (nint)IntPtr.MaxValue;
+        }
+
+        return ((nint)1 << processorCount) - 1;
+    }
+
+    /// <summary>
     /// Instantiates the <see cref="ProcessResourcePolicy"/> with default values unless specified parameters are provided.
     /// </summary>
     /// <param name="processorAffinity">The processor affinity to be used for the Process.</param>
@@ -58,7 +76,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
             ArgumentOutOfRangeException.ThrowIfLessThan((nint)processorAffinity, 0x0001);
             
             ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity,
-                ((nint)1 << Environment.ProcessorCount) - 1);
+                ComputeMaxProcessorAffinity());
         }
 
         if (maxWorkingSet is not null)
@@ -67,10 +85,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         
         ProcessorAffinity = processorAffinity ??
 #pragma warning restore CA1416
-#if NETSTANDARD2_0
-                            (nint)
-#endif
-                            ((nint)1 << Environment.ProcessorCount) - 1;
+                            ComputeMaxProcessorAffinity();
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -122,10 +137,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
     public static ProcessResourcePolicy Default { get; } = new(
-#if NETSTANDARD2_0
-        (nint)
-#endif
-        ((nint)1 << Environment.ProcessorCount) - 1
+        ComputeMaxProcessorAffinity()
     );
 
     /// <summary>

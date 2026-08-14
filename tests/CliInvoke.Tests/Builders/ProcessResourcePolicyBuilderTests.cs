@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Runtime.Versioning;
 using Assert = Xunit.Assert;
 
@@ -8,11 +10,55 @@ namespace CliInvoke.Tests.Builders;
 
 public class ProcessResourcePolicyBuilderTests
 {
+    private static nint ComputeMaxAffinity()
+    {
+        int processorCount = Environment.ProcessorCount;
+        int nativeWidth = IntPtr.Size * 8;
+
+        if (processorCount >= nativeWidth)
+        {
+            return nint.MaxValue;
+        }
+
+        return ((nint)1 << processorCount) - 1;
+    }
+
+    public static IEnumerable<object[]> ValidProcessorAffinityValues()
+    {
+        nint maxAffinity = ComputeMaxAffinity();
+        nint smallMask1 = (nint)0x0001;
+        nint smallMask2 = (nint)0x0003;
+        nint smallMask4 = (nint)0x000F;
+
+        if (smallMask4 <= maxAffinity)
+        {
+            yield return new object[] { smallMask4 };
+        }
+
+        if (smallMask2 <= maxAffinity && smallMask2 != smallMask4)
+        {
+            yield return new object[] { smallMask2 };
+        }
+
+        if (smallMask1 <= maxAffinity && smallMask1 != smallMask2 && smallMask1 != smallMask4)
+        {
+            yield return new object[] { smallMask1 };
+        }
+
+        yield return new object[] { maxAffinity };
+    }
+
+    public static IEnumerable<object[]> InvalidProcessorAffinityValues()
+    {
+        nint maxAffinity = ComputeMaxAffinity();
+        yield return new object[] { maxAffinity + 1 };
+        yield return new object[] { (nint)0 };
+    }
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(0x000F)]  // 0b1111 - valid for 4+ processor systems
-    [InlineData(0x0007)]  // 0b0111 - valid for 3+ processor systems
+    [MemberData(nameof(ValidProcessorAffinityValues))]
     public void WithProcessorAffinity_ValidProcessorAffinity_Valid_Success(nint processorAffinity)
     {
         // Arrange
@@ -31,8 +77,7 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(0x10000)]  // 0b10000000000000000 - exceeds max for most systems
-    [InlineData(0)]
+    [MemberData(nameof(InvalidProcessorAffinityValues))]
     public void WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail(nint processorAffinity)
     {
         // Arrange
@@ -169,15 +214,31 @@ public class ProcessResourcePolicyBuilderTests
                 .SetMinWorkingSet(minWorkingSet).SetMaxWorkingSet(maxWorkingSet));
     }
 
+    public static IEnumerable<object[]> BuildSuccessData()
+    {
+        nint maxAffinity = ComputeMaxAffinity();
+        nint mask4 = (nint)0x000F;
+        nint mask3 = (nint)0x0003;
+
+        if (mask4 <= maxAffinity)
+        {
+            yield return new object[] { maxAffinity, 1024_000, 8192, true, ProcessPriorityClass.AboveNormal };
+            yield return new object[] { mask4, 8192, 1024, false, ProcessPriorityClass.Normal };
+        }
+
+        if (mask3 <= maxAffinity)
+        {
+            yield return new object[] { mask3, 1024, 0, false, ProcessPriorityClass.Normal };
+            yield return new object[] { maxAffinity & ~mask3, 1024, 1024, true, ProcessPriorityClass.BelowNormal };
+        }
+    }
+
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("linux")]
     [Theory]
-    [InlineData(0x000F, 1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]   // 0b1111
-    [InlineData(0x0007, 8192, 1024, false, ProcessPriorityClass.Normal)]           // 0b0111
-    [InlineData(0x0003, 1024, 0, false, ProcessPriorityClass.Normal)]              // 0b0011
-    [InlineData(0x000F, 1024, 1024, true, ProcessPriorityClass.BelowNormal)]       // 0b1111
+    [MemberData(nameof(BuildSuccessData))]
     public void Build_Successfully(nint processorAffinity, nint maxWorkingSet, nint minWorkingSet,
         bool priorityBoostEnabled, ProcessPriorityClass priorityClass)
     {
