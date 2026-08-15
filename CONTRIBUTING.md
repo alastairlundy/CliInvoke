@@ -9,15 +9,39 @@ If you'd like to add a feature or change part of this project's code, please:
 2) Make a new branch from main with a name that very briefly describes the changes you want to make
 3) Test the changes to make sure it doesn't break any existing code and works on the Platforms that the project currently works on
 4) Submit a Pull Request describing the changes you've made and why you've made them (particularly if it's not immediately apparent or obvious)
-5) If I haven't commented on the Pull Request or reviewed it within a few weeks of it being created, please feel free to tag me @alastairlundy in the Pull Request.
+5) If you haven't had a response within a reasonable time, feel free to tag the maintainer (@alastairlundy) in the Pull Request so they can take a look.
 
 If you have multiple features or changes that you want to add that don't rely on each other, please create separate branches for each separate change or feature. 
 
 You might find it duplicative to do this, but it helps to ensure that: 
 A) individual changes are accepted or declined based on their own merits
-B) code that is submitted to be merged is reviewed and scrutinized carefully to avoid, and/or mitigate against attacks on Open Source code and infrastructure - We don't need a repeat of the xz utils backdoor attack.
+B) submitted code is reviewed and tested carefully, which is normal, healthy open-source practice that keeps quality high and catches regressions before they reach the released package
 and C) code is safely added to this project without causing this package to suffer any regressions as a result of accepting the contribution. 
 
-If you follow these steps, and your contribution makes a helpful change, I am likely to agree to merge it.
+If you follow these steps, and your contribution makes a helpful change, the maintainer is likely to merge it.
+
+### How to build & test
+
+CliInvoke targets .NET 10 (see `global.json`) and uses the [TUnit](https://www.tunit.dev/) test framework.
+
+1. Install the .NET 10 SDK (matching `global.json`).
+2. Restore and build the solution from the repo root:
+   ```bash
+   dotnet build src/CliInvoke.sln -c Debug
+   ```
+3. Run the tests from the main test project directory:
+   ```bash
+   cd tests/CliInvoke.Tests
+   dotnet test
+   ```
+4. For full build, release, and packaging guidance, see [building-cliinvoke.md](site/docs/building-cliinvoke.md).
+
+### Development setup, standards & PR conventions
+
+- **SDK & target frameworks:** Use the .NET 10 SDK and respect the `net10.0` target frameworks declared in the project files.
+- **Code style:** Match the existing C# conventions in the repository. Keep changes small and focused, and make sure `dotnet test` passes before submitting.
+- **Pull requests:** When you open a PR, fill in every section of [`.github/pull_request_template.md`](.github/pull_request_template.md) — including the Testing and Contribution Policy sections, and the authorship declaration (human-authored or AI-co-authored).
+- **Issues:** Use the provided templates under [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) (bug report or feature request) when filing an issue.
+- **Contribution policy:** There is currently no CLA or DCO required for this project. By contributing, you confirm you have read and followed this `CONTRIBUTING.md` and that your contribution is your own original work (or properly licensed).
 
 Thank you for reading these contribution guidelines.

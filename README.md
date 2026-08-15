@@ -47,19 +47,21 @@ Launch processes, redirect standard input and output streams, await process comp
 | Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                        |                           ❌                           | ⚠️, offers limited separation of concerns via ProcessStartInfo model class |
 | Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                        |                           ❌                           |                                     ❌                                     |
 | Installable via NuGet                                                      |      ✅      |                                                        ✅                                                        |                           ✅                           |                            ✅ , Built into .NET                            |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                       ✅*                                                        |                          ❌*                           |                                     ✅                                     |  
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                            ✅ (Windows/macOS/Linux officially; BSD unverified)                                    |            ❌ (Windows‑only officially)              |                                     ✅                                     |
 | Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                        |                           ✅                           |           ⚠️, can lead to deadlocks or exceptions if not careful           |
 | Support for Process/Command Timeout                                        |      ✅      |                              :warning:, limited to cancelling via CancellationToken                              | :warning:, limited to cancelling via CancellationToken |           :warning:, limited to cancelling via CancellationToken           |
 | Graceful Cancellation Support via SIGTERM/SIGINT Signals                   |  ✅, 2.3.0+  |                                                        ✅                                                        |                           ❌                           |                                     ❌                                     |
 | Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                        |                           ✅                           |                                     ✅                                     |  
-| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                        ✅ (MIT)                        |                    ✅ (.NET Runtime licensed under MIT)                    |
+| License                                                                    |     MPL‑2.0     |                                  MIT                                                                              |                         MIT                          |                     MIT (.NET Runtime)                                  |
+| Fork / maintenance notes                                                   | MPL‑2.0 file‑level copyleft — retain MPL notice on copied files | Test projects depend on a source‑available (non‑OSI) library; check its license before redistributing the test suite | MIT, no additional terms | Governed by the .NET Runtime project |
 
 Notes:
 
 - *Indicates not explicitly advertised for all listed OSes but may work in practice; check each project's docs.
-- The CliWrap repository includes a test project that references a source‑available (non‑open source) library; that
-  library is used for tests and is not distributed with the runtime package. The repo also contains an informal "Terms
-  of Use" statement — review repository files if legal certainty is required.
+- CliWrap's repository also contains an informal Terms of Use document, separate from the
+  MIT license; the project's stated position is that this is governance signalling rather
+  than a binding license addendum. Fork maintainers should read both the MIT license and
+  the Terms of Use document before redistributing.
 
 ## Installing CliInvoke
 
@@ -288,9 +290,12 @@ into your third-party licenses TXT file or provided as a distinct TXT file withi
 
 ### CliInvoke Assets
 
-CliInvoke's Icon is owned by and has all rights reserved to me (Alastair Lundy).
+The CliInvoke icon is a separately-owned asset and is **not** licensed under MPL-2.0 like
+the rest of the codebase.
 
-If you fork CliInvoke and re-distribute it, please replace the icon unless you have prior written approval from me.
+If you fork CliInvoke and re-distribute it, please replace the icon with your own artwork
+unless you have written permission from the maintainer. To request permission, open a
+[GitHub issue](https://github.com/alastairlundy/CliInvoke/issues/new) tagged `asset-license`.
 
 ## Star History
 
