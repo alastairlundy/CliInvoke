@@ -23,11 +23,16 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.9.0</Version>
-        <PackageReleaseNotes>-Updated Polyfill from 10.11.2 to 11.0.1</PackageReleaseNotes>
+        <Version>2.9.1</Version>
+        <PackageReleaseNotes>-Updated Polyfill from 11.0.1 to 11.0.2
+
+#### 🐛 Bug Fixes
+- Corrected the upper bound validation for processor affinity.
+- Centralized the processor affinity upper bound and made the related tests processor-count-aware.
+- Replaced `nint`/`IntPtr.MaxValue` with a netstandard2.0-compatible computation in the processor affinity policy.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.9.0.0</AssemblyVersion>
-        <FileVersion>2.9.0.0</FileVersion>
+        <AssemblyVersion>2.9.1.0</AssemblyVersion>
+        <FileVersion>2.9.1.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
