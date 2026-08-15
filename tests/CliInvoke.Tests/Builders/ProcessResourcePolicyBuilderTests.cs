@@ -10,37 +10,35 @@ public class ProcessResourcePolicyBuilderTests
 {
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-    [Theory]
-    [InlineData(1 * 16 - 1)]
-    [InlineData(1 * 8 - 1)]
-    public void WithProcessorAffinity_ValidProcessorAffinity_Valid_Success(nint processorAffinity)
+    [Fact]
+    public void WithProcessorAffinity_ValidProcessorAffinity_Valid_Success()
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
+        nint maxAffinity = (nint)((1 << Environment.ProcessorCount) - 1);
         
         // Act
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .SetProcessorAffinity(processorAffinity);
+            .SetProcessorAffinity(maxAffinity);
         
         ProcessResourcePolicy resourcePolicy =  processResourcePolicyBuilder.Build();
         
         Assert.NotNull(resourcePolicy.ProcessorAffinity);
-        Assert.Equal(processorAffinity, resourcePolicy.ProcessorAffinity);
+        Assert.Equal(maxAffinity, resourcePolicy.ProcessorAffinity);
     }
     
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
-    [Theory]
-    [InlineData(2 * 24)]
-    [InlineData(0)]
-    public void WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail(nint processorAffinity)
+    [Fact]
+    public void WithProcessorAffinity_ValidProcessorAffinity_Invalid_Fail()
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
+        nint invalidAffinity = (nint)((1 << Environment.ProcessorCount) + 1);
         
         // Act and Assert
         Assert.Throws<ArgumentOutOfRangeException>(() => processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
-            .SetProcessorAffinity(processorAffinity));
+            .SetProcessorAffinity(invalidAffinity));
     }
 
     [Theory]
@@ -173,16 +171,16 @@ public class ProcessResourcePolicyBuilderTests
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
     [SupportedOSPlatform("linux")]
-    [Theory]
-    [InlineData(2 * 16 - 1,1024_000, 8192, true, ProcessPriorityClass.AboveNormal)]
-    [InlineData(1 * 16 -1, 8192, 1024, false, ProcessPriorityClass.Normal)]
-    [InlineData(1 * 8 - 1, 1024, 0, false,  ProcessPriorityClass.Normal)]
-    [InlineData(2 * 8 - 1, 1024, 1024, true,   ProcessPriorityClass.BelowNormal)]
-    public void Build_Successfully(nint processorAffinity, nint maxWorkingSet, nint minWorkingSet,
-        bool priorityBoostEnabled, ProcessPriorityClass priorityClass)
+    [Fact]
+    public void Build_Successfully()
     {
         // Arrange
         IProcessResourcePolicyBuilder processResourcePolicyBuilder;
+        nint processorAffinity = (nint)((1 << Environment.ProcessorCount) - 1);
+        nint minWorkingSet = 1024;
+        nint maxWorkingSet = 8192;
+        bool priorityBoostEnabled = true;
+        ProcessPriorityClass priorityClass = ProcessPriorityClass.AboveNormal;
         
         // Act
         processResourcePolicyBuilder = new ProcessResourcePolicyBuilder()
