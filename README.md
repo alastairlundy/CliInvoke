@@ -80,7 +80,7 @@ The package(s) to install depends on your use case:
 |------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                  | Only the Core (abstractions) package — consumers can choose implementations. |
 | Library or app that needs concrete builders / implementations                | `CliInvoke.Core`, `CliInvoke`                                                     | Implementation package plus Core for models/abstractions.                    |
-| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions`                             | Includes DI registration and convenience extensions for easy setup.          |
+| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions`                             | Includes DI registration and convenience extensions for easy setup, and some Middleware implementations.         |
 | Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed) | Adds Cmd/PowerShell and other specializations; include only when required.   |
 
 ### Links to packages
@@ -210,6 +210,27 @@ ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
 * `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
 * `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
 * `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell` also has an overload `UsePowerShell(windowCreation, useShellExecution)` for non-default behaviour; the parameterless form defaults both to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
+
+### Configuring middleware through DI
+
+Middleware does not need to be wired by hand when you register CliInvoke through `Microsoft.Extensions.DependencyInjection`. The `AddCliInvoke(IServiceCollection, Func<ProcessInvoker, ProcessInvoker>, ServiceLifetime)` overload in `CliInvoke.Extensions.DependencyInjection.DependencyInjectionExtensions` accepts a callback that receives a bare `ProcessInvoker` and must return a configured one. Middleware extensions chain off it exactly as they do with direct construction:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Core.Validation;
+using CliInvoke.Extensions;
+using CliInvoke.Extensions.Middleware;
+using CliInvoke.Extensions.Middleware.Validation;
+using CliInvoke.Validation;
+
+builder.Services.AddCliInvoke(invoker => invoker
+        .UseLogging()
+        .UsePostExitValidation(
+            new ProcessResultValidator<ProcessResult>(
+                [CommonValidationRules<ProcessResult>.RequiresExitCodeZero])));
+```
+
+The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Transient`). The bare invoker is built from the container's `IExternalProcessFactory`; the middleware itself still resolves its per-invocation dependencies (for example `ILogger` via the `MiddlewareItems` bag) from the active scope, so DI-driven configuration does not bypass the middleware contract described above.
 
 ### Result-ownership and disposal through the chain
 
