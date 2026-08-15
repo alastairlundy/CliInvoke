@@ -261,12 +261,6 @@ If there isn't already a relevant issue filed,
 please [file one here](https://github.com/alastairlundy/CliInvoke/issues/new) and follow the respective guidance from
 the appropriate issue template.
 
-## Used By
-
-CliInvoke is used by these projects:
-
-Want your project added to this list? [Open an issue](https://github.com/alastairlundy/cliinvoke/issues/new/)
-
 ## CliInvoke's Roadmap
 
 CliInvoke aims to make working with Commands and external processes easier.

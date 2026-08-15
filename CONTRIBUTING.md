@@ -1,7 +1,7 @@
 ## Contributing to the Project
 
 ### Suggestions and Bug Reports
-If you have either a suggestion or bug report you can file it on this project's [GitHub Issues page](https://github.com/alastairlundy/CliRunner/issues/).
+If you have either a suggestion or bug report you can file it on this project's [GitHub Issues page](https://github.com/alastairlundy/CliInvoke/issues/).
 
 ### Submitting a Pull Request
 If you'd like to add a feature or change part of this project's code, please:
@@ -18,6 +18,6 @@ A) individual changes are accepted or declined based on their own merits
 B) code that is submitted to be merged is reviewed and scrutinized carefully to avoid, and/or mitigate against attacks on Open Source code and infrastructure - We don't need a repeat of the xz utils backdoor attack.
 and C) code is safely added to this project without causing this package to suffer any regressions as a result of accepting the contribution. 
 
-If you follows these steps, and your contribution makes a helpful change, I am likely to agree to merge it.
+If you follow these steps, and your contribution makes a helpful change, I am likely to agree to merge it.
 
 Thank you for reading these contribution guidelines.
