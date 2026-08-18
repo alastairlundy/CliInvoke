@@ -9,7 +9,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-
 using CliInvoke.Core.Middleware;
 
 namespace CliInvoke.Extensions.Middleware;
@@ -39,7 +38,7 @@ public static class LoggingMiddlewareExtensions
         {
             ArgumentNullException.ThrowIfNull(builder);
 
-            builder.Use(new LoggingMiddleware());
+            builder.UseMiddleware(new LoggingMiddleware());
 
             return builder;
         }

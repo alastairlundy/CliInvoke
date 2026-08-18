@@ -15,15 +15,42 @@ namespace CliInvoke.Core.Middleware;
 public interface IProcessMiddlewareBuilder
 {
     /// <summary>
-    ///     Adds a middleware to the pipeline.
+    ///     Adds a middleware instance to the pipeline.
     /// </summary>
-    /// <param name="middleware">The middleware to add.</param>
+    /// <param name="middleware">The middleware instance to add.</param>
     /// <returns>The builder for fluent chaining.</returns>
-    IProcessMiddlewareBuilder Use(IProcessMiddleware middleware);
+    IProcessMiddlewareBuilder UseMiddleware(IProcessMiddleware middleware);
 
     /// <summary>
-    ///     Builds the read-only list of middleware in registration order.
+    ///     Adds a middleware type to the pipeline. The type is resolved through the
+    ///     builder's resolver at <see cref="Build"/> time.
     /// </summary>
-    /// <returns>A read-only list of middleware instances.</returns>
+    /// <typeparam name="T">A type implementing <see cref="IProcessMiddleware"/>.</typeparam>
+    /// <returns>The builder for fluent chaining.</returns>
+    IProcessMiddlewareBuilder UseMiddleware<T>() where T : IProcessMiddleware;
+
+    /// <summary>
+    ///     Adds conditional middleware that runs a sub-pipeline only when the
+    ///     synchronous predicate returns <c>true</c>.
+    /// </summary>
+    /// <param name="predicate">The condition evaluated before each invocation.</param>
+    /// <param name="configuration">An action that configures the sub-pipeline builder.</param>
+    /// <returns>The builder for fluent chaining.</returns>
+    IProcessMiddlewareBuilder UseWhen(Func<InvocationContext, bool> predicate, Action<IProcessMiddlewareBuilder> configuration);
+
+    /// <summary>
+    ///     Adds conditional middleware that runs a sub-pipeline only when the
+    ///     asynchronous predicate returns <c>true</c>.
+    /// </summary>
+    /// <param name="predicate">The async condition evaluated before each invocation.</param>
+    /// <param name="configuration">An action that configures the sub-pipeline builder.</param>
+    /// <returns>The builder for fluent chaining.</returns>
+    IProcessMiddlewareBuilder UseWhen(Func<InvocationContext, Task<bool>> predicate, Action<IProcessMiddlewareBuilder> configuration);
+
+    /// <summary>
+    ///     Builds the middleware pipeline, resolving any type-based entries through
+    ///     the builder's internal resolver.
+    /// </summary>
+    /// <returns>An ordered, read-only list of middleware instances.</returns>
     IReadOnlyList<IProcessMiddleware> Build();
 }

@@ -36,7 +36,7 @@ public static class PostExitValidationExtensions
             ArgumentNullException.ThrowIfNull(builder);
             ArgumentNullException.ThrowIfNull(validator);
 
-            builder.Use(new PostExitValidationMiddleware(validator));
+            builder.UseMiddleware(new PostExitValidationMiddleware(validator));
 
             return builder;
         }
