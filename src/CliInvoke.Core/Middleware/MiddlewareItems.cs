@@ -51,6 +51,32 @@ public sealed class MiddlewareItems
     }
 
     /// <summary>
+    ///     Attempts to get a value by key, cast to the specified type.
+    /// </summary>
+    /// <typeparam name="T">The expected type of the value.</typeparam>
+    /// <param name="key">The key to look up.</param>
+    /// <param name="value">
+    ///     When this method returns, contains the value cast to <typeparamref name="T"/>
+    ///     if the key exists and the type matches; otherwise, the default value of
+    ///     <typeparamref name="T"/>.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the key exists and the stored value is assignable to
+    ///     <typeparamref name="T"/>; otherwise, <c>false</c>.
+    /// </returns>
+    public bool TryGet<T>(string key, out T? value)
+    {
+        if (!_items.TryGetValue(key, out object? stored) || stored is not T typed)
+        {
+            value = default;
+            return false;
+        }
+
+        value = typed;
+        return true;
+    }
+
+    /// <summary>
     ///     Sets a value by key.
     /// </summary>
     /// <typeparam name="T">The type of the value.</typeparam>

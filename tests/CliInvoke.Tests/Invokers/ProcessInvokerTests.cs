@@ -39,13 +39,13 @@ public class ProcessInvokerTests
     {
         public async Task InvokeAsync(
             InvocationContext context,
-            Func<InvocationContext, CancellationToken, Task> next)
+            Func<InvocationContext, Task> next)
         {
             InvocationContext rewritten = context.WithConfiguration(
                 new ProcessConfiguration(
                     context.Configuration.TargetFilePath,
                     context.Configuration.Arguments));
-            await next(rewritten, context.CancellationToken);
+            await next(rewritten);
         }
     }
 

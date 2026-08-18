@@ -16,7 +16,7 @@ namespace CliInvoke.Core.Middleware;
 internal sealed class MiddlewareChain
 {
     private readonly IReadOnlyList<IProcessMiddleware> _middleware;
-    private readonly Func<InvocationContext, CancellationToken, Task> _terminal;
+    private readonly Func<InvocationContext, Task> _terminal;
     private readonly MiddlewareItems? _initialItems;
 
     /// <summary>
@@ -30,7 +30,7 @@ internal sealed class MiddlewareChain
     /// </param>
     public MiddlewareChain(
         IReadOnlyList<IProcessMiddleware> middleware,
-        Func<InvocationContext, CancellationToken, Task> terminal,
+        Func<InvocationContext, Task> terminal,
         MiddlewareItems? initialItems = null)
     {
         _middleware = middleware;
@@ -49,19 +49,13 @@ internal sealed class MiddlewareChain
     {
         // Build the chain from last to first, wrapping each middleware around the next.
         // The terminal is the innermost delegate.
-        Func<InvocationContext, CancellationToken, Task> next = _terminal;
+        Func<InvocationContext, Task> next = _terminal;
 
         for (int i = _middleware.Count - 1; i >= 0; i--)
         {
             IProcessMiddleware middleware = _middleware[i];
-            Func<InvocationContext, CancellationToken, Task> currentNext = next;
-            next = (ctx, _) =>
-            {
-                // Update context.Middleware.Next so the current middleware sees the
-                // correct downstream delegate, not the outermost stage.
-                ctx.Middleware!.Next = currentNext;
-                return middleware.InvokeAsync(ctx, currentNext);
-            };
+            Func<InvocationContext, Task> currentNext = next;
+            next = (ctx) => middleware.InvokeAsync(ctx, currentNext);
         }
 
         // Expose a per-step MiddlewareContext (with any seeded items) to every middleware
@@ -70,6 +64,6 @@ internal sealed class MiddlewareChain
         context.Middleware = new MiddlewareContext(next, cancellationToken, _initialItems);
 
         // Invoke the outermost middleware (or the terminal if no middleware registered).
-        await next(context, cancellationToken);
+        await next(context);
     }
 }

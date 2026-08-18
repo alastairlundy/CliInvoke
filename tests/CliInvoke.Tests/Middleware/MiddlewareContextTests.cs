@@ -9,7 +9,7 @@ public class MiddlewareContextTests
     public async Task Next_IsTheSuppliedDelegate()
     {
         bool called = false;
-        Func<InvocationContext, CancellationToken, Task> nextDelegate = (ctx, ct) =>
+        Func<InvocationContext, Task> nextDelegate = (ctx) =>
         {
             called = true;
             return Task.CompletedTask;
@@ -27,7 +27,7 @@ public class MiddlewareContextTests
         cts.Cancel();
 
         MiddlewareContext context = new MiddlewareContext(
-            (ctx, ct) => Task.CompletedTask,
+            (ctx) => Task.CompletedTask,
             cts.Token);
 
         await Assert.That(context.CancellationToken.IsCancellationRequested).IsEqualTo(true);
@@ -40,11 +40,11 @@ public class MiddlewareContextTests
         items.Set("shared", "value1");
 
         MiddlewareContext firstContext = new MiddlewareContext(
-            (ctx, ct) => Task.CompletedTask,
+            (ctx) => Task.CompletedTask,
             CancellationToken.None,
             items);
         MiddlewareContext secondContext = new MiddlewareContext(
-            (ctx, ct) => Task.CompletedTask,
+            (ctx) => Task.CompletedTask,
             CancellationToken.None,
             items);
 
@@ -57,10 +57,10 @@ public class MiddlewareContextTests
     public async Task Items_IsInitializedForEachContext()
     {
         MiddlewareContext context1 = new MiddlewareContext(
-            (ctx, ct) => Task.CompletedTask,
+            (ctx) => Task.CompletedTask,
             CancellationToken.None);
         MiddlewareContext context2 = new MiddlewareContext(
-            (ctx, ct) => Task.CompletedTask,
+            (ctx) => Task.CompletedTask,
             CancellationToken.None);
 
         context1.Items.Set("key", "value1");

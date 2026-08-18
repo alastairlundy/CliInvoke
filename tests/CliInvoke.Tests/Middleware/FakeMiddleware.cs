@@ -25,13 +25,13 @@ public class FakeMiddleware : IProcessMiddleware
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task InvokeAsync(InvocationContext context, Func<InvocationContext, CancellationToken, Task> next)
+    public Task InvokeAsync(InvocationContext context, Func<InvocationContext, Task> next)
     {
         _callLog.Add(_name);
 
         return _mode switch
         {
-            FakeMiddlewareMode.AlwaysInvokeNext => next(context, context.CancellationToken),
+            FakeMiddlewareMode.AlwaysInvokeNext => next(context),
             FakeMiddlewareMode.NeverInvokeNext => Task.CompletedTask,
             FakeMiddlewareMode.ThrowOnInvoke => throw _exceptionToThrow ?? new InvalidOperationException($" {_name} threw"),
             _ => Task.CompletedTask

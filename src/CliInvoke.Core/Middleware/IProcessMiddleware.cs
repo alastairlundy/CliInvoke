@@ -20,8 +20,12 @@ public interface IProcessMiddleware
     ///     Invokes the middleware, optionally calling <paramref name="next"/> to
     ///     continue the pipeline.
     /// </summary>
+    /// <remarks>
+    ///     The <c>next</c> delegate no longer carries a <see cref="CancellationToken"/> parameter.
+    ///     Middleware must read the cancellation token from <c>context.CancellationToken</c>.
+    /// </remarks>
     /// <param name="context">The current invocation context.</param>
     /// <param name="next">The delegate to invoke the next middleware or the terminal pipeline.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task InvokeAsync(InvocationContext context, Func<InvocationContext, CancellationToken, Task> next);
+    Task InvokeAsync(InvocationContext context, Func<InvocationContext, Task> next);
 }

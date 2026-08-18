@@ -15,7 +15,7 @@ public class MiddlewareChainTests
         
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA, middlewareB },
-            (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
+            (ctx) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
@@ -36,7 +36,7 @@ public class MiddlewareChainTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA, middlewareB },
-            (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
+            (ctx) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
@@ -57,7 +57,7 @@ public class MiddlewareChainTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA },
-            (ctx, ct) => throw expectedException);
+            (ctx) => throw expectedException);
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
@@ -80,7 +80,7 @@ public class MiddlewareChainTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA, middlewareB },
-            (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
+            (ctx) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
@@ -102,10 +102,10 @@ public class MiddlewareChainTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA },
-            (ctx, ct) =>
+            (ctx) =>
             {
                 callLog.Add("terminal");
-                ct.ThrowIfCancellationRequested();
+                ctx.CancellationToken.ThrowIfCancellationRequested();
                 return Task.CompletedTask;
             });
 
@@ -131,7 +131,7 @@ public class MiddlewareChainTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { middlewareA, middlewareB },
-            (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
+            (ctx) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
@@ -150,7 +150,7 @@ public class MiddlewareChainTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
-            (ctx, ct) => { callLog.Add("terminal"); return Task.CompletedTask; });
+            (ctx) => { callLog.Add("terminal"); return Task.CompletedTask; });
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),

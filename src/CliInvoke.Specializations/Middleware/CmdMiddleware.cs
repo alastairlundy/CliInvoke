@@ -44,7 +44,7 @@ internal sealed class CmdMiddleware : IProcessMiddleware
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
-    public async Task InvokeAsync(InvocationContext context, Func<InvocationContext, CancellationToken, Task> next)
+    public async Task InvokeAsync(InvocationContext context, Func<InvocationContext, Task> next)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
@@ -78,7 +78,7 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             windowCreation: src.WindowCreation);
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
-        await next(newContext, context.CancellationToken);
+        await next(newContext);
 
         // The terminal ran against the rewritten context, so propagate its result back to the
         // original chain context that the caller reads from.

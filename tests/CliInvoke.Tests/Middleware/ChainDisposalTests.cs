@@ -14,7 +14,7 @@ public class ChainDisposalTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
-            (ctx, ct) =>
+            (ctx) =>
             {
                 ctx.Result = pipedResult;
                 return Task.CompletedTask;
@@ -41,7 +41,7 @@ public class ChainDisposalTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
-            (ctx, ct) =>
+            (ctx) =>
             {
                 ctx.Result = pipedResult;
                 return Task.CompletedTask;

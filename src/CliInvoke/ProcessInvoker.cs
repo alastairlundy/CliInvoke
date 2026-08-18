@@ -123,7 +123,7 @@ public class ProcessInvoker : IProcessInvoker
     ///     Stores the typed result on the <see cref="InvocationContext.Result"/> property
     ///     so the caller can read it back after the chain completes.
     /// </summary>
-    private async Task RunPipelineThroughContext(InvocationContext ctx, CancellationToken cancellationToken)
+    private async Task RunPipelineThroughContext(InvocationContext ctx)
     {
         ProcessResult result = ctx.Mode switch
         {

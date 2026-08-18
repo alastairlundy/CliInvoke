@@ -26,7 +26,7 @@ public sealed class MiddlewareContext
     ///     to every middleware. When omitted, a fresh <see cref="MiddlewareItems"/> is created.
     /// </param>
     public MiddlewareContext(
-        Func<InvocationContext, CancellationToken, Task> next,
+        Func<InvocationContext, Task> next,
         CancellationToken cancellationToken,
         MiddlewareItems? items = null)
     {
@@ -36,11 +36,12 @@ public sealed class MiddlewareContext
     }
 
     /// <summary>
-    ///     Gets or sets the delegate to invoke the next middleware or the terminal pipeline.
-    ///     Updated by the chain walker before each middleware invocation so that
-    ///     <c>context.Middleware.Next</c> always references the correct downstream stage.
+    ///     Gets the delegate to invoke the next middleware or the terminal pipeline.
+    ///     This property is read-only and retained for diagnostics and introspection.
+    ///     Middleware must receive the <c>next</c> delegate via the
+    ///     <see cref="IProcessMiddleware.InvokeAsync"/> parameter, not via this property.
     /// </summary>
-    public Func<InvocationContext, CancellationToken, Task> Next { get; internal set; }
+    public Func<InvocationContext, Task> Next { get; }
 
     /// <summary>
     ///     Gets the cancellation token for this middleware step.
