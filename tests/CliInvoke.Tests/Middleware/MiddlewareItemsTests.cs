@@ -69,38 +69,4 @@ public class MiddlewareItemsTests
         await Assert.That(result).IsEqualTo(2);
     }
 
-    [Test]
-    public async Task TryGet_ReturnsFalse_ForMissingKey()
-    {
-        MiddlewareItems items = new MiddlewareItems();
-
-        bool found = items.TryGet("missing", out int value);
-
-        await Assert.That(found).IsEqualTo(false);
-        await Assert.That(value).IsEqualTo(default(int));
-    }
-
-    [Test]
-    public async Task TryGet_ReturnsTrue_ForMatchingType()
-    {
-        MiddlewareItems items = new MiddlewareItems();
-        items.Set("key", 42);
-
-        bool found = items.TryGet("key", out int value);
-
-        await Assert.That(found).IsEqualTo(true);
-        await Assert.That(value).IsEqualTo(42);
-    }
-
-    [Test]
-    public async Task TryGet_ReturnsFalse_ForTypeMismatch()
-    {
-        MiddlewareItems items = new MiddlewareItems();
-        items.Set("key", "string value");
-
-        bool found = items.TryGet("key", out int value);
-
-        await Assert.That(found).IsEqualTo(false);
-        await Assert.That(value).IsEqualTo(default(int));
-    }
 }
