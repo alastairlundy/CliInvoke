@@ -13,8 +13,7 @@ public class ConditionalMiddlewareTests
         FakeMiddleware subMiddleware = new FakeMiddleware("SubA", callLog);
         ConditionalMiddleware conditional = new ConditionalMiddleware(
             _ => Task.FromResult(true),
-            new List<IProcessMiddleware> { subMiddleware },
-            _ => subMiddleware);
+            new List<IProcessMiddleware> { subMiddleware });
 
         Func<InvocationContext, Task> outerNext = ctx =>
         {
@@ -35,8 +34,7 @@ public class ConditionalMiddlewareTests
         FakeMiddleware subMiddleware = new FakeMiddleware("SubA", callLog);
         ConditionalMiddleware conditional = new ConditionalMiddleware(
             _ => Task.FromResult(false),
-            new List<IProcessMiddleware> { subMiddleware },
-            _ => subMiddleware);
+            new List<IProcessMiddleware> { subMiddleware });
 
         Func<InvocationContext, Task> outerNext = ctx =>
         {
@@ -63,8 +61,7 @@ public class ConditionalMiddlewareTests
         FakeMiddleware blockingMiddleware = new FakeMiddleware("SubA", callLog, FakeMiddlewareMode.NeverInvokeNext);
         ConditionalMiddleware conditional = new ConditionalMiddleware(
             _ => Task.FromResult(true),
-            new List<IProcessMiddleware> { blockingMiddleware },
-            _ => blockingMiddleware);
+            new List<IProcessMiddleware> { blockingMiddleware });
 
         InvocationContext ctx = CreateContext();
         await conditional.InvokeAsync(ctx, outerNext);
@@ -80,8 +77,7 @@ public class ConditionalMiddlewareTests
         FakeMiddleware subB = new FakeMiddleware("SubB", callLog);
         ConditionalMiddleware conditional = new ConditionalMiddleware(
             _ => Task.FromResult(true),
-            new List<IProcessMiddleware> { subA, subB },
-            _ => subA);
+            new List<IProcessMiddleware> { subA, subB });
 
         Func<InvocationContext, Task> outerNext = ctx =>
         {
@@ -102,8 +98,7 @@ public class ConditionalMiddlewareTests
         FakeMiddleware subMiddleware = new FakeMiddleware("SubA", callLog);
         ConditionalMiddleware conditional = new ConditionalMiddleware(
             ctx => Task.FromResult(true),
-            new List<IProcessMiddleware> { subMiddleware },
-            _ => subMiddleware);
+            new List<IProcessMiddleware> { subMiddleware });
 
         Func<InvocationContext, Task> outerNext = ctx =>
         {
