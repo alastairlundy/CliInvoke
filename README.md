@@ -165,10 +165,10 @@ using CliInvoke.Core.Middleware; // MiddlewareItems
 
 var items = new MiddlewareItems();
 items.Set("Logger", myLogger);
-var invoker = new ProcessInvoker(factory, items).UseLogging();
+var invoker = new ProcessInvoker(factory, items);
 ```
 
-Use the first constructor when you don't need middleware. Use the second (or one of the `Use…` extension methods below) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
+Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the first constructor when you don't need middleware. Use the second when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
 
 ### The `IProcessMiddleware` contract
 
@@ -187,24 +187,20 @@ Middleware read and share data through `InvocationContext.Middleware.Items` (a t
 
 ### Built-in middleware
 
-The public API is the **extension methods**, not the middleware classes (which are internal). All of them return a *new* `ProcessInvoker`, so they compose fluently:
+The public API is the **builder extension methods** (`UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd`), not the middleware classes (which are internal). These extensions are defined on `IProcessMiddlewareBuilder` and are used when configuring middleware through DI or the builder:
 
 ```csharp
-using CliInvoke;                       // ProcessInvoker
+using CliInvoke;
 using CliInvoke.Extensions.Middleware;            // UseLogging
 using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation
 using CliInvoke.Specializations.Middleware;        // UsePowerShell, UseCmd
 
-// Log entry/exit (and each stdout/stderr line at Debug) for every invocation:
-ProcessInvoker loggingInvoker = new ProcessInvoker(factory).UseLogging();
-
-// Validate the result after exit (throws ProcessValidationException on failure):
-ProcessInvoker validatedInvoker = new ProcessInvoker(factory)
-    .UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
-
-// Run the command inside PowerShell Core / Windows cmd.exe:
-ProcessInvoker psInvoker = new ProcessInvoker(factory).UsePowerShell();
-ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
+builder.Services.AddCliInvoke(builder =>
+{
+    builder.UseLogging();
+    builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+    builder.UsePowerShell();
+});
 ```
 
 * `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
@@ -213,24 +209,24 @@ ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();
 
 ### Configuring middleware through DI
 
-Middleware does not need to be wired by hand when you register CliInvoke through `Microsoft.Extensions.DependencyInjection`. The `AddCliInvoke(IServiceCollection, Func<ProcessInvoker, ProcessInvoker>, ServiceLifetime)` overload in `CliInvoke.Extensions.DependencyInjection.DependencyInjectionExtensions` accepts a callback that receives a bare `ProcessInvoker` and must return a configured one. Middleware extensions chain off it exactly as they do with direct construction:
+Middleware does not need to be wired by hand when you register CliInvoke through `Microsoft.Extensions.DependencyInjection`. The `AddCliInvoke(IServiceCollection, Action<IProcessMiddlewareBuilder>, ServiceLifetime)` overload in `CliInvoke.Extensions.DependencyInjection.DependencyInjectionExtensions` accepts a callback that receives an `IProcessMiddlewareBuilder` and configures the middleware pipeline:
 
 ```csharp
 using CliInvoke;
-using CliInvoke.Core.Validation;
 using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
-using CliInvoke.Validation;
 
-builder.Services.AddCliInvoke(invoker => invoker
-        .UseLogging()
-        .UsePostExitValidation(
-            new ProcessResultValidator<ProcessResult>(
-                [CommonValidationRules<ProcessResult>.RequiresExitCodeZero])));
+builder.Services.AddCliInvoke(configure: builder =>
+{
+    builder.UseLogging();
+    builder.UsePostExitValidation(
+        new ProcessResultValidator<ProcessResult>(
+            [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
+});
 ```
 
-The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Transient`). The bare invoker is built from the container's `IExternalProcessFactory`; the middleware itself still resolves its per-invocation dependencies (for example `ILogger` via the `MiddlewareItems` bag) from the active scope, so DI-driven configuration does not bypass the middleware contract described above.
+The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Transient`). The `IProcessMiddlewareBuilder` creates the middleware chain from the container's services; the middleware itself still resolves its per-invocation dependencies (for example `ILogger` via the `MiddlewareItems` bag) from the active scope, so DI-driven configuration does not bypass the middleware contract described above.
 
 ### Result-ownership and disposal through the chain
 

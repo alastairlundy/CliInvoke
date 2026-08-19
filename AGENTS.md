@@ -55,6 +55,25 @@ The following skills are available to handle specific operational tasks. Load th
 | Local NuGet packing for cross-project testing | `cliinvoke-publish-and-package` |
 | Production release: versioning and publishing to NuGet | `cliinvoke-publish-and-package` |
 
+## Middleware Patterns
+
+### Middleware asymmetry across invocation patterns
+
+Middleware applies to `ProcessInvoker` and `IProcessInvoker` only. The three invocation patterns have different middleware coverage:
+
+- **`ProcessInvoker` / `IProcessInvoker`** — full middleware support. Every invocation flows through the registered middleware chain.
+- **`IExternalProcess`** — does **not** flow through middleware. This is the bypass pattern for direct process execution.
+- **`CliInvoke.Specializations`** — can be used via middleware extensions (e.g., `UsePowerShell`, `UseCmd`) but is not required to do so. Specializations that bypass the invoker do not go through middleware.
+
+### DI and `MiddlewareItems` coexistence
+
+DI and `MiddlewareItems` serve complementary purposes and coexist in the middleware pipeline:
+
+- **DI** handles framework services with proper lifetime and scope management — loggers, validators, options, and other registered services.
+- **`MiddlewareItems`** handles ad-hoc per-invocation state shared between middleware instances — a custom validation result, a per-invocation correlation id, or any other ad-hoc data that does not belong in the DI container.
+
+This mirrors the ASP.NET Core precedent where `HttpContext.RequestServices` provides DI-resolved services and `HttpContext.Items` provides an ad-hoc dictionary for per-request state.
+
 ## Agent skills
 
 ### Issue tracker
