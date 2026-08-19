@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>14</LangVersion>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <PackageId>CliInvoke.Extensions.Tests</PackageId>
+    <Authors>CliInvoke.Extensions.Tests</Authors>
+    <UseTestingPlatformRunner>true</UseTestingPlatformRunner>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="TUnit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />
+    <ProjectReference Include="..\..\src\CliInvoke.Extensions\CliInvoke.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\CliInvoke\CliInvoke.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+global using System;
+global using System.Diagnostics;
+global using System.IO;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using CliInvoke;
+global using CliInvoke.Core;
+global using CliInvoke.Core.Middleware;
+global using CliInvoke.Extensions;
+global using CliInvoke.Extensions.Middleware;
+global using CliInvoke.Extensions.Middleware.Validation;
+global using CliInvoke.Validation;
+global using Microsoft.Extensions.DependencyInjection;
+global using TUnit.Core;
+global using TUnit.Assertions;

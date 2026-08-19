@@ -35,7 +35,8 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddCliInvoke(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        return AddCliInvokeCore(services, configure: null, lifetime);
+        // Null configure means "register default invoker with no custom middleware".
+        return ConfigureCliInvokeServices(services, configure: null, lifetime);
     }
 
     /// <summary>
@@ -62,14 +63,19 @@ public static class DependencyInjectionExtensions
     {
         ArgumentNullException.ThrowIfNull(configure);
 
-        return AddCliInvokeCore(services, configure, lifetime);
+        // configure is validated non-null here; the Core method accepts nullable
+        // because the parameterless overload intentionally passes null.
+        return ConfigureCliInvokeServices(services, configure, lifetime);
     }
 
     /// <summary>
     ///     Core implementation shared by both <see cref="AddCliInvoke(IServiceCollection, ServiceLifetime)"/>
     ///     and <see cref="AddCliInvoke(IServiceCollection, Action{IProcessMiddlewareBuilder}, ServiceLifetime)"/>.
+    ///     When <paramref name="configure"/> is <c>null</c>, a default <see cref="ProcessInvoker"/>
+    ///     with no custom middleware is registered. Null is intentionally allowed here because the
+    ///     parameterless public overload delegates to this method without a configure callback.
     /// </summary>
-    private static IServiceCollection AddCliInvokeCore(this IServiceCollection services,
+    private static IServiceCollection ConfigureCliInvokeServices(this IServiceCollection services,
         Action<IProcessMiddlewareBuilder>? configure,
         ServiceLifetime lifetime)
     {
@@ -96,10 +102,10 @@ public static class DependencyInjectionExtensions
                     services.AddSingleton<IProcessInvoker>(sp =>
                     {
                         IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
-                        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(sp);
+                        ProcessMiddlewareBuilder builder = new(sp);
                         configure(builder);
-                        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
-                        return new ProcessInvoker(factory, middlewares);
+                        IReadOnlyList<IProcessMiddleware> middlewareList = builder.Build();
+                        return new ProcessInvoker(factory, middlewareList);
                     });
                 }
                 else
@@ -131,10 +137,10 @@ public static class DependencyInjectionExtensions
                     services.AddScoped<IProcessInvoker>(sp =>
                     {
                         IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
-                        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(sp);
+                        ProcessMiddlewareBuilder builder = new(sp);
                         configure(builder);
-                        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
-                        return new ProcessInvoker(factory, middlewares);
+                        IReadOnlyList<IProcessMiddleware> middlewareList = builder.Build();
+                        return new ProcessInvoker(factory, middlewareList);
                     });
                 }
                 else
@@ -166,10 +172,10 @@ public static class DependencyInjectionExtensions
                     services.AddTransient<IProcessInvoker>(sp =>
                     {
                         IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
-                        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(sp);
+                        ProcessMiddlewareBuilder builder = new(sp);
                         configure(builder);
-                        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
-                        return new ProcessInvoker(factory, middlewares);
+                        IReadOnlyList<IProcessMiddleware> middlewareList = builder.Build();
+                        return new ProcessInvoker(factory, middlewareList);
                     });
                 }
                 else

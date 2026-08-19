@@ -43,6 +43,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Middleware", "Middleware", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Tests.Helpers", "..\tests\CliInvoke.Tests.Helpers\CliInvoke.Tests.Helpers.csproj", "{27F969D5-0057-43D4-A053-40FD765F3C4D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliInvoke.Extensions.Tests", "..\tests\CliInvoke.Extensions.Tests\CliInvoke.Extensions.Tests.csproj", "{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -185,6 +187,18 @@ Global
 		{27F969D5-0057-43D4-A053-40FD765F3C4D}.Release|x64.Build.0 = Release|Any CPU
 		{27F969D5-0057-43D4-A053-40FD765F3C4D}.Release|x86.ActiveCfg = Release|Any CPU
 		{27F969D5-0057-43D4-A053-40FD765F3C4D}.Release|x86.Build.0 = Release|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Debug|x64.Build.0 = Debug|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Debug|x86.Build.0 = Debug|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Release|x64.ActiveCfg = Release|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Release|x64.Build.0 = Release|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Release|x86.ActiveCfg = Release|Any CPU
+		{FAF04FBD-A154-4EDD-B0F2-0EBBCBBDBD27}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
