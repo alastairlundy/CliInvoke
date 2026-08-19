@@ -333,7 +333,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
                && UseShellExecution.Equals(other.UseShellExecution)
                && Credential.Equals(other.Credential)
-               && ResourcePolicy.Equals(other.ResourcePolicy)
+               && RequiresAdministrator.Equals(other.RequiresAdministrator)
+               && WindowCreation.Equals(other.WindowCreation)
                && StandardInput.Equals(other.StandardInput)
 #pragma warning disable CS0618 // Type or member is obsolete
                && StandardOutput.Equals(other.StandardOutput)
