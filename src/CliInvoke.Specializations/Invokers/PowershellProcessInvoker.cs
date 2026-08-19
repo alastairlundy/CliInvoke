@@ -9,6 +9,7 @@
 
 
 using CliInvoke.Core.Factories;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Specializations.Middleware;
 
 namespace CliInvoke.Specializations;
@@ -56,9 +57,9 @@ public class PowershellProcessInvoker : IProcessInvoker
         IFilePathResolver filePathResolver,
         IExternalProcessFactory externalProcessFactory)
     {
-        _processInvoker =
-            new ProcessInvoker(externalProcessFactory)
-                .UsePowerShell(filePathResolver, windowCreation: false, useShellExecution: false);
+        IReadOnlyList<IProcessMiddleware> middlewares =
+            [new PowerShellMiddleware(filePathResolver, windowCreation: false, useShellExecution: false)];
+        _processInvoker = new ProcessInvoker(externalProcessFactory, middlewares);
     }
 
     /// <summary>

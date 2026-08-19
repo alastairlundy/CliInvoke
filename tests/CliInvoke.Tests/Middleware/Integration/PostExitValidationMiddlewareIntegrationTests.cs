@@ -7,7 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using System.Collections.Generic;
+
 using CliInvoke.Core.Exceptions;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Factories;
 
@@ -19,8 +22,9 @@ public class PostExitValidationMiddlewareIntegrationTests
     public async Task UsePostExitValidation_ZeroExit_DoesNotThrow()
     {
         // `dotnet --version` is a portable command that exits 0.
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory())
-            .UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+        IReadOnlyList<IProcessMiddleware> middlewares =
+            [new PostExitValidationMiddleware(PostExitValidation.ExitCodeIsZero())];
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 
@@ -35,8 +39,9 @@ public class PostExitValidationMiddlewareIntegrationTests
     public async Task UsePostExitValidation_NonZeroExit_ThrowsProcessValidationException()
     {
         // `dotnet --this-flag-does-not-exist` is a portable command that exits non-zero.
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory())
-            .UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+        IReadOnlyList<IProcessMiddleware> middlewares =
+            [new PostExitValidationMiddleware(PostExitValidation.ExitCodeIsZero())];
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
 
         using ProcessConfiguration config =
             ProcessConfigurationFactory.Create("dotnet", "--this-flag-does-not-exist");
@@ -54,8 +59,9 @@ public class PostExitValidationMiddlewareIntegrationTests
     public async Task UsePostExitValidation_StdoutMatches_ValidatesBufferedOutput()
     {
         // `dotnet --version` writes a version string (e.g. "8.0.100") to standard output.
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory())
-            .UsePostExitValidation(PostExitValidation.StdoutMatches(@"\d+\.\d+"));
+        IReadOnlyList<IProcessMiddleware> middlewares =
+            [new PostExitValidationMiddleware(PostExitValidation.StdoutMatches(@"\d+\.\d+"))];
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 

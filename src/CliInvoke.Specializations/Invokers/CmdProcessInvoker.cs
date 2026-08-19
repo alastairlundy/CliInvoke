@@ -8,6 +8,7 @@
 */
 
 using CliInvoke.Core.Factories;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Specializations.Configurations;
 using CliInvoke.Specializations.Middleware;
 
@@ -52,7 +53,8 @@ public class CmdProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     public CmdProcessInvoker(IExternalProcessFactory externalProcessFactory)
     {
-        _processInvoker = new ProcessInvoker(externalProcessFactory).UseCmd();
+        IReadOnlyList<IProcessMiddleware> middlewares = [new CmdMiddleware()];
+        _processInvoker = new ProcessInvoker(externalProcessFactory, middlewares);
     }
 
     /// <summary>

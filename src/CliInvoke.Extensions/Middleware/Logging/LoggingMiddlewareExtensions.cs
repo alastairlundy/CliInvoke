@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Collections.Generic;
-using System.Linq;
 using CliInvoke.Core.Middleware;
 
 namespace CliInvoke.Extensions.Middleware;
@@ -44,28 +42,4 @@ public static class LoggingMiddlewareExtensions
         }
     }
 
-    /// <param name="invoker">The existing process invoker.</param>
-    extension(ProcessInvoker invoker)
-    {
-        /// <summary>
-        ///     Creates a new <see cref="ProcessInvoker"/> with <see cref="LoggingMiddleware"/>
-        ///     prepended so that every invocation logs entry and exit details.
-        /// </summary>
-        /// <remarks>
-        ///     The middleware resolves an <see cref="Microsoft.Extensions.Logging.ILogger"/>
-        ///     from the chain's shared <see cref="MiddlewareItems"/> using the well-known key
-        ///     <c>"Logger"</c>. When absent, a no-op logger is used.
-        /// </remarks>
-        /// <returns>A new process invoker with logging middleware applied.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///     Thrown when <paramref name="invoker"/> is <c>null</c>.
-        /// </exception>
-        public ProcessInvoker UseLogging()
-        {
-            ArgumentNullException.ThrowIfNull(invoker);
-
-            IEnumerable<IProcessMiddleware> newList = invoker.Middlewares.Prepend(new LoggingMiddleware());
-            return new ProcessInvoker(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
-        }
-    }
 }

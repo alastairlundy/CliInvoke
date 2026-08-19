@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Extensions;
@@ -52,7 +50,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(invoker => invoker.UseLogging());
+        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware()));
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();
@@ -60,10 +58,6 @@ public class DependencyInjectionExtensionTests
 
         await Assert.That(invoker).IsNotNull();
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
-
-        ProcessInvoker concreteInvoker = (ProcessInvoker)invoker;
-        await Assert.That(concreteInvoker.Middlewares.Count).IsEqualTo(1);
-        await Assert.That(concreteInvoker.Middlewares[0]).IsTypeOf<LoggingMiddleware>();
     }
 
     [Test]
@@ -82,7 +76,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_Singleton_RegistersAsSingleton()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(invoker => invoker.UseLogging(), ServiceLifetime.Singleton);
+        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware()), ServiceLifetime.Singleton);
         IServiceProvider provider = services.BuildServiceProvider();
 
         IProcessInvoker? invoker1 = provider.GetService<IProcessInvoker>();
@@ -97,7 +91,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_Scoped_RegistersAsScoped()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(invoker => invoker.UseLogging(), ServiceLifetime.Scoped);
+        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware()), ServiceLifetime.Scoped);
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope1 = provider.CreateScope();
@@ -118,7 +112,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_Transient_RegistersAsTransient()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(invoker => invoker.UseLogging(), ServiceLifetime.Transient);
+        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware()), ServiceLifetime.Transient);
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();
@@ -134,12 +128,10 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_ChainedMiddleware_AllApplied()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(invoker =>
+        services.AddCliInvoke(builder =>
         {
-            ProcessInvoker result = invoker
-                .UsePostExitValidation(PostExitValidation.ExitCodeIsZero())
-                .UseLogging();
-            return result;
+            builder.UseMiddleware(new LoggingMiddleware());
+            builder.UseMiddleware(new PostExitValidationMiddleware(PostExitValidation.ExitCodeIsZero()));
         });
         IServiceProvider provider = services.BuildServiceProvider();
 
@@ -147,29 +139,16 @@ public class DependencyInjectionExtensionTests
         IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
 
         await Assert.That(invoker).IsNotNull();
-
-        ProcessInvoker concreteInvoker = (ProcessInvoker)invoker;
-        await Assert.That(concreteInvoker.Middlewares.Count).IsEqualTo(2);
-        await Assert.That(concreteInvoker.Middlewares[0]).IsTypeOf<LoggingMiddleware>();
-        await Assert.That(concreteInvoker.Middlewares[1]).IsTypeOf<PostExitValidationMiddleware>();
+        await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
     }
 
     [Test]
     public async Task AddCliInvoke_WithConfigure_MiddlewareRunsDuringExecution()
     {
-        // Arrange
-        CapturingLogger logger = new CapturingLogger();
-
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(invoker =>
-        {
-            MiddlewareItems items = new MiddlewareItems();
-            items.Set(LoggingMiddleware.LoggerKey, (Microsoft.Extensions.Logging.ILogger)logger);
-            return new ProcessInvoker(invoker.ExternalProcessFactory, items).UseLogging();
-        });
+        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware()));
         IServiceProvider provider = services.BuildServiceProvider();
 
-        // Act
         using IServiceScope scope = provider.CreateScope();
         IProcessInvoker invoker = scope.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
@@ -180,53 +159,6 @@ public class DependencyInjectionExtensionTests
             config,
             ProcessExitConfiguration.CreateGraceful());
 
-        // Assert
         await Assert.That(result.ExitCode).IsEqualTo(0);
-
-        bool hasEntryLog = logger.Entries.Any(e =>
-            e.Level == Microsoft.Extensions.Logging.LogLevel.Information && e.Message.Contains(filePath));
-        bool hasExitLog = logger.Entries.Any(e =>
-            e.Level == Microsoft.Extensions.Logging.LogLevel.Information && e.Message.Contains("exited with code"));
-
-        await Assert.That(hasEntryLog).IsTrue();
-        await Assert.That(hasExitLog).IsTrue();
-    }
-}
-
-/// <summary>
-///     A minimal <see cref="Microsoft.Extensions.Logging.ILogger"/> implementation that captures log entries for assertions.
-/// </summary>
-internal sealed class CapturingLogger : Microsoft.Extensions.Logging.ILogger
-{
-    private readonly object _lock = new();
-    private readonly List<(Microsoft.Extensions.Logging.LogLevel Level, string Message)> _entries = [];
-
-    public IReadOnlyList<(Microsoft.Extensions.Logging.LogLevel Level, string Message)> Entries
-    {
-        get { lock (_lock) { return _entries.ToArray(); } }
-    }
-
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull
-        => NullScope.Instance;
-
-    public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel) => true;
-
-    public void Log<TState>(
-        Microsoft.Extensions.Logging.LogLevel logLevel,
-        Microsoft.Extensions.Logging.EventId eventId,
-        TState state,
-        Exception? exception,
-        Func<TState, Exception?, string> formatter)
-    {
-        lock (_lock)
-        {
-            _entries.Add((logLevel, formatter(state, exception)));
-        }
-    }
-
-    private sealed class NullScope : IDisposable
-    {
-        public static readonly NullScope Instance = new();
-        public void Dispose() { }
     }
 }

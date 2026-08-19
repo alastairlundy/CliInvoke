@@ -11,7 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CliInvoke.Factories;
-using CliInvoke.Specializations.Middleware;
+using CliInvoke.Specializations;
 using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Specializations.Tests.Middleware;
@@ -58,7 +58,9 @@ public class PowerShellMiddlewareIntegrationTests
                 "PowerShell Core (pwsh) is not available on PATH; skipping PowerShell middleware integration test.");
         }
 
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory()).UsePowerShell();
+        PowershellProcessInvoker invoker = new PowershellProcessInvoker(
+            new CliInvoke.FilePathResolver(),
+            new ExternalProcessFactory());
 
         // The original target is `dotnet`, but PowerShellMiddleware rewrites the configuration
         // to run the command inside `pwsh -NoProfile -Command "..."`.

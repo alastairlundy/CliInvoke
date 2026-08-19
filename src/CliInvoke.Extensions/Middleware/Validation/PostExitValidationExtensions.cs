@@ -7,9 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Collections.Generic;
-using System.Linq;
-
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 
@@ -42,26 +39,4 @@ public static class PostExitValidationExtensions
         }
     }
 
-    /// <param name="invoker">The existing process invoker.</param>
-    extension(ProcessInvoker invoker)
-    {
-        /// <summary>
-        ///     Creates a new <see cref="ProcessInvoker"/> with <see cref="PostExitValidationMiddleware"/>
-        ///     prepended so that every invocation validates the resulting <see cref="ProcessResult"/>.
-        /// </summary>
-        /// <param name="validator">The validator applied to the process result.</param>
-        /// <returns>A new process invoker with post-exit validation middleware applied.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///     Thrown when <paramref name="invoker"/> or <paramref name="validator"/> is <c>null</c>.
-        /// </exception>
-        public ProcessInvoker UsePostExitValidation(IProcessResultValidator<ProcessResult> validator)
-        {
-            ArgumentNullException.ThrowIfNull(invoker);
-            ArgumentNullException.ThrowIfNull(validator);
-
-            IEnumerable<IProcessMiddleware> newList =
-                invoker.Middlewares.Prepend(new PostExitValidationMiddleware(validator));
-            return new ProcessInvoker(invoker.ExternalProcessFactory, newList, invoker.SharedItems);
-        }
-    }
 }

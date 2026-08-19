@@ -58,21 +58,6 @@ public class ProcessInvoker : IProcessInvoker
     }
 
     /// <summary>
-    ///     Gets the external process factory used by this invoker.
-    /// </summary>
-    internal IExternalProcessFactory ExternalProcessFactory => _externalProcessFactory;
-
-    /// <summary>
-    ///     Gets the ordered middleware list applied to every invocation.
-    /// </summary>
-    internal IReadOnlyList<IProcessMiddleware> Middlewares => _middlewares;
-
-    /// <summary>
-    ///     Gets the pre-seeded middleware items shared across every invocation's chain, if any.
-    /// </summary>
-    internal MiddlewareItems? SharedItems => _sharedItems;
-
-    /// <summary>
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes
     ///     with middleware applied to every invocation.
     /// </summary>

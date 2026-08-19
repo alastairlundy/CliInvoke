@@ -7,8 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using System.Collections.Generic;
+
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility;
 using CliInvoke.Factories;
@@ -37,16 +40,16 @@ public static class DependencyInjectionExtensions
 
     /// <summary>
     ///     Sets up Dependency Injection for CliInvoke's main interface-able types,
-    ///     allowing fluent configuration of the <see cref="ProcessInvoker"/> via a callback.
+    ///     allowing fluent configuration of the middleware pipeline via a callback.
     /// </summary>
     /// <remarks>
-    ///     The callback receives a bare <see cref="ProcessInvoker"/> and must return a configured instance.
-    ///     Typical usage chains middleware extensions such as <c>UseLogging()</c>, <c>UsePostExitValidation()</c>,
-    ///     or <c>UsePowerShell()</c>.
+    ///     The callback receives an <see cref="IProcessMiddlewareBuilder"/> and can compose
+    ///     middleware using <c>UseMiddleware()</c>, <c>UseMiddleware&lt;T&gt;()</c>,
+    ///     <c>UseLogging()</c>, <c>UsePostExitValidation()</c>, etc.
     /// </remarks>
     /// <param name="services">The service collection to add to.</param>
     /// <param name="configure">
-    ///     A delegate that receives a bare <see cref="ProcessInvoker"/> and returns a configured instance.
+    ///     A delegate that configures the middleware pipeline.
     /// </param>
     /// <param name="lifetime">The service lifetime to use if specified; Scoped otherwise.</param>
     /// <returns>The updated service collection with the added CliInvoke services set up.</returns>
@@ -54,7 +57,7 @@ public static class DependencyInjectionExtensions
     ///     Thrown when <paramref name="configure"/> is <c>null</c>.
     /// </exception>
     public static IServiceCollection AddCliInvoke(this IServiceCollection services,
-        Func<ProcessInvoker, ProcessInvoker> configure,
+        Action<IProcessMiddlewareBuilder> configure,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         ArgumentNullException.ThrowIfNull(configure);
@@ -64,10 +67,10 @@ public static class DependencyInjectionExtensions
 
     /// <summary>
     ///     Core implementation shared by both <see cref="AddCliInvoke(IServiceCollection, ServiceLifetime)"/>
-    ///     and <see cref="AddCliInvoke(IServiceCollection, Func{ProcessInvoker, ProcessInvoker}, ServiceLifetime)"/>.
+    ///     and <see cref="AddCliInvoke(IServiceCollection, Action{IProcessMiddlewareBuilder}, ServiceLifetime)"/>.
     /// </summary>
     private static IServiceCollection AddCliInvokeCore(this IServiceCollection services,
-        Func<ProcessInvoker, ProcessInvoker>? configure,
+        Action<IProcessMiddlewareBuilder>? configure,
         ServiceLifetime lifetime)
     {
         switch (lifetime)
@@ -93,8 +96,10 @@ public static class DependencyInjectionExtensions
                     services.AddSingleton<IProcessInvoker>(sp =>
                     {
                         IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
-                        ProcessInvoker invoker = new ProcessInvoker(factory);
-                        return configure(invoker);
+                        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(sp);
+                        configure(builder);
+                        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
+                        return new ProcessInvoker(factory, middlewares);
                     });
                 }
                 else
@@ -126,8 +131,10 @@ public static class DependencyInjectionExtensions
                     services.AddScoped<IProcessInvoker>(sp =>
                     {
                         IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
-                        ProcessInvoker invoker = new ProcessInvoker(factory);
-                        return configure(invoker);
+                        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(sp);
+                        configure(builder);
+                        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
+                        return new ProcessInvoker(factory, middlewares);
                     });
                 }
                 else
@@ -159,8 +166,10 @@ public static class DependencyInjectionExtensions
                     services.AddTransient<IProcessInvoker>(sp =>
                     {
                         IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
-                        ProcessInvoker invoker = new ProcessInvoker(factory);
-                        return configure(invoker);
+                        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(sp);
+                        configure(builder);
+                        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
+                        return new ProcessInvoker(factory, middlewares);
                     });
                 }
                 else
