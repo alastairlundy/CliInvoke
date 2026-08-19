@@ -14,8 +14,12 @@ using CliInvoke.Core.Builders;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility;
+using CliInvoke.Extensions.Middleware;
 using CliInvoke.Factories;
+using CliInvoke.Specializations.Middleware;
 using CliInvoke.Validation;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 // ReSharper disable RedundantAssignment
 
@@ -83,6 +87,7 @@ public static class DependencyInjectionExtensions
         {
             case ServiceLifetime.Singleton:
                 services.TryAddSingleton<IFilePathResolver, FilePathResolver>();
+                services.RegisterBuiltInMiddleware(lifetime);
                 services.TryAddSingleton<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
@@ -118,6 +123,7 @@ public static class DependencyInjectionExtensions
                 break;
             case ServiceLifetime.Scoped:
                 services.TryAddScoped<IFilePathResolver, FilePathResolver>();
+                services.RegisterBuiltInMiddleware(lifetime);
                 services.TryAddScoped<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
@@ -153,6 +159,7 @@ public static class DependencyInjectionExtensions
                 break;
             case ServiceLifetime.Transient:
                 services.TryAddTransient<IFilePathResolver, FilePathResolver>();
+                services.RegisterBuiltInMiddleware(lifetime);
                 services.TryAddTransient<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
                         [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
@@ -193,5 +200,51 @@ public static class DependencyInjectionExtensions
         }
 
         return services;
+    }
+
+    /// <summary>
+    ///     Registers CliInvoke's built-in middleware types and their options POCO in the service
+    ///     collection so the type-based <see cref="IProcessMiddlewareBuilder.UseMiddleware{T}"/> overload
+    ///     (used by the convenience extensions <c>UseLogging</c>, <c>UsePowerShell</c>, <c>UseCmd</c>)
+    ///     can resolve them from the dependency injection container.
+    /// </summary>
+    /// <remarks>
+    ///     All registrations use <see cref="ServiceCollectionDescriptorExtensions.TryAdd(IServiceCollection, ServiceDescriptor)"/>
+    ///     so that a consumer-supplied registration for any of these types takes precedence. The
+    ///     middleware lifetimes match the invoker lifetime to avoid capturing scoped services into a
+    ///     singleton. <see cref="LoggingMiddleware"/> falls back to <see cref="NullLogger{T}.Instance"/>
+    ///     when no <see cref="ILogger{T}"/> is registered.
+    /// </remarks>
+    /// <param name="services">The service collection to add to.</param>
+    /// <param name="lifetime">The service lifetime to register the middleware with.</param>
+    private static void RegisterBuiltInMiddleware(this IServiceCollection services, ServiceLifetime lifetime)
+    {
+        services.TryAdd(ServiceDescriptor.Describe(
+            typeof(PowerShellMiddlewareOptions),
+            _ => PowerShellMiddlewareOptions.Default,
+            lifetime));
+
+        // Registration is intentionally platform-agnostic: the middleware themselves throw
+        // PlatformNotSupportedException at invocation time on unsupported platforms, which is the
+        // documented behaviour. Suppress CA1416 for the construction call sites below.
+#pragma warning disable CA1416
+        services.TryAdd(ServiceDescriptor.Describe(
+            typeof(PowerShellMiddleware),
+            sp => new PowerShellMiddleware(
+                sp.GetService<IFilePathResolver>(),
+                sp.GetService<PowerShellMiddlewareOptions>()),
+            lifetime));
+
+        services.TryAdd(ServiceDescriptor.Describe(
+            typeof(CmdMiddleware),
+            _ => new CmdMiddleware(),
+            lifetime));
+#pragma warning restore CA1416
+
+        services.TryAdd(ServiceDescriptor.Describe(
+            typeof(LoggingMiddleware),
+            sp => new LoggingMiddleware(
+                sp.GetService<ILogger<LoggingMiddleware>>() ?? NullLogger<LoggingMiddleware>.Instance),
+            lifetime));
     }
 }

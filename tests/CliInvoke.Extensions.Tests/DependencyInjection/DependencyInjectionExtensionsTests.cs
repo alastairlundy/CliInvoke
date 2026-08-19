@@ -13,6 +13,7 @@ using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Factories;
+using CliInvoke.Specializations.Middleware;
 using CliInvoke.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -161,5 +162,53 @@ public class DependencyInjectionExtensionsTests
             ProcessExitConfiguration.CreateGraceful());
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task AddCliInvoke_WithConfigure_UsePowerShell_RegistersConfiguredInvoker()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvoke(builder => builder.UsePowerShell());
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
+
+        await Assert.That(invoker).IsNotNull();
+        await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
+    }
+
+    [Test]
+    public async Task AddCliInvoke_WithConfigure_UseCmd_RegistersConfiguredInvoker()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvoke(builder => builder.UseCmd());
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
+
+        await Assert.That(invoker).IsNotNull();
+        await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
+    }
+
+    [Test]
+    public async Task AddCliInvoke_WithConfigure_AllBuiltInMiddleware_RegistersConfiguredInvoker()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvoke(builder =>
+        {
+            builder.UseLogging();
+            builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+            builder.UsePowerShell();
+            builder.UseCmd();
+        });
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
+
+        await Assert.That(invoker).IsNotNull();
+        await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
     }
 }

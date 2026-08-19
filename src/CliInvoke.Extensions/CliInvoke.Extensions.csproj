@@ -54,6 +54,7 @@
     <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
         <ProjectReference Include="..\CliInvoke\CliInvoke.csproj"/>
+        <ProjectReference Include="..\CliInvoke.Specializations\CliInvoke.Specializations.csproj"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
