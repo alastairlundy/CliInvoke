@@ -330,7 +330,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
                && UseShellExecution.Equals(other.UseShellExecution)
                && Credential.Equals(other.Credential)
-               && ResourcePolicy.Equals(other.ResourcePolicy)
+               && RequiresAdministrator == other.RequiresAdministrator
+               && WindowCreation == other.WindowCreation
                && StandardInput.Equals(other.StandardInput)
 #pragma warning disable CS0618 // Type or member is obsolete
                && StandardOutput.Equals(other.StandardOutput)
@@ -386,6 +387,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(StandardError);
 #pragma warning restore CS0618 // Type or member is obsolete
         hashCode.Add(ResourcePolicy);
+        hashCode.Add(RequiresAdministrator);
+        hashCode.Add(WindowCreation);
         hashCode.Add(StandardInputEncoding);
         hashCode.Add(StandardOutputEncoding);
         hashCode.Add(StandardErrorEncoding);
