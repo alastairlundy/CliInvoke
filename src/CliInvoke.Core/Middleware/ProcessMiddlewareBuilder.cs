@@ -31,7 +31,7 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
     {
         ArgumentNullException.ThrowIfNull(provider);
         _resolver = type => (IProcessMiddleware)(provider.GetService(type)
-            ?? throw new InvalidOperationException($"No service of type '{type.FullName}' has been registered."));
+            ?? throw new InvalidOperationException(FormatMissingServiceMessage(type)));
     }
 
     /// <summary>
@@ -103,5 +103,11 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
         }
 
         return result.AsReadOnly();
+    }
+
+    private static string FormatMissingServiceMessage(Type serviceType)
+    {
+        return $"No service of type '{serviceType.FullName}' has been registered. " +
+               $"Register the middleware type in the DI container before calling AddCliInvoke.";
     }
 }

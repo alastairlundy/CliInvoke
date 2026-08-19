@@ -25,8 +25,17 @@ public interface IProcessMiddlewareBuilder
     ///     Adds a middleware type to the pipeline. The type is resolved through the
     ///     builder's resolver at <see cref="Build"/> time.
     /// </summary>
+    /// <remarks>
+    ///     When using DI, the type <typeparamref name="T"/> must be registered in the
+    ///     container before <see cref="Build"/> is called. Built-in middleware types
+    ///     (<c>LoggingMiddleware</c>, <c>PowerShellMiddleware</c>, <c>CmdMiddleware</c>)
+    ///     are registered automatically by <c>AddCliInvoke</c>.
+    /// </remarks>
     /// <typeparam name="T">A type implementing <see cref="IProcessMiddleware"/>.</typeparam>
     /// <returns>The builder for fluent chaining.</returns>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown at <see cref="Build"/> time when <typeparamref name="T"/> cannot be resolved.
+    /// </exception>
     IProcessMiddlewareBuilder UseMiddleware<T>() where T : IProcessMiddleware;
 
     /// <summary>
