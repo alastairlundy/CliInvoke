@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CliInvoke.Factories;
 using CliInvoke.Specializations;
+using CliInvoke.Specializations.Middleware;
 using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Specializations.Tests.Middleware;
@@ -81,5 +82,27 @@ public class PowerShellMiddlewareIntegrationTests
             : "pwsh";
         await Assert.That(result.ExecutedFilePath)
             .Contains(expectedPwshName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Test]
+    public async Task PowerShellMiddlewareOptions_Default_HasExpectedValues()
+    {
+        PowerShellMiddlewareOptions options = PowerShellMiddlewareOptions.Default;
+
+        await Assert.That(options.WindowCreation).IsFalse();
+        await Assert.That(options.UseShellExecution).IsFalse();
+    }
+
+    [Test]
+    public async Task PowerShellMiddlewareOptions_CanCustomiseProperties()
+    {
+        PowerShellMiddlewareOptions options = new PowerShellMiddlewareOptions
+        {
+            WindowCreation = true,
+            UseShellExecution = true
+        };
+
+        await Assert.That(options.WindowCreation).IsTrue();
+        await Assert.That(options.UseShellExecution).IsTrue();
     }
 }

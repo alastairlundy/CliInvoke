@@ -58,7 +58,7 @@ public class PowershellProcessInvoker : IProcessInvoker
         IExternalProcessFactory externalProcessFactory)
     {
         IReadOnlyList<IProcessMiddleware> middlewares =
-            [new PowerShellMiddleware(filePathResolver, windowCreation: false, useShellExecution: false)];
+            [new PowerShellMiddleware(filePathResolver)];
         _processInvoker = new ProcessInvoker(externalProcessFactory, middlewares);
     }
 

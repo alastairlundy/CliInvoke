@@ -37,42 +37,23 @@ namespace CliInvoke.Specializations.Middleware;
 internal sealed class PowerShellMiddleware : IProcessMiddleware
 {
     private readonly IFilePathResolver _filePathResolver;
-    private readonly bool _windowCreation;
-    private readonly bool _useShellExecution;
+    private readonly PowerShellMiddlewareOptions _options;
 
     /// <summary>
-    ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with the
-    ///     default options (<c>windowCreation = false</c>, <c>useShellExecution = false</c>),
-    ///     matching the unified defaults used by <see cref="ProcessConfiguration"/>.
+    ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with
+    ///     default options (<see cref="PowerShellMiddlewareOptions.Default"/>).
     /// </summary>
     /// <param name="filePathResolver">
     ///     The resolver used to locate the <c>pwsh</c> / <c>pwsh.exe</c> executable. A default
     ///     <see cref="CliInvoke.FilePathResolver"/> is used when omitted.
     /// </param>
-    public PowerShellMiddleware(IFilePathResolver? filePathResolver = null)
-        : this(filePathResolver, windowCreation: false, useShellExecution: false)
-    {
-    }
-
-    /// <summary>
-    ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with the
-    ///     supplied window-creation and shell-execution flags.
-    /// </summary>
-    /// <param name="filePathResolver">
-    ///     The resolver used to locate the <c>pwsh</c> / <c>pwsh.exe</c> executable. A default
-    ///     <see cref="CliInvoke.FilePathResolver"/> is used when omitted.
+    /// <param name="options">
+    ///     The PowerShell middleware options. Defaults to <see cref="PowerShellMiddlewareOptions.Default"/>.
     /// </param>
-    /// <param name="windowCreation">
-    ///     Whether PowerShell should create a new window when launched.
-    /// </param>
-    /// <param name="useShellExecution">
-    ///     Whether to use shell execution semantics for the wrapped process.
-    /// </param>
-    public PowerShellMiddleware(IFilePathResolver? filePathResolver, bool windowCreation, bool useShellExecution)
+    public PowerShellMiddleware(IFilePathResolver? filePathResolver = null, PowerShellMiddlewareOptions? options = null)
     {
         _filePathResolver = filePathResolver ?? new CliInvoke.FilePathResolver();
-        _windowCreation = windowCreation;
-        _useShellExecution = useShellExecution;
+        _options = options ?? PowerShellMiddlewareOptions.Default;
     }
 
     /// <inheritdoc />
@@ -120,8 +101,8 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
             standardOutputEncoding: src.StandardOutputEncoding,
             standardErrorEncoding: src.StandardErrorEncoding,
             processResourcePolicy: src.ResourcePolicy,
-            windowCreation: _windowCreation,
-            useShellExecution: _useShellExecution);
+            windowCreation: _options.WindowCreation,
+            useShellExecution: _options.UseShellExecution);
 
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
