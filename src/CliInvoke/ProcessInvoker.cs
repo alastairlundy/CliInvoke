@@ -19,9 +19,7 @@ namespace CliInvoke;
 /// </summary>
 public class ProcessInvoker : IProcessInvoker
 {
-    private readonly IExternalProcessFactory _externalProcessFactory;
     private readonly ProcessInvocationPipeline _pipeline;
-    private readonly IReadOnlyList<IProcessMiddleware> _middlewares;
     private readonly MiddlewareChain? _chain;
     private readonly MiddlewareItems? _sharedItems;
 
@@ -48,8 +46,6 @@ public class ProcessInvoker : IProcessInvoker
         IExternalProcessFactory externalProcessFactory,
         MiddlewareItems? sharedItems)
     {
-        _externalProcessFactory = externalProcessFactory;
-        _middlewares = Array.Empty<IProcessMiddleware>();
         _sharedItems = sharedItems;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
         _chain = sharedItems is null
@@ -65,8 +61,8 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="middlewares">The ordered middleware to apply before the terminal pipeline.</param>
     public ProcessInvoker(
         IExternalProcessFactory externalProcessFactory,
-        IEnumerable<IProcessMiddleware> middlewares)
-        : this(externalProcessFactory, middlewares, sharedItems: null)
+        IEnumerable<IProcessMiddleware> middlewareSequence)
+        : this(externalProcessFactory, middlewareSequence, sharedItems: null)
     {
     }
 
@@ -84,20 +80,18 @@ public class ProcessInvoker : IProcessInvoker
     /// </param>
     public ProcessInvoker(
         IExternalProcessFactory externalProcessFactory,
-        IEnumerable<IProcessMiddleware> middlewares,
+        IEnumerable<IProcessMiddleware> middlewareSequence,
         MiddlewareItems? sharedItems)
     {
-        ArgumentNullException.ThrowIfNull(middlewares);
+        ArgumentNullException.ThrowIfNull(middlewareSequence);
 
-        IReadOnlyList<IProcessMiddleware> materialized = middlewares.ToList();
+        IReadOnlyList<IProcessMiddleware> materialized = middlewareSequence.ToList();
 
         foreach (IProcessMiddleware middleware in materialized)
         {
             ArgumentNullException.ThrowIfNull(middleware);
         }
 
-        _externalProcessFactory = externalProcessFactory;
-        _middlewares = materialized;
         _sharedItems = sharedItems;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
         _chain = new MiddlewareChain(materialized, RunPipelineThroughContext, sharedItems);
