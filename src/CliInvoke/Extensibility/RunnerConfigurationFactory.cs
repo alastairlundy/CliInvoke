@@ -67,9 +67,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
             .EnableWindowCreation(processConfigToBeRun.WindowCreation);
 
         if (runnerProcessConfig.RequiresAdministrator)
-            commandBuilder = new ProcessConfigurationBuilder(
-                runnerProcessConfig.TargetFilePath
-            ).RequireAdministratorPrivileges();
+            commandBuilder.RequireAdministratorPrivileges();
 
         return commandBuilder.Build();
     }

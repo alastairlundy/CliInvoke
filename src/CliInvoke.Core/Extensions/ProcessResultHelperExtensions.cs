@@ -102,7 +102,7 @@ public static class ProcessResultHelperExtensions
         /// </returns>
         public bool HasErrors()
         {
-            using StreamReader stdErrorReader = new(processResult.StandardOutput);
+            using StreamReader stdErrorReader = new(processResult.StandardError);
 
             string stdError = stdErrorReader.ReadToEnd();
 
@@ -122,7 +122,7 @@ public static class ProcessResultHelperExtensions
         /// </returns>
         public async Task<bool> HasErrorsAsync(CancellationToken cancellationToken = default)
         {
-            using StreamReader stdErrorReader = new(processResult.StandardOutput);
+            using StreamReader stdErrorReader = new(processResult.StandardError);
 
             string stdError = await stdErrorReader.ReadToEndAsync(cancellationToken);
 

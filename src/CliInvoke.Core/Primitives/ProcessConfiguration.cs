@@ -219,7 +219,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
                && UseShellExecution.Equals(other.UseShellExecution)
                && Credential.Equals(other.Credential)
-               && ResourcePolicy.Equals(other.ResourcePolicy)
+               && RequiresAdministrator == other.RequiresAdministrator
+               && WindowCreation == other.WindowCreation
                && StandardInput.Equals(other.StandardInput)
                && RedirectStandardInput.Equals(other.RedirectStandardInput)
                && OutputRedirection == other.OutputRedirection
@@ -257,6 +258,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(EnvironmentVariables);
 
         hashCode.Add(Credential);
+        hashCode.Add(RequiresAdministrator);
+        hashCode.Add(WindowCreation);
 
         hashCode.Add(StandardInput);
         hashCode.Add(ResourcePolicy);

@@ -18,22 +18,18 @@ internal sealed class ConditionalMiddleware : IProcessMiddleware
 {
     private readonly Func<InvocationContext, Task<bool>> _predicate;
     private readonly IReadOnlyList<IProcessMiddleware> _subPipeline;
-    private readonly Func<Type, IProcessMiddleware> _resolver;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="ConditionalMiddleware"/> class.
     /// </summary>
     /// <param name="predicate">The async condition evaluated before each invocation.</param>
     /// <param name="subPipeline">The ordered sub-pipeline middleware to run when the predicate is true.</param>
-    /// <param name="resolver">The resolver used to construct a <see cref="MiddlewareChain"/> for the sub-pipeline.</param>
     public ConditionalMiddleware(
         Func<InvocationContext, Task<bool>> predicate,
-        IReadOnlyList<IProcessMiddleware> subPipeline,
-        Func<Type, IProcessMiddleware> resolver)
+        IReadOnlyList<IProcessMiddleware> subPipeline)
     {
         _predicate = predicate;
         _subPipeline = subPipeline;
-        _resolver = resolver;
     }
 
     /// <inheritdoc />

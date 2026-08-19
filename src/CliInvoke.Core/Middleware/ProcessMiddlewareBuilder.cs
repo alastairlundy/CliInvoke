@@ -81,7 +81,7 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
 
         IReadOnlyList<IProcessMiddleware> subPipeline = subBuilder.Build();
 
-        return UseMiddleware(new ConditionalMiddleware(predicate, subPipeline, _resolver));
+        return UseMiddleware(new ConditionalMiddleware(predicate, subPipeline));
     }
 
     /// <inheritdoc />
