@@ -23,10 +23,9 @@ namespace CliInvoke.Extensions.Middleware;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The middleware looks for an <see cref="ILogger"/> instance under the well-known
-///         key <c>"Logger"</c> in <see cref="MiddlewareContext.Items"/>. When the key is
-///         missing or the value is not an <see cref="ILogger"/>, a static
-///         <see cref="NullLogger.Instance"/> is used as a no-op fallback.
+///         The <see cref="ILogger"/> is resolved via constructor injection from
+///         the dependency injection container. When no logger is registered,
+///         <see cref="NullLogger{T}.Instance"/> is used as a no-op fallback.
 ///     </para>
 ///     <para>
 ///     Sensitive argument values following the flags <c>--password</c>,
@@ -36,15 +35,23 @@ namespace CliInvoke.Extensions.Middleware;
 /// </remarks>
 internal sealed class LoggingMiddleware : IProcessMiddleware
 {
-    /// <summary>
-    ///     The well-known key used to retrieve the <see cref="ILogger"/> from
-    ///     <see cref="MiddlewareContext.Items"/>.
-    /// </summary>
-    public const string LoggerKey = "Logger";
+    private readonly ILogger<LoggingMiddleware> _logger;
 
     private static readonly Regex SensitiveArgPattern = new(
         @"(--password|--token|--api-key)(\s+|=)(""[^""]*""|'[^']*'|[^-\s]\S*)",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>
+    ///     Initialises a new instance of the <see cref="LoggingMiddleware"/> class.
+    /// </summary>
+    /// <param name="logger">
+    ///     The logger used to write process invocation entry and exit information.
+    ///     Resolved from the dependency injection container.
+    /// </param>
+    public LoggingMiddleware(ILogger<LoggingMiddleware> logger)
+    {
+        _logger = logger ?? NullLogger<LoggingMiddleware>.Instance;
+    }
 
     /// <summary>
     ///     Executes the middleware pipeline, logging process entry and exit details.
@@ -57,11 +64,9 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        ILogger logger = ResolveLogger(context);
-
         string sanitizedArgs = SanitizeArguments(context.Configuration.Arguments);
 
-        logger.LogInformation("Invoking process {TargetFilePath} with arguments {Arguments}",
+        _logger.LogInformation("Invoking process {TargetFilePath} with arguments {Arguments}",
             context.Configuration.TargetFilePath,
             sanitizedArgs);
 
@@ -70,7 +75,7 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
         if (context.Result is null)
             return;
 
-        logger.LogInformation("Process {TargetFilePath} exited with code {ExitCode}",
+        _logger.LogInformation("Process {TargetFilePath} exited with code {ExitCode}",
             context.Configuration.TargetFilePath,
             context.Result.ExitCode);
 
@@ -85,7 +90,7 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
                              Environment.NewLine,
                              StringSplitOptions.RemoveEmptyEntries))
                 {
-                    logger.LogDebug("STDOUT: {Line}", line);
+                    _logger.LogDebug("STDOUT: {Line}", line);
                 }
             }
 
@@ -95,24 +100,9 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
                              Environment.NewLine,
                              StringSplitOptions.RemoveEmptyEntries))
                 {
-                    logger.LogDebug("STDERR: {Line}", line);
+                    _logger.LogDebug("STDERR: {Line}", line);
                 }
             }
-        }
-    }
-
-    private static ILogger ResolveLogger(InvocationContext context)
-    {
-        if (context.Middleware?.Items is null)
-            return NullLogger.Instance;
-
-        try
-        {
-            return context.Middleware.Items.Get<ILogger>(LoggerKey) ?? throw new InvalidOperationException();
-        }
-        catch (Exception)
-        {
-            return NullLogger.Instance;
         }
     }
 

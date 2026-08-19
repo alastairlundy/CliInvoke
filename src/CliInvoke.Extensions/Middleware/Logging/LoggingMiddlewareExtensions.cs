@@ -23,9 +23,9 @@ public static class LoggingMiddlewareExtensions
         ///     Adds <see cref="LoggingMiddleware"/> to the process invocation pipeline.
         /// </summary>
         /// <remarks>
-        ///     The middleware resolves an <see cref="Microsoft.Extensions.Logging.ILogger"/>
-        ///     from <see cref="MiddlewareContext.Items"/> using the well-known key
-        ///     <c>"Logger"</c>. When absent, <see cref="Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance"/>
+        ///     The middleware resolves an <see cref="Microsoft.Extensions.Logging.ILogger{T}"/>
+        ///     from the dependency injection container at pipeline build time.
+        ///     When no logger is registered, <see cref="Microsoft.Extensions.Logging.Abstractions.NullLogger{T}.Instance"/>
         ///     is used as a no-op fallback.
         /// </remarks>
         /// <returns>The builder for fluent chaining.</returns>
@@ -36,7 +36,7 @@ public static class LoggingMiddlewareExtensions
         {
             ArgumentNullException.ThrowIfNull(builder);
 
-            builder.UseMiddleware(new LoggingMiddleware());
+            builder.UseMiddleware<LoggingMiddleware>();
 
             return builder;
         }

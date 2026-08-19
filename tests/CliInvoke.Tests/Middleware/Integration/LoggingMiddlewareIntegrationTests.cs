@@ -21,7 +21,7 @@ namespace CliInvoke.Tests.Middleware.Integration;
 /// <summary>
 ///     A minimal <see cref="ILogger"/> implementation that captures log entries for assertions.
 /// </summary>
-internal sealed class CapturingLogger : ILogger
+internal sealed class CapturingLogger<T> : ILogger<T>
 {
     private readonly object _lock = new();
     private readonly List<(LogLevel Level, string Message)> _entries = [];
@@ -74,13 +74,19 @@ public class LoggingMiddlewareIntegrationTests
     [Test]
     public async Task UseLogging_CapturesEntryAndExitLogs_ForRealInvocation()
     {
-        CapturingLogger logger = new CapturingLogger();
+        CapturingLogger<LoggingMiddleware> logger = new();
 
-        MiddlewareItems items = new MiddlewareItems();
-        items.Set(LoggingMiddleware.LoggerKey, (ILogger)logger);
+        ProcessMiddlewareBuilder builder = new(type =>
+        {
+            if (type == typeof(LoggingMiddleware))
+                return new LoggingMiddleware(logger);
 
-        IReadOnlyList<IProcessMiddleware> middlewares = [new LoggingMiddleware()];
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, items);
+            throw new InvalidOperationException($"Unexpected type: {type.FullName}");
+        });
+
+        builder.UseLogging();
+        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
 
         (string filePath, string arguments) = ResolveEchoCommand();
 
