@@ -25,7 +25,6 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Documentation](#documentation)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
 * [Used By](#used-by)
-* [Roadmap](#cliinvokes-roadmap)
 * [License](#license)
 * [Acknowledgements](#acknowledgements)
 
@@ -42,29 +41,9 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Comparison vs Alternatives
 
-| Feature / Criterion                                                        |  CliInvoke   |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   |    [ProcessX](https://github.com/Cysharp/ProcessX)     |                             .NET Process class                             |
-|----------------------------------------------------------------------------|:------------:|:----------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------:|:--------------------------------------------------------------------------:|
-| Separate configuration and invocation types                               |      ✅      |   ❌ (`Command` is a partial class — configuration and execution share one type) |                           �                           | ⚠️ (`ProcessStartInfo` is a config model; execution uses `Process` itself) |
-| Builder pattern / fluent configuration API                                | ✅ (`ProcessConfigurationBuilder`, `IExternalProcessFactory`) | ✅ (dedicated builder classes; fluent `Command` chain via `Cli.Wrap(...)) | ✅ (per-command configuration object — see project docs for details) | ❌ (no builder; consumers construct `ProcessStartInfo` directly) |
-| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                        |                           ❌                           |                                     ❌                                     |
-| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                        |                           ✅                           |                            ✅ , Built into .NET                            |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                            ✅ (Windows/macOS/Linux officially; BSD unverified)                                    |            ❌ (Windows‑only officially)              |                                     ✅                                     |
-| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                        |                           ✅                           |      ⚠️, available; drain stdout and stderr concurrently to avoid deadlocks      |
-| Result type variants                                                       |  ✅ (ProcessResult / BufferedProcessResult / PipedProcessResult) |  ✅ (CommandResult / BufferedCommandResult)            |            ✅ (multiple result shapes)               | ⚠️ (`ProcessExitInfo` in .NET 11 Preview only; sealed struct, no buffered/piped variants) |
-| Support for Process/Command Timeout                                        |      ✅      |                              :warning:, limited to cancelling via CancellationToken                              | :warning:, limited to cancelling via CancellationToken |           :warning:, limited to cancelling via CancellationToken           |
-| Graceful Cancellation Support via SIGTERM/SIGINT Signals                   |  ✅, 2.3.0+  |          ⚠️, requires bundled .NET Framework console helper on Windows                                          |                           ❌                           |                                     ❌                                     |
-| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                        |                           ✅                           |                                     ✅                                     |
-| Middleware / cross-cutting pipeline                                       | ✅ (v3 pre-release; `IProcessMiddleware` chain via `ProcessInvoker`) | ❌ | ❌ | ❌ |
-| License                                                                    |     MPL‑2.0     |                                  MIT                                                                              |                         MIT                          |                     MIT (.NET Runtime)                                  |
-| Fork / maintenance notes                                                   | MPL‑2.0 file‑level copyleft — retain MPL notice on copied files  | Test projects depend on a source‑available (non‑OSI) library; check its license before redistributing the test suite | MIT, no additional terms                              | Governed by the .NET Runtime project                            |
+CliInvoke is compared against [CliWrap](https://github.com/Tyrrrz/CliWrap/), [ProcessX](https://github.com/Cysharp/ProcessX), and the built-in .NET `Process` class across features like configuration separation, DI support, middleware, cross-platform support, and licensing.
 
-Notes:
-
-- CliInvoke v1 and v2 shipped dedicated builder classes (`ArgumentsBuilder`, `EnvironmentVariablesBuilder` etc); v3+ replaces them with `ProcessConfiguration` Spec types (`ArgumentsSpec`, `EnvironmentVariablesSpec` etc). CliWrap provides dedicated builder classes plus a fluent `Command` chain via `Cli.Wrap(...)`.
-- CliWrap's repository also contains an informal Terms of Use document, separate from the
-  MIT license; the project's stated position is that this is governance signalling rather
-  than a binding license addendum. Fork maintainers should read both the MIT license and
-  the Terms of Use document before redistributing.
+See the [full comparison table](site/docs/comparison.md) for a detailed feature-by-feature breakdown.
 
 ## Installing CliInvoke
 
@@ -141,100 +120,11 @@ For fine-grained control over process execution — custom timeouts, cancellatio
 
 ## Middleware
 
-CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns (logging, validation, platform selection, retries, …) around the terminal process pipeline without changing how you call it. The pipeline remains the "leaf" that actually starts and waits on the process; middleware wraps it in the order you register.
+CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns — logging, validation, platform selection, retries — around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`, `ExecutePipedAsync`) remain identical.
 
-### When to use middleware, and the two constructors
+Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`.
 
-`ProcessInvoker` has two constructors:
-
-```csharp
-// 1. No middleware — the classic, unchanged behavior.
-public ProcessInvoker(IExternalProcessFactory externalProcessFactory);
-
-// 2. With middleware — every invocation runs through the chain, in order,
-//    before the terminal pipeline executes.
-public ProcessInvoker(
-    IExternalProcessFactory externalProcessFactory,
-    IEnumerable<IProcessMiddleware> middlewares);
-```
-
-Each constructor has an overload that also accepts a `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
-
-```csharp
-using CliInvoke.Core.Middleware; // MiddlewareItems
-
-var items = new MiddlewareItems();
-items.Set("Logger", myLogger);
-var invoker = new ProcessInvoker(factory, items);
-```
-
-Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the first constructor when you don't need middleware. Use the second when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
-
-### The `IProcessMiddleware` contract
-
-A middleware is any `IProcessMiddleware` implementation. It receives the `InvocationContext` and a `next` delegate; calling `next` continues the chain (or the terminal pipeline), omitting it short-circuits:
-
-```csharp
-public interface IProcessMiddleware
-{
-    Task InvokeAsync(
-        InvocationContext context,
-        Func<InvocationContext, CancellationToken, Task> next);
-}
-```
-
-Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag). For example, `LoggingMiddleware` resolves an `ILogger` from that bag under the well-known key `"Logger"`.
-
-### Built-in middleware
-
-The public API is the **builder extension methods** (`UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd`), not the middleware classes (which are internal). These extensions are defined on `IProcessMiddlewareBuilder` and are used when configuring middleware through DI or the builder:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Extensions.Middleware;            // UseLogging
-using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation
-using CliInvoke.Specializations.Middleware;        // UsePowerShell, UseCmd
-
-builder.Services.AddCliInvoke(builder =>
-{
-    builder.UseLogging();
-    builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
-    builder.UsePowerShell();
-});
-```
-
-* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
-* `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
-* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell` also has an overload `UsePowerShell(windowCreation, useShellExecution)` for non-default behaviour; the parameterless form defaults both to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
-
-### Configuring middleware through DI
-
-Middleware does not need to be wired by hand when you register CliInvoke through `Microsoft.Extensions.DependencyInjection`. The `AddCliInvoke(IServiceCollection, Action<IProcessMiddlewareBuilder>, ServiceLifetime)` overload in `CliInvoke.Extensions.DependencyInjection.DependencyInjectionExtensions` accepts a callback that receives an `IProcessMiddlewareBuilder` and configures the middleware pipeline:
-
-```csharp
-using CliInvoke;
-using CliInvoke.Extensions;
-using CliInvoke.Extensions.Middleware;
-using CliInvoke.Extensions.Middleware.Validation;
-
-builder.Services.AddCliInvoke(configure: builder =>
-{
-    builder.UseLogging();
-    builder.UsePostExitValidation(
-        new ProcessResultValidator<ProcessResult>(
-            [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
-});
-```
-
-The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Transient`). The `IProcessMiddlewareBuilder` creates the middleware chain from the container's services; the middleware itself still resolves its per-invocation dependencies (for example `ILogger` via the `MiddlewareItems` bag) from the active scope, so DI-driven configuration does not bypass the middleware contract described above.
-
-### Result-ownership and disposal through the chain
-
-Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. See **[Resource Disposal](#resource-disposal)** for the full ownership rules and checklist.
-
-### The result-swap rule
-
-By default, middleware does **not** mutate the `ProcessResult` object. Logging and post-exit validation pass the result through unchanged. Platform-selection middleware (`UsePowerShell` / `UseCmd`) substitutes the result of the wrapped `pwsh` / `cmd.exe` invocation — the caller still sees a normal `ProcessResult`, but the data comes from the wrapped shell, not from the original command. Transforming or replacing the result is a deliberate, niche operation: a middleware that does so should write the new result onto `InvocationContext.Result` so the caller receives it.
+For the full guide — constructor details, the `IProcessMiddleware` contract, DI configuration, result ownership, and the result-swap rule — see the **[Middleware Guide](site/docs/guides/middleware.md)**.
 
 ## Resource Disposal
 
@@ -282,24 +172,6 @@ already open.
 If there isn't already a relevant issue filed,
 please [file one here](https://github.com/alastairlundy/CliInvoke/issues/new) and follow the respective guidance from
 the appropriate issue template.
-
-## CliInvoke's Roadmap
-
-CliInvoke aims to make working with Commands and external processes easier.
-
-Future updates may focus on one or more of the following:
-
-* Improved ease of use
-* Improved stability
-* New features
-* Enhancing existing features
-
-## New vs Old Package and Namespace
-
-CliInvoke changed its NuGet package ID and namespace starting from the re-release of 2.0.0 (tagged as 2.0.0-v2) and has
-since been published directly under the ``CliInvoke`` package ID prefix and namespace.
-
-The previous package IDs are marked as deprecated and will not receive future updates.
 
 ## License
 
