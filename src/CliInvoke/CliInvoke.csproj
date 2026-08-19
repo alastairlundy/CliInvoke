@@ -15,26 +15,23 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>🆕 **Additions**
-- Added `ProcessInvocationPipeline` internal class.
-- Added a `ProcessInvoker` constructor accepting a middleware chain, with chain routing.
-- Added pipeline dispatch and invoker integration tests.
+        <PackageReleaseNotes>#### 🆕 Additions
+- Promoted `ProcessMiddlewareBuilder` to public with `UseMiddleware` and `UseWhen` support
 
-⚙️ **Modifications**
-- Wired invokers to `ProcessInvocationPipeline`.
-- Updated `ProcessInvocationPipeline` and `ExternalProcess` implementations.
-- Specified `Lock` type for shared synchronization.
-- Replaced `var` usage with explicit types; cleaned up `using` statements.
-- Addressed PR #397 review findings in `ProcessInvocationPipeline` wiring.
-- Renamed `ProcessInvocationContext` to `InvocationContext` across invokers.
+#### ⚙️ Modifications
+- Removed `ProcessInvoker` internal accessors and `invoker.Use...()` extensions
+- Renamed `AddCliInvokeCore`
+- Cleaned up middleware internal API surface
+- Removed unused fields and renamed parameters for clarity in `ProcessInvoker`
 
-🐛 **Bug Fixes**
-- Fixed a `WaitForExitAsync` pipe EOF hang on Linux.
-- Fixed output redirection for timeout in the SuspendResume test.</PackageReleaseNotes>
+#### 🐛 Bug Fixes
+- Fixed test build failures on configuration-seam-stack branch
+- Fixed validation logic in `AddEnumerable(IFormattable)` overload
+- Guarded shell execution against redirected standard input</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.8</PackageVersion>
+        <PackageVersion>3.0.0-alpha.9</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

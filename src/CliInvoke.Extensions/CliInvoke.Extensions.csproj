@@ -9,21 +9,21 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>3.0.0-alpha.8</Version>
+        <Version>3.0.0-alpha.9</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>🆕 **Additions**
-- Added `LoggingMiddleware` and the `UseLogging` extension.
-- Added `PostExitValidationMiddleware` and the `UsePostExitValidation` extension.
-- Added `PowerShellMiddleware` and `CmdMiddleware` with `UsePowerShell`/`UseCmd` extensions.
-- Added integration tests for the built-in middleware.
+        <PackageReleaseNotes>#### ⚙️ Modifications
+- Migrated PostExitValidation integration tests to use `ProcessMiddlewareBuilder`
+- Migrated `LoggingMiddleware` to DI constructor injection
+- Added `CliInvoke.Extensions.Tests`
 
-🐛 **Bug Fixes**
-- Fixed sensitive-argument redaction to handle quoted values containing spaces.</PackageReleaseNotes>
+#### 🐛 Bug Fixes
+- Fixed potential regex redaction issues
+- Registered built-in middleware types in `AddCliInvoke` so `UseMiddleware&lt;T&gt;()` resolves them from DI</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

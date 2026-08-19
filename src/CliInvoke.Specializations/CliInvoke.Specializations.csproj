@@ -12,21 +12,15 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.8</PackageVersion>
+        <PackageVersion>3.0.0-alpha.9</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>⚙️ **Modifications**
-- Refactored specialized invokers into thin wrappers over `ProcessInvoker` + middleware.
-- Forwarded the full process configuration in both platform middleware.
-- Cleaned up `PowershellInvoker`; updated `PowershellProcessInvoker`, `PlatformMiddlewareExtensions`, and `EnvironmentVariablesBuilder`.
-- Ensured standard-output redirection is disabled when shell execution is used.
-- Added the call operator to the PowerShell-wrapped command.
-
-🐛 **Bug Fixes**
-- Fixed XML doc comments to reference correct class names.</PackageReleaseNotes>
+        <PackageReleaseNotes>
+#### 🆕 Additions
+- Added `PowerShellMiddlewareOptions` POCO and builder extensions</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
