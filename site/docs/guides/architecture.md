@@ -33,7 +33,7 @@ This page exists to answer four questions precisely:
 
 The following terms are used throughout this guide. They mirror the
 canonical definitions in
-[`CONTEXT.md`](https://github.com/alastairlundy/CliInvoke/blob/main/CONTEXT.md#core-concepts).
+[`GLOSSARY.md`](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md#core-concepts).
 
 A **Builder** is a fluent, mutable object used to assemble a configuration
 model. Each builder is a short-lived staging area whose only job is to
@@ -378,7 +378,7 @@ an absolute path.
 Customising the resolver is the supported way to add new lookup
 strategies — for example, looking up executable paths in a vendored
 toolchain directory. See
-[`CONTEXT.md` § 1 — Resolution order rationale](https://github.com/alastairlundy/CliInvoke/blob/main/CONTEXT.md#1-resolution-order-rationale)
+[`GLOSSARY.md` § 1 — Resolution order rationale](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md#1-resolution-order-rationale)
 for the performance contract that custom resolvers must respect.
 
 #### 2. Runner wrapping — `IRunnerConfigurationFactory`
@@ -493,7 +493,7 @@ scenario.
   leaks, hangs, exit-code mismatches, and file-not-found errors.
 - [`PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/PATTERNS.md) — full API-level detail for
   the three invocation patterns.
-- [`CONTEXT.md`](https://github.com/alastairlundy/CliInvoke/blob/main/CONTEXT.md) — the canonical glossary,
+- [`GLOSSARY.md`](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md) — the canonical glossary,
   including the definitions of the Process Invocation Pipeline and
   the Process Invocation Context.
 

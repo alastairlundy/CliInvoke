@@ -44,7 +44,7 @@ public abstract class FilePathResolverBase : IFilePathResolver
             return new FileInfo(filePathToResolve);
         }
 
-        // PATH first, then directory recursion — see CONTEXT.md
+        // PATH first, then directory recursion — see GLOSSARY.md
         bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out FileInfo? filePath);
 
         if (filePath is not null && resolveFromPath)

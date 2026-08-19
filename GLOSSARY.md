@@ -1,4 +1,4 @@
-# CliInvoke Context
+# CliInvoke Glossary
 
 This document provides a glossary and architectural mapping of the CliInvoke domain. It is intended to ensure consistency across the codebase and provide unambiguous definitions for agents and developers.
 

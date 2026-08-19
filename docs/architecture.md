@@ -245,7 +245,7 @@ Use the table below to decide which stage a change belongs to.
 
 ## Cross-References
 
-- [CONTEXT.md](../CONTEXT.md) — domain glossary.
+- [GLOSSARY.md](../GLOSSARY.md) — domain glossary.
 - [PATTERNS.md](../PATTERNS.md) — three invocation patterns and when
   to use them.
 - [site/docs/guides/configuration.md](../site/docs/guides/configuration.md) —
