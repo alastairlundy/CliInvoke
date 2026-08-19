@@ -16,8 +16,7 @@
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.2 and CliInvoke 2.10.2
-* Updated Polyfill version from 11.0.1 to 11.2.0</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.3 and CliInvoke 2.10.3</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -26,8 +25,8 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageId>CliInvoke.Extensions</PackageId>
         <Product>CliInvoke.Extensions</Product>
-        <AssemblyVersion>2.10.2.0</AssemblyVersion>
-        <FileVersion>2.10.2.0</FileVersion>
+        <AssemblyVersion>2.10.3.0</AssemblyVersion>
+        <FileVersion>2.10.3.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
