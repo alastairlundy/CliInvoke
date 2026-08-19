@@ -22,8 +22,9 @@ public class PostExitValidationMiddlewareIntegrationTests
     public async Task UsePostExitValidation_ZeroExit_DoesNotThrow()
     {
         // `dotnet --version` is a portable command that exits 0.
-        IReadOnlyList<IProcessMiddleware> middlewares =
-            [new PostExitValidationMiddleware(PostExitValidation.ExitCodeIsZero())];
+        ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
+        builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
@@ -39,8 +40,9 @@ public class PostExitValidationMiddlewareIntegrationTests
     public async Task UsePostExitValidation_NonZeroExit_ThrowsProcessValidationException()
     {
         // `dotnet --this-flag-does-not-exist` is a portable command that exits non-zero.
-        IReadOnlyList<IProcessMiddleware> middlewares =
-            [new PostExitValidationMiddleware(PostExitValidation.ExitCodeIsZero())];
+        ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
+        builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
 
         using ProcessConfiguration config =
@@ -59,8 +61,9 @@ public class PostExitValidationMiddlewareIntegrationTests
     public async Task UsePostExitValidation_StdoutMatches_ValidatesBufferedOutput()
     {
         // `dotnet --version` writes a version string (e.g. "8.0.100") to standard output.
-        IReadOnlyList<IProcessMiddleware> middlewares =
-            [new PostExitValidationMiddleware(PostExitValidation.StdoutMatches(@"\d+\.\d+"))];
+        ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
+        builder.UsePostExitValidation(PostExitValidation.StdoutMatches(@"\d+\.\d+"));
+        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
