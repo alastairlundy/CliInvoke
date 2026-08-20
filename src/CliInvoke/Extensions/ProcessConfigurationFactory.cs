@@ -7,8 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Linq;
 using System.Text;
+
+using CliInvoke.Builders;
 using CliInvoke.Core.Configuration;
 
 namespace CliInvoke;
