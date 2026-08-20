@@ -1,0 +1,16 @@
+name: cliinvoke-v1-to-v2-migration-eval
+description: Evaluation suite for the cliinvoke-v1-to-v2-migration skill
+skill: cliinvoke-v1-to-v2-migration
+version: "1.0"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: gpt-5-mini
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+tasks:
+  - "tasks/*.yaml"

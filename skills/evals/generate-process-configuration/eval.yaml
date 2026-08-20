@@ -1,0 +1,16 @@
+name: generate-process-configuration-eval
+description: Evaluation suite for the generate-process-configuration skill
+skill: generate-process-configuration
+version: "1.0"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: gpt-5-mini
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+tasks:
+  - "tasks/*.yaml"

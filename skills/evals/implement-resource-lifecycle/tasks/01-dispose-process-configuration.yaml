@@ -1,0 +1,44 @@
+id: dispose-process-configuration
+name: "Dispose ProcessConfiguration correctly"
+description: Verify the agent recommends using 'using' or 'await using' for ProcessConfiguration disposal.
+tags:
+  - positive
+  - disposal
+inputs:
+  prompt: "I've created a ProcessConfiguration object using ProcessConfigurationBuilder. What's the correct way to dispose of it to prevent resource leaks?"
+  context:
+    fixture: "fixtures"
+expected:
+  output_contains:
+    - "using"
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: mentions_using_and_processconfiguration
+    config:
+      contains:
+        - "using"
+        - "ProcessConfiguration"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly recommended using a 'using' or 'await using' block to dispose of ProcessConfiguration.
+        2. Explained that the creator of the configuration is responsible for its disposal.
+        3. Did not suggest ignoring disposal or disposing it at the wrong time.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.

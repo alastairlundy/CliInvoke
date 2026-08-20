@@ -1,0 +1,45 @@
+id: dispose-iexternalprocess-async
+name: "Dispose IExternalProcess in async methods"
+description: Verify the agent recommends 'await using' for IExternalProcess in async contexts.
+tags:
+  - positive
+  - disposal
+  - async
+inputs:
+  prompt: "I'm working with IExternalProcess in an async method. Should I use 'using' or 'await using' to dispose of it properly?"
+  context:
+    fixture: "fixtures"
+expected:
+  output_contains:
+    - "await using"
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: mentions_await_using_and_iexternalprocess
+    config:
+      contains:
+        - "await using"
+        - "IExternalProcess"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly recommended using 'await using' for IExternalProcess in async contexts.
+        2. Explained that this ensures non-blocking resource cleanup.
+        3. Did not suggest using 'using' instead of 'await using' for async methods.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.

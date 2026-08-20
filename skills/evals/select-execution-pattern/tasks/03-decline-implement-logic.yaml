@@ -1,0 +1,41 @@
+id: decline-implement-logic
+name: "Decline request for implementing actual process logic"
+description: Verify the agent declines to write actual process execution code (out of scope).
+tags:
+  - negative
+  - decline
+inputs:
+  prompt: "I need to implement the actual logic for starting and managing a process. Can you show me how to write the process execution code?"
+  context:
+    fixture: "fixtures"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: decline_pattern
+    config:
+      regex_match:
+        - "(?i)(implementing the actual process logic|not for implementing|does not cover|cannot help with|out of scope.*process.*logic)"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly identified that implementing actual process logic is outside the scope of this skill.
+        2. Did not attempt to provide process implementation code or detailed coding guidance.
+        3. Redirected the user to appropriate resources for learning process implementation.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.

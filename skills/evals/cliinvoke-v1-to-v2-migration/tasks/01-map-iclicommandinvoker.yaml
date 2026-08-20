@@ -1,0 +1,44 @@
+id: map-iclicommandinvoker
+name: "Map V1 invoker interface to V2 equivalent"
+description: Verify the agent maps ICliCommandInvoker to IProcessInvoker.
+tags:
+  - positive
+  - v1-to-v2
+  - interface-mapping
+inputs:
+  prompt: "In CliInvoke V1, I was using ICliCommandInvoker. What is the equivalent interface in V2?"
+  context:
+    fixture: "fixtures"
+expected:
+  output_contains:
+    - "IProcessInvoker"
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: mentions_iprocessinvoker
+    config:
+      contains:
+        - "IProcessInvoker"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly identified that ICliCommandInvoker maps to IProcessInvoker in V2.
+        2. Provided the clear and direct mapping between V1 and V2 interfaces.
+        3. Did not confuse the mapping with other similar interfaces like IProcessFactory.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.
