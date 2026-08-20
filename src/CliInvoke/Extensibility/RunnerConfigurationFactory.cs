@@ -10,7 +10,6 @@
 #pragma warning disable CA1416
 
 using CliInvoke.Builders;
-using CliInvoke.Core.Configuration;
 using CliInvoke.Core.Extensibility;
 
 namespace CliInvoke.Extensibility;
@@ -51,8 +50,8 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
             {
                 resourceSpec.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
                 
-                resourceSpec.SetMinWorkingSet((nint?)processConfigToBeRun.ResourcePolicy.MinWorkingSet);
-                resourceSpec.SetMaxWorkingSet((nint?)processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                resourceSpec.SetMinWorkingSet(processConfigToBeRun.ResourcePolicy.MinWorkingSet);
+                resourceSpec.SetMaxWorkingSet(processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
 
                 resourceSpec.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
                     .EnablePriorityBoost);

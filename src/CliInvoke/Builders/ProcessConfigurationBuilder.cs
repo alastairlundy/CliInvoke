@@ -341,8 +341,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
             spec.SetPriorityClass(processResourcePolicy.PriorityClass)
                 .ConfigurePriorityBoost(processResourcePolicy.EnablePriorityBoost);
 
-            spec.SetMinWorkingSet((nint?)processResourcePolicy.MinWorkingSet);
-            spec.SetMaxWorkingSet((nint?)processResourcePolicy.MaxWorkingSet);
+            spec.SetMinWorkingSet(processResourcePolicy.MinWorkingSet);
+            spec.SetMaxWorkingSet(processResourcePolicy.MaxWorkingSet);
 
             spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity is not null
                 ? (nint)processResourcePolicy.ProcessorAffinity
