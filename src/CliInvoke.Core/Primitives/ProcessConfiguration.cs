@@ -51,7 +51,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processResourcePolicy">The process resource policy, or <c>null</c> for defaults.</param>
     /// <param name="windowCreation">Whether to enable window creation.</param>
     /// <param name="useShellExecution">Whether to use shell execution.</param>
-    protected ProcessConfiguration(
+    protected internal ProcessConfiguration(
         string targetFilePath,
         string arguments,
         bool redirectStandardInput,
