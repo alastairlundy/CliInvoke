@@ -31,7 +31,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         ProcessResult result =
             await processInvoker.ExecuteAsync(config,
@@ -48,7 +48,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         BufferedProcessResult result =
             await processInvoker.ExecuteBufferedAsync(config,
@@ -65,7 +65,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         PipedProcessResult result =
             await processInvoker.ExecutePipedAsync(config,
@@ -82,7 +82,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () =>
                 await processInvoker.ExecuteAsync(config,
@@ -98,7 +98,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () =>
                 await processInvoker.ExecuteBufferedAsync(config,
@@ -114,7 +114,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         using ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () =>
                 await processInvoker.ExecutePipedAsync(config,

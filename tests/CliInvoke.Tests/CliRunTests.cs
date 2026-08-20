@@ -66,7 +66,7 @@ public class CliRunTests : IDisposable
     public async Task RunAsync_WithConfig_RoutesThroughFactory()
     {
         using ProcessConfiguration configuration =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         ProcessResult result = await CliRun.RunAsync(configuration,
             ProcessExitConfiguration.CreateGraceful());
@@ -80,7 +80,7 @@ public class CliRunTests : IDisposable
     public async Task RunBufferedAsync_WithConfig_RoutesThroughFactory()
     {
         using ProcessConfiguration configuration =
-            ProcessConfigurationFactory.Create(_targetFilePath, outputRedirection: true);
+            ProcessConfigurationFactory.Create(_targetFilePath, "", outputRedirection: true);
 
         BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
             ProcessExitConfiguration.CreateGraceful());
@@ -94,7 +94,7 @@ public class CliRunTests : IDisposable
     public async Task RunPipedAsync_WithConfig_RoutesThroughFactory()
     {
         using ProcessConfiguration configuration =
-            ProcessConfigurationFactory.Create(_targetFilePath, outputRedirection: true);
+            ProcessConfigurationFactory.Create(_targetFilePath, "", outputRedirection: true);
 
         PipedProcessResult result = await CliRun.RunPipedAsync(configuration,
             ProcessExitConfiguration.CreateGraceful());
@@ -143,7 +143,7 @@ public class CliRunTests : IDisposable
         _factory.ThrowOnStart = new InvalidOperationException("simulated start failure");
 
         using ProcessConfiguration configuration =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () => await CliRun.RunAsync(configuration,
                 ProcessExitConfiguration.CreateGraceful()))
@@ -158,7 +158,7 @@ public class CliRunTests : IDisposable
         CountingExternalProcessFactory thirdFactory = new CountingExternalProcessFactory();
 
         using (ProcessConfiguration firstConfig =
-               ProcessConfigurationFactory.Create(_targetFilePath))
+               ProcessConfigurationFactory.Create(_targetFilePath, ""))
         {
             await CliRun.RunAsync(firstConfig, ProcessExitConfiguration.CreateGraceful());
         }
@@ -166,7 +166,7 @@ public class CliRunTests : IDisposable
 
         CliRun.UseExternalProcessFactory(secondFactory);
         using (ProcessConfiguration secondConfig =
-               ProcessConfigurationFactory.Create(_targetFilePath))
+               ProcessConfigurationFactory.Create(_targetFilePath, ""))
         {
             await CliRun.RunAsync(secondConfig, ProcessExitConfiguration.CreateGraceful());
         }
@@ -175,7 +175,7 @@ public class CliRunTests : IDisposable
 
         CliRun.UseExternalProcessFactory(thirdFactory);
         using (ProcessConfiguration thirdConfig =
-               ProcessConfigurationFactory.Create(_targetFilePath))
+               ProcessConfigurationFactory.Create(_targetFilePath, ""))
         {
             await CliRun.RunAsync(thirdConfig, ProcessExitConfiguration.CreateGraceful());
         }
@@ -191,7 +191,7 @@ public class CliRunTests : IDisposable
     public async Task FireAndForget_WithConfig_RoutesThroughFactory()
     {
         using ProcessConfiguration configuration =
-            ProcessConfigurationFactory.Create(_targetFilePath);
+            ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         CliRun.FireAndForget(configuration);
 
@@ -219,7 +219,7 @@ public class CliRunTests : IDisposable
             CliRun.UseExternalProcessFactory(disposalFactory);
 
             using ProcessConfiguration configuration =
-                ProcessConfigurationFactory.Create(_targetFilePath);
+                ProcessConfigurationFactory.Create(_targetFilePath, "");
 
             CliRun.FireAndForget(configuration);
 
@@ -244,7 +244,7 @@ public class CliRunTests : IDisposable
             CliRun.UseExternalProcessFactory(disposalFactory);
 
             using ProcessConfiguration configuration =
-                ProcessConfigurationFactory.Create(_targetFilePath);
+                ProcessConfigurationFactory.Create(_targetFilePath, "");
 
             await Assert.That(() => CliRun.FireAndForget(configuration))
                 .Throws<InvalidOperationException>();
