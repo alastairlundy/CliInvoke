@@ -29,8 +29,8 @@ public static class ProcessConfigurationFactory
     /// <param name="outputRedirection">
     ///     Whether to redirect standard output and standard error.
     ///     <remarks>
-    ///     Note: <c>ProcessConfigurationBuilder._outputRedirection</c> defaults to <c>false</c>;
-    ///     the factory's default is <c>true</c>. Use the builder when you need explicit output redirection control.
+    ///     Note: <see cref="ProcessConfigurationBuilder._outputRedirection"/> defaults to <c>false</c>;
+    ///     the factory's default is <c>true</c>. Set <paramref name="outputRedirection"/> to <c>false</c> if output redirection is not desired.
     ///     </remarks>
     /// </param>
     /// <param name="enableWindowCreation">Whether to enable window creation for the process.</param>
