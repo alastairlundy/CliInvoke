@@ -74,4 +74,10 @@
     <data name="Exceptions.VersionParsing.InvalidVersionString" xml:space="preserve">
         <value>An invalid version string of {0} was provided.</value>
     </data>
+    <data name="Exceptions.DirectoryNotFound.WorkingDirectory" xml:space="preserve">
+        <value>Working directory '{0}' does not exist.</value>
+    </data>
+    <data name="Exceptions.Arguments.EmptyArgsSequence" xml:space="preserve">
+        <value>Arguments sequence cannot be empty.</value>
+    </data>
 </root>
