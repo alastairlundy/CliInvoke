@@ -48,12 +48,9 @@ public static class ProcessConfigurationFactory
         ArgumentNullException.ThrowIfNull(arguments);
 
         if (workingDirectory is not null && !Directory.Exists(workingDirectory))
-            throw new ArgumentException($"Working directory '{workingDirectory}' does not exist.", nameof(workingDirectory));
-
-        IReadOnlyDictionary<string, string> environmentVariables = new EnvironmentVariablesSpec().Build();
-        ProcessResourcePolicy processResourcePolicy = new ProcessResourcePolicySpec().Build();
-        UserCredential? credential = new UserCredentialSpec().Build();
-
+            throw new DirectoryNotFoundException(string.Format(
+                Resources.Exceptions_DirectoryNotFound_WorkingDirectory, workingDirectory));
+        
         return new ProcessConfiguration(
             targetFilePath,
             arguments,
@@ -61,13 +58,13 @@ public static class ProcessConfigurationFactory
             outputRedirection,
             workingDirectoryPath: workingDirectory,
             requiresAdministrator: false,
-            environmentVariables,
-            credential,
+            environmentVariables:null,
+            UserCredential.Null,
             standardInput: StreamWriter.Null,
             standardInputEncoding: Encoding.Default,
             standardOutputEncoding: Encoding.Default,
             standardErrorEncoding: Encoding.Default,
-            processResourcePolicy,
+            ProcessResourcePolicy.Default,
             windowCreation: enableWindowCreation,
             useShellExecution: false);
     }
@@ -117,14 +114,15 @@ public static class ProcessConfigurationFactory
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
 
-        List<string> argumentsList = arguments.ToList();
+        List<string> argumentsList = [.. arguments];
 
         if (argumentsList.Count == 0)
-            throw new ArgumentException("Arguments cannot be empty.", nameof(arguments));
+            throw new ArgumentException(Resources.Exceptions_Arguments_EmptyArgsSequence, nameof(arguments));
 
         if (workingDirectory is not null && !Directory.Exists(workingDirectory))
-            throw new ArgumentException($"Working directory '{workingDirectory}' does not exist.", nameof(workingDirectory));
-
+            throw new DirectoryNotFoundException(string.Format(
+                Resources.Exceptions_DirectoryNotFound_WorkingDirectory, workingDirectory));
+        
         ArgumentsSpec argumentsSpec = new();
         argumentsSpec.AddEnumerable(argumentsList, escape: true);
         string builtArguments = argumentsSpec.Build();
@@ -139,7 +137,7 @@ public static class ProcessConfigurationFactory
 
         UserCredentialSpec userCredentialSpec = new();
         configureCredential?.Invoke(userCredentialSpec);
-        UserCredential? credential = userCredentialSpec.Build();
+        UserCredential credential = userCredentialSpec.Build();
 
         return new ProcessConfiguration(
             targetFilePath,

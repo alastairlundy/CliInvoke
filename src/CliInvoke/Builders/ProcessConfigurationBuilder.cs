@@ -11,7 +11,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System.Linq;
 using System.Text;
 
 using CliInvoke.Core.Configuration;
@@ -98,15 +97,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
 
         _argumentsSpec.Clear();
 
-        List<string> argumentsList = arguments.ToList();
+        List<string> argumentsList = [.. arguments];
+        
         if (argumentsList.Count == 0)
             return this;
 
-        if (escapeArguments)
-            _argumentsSpec.AddEnumerable(argumentsList, escape: true);
-        else
-            _argumentsSpec.AddEnumerable(argumentsList, escape: false);
-
+        _argumentsSpec.AddEnumerable(argumentsList, escape: escapeArguments);
+        
         return this;
     }
 
@@ -344,9 +341,8 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
             spec.SetMinWorkingSet(processResourcePolicy.MinWorkingSet);
             spec.SetMaxWorkingSet(processResourcePolicy.MaxWorkingSet);
 
-            spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity is not null
-                ? (nint)processResourcePolicy.ProcessorAffinity
-                : (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+            spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity ??
+                                      (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
         });
     }
 
@@ -364,7 +360,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public IProcessConfigurationBuilder UseShellExecution(bool useShellExecution)
     {
         _useShellExecution = useShellExecution;
-        
         return this;
     }
 
@@ -422,8 +417,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public ProcessConfiguration Build()
     {
         if (_useShellExecution && (_redirectStandardInput || _standardInput != StreamWriter.Null))
-            throw new ArgumentException(
-                "Using shell execution whilst also redirecting standard input is not supported.");
+            throw new ArgumentException("Using shell execution whilst also redirecting standard input is not supported.");
 
         string arguments = _argumentsSpec.Build();
         
