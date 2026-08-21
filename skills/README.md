@@ -1,5 +1,7 @@
 # CliInvoke AI Agent Skills
 
+> **API version note:** These skills describe the **upcoming CliInvoke 3.0 configuration API** — the `*Spec` configuration seams (e.g. `ArgumentsSpec`, `EnvironmentVariablesSpec`, `ProcessResourcePolicySpec`, `UserCredentialSpec`) and the `ConfigureXxx(Action<XxxSpec>)` builder methods. This API is **not yet in a released package**. On the current released (2.x) API the equivalent surface is the builder types (`IArgumentsBuilder`, `UserCredentialBuilder`, etc.). Agents running against a 2.x package should treat the builder API as the live surface and expect the spec API in 3.0.
+
 This directory contains SKILLs designed to guide AI agents in correctly using the CliInvoke library.
 
 ## Organization
