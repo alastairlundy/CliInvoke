@@ -64,8 +64,8 @@ internal class ProcessInvocationPipeline
 
             await externalProcess.StartAsync(ctx.CancellationToken);
 
-            //TODO: Look into handling FireAndForget in switch statement.
-            
+            // FireAndForget returns above (lines 46-63) without waiting.
+            // Only Raw, Buffered, and Piped reach this switch.
             return ctx.Mode switch
             {
                 InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
