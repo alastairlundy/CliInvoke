@@ -27,14 +27,8 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     /// <param name="filePathResolver"></param>
     /// <param name="targetFilePath"></param>
     public ExternalProcess(IFilePathResolver filePathResolver, string targetFilePath)
+        : this(filePathResolver, new ProcessConfiguration(targetFilePath))
     {
-        Configuration = new ProcessConfiguration(targetFilePath);
-        _filePathResolver = filePathResolver;
-        _processWrapper = new ProcessWrapper(Configuration, _filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
-        ExitConfiguration = ProcessExitConfiguration.CreateGraceful();
-
-        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
     }
 
     /// <summary>
@@ -49,15 +43,9 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     /// <param name="configuration"></param>
     /// <param name="exitConfiguration"></param>
     public ExternalProcess(ProcessConfiguration configuration,
-        ProcessExitConfiguration? exitConfiguration = null)
+        ProcessExitConfiguration? exitConfiguration = null) 
+        : this(new FilePathResolver(), configuration, exitConfiguration)
     {
-        _filePathResolver = new FilePathResolver();
-        _processWrapper = new ProcessWrapper(configuration, _filePathResolver.ResolveFilePath(configuration.TargetFilePath));
-        Configuration = configuration;
-        ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
-
-        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
     }
     
     /// <summary>
