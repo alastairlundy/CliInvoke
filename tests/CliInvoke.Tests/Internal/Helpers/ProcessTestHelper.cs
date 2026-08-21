@@ -9,9 +9,9 @@ internal class ProcessTestHelper
     {
         string filePath;
         if (OperatingSystem.IsWindows())
-            filePath = TargetFilePaths.CmdFilePath;
+            filePath = "cmd";
         else if (OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() || OperatingSystem.IsAndroid())
-            filePath = TargetFilePaths.LinuxEchoFilePath;
+            filePath = "echo";
         else if (OperatingSystem.IsMacOS())
             filePath = "echo";
         else
