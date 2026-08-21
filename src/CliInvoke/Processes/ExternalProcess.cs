@@ -113,6 +113,10 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     ///     Stdin piping is not performed by this method.
     /// </summary>
     /// <returns>The process ID of the started process.</returns>
+    /// <remarks>
+    /// Configuration is not mutated; the resolved file path is returned via the result.
+    /// <see cref="ProcessResult.ExecutedFilePath"/>.
+    /// </remarks>
     /// <exception cref="InvalidOperationException">Thrown when the process has already been started.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -146,6 +150,10 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     ///     A task representing the asynchronous operation. The result contains the buffered process
     ///     result when the method completes.
     /// </returns>
+    /// <remarks>
+    /// Configuration is not mutated; the resolved file path is returned via the result.
+    /// <see cref="ProcessResult.ExecutedFilePath"/>.
+    /// </remarks>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
@@ -154,7 +162,17 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         if (HasStarted)
             throw new InvalidOperationException("The process has already been started.");
 
-        await StartAsync(Configuration, cancellationToken);
+        FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
+
+        _processWrapper.Dispose();
+        _processWrapper = new ProcessWrapper(Configuration, filePath);
+
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+
+        _processWrapper.Start();
+
+        await _processWrapper.WaitForExitAsync(cancellationToken);
     }
 
     /// <summary>
@@ -169,6 +187,10 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     ///     A task representing the asynchronous operation. The result contains the buffered process
     ///     result when the method completes.
     /// </returns>
+    /// <remarks>
+    /// Configuration is not mutated; the resolved file path is returned via the result.
+    /// <see cref="ProcessResult.ExecutedFilePath"/>.
+    /// </remarks>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
@@ -178,7 +200,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         if (HasStarted)
             throw new InvalidOperationException("The process has already been started.");
 
-        FileInfo filePath = await Task.FromResult(_filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
+        FileInfo filePath = await Task.FromResult(_filePathResolver.ResolveFilePath(configuration.TargetFilePath));
 
         _processWrapper = new ProcessWrapper(configuration, filePath);
 
