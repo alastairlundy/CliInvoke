@@ -22,7 +22,7 @@ namespace CliInvoke.Core;
 public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessResult>
 {
     /// <summary>
-    ///     Initializes the BufferedProcessResult with process information.
+    ///     Initialises the BufferedProcessResult with process information.
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
@@ -118,10 +118,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">The first BufferedProcessResult to compare.</param>
     /// <param name="right">The second BufferedProcessResult to compare.</param>
     /// <returns>True if the two BufferedProcessResult objects are equal; false otherwise.</returns>
-    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right)
-    {
-        return left.Equals(right);
-    }
+    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right) 
+        => left.Equals(right);
 
     /// <summary>
     ///     Determines if a BufferedProcessResult is equal to another BufferedProcessResult.
@@ -129,10 +127,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are equal to each other; false otherwise.</returns>
-    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right)
-    {
-        return Equals(left, right);
-    }
+    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right) 
+        => Equals(left, right);
 
     /// <summary>
     ///     Determines if a BufferedProcessResult is not equal to another BufferedProcessResult.
@@ -140,8 +136,6 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right)
-    {
-        return !Equals(left, right);
-    }
+    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right) 
+        => !Equals(left, right);
 }

@@ -84,6 +84,7 @@ public static class CliRun
 
         lock (_syncRoot)
         {
+            //TODO: Address this warning.
             return _pipeline ??= new ProcessInvocationPipeline(GetExternalProcessFactory());
         }
     }

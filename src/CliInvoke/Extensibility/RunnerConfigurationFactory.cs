@@ -56,9 +56,8 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                 resourceSpec.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
                     .EnablePriorityBoost);
                 
-                resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity is not null
-                    ? (nint)processConfigToBeRun.ResourcePolicy.ProcessorAffinity
-                    : (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+                resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity ??
+                                                  (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
             })
             .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)
