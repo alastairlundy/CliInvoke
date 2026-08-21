@@ -262,7 +262,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(TargetFilePath);
         hashCode.Add(Arguments);
         hashCode.Add(WorkingDirectoryPath);
-        foreach (var kvp in EnvironmentVariables)
+        foreach (var kvp in EnvironmentVariables.OrderBy(kvp => kvp.Key, StringComparer.Ordinal))
         {
             hashCode.Add(kvp.Key);
             hashCode.Add(kvp.Value);
