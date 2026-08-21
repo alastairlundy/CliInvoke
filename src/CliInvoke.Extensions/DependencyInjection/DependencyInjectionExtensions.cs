@@ -231,7 +231,6 @@ public static class DependencyInjectionExtensions
         services.TryAdd(ServiceDescriptor.Describe(
             typeof(PowerShellMiddleware),
             sp => new PowerShellMiddleware(
-                sp.GetService<IFilePathResolver>(),
                 sp.GetService<PowerShellMiddlewareOptions>()),
             lifetime));
 

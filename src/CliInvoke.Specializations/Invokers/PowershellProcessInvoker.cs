@@ -45,20 +45,16 @@ public class PowershellProcessInvoker : IProcessInvoker
     /// <summary>
     ///     Initialises a new instance of the <see cref="PowershellProcessInvoker"/> class.
     /// </summary>
-    /// <param name="filePathResolver">
-    ///     The resolver used to locate the <c>pwsh</c> / <c>pwsh.exe</c> executable.
-    /// </param>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
     public PowershellProcessInvoker(
-        IFilePathResolver filePathResolver,
         IExternalProcessFactory externalProcessFactory)
     {
         IReadOnlyList<IProcessMiddleware> middlewares =
-            [new PowerShellMiddleware(filePathResolver)];
+            [new PowerShellMiddleware()];
         _processInvoker = new ProcessInvoker(externalProcessFactory, middlewares);
     }
 
