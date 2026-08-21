@@ -24,9 +24,11 @@ public class ProcessSuspendResumeTests
         {
             // Windows 'timeout' exits immediately when any standard stream is redirected.
             // Disable output redirection so stdout/stderr stay connected to the console.
-            ProcessConfiguration configuration = new ProcessConfiguration("timeout",
-                $"/t {sleepTimeSeconds} /nobreak", outputRedirection: false);
-            process = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+            FilePathResolver resolver = new();
+            FileInfo resolvedCmd = resolver.ResolveFilePath("cmd.exe");
+            ProcessConfiguration configuration = new ProcessConfiguration(resolvedCmd.FullName,
+                $"/c timeout /t {sleepTimeSeconds} /nobreak", outputRedirection: false);
+            process = new ProcessWrapper(configuration, resolvedCmd);
         }
         else
             throw new PlatformNotSupportedException();

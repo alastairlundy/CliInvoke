@@ -54,10 +54,7 @@ public class ProcessInvokerTests
     {
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        // A real file path is required here to avoid throwing FileNotFoundException.
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create(ProcessTestHelper.GetTargetFilePath(), "");
-
-        config.TargetFilePath = " ";
+        using ProcessConfiguration config = new ProcessConfiguration(" ");
 
         await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.CreateGraceful(), cancellationToken: CancellationToken.None)).Throws<ArgumentException>();
@@ -66,14 +63,8 @@ public class ProcessInvokerTests
     [Test]
     public async Task Invoker_EmptyFilePath_ShouldThrow()
     {
-        IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
-
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create("FAKE/PATH", "");
-
-        config.TargetFilePath = string.Empty;
-
-        await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config,
-            ProcessExitConfiguration.CreateGraceful(), cancellationToken: CancellationToken.None)).Throws<ArgumentException>();
+        await Assert.That(() => new ProcessConfiguration(string.Empty))
+            .Throws<ArgumentException>();
     }
 
     [Test]

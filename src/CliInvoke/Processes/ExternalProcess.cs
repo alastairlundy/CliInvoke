@@ -29,10 +29,9 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     public ExternalProcess(IFilePathResolver filePathResolver, string targetFilePath)
     {
         Configuration = new ProcessConfiguration(targetFilePath);
-        _processWrapper = new ProcessWrapper(Configuration, ProcessResourcePolicy.Default);
-        ExitConfiguration = ProcessExitConfiguration.CreateGraceful();
-
         _filePathResolver = filePathResolver;
+        _processWrapper = new ProcessWrapper(Configuration, _filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
+        ExitConfiguration = ProcessExitConfiguration.CreateGraceful();
 
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
@@ -53,7 +52,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         ProcessExitConfiguration? exitConfiguration = null)
     {
         _filePathResolver = new FilePathResolver();
-        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        _processWrapper = new ProcessWrapper(configuration, _filePathResolver.ResolveFilePath(configuration.TargetFilePath));
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
 
@@ -71,7 +70,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
         ProcessExitConfiguration? exitConfiguration = null)
     {
         _filePathResolver = filePathResolver;
-        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        _processWrapper = new ProcessWrapper(configuration, _filePathResolver.ResolveFilePath(configuration.TargetFilePath));
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
 
@@ -124,10 +123,9 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
             throw new InvalidOperationException("The process has already been started.");
 
         FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
-        Configuration.TargetFilePath = filePath.FullName;
 
         _processWrapper.Dispose();
-        _processWrapper = new ProcessWrapper(Configuration, Configuration.ResourcePolicy);
+        _processWrapper = new ProcessWrapper(Configuration, filePath);
 
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
@@ -182,9 +180,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 
         FileInfo filePath = await Task.FromResult(_filePathResolver.ResolveFilePath(Configuration.TargetFilePath));
 
-        Configuration.TargetFilePath = filePath.FullName;
-
-        _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        _processWrapper = new ProcessWrapper(configuration, filePath);
 
         if (configuration.StandardInput is not null
             && configuration.StandardInput != StreamWriter.Null)

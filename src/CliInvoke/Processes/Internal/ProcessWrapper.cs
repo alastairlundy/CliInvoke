@@ -8,6 +8,7 @@
    */
 
 using System.ComponentModel;
+using System.IO;
 
 using CliInvoke.Processes.Internal.Cancellation;
 using CliInvoke.Processes.Internal.ControlAdapters;
@@ -53,11 +54,12 @@ internal class ProcessWrapper : Process
     internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
     internal ProcessWrapper(ProcessConfiguration configuration,
-        ProcessResourcePolicy? resourcePolicy)
+        FileInfo resolvedFilePath)
     {
         ProcessControlAdapter = ProcessControlAdapterFactory.Create();
-        ResourcePolicy = resourcePolicy ?? ProcessResourcePolicy.Default;
+        ResourcePolicy = configuration.ResourcePolicy;
         ProcessControlAdapter.ApplyConfiguration(this, configuration);
+        StartInfo.FileName = resolvedFilePath.FullName;
         ProcessName = StartInfo.FileName;
         EnableRaisingEvents = true;
         Exited += OnExited;

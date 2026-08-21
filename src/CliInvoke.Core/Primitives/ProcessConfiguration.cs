@@ -104,7 +104,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     ///     The file path of the executable to be run and wrapped.
     /// </summary>
-    public string TargetFilePath { get; set; }
+    /// <remarks>
+    ///     Not mutated after Start; for the resolved file path, see the result.
+    ///     <see cref="ProcessResult.ExecutedFilePath"/>.
+    /// </remarks>
+    public string TargetFilePath { get; init; }
 
     /// <summary>
     ///     The working directory path to be used when executing the Command.

@@ -24,7 +24,9 @@ internal class ProcessTestHelper
     {
         ProcessConfiguration configuration = new ProcessConfiguration(targetFilePath,arguments);
 
-        ProcessWrapper process = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        FilePathResolver resolver = new();
+        FileInfo resolvedPath = resolver.ResolveFilePath(targetFilePath);
+        ProcessWrapper process = new ProcessWrapper(configuration, resolvedPath);
 
         return process;
     }
