@@ -202,7 +202,11 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 
         FileInfo filePath = await Task.FromResult(_filePathResolver.ResolveFilePath(configuration.TargetFilePath));
 
+        _processWrapper.Dispose();
         _processWrapper = new ProcessWrapper(configuration, filePath);
+
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
 
         if (configuration.StandardInput is not null
             && configuration.StandardInput != StreamWriter.Null)
