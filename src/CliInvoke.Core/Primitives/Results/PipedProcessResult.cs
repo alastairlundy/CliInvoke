@@ -20,7 +20,7 @@ public class PipedProcessResult
         IAsyncDisposable
 {
     /// <summary>
-    ///     Initializes the PipedProcessResult with process information.
+    ///     Initialises the PipedProcessResult with process information.
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
