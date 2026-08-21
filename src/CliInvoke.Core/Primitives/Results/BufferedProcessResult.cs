@@ -80,7 +80,9 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         return ExecutedFilePath == other.ExecutedFilePath &&
                StandardOutput == other.StandardOutput
                && StandardError == other.StandardError
-               && ExitCode == other.ExitCode;
+               && ExitCode == other.ExitCode &&
+               StartTime == other.StartTime &&
+               ExitTime == other.ExitTime;
     }
 
     /// <summary>
