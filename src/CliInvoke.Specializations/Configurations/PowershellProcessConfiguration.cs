@@ -8,9 +8,7 @@
    */
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace CliInvoke.Specializations.Configurations;
 
@@ -32,7 +30,6 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <summary>
     ///     Initializes a new instance of the <see cref="PowershellProcessConfiguration"/> class.
     /// </summary>
-    /// <param name="filePathResolver"></param>
     /// <param name="arguments">The arguments to be passed to the command.</param>
     /// <param name="outputRedirection"></param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
@@ -47,7 +44,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
     /// <param name="redirectStandardInput"></param>
-    public PowershellProcessConfiguration(IFilePathResolver filePathResolver,
+    public PowershellProcessConfiguration(
         string arguments,
         bool redirectStandardInput, bool outputRedirection = true,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
@@ -66,28 +63,6 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             windowCreation: windowCreation,
             useShellExecution: useShellExecution)
     {
-        string filePath;
-
-        if (OperatingSystem.IsWindows())
-            try
-            {
-                filePath = filePathResolver.ResolveFilePath("pwsh.exe").FullName;
-            }
-            catch
-            {
-                filePath = $"{GetInstallLocationOnWindows()}";
-            }
-        else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
-                 OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
-            filePath = filePathResolver
-                .ResolveFilePath("pwsh")
-                .FullName;
-        else
-            throw new PlatformNotSupportedException(Resources
-                .Exceptions_Powershell_OnlySupportedOnDesktop);
-
-        TargetFilePath = filePath;
-        base.TargetFilePath = TargetFilePath;
     }
 
     /// <summary>
@@ -108,26 +83,4 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("watchos")]
     public new string TargetFilePath { get; }
-
-    private static string GetInstallLocationOnWindows()
-    {
-        string programFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem
-            ? Environment.SpecialFolder.ProgramFiles
-            : Environment.SpecialFolder.ProgramFilesX86);
-
-        IEnumerable<string> directories = Directory.EnumerateDirectories(
-                $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
-            .Where(d => Regex.IsMatch(d, @"v\d+"))
-            .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));
-
-        foreach (string directory in directories)
-        {
-            string expectedFilePath = $"{directory}{Path.DirectorySeparatorChar}pwsh.exe";
-
-            if (File.Exists(expectedFilePath))
-                return expectedFilePath;
-        }
-
-        throw new FileNotFoundException(Resources.Exceptions_Powershell_NotInstalled);
-    }
 }
