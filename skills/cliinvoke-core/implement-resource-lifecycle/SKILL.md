@@ -2,11 +2,12 @@
 name: implement-resource-lifecycle
 description: Guidance on auditing and managing the lifecycle of disposable types in CliInvoke to prevent resource leaks and secure sensitive data. USE FOR auditing and managing disposable types (ProcessConfiguration, IExternalProcess, etc.) to prevent resource leaks. DO NOT USE FOR general C# memory management.
 compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, or CliInvoke.Specialization)
+targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 ---
 # Implement Resource Lifecycle
 
 ## When to Use
-- When auditing code for proper disposal of CliInvoke's six mandatory disposable types: `ProcessConfiguration`, `IExternalProcess`, `PipedProcessResult`, `UserCredential`, `UserCredentialSpec`, and `UserCredentialBuilder`.
+- When auditing code for proper disposal of CliInvoke's mandatory disposable types: `ProcessConfiguration`, `IExternalProcess`, `PipedProcessResult`, `UserCredential`, and the credential-build type for your version — `UserCredentialBuilder` on 2.x or `UserCredentialSpec` on 3.0.
 - When deciding between `using` and `await using` in async methods.
 - When investigating a suspected handle leak, memory pressure, or `SecureString` retention issue.
 - When the user asks about `SecureString` cleanup or process/stream lifetime in CliInvoke.
@@ -22,7 +23,7 @@ If you configure `ProcessInvoker` with middleware (`UseLogging`, `UsePostExitVal
 
 ## Mandatory Disposable Types
 
-The following six types MUST be disposed of. Failure to do so can lead to handle leaks, memory pressure, or sensitive data remaining in memory.
+The following types MUST be disposed of (five on the 2.x API, six once `UserCredentialSpec` ships in 3.0). Failure to do so can lead to handle leaks, memory pressure, or sensitive data remaining in memory.
 
 ### 1. `ProcessConfiguration`
 - **Reason**: Manages `StandardInput` (StreamWriter) and potentially a `SecureString` credential.
@@ -48,11 +49,11 @@ The following six types MUST be disposed of. Failure to do so can lead to handle
 - **Note**: If assigned to a `ProcessConfiguration`, the configuration's disposal will also dispose the credential.
 - **Example**: See [UserCredential.md](./references/UserCredential.md)
 
-### 5. `UserCredentialSpec`
+### 5. `UserCredentialSpec` (CliInvoke 3.0)
 - **Reason**: A sealed configuration seam that holds a `SecureString` for passwords during credential construction. Implements `IDisposable` to clear the secure string from memory.
 - **Pattern**: Always wrap the spec in a `using` block.
 - **Timing**: Dispose immediately after calling `.Build()`.
-- **Note**: `UserCredentialSpec` is the recommended replacement for `UserCredentialBuilder`. Prefer it in new code.
+- **Note**: This is the **3.0** replacement for the 2.x `UserCredentialBuilder`. Prefer it in new code **once you are on CliInvoke 3.0** (see the version note in `skills/README.md`).
 - **Example**:
   ```csharp
   UserCredential credential;
@@ -64,18 +65,18 @@ The following six types MUST be disposed of. Failure to do so can lead to handle
   // spec disposed here; SecureString cleared from memory
   ```
 
-### 6. `UserCredentialBuilder`
+### 6. `UserCredentialBuilder` (CliInvoke 2.x — current released API)
 - **Reason**: Holds a `SecureString` during the construction of credentials.
 - **Pattern**: Always wrap the builder in a `using` block.
 - **Timing**: Dispose immediately after calling `.Build()`.
-- **Note**: Deprecated in favour of `UserCredentialSpec`. Use `UserCredentialSpec` for new code.
+- **Note**: This is the **current released (2.x)** type. It is superseded by `UserCredentialSpec` in 3.0; use `UserCredentialSpec` once you move to 3.0.
 - **Example**: See [UserCredentialBuilder.md](./references/UserCredentialBuilder.md)
 
 ## Implementation Checklist
 
 - [ ] Every instance of the 6 types above is wrapped in a `using` or `await using` block.
 - [ ] `IExternalProcess` and `PipedProcessResult` use `await using` in async methods.
-- [ ] `UserCredentialSpec` (or `UserCredentialBuilder`) is disposed of after `.Build()` is called.
+- [ ] The credential-build type is disposed of after `.Build()` is called — `UserCredentialSpec` on 3.0, `UserCredentialBuilder` on 2.x.
 - [ ] `ProcessConfiguration` is disposed of after the process has completed and results are processed.
 
 For detailed usage examples, see the following references:

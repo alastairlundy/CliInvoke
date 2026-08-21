@@ -1,4 +1,6 @@
-# UserCredentialBuilder Disposal
+# UserCredentialBuilder Disposal (CliInvoke 2.x — current released API)
+
+> On **CliInvoke 3.0** use `UserCredentialSpec` instead (see the `UserCredentialSpec` section in the skill body). This page documents the current 2.x builder API.
 
 `UserCredentialBuilder` holds a `SecureString` sensitive password while building a credential.
 
