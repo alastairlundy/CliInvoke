@@ -191,14 +191,14 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 
     /// <summary>
     ///     Defines a greater-than comparison between two <see cref="ProcessTimeoutPolicy" />
-    ///     instances.
+    ///     instances. Null is considered less than any non-null value.
     /// </summary>
     /// <param name="left">The left-hand operand in the comparison.</param>
     /// <param name="right">The right-hand operand in the comparison.</param>
     /// <returns>
     ///     <see langword="true" /> if the left-hand operand is greater than the right-hand
-    ///     operand;
-    ///     <see langword="false" /> if either operand is <see langword="null" />, or the left is
+    ///     operand (a non-null policy is greater than <see langword="null" />);
+    ///     <see langword="false" /> if the left is <see langword="null" /> or the left is
     ///     not greater than the right.
     /// </returns>
     public static bool operator >(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
@@ -211,14 +211,14 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 
     /// <summary>
     ///     Defines a less-than comparison between two <see cref="ProcessTimeoutPolicy" />
-    ///     instances.
+    ///     instances. Null is considered less than any non-null value.
     /// </summary>
     /// <param name="left">The left-hand operand in the comparison.</param>
     /// <param name="right">The right-hand operand in the comparison.</param>
     /// <returns>
     ///     <see langword="true" /> if the left-hand operand is less than the right-hand
-    ///     operand;
-    ///     <see langword="false" /> if either operand is <see langword="null" />, or the left is
+    ///     operand (<see langword="null" /> is less than any non-null policy);
+    ///     <see langword="false" /> if the right is <see langword="null" /> or the left is
     ///     not less than the right.
     /// </returns>
     public static bool operator <(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
@@ -231,15 +231,17 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 
     /// <summary>
     ///     Defines a greater-than-or-equal-to comparison between two
-    ///     <see cref="ProcessTimeoutPolicy" /> instances.
+    ///     <see cref="ProcessTimeoutPolicy" /> instances. Null is considered less than any
+    ///     non-null value.
     /// </summary>
     /// <param name="left">The left-hand operand in the comparison.</param>
     /// <param name="right">The right-hand operand in the comparison.</param>
     /// <returns>
     ///     <see langword="true" /> if the left-hand operand is greater than or equal to the
-    ///     right-hand operand;
-    ///     <see langword="false" /> if the left is less than the right, or the right is
-    ///     <see langword="null" /> while the left is not.
+    ///     right-hand operand (a non-null policy is greater than or equal to
+    ///     <see langword="null" />, and two null values are equal);
+    ///     <see langword="false" /> if the left is <see langword="null" /> while the right
+    ///     is not, or the left is less than the right.
     /// </returns>
     public static bool operator >=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
@@ -250,15 +252,16 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 
     /// <summary>
     ///     Defines a less-than-or-equal-to comparison between two <see cref="ProcessTimeoutPolicy" />
-    ///     instances.
+    ///     instances. Null is considered less than any non-null value.
     /// </summary>
     /// <param name="left">The left-hand operand in the comparison.</param>
     /// <param name="right">The right-hand operand in the comparison.</param>
     /// <returns>
     ///     <see langword="true" /> if the left-hand operand is less than or equal to the right-hand
-    ///     operand;
-    ///     <see langword="false" /> if the left is greater than the right, or the left is
-    ///     <see langword="null" /> while the right is not.
+    ///     operand (<see langword="null" /> is less than or equal to any non-null policy,
+    ///     and two null values are equal);
+    ///     <see langword="false" /> if the right is <see langword="null" /> while the left
+    ///     is not, or the left is greater than the right.
     /// </returns>
     public static bool operator <=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
