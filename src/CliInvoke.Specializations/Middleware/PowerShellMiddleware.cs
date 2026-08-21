@@ -36,23 +36,17 @@ namespace CliInvoke.Specializations.Middleware;
 [UnsupportedOSPlatform("watchos")]
 internal sealed class PowerShellMiddleware : IProcessMiddleware
 {
-    private readonly IFilePathResolver _filePathResolver;
     private readonly PowerShellMiddlewareOptions _options;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with
     ///     default options (<see cref="PowerShellMiddlewareOptions.Default"/>).
     /// </summary>
-    /// <param name="filePathResolver">
-    ///     The resolver used to locate the <c>pwsh</c> / <c>pwsh.exe</c> executable. A default
-    ///     <see cref="CliInvoke.FilePathResolver"/> is used when omitted.
-    /// </param>
     /// <param name="options">
     ///     The PowerShell middleware options. Defaults to <see cref="PowerShellMiddlewareOptions.Default"/>.
     /// </param>
-    public PowerShellMiddleware(IFilePathResolver? filePathResolver = null, PowerShellMiddlewareOptions? options = null)
+    public PowerShellMiddleware(PowerShellMiddlewareOptions? options = null)
     {
-        _filePathResolver = filePathResolver ?? new CliInvoke.FilePathResolver();
         _options = options ?? PowerShellMiddlewareOptions.Default;
     }
 
@@ -88,7 +82,6 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
         // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration newConfig = new PowershellProcessConfiguration(
-            _filePathResolver,
             newArguments,
             src.RedirectStandardInput,
             outputRedirection: context.Mode != InvocationMode.Raw,

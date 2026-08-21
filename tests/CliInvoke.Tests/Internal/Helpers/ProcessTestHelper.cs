@@ -9,9 +9,9 @@ internal class ProcessTestHelper
     {
         string filePath;
         if (OperatingSystem.IsWindows())
-            filePath = TargetFilePaths.CmdFilePath;
+            filePath = "cmd";
         else if (OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD() || OperatingSystem.IsAndroid())
-            filePath = TargetFilePaths.LinuxEchoFilePath;
+            filePath = "echo";
         else if (OperatingSystem.IsMacOS())
             filePath = "echo";
         else
@@ -24,7 +24,9 @@ internal class ProcessTestHelper
     {
         ProcessConfiguration configuration = new ProcessConfiguration(targetFilePath,arguments);
 
-        ProcessWrapper process = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        FilePathResolver resolver = new();
+        FileInfo resolvedPath = resolver.ResolveFilePath(targetFilePath);
+        ProcessWrapper process = new ProcessWrapper(configuration, resolvedPath);
 
         return process;
     }

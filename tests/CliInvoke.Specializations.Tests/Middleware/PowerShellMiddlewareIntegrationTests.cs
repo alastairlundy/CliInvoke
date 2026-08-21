@@ -60,7 +60,6 @@ public class PowerShellMiddlewareIntegrationTests
         }
 
         PowershellProcessInvoker invoker = new PowershellProcessInvoker(
-            new CliInvoke.FilePathResolver(),
             new ExternalProcessFactory());
 
         // The original target is `dotnet`, but PowerShellMiddleware rewrites the configuration
