@@ -118,7 +118,7 @@ PowerShellMiddleware middleware = new PowerShellMiddleware(
 
 ## 6. Obtaining the Resolved File Path
 
-The resolved file path is no longer written back to `Configuration.TargetFilePath`. Instead, it is available on the result objects returned by `ExternalProcess.Start()`, `StartAsync()`, and the `IProcessInvoker` methods:
+The resolved file path is no longer written back to `Configuration.TargetFilePath`. Instead, it is available on the result objects after starting the process:
 
 - **`ProcessResult.ExecutedFilePath`** — the resolved file path that was actually executed.
 - **`BufferedProcessResult.ExecutedFilePath`** — same, for buffered process results.
@@ -126,7 +126,10 @@ The resolved file path is no longer written back to `Configuration.TargetFilePat
 
 ```csharp
 ExternalProcess process = new ExternalProcess(new ProcessConfiguration("dotnet"));
-BufferedProcessResult result = await process.StartAsync();
+
+// Start the process, then capture the result:
+process.Start();
+BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None);
 
 // The resolved file path:
 string resolvedPath = result.ExecutedFilePath;
