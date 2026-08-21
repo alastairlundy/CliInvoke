@@ -1,6 +1,7 @@
 using System.Linq;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
+using CliInvoke.Tests.Internal.Constants;
 
 namespace CliInvoke.Tests.Resolvers;
 
@@ -63,12 +64,16 @@ public class FilePathResolverTests
     [Test]
     public async Task Resolve_CrossPlatform_PathEnv_Executable()
     {
-        FileInfo expected = new FileInfo(ProcessTestHelper.GetTargetFilePath());
+        string executableName = ProcessTestHelper.GetTargetFilePath();
+
+        string expectedPath = OperatingSystem.IsWindows()
+            ? TargetFilePaths.CmdFilePath
+            : TargetFilePaths.LinuxEchoFilePath;
 
         IFilePathResolver filePathResolver = CreateFileResolver();
 
-        FileInfo actual = filePathResolver.ResolveFilePath(expected.Name);
+        FileInfo actual = filePathResolver.ResolveFilePath(executableName);
 
-        await Assert.That(actual.FullName).IsEqualTo(expected.FullName);
+        await Assert.That(actual.FullName).IsEqualTo(expectedPath);
     }
 }
