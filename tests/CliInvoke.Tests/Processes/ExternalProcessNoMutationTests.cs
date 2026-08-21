@@ -13,9 +13,10 @@ namespace CliInvoke.Tests.Processes;
 
 /// <summary>
 ///     Verifies the no-mutation contract (D002): <c>Configuration.TargetFilePath</c>
-///     is never rewritten by <see cref="ExternalProcess.Start"/> or
-///     <see cref="ExternalProcess.StartAsync(CancellationToken)"/>, while the
-///     result's <c>ExecutedFilePath</c> reflects the resolved path.
+///     is never rewritten by <see cref="ExternalProcess.Start"/>,
+///     <see cref="ExternalProcess.StartAsync(CancellationToken)"/>, or
+///     <see cref="ExternalProcess.StartAsync(ProcessConfiguration, CancellationToken)"/>,
+///     while the result's <c>ExecutedFilePath</c> reflects the resolved path.
 /// </summary>
 public class ExternalProcessNoMutationTests
 {
@@ -62,6 +63,32 @@ public class ExternalProcessNoMutationTests
         try
         {
             await Assert.That(configuration.TargetFilePath).IsEqualTo(originalTargetFilePath);
+
+            FilePathResolver resolver = new();
+            FileInfo resolvedPath = resolver.ResolveFilePath(_targetFilePath);
+            await Assert.That(result.ExecutedFilePath).IsEqualTo(resolvedPath.FullName);
+        }
+        finally
+        {
+            await process.Kill();
+        }
+    }
+
+    [Test]
+    public async Task StartAsync_WithConfiguration_DoesNotMutateCallerConfiguration()
+    {
+        using ProcessConfiguration callerConfig = new(_targetFilePath);
+
+        string originalTargetFilePath = callerConfig.TargetFilePath;
+
+        using ExternalProcess process = new(callerConfig);
+
+        await process.StartAsync(callerConfig, CancellationToken.None);
+        ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);
+
+        try
+        {
+            await Assert.That(callerConfig.TargetFilePath).IsEqualTo(originalTargetFilePath);
 
             FilePathResolver resolver = new();
             FileInfo resolvedPath = resolver.ResolveFilePath(_targetFilePath);
