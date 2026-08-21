@@ -64,8 +64,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     ///     object.
     /// </summary>
     /// <remarks>
-    ///     This method intentionally does not consider Start and Exit times of Command Results for
-    ///     equality comparison.
+    ///     All fields including StartTime and ExitTime are considered for equality comparison,
+    ///     consistent with <see cref="GetHashCode"/>.
     /// </remarks>
     /// <param name="other">The other BufferedProcessResult to compare.</param>
     /// <returns>
