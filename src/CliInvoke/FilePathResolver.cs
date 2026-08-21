@@ -59,22 +59,6 @@ public class FilePathResolver : FilePathResolverBase
     /// <summary>
     /// 
     /// </summary>
-    /// <returns></returns>
-    protected override string[] GetPathFileExtensions()
-    {
-        string[] pathExtensions = PathEnvironmentVariable.EnumerateFileExtensions().ToArray();
-
-        for (int i = 0; i < pathExtensions.Length; i++)
-        {
-            pathExtensions[i] = pathExtensions[i].ToLowerInvariant();
-        }
-
-        return pathExtensions;
-    }
-    
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="filePathToResolve"></param>
     /// <param name="resolvedFilePath"></param>
     /// <returns></returns>
