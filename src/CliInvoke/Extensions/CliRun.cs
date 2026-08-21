@@ -84,6 +84,9 @@ public static class CliRun
 
         lock (_syncRoot)
         {
+            //TODO: Rider warns "volatile compound operation is not atomic" on ??=.
+            //This is safe: the lock serialises the write, and volatile ensures the
+            //first-read fast path sees a fresh value without acquiring the lock.
             return _pipeline ??= new ProcessInvocationPipeline(GetExternalProcessFactory());
         }
     }

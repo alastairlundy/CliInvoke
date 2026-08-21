@@ -96,6 +96,15 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Arguments sequence cannot be empty..
+        /// </summary>
+        internal static string Exceptions_Arguments_EmptyArgsSequence {
+            get {
+                return ResourceManager.GetString("Exceptions.Arguments.EmptyArgsSequence", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The executed command was not successful and returned an exit code of {x}..
         /// </summary>
         internal static string Exceptions_CommandNotSuccessful_Generic {
@@ -119,6 +128,15 @@ namespace CliInvoke.Internal.Localizations {
         internal static string Exceptions_Credentials_EmptyPassword {
             get {
                 return ResourceManager.GetString("Exceptions.Credentials.EmptyPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working directory &apos;{0}&apos; does not exist..
+        /// </summary>
+        internal static string Exceptions_DirectoryNotFound_WorkingDirectory {
+            get {
+                return ResourceManager.GetString("Exceptions.DirectoryNotFound.WorkingDirectory", resourceCulture);
             }
         }
         
@@ -202,7 +220,7 @@ namespace CliInvoke.Internal.Localizations {
                 return ResourceManager.GetString("Exceptions.TargetFile.NullOrEmpty", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to An invalid version string of {0} was provided..
         /// </summary>

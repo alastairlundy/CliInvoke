@@ -20,7 +20,7 @@ public class PipedProcessResult
         IAsyncDisposable
 {
     /// <summary>
-    ///     Initializes the PipedProcessResult with process information.
+    ///     Initialises the PipedProcessResult with process information.
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
@@ -87,8 +87,8 @@ public class PipedProcessResult
     ///     object.
     /// </summary>
     /// <remarks>
-    ///     This method intentionally does not consider Start and Exit times of Command Results for
-    ///     equality comparison.
+    ///     All fields including StartTime and ExitTime are considered for equality comparison,
+    ///     consistent with <see cref="GetHashCode"/>.
     /// </remarks>
     /// <param name="other">The other PipedProcessResult to compare.</param>
     /// <returns>True if this PipedProcessResult is equal to the other PipedProcessResult; false otherwise.</returns>

@@ -11,7 +11,6 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System.Linq;
 using System.Text;
 
 using CliInvoke.Core.Configuration;
@@ -98,15 +97,13 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
 
         _argumentsSpec.Clear();
 
-        List<string> argumentsList = arguments.ToList();
+        List<string> argumentsList = [.. arguments];
+        
         if (argumentsList.Count == 0)
             return this;
 
-        if (escapeArguments)
-            _argumentsSpec.AddEnumerable(argumentsList, escape: true);
-        else
-            _argumentsSpec.AddEnumerable(argumentsList, escape: false);
-
+        _argumentsSpec.AddEnumerable(argumentsList, escape: escapeArguments);
+        
         return this;
     }
 
@@ -341,12 +338,11 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
             spec.SetPriorityClass(processResourcePolicy.PriorityClass)
                 .ConfigurePriorityBoost(processResourcePolicy.EnablePriorityBoost);
 
-            spec.SetMinWorkingSet((nint?)processResourcePolicy.MinWorkingSet);
-            spec.SetMaxWorkingSet((nint?)processResourcePolicy.MaxWorkingSet);
+            spec.SetMinWorkingSet(processResourcePolicy.MinWorkingSet);
+            spec.SetMaxWorkingSet(processResourcePolicy.MaxWorkingSet);
 
-            spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity is not null
-                ? (nint)processResourcePolicy.ProcessorAffinity
-                : (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+            spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity ??
+                                      (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
         });
     }
 
@@ -364,7 +360,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public IProcessConfigurationBuilder UseShellExecution(bool useShellExecution)
     {
         _useShellExecution = useShellExecution;
-        
         return this;
     }
 
@@ -422,8 +417,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
     public ProcessConfiguration Build()
     {
         if (_useShellExecution && (_redirectStandardInput || _standardInput != StreamWriter.Null))
-            throw new ArgumentException(
-                "Using shell execution whilst also redirecting standard input is not supported.");
+            throw new ArgumentException("Using shell execution whilst also redirecting standard input is not supported.");
 
         string arguments = _argumentsSpec.Build();
         
@@ -432,7 +426,7 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         ProcessResourcePolicy resourcePolicy = _processResourcePolicySpec.Build();
         UserCredential credential = _userCredentialSpec.Build();
 
-        BuilderProcessConfiguration configuration = new(_targetFilePath, arguments,
+        ProcessConfiguration configuration = new(_targetFilePath, arguments,
             _redirectStandardInput, _outputRedirection,
             _workingDirectoryPath, _requiresAdministratorPrivileges, environmentVariables,
             credential, _standardInput, _standardInputEncoding, _standardOutputEncoding, _standardErrorEncoding, resourcePolicy, _enableWindowCreation,
@@ -447,40 +441,6 @@ public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDispos
         _userCredentialSpec.Dispose();
         _standardInput.Dispose();
         GC.SuppressFinalize(this);
-    }
-}
-
-/// <summary>
-/// An internal subclass of <see cref="ProcessConfiguration"/> used by <see cref="ProcessConfigurationBuilder"/> to invoke the protected multi-parameter constructor.
-/// </summary>
-/// <remarks>
-/// <para>
-/// The builder lives in the <c>CliInvoke</c> assembly, while <see cref="ProcessConfiguration"/> and its multi-parameter protected constructor reside in the <c>CliInvoke.Core</c> assembly.
-/// Cross-assembly access to the protected constructor requires this internal wrapper class as the legitimate access path.
-/// </para>
-/// <para>
-/// Do not delete this class without first choosing a long-term replacement.
-/// </para>
-/// <para>
-/// A long-term solution to eliminate this wrapper is being developed. See <see cref="ProcessConfigurationBuilder"/> for the current consumer.
-/// </para>
-/// </remarks>
-internal class BuilderProcessConfiguration : ProcessConfiguration
-{
-    internal BuilderProcessConfiguration(string targetFilePath, string arguments,
-        bool redirectStandardInput,
-        bool outputRedirection = false,
-        string? workingDirectoryPath = null, bool requiresAdministrator = false,
-        IReadOnlyDictionary<string, string>? environmentVariables = null,
-        UserCredential? credential = null, StreamWriter? standardInput = null,
-        Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
-        Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool windowCreation = false, bool useShellExecution = false) : base(targetFilePath,
-        arguments, redirectStandardInput, outputRedirection, workingDirectoryPath,
-        requiresAdministrator, environmentVariables, credential, standardInput,
-        standardInputEncoding, standardOutputEncoding, standardErrorEncoding, processResourcePolicy,
-        windowCreation, useShellExecution)
-    {
     }
 }
 
