@@ -81,7 +81,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     /// <summary>
     ///     Represents the configuration settings used by an external process.
     /// </summary>
-    public ProcessConfiguration Configuration { get; set; }
+    public ProcessConfiguration Configuration { get; init; }
 
     /// <summary>
     ///     Represents the configuration for handling external process exit.

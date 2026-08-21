@@ -337,7 +337,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
             _onDisposed = onDisposed;
         }
 
-        public ProcessConfiguration Configuration { get; set; }
+        public ProcessConfiguration Configuration { get; init; }
 
         public ProcessExitConfiguration ExitConfiguration { get; set; }
 
