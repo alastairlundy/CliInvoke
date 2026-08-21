@@ -1,0 +1,16 @@
+name: select-execution-pattern-eval
+description: Evaluation suite for the select-execution-pattern skill
+skill: select-execution-pattern
+version: "1.0"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: gpt-5-mini
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+tasks:
+  - "tasks/*.yaml"

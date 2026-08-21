@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Linq;
-
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Middleware;
 
@@ -21,13 +19,13 @@ public class ProcessInvoker : IProcessInvoker
 {
     private readonly ProcessInvocationPipeline _pipeline;
     private readonly MiddlewareChain? _chain;
-    private readonly MiddlewareItems? _sharedItems;
 
     /// <summary>
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes.
     /// </summary>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
     public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
+        // ReSharper disable once IntroduceOptionalParameters.Global
         : this(externalProcessFactory, sharedItems: null)
     {
     }
@@ -46,11 +44,10 @@ public class ProcessInvoker : IProcessInvoker
         IExternalProcessFactory externalProcessFactory,
         MiddlewareItems? sharedItems)
     {
-        _sharedItems = sharedItems;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
         _chain = sharedItems is null
             ? null
-            : new MiddlewareChain(Array.Empty<IProcessMiddleware>(), RunPipelineThroughContext, sharedItems);
+            : new MiddlewareChain([], RunPipelineThroughContext, sharedItems);
     }
 
     /// <summary>
@@ -58,10 +55,11 @@ public class ProcessInvoker : IProcessInvoker
     ///     with middleware applied to every invocation.
     /// </summary>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
-    /// <param name="middlewares">The ordered middleware to apply before the terminal pipeline.</param>
+    /// <param name="middlewareSequence">The ordered middleware to apply before the terminal pipeline.</param>
     public ProcessInvoker(
-        IExternalProcessFactory externalProcessFactory,
-        IEnumerable<IProcessMiddleware> middlewareSequence)
+            IExternalProcessFactory externalProcessFactory,
+            IEnumerable<IProcessMiddleware> middlewareSequence)
+        // ReSharper disable once IntroduceOptionalParameters.Global
         : this(externalProcessFactory, middlewareSequence, sharedItems: null)
     {
     }
@@ -72,7 +70,7 @@ public class ProcessInvoker : IProcessInvoker
     ///     shared across every invocation's chain.
     /// </summary>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
-    /// <param name="middlewares">The ordered middleware to apply before the terminal pipeline.</param>
+    /// <param name="middlewareSequence">The ordered middleware to apply before the terminal pipeline.</param>
     /// <param name="sharedItems">
     ///     Pre-seeded middleware items shared across every invocation's chain. Use this
     ///     to inject framework-level services (such as a logger)
@@ -85,14 +83,13 @@ public class ProcessInvoker : IProcessInvoker
     {
         ArgumentNullException.ThrowIfNull(middlewareSequence);
 
-        IReadOnlyList<IProcessMiddleware> materialized = middlewareSequence.ToList();
+        IReadOnlyList<IProcessMiddleware> materialized = [.. middlewareSequence];
 
         foreach (IProcessMiddleware middleware in materialized)
         {
             ArgumentNullException.ThrowIfNull(middleware);
         }
 
-        _sharedItems = sharedItems;
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
         _chain = new MiddlewareChain(materialized, RunPipelineThroughContext, sharedItems);
     }

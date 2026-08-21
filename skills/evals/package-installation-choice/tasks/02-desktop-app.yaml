@@ -1,0 +1,46 @@
+id: desktop-app
+name: "Select packages for desktop application"
+description: Verify the agent recommends Core + CliInvoke + Extensions for a desktop app.
+tags:
+  - positive
+  - package-selection
+inputs:
+  prompt: "I'm building a desktop application and want to use CliInvoke with DI registration and convenience helpers for easy setup. What packages do I need?"
+  context:
+    fixture: "fixtures"
+expected:
+  output_contains:
+    - "CliInvoke.Core"
+    - "CliInvoke.Extensions"
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: mentions_required_packages
+    config:
+      contains:
+        - "CliInvoke.Core"
+        - "CliInvoke.Extensions"
+        - "CliInvoke"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly identified the full application setup: CliInvoke.Core, CliInvoke, and CliInvoke.Extensions.
+        2. Explained that this includes DI registration and convenience extensions for easy setup.
+        3. Did not forget any of the three required packages for the recommended desktop application setup.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.

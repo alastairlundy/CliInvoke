@@ -1,0 +1,44 @@
+id: map-witharguments
+name: "Map V1 WithArguments method to V2 equivalent"
+description: Verify the agent maps WithArguments to SetArguments in V2.
+tags:
+  - positive
+  - v1-to-v2
+  - method-mapping
+inputs:
+  prompt: "I'm upgrading from CliInvoke V1 to V2. In V1, I used WithArguments(...) on the configuration builder. What method should I use in V2?"
+  context:
+    fixture: "fixtures"
+expected:
+  output_contains:
+    - "SetArguments"
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: mentions_setarguments
+    config:
+      contains:
+        - "SetArguments"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly identified that WithArguments maps to SetArguments in V2.
+        2. Explained the general pattern that With* methods in V1 become Set* or Configure* methods in V2.
+        3. Did not suggest an incorrect method like AddArguments or WithArguments (V1 method name) as the V2 answer.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.

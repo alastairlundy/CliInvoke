@@ -51,7 +51,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processResourcePolicy">The process resource policy, or <c>null</c> for defaults.</param>
     /// <param name="windowCreation">Whether to enable window creation.</param>
     /// <param name="useShellExecution">Whether to use shell execution.</param>
-    protected ProcessConfiguration(
+    protected internal ProcessConfiguration(
         string targetFilePath,
         string arguments,
         bool redirectStandardInput,
@@ -161,6 +161,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <summary>
     /// 
     /// </summary>
+    /// //TODO: Add missing xml doc comment.
     public bool OutputRedirection { get; }
 
     /// <summary>
@@ -317,7 +318,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <returns>A string representation of the Command configuration.</returns>
     public override string ToString()
     {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
 
         stringBuilder.Append($"{TargetFilePath} {Arguments}");
         
@@ -338,7 +339,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             stringBuilder.Append($"{Environment.NewLine} {Resources
                 .Labels_ProcessConfiguration_ToString_ShellExecution}");
         }
-        
         
         return stringBuilder.ToString();
     }

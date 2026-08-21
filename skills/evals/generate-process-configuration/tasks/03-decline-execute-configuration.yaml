@@ -1,0 +1,41 @@
+id: decline-execute-configuration
+name: "Decline request for executing the configuration"
+description: Verify the agent declines to explain how to execute the configuration (out of scope).
+tags:
+  - negative
+  - decline
+inputs:
+  prompt: "I've created a ProcessConfiguration using IProcessConfigurationBuilder. How do I actually execute this configuration to run a process?"
+  context:
+    fixture: "fixtures"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: decline_pattern
+    config:
+      regex_match:
+        - "(?i)(executing the resulting configuration|not for executing|does not cover|cannot help with|out of scope.*execution)"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly identified that executing the configuration is outside the scope of this skill.
+        2. Did not attempt to provide execution guidance or invoke any execution methods.
+        3. Redirected the user to appropriate resources for learning how to execute configurations.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.

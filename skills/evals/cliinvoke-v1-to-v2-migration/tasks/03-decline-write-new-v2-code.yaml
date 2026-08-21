@@ -1,0 +1,41 @@
+id: decline-write-new-v2-code
+name: "Decline request for writing new V2 code without V1 reference"
+description: Verify the agent declines to write new V2 code from scratch (out of scope).
+tags:
+  - negative
+  - decline
+inputs:
+  prompt: "I'm starting a new project and want to write CliInvoke V2 code from scratch without referencing V1. Can you help me?"
+  context:
+    fixture: "fixtures"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: decline_pattern
+    config:
+      regex_match:
+        - "(?i)(writing new V2 code|from scratch without referencing V1|not for writing new code|does not cover|out of scope)"
+  - type: prompt
+    name: rubric_judge
+    config:
+      model: gpt-5-mini
+      continue_session: true
+      prompt: |
+        You are grading an agent's answer to a CliInvoke skill question.
+
+        The session contains a user question and the agent's response. Read the
+        conversation history to find the user's question (the first user message)
+        and the agent's final assistant message — that final message is the answer
+        to grade.
+
+        Rubric items (the agent must satisfy ALL of these):
+        1. Correctly identified that this skill is for mapping V1 to V2, not for writing new V2 code from scratch.
+        2. Did not attempt to provide V2 coding guidance unrelated to V1 mapping.
+        3. Redirected the user to appropriate resources for learning V2 development.
+
+        After reviewing the agent's final answer against the rubric, call
+        set_waza_grade_pass if the answer fully satisfies the rubric.
+        Otherwise call set_waza_grade_fail with a short reason citing which
+        rubric items were not met.

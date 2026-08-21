@@ -10,7 +10,6 @@
 #pragma warning disable CA1416
 
 using CliInvoke.Builders;
-using CliInvoke.Core.Configuration;
 using CliInvoke.Core.Extensibility;
 
 namespace CliInvoke.Extensibility;
@@ -51,15 +50,14 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
             {
                 resourceSpec.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
                 
-                resourceSpec.SetMinWorkingSet((nint?)processConfigToBeRun.ResourcePolicy.MinWorkingSet);
-                resourceSpec.SetMaxWorkingSet((nint?)processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                resourceSpec.SetMinWorkingSet(processConfigToBeRun.ResourcePolicy.MinWorkingSet);
+                resourceSpec.SetMaxWorkingSet(processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
 
                 resourceSpec.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
                     .EnablePriorityBoost);
                 
-                resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity is not null
-                    ? (nint)processConfigToBeRun.ResourcePolicy.ProcessorAffinity
-                    : (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+                resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity ??
+                                                  (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
             })
             .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)
