@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Linq;
 using System.Text;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
@@ -218,7 +219,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
         return TargetFilePath.Equals(other.TargetFilePath)
-               && EnvironmentVariables.Equals(other.EnvironmentVariables)
+               && EnvironmentVariables.Count == other.EnvironmentVariables.Count
+               && !EnvironmentVariables.Except(other.EnvironmentVariables).Any()
                && Arguments.Equals(other.Arguments)
                && ResourcePolicy.Equals(other.ResourcePolicy)
                && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
@@ -260,7 +262,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(TargetFilePath);
         hashCode.Add(Arguments);
         hashCode.Add(WorkingDirectoryPath);
-        hashCode.Add(EnvironmentVariables);
+        foreach (var kvp in EnvironmentVariables.OrderBy(kvp => kvp.Key, StringComparer.Ordinal))
+        {
+            hashCode.Add(kvp.Key);
+            hashCode.Add(kvp.Value);
+        }
 
         hashCode.Add(Credential);
         hashCode.Add(RequiresAdministrator);
@@ -326,7 +332,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
         stringBuilder.Append($"{TargetFilePath} {Arguments}");
         
-        if (string.IsNullOrEmpty(WorkingDirectoryPath))
+        if (!string.IsNullOrEmpty(WorkingDirectoryPath))
         {
             stringBuilder.Append($" ({Resources
                 .Labels_ProcessConfiguration_ToString_WorkingDirectory}: {WorkingDirectoryPath})");

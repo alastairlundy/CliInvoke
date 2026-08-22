@@ -122,31 +122,21 @@ public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionI
     {
         if (other is null) return false;
 
+        bool credentialEqual = UserCredential.Equals(Credential, other.Credential);
 
         if (Configuration is not null)
         {
-            return (Credential is not null) switch
-            {
-                false => Configuration.Equals(other.Configuration) && Result.Equals(other.Result) &&
-                         ArgumentsConflict == other.ArgumentsConflict &&
-                         ResourcePolicy.Equals(other.ResourcePolicy) &&
-                         Credential.Equals(other.Credential),
-                true => Configuration.Equals(other.Configuration) && Result.Equals(other.Result) &&
-                        ArgumentsConflict == other.ArgumentsConflict &&
-                        ResourcePolicy.Equals(other.ResourcePolicy)
-            };
+            return Configuration.Equals(other.Configuration)
+                   && Result.Equals(other.Result)
+                   && ArgumentsConflict == other.ArgumentsConflict
+                   && ResourcePolicy.Equals(other.ResourcePolicy)
+                   && credentialEqual;
         }
-        
-        return (Credential is not null) switch
-        {
-            false => Result.Equals(other.Result) &&
-                     ArgumentsConflict == other.ArgumentsConflict &&
-                     ResourcePolicy.Equals(other.ResourcePolicy) &&
-                     Credential.Equals(other.Credential),
-            true => Result.Equals(other.Result) &&
-                    ArgumentsConflict == other.ArgumentsConflict &&
-                    ResourcePolicy.Equals(other.ResourcePolicy)
-        };
+
+        return Result.Equals(other.Result)
+               && ArgumentsConflict == other.ArgumentsConflict
+               && ResourcePolicy.Equals(other.ResourcePolicy)
+               && credentialEqual;
     }
 
     /// <summary>

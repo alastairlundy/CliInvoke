@@ -160,8 +160,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     /// </returns>
     public static bool Equals(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null) return right is null;
 
         return left.Equals(right);
     }
@@ -191,66 +190,83 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
+    ///     Defines a greater-than comparison between two <see cref="ProcessTimeoutPolicy" />
+    ///     instances. Null is considered less than any non-null value.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The left-hand operand in the comparison.</param>
+    /// <param name="right">The right-hand operand in the comparison.</param>
+    /// <returns>
+    ///     <see langword="true" /> if the left-hand operand is greater than the right-hand
+    ///     operand (a non-null policy is greater than <see langword="null" />);
+    ///     <see langword="false" /> if the left is <see langword="null" /> or the left is
+    ///     not greater than the right.
+    /// </returns>
     public static bool operator >(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null) return false;
+        if (right is null) return true;
 
         return left.TimeoutThreshold > right.TimeoutThreshold;
     }
 
     /// <summary>
+    ///     Defines a less-than comparison between two <see cref="ProcessTimeoutPolicy" />
+    ///     instances. Null is considered less than any non-null value.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The left-hand operand in the comparison.</param>
+    /// <param name="right">The right-hand operand in the comparison.</param>
+    /// <returns>
+    ///     <see langword="true" /> if the left-hand operand is less than the right-hand
+    ///     operand (<see langword="null" /> is less than any non-null policy);
+    ///     <see langword="false" /> if the right is <see langword="null" /> or the left is
+    ///     not less than the right.
+    /// </returns>
     public static bool operator <(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (right is null) return false;
+        if (left is null) return true;
 
         return left.TimeoutThreshold < right.TimeoutThreshold;
     }
 
     /// <summary>
+    ///     Defines a greater-than-or-equal-to comparison between two
+    ///     <see cref="ProcessTimeoutPolicy" /> instances. Null is considered less than any
+    ///     non-null value.
+    /// </summary>
+    /// <param name="left">The left-hand operand in the comparison.</param>
+    /// <param name="right">The right-hand operand in the comparison.</param>
+    /// <returns>
+    ///     <see langword="true" /> if the left-hand operand is greater than or equal to the
+    ///     right-hand operand (a non-null policy is greater than or equal to
+    ///     <see langword="null" />, and two null values are equal);
+    ///     <see langword="false" /> if the left is <see langword="null" /> while the right
+    ///     is not, or the left is less than the right.
+    /// </returns>
+    public static bool operator >=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
+    {
+        if (left is null) return right is null;
+
+        return left.TimeoutThreshold >= (right?.TimeoutThreshold ?? default);
+    }
+
+    /// <summary>
     ///     Defines a less-than-or-equal-to comparison between two <see cref="ProcessTimeoutPolicy" />
-    ///     instances.
+    ///     instances. Null is considered less than any non-null value.
     /// </summary>
     /// <param name="left">The left-hand operand in the comparison.</param>
     /// <param name="right">The right-hand operand in the comparison.</param>
     /// <returns>
     ///     <see langword="true" /> if the left-hand operand is less than or equal to the right-hand
-    ///     operand;
-    ///     otherwise, <see langword="false" />.
-    /// </returns>
-    public static bool operator >=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
-    {
-        if (left is null || right is null)
-            return false;
-
-        return left.TimeoutThreshold >= right.TimeoutThreshold;
-    }
-
-    /// <summary>
-    ///     Defines an operator for comparing two <see cref="ProcessTimeoutPolicy" /> instances based on
-    ///     their TimeoutThreshold.
-    /// </summary>
-    /// <param name="left">The left operand, a <see cref="ProcessTimeoutPolicy" /> instance.</param>
-    /// <param name="right">The right operand, a <see cref="ProcessTimeoutPolicy" /> instance.</param>
-    /// <returns>
-    ///     Returns true if the TimeoutThreshold of the left <see cref="ProcessTimeoutPolicy" /> is
-    ///     less than or equal to the TimeoutThreshold of the right <see cref="ProcessTimeoutPolicy" />,
-    ///     otherwise returns false. If either operand is null, returns false.
+    ///     operand (<see langword="null" /> is less than or equal to any non-null policy,
+    ///     and two null values are equal);
+    ///     <see langword="false" /> if the right is <see langword="null" /> while the left
+    ///     is not, or the left is greater than the right.
     /// </returns>
     public static bool operator <=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (right is null) return left is null;
 
-        return left.TimeoutThreshold <= right.TimeoutThreshold;
+        return (left?.TimeoutThreshold ?? default) <= right.TimeoutThreshold;
     }
 }
