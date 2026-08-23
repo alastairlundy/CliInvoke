@@ -92,7 +92,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 
         public ProcessConfiguration Configuration { get; init; }
 
-        public ProcessExitConfiguration ExitConfiguration { get; set; }
+        public ProcessExitConfiguration ExitConfiguration { get; }
 
         public bool HasExited => HasStarted;
 

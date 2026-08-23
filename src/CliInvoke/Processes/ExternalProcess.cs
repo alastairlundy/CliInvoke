@@ -16,38 +16,12 @@ namespace CliInvoke.Processes;
 ///     Represents an external process that can be run.
 /// </summary>
 // ReSharper disable once RedundantExtendsListEntry
-public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
+public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 {
     private ProcessWrapper _processWrapper;
     
     private readonly IFilePathResolver _filePathResolver;
 
-    /// <summary>
-    /// </summary>
-    /// <param name="filePathResolver"></param>
-    /// <param name="targetFilePath"></param>
-    public ExternalProcess(IFilePathResolver filePathResolver, string targetFilePath)
-        : this(filePathResolver, new ProcessConfiguration(targetFilePath))
-    {
-    }
-
-    /// <summary>
-    ///     Initialises a new instance of the <see cref="ExternalProcess"/> class and
-    ///     allocates a default <see cref="FilePathResolver"/> internally to resolve
-    ///     the target executable path. This constructor performs an implicit
-    ///     <see cref="FilePathResolver"/> allocation; callers that need a custom
-    ///     resolver should use the
-    ///     <see cref="ExternalProcess(IFilePathResolver, ProcessConfiguration, ProcessExitConfiguration?)"/>
-    ///     overload instead.
-    /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="exitConfiguration"></param>
-    public ExternalProcess(ProcessConfiguration configuration,
-        ProcessExitConfiguration? exitConfiguration = null) 
-        : this(new FilePathResolver(), configuration, exitConfiguration)
-    {
-    }
-    
     /// <summary>
     /// 
     /// </summary>
@@ -74,7 +48,7 @@ public class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
     /// <summary>
     ///     Represents the configuration for handling external process exit.
     /// </summary>
-    public ProcessExitConfiguration ExitConfiguration { get; set; }
+    public ProcessExitConfiguration ExitConfiguration { get; }
 
     /// <summary>
     ///     Indicates whether the external process has exited.

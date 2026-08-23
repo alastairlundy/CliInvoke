@@ -23,7 +23,7 @@ public interface IExternalProcess : IDisposable
     /// <summary>
     ///     Represents the configuration for handling external process exit.
     /// </summary>
-    ProcessExitConfiguration ExitConfiguration { get; set; }
+    ProcessExitConfiguration ExitConfiguration { get; }
 
     /// <summary>
     ///     Indicates whether the external process has exited.

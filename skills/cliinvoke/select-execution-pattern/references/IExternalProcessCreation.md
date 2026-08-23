@@ -57,7 +57,7 @@ using CliInvoke.Core.Factories;
 using CliInvoke.Processes;
 
 using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
-await using ExternalProcess process = new ExternalProcess(config);
+await using ExternalProcess process = new ExternalProcess(new FilePathResolver(), config);
 await process.StartAsync();
 
 BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None);

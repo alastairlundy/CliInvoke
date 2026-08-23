@@ -29,7 +29,7 @@ public class ExternalProcessNoMutationTests
 
         string originalTargetFilePath = configuration.TargetFilePath;
 
-        using ExternalProcess process = new(configuration);
+        using ExternalProcess process = new(new FilePathResolver(), configuration);
 
         process.Start();
         ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);
@@ -55,7 +55,7 @@ public class ExternalProcessNoMutationTests
 
         string originalTargetFilePath = configuration.TargetFilePath;
 
-        using ExternalProcess process = new(configuration);
+        using ExternalProcess process = new(new FilePathResolver(), configuration);
 
         await process.StartAsync(CancellationToken.None);
         ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);
@@ -81,7 +81,7 @@ public class ExternalProcessNoMutationTests
 
         string originalTargetFilePath = callerConfig.TargetFilePath;
 
-        using ExternalProcess process = new(callerConfig);
+        using ExternalProcess process = new(new FilePathResolver(), callerConfig);
 
         await process.StartAsync(callerConfig, CancellationToken.None);
         ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);
@@ -107,7 +107,7 @@ public class ExternalProcessNoMutationTests
 
         string originalTargetFilePath = configuration.TargetFilePath;
 
-        using ExternalProcess process = new(configuration);
+        using ExternalProcess process = new(new FilePathResolver(), configuration);
 
         process.Start();
         BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None);
