@@ -452,16 +452,18 @@ run, do not need to reuse the configuration, and do not want to
 import an `IProcessInvoker` from DI.
 
 Internally, `CliRun` constructs an `IExternalProcess` via a
-pluggable `IExternalProcessFactory`, calls `StartAsync` on it, then
+default `IExternalProcessFactory`, calls `StartAsync` on it, then
 calls one of the capture methods (`WaitForExitOrTimeoutAsync` for
 `RunAsync`, `CaptureBufferedResultAsync` for `RunBufferedAsync`,
 `CapturePipedResultAsync` for `RunPipedAsync`) to obtain the result,
 and disposes the `IExternalProcess`. The configuration is built for
 you from the positional parameters; the timeout defaults to
 `ProcessTimeoutPolicy.Default.TimeoutThreshold` (3 minutes); and
-the exit configuration defaults to a graceful one. The factory can
-be replaced by calling `CliRun.UseExternalProcessFactory(...)` at
-startup.
+the exit configuration defaults to a graceful one. The factory and
+file-path resolver are fixed defaults — `CliRun` keeps no process-wide
+mutable state — so callers that need a custom factory or resolver
+should construct an `IProcessInvoker` (or resolve one from the DI
+container) instead.
 
 `CliRun` is the most concise entry point and the most opinionated.
 It trades the explicitness of the configuration model for
