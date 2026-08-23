@@ -22,7 +22,7 @@ namespace CliInvoke.Builders;
 /// <summary>
 ///     Builder class for creating process configurations.
 /// </summary>
-public class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
+public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
 {
     private string _targetFilePath;
     private bool _outputRedirection;
