@@ -80,12 +80,23 @@ public class InvocationContext
     private readonly SharedResult _sharedResult = new();
 
     /// <summary>
-    ///     Gets or sets the process result, set by the pipeline after execution.
+    ///     Gets or sets the process result produced by the invocation.
     /// </summary>
     /// <remarks>
-    ///     Derived contexts (created via <see cref="WithConfiguration"/>) share this value,
-    ///     so a result set by the terminal pipeline on a derived context is visible to the
-    ///     original context that the invoker reads from.
+    ///     <para>
+    ///         This property is <b>owned by the pipeline</b>, not by caller code. The only
+    ///         legitimate mutators are the <see cref="MiddlewareChain"/> walker, the terminal
+    ///         delegate that bridges the chain to the pipeline (for example
+    ///         <c>ProcessInvoker.RunPipelineThroughContext</c>), and any propagating middleware
+    ///         that short-circuits the chain by assigning its own result. Caller code — including
+    ///         user-authored middleware — must not read or write <see cref="Result"/> outside those
+    ///         mutators; reading it before the chain completes returns <see langword="null"/>.
+    ///     </para>
+    ///     <para>
+    ///         Derived contexts (created via <see cref="WithConfiguration"/>) share this value,
+    ///         so a result set by the terminal pipeline on a derived context is visible to the
+    ///         original context that the invoker reads from.
+    ///     </para>
     /// </remarks>
     public ProcessResult? Result
     {
@@ -98,10 +109,18 @@ public class InvocationContext
         public ProcessResult? Value { get; set; }
     }
 
+    /// <summary>
+    ///     Gets or sets the <see cref="MiddlewareContext"/> exposed to middleware during execution.
+    /// </summary>
     /// <remarks>
-    ///     The chain walker assigns this before invoking the first middleware so that
-    ///     middleware can read framework-level services (such as a logger)
-    ///     from <see cref="MiddlewareContext.Items"/>.
+    ///     <para>
+    ///         This property is <b>owned by the invoker</b>, not by caller code. The only legitimate
+    ///         mutator is the <see cref="MiddlewareChain"/> walker, which assigns this immediately
+    ///         before invoking the first middleware so that middleware can read framework-level
+    ///         services (such as a logger) from <see cref="MiddlewareContext.Items"/>. Caller code —
+    ///         including user-authored middleware — must not read or write <see cref="Middleware"/>
+    ///         outside the chain; it is <see langword="null"/> until the walker populates it.
+    ///     </para>
     /// </remarks>
     public MiddlewareContext? Middleware { get; set; }
 
