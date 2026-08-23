@@ -121,7 +121,7 @@ ProcessInvoker invoker = new ProcessInvoker(factory)
 // Seed shared services (e.g. an ILogger) via the MiddlewareItems bag:
 var items = new MiddlewareItems();
 items.Set("Logger", myLogger);
-ProcessInvoker seededInvoker = new ProcessInvoker(factory, items).UseLogging();
+ProcessInvoker seededInvoker = new ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items).UseLogging();
 
 // Call sites are identical to the non-middleware path:
 using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");

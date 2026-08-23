@@ -86,7 +86,7 @@ public class LoggingMiddlewareIntegrationTests
 
         builder.UseLogging();
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
         (string filePath, string arguments) = ResolveEchoCommand();
 

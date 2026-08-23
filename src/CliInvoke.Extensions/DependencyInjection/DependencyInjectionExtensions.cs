@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -110,7 +110,7 @@ public static class DependencyInjectionExtensions
                         ProcessMiddlewareBuilder builder = new(sp);
                         configure(builder);
                         IReadOnlyList<IProcessMiddleware> middlewareList = builder.Build();
-                        return new ProcessInvoker(factory, middlewareList);
+                        return new ProcessInvoker(factory, middlewareList, null);
                     });
                 }
                 else
@@ -146,7 +146,7 @@ public static class DependencyInjectionExtensions
                         ProcessMiddlewareBuilder builder = new(sp);
                         configure(builder);
                         IReadOnlyList<IProcessMiddleware> middlewareList = builder.Build();
-                        return new ProcessInvoker(factory, middlewareList);
+                        return new ProcessInvoker(factory, middlewareList, null);
                     });
                 }
                 else
@@ -182,7 +182,7 @@ public static class DependencyInjectionExtensions
                         ProcessMiddlewareBuilder builder = new(sp);
                         configure(builder);
                         IReadOnlyList<IProcessMiddleware> middlewareList = builder.Build();
-                        return new ProcessInvoker(factory, middlewareList);
+                        return new ProcessInvoker(factory, middlewareList, null);
                     });
                 }
                 else

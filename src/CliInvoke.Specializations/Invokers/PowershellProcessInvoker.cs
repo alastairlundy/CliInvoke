@@ -55,7 +55,7 @@ public class PowershellProcessInvoker : IProcessInvoker
     {
         IReadOnlyList<IProcessMiddleware> middlewares =
             [new PowerShellMiddleware()];
-        _processInvoker = new ProcessInvoker(externalProcessFactory, middlewares);
+        _processInvoker = new ProcessInvoker(externalProcessFactory, middlewares, null);
     }
 
     /// <summary>

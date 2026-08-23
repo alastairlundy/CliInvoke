@@ -54,7 +54,7 @@ public class CmdProcessInvoker : IProcessInvoker
     public CmdProcessInvoker(IExternalProcessFactory externalProcessFactory)
     {
         IReadOnlyList<IProcessMiddleware> middlewares = [new CmdMiddleware()];
-        _processInvoker = new ProcessInvoker(externalProcessFactory, middlewares);
+        _processInvoker = new ProcessInvoker(externalProcessFactory, middlewares, null);
     }
 
     /// <summary>

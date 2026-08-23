@@ -25,7 +25,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
         builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 
@@ -43,7 +43,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
         builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
         using ProcessConfiguration config =
             ProcessConfigurationFactory.Create("dotnet", "--this-flag-does-not-exist");
@@ -64,7 +64,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
         builder.UsePostExitValidation(PostExitValidation.StdoutMatches(@"\d+\.\d+"));
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
-        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares);
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 

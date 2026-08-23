@@ -22,17 +22,17 @@ public ProcessInvoker(
     IEnumerable<IProcessMiddleware> middlewares);
 ```
 
-Each constructor has an overload that also accepts a `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
+The full constructor accepts an optional `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
 
 ```csharp
 using CliInvoke.Core.Middleware; // MiddlewareItems
 
 var items = new MiddlewareItems();
 items.Set("Logger", myLogger);
-var invoker = new ProcessInvoker(factory, items);
+var invoker = new ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items);
 ```
 
-Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the first constructor when you don't need middleware. Use the second when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
+Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the factory-only constructor when you don't need middleware. Use the full constructor (factory, an `IEnumerable<IProcessMiddleware>` sequence, and an optional `sharedItems`) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
 
 ## The `IProcessMiddleware` contract
 

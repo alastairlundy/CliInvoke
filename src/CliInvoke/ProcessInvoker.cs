@@ -25,42 +25,7 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
     public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
-        // ReSharper disable once IntroduceOptionalParameters.Global
-        : this(externalProcessFactory, sharedItems: null)
-    {
-    }
-
-    /// <summary>
-    ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes,
-    ///     with pre-seeded middleware items shared across every invocation's chain.
-    /// </summary>
-    /// <param name="externalProcessFactory">The factory used to create external processes.</param>
-    /// <param name="sharedItems">
-    ///     Pre-seeded middleware items shared across every invocation's chain. Use this
-    ///     to inject framework-level services (such as a logger)
-    ///     that middleware can read from <see cref="InvocationContext.Middleware"/>.
-    /// </param>
-    public ProcessInvoker(
-        IExternalProcessFactory externalProcessFactory,
-        MiddlewareItems? sharedItems)
-    {
-        _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
-        _chain = sharedItems is null
-            ? null
-            : new MiddlewareChain([], RunPipelineThroughContext, sharedItems);
-    }
-
-    /// <summary>
-    ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes
-    ///     with middleware applied to every invocation.
-    /// </summary>
-    /// <param name="externalProcessFactory">The factory used to create external processes.</param>
-    /// <param name="middlewareSequence">The ordered middleware to apply before the terminal pipeline.</param>
-    public ProcessInvoker(
-            IExternalProcessFactory externalProcessFactory,
-            IEnumerable<IProcessMiddleware> middlewareSequence)
-        // ReSharper disable once IntroduceOptionalParameters.Global
-        : this(externalProcessFactory, middlewareSequence, sharedItems: null)
+        : this(externalProcessFactory, Array.Empty<IProcessMiddleware>(), sharedItems: null)
     {
     }
 
