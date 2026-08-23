@@ -22,7 +22,7 @@ change set. Themes:
 
 ### Breaking changes
 
-- **D002 — `CliRun` static mutable state removed.** `CliRun.UseExternalProcessFactory`
+- **`CliRun` static mutable state removed.** `CliRun.UseExternalProcessFactory`
   and `CliRun.UseFilePathResolver` no longer exist. `CliRun` retains only its
   `Run*`/`FireAndForget` methods, and each call now allocates a fresh
   `ProcessInvocationPipeline` (with a fresh `ExternalProcessFactory` and default
@@ -30,32 +30,32 @@ change set. Themes:
   leak between calls. Callers needing a custom factory or resolver must use
   `IProcessInvoker` (or DI) instead of `CliRun`. No `[Obsolete]` shim or bridge
   method was added (direct cutover).
-- **D003 — `InvocationContext.Result` / `.Middleware` ownership documented (no API change).**
+- **`InvocationContext.Result` / `.Middleware` ownership documented (no API change).**
   These properties are now documented as owned by specific middleware: the only
   legitimate mutators are the `MiddlewareChain` walker, the terminal delegate
   that bridges the chain to the pipeline, and any propagating middleware that
   short-circuits the chain. Caller code must not read or write them outside
   those mutators. This is a documentation-only change; the setters are retained.
-- **D004 — `ExitConfiguration` is now read-only.** `IExternalProcess.ExitConfiguration`
+- **`ExitConfiguration` is now read-only.** `IExternalProcess.ExitConfiguration`
   and `ExternalProcess.ExitConfiguration` are read-only `{ get; }` properties
   supplied at construction time. The `ExitConfiguration` setter and any
   `WithExitConfiguration(...)` method do not exist. Construct `ExternalProcess`
   with the exit configuration via its constructor.
-- **D005 — `ProcessInvoker` reduced to two constructors.** The partial overloads
+- **`ProcessInvoker` reduced to two constructors.** The partial overloads
   `(IExternalProcessFactory, MiddlewareItems?)` and
   `(IExternalProcessFactory, IEnumerable<IProcessMiddleware>)` were removed.
   The surviving constructors are `(IExternalProcessFactory)` and
   `(IExternalProcessFactory, IEnumerable<IProcessMiddleware>, MiddlewareItems?)`.
-- **D006 — `ExternalProcess` keeps only constructor C.** Constructors
+- **`ExternalProcess` keeps only constructor C.** Constructors
   `(IFilePathResolver, string)` and `(ProcessConfiguration, ProcessExitConfiguration?)`
   were removed. `ExternalProcess` is now constructed with
   `(IFilePathResolver, ProcessConfiguration, ProcessExitConfiguration?)`.
-- **D008 — `ExternalProcess` is sealed.** The class is now `sealed`; no
+- **`ExternalProcess` is sealed.** The class is now `sealed`; no
   public or protected extension points remain.
-- **D010 — `ProcessConfigurationBuilder` is sealed.** The concrete builder is now
+- **`ProcessConfigurationBuilder` is sealed.** The concrete builder is now
   `sealed`. Fluent chaining via the `IProcessConfigurationBuilder` interface is
   unaffected.
-- **D012 — `ProcessResult` equality is symmetric.** `ProcessResult.Equals(object?)`
+- **`ProcessResult` equality is symmetric.** `ProcessResult.Equals(object?)`
   now uses exact runtime-type matching so that `a.Equals(b) == b.Equals(a)` holds
   across the `ProcessResult` hierarchy. `BufferedProcessResult` and
   `PipedProcessResult` were audited to satisfy the same symmetry contract.

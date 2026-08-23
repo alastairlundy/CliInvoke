@@ -12,7 +12,7 @@ using CliInvoke.Processes;
 namespace CliInvoke.Tests.Processes;
 
 /// <summary>
-///     Verifies the no-mutation contract (D002): <c>Configuration.TargetFilePath</c>
+///     Verifies the no-mutation contract: <c>Configuration.TargetFilePath</c>
 ///     is never rewritten by <see cref="ExternalProcess.Start"/>,
 ///     <see cref="ExternalProcess.StartAsync(CancellationToken)"/>, or
 ///     <see cref="ExternalProcess.StartAsync(ProcessConfiguration, CancellationToken)"/>,
