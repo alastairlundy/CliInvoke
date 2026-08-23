@@ -86,6 +86,9 @@ public class ProcessResult : IEquatable<ProcessResult>
         if (other is null)
             return false;
 
+        if (other.GetType() != GetType())
+            return false;
+
         return ExitCode == other.ExitCode
                && ExecutedFilePath == other.ExecutedFilePath
                && ProcessId == other.ProcessId
@@ -106,10 +109,10 @@ public class ProcessResult : IEquatable<ProcessResult>
         if (obj is null)
             return false;
 
-        if (obj is ProcessResult other)
-            return Equals(other);
+        if (obj.GetType() != GetType())
+            return false;
 
-        return false;
+        return Equals((ProcessResult)obj);
     }
 
     /// <summary>

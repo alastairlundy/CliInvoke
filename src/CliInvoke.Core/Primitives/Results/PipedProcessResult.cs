@@ -118,6 +118,9 @@ public class PipedProcessResult
         if (obj is null)
             return false;
 
+        if (obj.GetType() != typeof(PipedProcessResult))
+            return false;
+
         if (obj is PipedProcessResult pipedProcessResult)
             return Equals(pipedProcessResult);
 
