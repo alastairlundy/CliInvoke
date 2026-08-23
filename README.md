@@ -156,6 +156,15 @@ Full documentation is available in the [CliInvoke Developer Portal](site/docs/re
 | **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](site/docs/getting-started.md) → [Configuration](site/docs/guides/configuration.md)                                                                                                     |
 | **Power User** — "I need full lifecycle control"                   | [Choosing your Invocation Pattern → IExternalProcess](site/docs/guides/choosing-invocation-pattern.md#iexternalprocess--power-user-lifecycle-control) → [Architecture](site/docs/guides/architecture.md) |
 
+> [!NOTE]
+> **Upgrading to 3.0.0?** The `CliRun.UseExternalProcessFactory` / `CliRun.UseFilePathResolver`
+> methods, the configurable `ExitConfiguration` setter, and several `ProcessInvoker` /
+> `ExternalProcess` constructors were removed. `CliRun` is now a stateless
+> batteries-included facade; callers needing a custom factory or resolver should use
+> `IProcessInvoker` (or the DI container) instead. See the
+> **[3.0.0 Migration Guide](site/docs/migration-guides/3.0.0.md)** and
+> **[CHANGELOG.md](CHANGELOG.md)** for the full breaking-change list.
+
 Other guides: [Troubleshooting](site/docs/guides/troubleshooting.md) · [Migration Guides](site/docs/migration-guides/readme.md) · [Building from Source](site/docs/building-cliinvoke.md)
 
 ## How to Build CliInvoke's code

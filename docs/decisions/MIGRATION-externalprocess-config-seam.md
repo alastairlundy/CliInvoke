@@ -51,17 +51,19 @@ ProcessConfiguration config2 = new ProcessConfiguration("dotnet")
 
 **Before (v2):**
 ```csharp
-ExternalProcess process = new ExternalProcess(config);
+IFilePathResolver resolver = new FilePathResolver();
+ExternalProcess process = new ExternalProcess(resolver, config);
 process.Configuration = new ProcessConfiguration("dotnet"); // compiled in v2
 ```
 
 **After (v3):**
 ```csharp
-ExternalProcess process = new ExternalProcess(config);
+IFilePathResolver resolver = new FilePathResolver();
+ExternalProcess process = new ExternalProcess(resolver, config);
 // Post-construction assignment is a compile error in v3.
 
 // Pass the configuration via the constructor instead:
-ExternalProcess process2 = new ExternalProcess(new ProcessConfiguration("dotnet"));
+ExternalProcess process2 = new ExternalProcess(resolver, new ProcessConfiguration("dotnet"));
 ```
 
 ## 4. Dropped Constructor Parameter from `PowershellProcessConfiguration`
@@ -125,7 +127,8 @@ The resolved file path is no longer written back to `Configuration.TargetFilePat
 - **`PipedProcessResult.ExecutedFilePath`** — same, for piped process results.
 
 ```csharp
-ExternalProcess process = new ExternalProcess(new ProcessConfiguration("dotnet"));
+IFilePathResolver resolver = new FilePathResolver();
+ExternalProcess process = new ExternalProcess(resolver, new ProcessConfiguration("dotnet"));
 
 // Start the process, then capture the result:
 process.Start();

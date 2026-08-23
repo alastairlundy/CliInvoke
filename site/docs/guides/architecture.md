@@ -238,9 +238,9 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(
 
 Internally, `CliRun` constructs a `ProcessConfigurationBuilder`,
 configures it from the method arguments, calls `Build()` (Stage 1 →
-Stage 2), constructs an `ExternalProcessFactory` (or uses the one
-configured via `UseExternalProcessFactory` / `UseFilePathResolver`),
-delegates to a `ProcessInvoker` (Stage 3), and returns the result
+Stage 2), constructs a fresh `ExternalProcessFactory` with a default `FilePathResolver`
+(there is no longer any shared, configurable static state — a new factory is
+allocated per call), delegates to a `ProcessInvoker` (Stage 3), and returns the result
 (Stage 4).
 
 The caller never sees the builder, the model, or the invoker. This is

@@ -370,8 +370,8 @@ is to add it to the appropriate model, not to overload the invoker.
 ```csharp
 public interface IExternalProcess : IDisposable
 {
-    ProcessConfiguration Configuration { get; set; }
-    ProcessExitConfiguration ExitConfiguration { get; set; }
+    ProcessConfiguration Configuration { get; init; }
+    ProcessExitConfiguration ExitConfiguration { get; }
 
     bool HasExited { get; }
     bool HasStarted { get; }
