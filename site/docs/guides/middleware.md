@@ -16,10 +16,12 @@ CliInvoke's `ProcessInvoker` supports an optional **middleware** system that let
 public ProcessInvoker(IExternalProcessFactory externalProcessFactory);
 
 // 2. With middleware — every invocation runs through the chain, in order,
-//    before the terminal pipeline executes.
+//    before the terminal pipeline executes. Pass a MiddlewareItems? to
+//    pre-seed the per-chain item bag (e.g. an ILogger); pass null for none.
 public ProcessInvoker(
     IExternalProcessFactory externalProcessFactory,
-    IEnumerable<IProcessMiddleware> middlewares);
+    IEnumerable<IProcessMiddleware> middlewares,
+    MiddlewareItems? sharedItems);
 ```
 
 The full constructor accepts an optional `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
