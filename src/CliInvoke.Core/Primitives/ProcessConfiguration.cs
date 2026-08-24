@@ -8,7 +8,6 @@
    */
 
 using System.Collections.Immutable;
-using System.Linq;
 using System.Text;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
@@ -237,7 +236,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
         return TargetFilePath.Equals(other.TargetFilePath)
                && EnvironmentVariables.Count == other.EnvironmentVariables.Count
-               && !EnvironmentVariables.Except(other.EnvironmentVariables).Any()
+               && EnvironmentVariables.Equals(other.EnvironmentVariables)
                && Arguments.Equals(other.Arguments)
                && ResourcePolicy.Equals(other.ResourcePolicy)
                && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
