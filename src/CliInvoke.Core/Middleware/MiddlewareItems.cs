@@ -15,7 +15,7 @@ namespace CliInvoke.Core.Middleware;
 /// </summary>
 public sealed class MiddlewareItems
 {
-    private readonly IDictionary<string, object?> _items = new Dictionary<string, object?>();
+    private readonly Dictionary<string, object?> _items = new();
 
     /// <summary>
     ///     Gets a value by key, cast to the specified type.
