@@ -182,9 +182,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public bool RedirectStandardInput { get; }
 
     /// <summary>
-    /// 
+    /// Whether to redirect process Standard Output and Error.
     /// </summary>
-    /// //TODO: Add missing xml doc comment.
     public bool OutputRedirection { get; }
 
     /// <summary>
