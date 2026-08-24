@@ -51,6 +51,28 @@ public sealed class MiddlewareItems
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T">The expected type of the value.</typeparam>
+    /// <param name="key">The key to look up.</param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public bool TryGet<T>(string key, out T? value)
+    {
+        try
+        {
+            value = Get<T>(key);
+
+            return true;
+        }
+        catch(KeyNotFoundException)
+        {
+            value = default;
+            return false;
+        }
+    }
+    
+    /// <summary>
     ///     Sets a value by key.
     /// </summary>
     /// <typeparam name="T">The type of the value.</typeparam>
