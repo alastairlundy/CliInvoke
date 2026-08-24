@@ -18,7 +18,7 @@ namespace CliInvoke;
 public class ProcessInvoker : IProcessInvoker
 {
     private readonly ProcessInvocationPipeline _pipeline;
-    private readonly MiddlewareChain? _chain;
+    private readonly MiddlewareChain _chain;
 
     /// <summary>
     ///     Instantiates a <see cref="ProcessInvoker" /> for creating and executing processes.
@@ -83,21 +83,14 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     private async Task<TResult> InvokeThroughChainAsync<TResult>(InvocationContext ctx) where TResult : ProcessResult
     {
-        if (_chain is not null)
+        await _chain.RunAsync(ctx, ctx.CancellationToken);
+
+        if (ctx.Result is null)
         {
-            await _chain.RunAsync(ctx, ctx.CancellationToken);
-
-            if (ctx.Result is null)
-            {
-                throw new InvalidOperationException(
-                    "The middleware chain completed without setting a result. " +
-                    "Short-circuiting middleware must assign InvocationContext.Result before returning.");
-            }
-
-            return (TResult)ctx.Result;
+            throw new InvalidOperationException(Resources.Exceptions_Middleware_ChainCompletedWithoutResult);
         }
 
-        return await _pipeline.InvokeAsync<TResult>(ctx);
+        return (TResult)ctx.Result;
     }
 
     /// <summary>

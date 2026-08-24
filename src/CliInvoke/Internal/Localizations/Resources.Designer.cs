@@ -105,6 +105,15 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The middleware chain completed without setting a result. Short-circuiting middleware must assign InvocationContext.Result before returning..
+        /// </summary>
+        internal static string Exceptions_Middleware_ChainCompletedWithoutResult {
+            get {
+                return ResourceManager.GetString("Exceptions.Middleware.ChainCompletedWithoutResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The executed command was not successful and returned an exit code of {x}..
         /// </summary>
         internal static string Exceptions_CommandNotSuccessful_Generic {

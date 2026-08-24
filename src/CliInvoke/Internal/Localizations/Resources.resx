@@ -80,4 +80,7 @@
     <data name="Exceptions.Arguments.EmptyArgsSequence" xml:space="preserve">
         <value>Arguments sequence cannot be empty.</value>
     </data>
+    <data name="Exceptions.Middleware.ChainCompletedWithoutResult" xml:space="preserve">
+        <value>The middleware chain completed without setting a result. Short-circuiting middleware must assign InvocationContext.Result before returning.</value>
+    </data>
 </root>
