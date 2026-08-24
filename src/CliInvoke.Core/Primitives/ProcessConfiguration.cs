@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -27,6 +28,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="outputRedirection"></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
+    /// <remarks>
+    ///     When environment variables are supplied via the full constructor, they are stored as an
+    ///     immutable, key-sorted snapshot; see the full constructor remarks for the implications on
+    ///     equality, hashing, and process execution.
+    /// </remarks>
     public ProcessConfiguration(string targetFilePath, string arguments = "", 
         bool outputRedirection = true)
         : this(targetFilePath, arguments, redirectStandardInput: false, outputRedirection: outputRedirection)
@@ -52,6 +58,16 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <param name="processResourcePolicy">The process resource policy, or <c>null</c> for defaults.</param>
     /// <param name="windowCreation">Whether to enable window creation.</param>
     /// <param name="useShellExecution">Whether to use shell execution.</param>
+    /// <remarks>
+    ///     The <paramref name="environmentVariables"/> collection is captured as an immutable
+    ///     snapshot sorted by key using ordinal comparison. This normalisation makes
+    ///     <see cref="Equals(ProcessConfiguration)"/> and <see cref="GetHashCode"/> order-independent
+    ///     (two configurations carrying the same variables in a different insertion order are considered
+    ///     equal) and avoids re-sorting on every hash code computation. Because environment variable
+    ///     ordering is irrelevant to the spawned process, this has no effect on process execution. The
+    ///     snapshot also isolates the configuration from later mutations made to the caller's original
+    ///     dictionary.
+    /// </remarks>
     protected internal ProcessConfiguration(
         string targetFilePath,
         string arguments,
@@ -77,7 +93,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         RequiresAdministrator = requiresAdministrator;
         Arguments = arguments;
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
-        EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+        EnvironmentVariables = environmentVariables is null
+            ? ImmutableSortedDictionary<string, string>.Empty
+            : ImmutableSortedDictionary.CreateRange(StringComparer.Ordinal, environmentVariables);
         Credential = credential ?? UserCredential.Null;
 
         OutputRedirection = outputRedirection;
@@ -262,7 +280,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         hashCode.Add(TargetFilePath);
         hashCode.Add(Arguments);
         hashCode.Add(WorkingDirectoryPath);
-        foreach (var kvp in EnvironmentVariables.OrderBy(kvp => kvp.Key, StringComparer.Ordinal))
+        foreach (var kvp in EnvironmentVariables)
         {
             hashCode.Add(kvp.Key);
             hashCode.Add(kvp.Value);
