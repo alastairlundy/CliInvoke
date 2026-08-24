@@ -1,5 +1,5 @@
 ﻿/*
-    AlastairLundy.DotPrimitives
+    CliInvoke.Core
     Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -47,7 +47,7 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    ///     Instantiates a default ProcessTimeoutPolicy which times out after 10 minutes.
+    ///     Instantiates a default ProcessTimeoutPolicy which times out after 2 minutes.
     /// </summary>
     public static ProcessTimeoutPolicy Default { get; } =
         new();

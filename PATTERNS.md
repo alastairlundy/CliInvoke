@@ -61,7 +61,7 @@ Full control over the process lifecycle while keeping the orchestrator abstract.
 
 ### Example
 ```csharp
-// Startup in an aoo
+// Startup in an app
 builder.Services.AddSingleton<IProcessInvoker, ProcessInvoker>();
 
 // Later in code
