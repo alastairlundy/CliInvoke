@@ -503,15 +503,15 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 
 | Property | Type | Default | Mutability | Source line |
 |----------|------|---------|------------|-------------|
-| `TargetFilePath` | `string` | *(required, no default)* | Mutable | 111 |
-| `Arguments` | `string` | `""` | `protected set` | 121 |
+| `TargetFilePath` | `string` | *(required, no default)* | Read-only | 111 |
+| `Arguments` | `string` | `""` | Read-only | 121 |
 | `RequiresAdministrator` | `bool` | `false` | Read-only | 106 |
 | `WorkingDirectoryPath` | `string` | `Directory.GetCurrentDirectory()` | Read-only | 116 |
 | `WindowCreation` | `bool` | `false` | Read-only | 126 |
 | `UseShellExecution` | `bool` | `false` | Read-only | 147 |
 | `EnvironmentVariables` | `IReadOnlyDictionary<string, string>` | `new Dictionary<string, string>()` | Read-only | 131 |
 | `Credential` | `UserCredential` | `UserCredential.Null` | Read-only | 136 |
-| `OutputRedirection` | `bool` | `true` | `protected set` | 168 |
+| `OutputRedirection` | `bool` | `true` | Read-only | 168 |
 | `RedirectStandardInput` | `bool` | `false` | Read-only | 163 |
 | `StandardInput` | `StreamWriter?` | `StreamWriter.Null` | Read-only | 158 |
 | `ResourcePolicy` | `ProcessResourcePolicy` | `ProcessResourcePolicy.Default` | Read-only | 181 |

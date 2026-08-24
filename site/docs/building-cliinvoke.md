@@ -7,14 +7,12 @@ title: "How to Build CliInvoke's code"
 ### Requirements
 CliInvoke requires the latest .NET release SDK to be installed to target all supported TFM (Target Framework Moniker) build targets.
 
-Currently, the required .NET SDK is .NET 9. 
+Currently, the required .NET SDK is .NET 10. 
 
 The current build targets include:
-* .NET Standard 2.0 
-* .NET 8
-* .NET 9
+* .NET 10
 
-Any version of the .NET 9 SDK can be used, but using the latest version is preferred.
+Any version of the .NET 10 SDK can be used, but using the latest version is preferred.
 
 ### Versioning new releases
 CliInvoke aims to follow Semantic versioning with ```[Major].[Minor].[Build]``` for most circumstances and an optional ``.[Revision]`` when only a configuration change is made, or a new build of a preview release is made.

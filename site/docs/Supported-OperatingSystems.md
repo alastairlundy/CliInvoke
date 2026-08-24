@@ -3,7 +3,7 @@ title: "Supported Operating Systems"
 ---
 
 ## Supported Operating Systems
-CliInvoke can currently be added to .NET Standard 2.0, .NET 8, or .NET 9 or newer supported projects.
+CliInvoke can currently be added to .NET 10 or newer supported projects.
 
 The following table details which target platforms are supported for executing commands via CliInvoke. 
 
@@ -20,7 +20,7 @@ The following table details which target platforms are supported for executing c
 | watchOS          | Not Supported :x:                  | Not supported due to ``Process.Start()`` not supporting watchOS <sup>4</sup>                |
 | Browser          | Not Planned :x:                    | Not supported due to not being a valid target Platform for executing programs or processes. |
 
-<sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0#system-diagnostics-process-start) for more info.
+<sup>3</sup> - See the [Process class documentation](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-10.0#system-diagnostics-process-start) for more info.
 
 <sup>4</sup> - Lack of watchOS support is implied by lack of IOS support since [watchOS is based on IOS](https://en.wikipedia.org/wiki/WatchOS).
 

@@ -296,7 +296,7 @@ using ProcessConfiguration config = new(
     "dotnet", "--runtime", true);
 using IExternalProcess process = factory.CreateExternalProcess(config);
 
-await process.StartAsync();
+await process.StartAsync(CancellationToken.None);
 
 // ← The caller can pipe input, monitor progress, etc. here.
 

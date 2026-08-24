@@ -2,7 +2,7 @@
 
 ## Notes
 
-All results posted below are run on .NET 10 with the following specs:
+All results posted below were captured with **.NET SDK 9.0.300** targeting **.NET 8.0.16** (see the BenchmarkDotNet output below). They should be re-run on .NET 10 to refresh.
 
 All CliInvoke benchmarks show the performance of using ``IExternalProcessFactory`` (from ``CliInvoke.Core.Factories``)
 and ``IProcessInvoker`` / ``ProcessInvoker`` (from ``CliInvoke.Core`` / ``CliInvoke``).
