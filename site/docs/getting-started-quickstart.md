@@ -8,7 +8,7 @@ layout: simple
 Install the package via NuGet:
 
 ```xml
-<PackageReference Include="CliInvoke" Version="1.0.0" />
+<PackageReference Include="CliInvoke" Version="3.0.0" />
 ```
 
 Add services:
