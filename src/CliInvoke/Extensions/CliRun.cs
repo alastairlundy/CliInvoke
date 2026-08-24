@@ -53,15 +53,13 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
+        (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
+            BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: false);
 
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory, outputRedirection: false);
-
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan ?? ProcessTimeoutPolicy.Default.TimeoutThreshold));
-
-        return await RunAsync(configuration, exitConfiguration, cancellationToken);
+        using (configuration)
+        {
+            return await RunAsync(configuration, exitConfiguration, cancellationToken);
+        }
     }
 
     /// <summary>
@@ -118,15 +116,13 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
+        (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
+            BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: true);
 
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory, outputRedirection: true);
-
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan ?? ProcessTimeoutPolicy.Default.TimeoutThreshold));
-
-        return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
+        using (configuration)
+        {
+            return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
+        }
     }
 
 
@@ -184,15 +180,13 @@ public static class CliRun
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
         CancellationToken cancellationToken = default)
     {
-        workingDirectory ??= Environment.CurrentDirectory;
+        (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
+            BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: true);
 
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory, outputRedirection: true);
-
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan ?? ProcessTimeoutPolicy.Default.TimeoutThreshold));
-
-        return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
+        using (configuration)
+        {
+            return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
+        }
     }
 
     /// <summary>
@@ -254,5 +248,23 @@ public static class CliRun
             arguments, workingDirectory, outputRedirection: false);
 
         return FireAndForget(configuration);
+    }
+
+    /// <summary>
+    ///     Builds the <see cref="ProcessConfiguration" /> and <see cref="ProcessExitConfiguration" />
+    ///     shared by the string-argument overloads, applying the default working directory and timeout policy.
+    /// </summary>
+    private static (ProcessConfiguration Configuration, ProcessExitConfiguration ExitConfiguration) BuildStringArgsConfig(
+        string targetFilePath, string arguments, string? workingDirectory, TimeSpan? timeoutTimeSpan, bool outputRedirection)
+    {
+        workingDirectory ??= Environment.CurrentDirectory;
+
+        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(
+            targetFilePath, arguments, workingDirectory, outputRedirection);
+
+        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
+            ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan ?? ProcessTimeoutPolicy.Default.TimeoutThreshold));
+
+        return (configuration, exitConfiguration);
     }
 }
