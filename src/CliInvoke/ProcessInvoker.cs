@@ -25,7 +25,7 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="externalProcessFactory">The factory used to create external processes.</param>
     public ProcessInvoker(IExternalProcessFactory externalProcessFactory)
-        : this(externalProcessFactory, Array.Empty<IProcessMiddleware>(), sharedItems: null)
+        : this(externalProcessFactory, [], null)
     {
     }
 
