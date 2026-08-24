@@ -13,10 +13,11 @@ For an implementing package, check out [CliInvoke](https://www.nuget.org/package
 Key Abstractions:
 
 * ``IProcessInvoker``
-* ``IProcessConfigurationFactory``
+* ``IExternalProcessFactory``
 
 * Piping:
-    * ``IProcessPipeHandler``
+    * Piping is handled via ``IProcessInvoker.ExecuteBufferedAsync`` / ``ExecutePipedAsync`` (or
+      ``IExternalProcess.CaptureBufferedResultAsync`` / ``CapturePipedResultAsync``).
 
 * Fluent Builders:
     * ``ArgumentsSpec`` - A spec for Argument Building and argument escaping.
@@ -77,7 +78,7 @@ CliInvoke.Core provides abstractions and types used by different design patterns
 
 ### Simple ``ProcessConfiguration`` creation with Factory Pattern
 
-This approach uses the ``IProcessConfigurationFactory`` interface factory to create a ``ProcessConfiguration``. It
+This approach uses the ``IExternalProcessFactory`` interface factory to create a ``ProcessConfiguration``. It
 requires fewer parameters and sets up more defaults for you.
 
 It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is
@@ -95,10 +96,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code ommitted for clarity
 
-// Get IProcessConfigurationFactory 
-IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
+// Get IExternalProcessFactory 
+IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
 
-// Get IProcessConfigurationInvoker
+// Get IProcessInvoker
 IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
@@ -120,10 +121,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code ommitted for clarity
 
-// Get IProcessConfigurationFactory 
-IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
+// Get IExternalProcessFactory 
+IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
 
-// Get IProcessConfigurationInvoker
+// Get IProcessInvoker
 IProcessnvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
@@ -193,8 +194,8 @@ using Microsoft.Extensions.DependencyInjection;
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
                             .SetArguments(["arg1", "arg2"])
                             .SetWorkingDirectory("/Path/To/Directory")
-                            .RedirectStandardOutput(true)
-                           .RedirectStandardError(true);
+                            .SetOutputRedirection(true)
+                           .SetOutputRedirection(true);
   
   // Build it as a ProcessConfiguration object when you're ready to use it.
   ProcessConfiguration config = builder.Build();
@@ -205,7 +206,7 @@ BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config
 
 #### Cancellation and Timeout
 
-CliInvoke provides flexible timeout and cancellation support for process execution. By default, processes have a **30-minute timeout** with graceful exit behavior.
+CliInvoke provides flexible timeout and cancellation support for process execution. By default, processes have a **2-minute timeout** with graceful exit behavior.
 
 ##### Default Timeout Policy
 
@@ -214,7 +215,7 @@ The default timeout policy is applied when creating a `ProcessExitConfiguration`
 ```csharp
 using CliInvoke.Core;
 
-// Default ProcessExitConfiguration has 30-minute timeout with graceful exit
+// Default ProcessExitConfiguration has 2-minute timeout with graceful exit
 ProcessExitConfiguration exitConfig = new ProcessExitConfiguration();
 ProcessResult result = await invoker.ExecuteAsync(config, exitConfig);
 ```

@@ -2,10 +2,10 @@
 
 ## Notes
 
-All results posted below are run on .NET 9 with the following specs:
+All results posted below are run on .NET 10 with the following specs:
 
-All CliInvoke benchmarks show the performance of using ``ProcessFactory`` (merged from Extensions.Processes`` and ``
-CliCommandInvoker``
+All CliInvoke benchmarks show the performance of using ``IExternalProcessFactory`` (from ``CliInvoke.Core.Factories``)
+and ``IProcessInvoker`` / ``ProcessInvoker`` (from ``CliInvoke.Core`` / ``CliInvoke``).
 
 ```BenchmarkDotNet v0.15.0, Windows 11 (10.0.26100.4061/24H2/2024Update/HudsonValley)
 Unknown processor

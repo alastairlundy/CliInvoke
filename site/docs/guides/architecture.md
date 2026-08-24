@@ -260,7 +260,7 @@ and returns the result (Stage 4).
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
 using ProcessConfiguration config = new(
-    "dotnet", "--info", OutputRedirectionMode.Buffer);
+    "dotnet", "--info", true);
 
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
     config, ProcessExitConfiguration.CreateGraceful());
@@ -293,7 +293,7 @@ IExternalProcessFactory factory =
     provider.GetRequiredService<IExternalProcessFactory>();
 
 using ProcessConfiguration config = new(
-    "dotnet", "--runtime", OutputRedirectionMode.Buffer);
+    "dotnet", "--runtime", true);
 using IExternalProcess process = factory.CreateExternalProcess(config);
 
 await process.StartAsync();

@@ -50,8 +50,8 @@ namespace MyApp;
             // AddCliInvoke goes here
             services.AddCliInvoke();
 
-            // Optional extra in case you want to run a Process Configuration through another Process
-            services.AddDefaultRunnerProcessInvoker();
+            // AddCliInvoke registers all CliInvoke services (IProcessInvoker,
+            // IExternalProcessFactory, IProcessMiddleware, etc.) for you.
 
             // Build the service provider
             serviceProvider = services.BuildServiceProvider();
@@ -62,26 +62,17 @@ namespace MyApp;
 ```
 
 #### Manual Setup
-This example manually sets up ``IProcessPipeHandler``, ``IProcessInvoker`` and other dependencies as Singletons.
+This example manually sets up ``IProcessInvoker``, ``IExternalProcessFactory`` and other dependencies as Singletons.
 
-Most developer users using CliInvoke in their applications should use the Extensions package's ``AddCliInvoke`` and optional ``AddDefaultRunnerProcessInvoker`` methods instead of manually configuring Dependency Injection unless there is good reason to avoid using it.
-
-Configuring ``DefaultRunnerProcessInvoker`` to be injected for the abstract class ``RunnerProcessInvokerBase`` is relatively trivial but can 
-lead to errors if configured incorrectly. 
-
-Configuring a custom class that implements ``RunnerProcessInvokerBase`` to be used instead of the ``DefaultRunnerProcessInvoker`` is not trivial and manual setup of it should be avoided if possible. The Extensions package contains a ``AddDerivedRunnerProcessInvoker`` extension method that can handle this.
+Most developer users using CliInvoke in their applications should use the Extensions package's ``AddCliInvoke`` method instead of manually configuring Dependency Injection unless there is good reason to avoid using it. ``AddCliInvoke`` registers all of the services shown below for you.
 
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 
 using CliInvoke;
-using CliInvoke.Piping;
 using CliInvoke.Core;
-using CliInvoke.Core.Piping;
-using CliInvoke.Core.Extensibility.Factories;
 using CliInvoke.Core.Extensibility;
-using CliInvoke.Extensibility.Factories;
 using CliInvoke.Extensibility;
 
 
@@ -99,21 +90,10 @@ namespace MyApp;
             // Register Your other dependencies here
             
             services.AddSingleton<IFilePathResolver, FilePathResolver>();
-            services.AddSingleton<IProcessPipeHandler, ProcessPipeHandler>();
+            services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
+            services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
             services.AddSingleton<IProcessInvoker, ProcessInvoker>();
-
-            // Optional - Add if you intend to run a Process Configuration through another Process.
-            services.AddSingleton<IProcessRunnerFactory, ProcessRunnerFactory>();
-            // Both the directly above and below code are needed for
-            // running Process Configurations through other Process Configurations.
-
-            // RunnerProcessConfiguration code ommitted for clarity -
-
-            services.AddScoped<RunnerProcessInvokerBase>(sp => new DefaultRunnerProcessInvoker(
-                    sp.GetRequiredService<IProcessInvoker>(),
-                    sp.GetRequiredService<IRunnerProcessFactory>(),
-                    runnerProcessConfiguration));
-
+            services.AddSingleton<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
 
             // Build the service provider
             serviceProvider = services.BuildServiceProvider();
@@ -128,19 +108,16 @@ Here's an example of a simple usage of creating a CliInvoke command. For more de
 
 ```csharp
 using CliInvoke;
-using CliInvoke.Abstractions;
-using CliInvoke.Builders;
-using CliInvoke.Builders.Abstractions;
+using CliInvoke.Core;
 
-ICliCommandInvoker commandRunner = serviceProvider.GetRequiredService<ICliCommandInvoker>();
+IProcessInvoker commandRunner = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-ICliCommandConfigurationBuilder builder = new CliCommandConfigurationBuilder("Path/To/Exe")
-              .WithArguments(["arg1", "arg2"]) 
-              .WithWorkingDirectory("/Path/To/Directory");
+using ProcessConfiguration command = new ProcessConfiguration("Path/To/Exe", "arg1 arg2")
+{
+    WorkingDirectoryPath = "/Path/To/Directory"
+};
 
-CliCommandConfiguration command = builder.Build();
-
-var result = await commandRunner.ExecuteBufferedAsync(command);
+BufferedProcessResult result = await commandRunner.ExecuteBufferedAsync(command, ProcessExitConfiguration.CreateGraceful());
 ```
 
 (Original content migrated from docs/site/getting-started.md)

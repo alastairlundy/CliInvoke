@@ -386,7 +386,6 @@ public interface IExternalProcess : IDisposable
     Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken);
     Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken);
 
-    int FireAndForget(CancellationToken cancellationToken);
     Task Kill();
 }
 ```
@@ -409,9 +408,17 @@ lifecycle as a sequence of steps you orchestrate yourself:
    a `PipedProcessResult` whose streams you can stream from. These
    methods can be called at any point during execution, not only at
    exit.
-4. **Terminate** — call `Kill()` to forcibly stop a runaway process,
-   or `FireAndForget` if you only need the OS process id and do not
-   care about the result.
+4. **Terminate** — call `Kill()` to forcibly stop a runaway process.
+
+> **Fire-and-forget launching** is *not* a member of `IExternalProcess`.
+> If you only need the OS process id and do not care about the result,
+> use the static `CliRun.FireAndForget(...)` API instead:
+>
+> ```csharp
+> // Returns the OS process id; the process runs detached from the caller.
+> static int CliRun.FireAndForget(ProcessConfiguration configuration);
+> static int CliRun.FireAndForget(string targetFilePath, string arguments = "", string? workingDirectory = null);
+> ```
 
 `IExternalProcess` is constructed by `IExternalProcessFactory`
 (typically obtained via dependency injection in the `CliInvoke.Extensions`

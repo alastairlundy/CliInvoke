@@ -34,7 +34,7 @@ Straightforward API for running a process and retrieving its result.
 ### Example
 ```csharp
 // Run a simple command and wait for completion.
-ProcessResult result = await CliRun.RunAsync("dotnet", "--version");
+BufferedProcessResult result = await CliRun.RunAsync("dotnet", "--version");
 
 Console.WriteLine(result.StandardOutput);
 ```
@@ -67,7 +67,7 @@ builder.Services.AddSingleton<IProcessInvoker, ProcessInvoker>();
 // Later in code
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-using ProcessConfiguration config = new("dotnet", "--info", OutputRedirectionMode.Buffer);
+using ProcessConfiguration config = new("dotnet", "--info", true);
 
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 ```
@@ -97,7 +97,7 @@ Mirror the classic `System.Diagnostics.Process` workflow while providing a safe 
 // 1) Without dependency injection – create factory manually
 IExternalProcessFactory factory = new ExternalProcessFactory();
 
-using ProcessConfiguration config = new("dotnet", "--runtime", OutputRedirectionMode.Buffer);
+using ProcessConfiguration config = new("dotnet", "--runtime", true);
 using IExternalProcess process = factory.CreateExternalProcess(config);
 await process.StartAsync();
 
@@ -111,7 +111,7 @@ Console.WriteLine(result.StandardOutput);
 builder.Services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
 IExternalProcessFactory externalFactory = provider.GetRequiredService<IExternalProcessFactory>();
 
-using ProcessConfiguration config = new("dotnet", "--runtime", OutputRedirectionMode.Buffer);
+using ProcessConfiguration config = new("dotnet", "--runtime", true);
 
 using IExternalProcess process = externalFactory.CreateExternalProcess(config);
 await process.StartAsync();

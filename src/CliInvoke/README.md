@@ -85,7 +85,7 @@ the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blo
 
 ### Simple ``ProcessConfiguration`` creation with Factory Pattern
 
-This approach uses the ``IProcessConfigurationFactory`` interface factory to create a ``ProcessConfiguration``. It
+This approach uses the ``IExternalProcessFactory`` interface factory to create a ``ProcessConfiguration``. It
 requires fewer parameters and sets up more defaults for you.
 
 It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is
@@ -98,17 +98,17 @@ This example gets a non buffered ``ProcessResult`` that contains basic process e
 ```csharp
 using CliInvoke.Core.Factories;
 using CliInvoke.Core;
-using AlastairLundy.CliIinvoke;
+using CliInvoke;
 
 using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code ommitted for clarity
 
-// Get IProcessConfigurationFactory 
-IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
+// Get IExternalProcessFactory 
+IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
 
-// Get IProcessConfigurationInvoker
-IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+// Get IProcessInvoker
+IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
@@ -124,17 +124,17 @@ This example gets a ``BufferedProcessResult`` which contains redirected Standard
 ```csharp
 using CliInvoke.Core.Factories;
 using CliInvoke.Core;
-using AlastairLundy.CliIinvoke;
+using CliInvoke;
 
 using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code ommitted for clarity
 
-// Get IProcessConfigurationFactory 
-IProcessConfigurationFactory processConfigFactory = serviceProvider.GetRequiredService<IProcessConfigurationFactory>();
+// Get IExternalProcessFactory 
+IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
 
-// Get IProcessConfigurationInvoker
-IProcessConfigurationInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessConfigurationInvoker>();
+// Get IProcessInvoker
+IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Simply create the process configuration.
 ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
@@ -202,9 +202,9 @@ using Microsoft.Extensions.DependencyInjection;
   // Fluently configure your Command.
   IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
                             .SetArguments(["arg1", "arg2"])
-                            .SetWorkingDirectory("/Path/To/Directory")
-                            .RedirectStandardOutput(true)
-                           .RedirectStandardError(true);
+                             .SetWorkingDirectory("/Path/To/Directory")
+                             .SetOutputRedirection(true)
+                            .SetOutputRedirection(true);
   
   // Build it as a ProcessConfiguration object when you're ready to use it.
   ProcessConfiguration config = builder.Build();

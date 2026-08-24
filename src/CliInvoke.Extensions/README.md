@@ -21,22 +21,22 @@ Microsoft.Extensions.DependencyInjection.
 
 The methods added include:
 
-* ``AddCliInvoke`` extension method to set up CliInvoke's interfaces and implementing classes with Dependency Injection.
-* ``AddDefaultRunnerProcessInvoker`` extension method to set up CliInvoke's ``DefaultRunnerProcessInvoker`` and abstract
-  class ``RunnerProcessInvokerBase`` with Dependency Injection - Only required for running Process Configurations
-  through other Process Configurations.
-* ``AddDerivedRunnerProcessInvoker`` extension method to set up a class that derives from the abstract class
-  ``RunnerProcessInvokerBase`` along with the abstract class itself with Dependency Injection - Only required for
-  running Process Configurations through other Process Configurations where a custom implementation of
-  ``RunnerProcessInvokerBase`` is desired.
+* ``AddCliInvoke`` extension method (namespace ``CliInvoke.Extensions``) to set up CliInvoke's interfaces and
+  implementing classes with Dependency Injection. This registers the process invoker (``IProcessInvoker`` /
+  ``ProcessInvoker``) along with the other core services, so a separate method to register a runner invoker is no
+  longer needed.
+
+For custom invoker behavior, implement ``IProcessMiddleware`` and register it via ``IProcessMiddlewareBuilder``, or
+construct a ``ProcessInvoker`` directly with your desired configuration.
 
 The services injected include:
 
 * ``IFilePathResolver`` - Used by ``IProcessInvoker`` to resolve the file path of a ``ProcessConfiguration``'s
   ``TargetFilePath`` string.
-* ``IProcessPipeHandler`` - Used by ``IProcessInvoker`` to pipe Standard Input, Output, and Error Streams.
-* ``IProcessInvoker`` - Runs a process based on a ``ProcessConfiguration``
-* ``IProcessConfigurationFactory`` - Enables easy ``ProcessConfiguration`` creation.
+* ``IProcessInvoker`` - Runs a process based on a ``ProcessConfiguration``. Piping of Standard Input, Output, and Error
+  streams is handled via ``IProcessInvoker.ExecuteBufferedAsync`` / ``ExecutePipedAsync`` (or
+  ``IExternalProcess.CaptureBufferedResultAsync`` / ``CapturePipedResultAsync``).
+* ``IExternalProcessFactory`` - Enables easy ``ProcessConfiguration`` creation.
 
 ## Why a separate package?
 
@@ -66,4 +66,4 @@ This project would like to thank the following projects for their work:
   for providing Dependency Injection Abstractions for .NET.
 
 For more information, please see
-the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/CliInvokeLibrary/CliInvoke.Extensions/THIRD_PARTY_NOTICES.txt).
+the [THIRD_PARTY_NOTICES file](../../THIRD_PARTY_NOTICES.txt).

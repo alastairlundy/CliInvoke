@@ -43,9 +43,11 @@ public interface IProcessMiddleware
 {
     Task InvokeAsync(
         InvocationContext context,
-        Func<InvocationContext, CancellationToken, Task> next);
+        Func<InvocationContext, Task> next);
 }
 ```
+
+The `next` delegate takes only the `InvocationContext`; the `CancellationToken` is available as `context.CancellationToken` (not a separate parameter). Calling `next(context)` continues the chain (or the terminal pipeline); omitting the call short-circuits.
 
 Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag). For example, `LoggingMiddleware` resolves an `ILogger` from that bag under the well-known key `"Logger"`.
 
@@ -69,7 +71,19 @@ builder.Services.AddCliInvoke(builder =>
 
 * `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
 * `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
-* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell` also has an overload `UsePowerShell(windowCreation, useShellExecution)` for non-default behaviour; the parameterless form defaults both to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. To configure non-default behaviour, register `PowerShellMiddlewareOptions` (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties) in the DI container — for example:
+
+  ```csharp
+  using CliInvoke.Specializations.Middleware; // PowerShellMiddlewareOptions
+
+  services.Configure<PowerShellMiddlewareOptions>(o =>
+  {
+      o.WindowCreation = true;
+      o.UseShellExecution = true;
+  });
+  ```
+
+  `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
 
 ## Configuring middleware through DI
 

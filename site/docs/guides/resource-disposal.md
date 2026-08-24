@@ -109,7 +109,7 @@ and the GC cannot reclaim them.
 redirected streams, and releases the kernel handle.
 
 **Ownership rule**: Returned from
-`IProcessInvoker.StartAsync(ProcessConfiguration)`. The caller owns
+`IExternalProcessFactory.CreateExternalProcess(ProcessConfiguration)`. The caller owns
 the returned `IExternalProcess` and must dispose it after
 `WaitForExitAsync` / `CaptureBufferedResultAsync` /
 `CapturePipedResultAsync` completes. The invoker does not retain a
@@ -292,7 +292,9 @@ Use for `IExternalProcess` and `PipedProcessResult`, which surface
 async-disposable streams.
 
 ```csharp
-await using var process = invoker.StartAsync(config);
+var factory = provider.GetRequiredService<IExternalProcessFactory>();
+await using var process = factory.CreateExternalProcess(config);
+await process.StartAsync(ct);
 await using var result = await process.CapturePipedResultAsync(ct);
 
 string output = await new StreamReader(result.StandardOutput).ReadToEndAsync();
@@ -306,7 +308,9 @@ declaration, or when working in a `try/catch` block where the
 disposable must outlive the catch.
 
 ```csharp
-var process = invoker.StartAsync(config);
+var factory = provider.GetRequiredService<IExternalProcessFactory>();
+var process = factory.CreateExternalProcess(config);
+await process.StartAsync(ct);
 try
 {
     var result = await process.CaptureBufferedResultAsync(ct);
