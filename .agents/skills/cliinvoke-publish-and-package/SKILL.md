@@ -1,6 +1,6 @@
 ---
 name: cliinvoke-publish-and-package
-description: Release operations for CliInvoke including local NuGet packing and publishing
+description: Use when testing or performing release operations for CliInvoke.
 ---
 
 # CliInvoke Publish and Package
