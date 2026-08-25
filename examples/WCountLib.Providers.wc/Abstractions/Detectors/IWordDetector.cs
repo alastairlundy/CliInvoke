@@ -21,8 +21,6 @@
     SOFTWARE.
  */
 
-// ReSharper disable InconsistentNaming
-
 namespace WCountLib.Providers.wc.Abstractions.Detectors;
 
 /// <summary>

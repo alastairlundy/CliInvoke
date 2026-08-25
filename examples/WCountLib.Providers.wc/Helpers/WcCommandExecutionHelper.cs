@@ -24,7 +24,6 @@
 using System.Linq;
 using System.Threading;
 using CliInvoke.Builders;
-using CliInvoke.Core.Configuration;
 
 namespace WCountLib.Providers.wc.Helpers;
 
@@ -39,7 +38,7 @@ internal class WcCommandExecutionHelper
         _filePathResolver = filePathResolver;
     }
 
-    private async Task<string> CreateTempFilePathAsync(string text)
+    private static async Task<string> CreateTempFilePathAsync(string text)
     {
         string tempFilePath = Path.GetTempFileName();
         tempFilePath = Path.ChangeExtension(tempFilePath, ".txt");
@@ -78,7 +77,6 @@ internal class WcCommandExecutionHelper
     [UnsupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -95,7 +93,6 @@ internal class WcCommandExecutionHelper
     [UnsupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("maccatalyst")]
     [SupportedOSPlatform("freebsd")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
