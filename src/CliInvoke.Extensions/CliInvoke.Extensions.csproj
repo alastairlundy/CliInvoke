@@ -9,7 +9,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>3.0.0-alpha.9</Version>
+        <Version>3.0.0-alpha.10</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
@@ -17,13 +17,13 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageReleaseNotes>#### ⚙️ Modifications
-- Migrated PostExitValidation integration tests to use `ProcessMiddlewareBuilder`
-- Migrated `LoggingMiddleware` to DI constructor injection
-- Added `CliInvoke.Extensions.Tests`
 
-#### 🐛 Bug Fixes
-- Fixed potential regex redaction issues
-- Registered built-in middleware types in `AddCliInvoke` so `UseMiddleware&lt;T&gt;()` resolves them from DI</PackageReleaseNotes>
+- Updated DI binding to use the reduced `ProcessInvoker` constructors
+- Updated DI registration to construct `PowerShellMiddleware` without `IFilePathResolver`
+
+#### 📄 Non Source Code
+
+- Fixed stale v1 API references in `CliInvoke.Extensions` README</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

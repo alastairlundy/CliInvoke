@@ -22,29 +22,41 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-alpha.9</Version>
+        <Version>3.0.0-alpha.10</Version>
         <PackageReleaseNotes>#### 🆕 Additions
-- Added sealed `ArgumentsSpec` configuration seam
-- Added sealed `EnvironmentVariablesSpec` configuration seam
-- Added sealed `ProcessResourcePolicySpec` configuration seam
-- Added sealed `UserCredentialSpec` configuration seam with `IDisposable`
-- Split `SetWorkingSet` into independent `SetMinWorkingSet` and `SetMaxWorkingSet`
+
+- Made `Configuration` init-only on `IExternalProcess` and `ExternalProcess`
+- Made `TargetFilePath` init-only and updated `ProcessWrapper` constructor
 
 #### ⚙️ Modifications
-- Changed `IProcessConfigurationBuilder` ConfigureXxx signatures to accept `Action&lt;XxxSpec&gt;`
-- Rewired `ProcessConfigurationBuilder` to hold and reuse shared spec instances
-- Deleted sub-builder interfaces and classes
-- Flowed environment variables and credentials through the `IProcessConfigurationBuilder` seam
-- Preserved argument escaping in `ProcessConfigurationFactory.Create`
-- Dropped unused `escapeArguments` param from `SetArguments(string)` overload
-- Relaxed `ProcessorAffinity` upper bound to accept valid bitmasks
-- Used correct bitmask upper bound for processor affinity
-- Snapshotted environment variables on `Build` to avoid aliasing
-- Copied `SecureString` on `SetPassword`/`Build` so disposing the spec does not invalidate the built credential
-- Improved error message when middleware type is not registered in DI
+
+- Collapsed `ProcessConfigurationFactory` to two static spec-callback overloads
+- Deleted `BuilderProcessConfiguration` bridge subclass
+- Resolved file path at `ExternalProcess.Start`/`StartAsync` without mutating `Configuration`
+- Sealed `ProcessConfigurationBuilder`
+- Sorted environment variables by key in `GetHashCode` for ordering independence
+- Removed LINQ usage in `ProcessConfiguration`
+- Improved `MiddlewareItems` performance
+- Improved `ProcessConfiguration.Equals` performance
+- Updated `MiddlewareItems.cs`
+- Added XML doc comment to `ProcessConfiguration`
+- Updated `PipedProcessResult.cs`
+- Cleaned up code
+- Cleaned up `ProcessConfigurationBuilder` and `ProcessConfigurationFactory`
+- Removed unnecessary casting code
+- Added localizations to internal resources
+- Changed 15-param `ProcessConfiguration` constructor visibility from `protected` to `protected internal`
+- Documented `InvocationContext.Result` and `.Middleware` ownership contract
 
 #### 🐛 Bug Fixes
-- Fixed issues in `ProcessResultHelperExtensions`, `ConditionalMiddleware`, `ProcessMiddlewareBuilder`, `ProcessConfiguration`, and `RunnerConfigurationFactory`</PackageReleaseNotes>
+
+- Fixed `ProcessResult` equality asymmetry
+- Fixed code smells: null safety, inverted condition, null equality, dead override, dict equality
+- Fixed XML doc comments for comparison operator null ordering
+- Fixed outdated equality remarks in `BufferedProcessResult` and `PipedProcessResult`
+- Fixed `BufferedProcessResult` equals method
+- Fixed `TargetFilePath` XML remarks to say "after construction"
+- Fixed copyright header and XML doc in `ProcessTimeoutPolicy`</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
