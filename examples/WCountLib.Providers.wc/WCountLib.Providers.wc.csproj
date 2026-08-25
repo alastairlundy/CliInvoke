@@ -8,10 +8,10 @@
     <Title>WCountLib.Providers.wc</Title>
     <Authors>AlastairLundy</Authors>
     <Copyright>Copyright (c) Alastair Lundy 2026</Copyright>
-    <RepositoryUrl>https://github.com/alastairlundy/WCount</RepositoryUrl>
+    <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>* Updated to CliInvoke v3 (3.0.0) API: ProcessConfigurationBuilder/ArgumentsSpec, IFilePathResolver-based wc resolution, and disposed ProcessConfiguration.</PackageReleaseNotes>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>* Updated to CliInvoke v3 API: ProcessConfigurationBuilder/ArgumentsSpec, IFilePathResolver-based wc resolution, and disposed ProcessConfiguration.</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>This package provides implementations for WCountLib.Abstractions interfaces that use Posix's and Unix's ``wc`` program to perform the calculations.</Description>
     <PackageTags>wordcount, word-count, word count,  wc, charcount, bytecount, linecount,</PackageTags>
     <IncludeSymbols>true</IncludeSymbols>
