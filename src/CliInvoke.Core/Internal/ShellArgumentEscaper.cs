@@ -19,7 +19,7 @@ namespace CliInvoke.Core.Internal;
 ///     The <c>Cmd</c> and <c>PowerShell</c> specializations rebuild the caller's
 ///     <c>TargetFilePath</c> + <c>Arguments</c> into a single shell command line
 ///     (e.g. <c>cmd /c "target" args</c> or
-///     <c>pwsh -Command &amp; "target" args</c>). The shell then re-parses that line,
+///     <c>pwsh -Command &amp; "target" args</c>). The shell then reparses that line,
 ///     so any shell metacharacters in the original arguments would execute as
 ///     additional shell commands (command injection). These helpers neutralise the
 ///     dangerous metacharacters for each shell before the command is rebuilt.
@@ -34,10 +34,10 @@ internal static class ShellArgumentEscaper
     /// </summary>
     /// <param name="value">The raw argument value to escape.</param>
     /// <returns>The escaped value, safe to embed in a PowerShell command.</returns>
-    public static string EscapeForPowerShell(string? value)
+    internal static string EscapeForPowerShell(string? value)
     {
-        if (string.IsNullOrEmpty(value))
-            return value ?? string.Empty;
+        if (string.IsNullOrEmpty(value) || value is null)
+            return string.Empty;
 
         StringBuilder builder = new(value.Length + 16);
 
@@ -84,10 +84,10 @@ internal static class ShellArgumentEscaper
     /// </summary>
     /// <param name="value">The raw argument value to escape.</param>
     /// <returns>The escaped value, safe to embed in a cmd command.</returns>
-    public static string EscapeForCmd(string? value)
+    internal static string EscapeForCmd(string? value)
     {
-        if (string.IsNullOrEmpty(value))
-            return value ?? string.Empty;
+        if (string.IsNullOrEmpty(value) || value is null)
+            return string.Empty;
 
         StringBuilder builder = new(value.Length + 16);
 
