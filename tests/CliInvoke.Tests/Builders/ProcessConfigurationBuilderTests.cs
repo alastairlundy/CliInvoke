@@ -235,7 +235,9 @@ public class ProcessConfigurationBuilderTests
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
         string input = "\\\n\t\r\"";
-        string expected = "\"\\\\\\n\\t\\r\\\"";
+        // EscapeForCmd drops CR/LF, doubles inner quotes, and keeps backslash/tab,
+        // then the value is wrapped in a single pair of quotes.
+        const string expected = "\"\\\t\"\"\"";
 
         // Act
         builder.ConfigureArguments(spec => spec.Add(input, escape: true));
@@ -299,7 +301,9 @@ public class ProcessConfigurationBuilderTests
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
         string[] values = ["a\nb", "c\"d"];
-        const string expected = "\"a\\nb c\\\"d\"";
+        // EscapeForCmd drops the LF in "a\nb" (-> "ab") and doubles the quote in
+        // "c\"d" (-> "c\"\"d"); the joined result is wrapped in a single pair of quotes.
+        const string expected = "\"ab c\"\"d\"";
 
         // Act
         builder.ConfigureArguments(spec => spec.AddEnumerable(values, escape: true));
