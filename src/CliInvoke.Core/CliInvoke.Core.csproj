@@ -47,7 +47,6 @@
              fires and it skips emitting its own public System.Index/System.Range, which would
              otherwise clash with Microsoft.Bcl.Memory's. Required because Bcl.Memory otherwise
              arrives only transitively and lacks the NuGetPackageId metadata Polyfill checks. -->
-        <PackageReference Include="Microsoft.Bcl.Memory" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -45,7 +45,6 @@
         <!-- Direct reference (netstandard2.0 only) so Polyfill's RefsBclMemory detection fires
              and it skips emitting its own System.Index/System.Range, which would otherwise clash
              with Microsoft.Bcl.Memory (transitive via CliInvoke.Core). -->
-        <PackageReference Include="Microsoft.Bcl.Memory" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
