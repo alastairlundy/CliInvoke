@@ -9,6 +9,7 @@
 
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Extensibility.Factories;
 
@@ -37,15 +38,28 @@ public class RunnerProcessFactory : IRunnerProcessFactory
             (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0 ||
              runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0))
         {
-            string target = processConfigToBeRun.TargetFilePath;
-            string quotedTarget = $"& '{target}'";
+            // Escape both the target and the arguments so they are passed to the
+            // wrapped command as literal data. Without this, shell metacharacters in
+            // the arguments (e.g. ';', '|', '&', '$(...)') would be re-interpreted by
+            // PowerShell as additional commands — a command-injection risk.
+            string safeTarget = ShellArgumentEscaper.EscapeForPowerShell(processConfigToBeRun.TargetFilePath);
+            string safeArguments = ShellArgumentEscaper.EscapeForPowerShell(processConfigToBeRun.Arguments);
+            string quotedTarget = $"& \"{safeTarget}\"";
             string prefix = string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments) ? string.Empty : runnerProcessConfig.Arguments;
-            string suffix = string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments) ? string.Empty : processConfigToBeRun.Arguments;
+            string suffix = string.IsNullOrWhiteSpace(safeArguments) ? string.Empty : safeArguments;
             combinedArgs = $"{prefix} {quotedTarget} {suffix}".Trim();
         }
         else
         {
-            combinedArgs = $"{runnerProcessConfig.Arguments} {processConfigToBeRun.TargetFilePath} {processConfigToBeRun.Arguments}".Trim();
+            // Escape both the target and the arguments so they are passed to the
+            // wrapped command as literal data. Without this, shell metacharacters in
+            // the arguments (e.g. '&', '|', '<', '>', '%VAR%') would be re-interpreted
+            // by cmd.exe as additional commands or redirection — a command-injection risk.
+            string safeTarget = ShellArgumentEscaper.EscapeForCmd(processConfigToBeRun.TargetFilePath);
+            string safeArguments = ShellArgumentEscaper.EscapeForCmd(processConfigToBeRun.Arguments);
+            string prefix = string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments) ? string.Empty : runnerProcessConfig.Arguments;
+            string suffix = string.IsNullOrWhiteSpace(safeArguments) ? string.Empty : safeArguments;
+            combinedArgs = $"{prefix} \"{safeTarget}\" {suffix}".Trim();
         }
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(

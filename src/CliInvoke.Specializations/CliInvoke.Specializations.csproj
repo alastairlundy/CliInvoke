@@ -12,13 +12,16 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.10.3</PackageVersion>
+        <PackageVersion>2.10.4</PackageVersion>
+        <AssemblyVersion>2.10.4.0</AssemblyVersion>
+        <FileVersion>2.10.4.0</FileVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.4
+* 🔒 Benefits from hardened shell argument escaping in CliInvoke.Core / CliInvoke (command-injection hardening for cmd/PowerShell specialisations)</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
@@ -29,7 +32,9 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="Polyfill" PrivateAssets="all"/>
+        <!-- Polyfill is consumed transitively via CliInvoke.Core, which surfaces its
+             polyfills publicly. Referencing it directly here causes duplicate-definition
+             (CS0433/CS0121) build errors against CliInvoke.Core's reference assembly. -->
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
