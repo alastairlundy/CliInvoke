@@ -24,7 +24,6 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Resource Disposal](#resource-disposal)
 * [Documentation](#documentation)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
-* [Used By](#used-by)
 * [License](#license)
 * [Acknowledgements](#acknowledgements)
 
