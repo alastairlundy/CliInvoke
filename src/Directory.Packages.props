@@ -7,6 +7,7 @@
     <PackageVersion Include="Polyfill" Version="11.2.0" />
     <PackageVersion Include="DotExtensions" Version="10.5.1" />
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.Bcl.Memory" Version="10.0.11" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
   </ItemGroup>
   <PropertyGroup>

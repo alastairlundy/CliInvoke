@@ -23,6 +23,12 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
+        <!-- Keep this project's polyfills internal and do NOT expose them to consumers via
+             InternalsVisibleTo. Polyfill normally adds IVT for the consuming project, which
+             would leak this assembly's internal 'Polyfills.Polyfill' helper type into
+             CliInvoke/CliInvoke.Specializations and cause duplicate-definition (CS0433/CS0121)
+             errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
+        <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <Version>2.10.4</Version>
         <AssemblyVersion>2.10.4.0</AssemblyVersion>
         <FileVersion>2.10.4.0</FileVersion>
@@ -37,6 +43,11 @@
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
+        <!-- Direct reference (netstandard2.0 only) so Polyfill's RefsBclMemory detection
+             fires and it skips emitting its own public System.Index/System.Range, which would
+             otherwise clash with Microsoft.Bcl.Memory's. Required because Bcl.Memory otherwise
+             arrives only transitively and lacks the NuGetPackageId metadata Polyfill checks. -->
+        <PackageReference Include="Microsoft.Bcl.Memory" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
     </ItemGroup>
 
     <ItemGroup>

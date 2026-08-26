@@ -4,6 +4,9 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
         <LangVersion>14</LangVersion>
+        <!-- Keep this project's polyfills internal and out of metadata (EmbeddedAttribute) so
+             they do not leak into, or clash with, CliInvoke.Core's copy. -->
+        <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>CliInvoke.Specializations</Title>
@@ -32,9 +35,17 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <!-- Polyfill is consumed transitively via CliInvoke.Core, which surfaces its
-             polyfills publicly. Referencing it directly here causes duplicate-definition
-             (CS0433/CS0121) build errors against CliInvoke.Core's reference assembly. -->
+        <!-- Reference Polyfill directly (PrivateAssets=all) so the netstandard2.0 polyfills this
+             assembly uses (notably the OS-platform attributes SupportedOSPlatformAttribute /
+             UnsupportedOSPlatformAttribute on the specialization configurations and invokers, plus
+             OperatingSystem.IsX) are compiled as its own private 'Polyfills.Polyfill'.
+             CliInvoke.Core also references Polyfill but with PolyUseEmbeddedAttribute, so it does
+             NOT leak its copy via IVT, avoiding duplicate-definition (CS0433/CS0121) clashes. -->
+        <PackageReference Include="Polyfill" PrivateAssets="all" />
+        <!-- Direct reference (netstandard2.0 only) so Polyfill's RefsBclMemory detection fires
+             and it skips emitting its own System.Index/System.Range, which would otherwise clash
+             with Microsoft.Bcl.Memory (transitive via CliInvoke.Core). -->
+        <PackageReference Include="Microsoft.Bcl.Memory" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
