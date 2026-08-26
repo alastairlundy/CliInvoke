@@ -33,13 +33,13 @@ namespace CliInvoke.Extensions.Middleware;
 ///         redacted to <c>***</c> in log output.
 ///     </para>
 /// </remarks>
-internal sealed class LoggingMiddleware : IProcessMiddleware
+internal sealed partial class LoggingMiddleware : IProcessMiddleware
 {
     private readonly ILogger<LoggingMiddleware> _logger;
 
-    private static readonly Regex SensitiveArgPattern = new(
-        @"(--password|--token|--api-key)(\s+|=)(""[^""]*""|'[^']*'|[^-\s]\S*)",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    [GeneratedRegex(@"(--password|--token|--api-key)(\s*=\s*|\s+)(?:""[^""]*""|'[^']*'|[^\s-][^\s]*)",
+        RegexOptions.IgnoreCase)]
+    private static partial Regex SensitiveArgPattern();
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="LoggingMiddleware"/> class.
@@ -112,7 +112,9 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
     /// <remarks>
     ///     Redacts values following <c>--password</c>, <c>--token</c>,
     ///     and <c>--api-key</c> flags. Both space-separated
-    ///     (<c>--password secret</c>) and equals-form (<c>--token=secret</c>) are handled.
+    ///     (<c>--password secret</c>) and equals-form (<c>--token=secret</c>) are handled,
+    ///     as are single- or double-quoted values that contain spaces
+    ///     (e.g. <c>--password "my secret"</c>).
     /// </remarks>
     /// <param name="args">The raw argument string.</param>
     /// <returns>The argument string with sensitive values replaced by <c>***</c>.</returns>
@@ -121,6 +123,6 @@ internal sealed class LoggingMiddleware : IProcessMiddleware
         if (string.IsNullOrWhiteSpace(args))
             return string.Empty;
 
-        return SensitiveArgPattern.Replace(args, "$1$2***");
+        return SensitiveArgPattern().Replace(args, "$1$2***");
     }
 }
