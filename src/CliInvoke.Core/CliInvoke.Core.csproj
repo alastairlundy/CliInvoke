@@ -32,12 +32,10 @@
         <Version>2.10.4</Version>
         <AssemblyVersion>2.10.4.0</AssemblyVersion>
         <FileVersion>2.10.4.0</FileVersion>
-        <PackageReleaseNotes>### 🐛 Bug Fixes
-- Fixed `ProcessConfiguration.Equals` to correctly compare `RequiresAdministrator` and `WindowCreation` properties instead of comparing `ResourcePolicy` twice, and added both properties to `GetHashCode` for consistency
-- 🔒 Hardened shell argument escaping: added `ShellArgumentEscaper` and escaped `TargetFilePath`/`Arguments` when wrapping commands through the cmd/PowerShell specialisations, neutralising command-injection metacharacters (`&amp;`, `|`, `;`, `&lt;`, `&gt;`, `%VAR%`, subexpression expansion, etc.)</PackageReleaseNotes>
+        <PackageReleaseNotes>General Improvements</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.10.3.0</AssemblyVersion>
-        <FileVersion>2.10.3.0</FileVersion>
+        <AssemblyVersion>2.10.4.0</AssemblyVersion>
+        <FileVersion>2.10.4.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>

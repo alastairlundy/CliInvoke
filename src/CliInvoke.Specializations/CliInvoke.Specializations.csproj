@@ -24,7 +24,7 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.4
-* 🔒 Benefits from hardened shell argument escaping in CliInvoke.Core / CliInvoke (command-injection hardening for cmd/PowerShell specialisations)</PackageReleaseNotes>
+* Improved security when running processes via Specialization powered configurations and invokers.</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>

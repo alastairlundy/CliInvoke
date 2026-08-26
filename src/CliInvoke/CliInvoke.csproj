@@ -15,9 +15,8 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>### 🐛 Bug Fixes
-- Fixed `RunnerProcessFactory.CreateRunnerConfiguration` to chain `RequireAdministratorPrivileges()` on the existing builder instead of replacing it with a fresh one, preserving all accumulated configuration when admin privileges are required
-- 🔒 Hardened shell argument escaping in `RunnerProcessFactory.CreateRunnerConfiguration`: the caller's `TargetFilePath` and `Arguments` are now escaped (cmd caret / PowerShell backtick) and the target path is quoted when wrapping through cmd/PowerShell, neutralising command-injection metacharacters</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.4
+* Improved security when running processes creating using ``RunnerProcessFactory``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
