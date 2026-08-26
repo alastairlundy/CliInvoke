@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Internal;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Specializations.Configurations;
 
@@ -54,9 +55,16 @@ internal sealed class CmdMiddleware : IProcessMiddleware
         string originalPath = context.Configuration.TargetFilePath;
         string originalArgs = context.Configuration.Arguments;
 
-        string wrappedCommand = string.IsNullOrWhiteSpace(originalArgs)
-            ? $"\"{originalPath}\""
-            : $"\"{originalPath}\" {originalArgs}";
+        // Escape both the target and the arguments so they are passed to the
+        // wrapped command as literal data. Without this, shell metacharacters in
+        // the arguments (e.g. '&', '|', '<', '>', '%VAR%') would be re-interpreted
+        // by cmd.exe as additional commands or redirection — a command-injection risk.
+        string safePath = ShellArgumentEscaper.EscapeForCmd(originalPath);
+        string safeArgs = ShellArgumentEscaper.EscapeForCmd(originalArgs);
+
+        string wrappedCommand = string.IsNullOrWhiteSpace(safeArgs)
+            ? $"\"{safePath}\""
+            : $"\"{safePath}\" {safeArgs}";
 
         // The specialization configuration class is the single source of truth for the cmd.exe
         // target and the /c switch; this middleware just supplies the wrapped command and

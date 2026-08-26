@@ -13,6 +13,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Core.Configuration;
 
@@ -207,56 +208,30 @@ public sealed class ArgumentsSpec
     /// <summary>
     ///     Escapes characters in a string without wrapping in quotes.
     /// </summary>
+    /// <remarks>
+    ///     Delegates to <see cref="ShellArgumentEscaper.EscapeForCmd"/> so argument
+    ///     escaping is consistent with the cmd/PowerShell specializations. The previous
+    ///     JSON-style escaping (<c>\\</c>, <c>\"</c>, <c>\n</c>, ...) was unsafe for
+    ///     command lines and is no longer used.
+    /// </remarks>
     private string EscapeCharactersWithoutWrapping(string argument)
     {
         ArgumentNullException.ThrowIfNull(argument);
 
-        StringBuilder contentBuilder = new();
-
-        foreach (char c in argument)
-            switch (c)
-            {
-                case '\\': contentBuilder.Append("\\\\"); break;
-                case '\"': contentBuilder.Append("\\\""); break;
-                case '\n': contentBuilder.Append(@"\n"); break;
-                case '\r': contentBuilder.Append(@"\r"); break;
-                case '\t': contentBuilder.Append(@"\t"); break;
-                case '\b': contentBuilder.Append(@"\b"); break;
-                case '\f': contentBuilder.Append(@"\f"); break;
-                case '\v': contentBuilder.Append(@"\v"); break;
-                case '\a': contentBuilder.Append(@"\a"); break;
-                case '\e': contentBuilder.Append(@"\e"); break;
-                case '\0': contentBuilder.Append(@"\0"); break;
-                default:
-                    if (char.IsControl(c))
-                    {
-                        contentBuilder.AppendFormat(@"\u{0:X4}", (int)c);
-                    }
-                    else
-                    {
-                        contentBuilder.Append(c);
-                    }
-
-                    break;
-            }
-
-        return contentBuilder.ToString();
+        return ShellArgumentEscaper.EscapeForCmd(argument);
     }
 
     private string EscapeCharacters(string argument)
     {
         ArgumentNullException.ThrowIfNull(argument);
 
-        string escapedContent = EscapeCharactersWithoutWrapping(argument);
+        string escapedContent = ShellArgumentEscaper.EscapeForCmd(argument);
 
+        // If the caller already supplied a fully quoted value, leave it as-is
+        // rather than double-wrapping it in additional quotes.
         if (argument.StartsWith('"') && argument.EndsWith('"'))
         {
             return escapedContent;
-        }
-
-        if (escapedContent.EndsWith("\\\""))
-        {
-            return $"\"{escapedContent}";
         }
 
         return $"\"{escapedContent}\"";

@@ -8,6 +8,7 @@
    */
 
 using CliInvoke.Core;
+using CliInvoke.Core.Internal;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Specializations.Configurations;
 
@@ -71,9 +72,16 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
         string originalPath = context.Configuration.TargetFilePath;
         string originalArgs = context.Configuration.Arguments;
 
-        string wrappedCommand = string.IsNullOrWhiteSpace(originalArgs)
-            ? $"& \"{originalPath}\""
-            : $"& \"{originalPath}\" {originalArgs}";
+        // Escape both the target and the arguments so they are passed to the
+        // wrapped command as literal data. Without this, shell metacharacters in
+        // the arguments (e.g. ';', '|', '&', '$(...)') would be re-interpreted by
+        // PowerShell as additional commands — a command-injection risk.
+        string safePath = ShellArgumentEscaper.EscapeForPowerShell(originalPath);
+        string safeArgs = ShellArgumentEscaper.EscapeForPowerShell(originalArgs);
+
+        string wrappedCommand = string.IsNullOrWhiteSpace(safeArgs)
+            ? $"& \"{safePath}\""
+            : $"& \"{safePath}\" {safeArgs}";
 
         string newArguments = $"-NoProfile -NonInteractive -Command {wrappedCommand}";
 

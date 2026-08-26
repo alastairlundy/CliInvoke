@@ -34,8 +34,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Polyfill" PrivateAssets="all"/>
         <InternalsVisibleTo Include="CliInvoke.Extensions"/>
+        <InternalsVisibleTo Include="CliInvoke.Specializations.Tests"/>
     </ItemGroup>
 
     <PropertyGroup>
