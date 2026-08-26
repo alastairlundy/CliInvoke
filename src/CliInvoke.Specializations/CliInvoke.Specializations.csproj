@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net10.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;</TargetFrameworks>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -12,33 +12,27 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-alpha.10</PackageVersion>
+        <PackageVersion>2.10.3</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>#### 🆕 Additions
-
-- Dropped `IFilePathResolver` from `PowershellProcessConfiguration` constructor
-
-#### ⚙️ Modifications
-
-- Dropped `IFilePathResolver` from `PowershellProcessInvoker` and `PowerShellMiddleware`</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.3</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion></AssemblyVersion>
+        <AssemblyVersion>2.10.3.0</AssemblyVersion>
+        <FileVersion>2.10.3.0</FileVersion>
     </PropertyGroup>
-
+    
     <ItemGroup>
-        <InternalsVisibleTo Include="CliInvoke.Extensions"/>
-        <InternalsVisibleTo Include="CliInvoke.Specializations.Tests"/>
+        <PackageReference Include="Polyfill" PrivateAssets="all"/>
     </ItemGroup>
 
-    <PropertyGroup>
+    <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
@@ -47,18 +41,15 @@
         <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
     </PropertyGroup>
 
-
     <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
-        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
-        <ProjectReference Include="..\CliInvoke\CliInvoke.csproj"/>
+        <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
         <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="CliInvoke.Core"/>
-        <PackageReference Include="CliInvoke"/>
+        <PackageReference Include="CliInvoke.Core" />
     </ItemGroup>
-
+    
     <ItemGroup>
         <Content Include="..\..\SPECIALIZATIONS_README.md">
             <Link>README.md</Link>
@@ -68,29 +59,25 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Update="Internal\Localizations\Resources.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
+      <EmbeddedResource Update="Internal\Localizations\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Internal\Localizations\Resources.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
+      <Compile Update="Internal\Localizations\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="..\..\.assets\icon.png">
-            <Pack>True</Pack>
-            <PackagePath></PackagePath>
-            <Link>icon.png</Link>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
+      <None Include="..\..\.assets\icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+        <Link>icon.png</Link>
+      </None>
     </ItemGroup>
 </Project>
