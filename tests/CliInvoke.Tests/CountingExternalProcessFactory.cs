@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Runtime.InteropServices;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 
@@ -98,6 +99,10 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 
         public bool HasStarted { get; private set; }
 
+        public bool Canceled { get; set; }
+
+        public PosixSignal? Signal { get; set; }
+
         public bool IsDisposed { get; internal set; }
 
         public event EventHandler? Started;
@@ -140,7 +145,8 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
             DateTime now = DateTime.UtcNow;
             return Task.FromResult(new ProcessResult(
                 Configuration.TargetFilePath, exitCode: 0, processId: 0,
-                startTime: now, exitTime: now));
+                startTime: now, exitTime: now,
+                canceled: Canceled, signal: Signal));
         }
 
         public Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken)
@@ -149,7 +155,8 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
             return Task.FromResult(new BufferedProcessResult(
                 Configuration.TargetFilePath, exitCode: 0, processId: 0,
                 standardOutput: string.Empty, standardError: string.Empty,
-                startTime: now, exitTime: now));
+                startTime: now, exitTime: now,
+                canceled: Canceled, signal: Signal));
         }
 
         public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
@@ -158,7 +165,8 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
             return Task.FromResult(new PipedProcessResult(
                 Configuration.TargetFilePath, exitCode: 0, processId: 0,
                 startTime: now, exitTime: now,
-                standardOutput: Stream.Null, standardError: Stream.Null));
+                standardOutput: Stream.Null, standardError: Stream.Null,
+                canceled: Canceled, signal: Signal));
         }
 
         public Task Kill() => Task.CompletedTask;
