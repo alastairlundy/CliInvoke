@@ -55,7 +55,6 @@ internal class ProcessInvocationPipeline
 
                 return (TResult)new ProcessResult(
                     externalProcess.Configuration.TargetFilePath,
-                    //TODO: Look into whether exit code 0 here is valid.
                     0,
                     processId,
                     DateTime.UtcNow,
