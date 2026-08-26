@@ -36,7 +36,11 @@ internal static class ShellArgumentEscaper
     /// <returns>The escaped value, safe to embed in a PowerShell command.</returns>
     internal static string EscapeForPowerShell(string? value)
     {
-        if (string.IsNullOrEmpty(value) || value is null)
+        if (string.IsNullOrEmpty(value) 
+#if NETSTANDARD2_0
+            || value is null
+#endif
+           )
             return string.Empty;
 
         StringBuilder builder = new(value.Length + 16);
@@ -86,7 +90,11 @@ internal static class ShellArgumentEscaper
     /// <returns>The escaped value, safe to embed in a cmd command.</returns>
     internal static string EscapeForCmd(string? value)
     {
-        if (string.IsNullOrEmpty(value) || value is null)
+        if (string.IsNullOrEmpty(value)
+#if NETSTANDARD2_0
+            || value is null
+#endif
+           )
             return string.Empty;
 
         StringBuilder builder = new(value.Length + 16);
