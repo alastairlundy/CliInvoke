@@ -45,7 +45,7 @@ public static class ConfigurationExtensions
         [OverloadResolutionPriority(2)]
         [Obsolete("This method is deprecated and will be removed in CliInvoke.Extensions version 3.")]
         public static ProcessConfiguration FromStartInfo(ProcessStartInfo processStartInfo)
-            => FromProcessStartInfo(processStartInfo);
+            => ProcessConfiguration.FromProcessStartInfo(processStartInfo);
         
         /// <summary>
         /// Converts a <see cref="ProcessStartInfo"/> instance to a <see cref="ProcessConfiguration"/> instance,
