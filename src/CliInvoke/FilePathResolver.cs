@@ -171,11 +171,9 @@ public class FilePathResolver : IFilePathResolver
                     {
                         StringBuilder sb = new StringBuilder(f.FullName);
 
-                        string lowerCasedExtension = extension.ToLower();
-
                         for (int i = 0; i < extension.Length; i++)
                         {
-                            sb[extensionIndex + i] = lowerCasedExtension[i];
+                            sb[extensionIndex + i] = char.ToLowerInvariant(extension[i]);
                         }
                         
                         f = new FileInfo(sb.ToString());

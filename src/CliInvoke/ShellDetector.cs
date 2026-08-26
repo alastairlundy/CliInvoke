@@ -78,7 +78,7 @@ public class ShellDetector : IShellDetector
             shellInfoProcessConfig, ProcessExitConfiguration.Default, false,
             cancellationToken);
         
-        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l => l.ToLower().Contains("version") &&
+        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l => l.Contains("version", StringComparison.OrdinalIgnoreCase) &&
             l.Any(c => char.IsDigit(c)));
 
         string[] commaSplit = versionLine.Split(',');
@@ -110,7 +110,7 @@ public class ShellDetector : IShellDetector
             string[] powershellResults = result.StandardOutput.Replace("v", string.Empty).Split(' ');
 
             string versionString = powershellResults.Last();
-            versionString = versionString.Substring(0, versionString.LastIndexOf('.') + 1);
+            versionString = versionString[..(versionString.LastIndexOf('.') + 1)];
             
             Version version = Version.GracefulParse(versionString);
 
