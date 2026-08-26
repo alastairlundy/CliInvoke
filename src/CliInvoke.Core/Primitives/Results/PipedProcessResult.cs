@@ -7,6 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
+using System.Runtime.InteropServices;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -29,6 +32,13 @@ public class PipedProcessResult
     /// <param name="exitTime">The exit time of the process.</param>
     /// <param name="standardOutput">The process' standard output.</param>
     /// <param name="standardError">The process' standard error.</param>
+    /// <param name="canceled">
+    ///     A value indicating whether the library terminated the process via its cancellation
+    ///     machinery rather than the process exiting on its own.
+    /// </param>
+    /// <param name="signal">
+    ///     The POSIX signal that terminated the process, or <c>null</c> when not applicable.
+    /// </param>
     public PipedProcessResult(
         string executableFilePath,
         int exitCode,
@@ -36,9 +46,11 @@ public class PipedProcessResult
         DateTime startTime,
         DateTime exitTime,
         Stream standardOutput,
-        Stream standardError
+        Stream standardError,
+        bool canceled,
+        PosixSignal? signal
     )
-        : base(executableFilePath, exitCode, processId, startTime, exitTime)
+        : base(executableFilePath, exitCode, processId, startTime, exitTime, canceled, signal)
     {
         ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
 
@@ -97,12 +109,16 @@ public class PipedProcessResult
         if (other is null)
             return false;
 
+#pragma warning disable CA1416
         return ExecutedFilePath == other.ExecutedFilePath &&
                StandardOutput.Equals(other.StandardOutput)
                && StandardError.Equals(other.StandardError)
                && ExitCode.Equals(other.ExitCode)
                && StartTime.Equals(other.StartTime)
-               && ExitTime.Equals(other.ExitTime);
+               && ExitTime.Equals(other.ExitTime)
+               && Canceled.Equals(other.Canceled)
+               && Signal.Equals(other.Signal);
+#pragma warning restore CA1416
     }
 
     /// <summary>
@@ -133,8 +149,10 @@ public class PipedProcessResult
     /// <returns>The hash code for the current PipedProcessResult.</returns>
     public override int GetHashCode()
     {
+#pragma warning disable CA1416
         return HashCode.Combine(ExecutedFilePath, ExitCode, StartTime, ExitTime, StandardOutput,
-            StandardError);
+            StandardError, Canceled, Signal);
+#pragma warning restore CA1416
     }
 
     /// <summary>
