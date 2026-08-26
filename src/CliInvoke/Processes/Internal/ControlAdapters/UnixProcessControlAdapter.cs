@@ -101,6 +101,9 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     {
     }
 
+    internal override PosixSignal? GetTerminatingSignal(int exitCode) =>
+        exitCode > 128 ? (PosixSignal)(exitCode - 128) : null;
+
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]

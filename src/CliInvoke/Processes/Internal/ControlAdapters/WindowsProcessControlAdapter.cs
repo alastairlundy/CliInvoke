@@ -178,6 +178,8 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
             process.StartInfo.LoadUserProfile = (bool)credential.LoadUserProfile;
     }
 
+    internal override PosixSignal? GetTerminatingSignal(int exitCode) => null;
+
     internal override Task<bool> SendInterruptSignalAsync(Process process,
         CancellationReason cancellationReason,
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)

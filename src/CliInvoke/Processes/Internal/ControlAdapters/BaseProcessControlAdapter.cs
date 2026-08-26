@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Runtime.InteropServices;
+
 using CliInvoke.Processes.Internal.Cancellation;
 
 namespace CliInvoke.Processes.Internal.ControlAdapters;
@@ -20,6 +22,13 @@ internal abstract class BaseProcessControlAdapter
     internal abstract void SetResourcePolicy(ProcessWrapper process,
         ProcessResourcePolicy? resourcePolicy);
     internal abstract void SetUserCredential(Process process, UserCredential credential);
+
+    /// <summary>
+    ///     Resolves the POSIX signal that terminated a process from its exit code, using the
+    ///     best-effort <c>ExitCode &gt; 128</c> heuristic. Returns <c>null</c> on platforms where
+    ///     signals are not represented this way.
+    /// </summary>
+    internal abstract PosixSignal? GetTerminatingSignal(int exitCode);
 
     internal virtual void ApplyConfiguration(ProcessWrapper process, ProcessConfiguration processConfiguration)
     {
