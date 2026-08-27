@@ -58,7 +58,9 @@ internal class ProcessInvocationPipeline
                     0,
                     processId,
                     DateTime.UtcNow,
-                    DateTime.UtcNow);
+                    DateTime.UtcNow,
+                    canceled: false,
+                    signal: null);
             }
 
             await externalProcess.StartAsync(ctx.CancellationToken);
