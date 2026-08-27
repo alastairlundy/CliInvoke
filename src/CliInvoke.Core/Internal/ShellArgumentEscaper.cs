@@ -25,7 +25,7 @@ namespace CliInvoke.Core.Internal;
 ///     dangerous metacharacters for each shell before the command is rebuilt.
 ///     <para>
 ///         This helper lives in <see cref="CliInvoke.Core"/> so that both the
-///         specializations and <see cref="CliInvoke.Core.Configuration.ArgumentsSpec"/>
+///         specialisations and <see cref="CliInvoke.Core.Configuration.ArgumentsSpec"/>
 ///         share a single, consistent escaping implementation.
 ///     </para>
 /// </remarks>

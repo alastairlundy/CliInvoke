@@ -66,17 +66,17 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             ? $"\"{safePath}\""
             : $"\"{safePath}\" {safeArgs}";
 
-        // The specialization configuration class is the single source of truth for the cmd.exe
+        // The specialisation configuration class is the single source of truth for the cmd.exe
         // target and the /c switch; this middleware just supplies the wrapped command and
         // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration newConfig = new CmdProcessConfiguration(
             wrappedCommand,
             src.RedirectStandardInput,
-            outputRedirection: context.Mode != InvocationMode.Raw,
+            context.Mode != InvocationMode.Raw,
             workingDirectoryPath: src.WorkingDirectoryPath,
             requiresAdministrator: src.RequiresAdministrator,
-            environmentVariables: new Dictionary<string, string>(src.EnvironmentVariables),
+            new Dictionary<string, string>(src.EnvironmentVariables),
             credentials: src.Credential,
             standardInput: src.StandardInput,
             standardInputEncoding: src.StandardInputEncoding,
