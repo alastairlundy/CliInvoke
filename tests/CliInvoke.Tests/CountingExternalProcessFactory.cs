@@ -22,6 +22,18 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 {
     private int _createCount;
 
+    /// <summary>
+    ///     When set, the next stub process will report this value for its
+    ///     <c>Canceled</c> state (used by TK006 tests).
+    /// </summary>
+    public bool DefaultCanceled { get; set; }
+
+    /// <summary>
+    ///     When set, the next stub process will report this value for
+    ///     <see cref="ProcessResult.Signal"/>-derived results (used by TK006 tests).
+    /// </summary>
+    public PosixSignal? DefaultSignal { get; set; }
+
     public int CreateCount => _createCount;
 
     public ProcessConfiguration? LastConfiguration { get; private set; }
@@ -39,7 +51,11 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
     {
         _createCount++;
         LastConfiguration = configuration;
-        return new StubExternalProcess(configuration, ThrowOnStart);
+        return new StubExternalProcess(configuration, ThrowOnStart)
+        {
+            Canceled = DefaultCanceled,
+            Signal = DefaultSignal
+        };
     }
 
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
@@ -48,7 +64,11 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
         _createCount++;
         LastConfiguration = configuration;
         LastExitConfiguration = exitConfiguration;
-        return new StubExternalProcess(configuration, exitConfiguration, ThrowOnStart);
+        return new StubExternalProcess(configuration, exitConfiguration, ThrowOnStart)
+        {
+            Canceled = DefaultCanceled,
+            Signal = DefaultSignal
+        };
     }
 
     public void Reset()

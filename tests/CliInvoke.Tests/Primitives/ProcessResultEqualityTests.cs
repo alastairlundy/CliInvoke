@@ -87,10 +87,9 @@ public class ProcessResultEqualityTests
             piped.Dispose();
         }
     }
-}
 
-[Test]
-public async Task ProcessResult_CanceledDifference_AffectsEquality()
+    [Test]
+    public async Task ProcessResult_CanceledDifference_AffectsEquality()
 {
     ProcessResult notCanceled = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
         new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: null);
@@ -116,4 +115,5 @@ public async Task ProcessResult_SignalDifference_AffectsEquality()
     await Assert.That(noSignal.Equals(signaled)).IsFalse();
     await Assert.That(signaled.Equals(noSignal)).IsFalse();
     await Assert.That(noSignal.GetHashCode()).IsNotEqualTo(signaled.GetHashCode());
+    }
 }
