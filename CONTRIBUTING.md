@@ -44,4 +44,14 @@ CliInvoke targets .NET 10 (see `global.json`) and uses the [TUnit](https://www.t
 - **Issues:** Use the provided templates under [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) (bug report or feature request) when filing an issue.
 - **Contribution policy:** There is currently no CLA or DCO required for this project. By contributing, you confirm you have read and followed this `CONTRIBUTING.md` and that your contribution is your own original work (or properly licensed).
 
-Thank you for reading these contribution guidelines.
+### InternalsVisibleTo (IVT) grant minimization
+
+CliInvoke packages minimize cross-package coupling by keeping their internal surfaces private. A new `InternalsVisibleTo` grant is **not** a default and **requires justification**:
+
+- **Justify new grants.** A new IVT grant must be defended: explain why the consuming assembly strictly requires access to internals and why the needed types cannot instead be promoted to a public, stable API or relocated to a shared package (see `docs/adr/0001-ivt-minimization.md`, D002).
+- **Remove unused grants.** Grants that no longer have a consumer are removed (D003). Do not leave dead coupling points in place.
+- **Test grants are excluded.** IVT grants to test assemblies (`CliInvoke.Tests`, `CliInvoke.Specializations.Tests`) stay; they are same-repo and not shipping packages, so they are out of scope for reduction (D004).
+
+### How to build & test
+
+CliInvoke targets .NET 10 (see `global.json`) and uses the [TUnit](https://www.tunit.dev/) test framework.
