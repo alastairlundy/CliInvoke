@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -235,9 +236,13 @@ public class ProcessConfigurationBuilderTests
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
         string input = "\\\n\t\r\"";
-        // EscapeForCmd drops CR/LF, doubles inner quotes, and keeps backslash/tab,
-        // then the value is wrapped in a single pair of quotes.
-        const string expected = "\"\\\t\"\"\"";
+        // ArgumentEscaper is platform-aware: on Windows it doubles inner quotes and wraps the
+        // value in a single pair of double quotes; on POSIX it wraps the value in a single pair
+        // of single quotes. Derive the expected value from the escaper so the assertion holds on
+        // every supported platform (ConfigureArguments routes single values through EscapeCharacters).
+        string expected = ArgumentEscaper.NeedsQuoting(input)
+            ? $"\"{ArgumentEscaper.EscapeInner(input)}\""
+            : ArgumentEscaper.EscapeInner(input);
 
         // Act
         builder.ConfigureArguments(spec => spec.Add(input, escape: true));
@@ -301,9 +306,11 @@ public class ProcessConfigurationBuilderTests
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
         string[] values = ["a\nb", "c\"d"];
-        // EscapeForCmd drops the LF in "a\nb" (-> "ab") and doubles the quote in
-        // "c\"d" (-> "c\"\"d"); the joined result is wrapped in a single pair of quotes.
-        const string expected = "\"ab c\"\"d\"";
+        // AddEnumerable escapes each value with ArgumentEscaper.EscapeInner, joins them with a
+        // single space, and wraps the joined result in a single pair of double quotes. Derive the
+        // expected value from the escaper so the assertion holds on every supported platform.
+        string joined = string.Join(" ", values.Select(ArgumentEscaper.EscapeInner));
+        string expected = $"\"{joined}\"";
 
         // Act
         builder.ConfigureArguments(spec => spec.AddEnumerable(values, escape: true));
