@@ -169,7 +169,10 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
                 canceled: Canceled, signal: Signal));
         }
 
-        public Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken)
+        public Task<BufferedProcessResult> CaptureBufferedResultAsync(
+            CancellationToken cancellationToken,
+            long? maxStandardOutputBytes = null,
+            long? maxStandardErrorBytes = null)
         {
             DateTime now = DateTime.UtcNow;
             return Task.FromResult(new BufferedProcessResult(

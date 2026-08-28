@@ -72,6 +72,12 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public string StandardError { get; }
 
     /// <summary>
+    ///     Indicates whether the captured standard output or standard error was truncated because it
+    ///     exceeded the configured per-stream cap.
+    /// </summary>
+    public bool WasTruncated { get; set; }
+
+    /// <summary>
     ///     Determines whether this BufferedProcessResult object is equal to another BufferedProcessResult
     ///     object.
     /// </summary>
