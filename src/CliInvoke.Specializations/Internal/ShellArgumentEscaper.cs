@@ -1,5 +1,5 @@
 /*
-    CliInvoke.Core
+    CliInvoke Specializations
     Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,7 +9,7 @@
 
 using System.Text;
 
-namespace CliInvoke.Core.Internal;
+namespace CliInvoke.Specializations.Internal;
 
 /// <summary>
 ///     Escapes argument strings so they are passed to a wrapped shell command as
@@ -24,9 +24,9 @@ namespace CliInvoke.Core.Internal;
 ///     additional shell commands (command injection). These helpers neutralise the
 ///     dangerous metacharacters for each shell before the command is rebuilt.
 ///     <para>
-///         This helper lives in <see cref="CliInvoke.Core"/> so that both the
-///         specialisations and <see cref="CliInvoke.Core.Configuration.ArgumentsSpec"/>
-///         share a single, consistent escaping implementation.
+///         This helper lives in <see cref="CliInvoke.Specializations"/> so the
+///         specializations do not depend on any <see cref="CliInvoke.Core"/> internal
+///         type (eliminating the Core → Specializations coupling).
 ///     </para>
 /// </remarks>
 internal static class ShellArgumentEscaper

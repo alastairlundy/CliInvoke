@@ -3,7 +3,24 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
+
+// Echo-args mode for escaping tests: print each subsequent argument to stdout,
+// newline-delimited, then exit. This lets a test verify that the OS actually parsed
+// the produced command line back into the original values.
+if (args.Length >= 1 && args[0] == "echo-args")
+{
+    Stream stdout = Console.OpenStandardOutput();
+    for (int i = 1; i < args.Length; i++)
+    {
+        byte[] argBytes = Encoding.UTF8.GetBytes(args[i]);
+        stdout.Write(argBytes, 0, argBytes.Length);
+        stdout.WriteByte((byte)'\n');
+    }
+    stdout.Flush();
+    return 0;
+}
 
 string markerPath = args.Length >= 1 ? args[0] : throw new ArgumentException(
     "Expected at least 2 arguments: <markerFilePath> <sleepSeconds>");

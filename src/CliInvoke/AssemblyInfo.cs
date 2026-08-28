@@ -8,7 +8,3 @@
 */
 
 using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("CliInvoke.Specializations")]
-[assembly: InternalsVisibleTo("CliInvoke.Specializations.Tests")]
-[assembly: InternalsVisibleTo("CliInvoke.Tests")]

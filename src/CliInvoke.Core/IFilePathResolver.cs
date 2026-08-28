@@ -40,5 +40,7 @@ public interface IFilePathResolver
     /// On failure, <paramref name="resolvedFilePath"/> is set to <see langword="null"/> and the method returns <see langword="false"/>.
     /// This method does not throw when the file cannot be resolved.
     /// </remarks>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
     bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath);
 }
