@@ -13,6 +13,9 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
+using System;
+using System.Runtime.InteropServices;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -31,6 +34,13 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="standardError">The process' standard error as a string.</param>
     /// <param name="startTime">The start time of the process.</param>
     /// <param name="exitTime">The exit time of the process.</param>
+    /// <param name="canceled">
+    ///     A value indicating whether the library terminated the process via its cancellation
+    ///     machinery rather than the process exiting on its own.
+    /// </param>
+    /// <param name="signal">
+    ///     The POSIX signal that terminated the process, or <c>null</c> when not applicable.
+    /// </param>
     public BufferedProcessResult(
         string executableFilePath,
         int exitCode,
@@ -38,8 +48,10 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         string standardOutput,
         string standardError,
         DateTime startTime,
-        DateTime exitTime)
-        : base(executableFilePath, exitCode, processId, startTime, exitTime)
+        DateTime exitTime,
+        bool canceled,
+        PosixSignal? signal)
+        : base(executableFilePath, exitCode, processId, startTime, exitTime, canceled, signal)
     {
         ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
         ArgumentNullException.ThrowIfNull(standardOutput);
@@ -77,12 +89,16 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         if (other is null)
             return false;
 
+#pragma warning disable CA1416
         return ExecutedFilePath == other.ExecutedFilePath &&
                StandardOutput == other.StandardOutput
                && StandardError == other.StandardError
                && ExitCode == other.ExitCode &&
                StartTime == other.StartTime &&
-               ExitTime == other.ExitTime;
+               ExitTime == other.ExitTime &&
+               Canceled == other.Canceled &&
+               Signal == other.Signal;
+#pragma warning restore CA1416
     }
 
     /// <summary>
@@ -113,8 +129,10 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <returns>The hash code for the current BufferedProcessResult.</returns>
     public override int GetHashCode()
     {
+#pragma warning disable CA1416
         return HashCode.Combine(ExecutedFilePath, StandardOutput, StandardError, ExitCode,
-            StartTime, ExitTime);
+            StartTime, ExitTime, Canceled, Signal);
+#pragma warning restore CA1416
     }
 
     /// <summary>

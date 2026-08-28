@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 using CliInvoke.Processes.Internal;
 using CliInvoke.Tests.Internal.Constants;
 
@@ -72,6 +74,26 @@ internal class ProcessTestHelper
 
         return binaryPath;
     }
+
+    /// <summary>
+    ///     Delivers <see cref="PosixSignal.SIGTERM"/> to the process with the given id.
+    /// </summary>
+    /// <remarks>
+    ///     <see cref="System.Diagnostics.Process.Kill"/> terminates a Unix process with
+    ///     <c>SIGKILL</c> (exit code 137), not <c>SIGTERM</c> (exit code 143), so it cannot be
+    ///     used to exercise the signal-trapping helper. This sends the expected signal directly.
+    /// </remarks>
+    internal static void SendTerminationSignal(int processId)
+    {
+        if (OperatingSystem.IsWindows())
+            return;
+
+        const int Sigterm = 15;
+        _ = kill(processId, Sigterm);
+    }
+
+    [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
+    private static extern int kill(int pid, int sig);
 
     /// <summary>
     ///     Creates a <see cref="ProcessWrapper"/> configured to launch the signal-trapping helper

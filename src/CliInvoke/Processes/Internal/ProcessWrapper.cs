@@ -9,6 +9,7 @@
 
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.InteropServices;
 
 using CliInvoke.Processes.Internal.Cancellation;
 using CliInvoke.Processes.Internal.ControlAdapters;
@@ -53,6 +54,9 @@ internal class ProcessWrapper : Process
     // Synchronisation primitive to prevent simultaneous cancellation attempts
     internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
+    // Resolved cancellation reason, persisted across the wait so Canceled can be computed afterward.
+    private CancellationReason _cancellationReason = CancellationReason.NotKnown;
+
     internal ProcessWrapper(ProcessConfiguration configuration,
         FileInfo resolvedFilePath)
     {
@@ -81,6 +85,18 @@ internal class ProcessWrapper : Process
     internal new int Id { get; private set; }
 
     internal new string ProcessName { get; private set; }
+
+    /// <summary>
+    ///     A value indicating whether the library terminated the process via its cancellation
+    ///     machinery (timeout or requested cancellation) rather than the process exiting on its own.
+    /// </summary>
+    internal bool Canceled =>
+        _cancellationReason is CancellationReason.Timeout or CancellationReason.RequestedCancellation;
+
+    /// <summary>
+    ///     The POSIX signal that terminated the process (Unix only), obtained via the control adapter.
+    /// </summary>
+    internal PosixSignal? Signal => ProcessControlAdapter.GetTerminatingSignal(ExitCode);
 
     
     private void OnStarted(object? sender, EventArgs e)
@@ -428,10 +444,15 @@ internal class ProcessWrapper : Process
         {
             if (isGraceful)
             {
+                // Capture the cancellation task so its completion (and the resulting
+                // _cancellationReason assignment) can be awaited explicitly below.
+                Task<bool> cancelWithInterruptTask = CancelWithInterrupt(
+                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                    processExitConfiguration, cancellationToken);
+
                 await Task.WhenAny([
                     WaitForExitSafeAsync(cancellationToken),
-                    CancelWithInterrupt(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                        processExitConfiguration, cancellationToken)
+                    cancelWithInterruptTask
                 ]);
 
                 await Task.WhenAny([
@@ -441,6 +462,14 @@ internal class ProcessWrapper : Process
                         cancellationToken),
                     WaitForExitSafeAsync(cancellationToken)
                 ]);
+
+                // Ensure the interrupt/timeout resolution has fully completed and persisted
+                // _cancellationReason before the caller reads Canceled. Otherwise the returned
+                // ProcessResult could observe Canceled as false even though the process was
+                // terminated by the cancellation machinery. Only wait when the process did not
+                // exit on its own, so fast-exiting processes are not held for the full timeout.
+                if (!HasExited && !cancelWithInterruptTask.IsCompleted)
+                    await cancelWithInterruptTask;
 
                 if (!HasExited && fallbackToForceful)
                     ForcefulExit();
@@ -524,6 +553,7 @@ internal class ProcessWrapper : Process
         try
         {
             await WaitForExitSafeAsync(actualCancellationToken);
+            _cancellationReason = cancellationReason;
         }
         catch (Exception exception)
         {
@@ -532,6 +562,7 @@ internal class ProcessWrapper : Process
                 CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
             CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
                 cancellationReason, exitConfiguration, exception);
+            _cancellationReason = cancellationReason;
         }
         finally
         {
@@ -580,6 +611,12 @@ internal class ProcessWrapper : Process
             if (HasExited)
                 return true;
 
+            // Reaching this point means the delay elapsed without the token being
+            // canceled, i.e. a graceful timeout. Persist the resolved reason before
+            // sending the interrupt so Canceled can be computed from it afterward.
+            cancellationReason = CancellationReason.Timeout;
+            _cancellationReason = cancellationReason;
+
             return  await ProcessControlAdapter.SendInterruptSignalAsync(this,
                 cancellationReason, exitConfiguration, cancellationToken);
         }
@@ -594,6 +631,7 @@ internal class ProcessWrapper : Process
             CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
                 cancellationReason,
                 exitConfiguration, exception);
+            _cancellationReason = cancellationReason;
         }
         finally
         {

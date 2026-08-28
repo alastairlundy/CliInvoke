@@ -203,7 +203,9 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             _processWrapper.ExitCode,
             _processWrapper.Id,
             _processWrapper.StartTime,
-            _processWrapper.ExitTime
+            _processWrapper.ExitTime,
+            canceled: _processWrapper.Canceled,
+            signal: _processWrapper.Signal
         );
 
         return result;
@@ -239,7 +241,9 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 _processWrapper.ExitCode,
                 _processWrapper.Id, outputStrings.Result.StandardOutput, outputStrings.Result.StandardError,
                 _processWrapper.StartTime,
-                _processWrapper.ExitTime);
+                _processWrapper.ExitTime,
+                canceled: _processWrapper.Canceled,
+                signal: _processWrapper.Signal);
 
             return result;
         }
@@ -280,7 +284,9 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime,
                 await standardOutputStream,
-                await standardErrorStream
+                await standardErrorStream,
+                canceled: _processWrapper.Canceled,
+                signal: _processWrapper.Signal
             );
 
             return result;
