@@ -27,10 +27,11 @@ namespace CliInvoke.Core.Internal;
 ///         special meaning only immediately before a quote. So inner quotes are
 ///         doubled, runs of backslashes are doubled before an embedded quote and
 ///         before the closing quote, and bare newlines are dropped (they would
-///         otherwise terminate the line). On Unix the inner content is escaped for a
-///         double-quoted context — backslashes and embedded double quotes are
-///         backslash-escaped and bare newlines are dropped — and the caller supplies
-///         the surrounding double quotes.
+///         otherwise terminate the line). On Unix the inner content is escaped for the
+///         double-quoted context the caller supplies: an embedded double quote is
+///         escaped as <c>\"</c> (so it is not treated as a delimiter) while backslashes
+///         are emitted literally — .NET's Unix argument parser treats a backslash as
+///         literal except immediately before a double quote — and bare newlines are dropped.
 ///     </para>
 /// </remarks>
 internal static class ArgumentEscaper
@@ -95,19 +96,17 @@ internal static class ArgumentEscaper
             return builder.ToString();
         }
 
-        // POSIX shell: the value is escaped for a double-quoted context — backslashes and
-        // embedded double quotes are backslash-escaped so they survive the surrounding
-        // double quotes the caller adds (or, for Add, emits verbatim). Bare newlines are
+        // POSIX: the caller supplies the surrounding double quotes (AddEnumerable always
+        // wraps; Add wraps when NeedsQuoting). .NET's Unix argument parser (used when launching
+        // the child) treats a backslash as literal except immediately before a double quote,
+        // where it escapes the quote. So backslashes are emitted literally and only an embedded
+        // double quote is escaped as \" so it is not treated as a delimiter. Bare newlines are
         // dropped. No outer single quotes are added here.
         StringBuilder posixBuilder = new(argument.Length + 8);
 
         foreach (char c in argument)
         {
-            if (c == '\\')
-            {
-                posixBuilder.Append('\\').Append('\\');
-            }
-            else if (c == '"')
+            if (c == '"')
             {
                 posixBuilder.Append('\\').Append('"');
             }

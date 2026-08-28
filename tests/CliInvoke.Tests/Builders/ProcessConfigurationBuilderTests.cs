@@ -336,7 +336,6 @@ public class ProcessConfigurationBuilderTests
         await Assert.That(parsed[0]).IsEqualTo(input);
     }
 
-    [SupportedOSPlatform("windows")]
     [Test]
     public async Task ConfigureArguments_Add_TrailingBackslash_RoundTrips()
     {
@@ -348,13 +347,13 @@ public class ProcessConfigurationBuilderTests
         builder.ConfigureArguments(spec => spec.Add(input, escape: true));
         ProcessConfiguration config = builder.Build();
 
-        // Assert — trailing backslashes must be doubled for the C-runtime closing quote.
+        // Assert — the trailing backslashes must round-trip exactly (doubled for the
+        // Windows C-runtime closing quote; passed through literally on POSIX).
         string[] parsed = await RunHelperAndParseArgs(config.Arguments);
         await Assert.That(parsed.Length).IsEqualTo(1);
         await Assert.That(parsed[0]).IsEqualTo(input);
     }
 
-    [SupportedOSPlatform("windows")]
     [Test]
     public async Task ConfigureArguments_Add_BackslashBeforeQuote_RoundTrips()
     {
@@ -366,8 +365,8 @@ public class ProcessConfigurationBuilderTests
         builder.ConfigureArguments(spec => spec.Add(input, escape: true));
         ProcessConfiguration config = builder.Build();
 
-        // Assert — backslashes before an embedded quote must be doubled so the C-runtime
-        // treats the quote as literal rather than a delimiter.
+        // Assert — backslashes before an embedded quote must round-trip exactly (doubled
+        // for the Windows C-runtime so the quote is literal; passed through on POSIX).
         string[] parsed = await RunHelperAndParseArgs(config.Arguments);
         await Assert.That(parsed.Length).IsEqualTo(1);
         await Assert.That(parsed[0]).IsEqualTo(input);
