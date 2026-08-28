@@ -50,8 +50,4 @@ CliInvoke packages minimize cross-package coupling by keeping their internal sur
 
 - **Justify new grants.** A new IVT grant must be defended: explain why the consuming assembly strictly requires access to internals and why the needed types cannot instead be promoted to a public, stable API or relocated to a shared package (see `docs/adr/0001-ivt-minimization.md`, D002).
 - **Remove unused grants.** Grants that no longer have a consumer are removed (D003). Do not leave dead coupling points in place.
-- **Test grants are excluded.** IVT grants to test assemblies (`CliInvoke.Tests`, `CliInvoke.Specializations.Tests`) stay; they are same-repo and not shipping packages, so they are out of scope for reduction (D004).
-
-### How to build & test
-
-CliInvoke targets .NET 10 (see `global.json`) and uses the [TUnit](https://www.tunit.dev/) test framework.
+- **Test grants follow the same rule.** IVT grants to test assemblies (`CliInvoke.Tests`, `CliInvoke.Specializations.Tests`) are kept only while actually used; an unused test-assembly grant is removed like any other unused grant (D004; unused-grant removal per D009). Being same-repo and not a shipping package does not exempt a test grant from reduction.

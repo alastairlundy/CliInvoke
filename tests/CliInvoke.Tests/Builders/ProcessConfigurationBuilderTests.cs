@@ -6,7 +6,9 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
-using CliInvoke.Core.Internal;
+using CliInvoke;
+using CliInvoke.Core.Processes;
+using CliInvoke.Tests.Internal.Helpers;
 
 namespace CliInvoke.Tests.Builders;
 
@@ -236,20 +238,17 @@ public class ProcessConfigurationBuilderTests
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
         string input = "\\\n\t\r\"";
-        // ArgumentEscaper is platform-aware: on Windows it doubles inner quotes and wraps the
-        // value in a single pair of double quotes; on POSIX it wraps the value in a single pair
-        // of single quotes. Derive the expected value from the escaper so the assertion holds on
-        // every supported platform (ConfigureArguments routes single values through EscapeCharacters).
-        string expected = ArgumentEscaper.NeedsQuoting(input)
-            ? $"\"{ArgumentEscaper.EscapeInner(input)}\""
-            : ArgumentEscaper.EscapeInner(input);
 
         // Act
         builder.ConfigureArguments(spec => spec.Add(input, escape: true));
-
-        // Assert
         ProcessConfiguration config = builder.Build();
-        await Assert.That(config.Arguments).IsEqualTo(expected);
+
+        // Assert — spawn a real child and verify the OS parses the produced command line
+        // back to the original value. Newlines are dropped by design, so strip them first.
+        string expected = input.Replace("\n", "").Replace("\r", "");
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        await Assert.That(parsed.Length).IsEqualTo(1);
+        await Assert.That(parsed[0]).IsEqualTo(expected);
     }
 
     [Test]
@@ -306,18 +305,80 @@ public class ProcessConfigurationBuilderTests
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
         string[] values = ["a\nb", "c\"d"];
-        // AddEnumerable escapes each value with ArgumentEscaper.EscapeInner, joins them with a
-        // single space, and wraps the joined result in a single pair of double quotes. Derive the
-        // expected value from the escaper so the assertion holds on every supported platform.
-        string joined = string.Join(" ", values.Select(ArgumentEscaper.EscapeInner));
-        string expected = $"\"{joined}\"";
 
         // Act
         builder.ConfigureArguments(spec => spec.AddEnumerable(values, escape: true));
-
-        // Assert
         ProcessConfiguration config = builder.Build();
-        await Assert.That(config.Arguments).IsEqualTo(expected);
+
+        // Assert — AddEnumerable joins the values (newlines dropped) and wraps the joined
+        // result in a single pair of double quotes, so the child receives ONE argument.
+        string expected = string.Join(" ", values.Select(v => v.Replace("\n", "").Replace("\r", "")));
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        await Assert.That(parsed.Length).IsEqualTo(1);
+        await Assert.That(parsed[0]).IsEqualTo(expected);
+    }
+
+    [Test]
+    public async Task ConfigureArguments_Add_EmbeddedDoubleQuote_RoundTrips()
+    {
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
+        string input = "a\"b"; // embedded double quote, no spaces (POSIX Add emits this unquoted)
+
+        // Act
+        builder.ConfigureArguments(spec => spec.Add(input, escape: true));
+        ProcessConfiguration config = builder.Build();
+
+        // Assert — the OS must parse the produced command line back to the original value,
+        // exercising the embedded-double-quote escaping on both Windows and POSIX.
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        await Assert.That(parsed.Length).IsEqualTo(1);
+        await Assert.That(parsed[0]).IsEqualTo(input);
+    }
+
+    [SupportedOSPlatform("windows")]
+    [Test]
+    public async Task ConfigureArguments_Add_TrailingBackslash_RoundTrips()
+    {
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
+        string input = "path\\to\\dir\\"; // trailing backslashes before the closing quote
+
+        // Act
+        builder.ConfigureArguments(spec => spec.Add(input, escape: true));
+        ProcessConfiguration config = builder.Build();
+
+        // Assert — trailing backslashes must be doubled for the C-runtime closing quote.
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        await Assert.That(parsed.Length).IsEqualTo(1);
+        await Assert.That(parsed[0]).IsEqualTo(input);
+    }
+
+    [SupportedOSPlatform("windows")]
+    [Test]
+    public async Task ConfigureArguments_Add_BackslashBeforeQuote_RoundTrips()
+    {
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
+        string input = "he said \\\"hello\\\""; // backslashes immediately before quotes
+
+        // Act
+        builder.ConfigureArguments(spec => spec.Add(input, escape: true));
+        ProcessConfiguration config = builder.Build();
+
+        // Assert — backslashes before an embedded quote must be doubled so the C-runtime
+        // treats the quote as literal rather than a delimiter.
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        await Assert.That(parsed.Length).IsEqualTo(1);
+        await Assert.That(parsed[0]).IsEqualTo(input);
+    }
+
+    private static async Task<string[]> RunHelperAndParseArgs(string arguments)
+    {
+        string helperPath = ProcessTestHelper.GetSignalTrappingHelperPath();
+        BufferedProcessResult result = await CliRun.RunBufferedAsync(helperPath, $"echo-args {arguments}");
+        await Assert.That(result.ExitCode).IsEqualTo(0);
+        return (result.StandardOutput ?? string.Empty).TrimEnd('\n').TrimEnd('\r').Split('\n');
     }
 
     [Test]

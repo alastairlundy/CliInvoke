@@ -23,10 +23,14 @@ namespace CliInvoke.Core.Internal;
 ///     transforms is a strict subset of <c>ShellArgumentEscaper.EscapeForCmd</c>'s set.
 ///     <para>
 ///         On Windows the C-runtime argument parser treats a doubled quote
-///         (<c>""</c>) inside a quoted token as a literal quote, so inner quotes are
-///         doubled and bare newlines are dropped (they would otherwise terminate the
-///         line). On Unix the value is wrapped in single quotes, escaping any embedded
-///         single quote as the <c>'\''</c> sequence.
+///         (<c>""</c>) inside a quoted token as a literal quote and gives backslashes
+///         special meaning only immediately before a quote. So inner quotes are
+///         doubled, runs of backslashes are doubled before an embedded quote and
+///         before the closing quote, and bare newlines are dropped (they would
+///         otherwise terminate the line). On Unix the inner content is escaped for a
+///         double-quoted context — backslashes and embedded double quotes are
+///         backslash-escaped and bare newlines are dropped — and the caller supplies
+///         the surrounding double quotes.
 ///     </para>
 /// </remarks>
 internal static class ArgumentEscaper
@@ -48,39 +52,64 @@ internal static class ArgumentEscaper
         if (OperatingSystem.IsWindows())
         {
             // Windows C-runtime argument parsing: a literal " inside a quoted token is
-            // written as "". Newlines would terminate the command line, so they are
-            // dropped. Shell metacharacters are intentionally left untouched here.
+            // written as "". Backslashes only gain special meaning immediately before a
+            // quote, so a run of N backslashes is doubled to 2N before an embedded quote
+            // and before the (implicit) closing quote the caller adds. Newlines would
+            // terminate the command line, so they are dropped. Shell metacharacters are
+            // intentionally left untouched here.
             StringBuilder builder = new(argument.Length + 8);
+
+            int backslashCount = 0;
 
             foreach (char c in argument)
             {
-                if (c == '"')
+                if (c == '\\')
                 {
+                    backslashCount++;
+                }
+                else if (c == '"')
+                {
+                    // Double the preceding backslashes, then emit a doubled quote.
+                    builder.Append('\\', backslashCount * 2);
                     builder.Append('"').Append('"');
+                    backslashCount = 0;
                 }
                 else if (c is '\n' or '\r')
                 {
-                    // Drop bare newlines so they cannot terminate the command line.
+                    // Drop bare newlines so they cannot terminate the command line,
+                    // flushing any preceding backslashes first.
+                    builder.Append('\\', backslashCount);
+                    backslashCount = 0;
                 }
                 else
                 {
+                    builder.Append('\\', backslashCount);
                     builder.Append(c);
+                    backslashCount = 0;
                 }
             }
+
+            // Double any trailing backslashes for the closing quote.
+            builder.Append('\\', backslashCount * 2);
 
             return builder.ToString();
         }
 
-        // POSIX shell: wrap the whole value in single quotes, escaping embedded
-        // single quotes as the '\'' sequence.
+        // POSIX shell: the value is escaped for a double-quoted context — backslashes and
+        // embedded double quotes are backslash-escaped so they survive the surrounding
+        // double quotes the caller adds (or, for Add, emits verbatim). Bare newlines are
+        // dropped. No outer single quotes are added here.
         StringBuilder posixBuilder = new(argument.Length + 8);
-        posixBuilder.Append('\'');
 
         foreach (char c in argument)
         {
-            if (c == '\'')
+            if (c == '\\')
             {
-                posixBuilder.Append("'\\''");
+                posixBuilder.Append('\\').Append('\\');
+            }
+            else if (c == '"')
+            {
+                posixBuilder.Append('\\').Append('"');
             }
             else if (c is '\n' or '\r')
             {
@@ -92,7 +121,6 @@ internal static class ArgumentEscaper
             }
         }
 
-        posixBuilder.Append('\'');
         return posixBuilder.ToString();
     }
 
@@ -127,8 +155,23 @@ internal static class ArgumentEscaper
             return false;
         }
 
-        // On POSIX the inner value is already single-quoted by EscapeInner, so no
-        // additional outer double-quote wrapping is required.
+        // On POSIX, EscapeInner returns content escaped for a double-quoted context
+        // (backslashes and embedded double quotes are backslash-escaped; the caller adds
+        // the surrounding double quotes). A value must still be wrapped when it contains
+        // whitespace (otherwise the OS would split it into multiple tokens), a double
+        // quote, a backslash, or a shell metacharacter that is literal inside double
+        // quotes — this keeps the single-value Add path consistent with AddEnumerable's
+        // double-quote wrapping.
+        foreach (char c in argument)
+        {
+            if (char.IsWhiteSpace(c)
+                || c is '"' or '\\'
+                || c is '&' or '|' or '<' or '>' or '^' or '%')
+            {
+                return true;
+            }
+        }
+
         return false;
     }
 }

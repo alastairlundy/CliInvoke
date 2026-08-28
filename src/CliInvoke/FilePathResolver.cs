@@ -63,6 +63,8 @@ public class FilePathResolver : IFilePathResolver
     /// is set to <see langword="null"/>; callers that need the failure cause should use
     /// <see cref="ResolveFilePath"/> instead.
     /// </remarks>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
     public bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath)
     {
         try

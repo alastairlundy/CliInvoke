@@ -31,11 +31,11 @@ In this pass, remove the unused IVT grants now; schedule the reduction of *requi
 
 ### D004 — Test-assembly IVT scope
 
-IVT grants to **test assemblies** are excluded from reduction in this effort and remain as-is.
+IVT grants to **test assemblies** are **not** a blanket exception: a test-assembly grant is kept only while it is actually consumed, and an unused test-assembly grant is removed in this pass (D003 applies to test grants too).
 
-- **Driver:** the user's goal targets downstream packages; test projects are same-repo and not the blast radius described in I001.
-- **Resolution:** Option A — Tests excluded: keep IVT to test assemblies; they are not shipping packages.
-- **Normalized requirement:** IVT grants to test assemblies (CliInvoke.Tests, CliInvoke.Specializations.Tests) are out of scope for reduction in this effort and remain as-is. The D002 principle does not apply to test grants.
+- **Driver:** the user's goal is fewer coupling points in general; a dead test grant is still a coupling point even though the test project is same-repo and not the shipping blast radius described in I001.
+- **Resolution:** Option B — Used test grants stay, unused removed: keep IVT to test assemblies that are actually consumed; remove test grants that no longer have a consumer.
+- **Normalized requirement:** IVT grants to test assemblies (CliInvoke.Tests, CliInvoke.Specializations.Tests) remain only while actually used; an unused test-assembly grant is removed in this pass. The D002 principle applies to test grants on a used/unused basis.
 
 ### D005 — Mechanism for required grants
 
@@ -60,6 +60,6 @@ The IVT-minimization principle is recorded in this ADR and in `CONTRIBUTING.md`.
 ## Consequences
 
 - New IVT grants require explicit justification; reviewers should challenge any grant that could be replaced by promotion/relocation.
-- Unused grants are removed aggressively (D003); test grants stay (D004).
+- Unused grants are removed aggressively (D003); used test-assembly grants stay while unused ones are removed (D004).
 - Required grants are reduced deliberately per type (D005), respecting the v3 breaking-change window for public promotions (D006).
 - Contributors have clear guidance (this ADR + `CONTRIBUTING.md`) but no automated enforcement, keeping the rule a reviewed convention rather than a build gate.
