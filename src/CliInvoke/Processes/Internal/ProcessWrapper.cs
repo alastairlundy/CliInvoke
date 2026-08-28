@@ -444,10 +444,15 @@ internal class ProcessWrapper : Process
         {
             if (isGraceful)
             {
+                // Capture the cancellation task so its completion (and the resulting
+                // _cancellationReason assignment) can be awaited explicitly below.
+                Task<bool> cancelWithInterruptTask = CancelWithInterrupt(
+                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                    processExitConfiguration, cancellationToken);
+
                 await Task.WhenAny([
                     WaitForExitSafeAsync(cancellationToken),
-                    CancelWithInterrupt(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                        processExitConfiguration, cancellationToken)
+                    cancelWithInterruptTask
                 ]);
 
                 await Task.WhenAny([
@@ -457,6 +462,14 @@ internal class ProcessWrapper : Process
                         cancellationToken),
                     WaitForExitSafeAsync(cancellationToken)
                 ]);
+
+                // Ensure the interrupt/timeout resolution has fully completed and persisted
+                // _cancellationReason before the caller reads Canceled. Otherwise the returned
+                // ProcessResult could observe Canceled as false even though the process was
+                // terminated by the cancellation machinery. Only wait when the process did not
+                // exit on its own, so fast-exiting processes are not held for the full timeout.
+                if (!HasExited && !cancelWithInterruptTask.IsCompleted)
+                    await cancelWithInterruptTask;
 
                 if (!HasExited && fallbackToForceful)
                     ForcefulExit();
