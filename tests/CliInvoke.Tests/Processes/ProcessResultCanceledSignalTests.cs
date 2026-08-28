@@ -159,8 +159,9 @@ public class ProcessResultCanceledSignalTests : IDisposable
             // Give the helper a moment to be running before delivering SIGTERM.
             await Task.Delay(200, CancellationToken.None);
 
-            // On Unix, Process.Kill() sends SIGTERM.
-            process.Kill();
+            // Process.Kill() terminates a Unix process with SIGKILL (exit code 137), not
+            // SIGTERM (exit code 143), so send the expected signal explicitly.
+            ProcessTestHelper.SendTerminationSignal(process.Id);
 
             await process.WaitForExitAsync(CancellationToken.None);
 
