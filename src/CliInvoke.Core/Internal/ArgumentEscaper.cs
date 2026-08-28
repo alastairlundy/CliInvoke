@@ -27,11 +27,11 @@ namespace CliInvoke.Core.Internal;
 ///         special meaning only immediately before a quote. So inner quotes are
 ///         doubled, runs of backslashes are doubled before an embedded quote and
 ///         before the closing quote, and bare newlines are dropped (they would
-///         otherwise terminate the line). On Unix the inner content is escaped for the
-///         double-quoted context the caller supplies: an embedded double quote is
-///         escaped as <c>\"</c> (so it is not treated as a delimiter) while backslashes
-///         are emitted literally — .NET's Unix argument parser treats a backslash as
-///         literal except immediately before a double quote — and bare newlines are dropped.
+///         otherwise terminate the line). .NET's Unix argument parser applies the same
+///         rule for the double-quoted context the caller supplies, so the POSIX branch
+///         uses identical escaping — doubled backslashes before an embedded quote and
+///         before the closing quote, embedded quotes written as <c>""</c> — and drops
+///         bare newlines.
 ///     </para>
 /// </remarks>
 internal static class ArgumentEscaper
@@ -97,28 +97,48 @@ internal static class ArgumentEscaper
         }
 
         // POSIX: the caller supplies the surrounding double quotes (AddEnumerable always
-        // wraps; Add wraps when NeedsQuoting). .NET's Unix argument parser (used when launching
-        // the child) treats a backslash as literal except immediately before a double quote,
-        // where it escapes the quote. So backslashes are emitted literally and only an embedded
-        // double quote is escaped as \" so it is not treated as a delimiter. Bare newlines are
-        // dropped. No outer single quotes are added here.
+        // wraps; Add wraps when NeedsQuoting). .NET's Unix argument parser applies the same
+        // backslash rule as the Windows C-runtime: a backslash is special only immediately
+        // before a double quote, where a run of N backslashes is halved (an odd run makes the
+        // following quote literal instead of a delimiter), and a trailing run before the closing
+        // quote the caller adds must be doubled. So the inner content uses identical escaping to
+        // the Windows branch — doubled backslashes before an embedded quote and before the closing
+        // quote, embedded quotes written as "" — with no outer single quotes added here. Bare
+        // newlines are dropped so they cannot terminate the command line.
         StringBuilder posixBuilder = new(argument.Length + 8);
+
+        int posixBackslashCount = 0;
 
         foreach (char c in argument)
         {
-            if (c == '"')
+            if (c == '\\')
             {
-                posixBuilder.Append('\\').Append('"');
+                posixBackslashCount++;
+            }
+            else if (c == '"')
+            {
+                // Double the preceding backslashes, then emit a doubled quote.
+                posixBuilder.Append('\\', posixBackslashCount * 2);
+                posixBuilder.Append('"').Append('"');
+                posixBackslashCount = 0;
             }
             else if (c is '\n' or '\r')
             {
-                // Drop bare newlines.
+                // Drop bare newlines so they cannot terminate the command line,
+                // flushing any preceding backslashes first.
+                posixBuilder.Append('\\', posixBackslashCount);
+                posixBackslashCount = 0;
             }
             else
             {
+                posixBuilder.Append('\\', posixBackslashCount);
                 posixBuilder.Append(c);
+                posixBackslashCount = 0;
             }
         }
+
+        // Double any trailing backslashes for the closing quote.
+        posixBuilder.Append('\\', posixBackslashCount * 2);
 
         return posixBuilder.ToString();
     }
