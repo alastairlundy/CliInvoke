@@ -10,16 +10,16 @@
 using System.Linq;
 using System.Text;
 
-using CliInvoke.Core.Internal.IO;
+using CliInvoke.Internal.IO;
 
 namespace CliInvoke;
 
 /// <summary>
 /// The default implementation of <see cref="IFilePathResolver"/>, providing
-/// the standard PATH-lookup and directory-recursion strategies on top of
-/// the shared algorithm in <see cref="FilePathResolverBase"/>.
+/// the standard PATH-lookup and directory-recursion strategies (PATH first, then
+/// directory recursion — see GLOSSARY.md Design Decision 1).
 /// </summary>
-public class FilePathResolver : FilePathResolverBase
+public class FilePathResolver : IFilePathResolver
 {
     /// <summary>
     /// Resolves a file path by checking if the file path exists or if it's a directory.
@@ -30,10 +30,10 @@ public class FilePathResolver : FilePathResolverBase
     /// <exception cref="PlatformNotSupportedException">Thrown if run on an unsupported platform.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    public new FileInfo ResolveFilePath(string filePathToResolve)
+    public FileInfo ResolveFilePath(string filePathToResolve)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
-        
+
         if (Path.IsPathRooted(filePathToResolve))
         {
             return new FileInfo(filePathToResolve);
@@ -45,26 +45,58 @@ public class FilePathResolver : FilePathResolverBase
         {
             return filePath;
         }
-        
+
         return LocateFileFromDirectory(filePathToResolve);
     }
 
     /// <summary>
-    /// 
+    /// Attempts to resolve a file path by delegating to <see cref="ResolveFilePath"/>,
+    /// swallowing any exception that escapes and reporting failure via the return value.
     /// </summary>
-    /// <returns></returns>
-    protected override IEnumerable<string>? EnumeratePathDirectories()
-        => PathEnvironmentVariable.EnumerateDirectories();
-    
+    /// <param name="filePathToResolve">The file path to resolve.</param>
+    /// <param name="resolvedFilePath">When this method returns, contains the resolved <see cref="FileInfo"/> on success; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the file path was resolved successfully; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// This wrapper follows the .NET <c>Try*</c> convention: it catches <see cref="Exception"/>
+    /// (not just <see cref="FileNotFoundException"/>) and never propagates an exception upward.
+    /// On failure the underlying exception is discarded and <paramref name="resolvedFilePath"/>
+    /// is set to <see langword="null"/>; callers that need the failure cause should use
+    /// <see cref="ResolveFilePath"/> instead.
+    /// </remarks>
+    public bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath)
+    {
+        try
+        {
+            resolvedFilePath = ResolveFilePath(filePathToResolve);
+            return true;
+        }
+        catch (Exception)
+        {
+            resolvedFilePath = null;
+            return false;
+        }
+    }
+
     /// <summary>
-    /// 
+    /// Enumerates the directories listed in the PATH environment variable.
     /// </summary>
-    /// <param name="filePathToResolve"></param>
-    /// <param name="resolvedFilePath"></param>
-    /// <returns></returns>
+    /// <returns>
+    /// An <see cref="IEnumerable{T}"/> of directory paths, or <see langword="null"/>
+    /// when the PATH variable is not set.
+    /// </returns>
+    protected virtual IEnumerable<string>? EnumeratePathDirectories()
+        => PathEnvironmentVariable.EnumerateDirectories();
+
+    /// <summary>
+    /// Attempts to resolve <paramref name="filePathToResolve"/> by looking it up in the
+    /// directories listed in the PATH environment variable.
+    /// </summary>
+    /// <param name="filePathToResolve">The file path to resolve.</param>
+    /// <param name="resolvedFilePath">When this method returns, contains the resolved <see cref="FileInfo"/> on success; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if a match was found in PATH; otherwise, <see langword="false"/>.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    protected override bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
+    protected virtual bool ResolveFromPathEnvironmentVariable(string filePathToResolve,
         out FileInfo? resolvedFilePath)
     {
         if (filePathToResolve.Contains(Path.DirectorySeparatorChar)
@@ -78,13 +110,13 @@ public class FilePathResolver : FilePathResolverBase
 
         string[] pathExtensions = GetPathFileExtensions();
         IEnumerable<string>? pathContents = EnumeratePathDirectories();
-        
+
         if(pathContents is null)
         {
             resolvedFilePath = null;
             return false;
         }
-        
+
         bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
 
         string fileName = Path.GetFileName(filePathToResolve);
@@ -92,7 +124,7 @@ public class FilePathResolver : FilePathResolverBase
         bool lookForExtension = !fileHasExtension && (OperatingSystem.IsWindows() ||
                                                       OperatingSystem.IsMacOS() ||
                                                       OperatingSystem.IsMacCatalyst());
-        
+
         foreach (string pathEntry in pathContents)
         {
             if (lookForExtension)
@@ -120,21 +152,21 @@ public class FilePathResolver : FilePathResolverBase
                 }
             }
         }
-        
+
         resolvedFilePath = null;
         return false;
     }
-    
+
     /// <summary>
-    /// 
+    /// Locates <paramref name="filePathToResolve"/> by recursing into the directory inferred
+    /// from the path (or the current working directory when no directory can be inferred).
     /// </summary>
-    /// <param name="filePathToResolve"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    /// <exception cref="FileNotFoundException"></exception>
+    /// <param name="filePathToResolve">The file path to resolve.</param>
+    /// <returns>The located <see cref="FileInfo"/>.</returns>
+    /// <exception cref="FileNotFoundException">Thrown when no matching file is found.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
-    protected override FileInfo LocateFileFromDirectory(string filePathToResolve)
+    protected virtual FileInfo LocateFileFromDirectory(string filePathToResolve)
     {
         string fileName = Path.GetFileName(filePathToResolve);
 
@@ -195,5 +227,27 @@ public class FilePathResolver : FilePathResolverBase
             Resources.Exceptions_FileNotFound.Replace(
                 "{file}",
                 filePathToResolve));
+    }
+
+    /// <summary>
+    /// Returns the file extensions listed in the PATHEXT environment variable, lowercased
+    /// in a single pass before being returned.
+    /// </summary>
+    /// <returns>A new <see cref="string"/> array containing the lowercased file extensions.</returns>
+    /// <remarks>
+    /// Subclasses receive a freshly allocated array in which every character has been
+    /// converted to its lowercase form. The returned array is safe to mutate without
+    /// affecting the underlying PATHEXT environment variable.
+    /// </remarks>
+    protected virtual string[] GetPathFileExtensions()
+    {
+        string[] extensions = PathEnvironmentVariable.EnumerateFileExtensions().ToArray();
+
+        for (int i = 0; i < extensions.Length; i++)
+        {
+            extensions[i] = extensions[i].ToLowerInvariant();
+        }
+
+        return extensions;
     }
 }
