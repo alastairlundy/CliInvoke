@@ -49,4 +49,41 @@ public class GracefulCancellationTests
                 File.Delete(markerPath);
         }
     }
+
+    [Test]
+    public async Task GracefulTimeout_Canceled_IsTrue()
+    {
+        string markerPath = Path.Combine(Path.GetTempPath(),
+            $"cliinvoke-graceful-canceled-{Guid.NewGuid():N}.marker");
+
+        const int gracefulTimeoutSeconds = 2;
+
+        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 5);
+
+        process.Start();
+
+        ProcessExitConfiguration exitConfiguration = new ProcessExitConfiguration(
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(gracefulTimeoutSeconds)),
+            cancellationThrowsException: false);
+
+        try
+        {
+            await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None);
+
+            await Assert.That(process.HasExited).IsTrue();
+            await Assert.That(process.Canceled).IsTrue();
+        }
+        finally
+        {
+            if (!process.HasExited)
+            {
+                try { process.Kill(true); } catch { process.Kill(); }
+            }
+
+            process.Dispose();
+
+            if (File.Exists(markerPath))
+                File.Delete(markerPath);
+        }
+    }
 }

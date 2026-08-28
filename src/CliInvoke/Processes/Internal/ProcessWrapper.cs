@@ -91,7 +91,7 @@ internal class ProcessWrapper : Process
     ///     machinery (timeout or requested cancellation) rather than the process exiting on its own.
     /// </summary>
     internal bool Canceled =>
-        !HasExited && _cancellationReason is CancellationReason.Timeout or CancellationReason.RequestedCancellation;
+        _cancellationReason is CancellationReason.Timeout or CancellationReason.RequestedCancellation;
 
     /// <summary>
     ///     The POSIX signal that terminated the process (Unix only), obtained via the control adapter.
@@ -597,6 +597,12 @@ internal class ProcessWrapper : Process
 
             if (HasExited)
                 return true;
+
+            // Reaching this point means the delay elapsed without the token being
+            // canceled, i.e. a graceful timeout. Persist the resolved reason before
+            // sending the interrupt so Canceled can be computed from it afterward.
+            cancellationReason = CancellationReason.Timeout;
+            _cancellationReason = cancellationReason;
 
             return  await ProcessControlAdapter.SendInterruptSignalAsync(this,
                 cancellationReason, exitConfiguration, cancellationToken);
