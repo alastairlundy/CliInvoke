@@ -169,7 +169,7 @@ public sealed class ArgumentsSpec
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        List<IFormattable> valuesList = values.ToList();
+        List<IFormattable> valuesList = [.. values];
 
         if (valuesList.Count == 0)
             throw new ArgumentException("No valid arguments to add.");

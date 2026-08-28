@@ -53,3 +53,22 @@ A result-model state indicating the library terminated the process through its c
 ### Signal
 
 The POSIX signal that terminated a process. Surfaced on Unix only; absent on Windows.
+
+## Internal Visibility & Coupling
+
+### InternalsVisibleTo grant (IVT grant)
+
+An assembly-scoped grant (via `<InternalsVisibleTo>` in a `.csproj` or `InternalsVisibleToAttribute`) by which one CliInvoke package exposes all of its internal types to a named friend assembly.
+
+### Cross-package coupling point
+
+A dependency surface where one CliInvoke package consumes another package's internal types through an IVT grant, so a change to the internal can break the consuming package.
+
+### Polyfill leakage
+
+The failure mode where a granting package's internal helper types (e.g., Guard/Ensure/polyfill extensions) appear in the signatures of IVT-exposed internals, so the consuming package cannot resolve them and fails to compile; a small internal tweak then ripples errors across downstream packages.
+
+### Entrypoint package
+
+One of the CliInvoke packages (Core, CliInvoke, Extensions, Specializations) that provides a distinct consumer entrypoint into the ecosystem; by design it may require limited internal access to other packages.
+
