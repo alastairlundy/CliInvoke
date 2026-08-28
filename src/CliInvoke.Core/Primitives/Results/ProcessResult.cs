@@ -13,6 +13,10 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
+using System;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -28,18 +32,31 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <param name="processId"></param>
     /// <param name="startTime">The start time of the process.</param>
     /// <param name="exitTime">The exit time of the process.</param>
+    /// <param name="canceled">
+    ///     A value indicating whether the library terminated the process via its cancellation
+    ///     machinery rather than the process exiting on its own.
+    /// </param>
+    /// <param name="signal">
+    ///     The POSIX signal that terminated the process, or <c>null</c> when not applicable.
+    /// </param>
     public ProcessResult(
         string executableFilePath,
         int exitCode,
         int processId,
         DateTime startTime,
-        DateTime exitTime)
+        DateTime exitTime,
+        bool canceled,
+        PosixSignal? signal)
     {
         ExitCode = exitCode;
         ExecutedFilePath = executableFilePath;
         StartTime = startTime;
         ExitTime = exitTime;
         ProcessId = processId;
+        Canceled = canceled;
+#pragma warning disable CA1416
+        Signal = signal;
+#pragma warning restore CA1416
     }
 
     /// <summary>
@@ -68,6 +85,25 @@ public class ProcessResult : IEquatable<ProcessResult>
     public DateTime ExitTime { get; }
 
     /// <summary>
+    ///     A value indicating whether the library terminated the process via its cancellation
+    ///     machinery, as opposed to the process exiting on its own.
+    /// </summary>
+    public bool Canceled { get; }
+
+    /// <summary>
+    ///     The POSIX signal that terminated the process, surfaced on Unix only.
+    /// </summary>
+    /// <remarks>
+    ///     This is a best-effort heuristic derived from <see cref="ExitCode" />
+    ///     (an <c>ExitCode &gt; 128</c> is interpreted as termination by signal
+    ///     <c>ExitCode - 128</c>). It is not authoritative and is <c>null</c> on Windows,
+    ///     where no POSIX signal terminated the process. The property is intentionally
+    ///     supported on every platform so Windows-targeted consumers can read it (always
+    ///     <c>null</c>) without triggering CA1416.
+    /// </remarks>
+    public PosixSignal? Signal { get; }
+
+    /// <summary>
     ///     How long the Command took to execute represented as a TimeSpan.
     /// </summary>
     public TimeSpan RuntimeDuration => ExitTime.Subtract(StartTime);
@@ -89,11 +125,15 @@ public class ProcessResult : IEquatable<ProcessResult>
         if (other.GetType() != GetType())
             return false;
 
+#pragma warning disable CA1416
         return ExitCode == other.ExitCode
                && ExecutedFilePath == other.ExecutedFilePath
                && ProcessId == other.ProcessId
                && StartTime == other.StartTime
-               && ExitTime == other.ExitTime;
+               && ExitTime == other.ExitTime
+               && Canceled == other.Canceled
+               && Signal == other.Signal;
+#pragma warning restore CA1416
     }
 
     /// <summary>
@@ -121,7 +161,9 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <returns>The hash code for the current ProcessResult.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine(ExitCode, ExecutedFilePath, StartTime, ExitTime);
+#pragma warning disable CA1416
+        return HashCode.Combine(ExitCode, ExecutedFilePath, ProcessId, StartTime, ExitTime, Canceled, Signal);
+#pragma warning restore CA1416
     }
 
     /// <summary>

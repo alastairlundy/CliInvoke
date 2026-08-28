@@ -10,7 +10,7 @@ public class ChainDisposalTests
     {
         MemoryStream stdout = new MemoryStream();
         MemoryStream stderr = new MemoryStream();
-        PipedProcessResult pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr);
+        PipedProcessResult pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr, canceled: false, signal: null);
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
@@ -37,7 +37,7 @@ public class ChainDisposalTests
     {
         MemoryStream stdout = new MemoryStream();
         MemoryStream stderr = new MemoryStream();
-        PipedProcessResult pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr);
+        PipedProcessResult pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr, canceled: false, signal: null);
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
