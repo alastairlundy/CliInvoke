@@ -96,9 +96,11 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// <remarks>
     ///     This is a best-effort heuristic derived from <see cref="ExitCode" />
     ///     (an <c>ExitCode &gt; 128</c> is interpreted as termination by signal
-    ///     <c>ExitCode - 128</c>). It is not authoritative and is <c>null</c> on Windows.
+    ///     <c>ExitCode - 128</c>). It is not authoritative and is <c>null</c> on Windows,
+    ///     where no POSIX signal terminated the process. The property is intentionally
+    ///     supported on every platform so Windows-targeted consumers can read it (always
+    ///     <c>null</c>) without triggering CA1416.
     /// </remarks>
-    [UnsupportedOSPlatform("windows")]
     public PosixSignal? Signal { get; }
 
     /// <summary>

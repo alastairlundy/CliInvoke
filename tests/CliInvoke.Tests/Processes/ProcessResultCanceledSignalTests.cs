@@ -143,8 +143,8 @@ public class ProcessResultCanceledSignalTests : IDisposable
     [Test]
     public async Task Unix_SignalTrappingHelper_KilledBySigterm_ReportsSignal()
     {
-        // Windows has no POSIX signals; Signal null is guaranteed by [UnsupportedOSPlatform]
-        // plus code review and is not CI-exercised (no Windows CI build).
+        // Windows has no POSIX signals; Signal is null by design on Windows
+        // (the property is supported on all platforms and simply returns null there).
         if (OperatingSystem.IsWindows())
             return;
 
