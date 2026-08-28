@@ -38,6 +38,19 @@ internal class ProcessInvocationPipeline
     /// <returns>The process result of type <typeparamref name="TResult"/>.</returns>
     public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx) where TResult : ProcessResult
     {
+        long? GetTruncationCap()
+        {
+            var middleware = ctx.Middleware;
+
+            if (middleware is not null &&
+                middleware.Items.TryGet<long>(TruncationDefaults.MaxBytesPerStreamKey, out long cap))
+                return cap;
+
+            return null;
+        }
+
+        long? truncationCap = GetTruncationCap();
+
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
             ctx.Configuration, ctx.ExitConfiguration);
 
@@ -70,7 +83,8 @@ internal class ProcessInvocationPipeline
             return ctx.Mode switch
             {
                 InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
-                InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(ctx.CancellationToken),
+                InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(
+                    ctx.CancellationToken, truncationCap, truncationCap),
                 InvocationMode.Piped => (TResult)(object)await externalProcess.CapturePipedResultAsync(ctx.CancellationToken),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
             };

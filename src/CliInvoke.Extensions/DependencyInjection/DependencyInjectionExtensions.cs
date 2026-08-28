@@ -15,6 +15,7 @@ using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility;
 using CliInvoke.Extensions.Middleware;
+using CliInvoke.Extensions.Middleware.Retry;
 using CliInvoke.Factories;
 using CliInvoke.Specializations.Middleware;
 using CliInvoke.Validation;
@@ -244,6 +245,19 @@ public static class DependencyInjectionExtensions
             typeof(LoggingMiddleware),
             sp => new LoggingMiddleware(
                 sp.GetService<ILogger<LoggingMiddleware>>() ?? NullLogger<LoggingMiddleware>.Instance),
+            lifetime));
+
+        services.TryAdd(ServiceDescriptor.Describe(
+            typeof(RetryOptions),
+            _ => RetryOptions.Default,
+            lifetime));
+
+        services.TryAdd(ServiceDescriptor.Describe(
+            typeof(RetryMiddleware),
+            sp => new RetryMiddleware(
+                sp.GetService<IProcessResultValidator<ProcessResult>>()
+                    ?? new ProcessResultValidator<ProcessResult>([CommonValidationRules<ProcessResult>.RequiresExitCodeZero]),
+                sp.GetService<RetryOptions>() ?? RetryOptions.Default),
             lifetime));
     }
 }

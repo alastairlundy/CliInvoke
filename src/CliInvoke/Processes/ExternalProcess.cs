@@ -237,9 +237,9 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         long? maxStandardOutputBytes = null,
         long? maxStandardErrorBytes = null)
     {
-        Task<(string StandardOutput, string StandardError)> outputStrings = Configuration.OutputRedirection ?
-            _processWrapper.ReadAllTextAsync(cancellationToken)
-            : Task.FromResult((string.Empty, string.Empty));
+        Task<(string StandardOutput, string StandardError, bool WasTruncated)> outputStrings = Configuration.OutputRedirection ?
+            _processWrapper.ReadAllTextAsync(cancellationToken, maxStandardOutputBytes, maxStandardErrorBytes)
+            : Task.FromResult((string.Empty, string.Empty, false));
 
         try
         {
@@ -254,6 +254,8 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 _processWrapper.ExitTime,
                 canceled: _processWrapper.Canceled,
                 signal: _processWrapper.Signal);
+
+            result.WasTruncated = outputStrings.Result.WasTruncated;
 
             return result;
         }
