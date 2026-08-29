@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using System.Collections.Generic;
 using CliInvoke.Core;
 
 namespace CliInvoke.Tests;
@@ -42,12 +43,19 @@ public class BufferedProcessResultEqualityTests
     }
 
     [Test]
-    public async Task GetHashCode_DistinguishesResultsThatDifferOnlyByWasTruncated()
+    public async Task HashSet_RetainsBothResultsThatDifferOnlyByWasTruncated()
     {
+        // The GetHashCode contract permits unequal values to share a hash code, so we do not assert
+        // distinct codes. Instead, verify the set retains both entries: it relies on Equals (which
+        // distinguishes the truncated flag), not on the hash codes differing.
         BufferedProcessResult truncated = Create(true);
         BufferedProcessResult notTruncated = Create(false);
 
-        await Assert.That(truncated.GetHashCode() == notTruncated.GetHashCode()).IsFalse();
+        var set = new HashSet<BufferedProcessResult> { truncated, notTruncated };
+
+        await Assert.That(set.Count).IsEqualTo(2);
+        await Assert.That(set.Contains(truncated)).IsTrue();
+        await Assert.That(set.Contains(notTruncated)).IsTrue();
     }
 
     [Test]
