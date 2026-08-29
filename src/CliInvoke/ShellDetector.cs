@@ -73,7 +73,7 @@ public class ShellDetector : IShellDetector
             execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
         FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
-            execResult.StandardOutput.Split(Environment.NewLine).First());
+            GetFirstLine(execResult.StandardOutput));
 
         using ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
             .Create(shellExeInfo.FullName, "--version");
@@ -81,9 +81,20 @@ public class ShellDetector : IShellDetector
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
             shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
-        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l =>
-            l.Contains("version", StringComparison.OrdinalIgnoreCase) &&
-            l.Any(c => char.IsDigit(c)));
+        string? versionLine = null;
+
+        foreach (var line in shellInfoResult.StandardOutput.AsSpan().EnumerateLines())
+        {
+            if (line.Contains("version".AsSpan(), StringComparison.OrdinalIgnoreCase) &&
+                line.IndexOfAny("0123456789".AsSpan()) >= 0)
+            {
+                versionLine = line.ToString();
+                break;
+            }
+        }
+
+        if (versionLine is null)
+            throw new InvalidOperationException("No version line was found in the shell output.");
 
         string[] commaSplit = versionLine.Split(',');
 
@@ -133,7 +144,7 @@ public class ShellDetector : IShellDetector
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
                 ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
-            string line = result.StandardOutput.Split(Environment.NewLine).First();
+            string line = GetFirstLine(result.StandardOutput);
 
             string versionString = line.Replace("Microsoft", string.Empty)
                 .Replace("Windows", string.Empty).Replace("]", string.Empty);
@@ -143,5 +154,19 @@ public class ShellDetector : IShellDetector
 
             return new ShellInformation("cmd", cmdExeInfo, cmdVersion);
         }
+    }
+
+    /// <summary>
+    ///     Returns the first line of the supplied text without allocating a full line array.
+    /// </summary>
+    private static string GetFirstLine(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+
+        foreach (var line in text.AsSpan().EnumerateLines())
+            return line.ToString();
+
+        return string.Empty;
     }
 }

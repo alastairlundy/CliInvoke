@@ -172,7 +172,7 @@ public class FilePathResolver : IFilePathResolver
     {
         string fileName = Path.GetFileName(filePathToResolve);
 
-        int index = filePathToResolve.LastIndexOf(fileName, StringComparison.InvariantCultureIgnoreCase);
+        int index = filePathToResolve.LastIndexOf(fileName, StringComparison.OrdinalIgnoreCase);
 
         string directoryPath;
         
@@ -197,7 +197,6 @@ public class FilePathResolver : IFilePathResolver
                 MatchCasing = OperatingSystem.IsWindows() ? MatchCasing.CaseInsensitive : MatchCasing.CaseSensitive,
                 RecurseSubdirectories = true,
             })
-            .Where(f => f.Exists)
             .Select(f =>
             {
                 if (OperatingSystem.IsWindows())
@@ -222,13 +221,24 @@ public class FilePathResolver : IFilePathResolver
 
                 return f;
             })
-            .FirstOrDefault(f => OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.InvariantCultureIgnoreCase) 
-                : f.Name.Equals(filePathToResolve, StringComparison.InvariantCulture));
+            .FirstOrDefault(f => OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)
+                : f.Name.Equals(filePathToResolve, StringComparison.Ordinal));
 
-        return file ?? throw new FileNotFoundException(
-            Resources.Exceptions_FileNotFound.Replace(
-                "{file}",
-                filePathToResolve));
+        if (file is null)
+            throw new FileNotFoundException(
+                Resources.Exceptions_FileNotFound.Replace(
+                    "{file}",
+                    filePathToResolve));
+
+        FileInfo refreshed = new FileInfo(file.FullName);
+
+        if (!refreshed.Exists)
+            throw new FileNotFoundException(
+                Resources.Exceptions_FileNotFound.Replace(
+                    "{file}",
+                    filePathToResolve));
+
+        return refreshed;
     }
 
     /// <summary>
