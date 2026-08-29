@@ -140,6 +140,39 @@ public class RetryMiddlewareTests
     }
 
     [Test]
+    public async Task Constructor_Throws_WhenMaxAttemptsIsLessThanOne()
+    {
+        var options = new RetryOptions { MaxAttempts = 0 };
+
+        await Assert.That(() => new RetryMiddleware(AlwaysRetry(), options))
+            .Throws<ArgumentOutOfRangeException>();
+    }
+
+    [Test]
+    public async Task InvokeAsync_PerformsExactlyOneAttempt_WhenMaxAttemptsIsOne()
+    {
+        var options = new RetryOptions
+        {
+            MaxAttempts = 1,
+            BaseDelay = TimeSpan.FromMilliseconds(1)
+        };
+        var middleware = new RetryMiddleware(AlwaysRetry(), options);
+        InvocationContext ctx = CreateContext();
+
+        int attempts = 0;
+        Func<InvocationContext, Task> next = c =>
+        {
+            attempts++;
+            c.Result = MakeResult();
+            return Task.CompletedTask;
+        };
+
+        await middleware.InvokeAsync(ctx, next);
+
+        await Assert.That(attempts).IsEqualTo(1);
+    }
+
+    [Test]
     public async Task UseRetryPolicy_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();

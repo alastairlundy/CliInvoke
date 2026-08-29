@@ -35,10 +35,19 @@ internal sealed class RetryMiddleware : IProcessMiddleware
     /// <exception cref="ArgumentNullException">
     ///     Thrown when <paramref name="retryableConditions"/> or <paramref name="options"/> is <c>null</c>.
     /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     Thrown when <paramref name="options"/>.<see cref="RetryOptions.MaxAttempts"/> is less than 1, since
+    ///     zero or negative attempts would be meaningless and the <c>do</c> loop would still run once.
+    /// </exception>
     public RetryMiddleware(IProcessResultValidator<ProcessResult> retryableConditions, RetryOptions options)
     {
         ArgumentNullException.ThrowIfNull(retryableConditions);
         ArgumentNullException.ThrowIfNull(options);
+
+        if (options.MaxAttempts < 1)
+            throw new ArgumentOutOfRangeException(
+                nameof(options),
+                "RetryOptions.MaxAttempts must be at least 1; zero or negative attempts are not allowed.");
 
         _retryableConditions = retryableConditions;
         _options = options;

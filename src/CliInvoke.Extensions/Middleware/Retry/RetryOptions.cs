@@ -28,6 +28,7 @@ public sealed class RetryOptions
     /// <summary>
     ///     Gets or sets the maximum number of invocation attempts, including the initial attempt.
     /// </summary>
+    /// <remarks>Must be at least 1. Values below 1 are rejected by <see cref="RetryMiddleware"/>.</remarks>
     public int MaxAttempts { get; set; } = 3;
 
     /// <summary>
