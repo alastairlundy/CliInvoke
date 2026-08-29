@@ -55,9 +55,11 @@ public static class CachingFilePathResolverExtensions
         ///     <see cref="CachingFilePathResolver"/>, overriding the caching options.
         /// </summary>
         /// <remarks>
-        ///     The inner resolver is captured from the prior <see cref="IFilePathResolver"/> registration and
+        ///     The inner resolver is captured from the active (last) <see cref="IFilePathResolver"/> registration and
         ///     reconstructed directly (not resolved via <see cref="IFilePathResolver"/> itself) so the decorator
-        ///     swap avoids a circular dependency. <see cref="IMemoryCache"/> is registered as a
+        ///     swap avoids a circular dependency. Because the DI container returns the last registered
+        ///     implementation when a single service is resolved, the decorator wraps that active resolver rather
+        ///     than an earlier one. <see cref="IMemoryCache"/> is registered as a
         ///     <see cref="ServiceLifetime.Singleton"/> and shared across all scopes.
         /// </remarks>
         /// <param name="configure">A callback to customise <see cref="CachingFilePathResolverOptions"/>.</param>
@@ -82,8 +84,11 @@ public static class CachingFilePathResolverExtensions
             services.TryAddSingleton<IMemoryCache>(_ =>
                 new MemoryCache(new MemoryCacheOptions { SizeLimit = options.SizeLimit }));
 
+            // The DI container resolves the last registered implementation for a single service
+            // (last-wins), so the active resolver is the last one. Capture it so the decorator wraps
+            // the resolver that would otherwise be returned, not an earlier registration.
             ServiceDescriptor? innerDescriptor =
-                services.FirstOrDefault(d => d.ServiceType == typeof(IFilePathResolver));
+                services.LastOrDefault(d => d.ServiceType == typeof(IFilePathResolver));
 
             if (innerDescriptor is null)
                 throw new InvalidOperationException(

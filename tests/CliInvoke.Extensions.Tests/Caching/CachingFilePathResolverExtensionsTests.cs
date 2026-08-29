@@ -108,4 +108,43 @@ public class CachingFilePathResolverExtensionsTests
 
         await Assert.That(() => services.UseCachingFilePathResolver()).Throws<InvalidOperationException>();
     }
+
+    [Test]
+    public async Task UseCachingFilePathResolver_WhenMultipleResolversRegistered_DecoratesLast()
+    {
+        // The DI container resolves the last registered implementation for a single service
+        // (last-wins). The decorator must wrap that active resolver, not the first registration.
+        IServiceCollection services = new ServiceCollection();
+        services.AddSingleton<IFilePathResolver>(new TaggedResolver("first"));
+        services.AddSingleton<IFilePathResolver>(new TaggedResolver("last"));
+        services.UseCachingFilePathResolver();
+
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IFilePathResolver resolver = scope.ServiceProvider.GetRequiredService<IFilePathResolver>();
+
+        await Assert.That(resolver).IsTypeOf<CachingFilePathResolver>();
+
+        // A cache miss delegates to the wrapped inner resolver; the tag reveals which one.
+        FileInfo resolved = resolver.ResolveFilePath("tool");
+
+        await Assert.That(resolved.Name).IsEqualTo("tool-last");
+    }
+
+    private sealed class TaggedResolver : IFilePathResolver
+    {
+        private readonly string _tag;
+
+        public TaggedResolver(string tag) => _tag = tag;
+
+        public FileInfo ResolveFilePath(string filePathToResolve)
+            => new FileInfo($"{filePathToResolve}-{_tag}");
+
+        public bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath)
+        {
+            resolvedFilePath = new FileInfo($"{filePathToResolve}-{_tag}");
+            return true;
+        }
+    }
 }
