@@ -187,7 +187,20 @@ public class RetryMiddlewareTests
     public async Task UseRetryPolicy_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
+        // Register UseRetryPolicy() first, then replace the validator and process factory with stubs.
+        // Registering after AddCliInvoke ensures our singleton registrations win over the ones it adds.
         services.AddCliInvoke(builder => builder.UseRetryPolicy());
+
+        // A validator that always classifies the result as retryable, plus a stub process factory that
+        // avoids spawning real processes. Executing through the resolved IProcessInvoker (not a
+        // manually-built ProcessInvoker) proves the registration actually adds the middleware: if
+        // UseRetryPolicy() stopped registering it, the stub would run once and the retry count would
+        // not reach MaxAttempts.
+        var validator = new CountingRetryValidator();
+        var factory = new StubExternalProcessFactory();
+        services.AddSingleton<IProcessResultValidator<ProcessResult>>(validator);
+        services.AddSingleton<IExternalProcessFactory>(factory);
+
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();
@@ -197,16 +210,10 @@ public class RetryMiddlewareTests
         await Assert.That(invoker).IsNotNull();
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
 
-        // Verify the retry middleware is actually registered and active: a result the validator
-        // classifies as retryable is attempted MaxAttempts times rather than once. The counting
-        // validator is consulted once per attempt. A stub process factory avoids spawning real processes.
-        var validator = new CountingRetryValidator();
-        var factory = new StubExternalProcessFactory();
-        var retryMiddleware = new RetryMiddleware(validator, RetryOptions.Default);
-        var directInvoker = new ProcessInvoker(factory, [retryMiddleware], null);
-
+        // The retry middleware is registered and active: the retryable result is attempted
+        // MaxAttempts times rather than once, and the validator is consulted once per attempt.
         using ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
-        await directInvoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
+        await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 
         await Assert.That(validator.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);
     }
