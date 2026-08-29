@@ -179,7 +179,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
                 Configuration.TargetFilePath, exitCode: 0, processId: 0,
                 standardOutput: string.Empty, standardError: string.Empty,
                 startTime: now, exitTime: now,
-                canceled: Canceled, signal: Signal));
+                canceled: Canceled, signal: Signal, wasTruncated: false));
         }
 
         public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)

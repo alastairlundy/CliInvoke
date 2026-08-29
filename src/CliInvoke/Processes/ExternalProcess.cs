@@ -253,9 +253,8 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime,
                 canceled: _processWrapper.Canceled,
-                signal: _processWrapper.Signal);
-
-            result.WasTruncated = outputStrings.Result.WasTruncated;
+                signal: _processWrapper.Signal,
+                wasTruncated: outputStrings.Result.WasTruncated);
 
             return result;
         }
