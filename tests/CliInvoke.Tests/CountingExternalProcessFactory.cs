@@ -169,14 +169,17 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
                 canceled: Canceled, signal: Signal));
         }
 
-        public Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken)
+        public Task<BufferedProcessResult> CaptureBufferedResultAsync(
+            CancellationToken cancellationToken,
+            long? maxStandardOutputBytes = null,
+            long? maxStandardErrorBytes = null)
         {
             DateTime now = DateTime.UtcNow;
             return Task.FromResult(new BufferedProcessResult(
                 Configuration.TargetFilePath, exitCode: 0, processId: 0,
                 standardOutput: string.Empty, standardError: string.Empty,
                 startTime: now, exitTime: now,
-                canceled: Canceled, signal: Signal));
+                canceled: Canceled, signal: Signal, wasTruncated: false));
         }
 
         public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)

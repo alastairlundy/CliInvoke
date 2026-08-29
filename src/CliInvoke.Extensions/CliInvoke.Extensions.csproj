@@ -37,8 +37,10 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="CliInvoke.Tests"/>
+        <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     </ItemGroup>
 
     <PropertyGroup>

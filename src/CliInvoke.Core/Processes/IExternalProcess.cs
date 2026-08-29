@@ -100,11 +100,22 @@ public interface IExternalProcess : IDisposable
     ///     A cancellation token that can be used by other objects or threads
     ///     to receive notice of cancellation.
     /// </param>
+    /// <param name="maxStandardOutputBytes">
+    ///     An optional maximum number of bytes to capture from standard output before truncating.
+    ///     <c>null</c> means no cap is applied.
+    /// </param>
+    /// <param name="maxStandardErrorBytes">
+    ///     An optional maximum number of bytes to capture from standard error before truncating.
+    ///     <c>null</c> means no cap is applied.
+    /// </param>
     /// <returns>
     ///     A task that represents the asynchronous operation.
     ///     The result contains the buffered process result when the method completes.
     /// </returns>
-    Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken);
+    Task<BufferedProcessResult> CaptureBufferedResultAsync(
+        CancellationToken cancellationToken,
+        long? maxStandardOutputBytes = null,
+        long? maxStandardErrorBytes = null);
 
     /// <summary>
     /// </summary>

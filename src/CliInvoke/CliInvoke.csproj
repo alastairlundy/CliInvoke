@@ -58,6 +58,8 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
+        <InternalsVisibleTo Include="CliInvoke.Extensions"/>
+        <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
     </ItemGroup>
 
 <!--    <ItemGroup>
