@@ -224,10 +224,21 @@ public class FilePathResolver : IFilePathResolver
             .FirstOrDefault(f => OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)
                 : f.Name.Equals(filePathToResolve, StringComparison.Ordinal));
 
-        return file ?? throw new FileNotFoundException(
-            Resources.Exceptions_FileNotFound.Replace(
-                "{file}",
-                filePathToResolve));
+        if (file is null)
+            throw new FileNotFoundException(
+                Resources.Exceptions_FileNotFound.Replace(
+                    "{file}",
+                    filePathToResolve));
+
+        FileInfo refreshed = new FileInfo(file.FullName);
+
+        if (!refreshed.Exists)
+            throw new FileNotFoundException(
+                Resources.Exceptions_FileNotFound.Replace(
+                    "{file}",
+                    filePathToResolve));
+
+        return refreshed;
     }
 
     /// <summary>
