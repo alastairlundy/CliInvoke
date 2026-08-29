@@ -13,7 +13,7 @@ Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/bl
 
 ## Usage
 
-CliInvoke.Specializations comes with two specializations as of 3.0.0:
+CliInvoke.Specializations comes with two specializations as of 3.0.0 (currently in pre-release as `3.0.0-alpha.10`):
 
 - [CmdProcessConfiguration](#cmdprocessconfiguration) — An easier way to execute processes and commands through
   Windows' `cmd.exe`.
@@ -49,8 +49,11 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(config, ProcessExit
 
 If you prefer to resolve an invoker from a dependency injection container, call `AddCliInvoke()` (namespace
 `CliInvoke.Extensions`). This registers the core services, the `IProcessInvoker` implementation, the
-`IRunnerConfigurationFactory`, and the specializations middleware (`UsePowerShell()` and `UseCmd()`) on the
-`IProcessMiddlewareBuilder`.
+`IRunnerConfigurationFactory`, and the `IExternalProcessFactory`.
+
+The Cmd and PowerShell specializations middleware (`UsePowerShell()` and `UseCmd()`) is **opt-in**: by default the
+registered invoker runs with no specializations middleware wired into its pipeline. To activate it, compose the
+middleware explicitly in the configure callback:
 
 ```csharp
 using CliInvoke.Extensions;
@@ -58,10 +61,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 ServiceCollection services = new ServiceCollection();
 
-services.AddCliInvoke();
-
-// The specializations middleware is registered automatically, but you can also compose it explicitly:
-// services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd());
+// The specializations middleware is opt-in: compose it explicitly.
+services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd());
 
 using IServiceProvider serviceProvider = services.BuildServiceProvider();
 ```
@@ -154,6 +155,34 @@ ProcessConfiguration processToRun = _runnerConfigurationFactory.CreateRunnerConf
 
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
 ```
+
+### Dedicated invokers
+
+In addition to the configuration classes above, CliInvoke.Specializations ships two convenience invoker wrappers —
+`CmdProcessInvoker` and `PowershellProcessInvoker` (namespace `CliInvoke.Specializations`) — that implement
+`IProcessInvoker` with the relevant middleware (`CmdMiddleware` / `PowerShellMiddleware`) pre-applied. They let you run
+commands through `cmd.exe` / `pwsh` directly without manually building a runner configuration each time.
+
+Both are constructed from an `IExternalProcessFactory`, which `AddCliInvoke()` registers in the container:
+
+```csharp
+using CliInvoke.Core;
+using CliInvoke.Core.Factories;
+using CliInvoke.Specializations;
+using CliInvoke.Specializations.Configurations;
+
+// Resolve the external process factory registered by AddCliInvoke().
+IExternalProcessFactory factory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
+
+// CmdProcessInvoker applies CmdMiddleware and runs through cmd.exe (Windows only).
+using CmdProcessInvoker cmdInvoker = new CmdProcessInvoker(factory);
+
+using CmdProcessConfiguration cmdConfig = new CmdProcessConfiguration("echo hello", false, true);
+ProcessResult result = await cmdInvoker.ExecuteAsync(cmdConfig);
+```
+
+`PowershellProcessInvoker` works the same way and is supported on the platforms that cross-platform PowerShell
+supports.
 
 ## Licensing
 

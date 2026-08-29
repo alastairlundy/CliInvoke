@@ -60,8 +60,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\SPECIALIZATIONS_README.md">
-            <Link>README.md</Link>
+        <Content Include="README.md">
             <PackagePath>README.md</PackagePath>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>

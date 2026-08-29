@@ -209,32 +209,25 @@ public sealed class ArgumentsSpec
     ///     Escapes characters in a string without wrapping in quotes.
     /// </summary>
     /// <remarks>
-    ///     Delegates to <see cref="ShellArgumentEscaper.EscapeForCmd"/> so argument
-    ///     escaping is consistent with the cmd/PowerShell specializations. The previous
-    ///     JSON-style escaping (<c>\\</c>, <c>\"</c>, <c>\n</c>, ...) was unsafe for
-    ///     command lines and is no longer used.
+    ///     Delegates to <see cref="ArgumentEscaper.EscapeInner"/> so argument escaping
+    ///     is platform-aware and consistent with the underlying C-runtime / POSIX shell
+    ///     argument parser. The previous JSON-style escaping (<c>\\</c>, <c>\"</c>,
+    ///     <c>\n</c>, ...) was unsafe for command lines and is no longer used.
     /// </remarks>
     private string EscapeCharactersWithoutWrapping(string argument)
     {
         ArgumentNullException.ThrowIfNull(argument);
 
-        return ShellArgumentEscaper.EscapeForCmd(argument);
+        return ArgumentEscaper.EscapeInner(argument);
     }
 
     private string EscapeCharacters(string argument)
     {
         ArgumentNullException.ThrowIfNull(argument);
 
-        string escapedContent = ShellArgumentEscaper.EscapeForCmd(argument);
+        string escapedContent = ArgumentEscaper.EscapeInner(argument);
 
-        // If the caller already supplied a fully quoted value, leave it as-is
-        // rather than double-wrapping it in additional quotes.
-        if (argument.StartsWith('"') && argument.EndsWith('"'))
-        {
-            return escapedContent;
-        }
-
-        return $"\"{escapedContent}\"";
+        return ArgumentEscaper.NeedsQuoting(argument) ? $"\"{escapedContent}\"" : escapedContent;
     }
 
     private bool IsValidArgument(IFormattable value, IFormatProvider provider)
