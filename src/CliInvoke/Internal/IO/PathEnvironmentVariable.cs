@@ -64,7 +64,7 @@ internal static class PathEnvironmentVariable
 
                 int homeTokenIndex = x.IndexOf(
                     homeToken,
-                    StringComparison.CurrentCultureIgnoreCase
+                    StringComparison.OrdinalIgnoreCase
                 );
 
                 if (x.StartsWith('~', StringComparison.OrdinalIgnoreCase))

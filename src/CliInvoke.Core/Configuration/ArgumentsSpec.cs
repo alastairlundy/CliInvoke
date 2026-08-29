@@ -11,7 +11,6 @@
  */
 
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using CliInvoke.Core.Internal;
 
@@ -134,17 +133,27 @@ public sealed class ArgumentsSpec
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        List<string> filteredList = values.Where(x => _argumentValidationLogic.Invoke(x)).ToList();
+        StringBuilder? joined = null;
+        int validCount = 0;
 
-        if (filteredList.Count == 0)
+        foreach (var item in values)
+        {
+            if (item is null || !_argumentValidationLogic.Invoke(item))
+                continue;
+
+            if (joined is null)
+                joined = new StringBuilder();
+            else
+                joined.Append(' ');
+
+            joined.Append(escape ? EscapeCharactersWithoutWrapping(item) : item);
+            validCount++;
+        }
+
+        if (validCount == 0)
             throw new ArgumentException("No valid arguments to add.");
 
-        List<string> processedList = escape
-            ? filteredList.Select(v => EscapeCharactersWithoutWrapping(v)).ToList()
-            : filteredList;
-
-        string joinedValues = string.Join(" ", processedList);
-        string wrappedValue = $"\"{joinedValues}\"";
+        string wrappedValue = $"\"{joined}\"";
 
         if (_buffer.Length is > 0 and < int.MaxValue)
             if (_buffer[^1] != ' ')
@@ -169,20 +178,29 @@ public sealed class ArgumentsSpec
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        List<IFormattable> valuesList = [.. values];
+        StringBuilder? joined = null;
+        int validCount = 0;
 
-        if (valuesList.Count == 0)
+        foreach (var item in values)
+        {
+            string? str = item.ToString(null, _formatProvider);
+
+            if (str is null || !_argumentValidationLogic.Invoke(str))
+                continue;
+
+            if (joined is null)
+                joined = new StringBuilder();
+            else
+                joined.Append(' ');
+
+            joined.Append(str);
+            validCount++;
+        }
+
+        if (validCount == 0)
             throw new ArgumentException("No valid arguments to add.");
 
-        List<string> valuesStrings = valuesList
-            .Select(x => x.ToString(null, _formatProvider)!)
-            .Where(x => _argumentValidationLogic.Invoke(x))
-            .ToList();
-
-        if (valuesStrings.Count == 0)
-            throw new ArgumentException("No valid arguments to add.");
-
-        string value = string.Join(' ', valuesStrings);
+        string value = joined!.ToString();
         string processedValue = escape ? EscapeCharactersWithoutWrapping(value) : value;
         string wrappedValue = $"\"{processedValue}\"";
 

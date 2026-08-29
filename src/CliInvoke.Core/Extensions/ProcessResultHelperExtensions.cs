@@ -64,7 +64,7 @@ public static class ProcessResultHelperExtensions
         /// an empty string will be returned.
         /// </returns>
         public string GetFirstOutputLine()
-            => processResult.StandardOutput.Split(Environment.NewLine).First();
+            => GetFirstLineFromSpan(processResult.StandardOutput.AsSpan());
 
         /// <summary>
         /// Splits the standard output and standard error of the process result into lines.
@@ -186,7 +186,7 @@ public static class ProcessResultHelperExtensions
             
             string stdOut = stdOutReader.ReadToEnd();
 
-            return stdOut.Split(Environment.NewLine).First();
+            return GetFirstLineFromSpan(stdOut.AsSpan());
         }
 
         /// <summary>
@@ -203,7 +203,18 @@ public static class ProcessResultHelperExtensions
 
             string stdOut = await stdOutReader.ReadToEndAsync(cancellationToken);
 
-            return stdOut.Split(Environment.NewLine).First();
+            return GetFirstLineFromSpan(stdOut.AsSpan());
         }
+    }
+
+    /// <summary>
+    ///     Returns the first line of the supplied text without allocating a full line array.
+    /// </summary>
+    private static string GetFirstLineFromSpan(ReadOnlySpan<char> text)
+    {
+        foreach (var line in text.EnumerateLines())
+            return line.ToString();
+
+        return string.Empty;
     }
 }
