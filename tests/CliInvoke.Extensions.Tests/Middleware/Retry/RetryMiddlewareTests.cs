@@ -149,6 +149,15 @@ public class RetryMiddlewareTests
     }
 
     [Test]
+    public async Task Constructor_Throws_WhenBaseDelayIsNegative()
+    {
+        var options = new RetryOptions { BaseDelay = TimeSpan.FromMilliseconds(-1) };
+
+        await Assert.That(() => new RetryMiddleware(AlwaysRetry(), options))
+            .Throws<ArgumentOutOfRangeException>();
+    }
+
+    [Test]
     public async Task InvokeAsync_PerformsExactlyOneAttempt_WhenMaxAttemptsIsOne()
     {
         var options = new RetryOptions

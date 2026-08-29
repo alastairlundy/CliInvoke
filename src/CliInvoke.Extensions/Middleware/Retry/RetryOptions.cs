@@ -34,6 +34,7 @@ public sealed class RetryOptions
     /// <summary>
     ///     Gets or sets the base delay applied between retry attempts.
     /// </summary>
+    /// <remarks>Must be non-negative. Negative values are rejected by <see cref="RetryMiddleware"/>.</remarks>
     public TimeSpan BaseDelay { get; set; } = TimeSpan.FromMilliseconds(100);
 
     /// <summary>
