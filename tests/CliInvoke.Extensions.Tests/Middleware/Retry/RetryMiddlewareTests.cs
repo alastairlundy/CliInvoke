@@ -7,7 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Core.Factories;
 using CliInvoke.Core.Middleware;
+using CliInvoke.Core.Processes;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensions.Middleware.Retry;
 using CliInvoke.Validation;
@@ -191,7 +193,132 @@ public class RetryMiddlewareTests
         using IServiceScope scope = provider.CreateScope();
         IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
 
+        // Preserve the original service-resolution assertions.
         await Assert.That(invoker).IsNotNull();
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
+
+        // Verify the retry middleware is actually registered and active: a result the validator
+        // classifies as retryable is attempted MaxAttempts times rather than once. The counting
+        // validator is consulted once per attempt. A stub process factory avoids spawning real processes.
+        var validator = new CountingRetryValidator();
+        var factory = new StubExternalProcessFactory();
+        var retryMiddleware = new RetryMiddleware(validator, RetryOptions.Default);
+        var directInvoker = new ProcessInvoker(factory, [retryMiddleware], null);
+
+        using ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
+        await directInvoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
+
+        await Assert.That(validator.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);
+    }
+
+    /// <summary>
+    ///     A validator that always classifies the result as retryable (Validate returns false, so the
+    ///     default <c>ShouldRetry => !Validate</c> returns true) and records how many times it is consulted.
+    /// </summary>
+    private sealed class CountingRetryValidator : IProcessResultValidator<ProcessResult>
+    {
+        public int Calls;
+
+        public Func<ProcessResult, bool>[] ValidationRules => [_ => false];
+
+        public bool Validate(ProcessResult result)
+        {
+            Calls++;
+            return false;
+        }
+
+        public ValidationFailure<ProcessResult>[] GetValidationFailures(ProcessResult result) => [];
+    }
+
+    /// <summary>
+    ///     A factory returning a <see cref="StubExternalProcess"/> so retry behaviour can be exercised
+    ///     without starting a real process.
+    /// </summary>
+    private sealed class StubExternalProcessFactory : IExternalProcessFactory
+    {
+        public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration)
+            => new StubExternalProcess(configuration);
+
+        public IExternalProcess CreateExternalProcess(
+            ProcessConfiguration configuration,
+            ProcessExitConfiguration exitConfiguration)
+            => new StubExternalProcess(configuration, exitConfiguration);
+    }
+
+    /// <summary>
+    ///     A no-op <see cref="IExternalProcess"/> that returns sentinel results, used to drive the retry loop.
+    /// </summary>
+    private sealed class StubExternalProcess : IExternalProcess
+    {
+        public StubExternalProcess(ProcessConfiguration configuration)
+            : this(configuration, ProcessExitConfiguration.CreateGraceful())
+        {
+        }
+
+        public StubExternalProcess(ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration)
+        {
+            Configuration = configuration;
+            ExitConfiguration = exitConfiguration;
+        }
+
+        public ProcessConfiguration Configuration { get; init; }
+
+        public ProcessExitConfiguration ExitConfiguration { get; }
+
+        public bool HasExited => true;
+
+        public bool HasStarted { get; private set; }
+
+        public event EventHandler? Started;
+
+        public event EventHandler? Exited;
+
+        public int Start()
+        {
+            HasStarted = true;
+            Started?.Invoke(this, EventArgs.Empty);
+            return 0;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+            => StartAsync(Configuration, cancellationToken);
+
+        public Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken)
+        {
+            HasStarted = true;
+            Started?.Invoke(this, EventArgs.Empty);
+            return Task.CompletedTask;
+        }
+
+        public Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
+        {
+            DateTime now = DateTime.UtcNow;
+            return Task.FromResult(new ProcessResult(
+                Configuration.TargetFilePath, 0, 0, now, now, false, null));
+        }
+
+        public Task<BufferedProcessResult> CaptureBufferedResultAsync(
+            CancellationToken cancellationToken,
+            long? maxStandardOutputBytes = null,
+            long? maxStandardErrorBytes = null)
+        {
+            DateTime now = DateTime.UtcNow;
+            return Task.FromResult(new BufferedProcessResult(
+                Configuration.TargetFilePath, 0, 0, string.Empty, string.Empty,
+                now, now, false, null, false));
+        }
+
+        public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
+        {
+            DateTime now = DateTime.UtcNow;
+            return Task.FromResult(new PipedProcessResult(
+                Configuration.TargetFilePath, 0, 0, now, now, Stream.Null, Stream.Null, false, null));
+        }
+
+        public Task Kill() => Task.CompletedTask;
+
+        public void Dispose()
+        {
+        }
     }
 }
