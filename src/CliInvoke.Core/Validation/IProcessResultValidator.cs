@@ -51,13 +51,14 @@ public interface IProcessResultValidator<TProcessResult> where TProcessResult : 
     ///     Determines whether a process result indicates the operation should be retried.
     /// </summary>
     /// <remarks>
-    ///     The default implementation reuses <see cref="Validate"/> so existing validators classify
-    ///     failures as retryable without requiring a separate classifier type. Implementers may
-    ///     override this to distinguish retryable from terminal failures.
+    ///     The default implementation returns the inverse of <see cref="Validate"/>: a validated (successful)
+    ///     result is not retried, while a failed result is. This reuses existing validators to classify
+    ///     failures as retryable without requiring a separate classifier type. Implementers may override this
+    ///     to distinguish retryable from terminal failures.
     /// </remarks>
     /// <param name="result">The result of the process to evaluate for retryability.</param>
     /// <returns>
     ///     <c>true</c> if the process result indicates the operation should be retried; otherwise, <c>false</c>.
     /// </returns>
-    bool ShouldRetry(TProcessResult result) => Validate(result);
+    bool ShouldRetry(TProcessResult result) => !Validate(result);
 }

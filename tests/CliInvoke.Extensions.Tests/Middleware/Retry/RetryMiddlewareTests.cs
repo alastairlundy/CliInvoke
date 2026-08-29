@@ -28,10 +28,10 @@ public class RetryMiddlewareTests
     }
 
     private static IProcessResultValidator<ProcessResult> AlwaysRetry()
-        => new ProcessResultValidator<ProcessResult>([_ => true]);
+        => new ProcessResultValidator<ProcessResult>([_ => false]);
 
     private static IProcessResultValidator<ProcessResult> NeverRetry()
-        => new ProcessResultValidator<ProcessResult>([_ => false]);
+        => new ProcessResultValidator<ProcessResult>([_ => true]);
 
     private static ProcessResult MakeResult()
         => new("dummy", 1, 1, DateTime.UtcNow, DateTime.UtcNow, false, null);
@@ -101,6 +101,36 @@ public class RetryMiddlewareTests
         {
             attempts++;
             c.Result = null;
+            return Task.CompletedTask;
+        };
+
+        await middleware.InvokeAsync(ctx, next);
+
+        await Assert.That(attempts).IsEqualTo(1);
+    }
+
+    private static IProcessResultValidator<ProcessResult> RequiresExitCodeZeroValidator()
+        => new ProcessResultValidator<ProcessResult>(
+            [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]);
+
+    [Test]
+    public async Task InvokeAsync_DoesNotRetry_WhenDefaultValidatorResultSucceeds()
+    {
+        // The default policy uses RequiresExitCodeZero, so a zero-exit (validated) result must stop
+        // after the first attempt and must not repeat process side effects.
+        var options = new RetryOptions
+        {
+            MaxAttempts = 3,
+            BaseDelay = TimeSpan.FromMilliseconds(1)
+        };
+        var middleware = new RetryMiddleware(RequiresExitCodeZeroValidator(), options);
+        InvocationContext ctx = CreateContext();
+
+        int attempts = 0;
+        Func<InvocationContext, Task> next = c =>
+        {
+            attempts++;
+            c.Result = new ProcessResult("dummy", 0, 1, DateTime.UtcNow, DateTime.UtcNow, false, null);
             return Task.CompletedTask;
         };
 
