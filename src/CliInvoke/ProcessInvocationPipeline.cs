@@ -76,7 +76,14 @@ internal class ProcessInvocationPipeline
                     signal: null);
             }
 
-            await externalProcess.StartAsync(ctx.CancellationToken);
+            // Raw awaits process exit (it does not drain redirected output). Buffered and Piped must be
+            // started WITHOUT awaiting exit so the capture methods can read the redirected streams
+            // concurrently with waiting for exit; awaiting exit first would deadlock when a child writes
+            // more than the OS pipe buffer and nothing is draining it yet.
+            if (ctx.Mode == InvocationMode.Raw)
+                await externalProcess.StartAsync(ctx.CancellationToken);
+            else
+                externalProcess.Start();
 
             // FireAndForget returns above (lines 46-63) without waiting.
             // Only Raw, Buffered, and Piped reach this switch.
