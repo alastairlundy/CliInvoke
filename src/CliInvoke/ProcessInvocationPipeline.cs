@@ -38,6 +38,19 @@ internal class ProcessInvocationPipeline
     /// <returns>The process result of type <typeparamref name="TResult"/>.</returns>
     public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx) where TResult : ProcessResult
     {
+        long? GetTruncationCap()
+        {
+            var middleware = ctx.Middleware;
+
+            if (middleware is not null &&
+                middleware.Items.TryGet<long>(TruncationDefaults.MaxBytesPerStreamKey, out long cap))
+                return cap;
+
+            return null;
+        }
+
+        long? truncationCap = GetTruncationCap();
+
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
             ctx.Configuration, ctx.ExitConfiguration);
 
@@ -63,14 +76,22 @@ internal class ProcessInvocationPipeline
                     signal: null);
             }
 
-            await externalProcess.StartAsync(ctx.CancellationToken);
+            // Raw awaits process exit (it does not drain redirected output). Buffered and Piped must be
+            // started WITHOUT awaiting exit so the capture methods can read the redirected streams
+            // concurrently with waiting for exit; awaiting exit first would deadlock when a child writes
+            // more than the OS pipe buffer and nothing is draining it yet.
+            if (ctx.Mode == InvocationMode.Raw)
+                await externalProcess.StartAsync(ctx.CancellationToken);
+            else
+                externalProcess.Start();
 
             // FireAndForget returns above (lines 46-63) without waiting.
             // Only Raw, Buffered, and Piped reach this switch.
             return ctx.Mode switch
             {
                 InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
-                InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(ctx.CancellationToken),
+                InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(
+                    ctx.CancellationToken, truncationCap, truncationCap),
                 InvocationMode.Piped => (TResult)(object)await externalProcess.CapturePipedResultAsync(ctx.CancellationToken),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
             };

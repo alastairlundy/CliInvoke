@@ -10,6 +10,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using CliInvoke.Processes.Internal.Cancellation;
 using CliInvoke.Processes.Internal.ControlAdapters;
@@ -317,6 +318,108 @@ internal class ProcessWrapper : Process
 
         return destination;
     }
+    #endregion
+
+    #region Buffered truncation-aware capture
+
+    /// <summary>
+    ///     Asynchronously reads both redirected streams into strings, truncating each at its optional
+    ///     per-stream byte cap (discarding the remainder beyond the limit).
+    /// </summary>
+    /// <remarks>
+    ///     This is a distinct overload of the base buffered-capture method on <see cref="Process"/>;
+    ///     the inherited method is NOT overridden. When a cap is <c>null</c> (or &lt;= 0) the stream is read
+    ///     in full, matching the prior behaviour.
+    /// </remarks>
+    /// <param name="cancellationToken">A cancellation token for the read operations.</param>
+    /// <param name="maxStandardOutputBytes">
+    ///     An optional maximum number of bytes to capture from standard output before truncating.
+    ///     <c>null</c> means no cap is applied.
+    /// </param>
+    /// <param name="maxStandardErrorBytes">
+    ///     An optional maximum number of bytes to capture from standard error before truncating.
+    ///     <c>null</c> means no cap is applied.
+    /// </param>
+    /// <returns>
+    ///     A tuple containing the captured standard output, standard error, and a flag indicating
+    ///     whether either stream was truncated.
+    /// </returns>
+    internal async Task<(string StandardOutput, string StandardError, bool WasTruncated)> ReadAllTextAsync(
+        CancellationToken cancellationToken,
+        long? maxStandardOutputBytes = null,
+        long? maxStandardErrorBytes = null)
+    {
+        Task<(string Text, bool Truncated)> standardOutputTask =
+            ReadStreamCappedAsync(StandardOutput, StartInfo.RedirectStandardOutput, maxStandardOutputBytes, cancellationToken);
+        Task<(string Text, bool Truncated)> standardErrorTask =
+            ReadStreamCappedAsync(StandardError, StartInfo.RedirectStandardError, maxStandardErrorBytes, cancellationToken);
+
+        await Task.WhenAll(standardOutputTask, standardErrorTask).ConfigureAwait(false);
+
+        return (standardOutputTask.Result.Text, standardErrorTask.Result.Text,
+            standardOutputTask.Result.Truncated || standardErrorTask.Result.Truncated);
+    }
+
+    /// <summary>
+    ///     Reads a redirected stream into a string, copying at most <paramref name="maxBytes"/> bytes and
+    ///     discarding any remainder (lossy truncation).
+    /// </summary>
+    private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
+        StreamReader reader,
+        bool redirected,
+        long? maxBytes,
+        CancellationToken cancellationToken)
+    {
+        if (!redirected || reader == StreamReader.Null)
+            return (string.Empty, false);
+
+        Encoding encoding = reader.CurrentEncoding;
+        Stream stream = reader.BaseStream;
+
+        if (maxBytes is null or <= 0)
+        {
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
+            return (encoding.GetString(memoryStream.ToArray()), false);
+        }
+
+        byte[] buffer = new byte[8192];
+        long totalBytes = 0;
+        bool truncated = false;
+
+        using var outputStream = new MemoryStream();
+
+        int bytesRead;
+        while ((bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+        {
+            long room = maxBytes.Value - totalBytes;
+
+            if (room <= 0)
+            {
+                truncated = true;
+                break;
+            }
+
+            int bytesToCopy = (int)Math.Min(bytesRead, room);
+            outputStream.Write(buffer, 0, bytesToCopy);
+            totalBytes += bytesToCopy;
+
+            if (bytesToCopy < bytesRead)
+            {
+                truncated = true;
+                break;
+            }
+        }
+
+        // Drain any remainder so the pipe is fully consumed even when truncated.
+        while (truncated && (bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+        {
+            // Remainder is discarded.
+        }
+
+        return (encoding.GetString(outputStream.ToArray()), truncated);
+    }
+
     #endregion
 
     internal void ForcefulExit()

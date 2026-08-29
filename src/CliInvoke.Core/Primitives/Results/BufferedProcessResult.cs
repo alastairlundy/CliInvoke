@@ -41,6 +41,10 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="signal">
     ///     The POSIX signal that terminated the process, or <c>null</c> when not applicable.
     /// </param>
+    /// <param name="wasTruncated">
+    ///     A value indicating whether the captured standard output or standard error was truncated
+    ///     because it exceeded the configured per-stream cap.
+    /// </param>
     public BufferedProcessResult(
         string executableFilePath,
         int exitCode,
@@ -50,7 +54,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         DateTime startTime,
         DateTime exitTime,
         bool canceled,
-        PosixSignal? signal)
+        PosixSignal? signal,
+        bool wasTruncated = false)
         : base(executableFilePath, exitCode, processId, startTime, exitTime, canceled, signal)
     {
         ArgumentException.ThrowIfNullOrEmpty(executableFilePath);
@@ -59,6 +64,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
 
         StandardOutput = standardOutput;
         StandardError = standardError;
+        WasTruncated = wasTruncated;
     }
 
     /// <summary>
@@ -70,6 +76,12 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     ///     The Standard Error from a Process or Command represented as a string.
     /// </summary>
     public string StandardError { get; }
+
+    /// <summary>
+    ///     Indicates whether the captured standard output or standard error was truncated because it
+    ///     exceeded the configured per-stream cap.
+    /// </summary>
+    public bool WasTruncated { get; }
 
     /// <summary>
     ///     Determines whether this BufferedProcessResult object is equal to another BufferedProcessResult
@@ -97,7 +109,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
                StartTime == other.StartTime &&
                ExitTime == other.ExitTime &&
                Canceled == other.Canceled &&
-               Signal == other.Signal;
+               Signal == other.Signal &&
+               WasTruncated == other.WasTruncated;
 #pragma warning restore CA1416
     }
 
@@ -130,8 +143,10 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        return HashCode.Combine(ExecutedFilePath, StandardOutput, StandardError, ExitCode,
-            StartTime, ExitTime, Canceled, Signal);
+        return HashCode.Combine(
+            HashCode.Combine(ExecutedFilePath, StandardOutput, StandardError, ExitCode,
+                StartTime, ExitTime, Canceled, Signal),
+            WasTruncated);
 #pragma warning restore CA1416
     }
 
