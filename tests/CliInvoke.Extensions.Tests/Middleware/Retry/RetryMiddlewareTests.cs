@@ -218,6 +218,56 @@ public class RetryMiddlewareTests
         await Assert.That(validator.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);
     }
 
+    [Test]
+    public async Task ComputeDelay_Linear_GrowsByBaseDelayPerAttempt()
+    {
+        var options = new RetryOptions
+        {
+            BaseDelay = TimeSpan.FromMilliseconds(10),
+            Strategy = RetryBackoffStrategy.Linear
+        };
+
+        await Assert.That(RetryMiddleware.ComputeDelay(1, options).Ticks)
+            .IsEqualTo(TimeSpan.FromMilliseconds(10).Ticks);
+        await Assert.That(RetryMiddleware.ComputeDelay(2, options).Ticks)
+            .IsEqualTo(TimeSpan.FromMilliseconds(20).Ticks);
+        await Assert.That(RetryMiddleware.ComputeDelay(3, options).Ticks)
+            .IsEqualTo(TimeSpan.FromMilliseconds(30).Ticks);
+    }
+
+    [Test]
+    public async Task ComputeDelay_Exponential_GrowsByPowerOfTwo_ForValidSettings()
+    {
+        var options = new RetryOptions
+        {
+            BaseDelay = TimeSpan.FromMilliseconds(10),
+            Strategy = RetryBackoffStrategy.Exponential
+        };
+
+        await Assert.That(RetryMiddleware.ComputeDelay(1, options).Ticks)
+            .IsEqualTo(TimeSpan.FromMilliseconds(10).Ticks);
+        await Assert.That(RetryMiddleware.ComputeDelay(2, options).Ticks)
+            .IsEqualTo(TimeSpan.FromMilliseconds(20).Ticks);
+        await Assert.That(RetryMiddleware.ComputeDelay(3, options).Ticks)
+            .IsEqualTo(TimeSpan.FromMilliseconds(40).Ticks);
+    }
+
+    [Test]
+    public async Task ComputeDelay_ClampsToTaskDelayMax_ForExponentialOverflow()
+    {
+        // base at the Task.Delay maximum: attempt 2 doubles it, which exceeds the limit, so it must be clamped.
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        var options = new RetryOptions
+        {
+            BaseDelay = maxDelay,
+            Strategy = RetryBackoffStrategy.Exponential,
+            MaxAttempts = 3
+        };
+
+        await Assert.That(RetryMiddleware.ComputeDelay(1, options).Ticks).IsEqualTo(maxDelay.Ticks);
+        await Assert.That(RetryMiddleware.ComputeDelay(2, options).Ticks).IsEqualTo(maxDelay.Ticks);
+    }
+
     /// <summary>
     ///     A validator that always classifies the result as retryable (Validate returns false, so the
     ///     default <c>ShouldRetry => !Validate</c> returns true) and records how many times it is consulted.

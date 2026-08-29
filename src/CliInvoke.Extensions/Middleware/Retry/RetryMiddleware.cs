@@ -90,14 +90,23 @@ internal sealed class RetryMiddleware : IProcessMiddleware
         while (attempts < _options.MaxAttempts);
     }
 
-    private static TimeSpan ComputeDelay(int completedAttempts, RetryOptions options)
+    // The maximum delay Task.Delay accepts; larger values throw ArgumentOutOfRangeException.
+    // ComputeDelay clamps to this so an aggressive exponential configuration cannot break the retry loop.
+    private static readonly TimeSpan MaxTaskDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+
+    internal static TimeSpan ComputeDelay(int completedAttempts, RetryOptions options)
     {
-        return options.Strategy switch
+        TimeSpan delay = options.Strategy switch
         {
             RetryBackoffStrategy.Fixed => options.BaseDelay,
             RetryBackoffStrategy.Exponential => TimeSpan.FromTicks(
                 options.BaseDelay.Ticks * (long)Math.Pow(2, completedAttempts - 1)),
+            RetryBackoffStrategy.Linear => TimeSpan.FromTicks(options.BaseDelay.Ticks * completedAttempts),
             _ => options.BaseDelay
         };
+
+        // Clamp to the largest value Task.Delay accepts; valid settings are unaffected for realistic
+        // attempt counts, and this prevents ArgumentOutOfRangeException on exponential overflow.
+        return delay > MaxTaskDelay ? MaxTaskDelay : delay;
     }
 }

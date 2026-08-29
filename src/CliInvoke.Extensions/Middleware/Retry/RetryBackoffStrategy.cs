@@ -23,4 +23,9 @@ public enum RetryBackoffStrategy
     ///     Waits an exponentially increasing delay (base × 2^(attempt-1)) between attempts.
     /// </summary>
     Exponential,
+
+    /// <summary>
+    ///     Waits a linearly increasing delay (base × attempt) between attempts.
+    /// </summary>
+    Linear,
 }
