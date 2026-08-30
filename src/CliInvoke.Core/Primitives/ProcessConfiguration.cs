@@ -17,7 +17,7 @@ namespace CliInvoke.Core;
 /// <summary>
 ///     A class to store Process configuration information.
 /// </summary>
-public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposable
+public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 {
     /// <summary>
     /// 
@@ -212,16 +212,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     ///     The encoding to use for the Standard Error.
     /// </summary>
     public Encoding StandardErrorEncoding { get; }
-
-    /// <summary>
-    ///     Disposes of the disposable properties in ProcessConfiguration.
-    /// </summary>
-    public void Dispose()
-    {
-        Credential.Dispose();
-        StandardInput?.Dispose();
-        GC.SuppressFinalize(this);
-    }
 
     /// <summary>
     ///     Determines if a Process configuration is equal to another Process configuration.

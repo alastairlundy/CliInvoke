@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -66,7 +66,7 @@ public class ShellDetector : IShellDetector
     {
         cancellationToken.Register(() => throw new TaskCanceledException());
 
-        using ProcessConfiguration execConfiguration = ProcessConfigurationFactory
+        ProcessConfiguration execConfiguration = ProcessConfigurationFactory
             .Create("ps", "-p $$ -o comm=");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
@@ -75,7 +75,7 @@ public class ShellDetector : IShellDetector
         FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
             GetFirstLine(execResult.StandardOutput));
 
-        using ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
+        ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
             .Create(shellExeInfo.FullName, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
@@ -116,7 +116,7 @@ public class ShellDetector : IShellDetector
         {
             FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
-            using ProcessConfiguration powershellConfig = ProcessConfigurationFactory
+            ProcessConfiguration powershellConfig = ProcessConfigurationFactory
                 .Create(powershell5PlusFileInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
@@ -138,7 +138,7 @@ public class ShellDetector : IShellDetector
         {
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
-            using ProcessConfiguration cmdConfig = ProcessConfigurationFactory
+            ProcessConfiguration cmdConfig = ProcessConfigurationFactory
                 .Create(cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,

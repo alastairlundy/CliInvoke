@@ -137,7 +137,7 @@ Here are some simple examples of using CliInvoke. For more detailed examples, se
 using CliInvoke;
 using CliInvoke.Core;
 
-using ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version");
 ProcessResult result = await CliRun.RunAsync(configuration, ProcessExitConfiguration.CreateGraceful());
 Console.WriteLine($"Exit code: {result.ExitCode}");
 ```
@@ -147,7 +147,7 @@ Console.WriteLine($"Exit code: {result.ExitCode}");
 using CliInvoke;
 using CliInvoke.Core;
 
-using ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version");
 BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration, ProcessExitConfiguration.CreateGraceful());
 Console.WriteLine(result.StandardOutput);
 ```
@@ -165,7 +165,7 @@ services.AddCliInvoke();
 ServiceProvider provider = services.BuildServiceProvider();
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 Console.WriteLine(result.StandardOutput);
 ```
@@ -178,7 +178,7 @@ using CliInvoke.Core.Factories;
 using CliInvoke.Extensions;
 
 IExternalProcessFactory factory = provider.GetRequiredService<IExternalProcessFactory>();
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 using IExternalProcess process = factory.CreateExternalProcess(config);
 await process.StartAsync(CancellationToken.None);
 ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);

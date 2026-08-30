@@ -128,17 +128,18 @@ For the full guide — constructor details, the `IProcessMiddleware` contract, D
 ## Resource Disposal
 
 > [!IMPORTANT]
-> CliInvoke has exactly **five Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
+> CliInvoke has exactly **four Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
 >
 > | # | Type                    | What it owns                                                      |
 > |---|-------------------------|-------------------------------------------------------------------|
-> | 1 | `ProcessConfiguration`  | `StreamWriter` (StandardInput), optional `UserCredential`         |
-> | 2 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
-> | 3 | `PipedProcessResult`    | `StandardOutput` and `StandardError` streams                      |
-> | 4 | `UserCredential`        | `SecureString` password buffer                                    |
-> | 5 | `UserCredentialSpec` | `SecureString` password buffer staged for `Build()`               |
+> | 1 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
+> | 2 | `PipedProcessResult`    | `StandardOutput` and `StandardError` streams                      |
+> | 3 | `UserCredential`        | `SecureString` password buffer                                    |
+> | 4 | `UserCredentialSpec` | `SecureString` password buffer staged for `Build()`               |
 >
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
+>
+> `ProcessConfiguration` is a plain immutable value object and does **not** implement `IDisposable`. The `StandardInput` (`StreamWriter`) and `UserCredential` you place inside it remain **your** responsibility to dispose — CliInvoke never disposes them on your behalf.
 
 For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](site/docs/guides/resource-disposal.md)**.
 

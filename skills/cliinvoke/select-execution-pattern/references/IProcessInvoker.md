@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Create process configuration
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
 // Execute the process and capture buffered output
 BufferedProcessResult result = await processInvoker.ExecuteBufferedAsync(config);
@@ -43,7 +43,7 @@ using Microsoft.Extensions.DependencyInjection;
 IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
 // Create process configuration
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "build");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "build");
 
 // Create exit configuration with timeout policy
 var exitConfig = new ProcessExitConfiguration(
@@ -124,7 +124,7 @@ items.Set("Logger", myLogger);
 ProcessInvoker seededInvoker = new ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items).UseLogging();
 
 // Call sites are identical to the non-middleware path:
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config);
 ```
 

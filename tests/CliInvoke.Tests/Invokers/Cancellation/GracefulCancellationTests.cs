@@ -103,7 +103,7 @@ public class GracefulCancellationTests
         const int gracefulTimeoutSeconds = 2;
 
         string helperPath = ProcessTestHelper.GetSignalTrappingHelperPath();
-        using ProcessConfiguration configuration = new(helperPath, $"\"{markerPath}\" 5");
+        ProcessConfiguration configuration = new(helperPath, $"\"{markerPath}\" 5");
 
         ProcessExitConfiguration exitConfiguration = new(
             ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(gracefulTimeoutSeconds)),

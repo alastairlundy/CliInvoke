@@ -25,11 +25,6 @@ internal class PipelineDispatchTests : IDisposable
 
     public void Dispose()
     {
-        foreach (ProcessConfiguration config in _configurations)
-        {
-            config.Dispose();
-        }
-
         _factory.Dispose();
     }
 

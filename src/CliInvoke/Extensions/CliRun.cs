@@ -56,10 +56,7 @@ public static class CliRun
         (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
             BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: false);
 
-        using (configuration)
-        {
-            return await RunAsync(configuration, exitConfiguration, cancellationToken);
-        }
+        return await RunAsync(configuration, exitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -119,10 +116,7 @@ public static class CliRun
         (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
             BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: true);
 
-        using (configuration)
-        {
-            return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
-        }
+        return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
     }
 
 
@@ -183,10 +177,7 @@ public static class CliRun
         (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
             BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: true);
 
-        using (configuration)
-        {
-            return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
-        }
+        return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
     }
 
     /// <summary>
@@ -244,7 +235,7 @@ public static class CliRun
         // ExitConfiguration is unused by FireAndForget
         workingDirectory ??= Environment.CurrentDirectory;
 
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
+        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
             arguments, workingDirectory, outputRedirection: false);
 
         return FireAndForget(configuration);

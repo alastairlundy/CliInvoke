@@ -90,7 +90,7 @@ public class LoggingMiddlewareIntegrationTests
 
         (string filePath, string arguments) = ResolveEchoCommand();
 
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create(filePath, arguments);
+        ProcessConfiguration config = ProcessConfigurationFactory.Create(filePath, arguments);
 
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,

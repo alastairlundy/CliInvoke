@@ -30,7 +30,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         ProcessResult result =
@@ -47,7 +47,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         BufferedProcessResult result =
@@ -64,7 +64,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         PipedProcessResult result =
@@ -81,7 +81,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () =>
@@ -97,7 +97,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () =>
@@ -113,7 +113,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () =>

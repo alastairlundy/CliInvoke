@@ -23,7 +23,7 @@ IWordCounter counter = new WcWordCounter(
     provider.GetRequiredService<IFilePathResolver>());
 ```
 
-Internally, each counter builds its `wc` invocation with the v3 `ProcessConfigurationBuilder` and the `ArgumentsSpec` configuration seam, resolves the `wc` executable path via `IFilePathResolver`, and runs it through `IProcessInvoker.ExecuteBufferedAsync`. The resulting `ProcessConfiguration` is disposed after each invocation.
+Internally, each counter builds its `wc` invocation with the v3 `ProcessConfigurationBuilder` and the `ArgumentsSpec` configuration seam, resolves the `wc` executable path via `IFilePathResolver`, and runs it through `IProcessInvoker.ExecuteBufferedAsync`. `ProcessConfiguration` is not disposable; disposal of any `StandardInput` or `UserCredential` it references remains the caller's responsibility.
 
 ### Supported Platforms
 The following table details which target platforms are supported for accessing WCountLib functionality via `wc`.

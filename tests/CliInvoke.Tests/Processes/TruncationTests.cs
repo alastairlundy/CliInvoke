@@ -33,7 +33,7 @@ public class TruncationTests
     public async Task CaptureBufferedResultAsync_WithCap_TruncatesAndSetsWasTruncated()
     {
         (string target, string arguments) = GetLargeOutputCommand();
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(target, arguments);
+        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(target, arguments);
         using ExternalProcess process = new(new FilePathResolver(), configuration,
             ProcessExitConfiguration.CreateGraceful());
 
@@ -49,7 +49,7 @@ public class TruncationTests
     public async Task CaptureBufferedResultAsync_WithoutCap_DoesNotTruncate()
     {
         (string target, string arguments) = GetLargeOutputCommand();
-        using ProcessConfiguration configuration = ProcessConfigurationFactory.Create(target, arguments);
+        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(target, arguments);
         using ExternalProcess process = new(new FilePathResolver(), configuration,
             ProcessExitConfiguration.CreateGraceful());
 

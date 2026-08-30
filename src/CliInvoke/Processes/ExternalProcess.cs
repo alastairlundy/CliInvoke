@@ -372,11 +372,15 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     }
 
     /// <summary>
-    ///     Disposes of the <see cref="Configuration" /> and the internal managed and unmanaged resources.
+    ///     Disposes of the internal managed and unmanaged resources.
     /// </summary>
+    /// <remarks>
+    ///     The <see cref="Configuration" /> supplied to this process is not disposed here; the caller
+    ///     owns disposal of any <see cref="ProcessConfiguration.StandardInput" /> stream or
+    ///     <see cref="UserCredential" /> it provided.
+    /// </remarks>
     public void Dispose()
     {
-        Configuration.Dispose();
         _processWrapper.Dispose();
 
         GC.SuppressFinalize(this);

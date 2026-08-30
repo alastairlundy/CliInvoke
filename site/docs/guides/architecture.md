@@ -259,7 +259,7 @@ and returns the result (Stage 4).
 ```csharp
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-using ProcessConfiguration config = new(
+ProcessConfiguration config = new(
     "dotnet", "--info", true);
 
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
@@ -292,7 +292,7 @@ multiple sub-stages that the caller drives:
 IExternalProcessFactory factory =
     provider.GetRequiredService<IExternalProcessFactory>();
 
-using ProcessConfiguration config = new(
+ProcessConfiguration config = new(
     "dotnet", "--runtime", true);
 using IExternalProcess process = factory.CreateExternalProcess(config);
 

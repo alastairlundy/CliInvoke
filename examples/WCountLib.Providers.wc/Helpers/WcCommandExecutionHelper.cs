@@ -1,4 +1,4 @@
-﻿/*
+/*
         NOTE:  CliInvoke Example apps are licensed under the MIT license. CliInvoke is licensed under the MPL 2.0 license.
 
       MIT License
@@ -58,7 +58,7 @@ internal class WcCommandExecutionHelper
     {
         string wcPath = _filePathResolver.ResolveFilePath("wc").FullName;
 
-        using ProcessConfiguration processConfiguration = new ProcessConfigurationBuilder(wcPath)
+        ProcessConfiguration processConfiguration = new ProcessConfigurationBuilder(wcPath)
             .ConfigureArguments(args => args
                 .Add(argument, escape: false)
                 .Add(tempFileName, escape: true))

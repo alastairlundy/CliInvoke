@@ -1,4 +1,4 @@
-﻿/*
+/*
         NOTE:  CliInvoke Example apps are licensed under the MIT license. CliInvoke is licensed under the MPL 2.0 license.
 
       MIT License
@@ -57,7 +57,7 @@ bool verboseOutput = parsedResults.CommandResult.GetRequiredValue(verbose);
 
 string dotnetExecutable = filePathResolver.ResolveFilePath("dotnet").FullName;
 
-using ProcessConfiguration toolsListConfiguration = new(dotnetExecutable, "tool list -g --format json");
+ProcessConfiguration toolsListConfiguration = new(dotnetExecutable, "tool list -g --format json");
 
 BufferedProcessResult toolListResult = await processInvoker.ExecuteBufferedAsync(toolsListConfiguration);
 
@@ -83,7 +83,7 @@ bool hasErrors = false;
 
 foreach (string tool in tools)
 {
-    using ProcessConfiguration toolUpdateConfiguration = new(dotnetExecutable, string.Join(' ', "tool update -g", tool));
+    ProcessConfiguration toolUpdateConfiguration = new(dotnetExecutable, string.Join(' ', "tool update -g", tool));
 
     BufferedProcessResult toolResult = await processInvoker.ExecuteBufferedAsync(toolUpdateConfiguration,
         new ProcessExitConfiguration(ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromMinutes(5))));

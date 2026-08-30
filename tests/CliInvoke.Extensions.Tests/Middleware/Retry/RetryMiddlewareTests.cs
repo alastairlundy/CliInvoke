@@ -212,7 +212,7 @@ public class RetryMiddlewareTests
 
         // The retry middleware is registered and active: the retryable result is attempted
         // MaxAttempts times rather than once, and the validator is consulted once per attempt.
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
+        ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
         await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 
         await Assert.That(validator.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);

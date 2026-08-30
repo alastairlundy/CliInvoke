@@ -48,19 +48,20 @@ to one of these five.
 2. **`PipedProcessResult` is read but not disposed.** `StandardOutput` and
    `StandardError` are live streams that own OS handles. Dispose the
    result (or use `await using`) once reading is complete.
-3. **Disposing a library-owned stream.** `StandardInput` on
-   `ProcessConfiguration`, and `StandardOutput` / `StandardError` on
-   `IExternalProcess`, are owned by the library. Disposing them
-   independently corrupts the parent's state.
+3. **Disposing a `StandardInput` stream too early.** The `StreamWriter` you assign to
+   `ProcessConfiguration.StandardInput` is **caller-owned** — `ProcessConfiguration` does not dispose
+   it. Do not dispose it while the process is still reading from it; dispose it only after the
+   invocation completes. `StandardOutput` / `StandardError` on `IExternalProcess` are released when the
+   `IExternalProcess` is disposed.
 4. **A `UserCredential`, a standalone `UserCredentialSpec`, or a builder-owned `UserCredentialSpec` is not disposed.**
    All three hold a `SecureString`. A standalone `UserCredential` or a `UserCredentialSpec` you create
    and own must be wrapped in `using` (the spec and the `UserCredential` it builds have independent
    lifetimes). A `UserCredentialSpec` configured through `ProcessConfigurationBuilder.ConfigureUserCredential`
-   is owned and disposed by the builder, so do not dispose it yourself; the library disposes any
-   credential it places on the `ProcessConfiguration` when that configuration is disposed.
-5. **Reusing a `ProcessConfiguration` after `Dispose()`.** Once disposed,
-   the internal `StreamWriter` is closed. Create a new configuration for
-   each invocation.
+   is owned and disposed by the builder, so do not dispose it yourself. A `UserCredential` assigned to
+   `ProcessConfiguration.Credential` is **not** disposed by the configuration — dispose it yourself.
+5. **Reusing a `ProcessConfiguration` is allowed.** `ProcessConfiguration` is not disposable, so it can
+   be safely reused across invocations. Ensure any `StandardInput` stream or `UserCredential` you supplied
+   is not disposed until after the final invocation that references it.
 6. **Capturing a `ProcessConfiguration` into a closure** that extends
    beyond the invocation, leaking the `SecureString` until the closure
    is collected.

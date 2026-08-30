@@ -64,7 +64,7 @@ public class PowerShellMiddlewareIntegrationTests
 
         // The original target is `dotnet`, but PowerShellMiddleware rewrites the configuration
         // to run the command inside `pwsh -NoProfile -Command "..."`.
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 
         // PowerShellMiddleware rewrites the config so the real target becomes `pwsh`.
         // Verify the rewrite by confirming the process executed through pwsh (exit 0 with output).

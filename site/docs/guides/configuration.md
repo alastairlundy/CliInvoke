@@ -89,7 +89,7 @@ If neither of these applies, construct the model directly:
 
 ```csharp
 // Direct construction — no builder.
-using ProcessConfiguration config = new ProcessConfiguration(
+ProcessConfiguration config = new ProcessConfiguration(
     targetFilePath: "git",
     arguments: "status",
     outputRedirection: true);
@@ -101,7 +101,7 @@ vs. the equivalent builder-based form:
 
 ```csharp
 // Builder-based construction.
-using ProcessConfiguration config = new ProcessConfigurationBuilder()
+ProcessConfiguration config = new ProcessConfigurationBuilder()
     .SetTargetFilePath("git")
     .SetArguments("status")
     .SetOutputRedirection(true)
@@ -189,7 +189,7 @@ parameter to the invoker; the others are referenced from
 Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 
 ```csharp
-public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposable
+public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 ```
 
 The **only required model**. It describes the executable to run, the
@@ -215,7 +215,9 @@ many invocations share the same `ProcessConfiguration` but differ in
 their `ProcessExitConfiguration` (e.g., one has a timeout, another
 does not).
 
-**Disposal**: `ProcessConfiguration` implements `IDisposable`; see the
+**Disposal**: `ProcessConfiguration` does **not** implement `IDisposable`. It is a plain
+immutable value object. The `StandardInput` (`StreamWriter`) and `UserCredential` you supply
+remain **your** responsibility to dispose — see the
 [Resource Disposal](./resource-disposal.md) guide for ownership rules.
 
 ### 2. `ProcessExitConfiguration`
@@ -261,9 +263,9 @@ credential". This is the default assigned by
 `ProcessConfiguration`'s constructor.
 
 **Disposal**: `UserCredential` owns its `SecureString` password and
-implements `IDisposable`. If the credential is assigned to a
-`ProcessConfiguration.Credential`, the configuration takes ownership
-and the caller must **not** double-dispose — see the
+implements `IDisposable`. A `UserCredential` assigned to a
+`ProcessConfiguration.Credential` is **not** disposed by the configuration —
+the caller must dispose it. See the
 [Resource Disposal](./resource-disposal.md) guide.
 
 ### 4. `ProcessResourcePolicy`

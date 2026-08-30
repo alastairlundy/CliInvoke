@@ -34,7 +34,7 @@ var exitConfig = new ProcessExitConfiguration(
 );
 
 // Create a process configuration and execute with exit configuration
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "build");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "build");
 BufferedProcessResult result = await CliRun.RunBufferedAsync(config, exitConfig);
 
 // Check for errors using the helper method

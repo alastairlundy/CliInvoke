@@ -18,7 +18,7 @@ namespace CliInvoke.Tests.Processes;
 ///     <see cref="ProcessResult.Signal"/> model: truth conditions (D003),
 ///     orthogonality (D006), and an OS-gated Unix SIGTERM integration (D005/D009).
 /// </summary>
-public class ProcessResultCanceledSignalTests : IDisposable
+public class ProcessResultCanceledSignalTests
 {
     private readonly ProcessConfiguration _configuration;
 
@@ -26,8 +26,6 @@ public class ProcessResultCanceledSignalTests : IDisposable
     {
         _configuration = ProcessConfigurationFactory.Create(ProcessTestHelper.GetTargetFilePath(), string.Empty);
     }
-
-    public void Dispose() => _configuration.Dispose();
 
     private static InvocationContext RawContext(ProcessConfiguration configuration)
         => new(configuration, ProcessExitConfiguration.CreateGraceful(), InvocationMode.Raw, CancellationToken.None);

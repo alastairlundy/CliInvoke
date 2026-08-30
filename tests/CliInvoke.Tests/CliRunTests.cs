@@ -30,7 +30,7 @@ public class CliRunTests
     [Test]
     public async Task RunAsync_WithConfig_RunsProcessAndReturnsSuccess()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         ProcessResult result = await CliRun.RunAsync(configuration,
@@ -43,7 +43,7 @@ public class CliRunTests
     [Test]
     public async Task RunBufferedAsync_WithConfig_RunsProcessAndReturnsSuccess()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
@@ -56,7 +56,7 @@ public class CliRunTests
     [Test]
     public async Task RunPipedAsync_WithConfig_RunsProcessAndReturnsSuccess()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         PipedProcessResult result = await CliRun.RunPipedAsync(configuration,
@@ -104,7 +104,7 @@ public class CliRunTests
     [Test]
     public async Task FireAndForget_WithConfig_StartsProcessAndReturnsProcessId()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         int processId = CliRun.FireAndForget(configuration);
@@ -123,7 +123,7 @@ public class CliRunTests
     [Test]
     public async Task FireAndForget_WithInvalidConfig_Throws()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration("NONEXISTENT_COMMAND_ABC123.exe", "");
 
         await Assert.That(() => CliRun.FireAndForget(configuration))
