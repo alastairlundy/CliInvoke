@@ -135,20 +135,10 @@ public class PowershellProcessInvoker : IProcessInvoker
     /// </param>
     /// <returns>
     ///     A task that represents the asynchronous operation. The task result contains a
-    ///     <see cref="PipedProcessResult" /> object with the details of the process execution outcome.
+    ///     <see cref="BufferedProcessResult" /> object with the details of the process execution outcome.
     /// </returns>
     /// <exception cref="PlatformNotSupportedException">
     ///     Thrown when the execution is attempted on an
     ///     unsupported platform such as Android, iOS, tvOS, or a browser environment.
     /// </exception>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    public Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null,
-        CancellationToken cancellationToken = default)
-    {
-        return _processInvoker.ExecutePipedAsync(processConfiguration, processExitConfiguration, cancellationToken);
-    }
 }

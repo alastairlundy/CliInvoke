@@ -68,19 +68,6 @@ public class ProcessResultCanceledSignalTests
         await Assert.That(result.Canceled).IsTrue();
     }
 
-    [Test]
-    public async Task Piped_Result_Carries_Injected_Canceled_True()
-    {
-        CountingExternalProcessFactory factory = new() { DefaultCanceled = true };
-        ProcessInvocationPipeline pipeline = new(factory);
-        InvocationContext ctx = new(_configuration, ProcessExitConfiguration.CreateGraceful(),
-            InvocationMode.Piped, CancellationToken.None);
-
-        PipedProcessResult result = await pipeline.InvokeAsync<PipedProcessResult>(ctx);
-
-        await Assert.That(result.Canceled).IsTrue();
-    }
-
     // ---- Orthogonality tests (D006) ----
 
     [Test]

@@ -54,19 +54,6 @@ public class CliRunTests
     }
 
     [Test]
-    public async Task RunPipedAsync_WithConfig_RunsProcessAndReturnsSuccess()
-    {
-        ProcessConfiguration configuration =
-            new ProcessConfiguration(TargetFilePath, TargetArguments);
-
-        PipedProcessResult result = await CliRun.RunPipedAsync(configuration,
-            ProcessExitConfiguration.CreateGraceful());
-
-        await Assert.That(result).IsNotNull();
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-    }
-
-    [Test]
     public async Task RunAsync_WithStringArgs_RunsProcessAndReturnsSuccess()
     {
         ProcessResult result = await CliRun.RunAsync(TargetFilePath, TargetArguments);
@@ -84,14 +71,7 @@ public class CliRunTests
         await Assert.That(result.ExitCode).IsEqualTo(0);
     }
 
-    [Test]
-    public async Task RunPipedAsync_WithStringArgs_RunsProcessAndReturnsSuccess()
-    {
-        PipedProcessResult result = await CliRun.RunPipedAsync(TargetFilePath, TargetArguments);
 
-        await Assert.That(result).IsNotNull();
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-    }
 
     [Test]
     public async Task RunAsync_WhenProcessCannotBeResolved_Throws()

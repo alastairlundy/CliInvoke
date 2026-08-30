@@ -70,7 +70,6 @@ public class ProcessInvoker : IProcessInvoker
         {
             InvocationMode.Raw => await _pipeline.InvokeAsync<ProcessResult>(ctx),
             InvocationMode.Buffered => await _pipeline.InvokeAsync<BufferedProcessResult>(ctx),
-            InvocationMode.Piped => await _pipeline.InvokeAsync<PipedProcessResult>(ctx),
             _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
         };
 
@@ -169,24 +168,9 @@ public class ProcessInvoker : IProcessInvoker
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="exitConfiguration"></param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns>The Piped Process Results from running the process.</returns>
+    /// <returns>The Buffered Process Results from running the process.</returns>
     /// <exception cref="ProcessNotSuccessfulException{TProcessResult}">
     ///     Thrown if the result validation requires the
     ///     process to exit with exit code zero and the process exits with a different exit code.
     /// </exception>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("browser")]
-    public async Task<PipedProcessResult> ExecutePipedAsync(
-        ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
-    {
-        InvocationContext ctx = new InvocationContext(
-            processConfiguration,
-            exitConfiguration ?? ProcessExitConfiguration.Default,
-            InvocationMode.Piped,
-            cancellationToken);
-
-        return await InvokeThroughChainAsync<PipedProcessResult>(ctx);
-    }
 }

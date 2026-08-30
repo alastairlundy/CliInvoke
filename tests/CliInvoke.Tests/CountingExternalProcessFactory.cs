@@ -182,16 +182,6 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
                 canceled: Canceled, signal: Signal, wasTruncated: false));
         }
 
-        public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
-        {
-            DateTime now = DateTime.UtcNow;
-            return Task.FromResult(new PipedProcessResult(
-                Configuration.TargetFilePath, exitCode: 0, processId: 0,
-                startTime: now, exitTime: now,
-                standardOutput: Stream.Null, standardError: Stream.Null,
-                canceled: Canceled, signal: Signal));
-        }
-
         public Task Kill() => Task.CompletedTask;
 
         public void Dispose()

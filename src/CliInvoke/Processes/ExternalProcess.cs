@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -264,50 +264,6 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         }
     }
 
-    /// <summary>
-    /// Asynchronously captures the result of an external pipe process, including its output streams.
-    /// </summary>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-    /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    public async Task<PipedProcessResult> CapturePipedResultAsync(
-        CancellationToken cancellationToken)
-    {
-        Task<Stream> standardOutputStream = Configuration.OutputRedirection
-            ? _processWrapper.PipeStandardOutputAsync(cancellationToken)
-            : (Task<Stream>)Task.CompletedTask;
-
-        Task<Stream> standardErrorStream = Configuration.OutputRedirection
-            ? _processWrapper.PipeStandardErrorAsync(cancellationToken)
-            : (Task<Stream>)Task.CompletedTask;
-
-        try
-        {
-            await Task.WhenAll(
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputStream, standardErrorStream);
-
-            PipedProcessResult result = new(
-                _processWrapper.StartInfo.FileName,
-                _processWrapper.ExitCode,
-                _processWrapper.Id,
-                _processWrapper.StartTime,
-                _processWrapper.ExitTime,
-                await standardOutputStream,
-                await standardErrorStream,
-                canceled: _processWrapper.Canceled,
-                signal: _processWrapper.Signal
-            );
-
-            return result;
-        }
-        finally
-        {
-            standardOutputStream.Dispose();
-            standardErrorStream.Dispose();
-        }
-    }
     
     /// <summary>
     /// Suspends the external process that is currently running.

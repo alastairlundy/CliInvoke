@@ -95,9 +95,6 @@ public static class DependencyInjectionExtensions
                 services.TryAddSingleton<IProcessResultValidator<BufferedProcessResult>>(_ =>
                     new ProcessResultValidator<BufferedProcessResult>(
                         [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
-                services.TryAddSingleton<IProcessResultValidator<PipedProcessResult>>(_ =>
-                    new ProcessResultValidator<PipedProcessResult>(
-                        [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
 
                 services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
                 
@@ -131,9 +128,6 @@ public static class DependencyInjectionExtensions
                 services.TryAddScoped<IProcessResultValidator<BufferedProcessResult>>(_ =>
                     new ProcessResultValidator<BufferedProcessResult>(
                         [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
-                services.TryAddScoped<IProcessResultValidator<PipedProcessResult>>(_ =>
-                    new ProcessResultValidator<PipedProcessResult>(
-                        [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
 
                 services.AddScoped<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
 
@@ -167,9 +161,6 @@ public static class DependencyInjectionExtensions
                 services.TryAddTransient<IProcessResultValidator<BufferedProcessResult>>(_ =>
                     new ProcessResultValidator<BufferedProcessResult>(
                         [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
-                services.TryAddTransient<IProcessResultValidator<PipedProcessResult>>(_ =>
-                    new ProcessResultValidator<PipedProcessResult>(
-                        [CommonValidationRules<PipedProcessResult>.RequiresExitCodeZero]));
 
                 services.AddTransient<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
 

@@ -139,19 +139,4 @@ public class CmdProcessInvoker : IProcessInvoker
     ///     Thrown if the operating system is not Windows, as this method
     ///     is only supported on Windows platforms.
     /// </exception>
-    [SupportedOSPlatform("windows")]
-    [UnsupportedOSPlatform("macos")]
-    [UnsupportedOSPlatform("linux")]
-    [UnsupportedOSPlatform("freebsd")]
-    [UnsupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("browser")]
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    public Task<PipedProcessResult> ExecutePipedAsync(
-        ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null,
-        CancellationToken cancellationToken = default)
-    {
-        return _processInvoker.ExecutePipedAsync(processConfiguration, processExitConfiguration, cancellationToken);
-    }
 }

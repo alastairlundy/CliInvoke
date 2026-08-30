@@ -124,8 +124,6 @@ public interface IExternalProcess : IDisposable
     ///     to receive notice of cancellation.
     /// </param>
     /// <returns></returns>
-    Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken);
-
     /// <summary>
     ///     Terminates the associated external process based on the specified exit configuration.
     /// </summary>

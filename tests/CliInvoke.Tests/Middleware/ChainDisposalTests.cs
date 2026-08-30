@@ -6,59 +6,55 @@ namespace CliInvoke.Tests.Middleware;
 public class ChainDisposalTests
 {
     [Test]
-    public async Task Chain_ReturnsPipedProcessResult_WithoutDisposing()
+    public async Task Chain_ReturnsBufferedProcessResult_WithoutDisposing()
     {
-        MemoryStream stdout = new MemoryStream();
-        MemoryStream stderr = new MemoryStream();
-        PipedProcessResult pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr, canceled: false, signal: null);
+        BufferedProcessResult bufferedResult = new BufferedProcessResult(
+            "test.exe", 0, 1, "output", "error", DateTime.UtcNow, DateTime.UtcNow,
+            canceled: false, signal: null, wasTruncated: false);
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
             (ctx) =>
             {
-                ctx.Result = pipedResult;
+                ctx.Result = bufferedResult;
                 return Task.CompletedTask;
             });
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
-            InvocationMode.Piped);
+            InvocationMode.Buffered);
 
         await chain.RunAsync(ctx, CancellationToken.None);
 
-        await Assert.That(ctx.Result).IsEqualTo(pipedResult);
-        await Assert.That(stdout.CanRead).IsEqualTo(true);
-        await Assert.That(stderr.CanRead).IsEqualTo(true);
+        await Assert.That(ctx.Result).IsEqualTo(bufferedResult);
+        await Assert.That(bufferedResult.StandardOutput).IsEqualTo("output");
     }
 
     [Test]
-    public async Task UserCanDisposeResult_AfterChainReturns()
+    public async Task UserCanReadResult_AfterChainReturns()
     {
-        MemoryStream stdout = new MemoryStream();
-        MemoryStream stderr = new MemoryStream();
-        PipedProcessResult pipedResult = new PipedProcessResult("test.exe", 0, 1, DateTime.UtcNow, DateTime.UtcNow, stdout, stderr, canceled: false, signal: null);
+        BufferedProcessResult bufferedResult = new BufferedProcessResult(
+            "test.exe", 0, 1, "output", "error", DateTime.UtcNow, DateTime.UtcNow,
+            canceled: false, signal: null, wasTruncated: false);
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware>(),
             (ctx) =>
             {
-                ctx.Result = pipedResult;
+                ctx.Result = bufferedResult;
                 return Task.CompletedTask;
             });
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),
             ProcessExitConfiguration.Default,
-            InvocationMode.Piped);
+            InvocationMode.Buffered);
 
         await chain.RunAsync(ctx, CancellationToken.None);
 
-        // User disposes after chain returns
-        PipedProcessResult result = (PipedProcessResult)ctx.Result!;
-        result.Dispose();
-
-        await Assert.That(stdout.CanRead).IsEqualTo(false);
-        await Assert.That(stderr.CanRead).IsEqualTo(false);
+        BufferedProcessResult result = (BufferedProcessResult)ctx.Result!;
+        await Assert.That(result.StandardOutput).IsEqualTo("output");
+        await Assert.That(result.StandardError).IsEqualTo("error");
     }
 }

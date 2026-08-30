@@ -365,13 +365,6 @@ public class RetryMiddlewareTests
                 now, now, false, null, false));
         }
 
-        public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
-        {
-            DateTime now = DateTime.UtcNow;
-            return Task.FromResult(new PipedProcessResult(
-                Configuration.TargetFilePath, 0, 0, now, now, Stream.Null, Stream.Null, false, null));
-        }
-
         public Task Kill() => Task.CompletedTask;
 
         public void Dispose()

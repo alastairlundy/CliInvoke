@@ -76,7 +76,7 @@ internal class ProcessInvocationPipeline
                     signal: null);
             }
 
-            // Raw awaits process exit (it does not drain redirected output). Buffered and Piped must be
+            // Raw awaits process exit (it does not drain redirected output). Buffered must be
             // started WITHOUT awaiting exit so the capture methods can read the redirected streams
             // concurrently with waiting for exit; awaiting exit first would deadlock when a child writes
             // more than the OS pipe buffer and nothing is draining it yet.
@@ -86,13 +86,12 @@ internal class ProcessInvocationPipeline
                 externalProcess.Start();
 
             // FireAndForget returns above (lines 46-63) without waiting.
-            // Only Raw, Buffered, and Piped reach this switch.
+            // Only Raw and Buffered reach this switch.
             return ctx.Mode switch
             {
                 InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
                 InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(
                     ctx.CancellationToken, truncationCap, truncationCap),
-                InvocationMode.Piped => (TResult)(object)await externalProcess.CapturePipedResultAsync(ctx.CancellationToken),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
             };
         }

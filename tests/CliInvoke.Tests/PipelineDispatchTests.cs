@@ -65,20 +65,6 @@ internal class PipelineDispatchTests : IDisposable
     }
 
     [Test]
-    public async Task InvokeAsync_Piped_ReturnsPipedProcessResult()
-    {
-        ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
-        InvocationContext ctx = CreateContext(InvocationMode.Piped);
-
-        PipedProcessResult result =
-            await pipeline.InvokeAsync<PipedProcessResult>(ctx);
-
-        await Assert.That(result).IsNotNull();
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-        await Assert.That(_factory.CreateCount).IsEqualTo(1);
-    }
-
-    [Test]
     public async Task InvokeAsync_FireAndForget_ReturnsProcessResult()
     {
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);

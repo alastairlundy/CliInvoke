@@ -25,9 +25,5 @@ public enum InvocationMode
     /// <summary>
     /// 
     /// </summary>
-    Piped,
-    /// <summary>
-    /// 
-    /// </summary>
     FireAndForget
 }

@@ -148,67 +148,6 @@ public static class CliRun
         return new ProcessInvocationPipeline(new ExternalProcessFactory()).InvokeAsync<BufferedProcessResult>(ctx);
     }
 
-    /// <summary>
-    /// Executes a process with the specified parameters and returns a result containing the process's piped data and exit information.
-    /// </summary>
-    /// <param name="targetFilePath">
-    /// The file path of the target executable to be run.
-    /// </param>
-    /// <param name="arguments">
-    /// The command-line arguments to pass to the executable. Defaults to an empty string if not specified.
-    /// </param>
-    /// <param name="workingDirectory">
-    /// The working directory in which the process will run. If null, the current directory is used.
-    /// </param>
-    /// <param name="timeoutTimeSpan">
-    /// The maximum allowed duration for the process to complete before timing out. If null, a default timeout is applied.
-    /// </param>
-    /// <param name="cancellationToken">
-    /// A token to monitor for cancellation requests, allowing the operation to be cancelled before completion.
-    /// </param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The task result contains a <see cref="PipedProcessResult"/> object
-    /// with details about the executed process, including piped output and exit status.
-    /// </returns>
-    public static async Task<PipedProcessResult> RunPipedAsync(string targetFilePath,
-        string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
-        CancellationToken cancellationToken = default)
-    {
-        (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
-            BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: true);
-
-        return await RunPipedAsync(configuration, exitConfiguration, cancellationToken);
-    }
-
-    /// <summary>
-    /// Executes a process using the specified configuration and returns a result containing piped process data.
-    /// </summary>
-    /// <param name="configuration">
-    /// The configuration for the process to be executed, including details such as file path, arguments, and environment settings.
-    /// </param>
-    /// <param name="exitConfiguration">
-    /// An optional configuration for managing the process exit behaviour. If null, a default graceful exit configuration is used.
-    /// </param>
-    /// <param name="cancellationToken">
-    /// A token to monitor for cancellation requests, allowing the operation to be cancelled before completion.
-    /// </param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The task result contains a <see cref="PipedProcessResult"/> object
-    /// with details about the executed process, including piped output and exit information.
-    /// </returns>
-    public static Task<PipedProcessResult> RunPipedAsync(
-        ProcessConfiguration configuration,
-        ProcessExitConfiguration? exitConfiguration = null,
-        CancellationToken cancellationToken = default)
-    {
-        InvocationContext ctx = new InvocationContext(
-            configuration,
-            exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
-            InvocationMode.Piped,
-            cancellationToken);
-
-        return new ProcessInvocationPipeline(new ExternalProcessFactory()).InvokeAsync<PipedProcessResult>(ctx);
-    }
 
     /// <summary>
     ///     Starts a process using the specified configuration and returns its process ID without

@@ -80,7 +80,7 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
             context.Result.ExitCode);
 
         // Stdout/stderr Debug logging is only available for BufferedProcessResult,
-        // where the output is captured as strings. For Raw and Piped modes the
+        // where the output is captured as strings. For Raw mode the
         // streams are not read here — use BufferedProcessResult to see per-line logs.
         if (context.Result is BufferedProcessResult bufferedResult)
         {

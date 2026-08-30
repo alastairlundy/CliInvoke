@@ -48,20 +48,4 @@ public interface IProcessInvoker
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default
     );
-
-    /// <summary>
-    ///     Pipes the Standard Input, runs the process asynchronously,
-    ///     waits for exit, pipes the standard output and error, and safely disposes of the Process before
-    ///     returning.
-    /// </summary>
-    /// <param name="processConfiguration">The configuration for the process to be executed.</param>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns>The Piped Process Result that is returned from running the process.</returns>
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("watchos")]
-    Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? exitConfiguration = null,
-        CancellationToken cancellationToken = default);
 }

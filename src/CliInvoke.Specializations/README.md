@@ -42,7 +42,7 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(config, ProcessExit
 // result.StandardOutput contains the captured output; result.ExitCode holds the process exit code.
 ```
 
-`CliRun` also exposes `RunAsync` (returns a `ProcessResult`), `RunPipedAsync` (returns a `PipedProcessResult`), and
+`CliRun` also exposes `RunAsync` (returns a `ProcessResult`) and
 `FireAndForget` for fire-and-forget execution.
 
 ### Dependency Injection

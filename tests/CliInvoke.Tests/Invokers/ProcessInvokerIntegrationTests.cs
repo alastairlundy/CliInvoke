@@ -59,23 +59,6 @@ public class ProcessInvokerIntegrationTests
     }
 
     [Test]
-    public async Task ExecutePipedAsync_ReturnsSuccessfulResult()
-    {
-        IProcessInvoker processInvoker =
-            _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
-
-        ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath, "");
-
-        PipedProcessResult result =
-            await processInvoker.ExecutePipedAsync(config,
-                ProcessExitConfiguration.CreateGraceful());
-
-        await Assert.That(result).IsNotNull();
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-    }
-
-    [Test]
     public async Task ExecuteAsync_PreCancelledToken_ThrowsOperationCanceledException()
     {
         IProcessInvoker processInvoker =
@@ -107,19 +90,4 @@ public class ProcessInvokerIntegrationTests
             .Throws<OperationCanceledException>();
     }
 
-    [Test]
-    public async Task ExecutePipedAsync_PreCancelledToken_ThrowsOperationCanceledException()
-    {
-        IProcessInvoker processInvoker =
-            _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
-
-        ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath, "");
-
-        await Assert.That(async () =>
-                await processInvoker.ExecutePipedAsync(config,
-                    ProcessExitConfiguration.CreateGraceful(),
-                    new CancellationToken(true)))
-            .Throws<OperationCanceledException>();
-    }
 }

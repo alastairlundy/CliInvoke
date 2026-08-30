@@ -15,9 +15,9 @@ Key Abstractions:
 * ``IProcessInvoker``
 * ``IExternalProcessFactory``
 
-* Piping:
-    * Piping is handled via ``IProcessInvoker.ExecuteBufferedAsync`` / ``ExecutePipedAsync`` (or
-      ``IExternalProcess.CaptureBufferedResultAsync`` / ``CapturePipedResultAsync``).
+* Output redirection:
+    * Output redirection is handled via ``IProcessInvoker.ExecuteBufferedAsync`` (or
+      ``IExternalProcess.CaptureBufferedResultAsync``).
 
 * Fluent Builders:
     * ``ArgumentsSpec`` - A spec for Argument Building and argument escaping.
