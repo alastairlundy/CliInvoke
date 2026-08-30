@@ -23,12 +23,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.9.2</Version>
-        <PackageReleaseNotes>#### 🐛 Bug Fixes
-- Fixed `ProcessConfiguration.Equals` to correctly compare `RequiresAdministrator` and `WindowCreation` properties instead of comparing `ResourcePolicy` twice, and added both properties to `GetHashCode` for consistency</PackageReleaseNotes>
+        <Version>2.9.3</Version>
+        <PackageReleaseNotes>* Fixed shell metacharacter escaping in RunnerProcessFactory. Added tests covering the new escaping behavior.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.9.2.0</AssemblyVersion>
-        <FileVersion>2.9.2.0</FileVersion>
+        <AssemblyVersion>2.9.3.0</AssemblyVersion>
+        <FileVersion>2.9.3.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
