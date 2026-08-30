@@ -15,12 +15,12 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.9.4 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.9.3 escaping fix).</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.8.5 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.9.3 escaping fix).</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.9.4</PackageVersion>
-        <AssemblyVersion>2.9.4.0</AssemblyVersion>
+        <PackageVersion>2.8.5</PackageVersion>
+        <AssemblyVersion>2.8.5.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -31,7 +31,7 @@
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
-        <FileVersion>2.9.4.0</FileVersion>
+        <FileVersion>2.8.5.0</FileVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
