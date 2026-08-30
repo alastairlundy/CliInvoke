@@ -35,11 +35,10 @@ public class RunnerProcessFactoryTests
 
         ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
 
-        // The runner flag, the call operator, the target path (kept whole, even though it
+        // The runner flag, the target path (kept whole, even though it
         // contains a space) and each user argument are separate tokens rather than one
         // re-parsed string. A space-bearing target stays a single token.
         Assert.Contains("/c", result.ArgumentsList);
-        Assert.Contains("&", result.ArgumentsList);
         Assert.Contains(@"C:\program files\app.exe", result.ArgumentsList);
         Assert.Contains("arg", result.ArgumentsList);
         Assert.Contains("one", result.ArgumentsList);
