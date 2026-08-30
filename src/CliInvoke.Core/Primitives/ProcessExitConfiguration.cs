@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Validation;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -86,7 +88,21 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// will throw an exception.
     /// </summary>
     public bool CancellationThrowsException { get; }
-    
+
+    /// <summary>
+    ///     Gets the self-describing validation rules applied to the process result after the process
+    ///     exits.
+    /// </summary>
+    /// <remarks>
+    ///     These rules are evaluated by the invocation pipeline once the process result is produced. A
+    ///     failing rule causes the pipeline to throw a
+    ///     <see cref="CliInvoke.Core.Exceptions.ProcessValidationException" />. This property is
+    ///     intentionally excluded from <see cref="IEquatable{ProcessExitConfiguration}.Equals" /> and
+    ///     <see cref="GetHashCode" /> because validation rules are delegate-based and are not
+    ///     value-compared.
+    /// </remarks>
+    public ValidationRule<ProcessResult>[] ValidationRules { get; init; } = [];
+
     /// <summary>
     ///     Determines whether the specified <see cref="ProcessExitConfiguration" /> is equal to the
     ///     current instance.

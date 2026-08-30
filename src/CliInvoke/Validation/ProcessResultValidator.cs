@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Linq;
-
 using CliInvoke.Core.Validation;
 
 namespace CliInvoke.Validation;
@@ -61,7 +59,7 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
     public ValidationRule<TProcessResult>[] Rules { get; }
 
     /// <inheritdoc />
-    public Func<TProcessResult, bool>[] ValidationRules => Rules.Select(rule => rule.Predicate).ToArray();
+    public ValidationRule<TProcessResult>[] ValidationRules => Rules;
 
     /// <summary>
     ///     Validates a <see cref="TProcessResult" /> against the configured <see cref="Rules" />.

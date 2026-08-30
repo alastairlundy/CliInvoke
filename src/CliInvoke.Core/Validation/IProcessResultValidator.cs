@@ -20,13 +20,11 @@ namespace CliInvoke.Core.Validation;
 public interface IProcessResultValidator<TProcessResult> where TProcessResult : ProcessResult
 {
     /// <summary>
-    ///     The validation rules to be applied to the process result. Each rule is a function
-    ///     that takes a process result of type <typeparamref name="TProcessResult" /> and returns a
-    ///     boolean.
-    ///     Each function represents a condition that the process result must satisfy to be considered
-    ///     valid.
+    ///     The self-describing validation rules to be applied to the process result. Each rule is a
+    ///     <see cref="ValidationRule{TProcessResult}" /> that carries its own name and failure message,
+    ///     so failures can be reported without relying on opaque predicates.
     /// </summary>
-    Func<TProcessResult, bool>[] ValidationRules { get; }
+    ValidationRule<TProcessResult>[] ValidationRules { get; }
 
     /// <summary>
     ///     Validates the given process result by applying all specified validation rules.

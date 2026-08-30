@@ -7,8 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Core.Exceptions;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
+using CliInvoke.Core.Validation;
 
 namespace CliInvoke;
 
@@ -87,17 +89,52 @@ internal class ProcessInvocationPipeline
 
             // FireAndForget returns above (lines 46-63) without waiting.
             // Only Raw and Buffered reach this switch.
-            return ctx.Mode switch
+            TResult result = ctx.Mode switch
             {
                 InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
                 InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(
                     ctx.CancellationToken, truncationCap, truncationCap),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
             };
+
+            ValidateResult(result, ctx.ExitConfiguration);
+
+            return result;
         }
         finally
         {
             externalProcess.Dispose();
+        }
+
+        /// <summary>
+        ///     Evaluates the configured validation rules against a completed process result and throws
+        ///     when any rule fails.
+        /// </summary>
+        /// <typeparam name="TResult">The type of process result being validated.</typeparam>
+        /// <param name="result">The process result produced by the invocation.</param>
+        /// <param name="exitConfiguration">
+        ///     The exit configuration whose <see cref="ProcessExitConfiguration.ValidationRules" /> are
+        ///     evaluated, or <c>null</c> when no validation is configured.
+        /// </param>
+        /// <exception cref="ProcessValidationException">
+        ///     Thrown when <paramref name="exitConfiguration" /> declares a rule that the result fails.
+        /// </exception>
+        static void ValidateResult<TResult>(TResult result, ProcessExitConfiguration? exitConfiguration)
+            where TResult : ProcessResult
+        {
+            if (exitConfiguration is null)
+                return;
+
+            ValidationRule<ProcessResult>[] rules = exitConfiguration.ValidationRules;
+
+            if (rules is null)
+                return;
+
+            foreach (ValidationRule<ProcessResult> rule in rules)
+            {
+                if (!rule.Predicate(result))
+                    throw new ProcessValidationException(result, rule.GetFailureMessage(result));
+            }
         }
     }
 }

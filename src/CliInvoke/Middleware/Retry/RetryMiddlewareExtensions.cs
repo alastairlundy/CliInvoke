@@ -24,7 +24,7 @@ public static class RetryMiddlewareExtensions
     /// </summary>
     private static IProcessResultValidator<ProcessResult> DefaultRetryableValidator()
         => new ProcessResultValidator<ProcessResult>(
-            [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]);
+            [CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]);
 
     /// <param name="builder">The middleware builder.</param>
     extension(IProcessMiddlewareBuilder builder)

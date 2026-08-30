@@ -91,10 +91,10 @@ public static class DependencyInjectionExtensions
                 services.RegisterBuiltInMiddleware(lifetime);
                 services.TryAddSingleton<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
-                        [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
+                        [CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]));
                 services.TryAddSingleton<IProcessResultValidator<BufferedProcessResult>>(_ =>
                     new ProcessResultValidator<BufferedProcessResult>(
-                        [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
+                        [CommonValidationRules<BufferedProcessResult>.ExitCodeZeroRule()]));
 
                 services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
                 
@@ -124,10 +124,10 @@ public static class DependencyInjectionExtensions
                 services.RegisterBuiltInMiddleware(lifetime);
                 services.TryAddScoped<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
-                        [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
+                        [CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]));
                 services.TryAddScoped<IProcessResultValidator<BufferedProcessResult>>(_ =>
                     new ProcessResultValidator<BufferedProcessResult>(
-                        [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
+                        [CommonValidationRules<BufferedProcessResult>.ExitCodeZeroRule()]));
 
                 services.AddScoped<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
 
@@ -157,10 +157,10 @@ public static class DependencyInjectionExtensions
                 services.RegisterBuiltInMiddleware(lifetime);
                 services.TryAddTransient<IProcessResultValidator<ProcessResult>>(_ =>
                     new ProcessResultValidator<ProcessResult>(
-                        [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
+                        [CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]));
                 services.TryAddTransient<IProcessResultValidator<BufferedProcessResult>>(_ =>
                     new ProcessResultValidator<BufferedProcessResult>(
-                        [CommonValidationRules<BufferedProcessResult>.RequiresExitCodeZero]));
+                        [CommonValidationRules<BufferedProcessResult>.ExitCodeZeroRule()]));
 
                 services.AddTransient<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
 
@@ -247,7 +247,7 @@ public static class DependencyInjectionExtensions
             typeof(RetryMiddleware),
             sp => new RetryMiddleware(
                 sp.GetService<IProcessResultValidator<ProcessResult>>()
-                    ?? new ProcessResultValidator<ProcessResult>([CommonValidationRules<ProcessResult>.RequiresExitCodeZero]),
+                    ?? new ProcessResultValidator<ProcessResult>([CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]),
                 sp.GetService<RetryOptions>() ?? RetryOptions.Default),
             lifetime));
     }

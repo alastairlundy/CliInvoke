@@ -102,7 +102,7 @@ builder.Services.AddCliInvoke(configure: builder =>
     builder.UseLogging();
     builder.UsePostExitValidation(
         new ProcessResultValidator<ProcessResult>(
-            [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
+            [CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]));
 });
 ```
 

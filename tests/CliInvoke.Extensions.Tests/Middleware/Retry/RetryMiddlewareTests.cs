@@ -276,7 +276,7 @@ public class RetryMiddlewareTests
     {
         public int Calls;
 
-        public Func<ProcessResult, bool>[] ValidationRules => [_ => false];
+        public ValidationRule<ProcessResult>[] ValidationRules => [new ValidationRule<ProcessResult>(_ => false)];
 
         public bool Validate(ProcessResult result)
         {
