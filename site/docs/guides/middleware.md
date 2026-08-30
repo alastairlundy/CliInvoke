@@ -34,7 +34,7 @@ items.Set("Logger", myLogger);
 var invoker = new ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items);
 ```
 
-Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the factory-only constructor when you don't need middleware. Use the full constructor (factory, an `IEnumerable<IProcessMiddleware>` sequence, and an optional `sharedItems`) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
+Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the factory-only constructor when you don't need middleware. Use the full constructor (factory, an `IEnumerable<IProcessMiddleware>` sequence, and an optional `sharedItems`) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync` and `ExecuteBufferedAsync` are unchanged.
 
 ## The `IProcessMiddleware` contract
 
@@ -110,7 +110,7 @@ The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Tr
 
 ## Result-ownership and disposal through the chain
 
-Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
+Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing the `ProcessConfiguration` you created. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
 
 ## The result-swap rule
 
