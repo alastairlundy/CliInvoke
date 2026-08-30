@@ -41,6 +41,10 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
     /// <param name="redirectStandardInput"></param>
+    /// <param name="argumentList">
+    ///     An optional verbatim argument list emitted via <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/>.
+    ///     Used by the middleware to deliver the PowerShell wrapper without OS re-tokenization.
+    /// </param>
     public PowershellProcessConfiguration(
         string arguments,
         bool redirectStandardInput, bool outputRedirection = true,
@@ -49,7 +53,8 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : 
+        bool useShellExecution = false, bool windowCreation = false,
+        IEnumerable<string>? argumentList = null) : 
         base(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
             arguments, redirectStandardInput, outputRedirection, workingDirectoryPath,
             requiresAdministrator, environmentVariables,
@@ -58,7 +63,8 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             standardInputEncoding, standardOutputEncoding,
             standardErrorEncoding, processResourcePolicy,
             windowCreation: windowCreation,
-            useShellExecution: useShellExecution)
+            useShellExecution: useShellExecution,
+            argumentList: argumentList)
     {
     }
 

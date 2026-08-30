@@ -20,6 +20,13 @@ public class CachingFilePathResolverTests
 {
     private sealed class FakeResolver : IFilePathResolver
     {
+        private readonly string _resolvedPath;
+
+        public FakeResolver(string resolvedPath)
+        {
+            _resolvedPath = resolvedPath;
+        }
+
         public int ResolveCount;
 
         public int TryResolveCount;
@@ -27,13 +34,13 @@ public class CachingFilePathResolverTests
         public FileInfo ResolveFilePath(string filePathToResolve)
         {
             ResolveCount++;
-            return new FileInfo(filePathToResolve);
+            return new FileInfo(_resolvedPath);
         }
 
         public bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath)
         {
             TryResolveCount++;
-            resolvedFilePath = new FileInfo(filePathToResolve);
+            resolvedFilePath = new FileInfo(_resolvedPath);
             return true;
         }
     }
@@ -41,23 +48,28 @@ public class CachingFilePathResolverTests
     [Test]
     public async Task ResolveFilePath_CachesAndDelegatesOnlyOnMiss()
     {
-        FakeResolver inner = new FakeResolver();
-        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
+        // Use a real, existing file so the cache's existence re-verification passes on the hit.
+        string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
+        var inner = new FakeResolver(existing);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var resolver = new CachingFilePathResolver(inner, cache);
 
         FileInfo first = resolver.ResolveFilePath("tool");
         FileInfo second = resolver.ResolveFilePath("tool");
 
+        // The inner resolver runs once; the second call is served from cache (re-verified via File.Exists).
         await Assert.That(inner.ResolveCount).IsEqualTo(1);
-        await Assert.That(first).IsSameReferenceAs(second);
+        await Assert.That(first.FullName).IsEqualTo(second.FullName);
+        await Assert.That(first.Exists).IsTrue();
     }
 
     [Test]
     public async Task TryResolveFilePath_CachesAndDelegatesOnlyOnMiss()
     {
-        FakeResolver inner = new FakeResolver();
-        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
+        string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
+        var inner = new FakeResolver(existing);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var resolver = new CachingFilePathResolver(inner, cache);
 
         bool firstOk = resolver.TryResolveFilePath("tool", out FileInfo? first);
         bool secondOk = resolver.TryResolveFilePath("tool", out FileInfo? second);
@@ -65,19 +77,20 @@ public class CachingFilePathResolverTests
         await Assert.That(firstOk).IsTrue();
         await Assert.That(secondOk).IsTrue();
         await Assert.That(inner.TryResolveCount).IsEqualTo(1);
-        await Assert.That(first).IsSameReferenceAs(second);
+        await Assert.That(first!.FullName).IsEqualTo(second!.FullName);
     }
 
     [Test]
     public async Task ResolveFilePath_MissDelegatesToInner()
     {
-        FakeResolver inner = new FakeResolver();
-        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
+        string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
+        var inner = new FakeResolver(existing);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var resolver = new CachingFilePathResolver(inner, cache);
 
         FileInfo result = resolver.ResolveFilePath("tool");
 
         await Assert.That(inner.ResolveCount).IsEqualTo(1);
-        await Assert.That(result.Name).IsEqualTo("tool");
+        await Assert.That(result.FullName).IsEqualTo(existing);
     }
 }

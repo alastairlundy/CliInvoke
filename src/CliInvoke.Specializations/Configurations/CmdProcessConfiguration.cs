@@ -47,6 +47,10 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
     /// <param name="redirectStandardInput"></param>
+    /// <param name="argumentList">
+    ///     An optional verbatim argument list emitted via <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/>.
+    ///     Used by the middleware to deliver the cmd wrapper without OS re-tokenization.
+    /// </param>
     public CmdProcessConfiguration(string arguments,
         bool redirectStandardInput, bool outputRedirection = true,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
@@ -54,14 +58,15 @@ public class CmdProcessConfiguration : ProcessConfiguration
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) :
-        base("cmd.exe",$"/c {arguments}",
+        bool useShellExecution = false, bool windowCreation = false,
+        IEnumerable<string>? argumentList = null) :
+        base("cmd.exe", string.Empty,
             redirectStandardInput, outputRedirection,
             workingDirectoryPath, requiresAdministrator, environmentVariables, credentials,
             standardInput, standardInputEncoding, standardOutputEncoding,
             standardErrorEncoding,
             processResourcePolicy,
-            windowCreation, useShellExecution)
+            windowCreation, useShellExecution, argumentList)
     {
         base.TargetFilePath = TargetFilePath;
     }
