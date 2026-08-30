@@ -76,11 +76,16 @@ For more details see the [list of supported platforms](site/docs/Supported-Opera
 
 ## Design Patterns & When to Use Them
 
-CliInvoke provides three distinct design patterns for invoking processes. See [PATTERNS.md](PATTERNS.md) for comprehensive documentation on each pattern.
+CliInvoke provides three core design patterns for invoking processes (with DI + Middleware and the
+platform Specializations as composition paths). See [PATTERNS.md](PATTERNS.md) for comprehensive
+documentation on each pattern, including a [Which pattern should I use?](PATTERNS.md#which-pattern-should-i-use)
+decision tree.
 
-* **`CliRun`** – Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults.
+* **`CliRun`** – **Recommended default.** Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. **Start here if you are new to CliInvoke.**
 * **`IProcessInvoker`** – DI-centric pattern and support for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
 * **`IExternalProcess` & `IExternalProcessFactory`** – Process-like API with DI support, rich capability, stable and predictable behaviour. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
+
+> **New to CliInvoke? Start with `CliRun`** — it is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control. See [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md) for the design rationale.
 
 ## Examples
 

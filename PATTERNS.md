@@ -3,7 +3,20 @@
 CliInvoke offers three distinct design patterns for invoking external processes. Each pattern targets a different audience and trade‑off space
 
 
+## Which pattern should I use?
+
+Start from your situation — this is a short decision tree; follow the first branch that matches:
+
+- **"I just need to run a command and get the result."** → Use **`CliRun`** — the recommended **default** for beginners, scripts, and CI/CD. Zero boilerplate, no DI required.
+- **"I need dependency injection, testability, or cross-cutting behaviour (logging, retry, validation)."** → Use **`IProcessInvoker`** registered in DI, and add the behaviour through the **middleware pipeline** — that combination is the **DI + Middleware** path.
+- **"I need raw, `System.Diagnostics.Process`-style control over start/stop and lifetime."** → Use **`IExternalProcess`** / `IExternalProcessFactory`.
+- **"I am scripting PowerShell or Cmd specifically."** → Use the **Specializations** (`UsePowerShell`, `UseCmd`), which build on the invoker.
+
+> **Not sure where to start? Use `CliRun`.** It covers the majority of cases. Move to `IProcessInvoker` only when you need DI or middleware, and to `IExternalProcess` only when you need process-level control. See [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md) for the design rationale.
+
 ## Table of Contents
+
+- [Which pattern should I use?](#which-pattern-should-i-use)
 
 - [Beginner‑Friendly Pattern – `CliRun`](#beginner-friendly-pattern-­cliRun)
 - [End‑to‑End / DI‑Friendly Pattern – `IProcessInvoker`](#end-to-end--di-friendly-pattern‑iprocessinvoquer)
@@ -122,10 +135,14 @@ Console.WriteLine(result.StandardOutput);
 
 ## Summary of Trade‑offs
 
-| Pattern | Beginner Friendly | Handles Resource Disposal | Testable | Lifecycle Control | Boilerplate |
-|---------|------------------|----------|---------|-----------|------------|
-| `CliRun` | ✔ |  ✔ | ✖ | ✖ | Minimal |
-| `IProcessInvoker` | ✖ | Requires `using` |  ✔ |  ✖ | Moderate |
+| Pattern | Beginner Friendly | Resource Disposal | Testable | Lifecycle Control | Boilerplate |
+|---------|------------------|------------------|---------|-----------|------------|
+| `CliRun` | ✔ | Result returned to caller | ✖ | ✖ | Minimal |
+| `IProcessInvoker` | ✖ | Result returned to caller |  ✔ |  ✖ | Moderate |
 | `IExternalProcess`/`ExternalProcess` | ✖ |  Requires `using` | ✔ |  ✔ | Significant |
 
 Choose `CliRun` for scripting or basic command execution, `IProcessInvoker` for DI‑centric applications, and `ExternalProcess` when you need process‑level APIs similar to `System.Diagnostics.Process`.
+
+## See also
+
+- [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md) — the design rationale behind the patterns above.

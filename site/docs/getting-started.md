@@ -4,6 +4,11 @@ title: "Getting Started"
 
 # Getting Started
 
+> **New to CliInvoke? Start with `CliRun`.** It is the recommended default entry point — zero boilerplate,
+> no dependency injection required. Use `IProcessInvoker` when you need DI or middleware, and
+> `IExternalProcess` when you need process-level control. See [PATTERNS.md](PATTERNS.md) for a
+> [Which pattern should I use?](PATTERNS.md#which-pattern-should-i-use) decision tree.
+
 ## Installing CliInvoke
 The main way to install CliInvoke is using [nuget](https://www.nuget.org/packages/CliInvoke/) directly or through your IDE or Code Editor of choice.
 

@@ -19,6 +19,21 @@ services.AddCliInvoke();
 var provider = services.BuildServiceProvider();
 ```
 
-Run a simple command using a ProcessConfiguration example (see full Getting Started for DI and advanced options).
+The quickest way to run a command is `CliRun` — the recommended default entry point:
+
+```csharp
+using CliInvoke;
+
+// Run a command and wait for it to finish
+ProcessResult result = await CliRun.RunAsync("dotnet", "--version");
+Console.WriteLine(result.ExitCode);
+
+// Or capture stdout/stderr
+BufferedProcessResult output = await CliRun.RunBufferedAsync("dotnet", "--info");
+Console.WriteLine(output.StandardOutput);
+```
+
+`CliRun` needs no dependency injection and no factories. When you need DI, middleware, or
+process-level control, see the full Getting Started guide and [PATTERNS.md](PATTERNS.md).
 
 (Quickstart migrated from existing docs.)
