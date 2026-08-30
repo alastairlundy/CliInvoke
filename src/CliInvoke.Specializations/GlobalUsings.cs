@@ -9,4 +9,8 @@ global using System.Threading.Tasks;
 
 global using CliInvoke.Core;
 global using CliInvoke.Core.Extensibility;
+global using CliInvoke.Core.Factories;
 global using CliInvoke.Specializations.Internal.Localizations;
+
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;

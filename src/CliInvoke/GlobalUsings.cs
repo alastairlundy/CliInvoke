@@ -16,4 +16,10 @@ global using CliInvoke.Core.Exceptions;
 global using CliInvoke.Internal;
 global using CliInvoke.Internal.Localizations;
 
+global using System.Diagnostics.CodeAnalysis;
+global using CliInvoke.Core.Extensibility;
+global using CliInvoke.Core.Factories;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;
+
 global using Polyfills;

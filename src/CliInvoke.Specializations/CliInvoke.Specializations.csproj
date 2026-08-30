@@ -34,7 +34,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="CliInvoke.Extensions"/>
         <InternalsVisibleTo Include="CliInvoke.Specializations.Tests"/>
     </ItemGroup>
 
@@ -51,6 +50,12 @@
     <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
         <ProjectReference Include="..\CliInvoke\CliInvoke.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
@@ -89,7 +94,4 @@
         </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\CliInvoke\CliInvoke.csproj" />
-    </ItemGroup>
 </Project>

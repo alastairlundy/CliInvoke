@@ -15,9 +15,7 @@
 
     <ItemGroup>
         <ProjectReference Include="../../src/CliInvoke/CliInvoke.csproj"/>
-        <ProjectReference Include="../../src/CliInvoke.Extensions/CliInvoke.Extensions.csproj"/>
         <TrimmerRootAssembly Include="CliInvoke"/>
-        <TrimmerRootAssembly Include="CliInvoke.Extensions"/>
     </ItemGroup>
 
     <!-- Add host package so IHost/Host APIs are available -->

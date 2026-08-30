@@ -58,7 +58,7 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
-        <InternalsVisibleTo Include="CliInvoke.Extensions"/>
+        <InternalsVisibleTo Include="CliInvoke.Specializations"/>
         <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
     </ItemGroup>
 
@@ -76,6 +76,12 @@
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
