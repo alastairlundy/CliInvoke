@@ -155,6 +155,19 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     public IReadOnlyList<string> ArgumentList { get; }
 
     /// <summary>
+    ///     A mutable tokenised argument list that can be set after construction.
+    ///     When non-empty, the control adapter emits these via
+    ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the single
+    ///     <see cref="Arguments"/> string.
+    /// </summary>
+    /// <remarks>
+    ///     This property is used by <c>RunnerConfigurationFactory</c> to expose pre-tokenised
+    ///     arguments so hosts can bypass OS-level re-parsing of the combined argument string.
+    ///     Set it directly to preserve tokens that contain spaces.
+    /// </remarks>
+    public IReadOnlyList<string> ArgumentsList { get; set; } = Array.Empty<string>();
+
+    /// <summary>
     ///     Whether to enable window creation or not when the Command's Process is run.
     /// </summary>
     public bool WindowCreation { get; }
