@@ -23,12 +23,17 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
+        <!-- Keep this project's polyfills internal and do NOT expose them to consumers via
+             InternalsVisibleTo. Polyfill normally adds IVT for the consuming project, which
+             would leak this assembly's internal 'Polyfills.Polyfill' helper type into
+             CliInvoke/CliInvoke.Specializations and cause duplicate-definition (CS0433/CS0121)
+             errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
-        <Version>2.8.4</Version>
-        <PackageReleaseNotes>* Fixed shell metacharacter escaping in RunnerProcessFactory. </PackageReleaseNotes>
+        <Version>2.9.4</Version>
+        <PackageReleaseNotes>* Security: re-backport the ArgumentList fix from 2.10.5. RunnerProcessFactory now composes the wrapped command from discrete argument tokens and ProcessStartInfo delivers them through ArgumentList, so the operating system quotes each value independently and the shell cannot reassemble a second command from a stray quote (CWE-78, CWE-88). 2.9.3's escaping-based fix was incomplete (a quote in arguments still broke OS-level quoting) and should not be relied upon; 2.9.4 replaces it.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.8.4.0</AssemblyVersion>
-        <FileVersion>2.8.4.0</FileVersion>
+        <AssemblyVersion>2.9.4.0</AssemblyVersion>
+        <FileVersion>2.9.4.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
