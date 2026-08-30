@@ -8,7 +8,7 @@
 */
 
 using System.Threading.Tasks;
-using CliInvoke.Specializations.Internal;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Specializations.Tests.Internal;
 

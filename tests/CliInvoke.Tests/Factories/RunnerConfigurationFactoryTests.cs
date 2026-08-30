@@ -62,8 +62,10 @@ public class RunnerConfigurationFactoryTests
 
         // Assert
         await Assert.That(result.RequiresAdministrator).IsTrue();
-        await Assert.That(result.Arguments).Contains("--input");
-        await Assert.That(result.Arguments).Contains("value");
+        // The factory delivers via ArgumentList (ProcessStartInfo.ArgumentList), not the
+        // single Arguments string, so the source-of-truth assertion is on the list.
+        await Assert.That(result.ArgumentList).Contains("--input");
+        await Assert.That(result.ArgumentList).Contains("value");
         await Assert.That(result.EnvironmentVariables).IsEquivalentTo(envVars);
         await Assert.That(result.StandardInputEncoding).IsEqualTo(System.Text.Encoding.UTF8);
     }
