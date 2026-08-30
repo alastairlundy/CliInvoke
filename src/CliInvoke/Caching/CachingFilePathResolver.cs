@@ -19,7 +19,7 @@ namespace CliInvoke.Extensions.Caching;
 /// </summary>
 /// <remarks>
 ///     Lives in <c>CliInvoke.Extensions</c>; <c>CliInvoke.Core</c> remains free of caching concerns
-///     (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md#D009, #D010).
+///     (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
 /// </remarks>
 public sealed class CachingFilePathResolver : IFilePathResolver
 {
