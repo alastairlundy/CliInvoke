@@ -15,13 +15,12 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.4
-* Improved security when running processes creating using ``RunnerProcessFactory``</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.5</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.10.4</PackageVersion>
-        <AssemblyVersion>2.10.4.0</AssemblyVersion>
+        <PackageVersion>2.10.5</PackageVersion>
+        <AssemblyVersion>2.10.5.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -34,7 +33,7 @@
              they do not leak into, or clash with, CliInvoke.Core's copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
-        <FileVersion>2.10.4.0</FileVersion>
+        <FileVersion>2.10.5.0</FileVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">

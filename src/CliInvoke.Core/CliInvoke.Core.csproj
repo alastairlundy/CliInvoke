@@ -29,13 +29,13 @@
              CliInvoke/CliInvoke.Specializations and cause duplicate-definition (CS0433/CS0121)
              errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
-        <Version>2.10.4</Version>
+        <Version>2.10.5</Version>
         <AssemblyVersion>2.10.4.0</AssemblyVersion>
         <FileVersion>2.10.4.0</FileVersion>
-        <PackageReleaseNotes>General Improvements</PackageReleaseNotes>
+        <PackageReleaseNotes>* Fixed shell metacharacter escaping in RunnerProcessFactory. Added tests covering the new escaping behavior.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.10.4.0</AssemblyVersion>
-        <FileVersion>2.10.4.0</FileVersion>
+        <AssemblyVersion>2.10.5.0</AssemblyVersion>
+        <FileVersion>2.10.5.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
