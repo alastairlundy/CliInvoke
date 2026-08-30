@@ -15,23 +15,40 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### ⚙️ Modifications
+        <PackageReleaseNotes>### Added
+- Output truncation middleware with configurable size limits and custom handlers
+- `CachingFilePathResolver` and DI registration extensions for file-path caching
+- Retry middleware (`UseRetryPolicy`) with configurable policies, linear backoff, and delay clamping
+- `RetryBackoffStrategy.Linear` option; retry delay clamped to `Task.Delay` maximum
+- `ValidationRule` primitive for post-exit process validation
+- `GetTerminatingSignal` control-adapter heuristic
+- `ProcessValidationException` type
 
-- Stripped `CliRun` static mutable state
-- Reduced `ProcessInvoker` constructors
-- Tightened `ExternalProcess` public API
-- Reduced constructor code duplication
-- Moved duplicated `CliRun` code to shared helper
-- Updated `ProcessInvoker.cs`
-- Updated `ProcessInvoker` to reflect `MiddlewareChain` not being null
-- Updated `ProcessConfigurationFactory.cs`
-- Migrated 21 params-overload call sites to new two-overload factory API
-- Replaced stale TODO in `ProcessInvocationPipeline` with design note
-- Clarified TODO in `CliRun.GetPipeline` about Rider volatile warning
+### Changed
+- `CliInvoke.Extensions` folded into the main package
+- `IDisposable` dropped from `ProcessConfiguration`
+- `PathEnvironmentVariable` moved to `CliInvoke`
+- Extension types relocated into `src/CliInvoke/Extensions` tree
+- `ArgumentsSpec` internals reworked
+- Per-call allocations eliminated in result parsing and argument building
+- LINQ usage removed from `ProcessConfiguration` to cut allocations
+- `ProcessResult.Equals` now uses exact runtime-type matching for symmetric equality
+- Process launch and logging paths made more robust
+- `AddEnumerable` now fails fast on null entries
+- `BufferedProcessResult.WasTruncated` made immutable and included in equality
+- `UseRetryPolicy` DI registration fixed to decorate the active (last) `IFilePathResolver` registration
+- Default `IProcessResultValidator.ShouldRetry` inverted to `!Validate(result)`
+- Caching resolver now decorates the active (last) `IFilePathResolver` registration
 
-#### 🐛 Bug Fixes
-
-- Fixed `ExternalProcess` to dispose old wrapper and reattach event handlers</PackageReleaseNotes>
+### Fixed
+- `Canceled` no longer reports `false` after graceful timeout cancellation
+- Deadlock resolved: buffered/piped capture now starts without awaiting process exit
+- `LocateFileFromDirectory` rechecks resolved `FileInfo` existence before returning
+- POSIX argument escaping fixed: `EscapeInner` double-backslashes before quotes and emits POSIX backslashes literally for correct round-tripping
+- Stale escaping expectations in `ProcessConfigurationBuilderTests` corrected
+- Argument-escaping assertions now platform-aware
+- `ProcessValidationException` constructors fixed
+- `UserCredential` constructor and validation rules fixed</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

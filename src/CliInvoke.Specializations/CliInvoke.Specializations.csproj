@@ -18,13 +18,18 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>#### 🆕 Additions
+        <PackageReleaseNotes>### Added
+- Platform-specific process control adapters (`UnixProcessControlAdapter`, `WindowsProcessControlAdapter`)
 
-- Dropped `IFilePathResolver` from `PowershellProcessConfiguration` constructor
+### Changed
+- `ShellArgumentEscaper` relocated to `Specializations`
+- `FilePathResolverBase` class removed
 
-#### ⚙️ Modifications
-
-- Dropped `IFilePathResolver` from `PowershellProcessInvoker` and `PowerShellMiddleware`</PackageReleaseNotes>
+## Removed
+- `Piped` invocation path and `PipedProcessResult`
+- `CmdProcessInvoker` and `PowershellProcessInvoker` wrappers
+- `FilePathResolverBase` class
+- `InvocationMode` enum</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>

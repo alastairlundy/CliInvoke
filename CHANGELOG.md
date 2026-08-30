@@ -64,6 +64,81 @@ change set. Themes:
 
 [3.0.0-alpha]: https://github.com/alastairlundy/CliInvoke/releases
 
+## Changes since 3.0.0-alpha.10
+
+### All Projects
+
+#### Additions
+
+- Output truncation middleware with configurable size limits and custom handlers.
+- `CachingFilePathResolver` and DI registration extensions for file-path caching.
+- Retry middleware (`UseRetryPolicy`) with configurable policies, linear backoff, and delay clamping.
+- `ValidationRule` primitive for post-exit process validation.
+- `RetryBackoffStrategy.Linear` option; retry delay clamped to `Task.Delay` maximum.
+- `Canceled` and `Signal` properties on `ProcessResult` for cancellation and signal handling.
+- `GetTerminatingSignal` control-adapter heuristic.
+- Platform-specific process control adapters (`UnixProcessControlAdapter`, `WindowsProcessControlAdapter`).
+- `ProcessValidationException` type.
+- `IProcessResultValidator` and `CommonValidationRules` for exit validation.
+- `ProcessExitConfiguration` for exit-code and signal validation.
+
+#### Modifications
+
+- `CliInvoke.Extensions` folded into the main `CliInvoke` package.
+- `Piped` invocation path and `PipedProcessResult` removed.
+- `IDisposable` dropped from `ProcessConfiguration`.
+- Dead `InternalsVisibleTo` grants across `Core` and `Specializations` stripped out.
+- `CmdProcessInvoker` and `PowershellProcessInvoker` wrappers deleted.
+- Solution layout cleaned: `Middleware` folder removed, `Extensions.Tests` wired.
+- Process launch and logging paths made more robust.
+- `AddEnumerable` now fails fast on null entries.
+- `BufferedProcessResult.WasTruncated` made immutable and included in equality.
+- Unused usings stripped; test references synchronized to new namespaces.
+- Shell argument escaping tightened; `ShellArgumentEscaper` relocated to `Specializations`.
+- `PathEnvironmentVariable` moved to `CliInvoke`; `FilePathResolverBase` dropped.
+- `ArgumentsSpec` internals reworked.
+- `UseRetryPolicy` DI registration fixed to decorate the active (last) `IFilePathResolver` registration.
+- Default `IProcessResultValidator.ShouldRetry` inverted to `!Validate(result)`.
+- Retry delay clamped to `Task.Delay` maximum; negative `RetryOptions.BaseDelay` and `MaxAttempts` below 1 now rejected.
+- Per-call allocations eliminated in result parsing and argument building.
+- LINQ usage removed from `ProcessConfiguration` to cut allocations.
+- `ProcessResult.Equals` now uses exact runtime-type matching for symmetric equality.
+- Extension types relocated into `src/CliInvoke/Extensions` tree.
+- `PipedProcessResult` references scrubbed from docs and skills.
+- `InvocationMode` enum removed (no longer needed after Piped removal).
+- `IFilePathResolver`, `IProcessMiddleware`, and `MiddlewareChain` interfaces updated; `MiddlewareChain` now non-nullable.
+
+#### Bug Fixes
+
+- `Canceled` no longer reports `false` after graceful timeout cancellation.
+- Deadlock resolved: buffered/piped capture now starts without awaiting process exit.
+- `LocateFileFromDirectory` rechecks resolved `FileInfo` existence before returning.
+- POSIX argument escaping fixed: `EscapeInner` double-backslashes before quotes and emits POSIX backslashes literally for correct round-tripping.
+- Caching resolver now decorates the active (last) `IFilePathResolver` registration.
+- Stale escaping expectations in `ProcessConfigurationBuilderTests` corrected.
+- Argument-escaping assertions now platform-aware.
+- `ProcessValidationException` constructors fixed.
+- `UserCredential` constructor and validation rules fixed.
+
+#### Removals
+
+- `PipedProcessResult` and the `Piped` invocation path.
+- `CmdProcessInvoker` and `PowershellProcessInvoker` wrappers.
+- `FilePathResolverBase` class.
+- `InvocationMode` enum.
+
+#### Non-Source Code
+
+- `README.md`, `GLOSSARY.md`, and `CONTRIBUTING.md` updated.
+- ADR 0001 (IVT-minimization principle) and ADR 0002 (why not CliWrap) added.
+- Migration guides for 3.0.0 and v1-to-v2 refreshed.
+- Getting-started and architecture documentation refreshed.
+- Middleware, configuration, and troubleshooting guides updated.
+
+##### Runtime Dependencies
+
+- `Microsoft.Extensions.Caching.Memory` 10.0.11 added to `Directory.Packages.props` for the new `CachingFilePathResolver`.
+
 ## Changes since 3.0.0-alpha.9
 
 ### All Packages
