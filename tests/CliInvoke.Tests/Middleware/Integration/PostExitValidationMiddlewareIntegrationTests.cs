@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using CliInvoke.Core.Exceptions;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
+using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Factories;
 
