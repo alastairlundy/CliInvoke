@@ -29,6 +29,7 @@
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
+        <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
         <FileVersion>2.9.3.0</FileVersion>
     </PropertyGroup>

@@ -7,10 +7,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Extensibility.Factories;
 
@@ -33,43 +35,36 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
 
-        string innerCommand;
-        // If the runner process is PowerShell, invoke the target via the call operator (&) and quote the path.
-        if (!string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath) &&
-            (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0 ||
-             runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0))
-        {
-            // The runner's own arguments (e.g. -NoProfile -NonInteractive -Command) stay as separate
-            // tokens; only the dynamic target + target arguments are wrapped as a single safe token.
-            string escapedTarget = processConfigToBeRun.TargetFilePath.Replace("'", "''");
-            string targetExpression = $"& '{escapedTarget}'";
-            string targetArguments = string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments)
-                ? string.Empty
-                : processConfigToBeRun.Arguments;
-            string commandBody = $"{targetExpression} {targetArguments}".Trim();
-            string wrappedBody = MakeShellSafe(commandBody, true);
+        // Compose the wrapped command as discrete tokens. Delivering the target and
+        // the caller's arguments as separate tokens (rather than one re-parsed string)
+        // means the operating system tokenises each value independently, so a quote or
+        // other special character inside a caller-supplied value cannot alter how the
+        // wrapped command is split.
+        List<string> commandTokens = new();
 
-            innerCommand = string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments)
-                ? wrappedBody
-                : $"{runnerProcessConfig.Arguments.Trim()} {wrappedBody}";
-        }
-        else
-        {
-            string targetArguments = string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments)
-                ? string.Empty
-                : processConfigToBeRun.Arguments;
-            string commandBody = $"{processConfigToBeRun.TargetFilePath} {targetArguments}".Trim();
-            string wrappedBody = MakeShellSafe(commandBody, false);
+        if (!string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments))
+            commandTokens.AddRange(ArgumentTokenizer.Tokenize(runnerProcessConfig.Arguments));
 
-            innerCommand = string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments)
-                ? wrappedBody
-                : $"{runnerProcessConfig.Arguments.Trim()} {wrappedBody}";
-        }
+        // PowerShell requires the call operator (&) to invoke a target whose path is
+        // quoted/contains spaces; cmd runs the target directly, so it is omitted there.
+        bool runnerIsPowerShell =
+            !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
+            && (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0
+                || runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0);
+
+        if (runnerIsPowerShell)
+            commandTokens.Add("&");
+
+        // Pass the target path and its arguments as literal tokens.
+        commandTokens.Add(processConfigToBeRun.TargetFilePath);
+
+        if (!string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments))
+            commandTokens.AddRange(ArgumentTokenizer.Tokenize(processConfigToBeRun.Arguments));
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath
             )
-            .SetArguments(innerCommand)
+            .SetArguments(commandTokens)
             .SetEnvironmentVariables(processConfigToBeRun.EnvironmentVariables)
             .SetProcessResourcePolicy(processConfigToBeRun.ResourcePolicy)
             .SetStandardInputEncoding(processConfigToBeRun.StandardInputEncoding)
@@ -88,63 +83,12 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         if (runnerProcessConfig.RequiresAdministrator)
             commandBuilder = commandBuilder.RequireAdministratorPrivileges();
 
-        return commandBuilder.Build();
-    }
+        ProcessConfiguration result = commandBuilder.Build();
 
-    /// <summary>
-    /// Produces a shell-safe, single-token representation of a composed command so that the
-    /// operating-system command-line parser cannot re-tokenize the inner contents and let the
-    /// wrapped shell reassemble a second command.
-    /// </summary>
-    /// <param name="command">The composed command (runner arguments, target, and target arguments).</param>
-    /// <param name="forPowerShell">True to wrap for a PowerShell <c>-Command</c> invocation; false for cmd <c>/c</c>.</param>
-    /// <returns>A single double-quoted token safe to pass as the runner process' arguments.</returns>
-    private static string MakeShellSafe(string command, bool forPowerShell)
-    {
-        if (string.IsNullOrWhiteSpace(command))
-            return "\"\"";
+        // Expose the pre-tokenized form so hosts can bypass OS-level re-parsing of the
+        // combined argument string. Set it directly to preserve tokens that contain spaces.
+        result.ArgumentsList = commandTokens;
 
-        // Strip control characters that could otherwise break out of the quoting wrapper.
-        StringBuilder sanitized = new(command.Length);
-        foreach (char c in command)
-        {
-            if (c < 0x20 && c != '\t' && c != '\n' && c != '\r')
-                continue;
-            sanitized.Append(c);
-        }
-
-        if (forPowerShell)
-        {
-            // Escape any backticks, double quotes and dollar signs, then wrap in a double-quoted
-            // literal so the OS parser passes the whole command to PowerShell as a single token.
-            // Escaping '$' prevents $(...) subexpression execution inside the wrapper.
-            string escaped = sanitized.ToString()
-                .Replace("`", "``")
-                .Replace("\"", "`\"")
-                .Replace("$", "`$");
-            return $"\"{escaped}\"";
-        }
-
-        // cmd: caret-escape the shell metacharacters (including '%' to block variable expansion),
-        // then wrap the result in a single double-quoted token.
-        StringBuilder escapedCmd = new(sanitized.Length + 8);
-        foreach (char c in sanitized.ToString())
-        {
-            switch (c)
-            {
-                case '"': escapedCmd.Append("^\""); break;
-                case '&': escapedCmd.Append("^&"); break;
-                case '|': escapedCmd.Append("^|"); break;
-                case '<': escapedCmd.Append("^<"); break;
-                case '>': escapedCmd.Append("^>"); break;
-                case '^': escapedCmd.Append("^^"); break;
-                case '(': escapedCmd.Append("^("); break;
-                case ')': escapedCmd.Append("^)"); break;
-                case '%': escapedCmd.Append("^%"); break;
-                default: escapedCmd.Append(c); break;
-            }
-        }
-
-        return $"\"{escapedCmd}\"";
+        return result;
     }
 }

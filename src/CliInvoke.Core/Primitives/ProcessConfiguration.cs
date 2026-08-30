@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -46,6 +47,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         
         RequiresAdministrator = false;
         Arguments = arguments ?? string.Empty;
+        ArgumentsList = string.IsNullOrEmpty(Arguments)
+            ? []
+            : ArgumentTokenizer.Tokenize(Arguments);
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = new Dictionary<string, string>();
         Credential = UserCredential.Null;
@@ -114,6 +118,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         
         RequiresAdministrator = requiresAdministrator;
         Arguments = arguments ?? string.Empty;
+        ArgumentsList = string.IsNullOrEmpty(Arguments)
+            ? []
+            : ArgumentTokenizer.Tokenize(Arguments);
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
         Credential = credential ?? UserCredential.Null;
@@ -190,6 +197,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         
         RequiresAdministrator = requiresAdministrator;
         Arguments = arguments ?? string.Empty;
+        ArgumentsList = string.IsNullOrEmpty(Arguments)
+            ? []
+            : ArgumentTokenizer.Tokenize(Arguments);
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
         Credential = credential ?? UserCredential.Null;
@@ -233,6 +243,19 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// The arguments to be provided to the executable to be run.
     /// </summary>
     public string Arguments { get; protected set; }
+
+    /// <summary>
+    /// The arguments to be provided to the executable to be run, exposed as a
+    /// pre-tokenized collection of discrete values.
+    /// </summary>
+    /// <remarks>
+    ///     When populated, each entry is treated as a separate command-line token.
+    ///     This lets hosts (such as <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList" />)
+    ///     pass the values to the operating system without re-parsing a single
+    ///     argument string, avoiding quoting/escaping ambiguity when a value contains
+    ///     characters such as the double-quote.
+    /// </remarks>
+    public IReadOnlyList<string> ArgumentsList { get; internal set; } = [];
 
     /// <summary>
     /// Whether to enable window creation or not when the Command's Process is run.
