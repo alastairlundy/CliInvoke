@@ -47,6 +47,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         
         RequiresAdministrator = false;
         Arguments = arguments ?? string.Empty;
+        ArgumentsList = string.IsNullOrEmpty(Arguments)
+            ? []
+            : ArgumentTokenizer.Tokenize(Arguments);
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = new Dictionary<string, string>();
         Credential = UserCredential.Null;
@@ -117,7 +120,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Arguments = arguments ?? string.Empty;
         ArgumentsList = string.IsNullOrEmpty(Arguments)
             ? []
-            : Internal.ArgumentParser.Tokenize(Arguments);
+            : ArgumentTokenizer.Tokenize(Arguments);
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
         Credential = credential ?? UserCredential.Null;
@@ -196,7 +199,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Arguments = arguments ?? string.Empty;
         ArgumentsList = string.IsNullOrEmpty(Arguments)
             ? []
-            : Internal.ArgumentParser.Tokenize(Arguments);
+            : ArgumentTokenizer.Tokenize(Arguments);
         WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
         EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
         Credential = credential ?? UserCredential.Null;
@@ -353,7 +356,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
                && UseShellExecution.Equals(other.UseShellExecution)
                && Credential.Equals(other.Credential)
-               && ResourcePolicy.Equals(other.ResourcePolicy)
+               && RequiresAdministrator.Equals(other.RequiresAdministrator)
+               && WindowCreation.Equals(other.WindowCreation)
                && StandardInput.Equals(other.StandardInput)
 #pragma warning disable CS0618 // Type or member is obsolete
                && StandardOutput.Equals(other.StandardOutput)

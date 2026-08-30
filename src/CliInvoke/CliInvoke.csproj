@@ -15,7 +15,7 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.8.5 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.9.3 escaping fix).</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.8.5 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.8.4 escaping fix).</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

@@ -9,9 +9,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility.Factories;
-using CliInvoke.Helpers.Processes;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Extensibility.Factories;
 
@@ -39,15 +40,31 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         // means the operating system tokenises each value independently, so a quote or
         // other special character inside a caller-supplied value cannot alter how the
         // wrapped command is split.
-        List<string> commandTokens = ComposeRunnerCommandTokens(
-            processConfigToBeRun, runnerProcessConfig);
+        List<string> commandTokens = new();
 
-        string combinedArgs = string.Join(" ", commandTokens);
+        if (!string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments))
+            commandTokens.AddRange(ArgumentTokenizer.Tokenize(runnerProcessConfig.Arguments));
+
+        // PowerShell requires the call operator (&) to invoke a target whose path is
+        // quoted/contains spaces; cmd runs the target directly, so it is omitted there.
+        bool runnerIsPowerShell =
+            !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
+            && (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0
+                || runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0);
+
+        if (runnerIsPowerShell)
+            commandTokens.Add("&");
+
+        // Pass the target path and its arguments as literal tokens.
+        commandTokens.Add(processConfigToBeRun.TargetFilePath);
+
+        if (!string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments))
+            commandTokens.AddRange(ArgumentTokenizer.Tokenize(processConfigToBeRun.Arguments));
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath
             )
-            .SetArguments(combinedArgs)
+            .SetArguments(commandTokens)
             .SetEnvironmentVariables(processConfigToBeRun.EnvironmentVariables)
             .SetProcessResourcePolicy(processConfigToBeRun.ResourcePolicy)
             .SetStandardInputEncoding(processConfigToBeRun.StandardInputEncoding)
@@ -64,9 +81,7 @@ public class RunnerProcessFactory : IRunnerProcessFactory
             .ConfigureWindowCreation(processConfigToBeRun.WindowCreation);
 
         if (runnerProcessConfig.RequiresAdministrator)
-            commandBuilder = new ProcessConfigurationBuilder(
-                runnerProcessConfig.TargetFilePath
-            ).RequireAdministratorPrivileges();
+            commandBuilder = commandBuilder.RequireAdministratorPrivileges();
 
         ProcessConfiguration result = commandBuilder.Build();
 
@@ -75,48 +90,5 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         result.ArgumentsList = commandTokens;
 
         return result;
-    }
-
-    /// <summary>
-    /// Builds the discrete argument tokens that the runner process will receive.
-    /// </summary>
-    /// <param name="processConfigToBeRun">The command to be run by the runner process.</param>
-    /// <param name="runnerProcessConfig">The runner process configuration.</param>
-    /// <returns>The list of discrete argument tokens for the runner process.</returns>
-    private static List<string> ComposeRunnerCommandTokens(
-        ProcessConfiguration processConfigToBeRun,
-        ProcessConfiguration runnerProcessConfig)
-    {
-        string runnerArgs = runnerProcessConfig.Arguments ?? string.Empty;
-        string target = processConfigToBeRun.TargetFilePath ?? string.Empty;
-        string targetArgs = processConfigToBeRun.Arguments ?? string.Empty;
-
-        IEnumerable<string> runnerTokens = ArgumentCompositionHelper.SplitArguments(runnerArgs);
-        IEnumerable<string> targetArgTokens = ArgumentCompositionHelper.SplitArguments(targetArgs);
-
-        List<string> segments = new();
-
-        // Preserve any arguments the runner process itself declares (e.g. -Command, /c) verbatim.
-        foreach (string token in runnerTokens)
-            segments.Add(token);
-
-        if (ArgumentCompositionHelper.IsPowerShell(runnerProcessConfig))
-        {
-            // Invoke the target via the call operator and keep its path in a quoted, escaped token.
-            segments.Add("&");
-            segments.Add(ArgumentCompositionHelper.QuoteArgument(target));
-        }
-        else
-        {
-            segments.Add(ArgumentCompositionHelper.QuoteArgument(target));
-        }
-
-        // The target path is treated as a single atomic token; only its arguments are tokenised,
-        // and each resulting token is individually quoted/escaped so a quote or ampersand inside
-        // cannot be re-interpreted as a command separator by the OS command-line parser.
-        foreach (string token in targetArgTokens)
-            segments.Add(ArgumentCompositionHelper.QuoteArgument(token));
-
-        return segments;
     }
 }

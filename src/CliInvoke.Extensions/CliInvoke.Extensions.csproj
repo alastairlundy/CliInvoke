@@ -16,7 +16,7 @@
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.8.5 and CliInvoke 2.8.5 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.9.3 escaping fix).</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.8.5 and CliInvoke 2.8.5 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.8.4 escaping fix).</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

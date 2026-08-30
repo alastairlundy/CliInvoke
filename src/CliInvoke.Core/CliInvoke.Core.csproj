@@ -30,7 +30,7 @@
              errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <Version>2.8.5</Version>
-        <PackageReleaseNotes>* Security: re-backport the ArgumentList fix from 2.10.5. RunnerProcessFactory now composes the wrapped command from discrete argument tokens and ProcessStartInfo delivers them through ArgumentList, so the operating system quotes each value independently and the shell cannot reassemble a second command from a stray quote (CWE-78, CWE-88). 2.9.3's escaping-based fix was incomplete (a quote in arguments still broke OS-level quoting) and should not be relied upon; 2.8.5 replaces it.</PackageReleaseNotes>
+        <PackageReleaseNotes>* Security: re-backport the ArgumentList fix from 2.10.5. RunnerProcessFactory now composes the wrapped command from discrete argument tokens and ProcessStartInfo delivers them through ArgumentList, so the operating system quotes each value independently and the shell cannot reassemble a second command from a stray quote (CWE-78, CWE-88). 2.8.4's escaping-based fix was incomplete (a quote in arguments still broke OS-level quoting) and should not be relied upon; 2.8.5 replaces it.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>2.8.5.0</AssemblyVersion>
         <FileVersion>2.8.5.0</FileVersion>

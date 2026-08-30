@@ -18,7 +18,7 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.8.5 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.9.3 escaping fix).</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.8.5 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.8.4 escaping fix).</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>

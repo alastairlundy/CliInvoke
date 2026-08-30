@@ -23,7 +23,7 @@ namespace CliInvoke.Core.Internal;
 ///     here into separate tokens so each can be passed to the operating system
 ///     independently and unambiguously.
 /// </remarks>
-internal static class ArgumentParser
+internal static class ArgumentTokenizer
 {
     /// <summary>
     ///     Splits <paramref name="value" /> into tokens, honouring double-quoted spans

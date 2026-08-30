@@ -14,6 +14,7 @@
 ### 2.8
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.8.5 | Unreleased | Security: re-backport of 2.10.5's ArgumentList fix. RunnerProcessFactory now composes the wrapped command from discrete argument tokens and ProcessStartInfo delivers them through ArgumentList, so the OS quotes each value independently and the shell cannot reassemble a second command from a stray quote (CWE-78, CWE-88). Supersedes the incomplete 2.8.4 escaping-based fix. |
 | 2.8.4 | Unreleased | Refined how runner configurations compose their argument strings so wrapped targets and arguments are handled more robustly. |
 
 ### 2.7
