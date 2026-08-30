@@ -22,7 +22,7 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-alpha.10</Version>
+        <Version>3.0.0-beta.1</Version>
         <PackageReleaseNotes>#### 🆕 Additions
 
 - Made `Configuration` init-only on `IExternalProcess` and `ExternalProcess`

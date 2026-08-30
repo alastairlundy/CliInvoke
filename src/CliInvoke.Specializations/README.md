@@ -13,7 +13,7 @@ Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/bl
 
 ## Usage
 
-CliInvoke.Specializations comes with two specializations as of 3.0.0 (currently in pre-release as `3.0.0-alpha.10`):
+CliInvoke.Specializations comes with two specializations as of 3.0.0 (currently in pre-release as `3.0.0-beta.1`):
 
 - [CmdProcessConfiguration](#cmdprocessconfiguration) — An easier way to execute processes and commands through
   Windows' `cmd.exe`.
