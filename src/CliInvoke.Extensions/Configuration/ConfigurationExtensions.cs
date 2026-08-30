@@ -42,7 +42,12 @@ public static class ConfigurationExtensions
         /// <param name="processStartInfo">The <see cref="ProcessStartInfo"/> containing the process start configuration.</param>
         /// <returns>An instance of <see cref="ProcessConfiguration"/> with the configuration applied from
         /// the provided <see cref="ProcessStartInfo"/>.</returns>
+#if NET9_0_OR_GREATER
+        // OverloadResolutionPriorityAttribute is public only in .NET 9 and later. On netstandard2.0
+        // and net8.0 the embedded copy is internal, so the attribute is skipped there. The method
+        // is [Obsolete] and the hint is informational only.
         [OverloadResolutionPriority(2)]
+#endif
         [Obsolete("This method is deprecated and will be removed in CliInvoke.Extensions version 3.")]
         public static ProcessConfiguration FromStartInfo(ProcessStartInfo processStartInfo)
             => FromProcessStartInfo(processStartInfo);

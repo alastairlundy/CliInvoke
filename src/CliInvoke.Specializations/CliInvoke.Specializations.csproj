@@ -12,20 +12,26 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.9.3</PackageVersion>
+        <PackageVersion>2.9.4</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.9.3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.9.4 (security re-backport of 2.10.5's ArgumentList fix for Surface A/B; supersedes the incomplete 2.9.3 escaping fix).</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>2.9.3.0</AssemblyVersion>
-        <FileVersion>2.9.3.0</FileVersion>
+        <AssemblyVersion>2.9.4.0</AssemblyVersion>
+        <FileVersion>2.9.4.0</FileVersion>
+        <!-- Keep this project's polyfills internal and do NOT expose them to consumers via
+             InternalsVisibleTo. Polyfill normally adds IVT for the consuming project, which
+             would leak this assembly's internal 'Polyfills.Polyfill' helper type into
+             CliInvoke.Core and cause duplicate-definition (CS0433/CS0121) errors. With
+             PolyUseEmbeddedAttribute each project generates its own private copy. -->
+        <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
     </PropertyGroup>
     
     <ItemGroup>
