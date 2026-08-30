@@ -50,12 +50,12 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     /// <inheritdoc />
     public FileInfo ResolveFilePath(string filePathToResolve)
     {
-        if (_cache.TryGetValue<FileInfo>(filePathToResolve, out FileInfo? cached) && cached is not null)
+        if (TryGetVerified(filePathToResolve, out FileInfo? cached) && cached is not null)
             return cached;
 
         FileInfo resolved = _inner.ResolveFilePath(filePathToResolve);
 
-        Cache(filePathToResolve, resolved);
+        Cache(filePathToResolve, resolved.FullName);
 
         return resolved;
     }
@@ -63,7 +63,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     /// <inheritdoc />
     public bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath)
     {
-        if (_cache.TryGetValue<FileInfo>(filePathToResolve, out FileInfo? cached) && cached is not null)
+        if (TryGetVerified(filePathToResolve, out FileInfo? cached) && cached is not null)
         {
             resolvedFilePath = cached;
             return true;
@@ -71,7 +71,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
 
         if (_inner.TryResolveFilePath(filePathToResolve, out FileInfo? innerResolved) && innerResolved is not null)
         {
-            Cache(filePathToResolve, innerResolved);
+            Cache(filePathToResolve, innerResolved.FullName);
             resolvedFilePath = innerResolved;
             return true;
         }
@@ -80,7 +80,31 @@ public sealed class CachingFilePathResolver : IFilePathResolver
         return false;
     }
 
-    private void Cache(string key, FileInfo value)
+    /// <summary>
+    ///     Reads a cached absolute path and re-verifies it still exists before trusting it.
+    /// </summary>
+    /// <remarks>
+    ///     Caching the resolved <see cref="FileInfo"/> by raw target name created a TOCTOU /
+    ///     cache-poisoning window: the PATH or working directory could change, or the file could
+    ///     be replaced (e.g. via a symlink swap), between the cache write and process start. We now
+    ///     cache only the absolute path string and re-check <see cref="File.Exists"/> on every hit,
+    ///     so a stale or swapped entry is discarded and re-resolved.
+    /// </remarks>
+    private bool TryGetVerified(string key, out FileInfo? verified)
+    {
+        verified = null;
+
+        if (!_cache.TryGetValue<string>(key, out string? cachedPath) || cachedPath is null)
+            return false;
+
+        if (!File.Exists(cachedPath))
+            return false;
+
+        verified = new FileInfo(cachedPath);
+        return true;
+    }
+
+    private void Cache(string key, string absolutePath)
     {
         var entryOptions = new MemoryCacheEntryOptions
         {
@@ -91,6 +115,6 @@ public sealed class CachingFilePathResolver : IFilePathResolver
         if (_options.PostEvictionCallback is not null)
             entryOptions.RegisterPostEvictionCallback(_options.PostEvictionCallback);
 
-        _cache.Set(key, value, entryOptions);
+        _cache.Set(key, absolutePath, entryOptions);
     }
 }

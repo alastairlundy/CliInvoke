@@ -1,0 +1,20 @@
+Fix command-injection RCE in shell wrappers and harden secret logging/caching
+
+- CRITICAL: PowerShell/Cmd specializations previously emitted the wrapped
+  shell command as a single ProcessStartInfo.Arguments string, which the OS
+  command-line parser re-tokenized before the wrapped shell parsed it. Because
+  only shell-layer escaping (PowerShell backtick / cmd caret) was applied, a '"'
+  in a target/argument broke OS-level quoting and let pwsh reassemble a second
+  command (RCE). Wrappers now deliver via ProcessStartInfo.ArgumentList so the
+  OS passes argv verbatim and only the shell parses once. Escapers unchanged.
+
+- LoggingMiddleware: replace the single-pattern secret redaction with a
+  pluggable Func<string?,string> redactor (Microsoft.Extensions.Compliance.
+  Redaction friendly) and redact captured stdout/stderr lines.
+
+- CachingFilePathResolver: cache the absolute path string and re-verify
+  File.Exists on each hit (was caching a mutable FileInfo by raw name).
+
+- UserCredential.Equals now compares SecureString content, not reference.
+- FilePathResolver.LocateFileFromDirectory no longer recurses the whole subtree.
+- Add injection regression tests; update caching tests for re-verification.

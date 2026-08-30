@@ -50,6 +50,17 @@ internal abstract class BaseProcessControlAdapter
             RedirectStandardError = processConfiguration.OutputRedirection,
         };
 
+        // When a verbatim argument list is supplied (shell wrappers), emit it via
+        // ArgumentList so the OS command-line parser passes each entry to the child
+        // unmodified. This prevents the double-parse command-injection vector where a
+        // single re-tokenized Arguments string is re-interpreted by the wrapped shell.
+        if (processConfiguration.ArgumentList.Count > 0)
+        {
+            processStartInfo.Arguments = string.Empty;
+            foreach (string arg in processConfiguration.ArgumentList)
+                processStartInfo.ArgumentList.Add(arg);
+        }
+
         if (processConfiguration.RequiresAdministrator)
             RequireRunningAsAdmin(process);
 

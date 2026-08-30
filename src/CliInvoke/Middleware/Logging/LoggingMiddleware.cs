@@ -36,6 +36,7 @@ namespace CliInvoke.Extensions.Middleware;
 internal sealed partial class LoggingMiddleware : IProcessMiddleware
 {
     private readonly ILogger<LoggingMiddleware> _logger;
+    private readonly Func<string?, string>? _redactor;
 
     [GeneratedRegex(@"(--password|--token|--api-key)(\s*=\s*|\s+)(?:""[^""]*""|'[^']*'|[^\s-][^\s]*)",
         RegexOptions.IgnoreCase)]
@@ -48,9 +49,17 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
     ///     The logger used to write process invocation entry and exit information.
     ///     Resolved from the dependency injection container.
     /// </param>
-    public LoggingMiddleware(ILogger<LoggingMiddleware> logger)
+    /// <param name="redactor">
+    ///     An optional redactor applied to argument strings and captured stdout/stderr lines
+    ///     before they are logged. When omitted, a built-in pattern redacts the values following
+    ///     the <c>--password</c>, <c>--token</c>, and <c>--api-key</c> flags. Consumers can supply
+    ///     Microsoft's <c>Microsoft.Extensions.Compliance.Redaction</c> redactor here to apply the
+    ///     standard, centrally-maintained secret taxonomy instead of this heuristic.
+    /// </param>
+    public LoggingMiddleware(ILogger<LoggingMiddleware> logger, Func<string?, string>? redactor = null)
     {
         _logger = logger ?? NullLogger<LoggingMiddleware>.Instance;
+        _redactor = redactor;
     }
 
     /// <summary>
@@ -64,7 +73,7 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        string sanitizedArgs = SanitizeArguments(context.Configuration.Arguments);
+        string sanitizedArgs = Sanitize(context.Configuration.Arguments);
 
         _logger.LogInformation("Invoking process {TargetFilePath} with arguments {Arguments}",
             context.Configuration.TargetFilePath,
@@ -90,7 +99,7 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
                              Environment.NewLine,
                              StringSplitOptions.RemoveEmptyEntries))
                 {
-                    _logger.LogDebug("STDOUT: {Line}", line);
+                    _logger.LogDebug("STDOUT: {Line}", Sanitize(line));
                 }
             }
 
@@ -100,29 +109,39 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
                              Environment.NewLine,
                              StringSplitOptions.RemoveEmptyEntries))
                 {
-                    _logger.LogDebug("STDERR: {Line}", line);
+                    _logger.LogDebug("STDERR: {Line}", Sanitize(line));
                 }
             }
         }
     }
 
     /// <summary>
-    ///     Redacts sensitive values from the argument string.
+    ///     Redacts sensitive values from the supplied string before it is logged.
     /// </summary>
     /// <remarks>
-    ///     Redacts values following <c>--password</c>, <c>--token</c>,
-    ///     and <c>--api-key</c> flags. Both space-separated
-    ///     (<c>--password secret</c>) and equals-form (<c>--token=secret</c>) are handled,
-    ///     as are single- or double-quoted values that contain spaces
-    ///     (e.g. <c>--password "my secret"</c>).
+    ///     When a custom <see cref="_redactor"/> was supplied it is applied to the whole value.
+    ///     Otherwise a built-in heuristic redacts the value following the <c>--password</c>,
+    ///     <c>--token</c>, and <c>--api-key</c> flags (both <c>--flag value</c> and
+    ///     <c>--flag=value</c> forms, including single-/double-quoted values).
+    ///     <para>
+    ///         Values carrying no recognizable signal cannot be auto-redacted; callers handling
+    ///         such secrets should supply a redactor (e.g. Microsoft's
+    ///         <c>Microsoft.Extensions.Compliance.Redaction</c>).
+    ///     </para>
     /// </remarks>
-    /// <param name="args">The raw argument string.</param>
-    /// <returns>The argument string with sensitive values replaced by <c>***</c>.</returns>
-    private static string SanitizeArguments(string? args)
+    /// <param name="value">The raw string (argument string or captured output line).</param>
+    /// <returns>The string with sensitive values replaced by <c>***</c>.</returns>
+    private string Sanitize(string? value)
     {
-        if (string.IsNullOrWhiteSpace(args))
+        if (value is null)
             return string.Empty;
 
-        return SensitiveArgPattern().Replace(args, "$1$2***");
+        if (_redactor is not null)
+            return _redactor(value);
+
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        return SensitiveArgPattern().Replace(value, "$1$2***");
     }
 }

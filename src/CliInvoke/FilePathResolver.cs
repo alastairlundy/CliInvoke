@@ -191,11 +191,16 @@ public class FilePathResolver : IFilePathResolver
         
         DirectoryInfo directory = new(directoryPath);
 
+        // Limit the enumeration to the immediate directory (no recursion). The previous
+        // RecurseSubdirectories:true walked the entire subtree from the inferred base directory,
+        // which is a denial-of-service / over-broad-match surface when the base directory is large
+        // or attacker-influenced. A single-level lookup is sufficient for the directory-recursion
+        // fallback and avoids enumerating unrelated files.
         FileInfo? file = directory.EnumerateFiles("*", new EnumerationOptions
             {
                 IgnoreInaccessible = true,
                 MatchCasing = OperatingSystem.IsWindows() ? MatchCasing.CaseInsensitive : MatchCasing.CaseSensitive,
-                RecurseSubdirectories = true,
+                RecurseSubdirectories = false,
             })
             .Select(f =>
             {

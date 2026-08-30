@@ -66,12 +66,18 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             ? $"\"{safePath}\""
             : $"\"{safePath}\" {safeArgs}";
 
+        // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
+        // re-tokenize it before cmd.exe parses it. A single re-tokenized Arguments string
+        // (the historical implementation) let a '"' in the value break the OS-level quoting and
+        // inject additional cmd commands (command-injection). ArgumentList is passed through unchanged.
+        IReadOnlyList<string> argumentList = ["/c", wrappedCommand];
+
         // The specialisation configuration class is the single source of truth for the cmd.exe
         // target and the /c switch; this middleware just supplies the wrapped command and
         // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration newConfig = new CmdProcessConfiguration(
-            wrappedCommand,
+            string.Empty,
             src.RedirectStandardInput,
             context.Mode != InvocationMode.Raw,
             workingDirectoryPath: src.WorkingDirectoryPath,
@@ -83,7 +89,8 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             standardOutputEncoding: src.StandardOutputEncoding,
             standardErrorEncoding: src.StandardErrorEncoding,
             processResourcePolicy: src.ResourcePolicy,
-            windowCreation: src.WindowCreation);
+            windowCreation: src.WindowCreation,
+            argumentList: argumentList);
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
         await next(newContext);
