@@ -7,11 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Collections.Generic;
-
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
-using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility;
 using CliInvoke.Extensions.Middleware;
