@@ -1,78 +1,62 @@
+/*
+    CliInvoke.Tests
+    Copyright (C) 2024-2026  Alastair Lundy
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility.Factories;
 using CliInvoke.Extensibility.Factories;
 using Xunit;
 
 namespace CliInvoke.Tests.Extensibility.Factories;
 
+/// <summary>
+///     Verifies that <see cref="RunnerProcessFactory"/> composes the wrapped command
+///     from discrete argument tokens, so caller-supplied values (including quotes and
+///     shell metacharacters) are passed through to the wrapped process as isolated
+///     literals instead of being re-parsed into additional command-line tokens.
+/// </summary>
 public class RunnerProcessFactoryTests
 {
-    private static ProcessConfiguration MakeRunner(string targetFilePath, string? arguments) =>
-        new(targetFilePath, arguments);
-
-    private static ProcessConfiguration MakeInner(string targetFilePath, string? arguments) =>
-        new(targetFilePath, arguments);
+    private static ProcessConfiguration BuildConfig(string targetFilePath, string arguments)
+        => new ProcessConfigurationBuilder(targetFilePath).SetArguments(arguments).Build();
 
     [Fact]
-    public void CreateRunnerConfiguration_PowerShell_WrapsAndEscapesTargetAndArguments()
+    public void CreateRunnerConfiguration_KeepsTargetAndArgsAsDiscreteTokens()
     {
         IRunnerProcessFactory factory = new RunnerProcessFactory();
 
-        ProcessConfiguration runner = MakeRunner("pwsh", "-Command");
-        ProcessConfiguration inner = MakeInner("evil\"&calc", "a\"b");
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\program files\app.exe", "arg one");
 
-        ProcessConfiguration result = factory.CreateRunnerConfiguration(inner, runner);
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
 
-        // The dynamic target+arguments become a single double-quoted literal passed to -Command,
-        // with inner double quotes backtick-escaped so a quote in the target cannot break out.
-        Assert.Equal("-Command \"& 'evil`\"&calc' a`\"b\"", result.Arguments);
+        // The runner flag, the target path (kept whole, even though it
+        // contains a space) and each user argument are separate tokens rather than one
+        // re-parsed string. A space-bearing target stays a single token.
+        Assert.Contains("/c", result.ArgumentsList);
+        Assert.Contains(@"C:\program files\app.exe", result.ArgumentsList);
+        Assert.Contains("arg", result.ArgumentsList);
+        Assert.Contains("one", result.ArgumentsList);
     }
 
     [Fact]
-    public void CreateRunnerConfiguration_Cmd_EscapesMetacharactersAndWrapsAsSingleToken()
+    public void CreateRunnerConfiguration_DoesNotMergeCallerQuoteWithWrapper()
     {
         IRunnerProcessFactory factory = new RunnerProcessFactory();
 
-        ProcessConfiguration runner = MakeRunner("cmd.exe", "/c");
-        ProcessConfiguration inner = MakeInner("evil\"&calc", "a\"b");
+        // A quote inside the caller's target must remain an isolated literal token, not
+        // be concatenated with the wrapper's quoting into a single broken token.
+        ProcessConfiguration runner = BuildConfig("pwsh.exe", "-NoProfile -NonInteractive -Command");
+        ProcessConfiguration target = BuildConfig("app\"evil.exe", "safe");
 
-        ProcessConfiguration result = factory.CreateRunnerConfiguration(inner, runner);
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
 
-        // The dynamic target+arguments become a single double-quoted /c token, with shell
-        // metacharacters caret-escaped so the OS parser cannot re-tokenize the inner contents.
-        Assert.Equal("/c \"evil^\"^&calc a^\"b\"", result.Arguments);
-    }
-
-    [Fact]
-    public void CreateRunnerConfiguration_MaliciousTargetQuote_CannotTerminateWrapperEarly()
-    {
-        IRunnerProcessFactory factory = new RunnerProcessFactory();
-
-        ProcessConfiguration runner = MakeRunner("cmd.exe", "/c");
-        ProcessConfiguration inner = MakeInner("prog.exe\" & notepad.exe", string.Empty);
-
-        ProcessConfiguration result = factory.CreateRunnerConfiguration(inner, runner);
-
-        // The runner prefix "/c " is a separate token, followed by the dynamic body wrapped in a
-        // single double-quoted token. Every inner quote must be caret-escaped (^\") so none can
-        // close the wrapper and inject a second command.
-        Assert.StartsWith("/c \"", result.Arguments);
-        Assert.EndsWith("\"", result.Arguments);
-        Assert.Contains("prog.exe^\"", result.Arguments);
-        Assert.DoesNotContain("/c \" &", result.Arguments);
-    }
-
-    [Fact]
-    public void CreateRunnerConfiguration_StripsControlCharacters()
-    {
-        IRunnerProcessFactory factory = new RunnerProcessFactory();
-
-        ProcessConfiguration runner = MakeRunner("cmd.exe", "/c");
-        string argumentWithControlChars = "arg" + (char)1 + (char)2 + "value";
-        ProcessConfiguration inner = MakeInner("prog.exe", argumentWithControlChars);
-
-        ProcessConfiguration result = factory.CreateRunnerConfiguration(inner, runner);
-
-        Assert.DoesNotContain((char)1, result.Arguments);
-        Assert.DoesNotContain((char)2, result.Arguments);
+        Assert.Contains("app\"evil.exe", result.ArgumentsList);
+        Assert.DoesNotContain("& \"app", result.ArgumentsList);
     }
 }
