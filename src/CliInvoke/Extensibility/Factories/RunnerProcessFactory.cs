@@ -7,6 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Collections.Generic;
+using System.Linq;
+
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility.Factories;
 using CliInvoke.Core.Internal;
@@ -31,41 +34,37 @@ public class RunnerProcessFactory : IRunnerProcessFactory
     {
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
-        
-        string combinedArgs;
-        // If the runner process is PowerShell, invoke the target via the call operator (&) and quote the path.
-        if (!string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath) &&
-            (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0 ||
-             runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0))
-        {
-            // Escape both the target and the arguments so they are passed to the
-            // wrapped command as literal data. Without this, shell metacharacters in
-            // the arguments (e.g. ';', '|', '&', '$(...)') would be re-interpreted by
-            // PowerShell as additional commands — a command-injection risk.
-            string safeTarget = ShellArgumentEscaper.EscapeForPowerShell(processConfigToBeRun.TargetFilePath);
-            string safeArguments = ShellArgumentEscaper.EscapeForPowerShell(processConfigToBeRun.Arguments);
-            string quotedTarget = $"& \"{safeTarget}\"";
-            string prefix = string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments) ? string.Empty : runnerProcessConfig.Arguments;
-            string suffix = string.IsNullOrWhiteSpace(safeArguments) ? string.Empty : safeArguments;
-            combinedArgs = $"{prefix} {quotedTarget} {suffix}".Trim();
-        }
-        else
-        {
-            // Escape both the target and the arguments so they are passed to the
-            // wrapped command as literal data. Without this, shell metacharacters in
-            // the arguments (e.g. '&', '|', '<', '>', '%VAR%') would be re-interpreted
-            // by cmd.exe as additional commands or redirection — a command-injection risk.
-            string safeTarget = ShellArgumentEscaper.EscapeForCmd(processConfigToBeRun.TargetFilePath);
-            string safeArguments = ShellArgumentEscaper.EscapeForCmd(processConfigToBeRun.Arguments);
-            string prefix = string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments) ? string.Empty : runnerProcessConfig.Arguments;
-            string suffix = string.IsNullOrWhiteSpace(safeArguments) ? string.Empty : safeArguments;
-            combinedArgs = $"{prefix} \"{safeTarget}\" {suffix}".Trim();
-        }
+
+        // Compose the wrapped command as discrete tokens. Delivering the target and
+        // the caller's arguments as separate tokens (rather than one re-parsed string)
+        // means the operating system tokenises each value independently, so a quote or
+        // other special character inside a caller-supplied value cannot alter how the
+        // wrapped command is split.
+        List<string> commandTokens = new();
+
+        if (!string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments))
+            commandTokens.AddRange(ArgumentTokenizer.Tokenize(runnerProcessConfig.Arguments));
+
+        // PowerShell requires the call operator (&) to invoke a target whose path is
+        // quoted/contains spaces; cmd runs the target directly, so it is omitted there.
+        bool runnerIsPowerShell =
+            !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
+            && (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0
+                || runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0);
+
+        if (runnerIsPowerShell)
+            commandTokens.Add("&");
+
+        // Pass the target path and its arguments as literal tokens.
+        commandTokens.Add(processConfigToBeRun.TargetFilePath);
+
+        if (!string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments))
+            commandTokens.AddRange(ArgumentTokenizer.Tokenize(processConfigToBeRun.Arguments));
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath
             )
-            .SetArguments(combinedArgs)
+            .SetArguments(commandTokens)
             .SetEnvironmentVariables(processConfigToBeRun.EnvironmentVariables)
             .SetProcessResourcePolicy(processConfigToBeRun.ResourcePolicy)
             .SetStandardInputEncoding(processConfigToBeRun.StandardInputEncoding)
@@ -84,6 +83,12 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         if (runnerProcessConfig.RequiresAdministrator)
             commandBuilder = commandBuilder.RequireAdministratorPrivileges();
 
-        return commandBuilder.Build();
+        ProcessConfiguration result = commandBuilder.Build();
+
+        // Expose the pre-tokenized form so hosts can bypass OS-level re-parsing of the
+        // combined argument string. Set it directly to preserve tokens that contain spaces.
+        result.ArgumentsList = commandTokens;
+
+        return result;
     }
 }
