@@ -79,7 +79,7 @@ public static class CachingFilePathResolverExtensions
             var options = new CachingFilePathResolverOptions();
             configure(options);
 
-            // Ensure a shared Singleton cache with the configured SizeLimit (D008/D013). TryAdd so a
+            // Ensure a shared Singleton cache with the configured SizeLimit. TryAdd so a
             // consumer-supplied IMemoryCache is not clobbered.
             services.TryAddSingleton<IMemoryCache>(_ =>
                 new MemoryCache(new MemoryCacheOptions { SizeLimit = options.SizeLimit }));

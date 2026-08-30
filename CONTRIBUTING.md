@@ -48,6 +48,6 @@ CliInvoke targets .NET 10 (see `global.json`) and uses the [TUnit](https://www.t
 
 CliInvoke packages minimize cross-package coupling by keeping their internal surfaces private. A new `InternalsVisibleTo` grant is **not** a default and **requires justification**:
 
-- **Justify new grants.** A new IVT grant must be defended: explain why the consuming assembly strictly requires access to internals and why the needed types cannot instead be promoted to a public, stable API or relocated to a shared package (see `docs/adr/0001-ivt-minimization.md`, D002).
-- **Remove unused grants.** Grants that no longer have a consumer are removed (D003). Do not leave dead coupling points in place.
-- **Test grants follow the same rule.** IVT grants to test assemblies (`CliInvoke.Tests`, `CliInvoke.Specializations.Tests`) are kept only while actually used; an unused test-assembly grant is removed like any other unused grant (D004; unused-grant removal per D009). Being same-repo and not a shipping package does not exempt a test grant from reduction.
+- **Justify new grants.** A new IVT grant must be defended: explain why the consuming assembly strictly requires access to internals and why the needed types cannot instead be promoted to a public, stable API or relocated to a shared package (see `docs/adr/0001-ivt-minimization.md`).
+- **Remove unused grants.** Grants that no longer have a consumer are removed. Do not leave dead coupling points in place.
+- **Test grants follow the same rule.** IVT grants to test assemblies (`CliInvoke.Tests`, `CliInvoke.Specializations.Tests`) are kept only while actually used; an unused test-assembly grant is removed like any other unused grant (unused-grant removal). Being same-repo and not a shipping package does not exempt a test grant from reduction.

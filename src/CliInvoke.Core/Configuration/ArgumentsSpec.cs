@@ -138,7 +138,9 @@ public sealed class ArgumentsSpec
 
         foreach (var item in values)
         {
-            if (item is null || !_argumentValidationLogic.Invoke(item))
+            ArgumentNullException.ThrowIfNull(item);
+
+            if (!_argumentValidationLogic.Invoke(item))
                 continue;
 
             if (joined is null)
@@ -183,6 +185,8 @@ public sealed class ArgumentsSpec
 
         foreach (var item in values)
         {
+            ArgumentNullException.ThrowIfNull(item);
+
             string? str = item.ToString(null, _formatProvider);
 
             if (str is null || !_argumentValidationLogic.Invoke(str))

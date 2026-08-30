@@ -25,7 +25,7 @@ CliInvoke — a .NET/C# library for running and interacting with command-line pr
 - **Working directory**: CI tests are executed from `tests/CliInvoke.Tests/` (see `.github/workflows/test.yml`). Match this when reproducing issues.
 - **Target framework**: net10.0 (see csproj files)
 - **Testing**: Uses TUnit framework - `dotnet test` discovers and runs tests.
-- **Resource disposal**: Refer to the Resource Cleanup section in `README.md` for guidance on disposing key types: `ProcessConfiguration`, `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, `PipedProcessResult`.
+- **Resource disposal**: Refer to the Resource Cleanup section in `README.md` for guidance on disposing key types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec`.
 - **Versioning**: Update csproj version and changelog for releases.
 
 ## Common Gotchas

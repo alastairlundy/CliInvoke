@@ -409,6 +409,34 @@ public class ProcessConfigurationBuilderTests
     }
 
     [Test]
+    public async Task ConfigureArguments_AddEnumerable_NullEntryThrows()
+    {
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
+        string[] values = ["ok", null];
+
+        // Act & Assert — a null entry must fail fast, matching Add(string, bool).
+        await Assert.That(() =>
+        {
+            builder.ConfigureArguments(spec => spec.AddEnumerable(values, escape: false));
+        }).Throws<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task ConfigureArguments_AddEnumerable_IFormattableNullEntryThrows()
+    {
+        // Arrange
+        IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
+        IFormattable[] values = [1, null];
+
+        // Act & Assert — a null entry must fail fast, matching Add(IFormattable, bool).
+        await Assert.That(() =>
+        {
+            builder.ConfigureArguments(spec => spec.AddEnumerable(values, escape: false));
+        }).Throws<ArgumentNullException>();
+    }
+
+    [Test]
     public async Task ConfigureArguments_Add_StringWithoutEscape_AppendsRawValue()
     {
         // Arrange

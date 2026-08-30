@@ -124,7 +124,7 @@ For fine-grained control over process execution — custom timeouts, cancellatio
 
 ## Middleware
 
-CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns — logging, validation, platform selection, retries — around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`, `ExecutePipedAsync`) remain identical.
+CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns — logging, validation, platform selection, retries — around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`) remain identical.
 
 Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`.
 
@@ -133,14 +133,13 @@ For the full guide — constructor details, the `IProcessMiddleware` contract, D
 ## Resource Disposal
 
 > [!IMPORTANT]
-> CliInvoke has exactly **four Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
+> CliInvoke has exactly **three Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
 >
 > | # | Type                    | What it owns                                                      |
 > |---|-------------------------|-------------------------------------------------------------------|
 > | 1 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
-> | 2 | `PipedProcessResult`    | `StandardOutput` and `StandardError` streams                      |
-> | 3 | `UserCredential`        | `SecureString` password buffer                                    |
-> | 4 | `UserCredentialSpec` | `SecureString` password buffer staged for `Build()`               |
+> | 2 | `UserCredential`        | `SecureString` password buffer                                    |
+> | 3 | `UserCredentialSpec` | `SecureString` password buffer staged for `Build()`               |
 >
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 >

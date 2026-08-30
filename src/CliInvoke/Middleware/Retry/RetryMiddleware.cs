@@ -20,7 +20,7 @@ namespace CliInvoke.Extensions.Middleware.Retry;
 /// </summary>
 /// <remarks>
 ///     Retries by default for classified (retryable) failures; callers should avoid this middleware for
-///     non-idempotent invocations (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md#D005).
+///     non-idempotent invocations (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
 /// </remarks>
 internal sealed class RetryMiddleware : IProcessMiddleware
 {

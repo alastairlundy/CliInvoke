@@ -60,10 +60,6 @@ Detail the three main method groups (each with two overloads):
    - `RunBufferedAsync(string targetFilePath, string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null, CancellationToken cancellationToken = default)`
    - `RunBufferedAsync(ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)`
 
-3. **RunPipedAsync** - Returns a `PipedProcessResult` for scenarios requiring input/output piping
-   - `RunPipedAsync(string targetFilePath, string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null, CancellationToken cancellationToken = default)`
-   - `RunPipedAsync(ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)`
-
 ## Note on Static Usage
 Using the static `CliRun` class involves the following trade-offs:
 - **Advantages**: Zero boilerplate – no DI container or factories required; most arguments are optional with sensible defaults for common use cases.

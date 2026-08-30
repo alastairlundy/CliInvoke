@@ -34,7 +34,7 @@ CliInvoke models process invocation as a four-stage pipeline:
 | 1 | **Configuration** | Pure data describing *what* to run and *how* to start it. | `ProcessConfiguration` (+ optional `ProcessExitConfiguration`, `UserCredential`, `ProcessResourcePolicy`) |
 | 2 | **Invoke** | The orchestration layer. Accepts a configuration, builds an `IExternalProcess`, drives start → capture, and disposes. | The invoker implementation and the factory. |
 | 3 | **OS Process** | The actual child process started by the OS via `System.Diagnostics.Process`. The library does not own the child after `Start()` returns; it observes it. | The OS process handle, the redirected pipes, and the captured exit code / start time / exit time. |
-| 4 | **Result** | Pure data describing *what happened*. | `ProcessResult` / `BufferedProcessResult` / `PipedProcessResult`. |
+| 4 | **Result** | Pure data describing *what happened*. | `ProcessResult` / `BufferedProcessResult`. |
 
 The arrow from each stage to the next is a data hand-off. Stage 1
 hands a value to Stage 2; Stage 2 hands a `System.Diagnostics.Process`
@@ -51,11 +51,9 @@ determines the result type:
 |------|--------------------|-------------|----------|
 | Basic | `IProcessInvoker.ExecuteAsync` / `CliRun.RunAsync` | `ProcessResult` | Exit code, PID, start/exit time, executed file path. |
 | Buffered | `IProcessInvoker.ExecuteBufferedAsync` / `CliRun.RunBufferedAsync` | `BufferedProcessResult` | Basic + stdout/stderr as `string`. |
-| Piped | `IProcessInvoker.ExecutePipedAsync` / `CliRun.RunPipedAsync` | `PipedProcessResult` | Basic + stdout/stderr as `Stream`. |
 
 The mode is implicit in which `IExternalProcess` method is called
-(`WaitForExitOrTimeoutAsync` / `CaptureBufferedResultAsync` /
-`CapturePipedResultAsync`).
+(`WaitForExitOrTimeoutAsync` / `CaptureBufferedResultAsync`).
 
 ## Implementation Mapping
 
@@ -149,7 +147,6 @@ cancellation callers cannot both issue `Kill()`.
 |------|------|
 | `ProcessResult` | `src/CliInvoke.Core/Primitives/Results/ProcessResult.cs` |
 | `BufferedProcessResult` | `src/CliInvoke.Core/Primitives/Results/BufferedProcessResult.cs` |
-| `PipedProcessResult` (implements `IDisposable`) | `src/CliInvoke.Core/Primitives/Results/PipedProcessResult.cs` |
 
 The result is built inside the `CaptureXxxResultAsync` method on
 `ExternalProcess`, immediately after `WaitForExitOrTimeoutAsync`
@@ -165,9 +162,7 @@ returns:
                                           + (Piped)    StandardOutput, StandardError streams
 ```
 
-Ownership of the result is transferred to the caller. For
-`PipedProcessResult`, the caller is responsible for disposing the
-wrapped streams (see README § Resource Cleanup).
+Ownership of the result is transferred to the caller.
 
 ## End-to-End Sequence
 

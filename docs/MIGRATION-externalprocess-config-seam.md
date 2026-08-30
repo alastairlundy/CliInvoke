@@ -124,7 +124,6 @@ The resolved file path is no longer written back to `Configuration.TargetFilePat
 
 - **`ProcessResult.ExecutedFilePath`** — the resolved file path that was actually executed.
 - **`BufferedProcessResult.ExecutedFilePath`** — same, for buffered process results.
-- **`PipedProcessResult.ExecutedFilePath`** — same, for piped process results.
 
 ```csharp
 IFilePathResolver resolver = new FilePathResolver();

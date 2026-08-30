@@ -15,8 +15,8 @@ namespace CliInvoke.Tests.Processes;
 
 /// <summary>
 ///     Validates the <see cref="ProcessResult.Canceled"/> and
-///     <see cref="ProcessResult.Signal"/> model: truth conditions (D003),
-///     orthogonality (D006), and an OS-gated Unix SIGTERM integration (D005/D009).
+///     <see cref="ProcessResult.Signal"/> model: truth conditions,
+///     orthogonality, and an OS-gated Unix SIGTERM integration.
 /// </summary>
 public class ProcessResultCanceledSignalTests
 {
@@ -30,7 +30,7 @@ public class ProcessResultCanceledSignalTests
     private static InvocationContext RawContext(ProcessConfiguration configuration)
         => new(configuration, ProcessExitConfiguration.CreateGraceful(), InvocationMode.Raw, CancellationToken.None);
 
-    // ---- Mock-injected truth-condition tests (D003) ----
+    // ---- Mock-injected truth-condition tests ----
 
     [Test]
     public async Task Raw_Result_Carries_Injected_Canceled_True()
@@ -68,7 +68,7 @@ public class ProcessResultCanceledSignalTests
         await Assert.That(result.Canceled).IsTrue();
     }
 
-    // ---- Orthogonality tests (D006) ----
+    // ---- Orthogonality tests ----
 
     [Test]
     public async Task NonNull_Signal_Does_Not_Force_Canceled()
@@ -102,7 +102,7 @@ public class ProcessResultCanceledSignalTests
         await Assert.That(result.Signal).IsNull();
     }
 
-    // ---- FireAndForget always false/null (T011) ----
+    // ---- FireAndForget always false/null ----
 
     [Test]
     public async Task FireAndForget_Result_Has_Canceled_False_And_Signal_Null()
@@ -123,7 +123,7 @@ public class ProcessResultCanceledSignalTests
         await Assert.That(result.Signal).IsNull();
     }
 
-    // ---- OS-gated Unix integration (D003/D005/D009) ----
+    // ---- OS-gated Unix integration ----
 
     [Test]
     public async Task Unix_SignalTrappingHelper_KilledBySigterm_ReportsSignal()
