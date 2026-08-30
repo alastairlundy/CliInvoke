@@ -11,6 +11,11 @@
 | 3.0.0 Alpha 2 | April 17th 2026 |  https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.2 |
 | 3.0.0 Alpha 1 | April 12th 2026 |  https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.1 |
 
+### 2.8
+| Version | Release Date | Changelog |
+|-|-|-|
+| 2.8.4 | Unreleased | Refined how runner configurations compose their argument strings so wrapped targets and arguments are handled more robustly. |
+
 ### 2.7
 | Version | Release Date | Changelog |
 |-|-|-|

@@ -15,14 +15,14 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>## Changes since 2.8.2
-- ⚙️ Updated `Polyfill` from 10.8.1 to 10.11.2
-- Updated to use CliInvoke.Core 2.8.3</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 2.8.3
+- Refined how runner configurations compose their argument strings so wrapped targets and arguments are handled more robustly.
+- Updated to use CliInvoke.Core 2.8.4</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.8.3</PackageVersion>
-        <AssemblyVersion>2.8.3.0</AssemblyVersion>
+        <PackageVersion>2.8.4</PackageVersion>
+        <AssemblyVersion>2.8.4.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -32,7 +32,7 @@
         <PolyEnsure>true</PolyEnsure>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
-        <FileVersion>2.8.3.0</FileVersion>
+        <FileVersion>2.8.4.0</FileVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">

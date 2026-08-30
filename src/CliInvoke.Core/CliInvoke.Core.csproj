@@ -23,8 +23,9 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <Version>2.8.3</Version>
-        <PackageReleaseNotes>- Updated internal `Polyfill` version from 10.8.1 to 10.11.2
+        <Version>2.8.4</Version>
+        <PackageReleaseNotes>- Refined argument handling used when composing wrapped runner commands so targets and arguments are handled more robustly.
+- Updated internal `Polyfill` version from 10.8.1 to 10.11.2
 
 #### 🐛 Bug Fixes
 - Fixed `ProcessTimeoutPolicy.Default` so it uses the parameterless constructor (3 minutes) rather than being hardcoded to 30 minutes, aligning the static `Default` value with the documented default-constructor behavior (#362).
@@ -32,8 +33,8 @@
 - Fixed an issue where the `ProcessResourcePolicy` constructor would not throw an Exception if ProcessorAffinity was set to a number greater than the 2x the ``Environment.ProcessorCount`` property
 - Changed `UserCredential.LoadUserProfile` to default to `null` instead of `false`, so that the builder-produced `UserCredential` matches the configuration's actual default (#361)</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.8.3.0</AssemblyVersion>
-        <FileVersion>2.8.3.0</FileVersion>
+        <AssemblyVersion>2.8.4.0</AssemblyVersion>
+        <FileVersion>2.8.4.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>

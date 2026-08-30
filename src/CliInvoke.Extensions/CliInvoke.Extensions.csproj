@@ -25,8 +25,8 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageId>CliInvoke.Extensions</PackageId>
         <Product>CliInvoke.Extensions</Product>
-        <AssemblyVersion>2.8.3.0</AssemblyVersion>
-        <FileVersion>2.8.3.0</FileVersion>
+        <AssemblyVersion>2.8.4.0</AssemblyVersion>
+        <FileVersion>2.8.4.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>

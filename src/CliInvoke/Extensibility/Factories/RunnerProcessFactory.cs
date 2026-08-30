@@ -7,8 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Collections.Generic;
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility.Factories;
+using CliInvoke.Helpers.Processes;
 
 namespace CliInvoke.Extensibility.Factories;
 
@@ -30,23 +32,8 @@ public class RunnerProcessFactory : IRunnerProcessFactory
     {
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
-        
-        string combinedArgs;
-        // If the runner process is PowerShell, invoke the target via the call operator (&) and quote the path.
-        if (!string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath) &&
-            (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0 ||
-             runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0))
-        {
-            string target = processConfigToBeRun.TargetFilePath;
-            string quotedTarget = $"& '{target}'";
-            string prefix = string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments) ? string.Empty : runnerProcessConfig.Arguments;
-            string suffix = string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments) ? string.Empty : processConfigToBeRun.Arguments;
-            combinedArgs = $"{prefix} {quotedTarget} {suffix}".Trim();
-        }
-        else
-        {
-            combinedArgs = $"{runnerProcessConfig.Arguments} {processConfigToBeRun.TargetFilePath} {processConfigToBeRun.Arguments}".Trim();
-        }
+
+        string combinedArgs = ComposeRunnerArguments(processConfigToBeRun, runnerProcessConfig);
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath
@@ -73,5 +60,51 @@ public class RunnerProcessFactory : IRunnerProcessFactory
             ).RequireAdministratorPrivileges();
 
         return commandBuilder.Build();
+    }
+
+    /// <summary>
+    /// Composes the argument string passed to the runner process so that the wrapped target and each of its
+    /// arguments are delivered as discrete, correctly delimited tokens. This prevents a quote in the wrapped
+    /// target or its arguments from breaking out of the intended token boundaries when the OS command-line
+    /// parser re-tokenizes the runner's argument string.
+    /// </summary>
+    /// <param name="processConfigToBeRun">The command to be run by the runner process.</param>
+    /// <param name="runnerProcessConfig">The runner process configuration.</param>
+    /// <returns>The composed argument string for the runner process.</returns>
+    private static string ComposeRunnerArguments(
+        ProcessConfiguration processConfigToBeRun,
+        ProcessConfiguration runnerProcessConfig)
+    {
+        string runnerArgs = runnerProcessConfig.Arguments ?? string.Empty;
+        string target = processConfigToBeRun.TargetFilePath ?? string.Empty;
+        string targetArgs = processConfigToBeRun.Arguments ?? string.Empty;
+
+        IEnumerable<string> runnerTokens = ArgumentCompositionHelper.SplitArguments(runnerArgs);
+        IEnumerable<string> targetArgTokens = ArgumentCompositionHelper.SplitArguments(targetArgs);
+
+        List<string> segments = new();
+
+        // Preserve any arguments the runner process itself declares (e.g. -Command, /c) verbatim.
+        foreach (string token in runnerTokens)
+            segments.Add(token);
+
+        if (ArgumentCompositionHelper.IsPowerShell(runnerProcessConfig))
+        {
+            // Invoke the target via the call operator and keep its path in a quoted, escaped token.
+            segments.Add("&");
+            segments.Add(ArgumentCompositionHelper.QuoteArgument(target));
+        }
+        else
+        {
+            segments.Add(ArgumentCompositionHelper.QuoteArgument(target));
+        }
+
+        // The target path is treated as a single atomic token; only its arguments are tokenised,
+        // and each resulting token is individually quoted/escaped so a quote or ampersand inside
+        // cannot be re-interpreted as a command separator by the OS command-line parser.
+        foreach (string token in targetArgTokens)
+            segments.Add(ArgumentCompositionHelper.QuoteArgument(token));
+
+        return string.Join(" ", segments);
     }
 }
