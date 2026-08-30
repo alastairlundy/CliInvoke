@@ -7,14 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CliInvoke;
 using CliInvoke.Core.Middleware;
+using CliInvoke.Internal.Extensions;
 
-namespace CliInvoke.Extensions.Middleware.Truncation;
+namespace CliInvoke.Extensions.Middleware;
 
 /// <summary>
 ///     Opt-in middleware that publishes a per-stream output-truncation cap into

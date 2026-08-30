@@ -8,15 +8,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.IO;
 using System.Linq;
 
 using CliInvoke.Builders;
-using CliInvoke.Core.Builders;
-using CliInvoke.Core.Configuration;
 
 namespace CliInvoke.Extensions;
 

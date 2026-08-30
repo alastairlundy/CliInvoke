@@ -9,6 +9,9 @@
 
 namespace CliInvoke.Extensions;
 
+/// <summary>
+/// 
+/// </summary>
 public static class FilePathResolverRegistration
 {
     /// <param name="services">The <see cref="IServiceCollection" /> to register the implementation with.</param>
