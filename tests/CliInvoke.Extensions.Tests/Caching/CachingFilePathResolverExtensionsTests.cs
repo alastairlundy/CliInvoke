@@ -63,7 +63,7 @@ public class CachingFilePathResolverExtensionsTests
     public async Task UseCachingFilePathResolver_DecoratesExistingResolver_AndCaches()
     {
         IServiceCollection services = new ServiceCollection();
-        var fake = new FakeResolver();
+        FakeResolver fake = new FakeResolver();
         services.AddCliInvoke();
         services.RemoveAll<IFilePathResolver>();
         services.AddSingleton<IFilePathResolver>(fake);

@@ -268,7 +268,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
         hashCode.Add(TargetFilePath);
         hashCode.Add(Arguments);
         hashCode.Add(WorkingDirectoryPath);
-        foreach (var kvp in EnvironmentVariables)
+        foreach (KeyValuePair<string, string> kvp in EnvironmentVariables)
         {
             hashCode.Add(kvp.Key);
             hashCode.Add(kvp.Value);

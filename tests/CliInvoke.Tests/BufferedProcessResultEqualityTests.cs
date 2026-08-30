@@ -51,7 +51,7 @@ public class BufferedProcessResultEqualityTests
         BufferedProcessResult truncated = Create(true);
         BufferedProcessResult notTruncated = Create(false);
 
-        var set = new HashSet<BufferedProcessResult> { truncated, notTruncated };
+        HashSet<BufferedProcessResult> set = new HashSet<BufferedProcessResult> { truncated, notTruncated };
 
         await Assert.That(set.Count).IsEqualTo(2);
         await Assert.That(set.Contains(truncated)).IsTrue();

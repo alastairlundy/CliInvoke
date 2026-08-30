@@ -41,13 +41,13 @@ public class RetryMiddlewareTests
     [Test]
     public async Task InvokeAsync_RetriesUntilMaxAttempts_WhenAlwaysRetryable()
     {
-        var options = new RetryOptions
+        RetryOptions options = new RetryOptions
         {
             MaxAttempts = 3,
             BaseDelay = TimeSpan.FromMilliseconds(1),
             Strategy = RetryBackoffStrategy.Fixed
         };
-        var middleware = new RetryMiddleware(AlwaysRetry(), options);
+        RetryMiddleware middleware = new RetryMiddleware(AlwaysRetry(), options);
         InvocationContext ctx = CreateContext();
 
         int attempts = 0;
@@ -66,12 +66,12 @@ public class RetryMiddlewareTests
     [Test]
     public async Task InvokeAsync_DoesNotRetry_WhenNotRetryable()
     {
-        var options = new RetryOptions
+        RetryOptions options = new RetryOptions
         {
             MaxAttempts = 3,
             BaseDelay = TimeSpan.FromMilliseconds(1)
         };
-        var middleware = new RetryMiddleware(NeverRetry(), options);
+        RetryMiddleware middleware = new RetryMiddleware(NeverRetry(), options);
         InvocationContext ctx = CreateContext();
 
         int attempts = 0;
@@ -90,12 +90,12 @@ public class RetryMiddlewareTests
     [Test]
     public async Task InvokeAsync_StopsWhenResultIsNull()
     {
-        var options = new RetryOptions
+        RetryOptions options = new RetryOptions
         {
             MaxAttempts = 3,
             BaseDelay = TimeSpan.FromMilliseconds(1)
         };
-        var middleware = new RetryMiddleware(AlwaysRetry(), options);
+        RetryMiddleware middleware = new RetryMiddleware(AlwaysRetry(), options);
         InvocationContext ctx = CreateContext();
 
         int attempts = 0;
@@ -120,12 +120,12 @@ public class RetryMiddlewareTests
     {
         // The default policy uses RequiresExitCodeZero, so a zero-exit (validated) result must stop
         // after the first attempt and must not repeat process side effects.
-        var options = new RetryOptions
+        RetryOptions options = new RetryOptions
         {
             MaxAttempts = 3,
             BaseDelay = TimeSpan.FromMilliseconds(1)
         };
-        var middleware = new RetryMiddleware(RequiresExitCodeZeroValidator(), options);
+        RetryMiddleware middleware = new RetryMiddleware(RequiresExitCodeZeroValidator(), options);
         InvocationContext ctx = CreateContext();
 
         int attempts = 0;
@@ -144,7 +144,7 @@ public class RetryMiddlewareTests
     [Test]
     public async Task Constructor_Throws_WhenMaxAttemptsIsLessThanOne()
     {
-        var options = new RetryOptions { MaxAttempts = 0 };
+        RetryOptions options = new RetryOptions { MaxAttempts = 0 };
 
         await Assert.That(() => new RetryMiddleware(AlwaysRetry(), options))
             .Throws<ArgumentOutOfRangeException>();
@@ -153,7 +153,7 @@ public class RetryMiddlewareTests
     [Test]
     public async Task Constructor_Throws_WhenBaseDelayIsNegative()
     {
-        var options = new RetryOptions { BaseDelay = TimeSpan.FromMilliseconds(-1) };
+        RetryOptions options = new RetryOptions { BaseDelay = TimeSpan.FromMilliseconds(-1) };
 
         await Assert.That(() => new RetryMiddleware(AlwaysRetry(), options))
             .Throws<ArgumentOutOfRangeException>();
@@ -162,12 +162,12 @@ public class RetryMiddlewareTests
     [Test]
     public async Task InvokeAsync_PerformsExactlyOneAttempt_WhenMaxAttemptsIsOne()
     {
-        var options = new RetryOptions
+        RetryOptions options = new RetryOptions
         {
             MaxAttempts = 1,
             BaseDelay = TimeSpan.FromMilliseconds(1)
         };
-        var middleware = new RetryMiddleware(AlwaysRetry(), options);
+        RetryMiddleware middleware = new RetryMiddleware(AlwaysRetry(), options);
         InvocationContext ctx = CreateContext();
 
         int attempts = 0;
@@ -196,8 +196,8 @@ public class RetryMiddlewareTests
         // manually-built ProcessInvoker) proves the registration actually adds the middleware: if
         // UseRetryPolicy() stopped registering it, the stub would run once and the retry count would
         // not reach MaxAttempts.
-        var validator = new CountingRetryValidator();
-        var factory = new StubExternalProcessFactory();
+        CountingRetryValidator validator = new CountingRetryValidator();
+        StubExternalProcessFactory factory = new StubExternalProcessFactory();
         services.AddSingleton<IProcessResultValidator<ProcessResult>>(validator);
         services.AddSingleton<IExternalProcessFactory>(factory);
 
@@ -221,7 +221,7 @@ public class RetryMiddlewareTests
     [Test]
     public async Task ComputeDelay_Linear_GrowsByBaseDelayPerAttempt()
     {
-        var options = new RetryOptions
+        RetryOptions options = new RetryOptions
         {
             BaseDelay = TimeSpan.FromMilliseconds(10),
             Strategy = RetryBackoffStrategy.Linear
@@ -238,7 +238,7 @@ public class RetryMiddlewareTests
     [Test]
     public async Task ComputeDelay_Exponential_GrowsByPowerOfTwo_ForValidSettings()
     {
-        var options = new RetryOptions
+        RetryOptions options = new RetryOptions
         {
             BaseDelay = TimeSpan.FromMilliseconds(10),
             Strategy = RetryBackoffStrategy.Exponential
@@ -257,7 +257,7 @@ public class RetryMiddlewareTests
     {
         // base at the Task.Delay maximum: attempt 2 doubles it, which exceeds the limit, so it must be clamped.
         TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
-        var options = new RetryOptions
+        RetryOptions options = new RetryOptions
         {
             BaseDelay = maxDelay,
             Strategy = RetryBackoffStrategy.Exponential,

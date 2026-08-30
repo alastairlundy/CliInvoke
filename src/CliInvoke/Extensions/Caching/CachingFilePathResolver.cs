@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.IO;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CliInvoke.Extensions.Caching;
@@ -82,7 +81,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
 
     private void Cache(string key, FileInfo value)
     {
-        var entryOptions = new MemoryCacheEntryOptions
+        MemoryCacheEntryOptions entryOptions = new MemoryCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = _options.AbsoluteExpirationRelativeToNow,
             Size = 1

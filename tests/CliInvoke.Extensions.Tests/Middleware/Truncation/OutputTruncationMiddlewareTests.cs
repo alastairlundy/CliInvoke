@@ -7,8 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Core.Middleware;
-using CliInvoke.Extensions.Middleware.Truncation;
+using CliInvoke.Internal.Extensions;
 
 namespace CliInvoke.Extensions.Tests.Middleware.Truncation;
 
@@ -21,7 +20,7 @@ public class OutputTruncationMiddlewareTests
     private static InvocationContext CreateContext(MiddlewareItems items)
     {
         ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
-        var ctx = new InvocationContext(config, ProcessExitConfiguration.CreateGraceful(), InvocationMode.Buffered,
+        InvocationContext ctx = new InvocationContext(config, ProcessExitConfiguration.CreateGraceful(), InvocationMode.Buffered,
             CancellationToken.None);
         ctx.Middleware = new MiddlewareContext(_ => Task.CompletedTask, CancellationToken.None, items);
         return ctx;
@@ -30,9 +29,9 @@ public class OutputTruncationMiddlewareTests
     [Test]
     public async Task InvokeAsync_WritesDefaultCap_ToMiddlewareItems()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         InvocationContext ctx = CreateContext(items);
-        var middleware = new OutputTruncationMiddleware(TruncationOptions.Default);
+        OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(TruncationOptions.Default);
 
         await middleware.InvokeAsync(ctx, c => Task.CompletedTask);
 
@@ -42,9 +41,9 @@ public class OutputTruncationMiddlewareTests
     [Test]
     public async Task InvokeAsync_WritesConfiguredCap_ToMiddlewareItems()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         InvocationContext ctx = CreateContext(items);
-        var middleware = new OutputTruncationMiddleware(new TruncationOptions { MaxSize = 2048 });
+        OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(new TruncationOptions { MaxSize = 2048 });
 
         await middleware.InvokeAsync(ctx, c => Task.CompletedTask);
 
@@ -54,9 +53,9 @@ public class OutputTruncationMiddlewareTests
     [Test]
     public async Task InvokeAsync_InvokesNext()
     {
-        var items = new MiddlewareItems();
+        MiddlewareItems items = new MiddlewareItems();
         InvocationContext ctx = CreateContext(items);
-        var middleware = new OutputTruncationMiddleware(TruncationOptions.Default);
+        OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(TruncationOptions.Default);
         bool nextCalled = false;
 
         await middleware.InvokeAsync(ctx, c =>

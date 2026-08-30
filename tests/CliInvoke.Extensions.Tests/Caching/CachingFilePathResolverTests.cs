@@ -41,9 +41,9 @@ public class CachingFilePathResolverTests
     [Test]
     public async Task ResolveFilePath_CachesAndDelegatesOnlyOnMiss()
     {
-        var inner = new FakeResolver();
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver();
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         FileInfo first = resolver.ResolveFilePath("tool");
         FileInfo second = resolver.ResolveFilePath("tool");
@@ -55,9 +55,9 @@ public class CachingFilePathResolverTests
     [Test]
     public async Task TryResolveFilePath_CachesAndDelegatesOnlyOnMiss()
     {
-        var inner = new FakeResolver();
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver();
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         bool firstOk = resolver.TryResolveFilePath("tool", out FileInfo? first);
         bool secondOk = resolver.TryResolveFilePath("tool", out FileInfo? second);
@@ -71,9 +71,9 @@ public class CachingFilePathResolverTests
     [Test]
     public async Task ResolveFilePath_MissDelegatesToInner()
     {
-        var inner = new FakeResolver();
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver();
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         FileInfo result = resolver.ResolveFilePath("tool");
 

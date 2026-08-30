@@ -95,7 +95,7 @@ public static class ProcessResultHelperExtensions
     /// </summary>
     private static string GetFirstLineFromSpan(ReadOnlySpan<char> text)
     {
-        foreach (var line in text.EnumerateLines())
+        foreach (ReadOnlySpan<char> line in text.EnumerateLines())
             return line.ToString();
 
         return string.Empty;

@@ -440,7 +440,6 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     {
         _userCredentialSpec.Dispose();
         _standardInput.Dispose();
-        GC.SuppressFinalize(this);
     }
 }
 

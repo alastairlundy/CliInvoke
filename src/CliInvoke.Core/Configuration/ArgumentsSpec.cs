@@ -136,7 +136,7 @@ public sealed class ArgumentsSpec
         StringBuilder? joined = null;
         int validCount = 0;
 
-        foreach (var item in values)
+        foreach (string item in values)
         {
             ArgumentNullException.ThrowIfNull(item);
 
@@ -183,7 +183,7 @@ public sealed class ArgumentsSpec
         StringBuilder? joined = null;
         int validCount = 0;
 
-        foreach (var item in values)
+        foreach (IFormattable item in values)
         {
             ArgumentNullException.ThrowIfNull(item);
 

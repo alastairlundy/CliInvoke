@@ -7,12 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
 using System.Linq;
 
-using CliInvoke.Core;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Extensions.Caching;
 
@@ -76,7 +73,7 @@ public static class CachingFilePathResolverExtensions
             ArgumentNullException.ThrowIfNull(services);
             ArgumentNullException.ThrowIfNull(configure);
 
-            var options = new CachingFilePathResolverOptions();
+            CachingFilePathResolverOptions options = new CachingFilePathResolverOptions();
             configure(options);
 
             // Ensure a shared Singleton cache with the configured SizeLimit. TryAdd so a
