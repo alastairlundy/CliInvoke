@@ -135,9 +135,8 @@ public class ArgumentsSpecTests
         // Arrange
         ArgumentsSpec spec = new();
 
-        // The default validation logic rejects a null ToString() result by
-        // throwing ArgumentException (the null is caught and the argument rejected).
-        // Assert
+        // A formattable whose ToString() returns null is rejected by the validation
+        // logic, which surfaces as ArgumentException ("not permitted").
         await Assert.That(() => spec.Add(new NullReturningFormattable(), escape: false))
             .Throws<ArgumentException>();
     }
@@ -156,16 +155,14 @@ public class ArgumentsSpecTests
     }
 
     [Test]
-    public async Task AddEnumerable_SkipsNullAndInvalidItems()
+    public async Task AddEnumerable_RejectsNullItem()
     {
         // Arrange
         ArgumentsSpec spec = new(arg => !arg.Contains("x"));
 
-        // Act
-        spec.AddEnumerable(new[] { "keep", null!, "hasx" }, escape: false);
-
-        // Assert
-        await Assert.That(spec.Build()).IsEqualTo("\"keep\"");
+        // Assert - a null item in the collection is rejected.
+        await Assert.That(() => spec.AddEnumerable(new[] { "keep", null!, "hasx" }, escape: false))
+            .Throws<ArgumentNullException>();
     }
 
     [Test]
