@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Threading.Tasks;
-
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 
@@ -20,7 +18,7 @@ namespace CliInvoke.Extensions.Middleware.Retry;
 /// </summary>
 /// <remarks>
 ///     Retries by default for classified (retryable) failures; callers should avoid this middleware for
-///     non-idempotent invocations (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md#D005).
+///     non-idempotent invocations (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
 /// </remarks>
 internal sealed class RetryMiddleware : IProcessMiddleware
 {

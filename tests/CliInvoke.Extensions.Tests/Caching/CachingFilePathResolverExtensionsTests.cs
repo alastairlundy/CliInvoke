@@ -57,7 +57,7 @@ public class CachingFilePathResolverExtensionsTests
         IMemoryCache cache1 = scope1.ServiceProvider.GetRequiredService<IMemoryCache>();
         IMemoryCache cache2 = scope2.ServiceProvider.GetRequiredService<IMemoryCache>();
 
-        // The cache store is shared across scopes (D008).
+        // The cache store is shared across scopes.
         await Assert.That(cache1).IsSameReferenceAs(cache2);
     }
 
@@ -65,7 +65,7 @@ public class CachingFilePathResolverExtensionsTests
     public async Task UseCachingFilePathResolver_DecoratesExistingResolver_AndCaches()
     {
         IServiceCollection services = new ServiceCollection();
-        var fake = new FakeResolver();
+        FakeResolver fake = new FakeResolver();
         services.AddCliInvoke();
         services.RemoveAll<IFilePathResolver>();
         services.AddSingleton<IFilePathResolver>(fake);

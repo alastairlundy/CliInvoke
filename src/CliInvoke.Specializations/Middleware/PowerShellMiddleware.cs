@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core;
-using CliInvoke.Core.Middleware;
 using CliInvoke.Specializations.Configurations;
 using CliInvoke.Specializations.Internal;
 
@@ -18,8 +16,7 @@ namespace CliInvoke.Specializations.Middleware;
 ///     Middleware that rewrites the <see cref="InvocationContext.Configuration"/> to execute the
 ///     original command inside a PowerShell (<c>pwsh</c> / <c>pwsh.exe</c>) process using
 ///     <c>-NoProfile -NonInteractive -Command</c>. This is the single source of truth for PowerShell
-///     wrapping; <see cref="CliInvoke.Specializations.PowershellProcessInvoker"/> is now a thin wrapper
-///     around <see cref="CliInvoke.ProcessInvoker"/> with this middleware applied.
+///     wrapping.
 /// </summary>
 /// <remarks>
 ///     Supports Windows, macOS, macCatalyst, Linux, and FreeBSD. Calls on Android, iOS, tvOS, watchOS,

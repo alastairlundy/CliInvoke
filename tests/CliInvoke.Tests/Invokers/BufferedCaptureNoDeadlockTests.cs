@@ -13,7 +13,7 @@ using CliInvoke;
 using CliInvoke.Core;
 using CliInvoke.Core.Processes;
 using CliInvoke.Extensions;
-using CliInvoke.Extensions.Middleware.Truncation;
+using CliInvoke.Extensions.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Tests.Invokers;

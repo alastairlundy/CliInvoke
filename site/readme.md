@@ -114,7 +114,7 @@ output, send signals, or replace components for advanced scenarios.
    customisation belongs.
 3. [Resource Disposal](docs/guides/resource-disposal.md) — the disposal
    contract for the five Resource-Owning Types, including
-   `IExternalProcess` and `PipedProcessResult`.
+   `IExternalProcess`.
 
 ### If you have a specific task
 

@@ -71,11 +71,10 @@ else
 
 ### Available Execute Methods
 
-The `IProcessInvoker` interface provides three methods for executing processes:
+The `IProcessInvoker` interface provides two methods for executing processes:
 
 1. `ExecuteAsync` - Returns a `ProcessResult` with exit code only
 2. `ExecuteBufferedAsync` - Returns a `BufferedProcessResult` with exit code, standard output, and standard error
-3. `ExecutePipedAsync` - Returns a `PipedProcessResult` for scenarios requiring input/output piping
 
 All methods follow the same parameter pattern:
 - `ProcessConfiguration` - Required configuration for the process
@@ -90,7 +89,7 @@ Using dependency injection to obtain `IProcessInvoker` provides several benefits
 - Consistency with other CliInvoke services like `IExternalProcessFactory`
 
 ### Adding Middleware (Cross-cutting Concerns)
-`ProcessInvoker` can be configured with an optional **middleware** chain that wraps the terminal Process Invocation Pipeline (Configuration → Invoke → OS Process → Result) in registration order. The public API is the fluent `Use*` extension methods — each returns a *new* `ProcessInvoker`, so they compose. Call sites (`ExecuteAsync` / `ExecuteBufferedAsync` / `ExecutePipedAsync`) are **unchanged** with or without middleware.
+`ProcessInvoker` can be configured with an optional **middleware** chain that wraps the terminal Process Invocation Pipeline (Configuration → Invoke → OS Process → Result) in registration order. The public API is the fluent `Use*` extension methods — each returns a *new* `ProcessInvoker`, so they compose. Call sites (`ExecuteAsync` / `ExecuteBufferedAsync`) are **unchanged** with or without middleware.
 
 ```csharp
 using CliInvoke;                                  // ProcessInvoker
@@ -128,4 +127,4 @@ ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config);
 ```
 
-**Disposal through the chain:** middleware returns the process result **un-disposed** (exactly as without middleware). You remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. See the `implement-resource-lifecycle` skill for the full ownership checklist.
+**Disposal through the chain:** middleware returns the process result **un-disposed** (exactly as without middleware). You remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration` you created. `ProcessConfiguration` itself is not disposable. See the `implement-resource-lifecycle` skill for the full ownership checklist.

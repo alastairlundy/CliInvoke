@@ -136,9 +136,11 @@ public sealed class ArgumentsSpec
         StringBuilder? joined = null;
         int validCount = 0;
 
-        foreach (var item in values)
+        foreach (string item in values)
         {
-            if (item is null || !_argumentValidationLogic.Invoke(item))
+            ArgumentNullException.ThrowIfNull(item);
+
+            if (!_argumentValidationLogic.Invoke(item))
                 continue;
 
             if (joined is null)
@@ -181,8 +183,10 @@ public sealed class ArgumentsSpec
         StringBuilder? joined = null;
         int validCount = 0;
 
-        foreach (var item in values)
+        foreach (IFormattable item in values)
         {
+            ArgumentNullException.ThrowIfNull(item);
+
             string? str = item.ToString(null, _formatProvider);
 
             if (str is null || !_argumentValidationLogic.Invoke(str))

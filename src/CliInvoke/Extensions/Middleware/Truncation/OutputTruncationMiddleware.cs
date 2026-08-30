@@ -7,14 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CliInvoke;
 using CliInvoke.Core.Middleware;
+using CliInvoke.Internal.Extensions;
 
-namespace CliInvoke.Extensions.Middleware.Truncation;
+namespace CliInvoke.Extensions.Middleware;
 
 /// <summary>
 ///     Opt-in middleware that publishes a per-stream output-truncation cap into
@@ -25,7 +21,7 @@ namespace CliInvoke.Extensions.Middleware.Truncation;
 ///     buffered-capture path (which runs downstream of this link) can truncate each stream as it is
 ///     read. This middleware only writes the cap; it does not perform truncation itself. It is ordered
 ///     upstream of <c>LoggingMiddleware</c> so logs reflect already-capped output
-///     (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md#D004). Does not apply to
+///     (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md). Does not apply to
 ///     <c>IExternalProcess</c> (middleware does not flow there).
 /// </remarks>
 internal sealed class OutputTruncationMiddleware : IProcessMiddleware

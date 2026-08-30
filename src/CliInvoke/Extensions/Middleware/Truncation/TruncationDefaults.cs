@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-namespace CliInvoke;
+namespace CliInvoke.Internal.Extensions;
 
 /// <summary>
 ///     Shared defaults for per-stream output truncation during buffered capture.

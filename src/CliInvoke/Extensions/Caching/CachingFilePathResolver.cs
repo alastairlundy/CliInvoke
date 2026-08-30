@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.IO;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CliInvoke.Extensions.Caching;
@@ -19,7 +18,7 @@ namespace CliInvoke.Extensions.Caching;
 /// </summary>
 /// <remarks>
 ///     Lives in <c>CliInvoke.Extensions</c>; <c>CliInvoke.Core</c> remains free of caching concerns
-///     (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md#D009, #D010).
+///     (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
 /// </remarks>
 public sealed class CachingFilePathResolver : IFilePathResolver
 {
@@ -106,7 +105,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
 
     private void Cache(string key, string absolutePath)
     {
-        var entryOptions = new MemoryCacheEntryOptions
+        MemoryCacheEntryOptions entryOptions = new MemoryCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = _options.AbsoluteExpirationRelativeToNow,
             Size = 1

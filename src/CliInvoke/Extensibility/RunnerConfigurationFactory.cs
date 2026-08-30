@@ -10,7 +10,6 @@
 #pragma warning disable CA1416
 
 using CliInvoke.Builders;
-using CliInvoke.Core.Extensibility;
 
 namespace CliInvoke.Extensibility;
 

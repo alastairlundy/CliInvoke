@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core.Middleware;
 using CliInvoke.Specializations.Configurations;
 using CliInvoke.Specializations.Internal;
 
@@ -16,9 +15,7 @@ namespace CliInvoke.Specializations.Middleware;
 /// <summary>
 ///     Middleware that rewrites the <see cref="InvocationContext.Configuration"/> to execute the
 ///     original command inside a Windows Command Processor (<c>cmd.exe</c>) process using the
-///     <c>/c</c> switch. This is the single source of truth for CMD wrapping;
-///     <see cref="CliInvoke.Specializations.CmdProcessInvoker"/> is now a thin wrapper around
-///     <see cref="CliInvoke.ProcessInvoker"/> with this middleware applied.
+///     <c>/c</c> switch. This is the single source of truth for CMD wrapping.
 /// </summary>
 /// <remarks>
 ///     Windows-only. Calls on any non-Windows platform throw

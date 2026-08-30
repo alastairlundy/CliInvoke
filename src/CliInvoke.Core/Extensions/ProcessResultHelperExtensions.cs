@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Linq;
-
 using CliInvoke.Core.Exceptions;
 using CliInvoke.Core.Validation;
 
@@ -97,7 +95,7 @@ public static class ProcessResultHelperExtensions
     /// </summary>
     private static string GetFirstLineFromSpan(ReadOnlySpan<char> text)
     {
-        foreach (var line in text.EnumerateLines())
+        foreach (ReadOnlySpan<char> line in text.EnumerateLines())
             return line.ToString();
 
         return string.Empty;

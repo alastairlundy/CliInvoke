@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-namespace CliInvoke.Extensions.Middleware.Truncation;
+namespace CliInvoke.Extensions.Middleware;
 
 /// <summary>
 ///     Configuration options for <see cref="OutputTruncationMiddleware"/>.
@@ -31,7 +31,7 @@ public sealed class TruncationOptions
     /// </summary>
     /// <remarks>
     ///     A single value bounds both streams. The default of 1 MB bounds memory growth out of the
-    ///     box while remaining overridable (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md#D011).
+    ///     box while remaining overridable (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
     /// </remarks>
     public long MaxSize { get; set; } = 1_048_576;
 }

@@ -62,7 +62,7 @@ When deciding which pattern to use, evaluate the requirements against the follow
   - `UseLogging()` (`CliInvoke.Extensions.Middleware`)
   - `UsePostExitValidation(PostExitValidation.ExitCodeIsZero())` (`CliInvoke.Extensions.Middleware.Validation`)
   - `UsePowerShell()` / `UseCmd()` (`CliInvoke.Specializations.Middleware`)
-- The terminal **Process Invocation Pipeline** (Configuration → Invoke → OS Process → Result) remains the leaf that actually starts and waits on the process; middleware wraps it in registration order. **Call sites are unchanged**: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` work exactly as without middleware.
+- The terminal **Process Invocation Pipeline** (Configuration → Invoke → OS Process → Result) remains the leaf that actually starts and waits on the process; middleware wraps it in registration order. **Call sites are unchanged**: `ExecuteAsync` and `ExecuteBufferedAsync` work exactly as without middleware.
 - Middleware is an invoker-level concern only. `CliRun` does **not** support middleware — if you need middleware, choose `IProcessInvoker`/`ProcessInvoker` instead. At the `IExternalProcess` layer there is no middleware either; middleware operates above the invoker.
 
 **Key Characteristic:**
@@ -91,6 +91,6 @@ For detailed implementation examples on creating external processes, see the fol
 | Using `IProcessInvoker` for interactive shells | Switch to `IExternalProcess` to allow real-time interaction with the process. |
 | Needing logging, result validation, or PowerShell/`cmd` wrapping on every call | Use the fluent `Use*` extension methods on `ProcessInvoker` (e.g., `.UseLogging().UsePostExitValidation(PostExitValidation.ExitCodeIsZero())`) instead of hand-writing the cross-cutting logic in each call site. |
 | Reaching for middleware but starting from `CliRun` | `CliRun` has no middleware support; construct a `ProcessInvoker` (optionally with `IEnumerable<IProcessMiddleware>` or `MiddlewareItems`) and use the `Use*` methods instead. |
-| Assuming middleware disposes the result for you | Middleware returns the `ProcessResult`/`PipedProcessResult` **un-disposed** — you remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. |
+| Assuming middleware disposes the result for you | Middleware returns the `ProcessResult` **un-disposed** — you remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration` you created. `ProcessConfiguration` itself is not disposable. |
 
 This is a pure knowledge skill and does not invoke external tools.

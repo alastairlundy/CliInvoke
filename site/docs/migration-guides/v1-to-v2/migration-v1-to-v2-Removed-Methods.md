@@ -81,7 +81,7 @@ public ProcessExitConfiguration( ProcessTimeoutPolicy timeoutPolicy, ProcessResu
 ProcessCancellationExceptionBehavior cancellationValidation)
 ```
 
-Use ``ProcessExitConfiguration`` with ``IProcessInvoker`` as a parameter in ``ExecuteAsync``, ``ExecuteBufferedAsync``, or ``ExecutePipedAsync``.
+Use ``ProcessExitConfiguration`` with ``IProcessInvoker`` as a parameter in ``ExecuteAsync`` or ``ExecuteBufferedAsync``.
 
 ## IArgumentsBuilder and ArgumentsBuilder
 

@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CliInvoke.Extensions.Caching;

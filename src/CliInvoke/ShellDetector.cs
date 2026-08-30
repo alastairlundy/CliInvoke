@@ -83,7 +83,7 @@ public class ShellDetector : IShellDetector
 
         string? versionLine = null;
 
-        foreach (var line in shellInfoResult.StandardOutput.AsSpan().EnumerateLines())
+        foreach (ReadOnlySpan<char> line in shellInfoResult.StandardOutput.AsSpan().EnumerateLines())
         {
             if (line.Contains("version".AsSpan(), StringComparison.OrdinalIgnoreCase) &&
                 line.IndexOfAny("0123456789".AsSpan()) >= 0)
@@ -164,7 +164,7 @@ public class ShellDetector : IShellDetector
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
-        foreach (var line in text.AsSpan().EnumerateLines())
+        foreach (ReadOnlySpan<char> line in text.AsSpan().EnumerateLines())
             return line.ToString();
 
         return string.Empty;

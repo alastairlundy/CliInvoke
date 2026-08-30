@@ -19,7 +19,7 @@ The goal of this page is to prevent two failure modes:
    process accumulates open handles faster than it releases them.
 
 If you only read one section, read
-[The Four Disposable Types](#the-four-disposable-types) and the
+[The Three Disposable Types](#the-three-disposable-types) and the
 [Disposal Patterns](#disposal-patterns) summary.
 
 ## Terminology
@@ -27,7 +27,7 @@ If you only read one section, read
 A **Resource-Owning Type** is any CliInvoke type that holds, directly
 or transitively, an unmanaged resource or a sensitive managed resource
 that must be deterministically released. The library exposes exactly
-four of them. Every other public type in the library is a
+three of them. Every other public type in the library is a
 value-bearing immutable, an enum, or an interface contract and
 requires no disposal.
 
@@ -39,14 +39,13 @@ requires no disposal.
 > owned and disposed by **you**, the caller (see
 > [Caller-owned resources](#processconfiguration--caller-owned-resources)).
 
-## The Four Disposable Types
+## The Three Disposable Types
 
 | # | Type | Disposal contract | Resources owned |
 |---|------|-------------------|-----------------|
 | 1 | [`IExternalProcess`](#1-iexternalprocess) | `IDisposable` | The underlying `System.Diagnostics.Process` (pipes, handles, threads) |
-| 2 | [`PipedProcessResult`](#2-pipedprocessresult) | `IDisposable` + `IAsyncDisposable` | `StandardOutput` and `StandardError` streams |
-| 3 | [`UserCredential`](#3-usercredential) | `IDisposable` | `SecureString` password buffer |
-| 4 | [`UserCredentialSpec`](#4-usercredentialspec) | `IDisposable` | `SecureString` password buffer staged for `Build()` |
+| 2 | [`UserCredential`](#2-usercredential) | `IDisposable` | `SecureString` password buffer |
+| 3 | [`UserCredentialSpec`](#3-usercredentialspec) | `IDisposable` | `SecureString` password buffer staged for `Build()` |
 
 No other public CliInvoke type implements `IDisposable`. If a type is
 not in the table above, it does not need to be disposed.
@@ -127,53 +126,11 @@ redirected streams, and releases the kernel handle.
 **Ownership rule**: Returned from
 `IExternalProcessFactory.CreateExternalProcess(ProcessConfiguration)`. The caller owns
 the returned `IExternalProcess` and must dispose it after
-`WaitForExitAsync` / `CaptureBufferedResultAsync` /
-`CapturePipedResultAsync` completes. The invoker does not retain a
+`WaitForExitAsync` / `CaptureBufferedResultAsync` completes. The
+invoker does not retain a
 reference after returning.
 
-### 2. `PipedProcessResult`
-
-Defined in `src/CliInvoke.Core/Primitives/Results/PipedProcessResult.cs`.
-
-```csharp
-public class PipedProcessResult : IDisposable, IAsyncDisposable
-```
-
-**What it owns**
-
-- `StandardOutput` — a `Stream` that owns the read end of the
-  redirected stdout pipe.
-- `StandardError` — a `Stream` that owns the read end of the
-  redirected stderr pipe.
-
-Unlike `ProcessConfiguration`, the streams here are consumed by
-`StreamReader.ReadToEndAsync` and similar, which is why the type
-implements **both** `IDisposable` and `IAsyncDisposable`. The async
-dispose path is preferred on .NET 8+.
-
-**`Dispose()` behaviour** (line 70):
-
-```csharp
-public async ValueTask DisposeAsync()
-{
-    await StandardOutput.DisposeAsync();
-    await StandardError.DisposeAsync();
-}
-
-public void Dispose()
-{
-    StandardOutput.Dispose();
-    StandardError.Dispose();
-}
-```
-
-**Ownership rule**: Returned from
-`IExternalProcess.CapturePipedResultAsync`. The caller owns the
-result. A `PipedProcessResult` that is not disposed will pin the read
-ends of the stdout and stderr pipes open for the lifetime of the
-`PipedProcessResult` object — even after the process has exited.
-
-### 3. `UserCredential`
+### 2. `UserCredential`
 
 Defined in `src/CliInvoke.Core/Primitives/UserCredential.cs`.
 
@@ -206,7 +163,7 @@ public void Dispose()
 2. The credential is used standalone (e.g., returned from a factory).
    The caller must dispose it.
 
-### 4. `UserCredentialSpec`
+### 3. `UserCredentialSpec`
 
 Defined in `src/CliInvoke.Core/Configuration/UserCredentialSpec.cs`.
 
@@ -256,8 +213,7 @@ process's file descriptor table, with a typical soft limit of 1024
 per process and 4096 for the entire system for unprivileged users.
 
 CliInvoke invocations in long-running services can easily reach
-these limits. Each leaked `PipedProcessResult` pins two file
-descriptors open. Each leaked `IExternalProcess` pins three. Each
+these limits. Each leaked `IExternalProcess` pins three. Each
 leaked `UserCredential` retains a pinned `SecureString` buffer. At a
 few thousand leaked invocations the process hits the soft limit and
 the next `Process.Start` throws `IOException("Too many open files")`
@@ -305,17 +261,19 @@ ProcessConfiguration config = new ProcessConfigurationBuilder("cmd")
 
 ### Pattern B — `await using` (preferred on .NET 8+)
 
-Use for `IExternalProcess` and `PipedProcessResult`, which surface
-async-disposable streams.
+Use for `IExternalProcess`, which surfaces async-disposable streams and
+exposes the live `StandardOutput` / `StandardError` streams for
+streaming consumption.
 
 ```csharp
 var factory = provider.GetRequiredService<IExternalProcessFactory>();
 await using var process = factory.CreateExternalProcess(config);
 await process.StartAsync(ct);
-await using var result = await process.CapturePipedResultAsync(ct);
 
-string output = await new StreamReader(result.StandardOutput).ReadToEndAsync();
-// process and result are both disposed when leaving scope
+// Stream stdout directly from the live process:
+string output = await new StreamReader(process.StandardOutput).ReadToEndAsync();
+await process.WaitForExitOrTimeoutAsync(ct);
+// process is disposed when leaving scope
 ```
 
 ### Pattern C — explicit `Dispose` in a `try/finally`
@@ -363,21 +321,19 @@ using (credential)
 
 These rules are normative for every consumer of the library.
 
-1. **Always dispose** the four resource-owning types listed above
-   (`IExternalProcess`, `PipedProcessResult`, `UserCredential`,
-   `UserCredentialSpec`). `ProcessConfiguration` is not among them.
+1. **Always dispose** the three resource-owning types listed above
+   (`IExternalProcess`, `UserCredential`, `UserCredentialSpec`).
+   `ProcessConfiguration` is not among them.
 2. **Dispose caller-supplied `StandardInput` and `UserCredential`
    yourself.** `ProcessConfiguration` does not dispose them, and
    neither does the invocation pipeline. Hold them in your own `using`
    declarations.
 3. **Never dispose a child resource owned by the library**. The
-   `SecureString` inside a `UserCredential`, the stdout/stderr streams
-   inside a `PipedProcessResult`, and the stream inside a
+   `SecureString` inside a `UserCredential` and the stream inside a
    `UserCredentialSpec` are released by their parent. Calling `Dispose`
    on them directly is a double-dispose.
-4. **Prefer `await using`** for `IExternalProcess` and
-   `PipedProcessResult` on .NET 8+. The streams are
-   async-disposable.
+4. **Prefer `await using`** for `IExternalProcess` on .NET 8+. The
+   streams are async-disposable.
 5. **Disposal is the caller's responsibility**. The invoker does not
    retain references to the configuration, the process, or the
    result after returning. The caller that received the object owns
@@ -393,9 +349,6 @@ following:
 
 - [ ] Every `IExternalProcess` returned from `StartAsync` is wrapped
   in `await using` or `try/finally`.
-- [ ] Every `PipedProcessResult` returned from
-  `CapturePipedResultAsync` is wrapped in `await using` or
-  `try/finally`.
 - [ ] Every standalone `UserCredential` is wrapped in `using`.
 - [ ] Every standalone `UserCredentialSpec` you create and own is wrapped in `using`, and the
   `UserCredential` it produces is wrapped in a separate `using`. A `UserCredentialSpec` configured
@@ -406,8 +359,8 @@ following:
 - [ ] No `SecureString`, `StandardOutput`, or `StandardError` is disposed
   directly — only their parents.
 - [ ] `IDisposable` is not implemented on any custom wrapper that
-  owns an `IExternalProcess` or `PipedProcessResult` without also
-  disposing the owned resource in its own `Dispose`.
+  owns an `IExternalProcess` without also disposing the owned
+  resource in its own `Dispose`.
 
 ## Cross-References
 
@@ -416,6 +369,5 @@ following:
 - Source files:
   - `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`
   - `src/CliInvoke.Core/Processes/IExternalProcess.cs`
-  - `src/CliInvoke.Core/Primitives/Results/PipedProcessResult.cs`
   - `src/CliInvoke.Core/Primitives/UserCredential.cs`
   - `src/CliInvoke.Core/Configuration/UserCredentialSpec.cs`
