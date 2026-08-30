@@ -8,6 +8,7 @@
  */
 
 using System.Collections.Generic;
+using System.Linq;
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility.Factories;
 using CliInvoke.Helpers.Processes;
@@ -33,7 +34,15 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
 
-        string combinedArgs = ComposeRunnerArguments(processConfigToBeRun, runnerProcessConfig);
+        // Compose the wrapped command as discrete tokens. Delivering the target and
+        // the caller's arguments as separate tokens (rather than one re-parsed string)
+        // means the operating system tokenises each value independently, so a quote or
+        // other special character inside a caller-supplied value cannot alter how the
+        // wrapped command is split.
+        List<string> commandTokens = ComposeRunnerCommandTokens(
+            processConfigToBeRun, runnerProcessConfig);
+
+        string combinedArgs = string.Join(" ", commandTokens);
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath
@@ -59,19 +68,22 @@ public class RunnerProcessFactory : IRunnerProcessFactory
                 runnerProcessConfig.TargetFilePath
             ).RequireAdministratorPrivileges();
 
-        return commandBuilder.Build();
+        ProcessConfiguration result = commandBuilder.Build();
+
+        // Expose the pre-tokenized form so hosts can bypass OS-level re-parsing of the
+        // combined argument string. Set it directly to preserve tokens that contain spaces.
+        result.ArgumentsList = commandTokens;
+
+        return result;
     }
 
     /// <summary>
-    /// Composes the argument string passed to the runner process so that the wrapped target and each of its
-    /// arguments are delivered as discrete, correctly delimited tokens. This prevents a quote in the wrapped
-    /// target or its arguments from breaking out of the intended token boundaries when the OS command-line
-    /// parser re-tokenizes the runner's argument string.
+    /// Builds the discrete argument tokens that the runner process will receive.
     /// </summary>
     /// <param name="processConfigToBeRun">The command to be run by the runner process.</param>
     /// <param name="runnerProcessConfig">The runner process configuration.</param>
-    /// <returns>The composed argument string for the runner process.</returns>
-    private static string ComposeRunnerArguments(
+    /// <returns>The list of discrete argument tokens for the runner process.</returns>
+    private static List<string> ComposeRunnerCommandTokens(
         ProcessConfiguration processConfigToBeRun,
         ProcessConfiguration runnerProcessConfig)
     {
@@ -105,6 +117,6 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         foreach (string token in targetArgTokens)
             segments.Add(ArgumentCompositionHelper.QuoteArgument(token));
 
-        return string.Join(" ", segments);
+        return segments;
     }
 }

@@ -23,6 +23,7 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
+        <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <Version>2.8.4</Version>
         <PackageReleaseNotes>* Fixed shell metacharacter escaping in RunnerProcessFactory. </PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
@@ -33,6 +34,11 @@
     <ItemGroup>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="CliInvoke"/>
+        <InternalsVisibleTo Include="CliInvoke.Tests"/>
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
