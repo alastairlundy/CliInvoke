@@ -153,7 +153,8 @@ public class UserCredentialSpecTests
     public async Task Dispose_CanBeCalledMultipleTimes()
     {
         // Arrange
-        UserCredentialSpec spec = new UserCredentialSpec().SetPassword(MakeSecureString("secret"));
+        using SecureString password = MakeSecureString("secret");
+        UserCredentialSpec spec = new UserCredentialSpec().SetPassword(password);
 
         // Act / Assert - should not throw on repeated dispose
         spec.Dispose();
