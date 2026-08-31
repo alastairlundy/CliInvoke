@@ -8,7 +8,6 @@
    */
 
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -378,7 +377,7 @@ internal class ProcessWrapper : Process
 
         if (maxBytes is null or <= 0)
         {
-            using var memoryStream = new MemoryStream();
+            using MemoryStream memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
             return (encoding.GetString(memoryStream.ToArray()), false);
         }
@@ -387,7 +386,7 @@ internal class ProcessWrapper : Process
         long totalBytes = 0;
         bool truncated = false;
 
-        using var outputStream = new MemoryStream();
+        using MemoryStream outputStream = new MemoryStream();
 
         int bytesRead;
         while ((bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)

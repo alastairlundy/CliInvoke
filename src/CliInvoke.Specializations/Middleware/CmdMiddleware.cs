@@ -7,18 +7,15 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core.Middleware;
+using CliInvoke.Core.Internal;
 using CliInvoke.Specializations.Configurations;
-using CliInvoke.Specializations.Internal;
 
 namespace CliInvoke.Specializations.Middleware;
 
 /// <summary>
 ///     Middleware that rewrites the <see cref="InvocationContext.Configuration"/> to execute the
 ///     original command inside a Windows Command Processor (<c>cmd.exe</c>) process using the
-///     <c>/c</c> switch. This is the single source of truth for CMD wrapping;
-///     <see cref="CliInvoke.Specializations.CmdProcessInvoker"/> is now a thin wrapper around
-///     <see cref="CliInvoke.ProcessInvoker"/> with this middleware applied.
+///     <c>/c</c> switch. This is the single source of truth for CMD wrapping.
 /// </summary>
 /// <remarks>
 ///     Windows-only. Calls on any non-Windows platform throw
@@ -66,12 +63,18 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             ? $"\"{safePath}\""
             : $"\"{safePath}\" {safeArgs}";
 
+        // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
+        // re-tokenize it before cmd.exe parses it. A single re-tokenized Arguments string
+        // (the historical implementation) let a '"' in the value break the OS-level quoting and
+        // inject additional cmd commands (command-injection). ArgumentList is passed through unchanged.
+        IReadOnlyList<string> argumentList = ["/c", wrappedCommand];
+
         // The specialisation configuration class is the single source of truth for the cmd.exe
         // target and the /c switch; this middleware just supplies the wrapped command and
         // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration newConfig = new CmdProcessConfiguration(
-            wrappedCommand,
+            string.Empty,
             src.RedirectStandardInput,
             context.Mode != InvocationMode.Raw,
             workingDirectoryPath: src.WorkingDirectoryPath,
@@ -83,7 +86,8 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             standardOutputEncoding: src.StandardOutputEncoding,
             standardErrorEncoding: src.StandardErrorEncoding,
             processResourcePolicy: src.ResourcePolicy,
-            windowCreation: src.WindowCreation);
+            windowCreation: src.WindowCreation,
+            argumentList: argumentList);
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
         await next(newContext);

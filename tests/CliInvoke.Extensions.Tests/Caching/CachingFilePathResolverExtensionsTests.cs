@@ -24,18 +24,20 @@ public class CachingFilePathResolverExtensionsTests
 {
     private sealed class FakeResolver : IFilePathResolver
     {
+        private readonly string _resolvedPath = typeof(CachingFilePathResolverExtensionsTests).Assembly.Location;
+
         public int ResolveCount;
 
         public FileInfo ResolveFilePath(string filePathToResolve)
         {
             ResolveCount++;
-            return new FileInfo(filePathToResolve);
+            return new FileInfo(_resolvedPath);
         }
 
         public bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath)
         {
             ResolveCount++;
-            resolvedFilePath = new FileInfo(filePathToResolve);
+            resolvedFilePath = new FileInfo(_resolvedPath);
             return true;
         }
     }
@@ -63,7 +65,7 @@ public class CachingFilePathResolverExtensionsTests
     public async Task UseCachingFilePathResolver_DecoratesExistingResolver_AndCaches()
     {
         IServiceCollection services = new ServiceCollection();
-        var fake = new FakeResolver();
+        FakeResolver fake = new FakeResolver();
         services.AddCliInvoke();
         services.RemoveAll<IFilePathResolver>();
         services.AddSingleton<IFilePathResolver>(fake);

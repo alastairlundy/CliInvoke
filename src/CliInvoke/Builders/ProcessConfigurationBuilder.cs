@@ -40,6 +40,8 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
 
     private StreamWriter _standardInput;
 
+    private IReadOnlyList<string>? _argumentList;
+
     private readonly ArgumentsSpec _argumentsSpec;
     private readonly EnvironmentVariablesSpec _environmentVariablesSpec;
     private readonly ProcessResourcePolicySpec _processResourcePolicySpec;
@@ -123,6 +125,19 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
         // not wrapped/escaped, matching the former ArgumentsBuilder behaviour.
         _argumentsSpec.Add(arguments, escape: false);
 
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets a pre-tokenised argument list. When non-empty, the control adapter emits these via
+    ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the single
+    ///     <see cref="ProcessConfiguration.Arguments"/> string.
+    /// </summary>
+    /// <param name="argumentList">The pre-tokenised argument list.</param>
+    /// <returns>A reference to this builder with the updated argument list, allowing method chaining.</returns>
+    public IProcessConfigurationBuilder SetArgumentList(IReadOnlyList<string>? argumentList)
+    {
+        _argumentList = argumentList;
         return this;
     }
 
@@ -430,7 +445,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
             _redirectStandardInput, _outputRedirection,
             _workingDirectoryPath, _requiresAdministratorPrivileges, environmentVariables,
             credential, _standardInput, _standardInputEncoding, _standardOutputEncoding, _standardErrorEncoding, resourcePolicy, _enableWindowCreation,
-            _useShellExecution);
+            _useShellExecution, _argumentList);
 
         return configuration;
     }
@@ -440,7 +455,6 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     {
         _userCredentialSpec.Dispose();
         _standardInput.Dispose();
-        GC.SuppressFinalize(this);
     }
 }
 

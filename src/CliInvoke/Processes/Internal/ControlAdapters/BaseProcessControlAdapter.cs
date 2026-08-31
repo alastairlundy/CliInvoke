@@ -50,6 +50,25 @@ internal abstract class BaseProcessControlAdapter
             RedirectStandardError = processConfiguration.OutputRedirection,
         };
 
+        // When a verbatim argument list is supplied (shell wrappers), emit it via
+        // ArgumentList so the OS command-line parser passes each entry to the child
+        // unmodified. This prevents the double-parse command-injection vector where a
+        // single re-tokenized Arguments string is re-interpreted by the wrapped shell.
+        // The read-only ArgumentList (set via the builder / constructor) is the canonical
+        // source; the mutable ArgumentsList is honoured as a fallback for configurations
+        // built without the builder, where the pre-tokenized form is assigned after
+        // construction.
+        IReadOnlyList<string> effectiveArgumentList = processConfiguration.ArgumentList.Count > 0
+            ? processConfiguration.ArgumentList
+            : processConfiguration.ArgumentsList;
+
+        if (effectiveArgumentList.Count > 0)
+        {
+            processStartInfo.Arguments = string.Empty;
+            foreach (string arg in effectiveArgumentList)
+                processStartInfo.ArgumentList.Add(arg);
+        }
+
         if (processConfiguration.RequiresAdministrator)
             RequireRunningAsAdmin(process);
 

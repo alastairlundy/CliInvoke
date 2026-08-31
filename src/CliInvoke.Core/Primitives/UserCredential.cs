@@ -120,7 +120,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
         if (Password is null || other.Password is null)
             passwordEquality = Password is null && other.Password is null;
         else
-            passwordEquality = Password.Equals(other.Password);
+            passwordEquality = SecureStringEquals(Password, other.Password);
 
         if (UserName is null || other.UserName is null)
             userNameEquality = UserName is null && other.UserName is null;
@@ -186,6 +186,45 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
         hash.Add(LoadUserProfile);
         return hash.ToHashCode();
 #pragma warning restore CA1416
+    }
+
+    /// <summary>
+    ///     Compares two <see cref="SecureString"/> instances for content equality without exposing
+    ///     the plaintext. Used by <see cref="Equals(UserCredential?)"/> because
+    ///     <see cref="SecureString"/> does not override equality (reference equality would be wrong).
+    /// </summary>
+    private static bool SecureStringEquals(SecureString left, SecureString right)
+    {
+        if (left.Length != right.Length)
+            return false;
+
+        nint leftPtr = IntPtr.Zero;
+        nint rightPtr = IntPtr.Zero;
+
+        try
+        {
+            leftPtr = System.Runtime.InteropServices.Marshal.SecureStringToBSTR(left);
+            rightPtr = System.Runtime.InteropServices.Marshal.SecureStringToBSTR(right);
+
+            int length = left.Length * 2; // UTF-16 code units
+
+            for (int i = 0; i < length; i++)
+            {
+                if (System.Runtime.InteropServices.Marshal.ReadByte(leftPtr, i) !=
+                    System.Runtime.InteropServices.Marshal.ReadByte(rightPtr, i))
+                    return false;
+            }
+
+            return true;
+        }
+        finally
+        {
+            if (leftPtr != IntPtr.Zero)
+                System.Runtime.InteropServices.Marshal.ZeroFreeBSTR(leftPtr);
+
+            if (rightPtr != IntPtr.Zero)
+                System.Runtime.InteropServices.Marshal.ZeroFreeBSTR(rightPtr);
+        }
     }
 
     /// <summary>

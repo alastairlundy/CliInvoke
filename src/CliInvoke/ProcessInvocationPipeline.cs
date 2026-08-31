@@ -7,10 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Core.Exceptions;
-using CliInvoke.Core.Factories;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Processes;
 using CliInvoke.Core.Validation;
+using CliInvoke.Internal.Extensions;
 
 namespace CliInvoke;
 
@@ -38,14 +38,16 @@ internal class ProcessInvocationPipeline
     /// <typeparam name="TResult">The type of process result to return.</typeparam>
     /// <param name="ctx">The process invocation context containing configuration and mode.</param>
     /// <returns>The process result of type <typeparamref name="TResult"/>.</returns>
-    public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx) where TResult : ProcessResult
+    public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx)
+        where TResult : ProcessResult
     {
         long? GetTruncationCap()
         {
-            var middleware = ctx.Middleware;
+            MiddlewareContext? middleware = ctx.Middleware;
 
             if (middleware is not null &&
-                middleware.Items.TryGet<long>(TruncationDefaults.MaxBytesPerStreamKey, out long cap))
+                middleware.Items.TryGet<long>(TruncationDefaults.MaxBytesPerStreamKey,
+                    out long cap))
                 return cap;
 
             return null;
@@ -91,9 +93,11 @@ internal class ProcessInvocationPipeline
             // Only Raw and Buffered reach this switch.
             TResult result = ctx.Mode switch
             {
-                InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
-                InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(
-                    ctx.CancellationToken, truncationCap, truncationCap),
+                InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(
+                    ctx.CancellationToken),
+                InvocationMode.Buffered => (TResult)(object)await externalProcess
+                    .CaptureBufferedResultAsync(
+                        ctx.CancellationToken, truncationCap, truncationCap),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
             };
 
@@ -105,6 +109,7 @@ internal class ProcessInvocationPipeline
         {
             externalProcess.Dispose();
         }
+    
 
         /// <summary>
         ///     Evaluates the configured validation rules against a completed process result and throws
