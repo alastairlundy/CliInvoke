@@ -35,7 +35,7 @@ public class FilePathResolverTests
             }
             else
             {
-                using ProcessConfiguration configuration = ProcessConfigurationFactory.Create("where", "dotnet.exe");
+                ProcessConfiguration configuration = ProcessConfigurationFactory.Create("where", "dotnet.exe");
 
                 IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
 
@@ -47,7 +47,7 @@ public class FilePathResolverTests
         }
         else
         {
-            using ProcessConfiguration configuration = ProcessConfigurationFactory.Create("which", "dotnet");
+            ProcessConfiguration configuration = ProcessConfigurationFactory.Create("which", "dotnet");
 
             IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
 

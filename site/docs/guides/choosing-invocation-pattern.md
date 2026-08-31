@@ -120,7 +120,7 @@ services.AddCliInvoke();
 // Later in your code
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-using ProcessConfiguration config = new(
+ProcessConfiguration config = new(
     "dotnet", "--info", true);
 
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
@@ -169,7 +169,7 @@ using CliInvoke.Factories;
 
 IExternalProcessFactory factory = new ExternalProcessFactory();
 
-using ProcessConfiguration config = new(
+ProcessConfiguration config = new(
     "dotnet", "--runtime", true);
 using IExternalProcess process = factory.CreateExternalProcess(config);
 
@@ -192,7 +192,7 @@ services.AddCliInvoke();
 IExternalProcessFactory factory =
     provider.GetRequiredService<IExternalProcessFactory>();
 
-using ProcessConfiguration config = new(
+ProcessConfiguration config = new(
     "dotnet", "--runtime", true);
 using IExternalProcess process = factory.CreateExternalProcess(config);
 
@@ -233,7 +233,7 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(
 // After: IProcessInvoker
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-using ProcessConfiguration config = new(
+ProcessConfiguration config = new(
     "dotnet", "--version", true);
 
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config);

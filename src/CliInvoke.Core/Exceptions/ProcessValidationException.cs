@@ -14,8 +14,8 @@ namespace CliInvoke.Core.Exceptions;
 /// </summary>
 /// <remarks>
 ///     The exception retains the <see cref="Result"/> so callers can inspect it. When
-///     <see cref="Result"/> is a <c>PipedProcessResult</c>, the exception handler must dispose it
-///     to release the underlying output streams.
+///     <see cref="Result"/> owns disposable resources (for example redirected output streams),
+///     the exception handler must dispose it to release those resources.
 /// </remarks>
 public sealed class ProcessValidationException : Exception
 {

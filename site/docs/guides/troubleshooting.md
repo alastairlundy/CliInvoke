@@ -23,11 +23,10 @@ detection method.
 
 ## Resource Management
 
-CliInvoke exposes exactly five [Resource-Owning Types](guides-resource-disposal.md#terminology)
-that hold unmanaged handles or sensitive memory: `ProcessConfiguration`,
-`IExternalProcess`, `PipedProcessResult`, `UserCredential`, and
-`UserCredentialSpec`. Every reported leak in this library traces back
-to one of these five.
+CliInvoke exposes exactly three [Resource-Owning Types](guides-resource-disposal.md#terminology)
+that hold unmanaged handles or sensitive memory: `IExternalProcess`,
+`UserCredential`, and `UserCredentialSpec`. Every reported leak in this
+library traces back to one of these three.
 
 ### Symptoms
 
@@ -45,23 +44,21 @@ to one of these five.
    `IExternalProcess` from `StartAsync`; the caller owns the lifetime.
    Wrap in `await using` (preferred) or call `Dispose()` in a `finally`
    block.
-2. **`PipedProcessResult` is read but not disposed.** `StandardOutput` and
-   `StandardError` are live streams that own OS handles. Dispose the
-   result (or use `await using`) once reading is complete.
-3. **Disposing a library-owned stream.** `StandardInput` on
-   `ProcessConfiguration`, and `StandardOutput` / `StandardError` on
-   `IExternalProcess`, are owned by the library. Disposing them
-   independently corrupts the parent's state.
-4. **A `UserCredential`, a standalone `UserCredentialSpec`, or a builder-owned `UserCredentialSpec` is not disposed.**
+2. **Disposing a `StandardInput` stream too early.** The `StreamWriter` you assign to
+   `ProcessConfiguration.StandardInput` is **caller-owned** — `ProcessConfiguration` does not dispose
+   it. Do not dispose it while the process is still reading from it; dispose it only after the
+   invocation completes. `StandardOutput` / `StandardError` on `IExternalProcess` are released when the
+   `IExternalProcess` is disposed.
+3. **A `UserCredential`, a standalone `UserCredentialSpec`, or a builder-owned `UserCredentialSpec` is not disposed.**
    All three hold a `SecureString`. A standalone `UserCredential` or a `UserCredentialSpec` you create
    and own must be wrapped in `using` (the spec and the `UserCredential` it builds have independent
    lifetimes). A `UserCredentialSpec` configured through `ProcessConfigurationBuilder.ConfigureUserCredential`
-   is owned and disposed by the builder, so do not dispose it yourself; the library disposes any
-   credential it places on the `ProcessConfiguration` when that configuration is disposed.
-5. **Reusing a `ProcessConfiguration` after `Dispose()`.** Once disposed,
-   the internal `StreamWriter` is closed. Create a new configuration for
-   each invocation.
-6. **Capturing a `ProcessConfiguration` into a closure** that extends
+   is owned and disposed by the builder, so do not dispose it yourself. A `UserCredential` assigned to
+   `ProcessConfiguration.Credential` is **not** disposed by the configuration — dispose it yourself.
+4. **Reusing a `ProcessConfiguration` is allowed.** `ProcessConfiguration` is not disposable, so it can
+   be safely reused across invocations. Ensure any `StandardInput` stream or `UserCredential` you supplied
+   is not disposed until after the final invocation that references it.
+5. **Capturing a `ProcessConfiguration` into a closure** that extends
    beyond the invocation, leaking the `SecureString` until the closure
    is collected.
 
@@ -246,11 +243,10 @@ and `ProcessExitBehaviour` that produce surprising exit behavior.
    executables (e.g. JVM-based tools) trip the timeout before producing
    any output, producing a misleading "process hung" diagnosis.
 
-Note: invokers return one of three result types — `ProcessResult`,
-`BufferedProcessResult`, and `PipedProcessResult`. None of them
-represent an exit *policy*; the policy is always on
-`ProcessExitConfiguration` and is consulted before the result is
-constructed.
+Note: invokers return one of two result types — `ProcessResult`
+and `BufferedProcessResult`. Neither represents an exit *policy*; the
+policy is always on `ProcessExitConfiguration` and is consulted before
+the result is constructed.
 
 ### Detection
 

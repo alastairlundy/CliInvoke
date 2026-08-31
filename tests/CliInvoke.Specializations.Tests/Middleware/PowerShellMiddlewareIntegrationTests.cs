@@ -10,9 +10,10 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using CliInvoke.Factories;
+using CliInvoke.Extensions;
 using CliInvoke.Specializations;
 using CliInvoke.Specializations.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Specializations.Tests.Middleware;
@@ -59,18 +60,26 @@ public class PowerShellMiddlewareIntegrationTests
                 "PowerShell Core (pwsh) is not available on PATH; skipping PowerShell middleware integration test.");
         }
 
-        PowershellProcessInvoker invoker = new PowershellProcessInvoker(
-            new ExternalProcessFactory());
+        // The original target is `dotnet`, but the PowerShellMiddleware registered via
+        // `UsePowerShell()` rewrites the configuration to run the command inside
+        // `pwsh -NoProfile -Command "..."`. We wire the middleware onto a normal
+        // ProcessInvoker through the supported DI entry point; the dedicated
+        // `PowershellProcessInvoker` type was removed in favour of this pipeline.
+        ServiceProvider provider = new ServiceCollection()
+            .AddCliInvoke(builder => builder.UsePowerShell())
+            .BuildServiceProvider();
 
-        // The original target is `dotnet`, but PowerShellMiddleware rewrites the configuration
-        // to run the command inside `pwsh -NoProfile -Command "..."`.
-        using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
+
+        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 
         // PowerShellMiddleware rewrites the config so the real target becomes `pwsh`.
         // Verify the rewrite by confirming the process executed through pwsh (exit 0 with output).
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,
             ProcessExitConfiguration.CreateGraceful());
+
+        await provider.DisposeAsync();
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput).IsNotNull();

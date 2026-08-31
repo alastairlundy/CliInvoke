@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace CliInvoke.Tests.Resolvers;
 
-internal sealed class TestableFilePathResolver : FilePathResolverBase
+internal sealed class TestableFilePathResolver : FilePathResolver
 {
     public const string PathStrategyName = "ResolveFromPathEnvironmentVariable";
     public const string DirectoryStrategyName = "LocateFileFromDirectory";

@@ -24,7 +24,6 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Resource Disposal](#resource-disposal)
 * [Documentation](#documentation)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
-* [Used By](#used-by)
 * [License](#license)
 * [Acknowledgements](#acknowledgements)
 
@@ -77,11 +76,16 @@ For more details see the [list of supported platforms](site/docs/Supported-Opera
 
 ## Design Patterns & When to Use Them
 
-CliInvoke provides three distinct design patterns for invoking processes. See [PATTERNS.md](PATTERNS.md) for comprehensive documentation on each pattern.
+CliInvoke provides three core design patterns for invoking processes (with DI + Middleware and the
+platform Specializations as composition paths). See [PATTERNS.md](PATTERNS.md) for comprehensive
+documentation on each pattern, including a [Which pattern should I use?](PATTERNS.md#which-pattern-should-i-use)
+decision tree.
 
-* **`CliRun`** – Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults.
+* **`CliRun`** – **Recommended default.** Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. **Start here if you are new to CliInvoke.**
 * **`IProcessInvoker`** – DI-centric pattern and support for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
 * **`IExternalProcess` & `IExternalProcessFactory`** – Process-like API with DI support, rich capability, stable and predictable behaviour. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
+
+> **New to CliInvoke? Start with `CliRun`** — it is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control. See [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md) for the design rationale.
 
 ## Examples
 
@@ -120,7 +124,7 @@ For fine-grained control over process execution — custom timeouts, cancellatio
 
 ## Middleware
 
-CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns — logging, validation, platform selection, retries — around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`, `ExecutePipedAsync`) remain identical.
+CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns — logging, validation, platform selection, retries — around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`) remain identical.
 
 Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`.
 
@@ -129,17 +133,17 @@ For the full guide — constructor details, the `IProcessMiddleware` contract, D
 ## Resource Disposal
 
 > [!IMPORTANT]
-> CliInvoke has exactly **five Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
+> CliInvoke has exactly **three Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
 >
 > | # | Type                    | What it owns                                                      |
 > |---|-------------------------|-------------------------------------------------------------------|
-> | 1 | `ProcessConfiguration`  | `StreamWriter` (StandardInput), optional `UserCredential`         |
-> | 2 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
-> | 3 | `PipedProcessResult`    | `StandardOutput` and `StandardError` streams                      |
-> | 4 | `UserCredential`        | `SecureString` password buffer                                    |
-> | 5 | `UserCredentialSpec` | `SecureString` password buffer staged for `Build()`               |
+> | 1 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
+> | 2 | `UserCredential`        | `SecureString` password buffer                                    |
+> | 3 | `UserCredentialSpec` | `SecureString` password buffer staged for `Build()`               |
 >
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
+>
+> `ProcessConfiguration` is a plain immutable value object and does **not** implement `IDisposable`. The `StandardInput` (`StreamWriter`) and `UserCredential` you place inside it remain **your** responsibility to dispose — CliInvoke never disposes them on your behalf.
 
 For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](site/docs/guides/resource-disposal.md)**.
 

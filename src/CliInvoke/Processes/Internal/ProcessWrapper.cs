@@ -8,7 +8,8 @@
    */
 
 using System.ComponentModel;
-using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 
 using CliInvoke.Processes.Internal.Cancellation;
 using CliInvoke.Processes.Internal.ControlAdapters;
@@ -53,6 +54,9 @@ internal class ProcessWrapper : Process
     // Synchronisation primitive to prevent simultaneous cancellation attempts
     internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
+    // Resolved cancellation reason, persisted across the wait so Canceled can be computed afterward.
+    private CancellationReason _cancellationReason = CancellationReason.NotKnown;
+
     internal ProcessWrapper(ProcessConfiguration configuration,
         FileInfo resolvedFilePath)
     {
@@ -81,6 +85,18 @@ internal class ProcessWrapper : Process
     internal new int Id { get; private set; }
 
     internal new string ProcessName { get; private set; }
+
+    /// <summary>
+    ///     A value indicating whether the library terminated the process via its cancellation
+    ///     machinery (timeout or requested cancellation) rather than the process exiting on its own.
+    /// </summary>
+    internal bool Canceled =>
+        _cancellationReason is CancellationReason.Timeout or CancellationReason.RequestedCancellation;
+
+    /// <summary>
+    ///     The POSIX signal that terminated the process (Unix only), obtained via the control adapter.
+    /// </summary>
+    internal PosixSignal? Signal => ProcessControlAdapter.GetTerminatingSignal(ExitCode);
 
     
     private void OnStarted(object? sender, EventArgs e)
@@ -303,6 +319,108 @@ internal class ProcessWrapper : Process
     }
     #endregion
 
+    #region Buffered truncation-aware capture
+
+    /// <summary>
+    ///     Asynchronously reads both redirected streams into strings, truncating each at its optional
+    ///     per-stream byte cap (discarding the remainder beyond the limit).
+    /// </summary>
+    /// <remarks>
+    ///     This is a distinct overload of the base buffered-capture method on <see cref="Process"/>;
+    ///     the inherited method is NOT overridden. When a cap is <c>null</c> (or &lt;= 0) the stream is read
+    ///     in full, matching the prior behaviour.
+    /// </remarks>
+    /// <param name="cancellationToken">A cancellation token for the read operations.</param>
+    /// <param name="maxStandardOutputBytes">
+    ///     An optional maximum number of bytes to capture from standard output before truncating.
+    ///     <c>null</c> means no cap is applied.
+    /// </param>
+    /// <param name="maxStandardErrorBytes">
+    ///     An optional maximum number of bytes to capture from standard error before truncating.
+    ///     <c>null</c> means no cap is applied.
+    /// </param>
+    /// <returns>
+    ///     A tuple containing the captured standard output, standard error, and a flag indicating
+    ///     whether either stream was truncated.
+    /// </returns>
+    internal async Task<(string StandardOutput, string StandardError, bool WasTruncated)> ReadAllTextAsync(
+        CancellationToken cancellationToken,
+        long? maxStandardOutputBytes = null,
+        long? maxStandardErrorBytes = null)
+    {
+        Task<(string Text, bool Truncated)> standardOutputTask =
+            ReadStreamCappedAsync(StandardOutput, StartInfo.RedirectStandardOutput, maxStandardOutputBytes, cancellationToken);
+        Task<(string Text, bool Truncated)> standardErrorTask =
+            ReadStreamCappedAsync(StandardError, StartInfo.RedirectStandardError, maxStandardErrorBytes, cancellationToken);
+
+        await Task.WhenAll(standardOutputTask, standardErrorTask).ConfigureAwait(false);
+
+        return (standardOutputTask.Result.Text, standardErrorTask.Result.Text,
+            standardOutputTask.Result.Truncated || standardErrorTask.Result.Truncated);
+    }
+
+    /// <summary>
+    ///     Reads a redirected stream into a string, copying at most <paramref name="maxBytes"/> bytes and
+    ///     discarding any remainder (lossy truncation).
+    /// </summary>
+    private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
+        StreamReader reader,
+        bool redirected,
+        long? maxBytes,
+        CancellationToken cancellationToken)
+    {
+        if (!redirected || reader == StreamReader.Null)
+            return (string.Empty, false);
+
+        Encoding encoding = reader.CurrentEncoding;
+        Stream stream = reader.BaseStream;
+
+        if (maxBytes is null or <= 0)
+        {
+            using MemoryStream memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
+            return (encoding.GetString(memoryStream.ToArray()), false);
+        }
+
+        byte[] buffer = new byte[8192];
+        long totalBytes = 0;
+        bool truncated = false;
+
+        using MemoryStream outputStream = new MemoryStream();
+
+        int bytesRead;
+        while ((bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+        {
+            long room = maxBytes.Value - totalBytes;
+
+            if (room <= 0)
+            {
+                truncated = true;
+                break;
+            }
+
+            int bytesToCopy = (int)Math.Min(bytesRead, room);
+            outputStream.Write(buffer, 0, bytesToCopy);
+            totalBytes += bytesToCopy;
+
+            if (bytesToCopy < bytesRead)
+            {
+                truncated = true;
+                break;
+            }
+        }
+
+        // Drain any remainder so the pipe is fully consumed even when truncated.
+        while (truncated && (bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+        {
+            // Remainder is discarded.
+        }
+
+        return (encoding.GetString(outputStream.ToArray()), truncated);
+    }
+
+    #endregion
+
     internal void ForcefulExit()
     {
         try
@@ -428,10 +546,15 @@ internal class ProcessWrapper : Process
         {
             if (isGraceful)
             {
+                // Capture the cancellation task so its completion (and the resulting
+                // _cancellationReason assignment) can be awaited explicitly below.
+                Task<bool> cancelWithInterruptTask = CancelWithInterrupt(
+                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
+                    processExitConfiguration, cancellationToken);
+
                 await Task.WhenAny([
                     WaitForExitSafeAsync(cancellationToken),
-                    CancelWithInterrupt(processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                        processExitConfiguration, cancellationToken)
+                    cancelWithInterruptTask
                 ]);
 
                 await Task.WhenAny([
@@ -441,6 +564,14 @@ internal class ProcessWrapper : Process
                         cancellationToken),
                     WaitForExitSafeAsync(cancellationToken)
                 ]);
+
+                // Ensure the interrupt/timeout resolution has fully completed and persisted
+                // _cancellationReason before the caller reads Canceled. Otherwise the returned
+                // ProcessResult could observe Canceled as false even though the process was
+                // terminated by the cancellation machinery. Only wait when the process did not
+                // exit on its own, so fast-exiting processes are not held for the full timeout.
+                if (!HasExited && !cancelWithInterruptTask.IsCompleted)
+                    await cancelWithInterruptTask;
 
                 if (!HasExited && fallbackToForceful)
                     ForcefulExit();
@@ -524,6 +655,7 @@ internal class ProcessWrapper : Process
         try
         {
             await WaitForExitSafeAsync(actualCancellationToken);
+            _cancellationReason = cancellationReason;
         }
         catch (Exception exception)
         {
@@ -532,6 +664,7 @@ internal class ProcessWrapper : Process
                 CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
             CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
                 cancellationReason, exitConfiguration, exception);
+            _cancellationReason = cancellationReason;
         }
         finally
         {
@@ -580,6 +713,12 @@ internal class ProcessWrapper : Process
             if (HasExited)
                 return true;
 
+            // Reaching this point means the delay elapsed without the token being
+            // canceled, i.e. a graceful timeout. Persist the resolved reason before
+            // sending the interrupt so Canceled can be computed from it afterward.
+            cancellationReason = CancellationReason.Timeout;
+            _cancellationReason = cancellationReason;
+
             return  await ProcessControlAdapter.SendInterruptSignalAsync(this,
                 cancellationReason, exitConfiguration, cancellationToken);
         }
@@ -594,6 +733,7 @@ internal class ProcessWrapper : Process
             CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
                 cancellationReason,
                 exitConfiguration, exception);
+            _cancellationReason = cancellationReason;
         }
         finally
         {

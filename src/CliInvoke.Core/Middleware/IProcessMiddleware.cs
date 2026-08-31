@@ -14,6 +14,18 @@ namespace CliInvoke.Core.Middleware;
 ///     the pipeline by calling <c>next</c> to continue, or omitting
 ///     the call to short-circuit the chain.
 /// </summary>
+/// <remarks>
+///     <see cref="IProcessMiddleware"/> is a first-class participant in the Process
+///     Invocation Pipeline. It wraps cross-cutting concerns (logging, diagnostics,
+///     policy enforcement, validation, instrumentation) around process execution
+///     without coupling those concerns to the invoker. Registered middleware form an
+///     ordered chain: each instance receives the <c>next</c> delegate that
+///     invokes the subsequent middleware and, at the centre, the terminal pipeline that
+///     actually starts the process. Calling <c>next</c> continues the chain; omitting the
+///     call short-circuits it, so a middleware may observe, transform, or veto an
+///     invocation before the process is ever launched. Middleware are resolved and invoked
+///     by <see cref="MiddlewareChain"/> in registration order.
+/// </remarks>
 public interface IProcessMiddleware
 {
     /// <summary>

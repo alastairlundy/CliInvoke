@@ -16,7 +16,7 @@ using CliInvoke.Processes;
 // Manually instantiate the factory
 IExternalProcessFactory factory = new ExternalProcessFactory();
 
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 // The factory handles the instantiation of the concrete ExternalProcess implementation
 await using IExternalProcess process = factory.CreateExternalProcess(config);
 await process.StartAsync();
@@ -36,7 +36,7 @@ using CliInvoke.Core.Factories;
 // Resolve factory manually from service provider
 IExternalProcessFactory factory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
 
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 await using IExternalProcess process = factory.CreateExternalProcess(config);
 await process.StartAsync();
 
@@ -56,7 +56,7 @@ using CliInvoke.Core.Processes;
 using CliInvoke.Core.Factories;
 using CliInvoke.Processes;
 
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 await using ExternalProcess process = new ExternalProcess(new FilePathResolver(), config);
 await process.StartAsync();
 
@@ -73,7 +73,7 @@ using CliInvoke.Core.Helpers;
 using CliInvoke.Processes;
 
 IFilePathResolver myResolver = new MyCustomFilePathResolver();
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
 await using ExternalProcess process = new ExternalProcess(myResolver, config);
 await process.StartAsync();

@@ -65,8 +65,8 @@ Every CliInvoke invocation moves through three stages.
    call), or the static `CliRun.RunAsync` family. Each consumer
    reads the model and runs the process; the result is then obtained
    from the returned task or, for `IExternalProcess`, by calling
-   `WaitForExitOrTimeoutAsync` / `CaptureBufferedResultAsync` /
-   `CapturePipedResultAsync` after the process has started.
+    `WaitForExitOrTimeoutAsync` / `CaptureBufferedResultAsync`
+    after the process has started.
 
 The same model can be reused across multiple invocations. The same
 builder can be used to produce multiple models, but only by calling
@@ -89,7 +89,7 @@ If neither of these applies, construct the model directly:
 
 ```csharp
 // Direct construction — no builder.
-using ProcessConfiguration config = new ProcessConfiguration(
+ProcessConfiguration config = new ProcessConfiguration(
     targetFilePath: "git",
     arguments: "status",
     outputRedirection: true);
@@ -101,7 +101,7 @@ vs. the equivalent builder-based form:
 
 ```csharp
 // Builder-based construction.
-using ProcessConfiguration config = new ProcessConfigurationBuilder()
+ProcessConfiguration config = new ProcessConfigurationBuilder()
     .SetTargetFilePath("git")
     .SetArguments("status")
     .SetOutputRedirection(true)
@@ -189,7 +189,7 @@ parameter to the invoker; the others are referenced from
 Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 
 ```csharp
-public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposable
+public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 ```
 
 The **only required model**. It describes the executable to run, the
@@ -215,7 +215,9 @@ many invocations share the same `ProcessConfiguration` but differ in
 their `ProcessExitConfiguration` (e.g., one has a timeout, another
 does not).
 
-**Disposal**: `ProcessConfiguration` implements `IDisposable`; see the
+**Disposal**: `ProcessConfiguration` does **not** implement `IDisposable`. It is a plain
+immutable value object. The `StandardInput` (`StreamWriter`) and `UserCredential` you supply
+remain **your** responsibility to dispose — see the
 [Resource Disposal](./resource-disposal.md) guide for ownership rules.
 
 ### 2. `ProcessExitConfiguration`
@@ -229,8 +231,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
 Describes **how the invoker should behave while the process is
 running and after it exits**. It is **not** stored on the
 `ProcessConfiguration`; it is passed as a separate parameter to
-`IProcessInvoker.ExecuteAsync`, `ExecuteBufferedAsync`, and
-`ExecutePipedAsync`. If the caller does not pass one, the invoker uses
+`IProcessInvoker.ExecuteAsync`, `ExecuteBufferedAsync`. If the caller
+does not pass one, the invoker uses
 its own internal default.
 
 **Owns**: a `ProcessTimeoutPolicy` (via `TimeoutPolicy`), a
@@ -261,9 +263,9 @@ credential". This is the default assigned by
 `ProcessConfiguration`'s constructor.
 
 **Disposal**: `UserCredential` owns its `SecureString` password and
-implements `IDisposable`. If the credential is assigned to a
-`ProcessConfiguration.Credential`, the configuration takes ownership
-and the caller must **not** double-dispose — see the
+implements `IDisposable`. A `UserCredential` assigned to a
+`ProcessConfiguration.Credential` is **not** disposed by the configuration —
+the caller must dispose it. See the
 [Resource Disposal](./resource-disposal.md) guide.
 
 ### 4. `ProcessResourcePolicy`
@@ -341,11 +343,6 @@ public interface IProcessInvoker
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
         CancellationToken cancellationToken = default);
-
-    Task<PipedProcessResult> ExecutePipedAsync(
-        ProcessConfiguration processConfiguration,
-        ProcessExitConfiguration? processExitConfiguration = null,
-        CancellationToken cancellationToken = default);
 }
 ```
 
@@ -384,7 +381,6 @@ public interface IExternalProcess : IDisposable
 
     Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken);
     Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken);
-    Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken);
 
     Task Kill();
 }
@@ -403,11 +399,9 @@ lifecycle as a sequence of steps you orchestrate yourself:
 2. **Observe** — subscribe to `Started` and `Exited` events, or
    poll `HasStarted` / `HasExited`.
 3. **Capture** — call `WaitForExitOrTimeoutAsync` for a plain
-   `ProcessResult`, `CaptureBufferedResultAsync` to read the buffered
-   stdout/stderr into memory, or `CapturePipedResultAsync` to obtain
-   a `PipedProcessResult` whose streams you can stream from. These
-   methods can be called at any point during execution, not only at
-   exit.
+    `ProcessResult`, or `CaptureBufferedResultAsync` to read the buffered
+    stdout/stderr into memory. These methods can be called at any point
+    during execution, not only at exit.
 4. **Terminate** — call `Kill()` to forcibly stop a runaway process.
 
 > **Fire-and-forget launching** is *not* a member of `IExternalProcess`.
@@ -449,7 +443,7 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default);
 
-    // RunBufferedAsync / RunPipedAsync follow the same shape.
+    // RunBufferedAsync follows the same shape.
 }
 ```
 
@@ -461,8 +455,8 @@ import an `IProcessInvoker` from DI.
 Internally, `CliRun` constructs an `IExternalProcess` via a
 default `IExternalProcessFactory`, calls `StartAsync` on it, then
 calls one of the capture methods (`WaitForExitOrTimeoutAsync` for
-`RunAsync`, `CaptureBufferedResultAsync` for `RunBufferedAsync`,
-`CapturePipedResultAsync` for `RunPipedAsync`) to obtain the result,
+`RunAsync` or `CaptureBufferedResultAsync` for `RunBufferedAsync`) to
+obtain the result,
 and disposes the `IExternalProcess`. The configuration is built for
 you from the positional parameters; the timeout defaults to
 `ProcessTimeoutPolicy.Default.TimeoutThreshold` (3 minutes); and

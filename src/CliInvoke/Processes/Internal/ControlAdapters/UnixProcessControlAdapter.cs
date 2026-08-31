@@ -101,6 +101,35 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     {
     }
 
+    internal override PosixSignal? GetTerminatingSignal(int exitCode)
+    {
+        if (exitCode <= 128)
+            return null;
+
+        // The BCL PosixSignal enum does not use OS signal numbers (it uses negative sentinels,
+        // e.g. SIGTERM = -4, SIGINT = -2), so a raw cast of (exitCode - 128) would yield a
+        // value that does not equal the corresponding enum member. Map the raw signal number
+        // to the correct PosixSignal explicitly instead.
+        int signalNumber = exitCode - 128;
+        return _signalByNumber.TryGetValue(signalNumber, out PosixSignal signal) ? signal : null;
+    }
+
+    private static readonly Dictionary<int, PosixSignal> _signalByNumber = new()
+    {
+        [1] = PosixSignal.SIGHUP,
+        [2] = PosixSignal.SIGINT,
+        [3] = PosixSignal.SIGQUIT,
+        [15] = PosixSignal.SIGTERM,
+        [17] = PosixSignal.SIGCHLD,
+        [18] = PosixSignal.SIGCONT,
+        [20] = PosixSignal.SIGTSTP,
+        [21] = PosixSignal.SIGTTIN,
+        [22] = PosixSignal.SIGTTOU,
+        [28] = PosixSignal.SIGWINCH,
+        // SIGKILL (9) is intentionally omitted: the PosixSignal enum has no SIGKILL member
+        // (it cannot be caught/trapped), so a SIGKILL death maps to null rather than a wrong value.
+    };
+
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]

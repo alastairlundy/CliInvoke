@@ -34,7 +34,7 @@ items.Set("Logger", myLogger);
 var invoker = new ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items);
 ```
 
-Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the factory-only constructor when you don't need middleware. Use the full constructor (factory, an `IEnumerable<IProcessMiddleware>` sequence, and an optional `sharedItems`) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync` are unchanged.
+Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the factory-only constructor when you don't need middleware. Use the full constructor (factory, an `IEnumerable<IProcessMiddleware>` sequence, and an optional `sharedItems`) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync` and `ExecuteBufferedAsync` are unchanged.
 
 ## The `IProcessMiddleware` contract
 
@@ -71,7 +71,7 @@ builder.Services.AddCliInvoke(builder =>
 });
 ```
 
-* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). Sensitive flags (`--password`, `--token`, `--api-key`) are redacted automatically. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
+* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). A built-in heuristic redacts the values following the sensitive flags (`--password`, `--token`, `--api-key`); captured stdout/stderr lines are redacted too. To apply an organisation-wide secret taxonomy instead, construct `LoggingMiddleware` with a `Func<string?, string>?` redactor (for example Microsoft's `Microsoft.Extensions.Compliance.Redaction` `IRedactorProvider`) — the built-in heuristic is used when no redactor is supplied. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
 * `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
 * `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. To configure non-default behaviour, register `PowerShellMiddlewareOptions` (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties) in the DI container — for example:
 
@@ -102,7 +102,7 @@ builder.Services.AddCliInvoke(configure: builder =>
     builder.UseLogging();
     builder.UsePostExitValidation(
         new ProcessResultValidator<ProcessResult>(
-            [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]));
+            [CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]));
 });
 ```
 
@@ -110,7 +110,7 @@ The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Tr
 
 ## Result-ownership and disposal through the chain
 
-Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
+Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing the `ProcessConfiguration` you created. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
 
 ## The result-swap rule
 

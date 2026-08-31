@@ -112,7 +112,7 @@ using CliInvoke.Core;
 
 IProcessInvoker commandRunner = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-using ProcessConfiguration command = ProcessConfigurationFactory.Create("Path/To/Exe", "arg1 arg2", "/Path/To/Directory");
+ProcessConfiguration command = ProcessConfigurationFactory.Create("Path/To/Exe", "arg1 arg2", "/Path/To/Directory");
 
 BufferedProcessResult result = await commandRunner.ExecuteBufferedAsync(command, ProcessExitConfiguration.CreateGraceful());
 ```

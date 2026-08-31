@@ -30,7 +30,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         ProcessResult result =
@@ -47,28 +47,11 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         BufferedProcessResult result =
             await processInvoker.ExecuteBufferedAsync(config,
-                ProcessExitConfiguration.CreateGraceful());
-
-        await Assert.That(result).IsNotNull();
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-    }
-
-    [Test]
-    public async Task ExecutePipedAsync_ReturnsSuccessfulResult()
-    {
-        IProcessInvoker processInvoker =
-            _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
-
-        using ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath, "");
-
-        PipedProcessResult result =
-            await processInvoker.ExecutePipedAsync(config,
                 ProcessExitConfiguration.CreateGraceful());
 
         await Assert.That(result).IsNotNull();
@@ -81,7 +64,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () =>
@@ -97,7 +80,7 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        using ProcessConfiguration config =
+        ProcessConfiguration config =
             ProcessConfigurationFactory.Create(_targetFilePath, "");
 
         await Assert.That(async () =>
@@ -107,19 +90,4 @@ public class ProcessInvokerIntegrationTests
             .Throws<OperationCanceledException>();
     }
 
-    [Test]
-    public async Task ExecutePipedAsync_PreCancelledToken_ThrowsOperationCanceledException()
-    {
-        IProcessInvoker processInvoker =
-            _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
-
-        using ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath, "");
-
-        await Assert.That(async () =>
-                await processInvoker.ExecutePipedAsync(config,
-                    ProcessExitConfiguration.CreateGraceful(),
-                    new CancellationToken(true)))
-            .Throws<OperationCanceledException>();
-    }
 }

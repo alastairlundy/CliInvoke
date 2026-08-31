@@ -57,9 +57,9 @@ configuration; it reads the model, runs the process, and disposes the
 OS resources it allocated.
 
 A **Result** is the immutable object returned by the invoker after the
-process exits. Three concrete result types exist —
-`ProcessResult`, `BufferedProcessResult`, and `PipedProcessResult` —
-corresponding to the three execution modes (Basic, Buffered, Piped).
+process exits. Two concrete result types exist —
+`ProcessResult` and `BufferedProcessResult` —
+corresponding to the two execution modes (Basic, Buffered).
 Results are the canonical return value of the pipeline.
 
 A **Process Invocation Pipeline** is the layered interceptor pattern that
@@ -173,8 +173,6 @@ methods exist on the interface, one per execution mode:
 - `ExecuteAsync` — returns `ProcessResult` (exit code only).
 - `ExecuteBufferedAsync` — returns `BufferedProcessResult` (exit code
   plus captured `StandardOutput` / `StandardError` as strings).
-- `ExecutePipedAsync` — returns `PipedProcessResult` (exit code plus
-  live `StandardOutput` / `StandardError` streams).
 
 **Invariants:**
 
@@ -190,9 +188,7 @@ methods exist on the interface, one per execution mode:
 ### Stage 4 — Result
 
 The invoker returns a result. The result is the canonical return value
-of an invocation. It is immutable and, for the `Piped` variant, holds
-live streams that the caller must dispose (see
-[Resource Disposal → `PipedProcessResult`](resource-disposal.md#3-pipedprocessresult)).
+of an invocation. It is immutable.
 
 The result carries the `Process Invocation Context` state that the
 cross-cutting concerns wrote to: the runner configuration (if any), the
@@ -259,7 +255,7 @@ and returns the result (Stage 4).
 ```csharp
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-using ProcessConfiguration config = new(
+ProcessConfiguration config = new(
     "dotnet", "--info", true);
 
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
@@ -284,15 +280,14 @@ multiple sub-stages that the caller drives:
 3. **The caller interacts with the process** — Stage 3c: write to
    `StandardInput`, read from `StandardOutput`, send signals, check
    status. This is the gap that no other pattern exposes.
-4. `process.CaptureBufferedResultAsync()` or
-   `CapturePipedResultAsync()` — Stage 3d: the library captures the
+4. `process.CaptureBufferedResultAsync()` — Stage 3d: the library captures the
    result and returns it.
 
 ```csharp
 IExternalProcessFactory factory =
     provider.GetRequiredService<IExternalProcessFactory>();
 
-using ProcessConfiguration config = new(
+ProcessConfiguration config = new(
     "dotnet", "--runtime", true);
 using IExternalProcess process = factory.CreateExternalProcess(config);
 

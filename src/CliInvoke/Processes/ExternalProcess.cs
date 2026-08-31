@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -203,7 +203,9 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             _processWrapper.ExitCode,
             _processWrapper.Id,
             _processWrapper.StartTime,
-            _processWrapper.ExitTime
+            _processWrapper.ExitTime,
+            canceled: _processWrapper.Canceled,
+            signal: _processWrapper.Signal
         );
 
         return result;
@@ -216,6 +218,14 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     ///     A cancellation token that can be used by other objects or threads
     ///     to receive notice of cancellation.
     /// </param>
+    /// <param name="maxStandardOutputBytes">
+    ///     An optional maximum number of bytes to capture from standard output before truncating.
+    ///     <c>null</c> means no cap is applied.
+    /// </param>
+    /// <param name="maxStandardErrorBytes">
+    ///     An optional maximum number of bytes to capture from standard error before truncating.
+    ///     <c>null</c> means no cap is applied.
+    /// </param>
     /// <returns>
     ///     A task that represents the asynchronous operation. The result contains the buffered
     ///     process result when the method completes.
@@ -223,11 +233,13 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<BufferedProcessResult> CaptureBufferedResultAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        long? maxStandardOutputBytes = null,
+        long? maxStandardErrorBytes = null)
     {
-        Task<(string StandardOutput, string StandardError)> outputStrings = Configuration.OutputRedirection ?
-            _processWrapper.ReadAllTextAsync(cancellationToken)
-            : Task.FromResult((string.Empty, string.Empty));
+        Task<(string StandardOutput, string StandardError, bool WasTruncated)> outputStrings = Configuration.OutputRedirection ?
+            _processWrapper.ReadAllTextAsync(cancellationToken, maxStandardOutputBytes, maxStandardErrorBytes)
+            : Task.FromResult((string.Empty, string.Empty, false));
 
         try
         {
@@ -239,7 +251,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 _processWrapper.ExitCode,
                 _processWrapper.Id, outputStrings.Result.StandardOutput, outputStrings.Result.StandardError,
                 _processWrapper.StartTime,
-                _processWrapper.ExitTime);
+                _processWrapper.ExitTime,
+                canceled: _processWrapper.Canceled,
+                signal: _processWrapper.Signal,
+                wasTruncated: outputStrings.Result.WasTruncated);
 
             return result;
         }
@@ -249,48 +264,6 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         }
     }
 
-    /// <summary>
-    /// Asynchronously captures the result of an external pipe process, including its output streams.
-    /// </summary>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-    /// <returns>A task representing the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    public async Task<PipedProcessResult> CapturePipedResultAsync(
-        CancellationToken cancellationToken)
-    {
-        Task<Stream> standardOutputStream = Configuration.OutputRedirection
-            ? _processWrapper.PipeStandardOutputAsync(cancellationToken)
-            : (Task<Stream>)Task.CompletedTask;
-
-        Task<Stream> standardErrorStream = Configuration.OutputRedirection
-            ? _processWrapper.PipeStandardErrorAsync(cancellationToken)
-            : (Task<Stream>)Task.CompletedTask;
-
-        try
-        {
-            await Task.WhenAll(
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputStream, standardErrorStream);
-
-            PipedProcessResult result = new(
-                _processWrapper.StartInfo.FileName,
-                _processWrapper.ExitCode,
-                _processWrapper.Id,
-                _processWrapper.StartTime,
-                _processWrapper.ExitTime,
-                await standardOutputStream,
-                await standardErrorStream
-            );
-
-            return result;
-        }
-        finally
-        {
-            standardOutputStream.Dispose();
-            standardErrorStream.Dispose();
-        }
-    }
     
     /// <summary>
     /// Suspends the external process that is currently running.
@@ -355,11 +328,15 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     }
 
     /// <summary>
-    ///     Disposes of the <see cref="Configuration" /> and the internal managed and unmanaged resources.
+    ///     Disposes of the internal managed and unmanaged resources.
     /// </summary>
+    /// <remarks>
+    ///     The <see cref="Configuration" /> supplied to this process is not disposed here; the caller
+    ///     owns disposal of any <see cref="ProcessConfiguration.StandardInput" /> stream or
+    ///     <see cref="UserCredential" /> it provided.
+    /// </remarks>
     public void Dispose()
     {
-        Configuration.Dispose();
         _processWrapper.Dispose();
 
         GC.SuppressFinalize(this);

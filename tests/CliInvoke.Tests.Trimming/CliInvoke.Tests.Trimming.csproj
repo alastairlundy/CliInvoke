@@ -18,11 +18,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../../src/CliInvoke.Extensions/CliInvoke.Extensions.csproj"/>
         <ProjectReference Include="../../src/CliInvoke/CliInvoke.csproj"/>
+        <ProjectReference Include="../../src/CliInvoke.Specializations/CliInvoke.Specializations.csproj"/>
         <!-- Reference local projects so the test uses the workspace sources -->
         <TrimmerRootAssembly Include="CliInvoke"/>
-        <TrimmerRootAssembly Include="CliInvoke.Extensions"/>
+        <TrimmerRootAssembly Include="CliInvoke.Specializations"/>
     </ItemGroup>
 
     <ItemGroup>

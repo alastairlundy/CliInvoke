@@ -7,8 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core;
-using CliInvoke.Core.Middleware;
+using CliInvoke.Core.Internal;
 using CliInvoke.Specializations.Configurations;
 
 namespace CliInvoke.Specializations.Middleware;
@@ -17,8 +16,7 @@ namespace CliInvoke.Specializations.Middleware;
 ///     Middleware that rewrites the <see cref="InvocationContext.Configuration"/> to execute the
 ///     original command inside a PowerShell (<c>pwsh</c> / <c>pwsh.exe</c>) process using
 ///     <c>-NoProfile -NonInteractive -Command</c>. This is the single source of truth for PowerShell
-///     wrapping; <see cref="CliInvoke.Specializations.PowershellProcessInvoker"/> is now a thin wrapper
-///     around <see cref="CliInvoke.ProcessInvoker"/> with this middleware applied.
+///     wrapping.
 /// </summary>
 /// <remarks>
 ///     Supports Windows, macOS, macCatalyst, Linux, and FreeBSD. Calls on Android, iOS, tvOS, watchOS,
@@ -71,18 +69,35 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
         string originalPath = context.Configuration.TargetFilePath;
         string originalArgs = context.Configuration.Arguments;
 
-        string wrappedCommand = string.IsNullOrWhiteSpace(originalArgs)
-            ? $"& \"{originalPath}\""
-            : $"& \"{originalPath}\" {originalArgs}";
+        // Escape both the target and the arguments so they are passed to the
+        // wrapped command as literal data. Without this, shell metacharacters in
+        // the arguments (e.g. ';', '|', '&', '$(...)') would be re-interpreted by
+        // PowerShell as additional commands — a command-injection risk.
+        string safePath = ShellArgumentEscaper.EscapeForPowerShell(originalPath);
+        string safeArgs = ShellArgumentEscaper.EscapeForPowerShell(originalArgs);
 
-        string newArguments = $"-NoProfile -NonInteractive -Command {wrappedCommand}";
+        string wrappedCommand = string.IsNullOrWhiteSpace(safeArgs)
+            ? $"& \"{safePath}\""
+            : $"& \"{safePath}\" {safeArgs}";
+
+        // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
+        // re-tokenize it before PowerShell parses it. A single re-tokenized Arguments string
+        // would let a '"' in the value break the OS-level quoting and let PowerShell reassemble
+        // a second command (command-injection). ArgumentList is passed through unchanged.
+        IReadOnlyList<string> argumentList =
+        [
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            wrappedCommand,
+        ];
 
         // The specialization configuration class is the single source of truth for the
         // pwsh target path and shell flags; this middleware just supplies the wrapped command and
         // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration newConfig = new PowershellProcessConfiguration(
-            newArguments,
+            string.Empty,
             src.RedirectStandardInput,
             outputRedirection: context.Mode != InvocationMode.Raw,
             workingDirectoryPath: src.WorkingDirectoryPath,
@@ -95,7 +110,8 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
             standardErrorEncoding: src.StandardErrorEncoding,
             processResourcePolicy: src.ResourcePolicy,
             windowCreation: _options.WindowCreation,
-            useShellExecution: _options.UseShellExecution);
+            useShellExecution: _options.UseShellExecution,
+            argumentList: argumentList);
 
         InvocationContext newContext = context.WithConfiguration(newConfig);
 

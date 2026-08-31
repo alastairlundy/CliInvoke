@@ -7,7 +7,7 @@ targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 # Implement Resource Lifecycle
 
 ## When to Use
-- When auditing code for proper disposal of CliInvoke's mandatory disposable types: `ProcessConfiguration`, `IExternalProcess`, `PipedProcessResult`, `UserCredential`, and the credential-build type for your version — `UserCredentialBuilder` on 2.x or `UserCredentialSpec` on 3.0.
+- When auditing code for proper disposal of CliInvoke's mandatory disposable types: `IExternalProcess`, `UserCredential`, and the credential-build type for your version — `UserCredentialBuilder` on 2.x or `UserCredentialSpec` on 3.0. (`ProcessConfiguration` is **not** disposable — it is a plain immutable value object; the caller still owns disposal of any `StandardInput` stream and `UserCredential` placed inside it.)
 - When deciding between `using` and `await using` in async methods.
 - When investigating a suspected handle leak, memory pressure, or `SecureString` retention issue.
 - When the user asks about `SecureString` cleanup or process/stream lifetime in CliInvoke.
@@ -19,37 +19,31 @@ targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 
 ## Middleware and Disposal
 
-If you configure `ProcessInvoker` with middleware (`UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd`), **the disposal contract is unchanged**. Middleware returns the process result **un-disposed** to the caller — identical to a non-middleware invoker. You remain responsible for disposing `PipedProcessResult` (and its streams) and the `ProcessConfiguration` you created. The same checklist below applies whether or not middleware is in the chain.
+If you configure `ProcessInvoker` with middleware (`UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd`), **the disposal contract is unchanged**. Middleware returns the process result **un-disposed** to the caller — identical to a non-middleware invoker. You remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration`; `ProcessConfiguration` itself is **not** disposable. The same checklist below applies whether or not middleware is in the chain.
 
 ## Mandatory Disposable Types
 
-The following types MUST be disposed of (five on the 2.x API, six once `UserCredentialSpec` ships in 3.0). Failure to do so can lead to handle leaks, memory pressure, or sensitive data remaining in memory.
+The following types MUST be disposed of (three on the 2.x API, four once
+`UserCredentialSpec` ships in 3.0). Failure to do so can lead to handle
+leaks, memory pressure, or sensitive data remaining in memory.
 
-### 1. `ProcessConfiguration`
-- **Reason**: Manages `StandardInput` (StreamWriter) and potentially a `SecureString` credential.
-- **Pattern**: Use `using` or `await using`.
-- **Ownership**: The creator of the configuration is responsible for its disposal.
-- **Example**: See [ProcessConfiguration.md](./references/ProcessConfiguration.md)
+> **`ProcessConfiguration` is NOT disposable.** It is a plain immutable
+> value object. The caller still owns disposal of any `StandardInput`
+> (`Stream`) and `UserCredential` placed inside it.
 
-### 2. `IExternalProcess`
+### 1. `IExternalProcess`
 - **Reason**: Wraps `System.Diagnostics.Process` and its associated OS handles.
 - **Pattern**: Use `await using` (preferred) or `using`.
 - **Timing**: Dispose immediately after the process is captured or the monitoring period ends.
 - **Example**: See [IExternalProcess.md](./references/IExternalProcess.md)
 
-### 3. `PipedProcessResult`
-- **Reason**: Owns the `StandardOutput` and `StandardError` streams.
-- **Pattern**: Use `await using` or `using`.
-- **Timing**: Dispose after all data has been read from the streams.
-- **Example**: See [PipedProcessResult.md](./references/PipedProcessResult.md)
-
-### 4. `UserCredential`
+### 2. `UserCredential`
 - **Reason**: Contains a `SecureString` for passwords; needs to be cleared from memory.
 - **Pattern**: `using` or explicit `.Dispose()`.
-- **Note**: If assigned to a `ProcessConfiguration`, the configuration's disposal will also dispose the credential.
+- **Note**: If assigned to a `ProcessConfiguration`, the configuration does **not** dispose the credential — you must dispose the `UserCredential` yourself.
 - **Example**: See [UserCredential.md](./references/UserCredential.md)
 
-### 5. `UserCredentialSpec` (CliInvoke 3.0)
+### 3. `UserCredentialSpec` (CliInvoke 3.0)
 - **Reason**: A sealed configuration seam that holds a `SecureString` for passwords during credential construction. Implements `IDisposable` to clear the secure string from memory.
 - **Pattern**: Always wrap the spec in a `using` block.
 - **Timing**: Dispose immediately after calling `.Build()`.
@@ -65,7 +59,7 @@ The following types MUST be disposed of (five on the 2.x API, six once `UserCred
   // spec disposed here; SecureString cleared from memory
   ```
 
-### 6. `UserCredentialBuilder` (CliInvoke 2.x — current released API)
+### 4. `UserCredentialBuilder` (CliInvoke 2.x — current released API)
 - **Reason**: Holds a `SecureString` during the construction of credentials.
 - **Pattern**: Always wrap the builder in a `using` block.
 - **Timing**: Dispose immediately after calling `.Build()`.
@@ -74,14 +68,13 @@ The following types MUST be disposed of (five on the 2.x API, six once `UserCred
 
 ## Implementation Checklist
 
-- [ ] Every instance of the 6 types above is wrapped in a `using` or `await using` block.
-- [ ] `IExternalProcess` and `PipedProcessResult` use `await using` in async methods.
+- [ ] Every instance of the disposable types above (`IExternalProcess`, `UserCredential`, `UserCredentialSpec`, `UserCredentialBuilder`) is wrapped in a `using` or `await using` block. `ProcessConfiguration` is not disposable.
+- [ ] `IExternalProcess` uses `await using` in async methods.
 - [ ] The credential-build type is disposed of after `.Build()` is called — `UserCredentialSpec` on 3.0, `UserCredentialBuilder` on 2.x.
-- [ ] `ProcessConfiguration` is disposed of after the process has completed and results are processed.
+- [ ] Any `StandardInput` stream or `UserCredential` supplied to a `ProcessConfiguration` is disposed by the caller after the process has completed and results are processed — `ProcessConfiguration` itself is not disposable.
 
 For detailed usage examples, see the following references:
 * [IExternalProcess example](./references/IExternalProcess.md)
-* [PipedProcessResult examples](./references/PipedProcessResult.md)
 * [ProcessConfiguration examples](./references/ProcessConfiguration.md)
 * [UserCredential examples](./references/UserCredential.md)
 * [UserCredentialSpec and UserCredentialBuilder examples](./references/UserCredentialBuilder.md)
@@ -90,8 +83,7 @@ For detailed usage examples, see the following references:
 
 | Pitfall | Solution |
 | :--- | :--- |
-| Ignoring `PipedProcessResult` disposal | Ensure `PipedProcessResult` is disposed of after reading all data to release associated streams. |
-| Using `using` instead of `await using` for processes | Use `await using` for `IExternalProcess` and `PipedProcessResult` in async contexts to ensure non-blocking resource cleanup. |
-| Assuming middleware disposes the result | Middleware returns the result un-disposed; dispose `PipedProcessResult` (and its streams) and the `ProcessConfiguration` yourself, even when `Use*` middleware is configured on the invoker. |
+| Using `using` instead of `await using` for processes | Use `await using` for `IExternalProcess` in async contexts to ensure non-blocking resource cleanup. |
+| Assuming middleware disposes the result | Middleware returns the result un-disposed; dispose the `IExternalProcess` yourself, and dispose any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration`, even when `Use*` middleware is configured on the invoker. `ProcessConfiguration` itself is not disposable. |
 
 This is a pure knowledge skill and does not invoke external tools.

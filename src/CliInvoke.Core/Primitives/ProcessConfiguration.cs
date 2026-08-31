@@ -7,7 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Text;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
@@ -17,7 +19,7 @@ namespace CliInvoke.Core;
 /// <summary>
 ///     A class to store Process configuration information.
 /// </summary>
-public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposable
+public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 {
     /// <summary>
     /// 
@@ -82,12 +84,16 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         Encoding? standardErrorEncoding = null,
         ProcessResourcePolicy? processResourcePolicy = null,
         bool windowCreation = false,
-        bool useShellExecution = false)
+        bool useShellExecution = false,
+        IEnumerable<string>? argumentList = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
 
         TargetFilePath = targetFilePath;
+        ArgumentList = argumentList is null
+            ? Array.Empty<string>()
+            : argumentList.ToArray();
         
         RequiresAdministrator = requiresAdministrator;
         Arguments = arguments;
@@ -137,6 +143,29 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     ///     The arguments to be provided to the executable to be run.
     /// </summary>
     public string Arguments { get; }
+
+    /// <summary>
+    ///     An optional verbatim argument list. When non-empty, the control adapter emits these via
+    ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the single
+    ///     <see cref="Arguments"/> string, so the operating-system command-line parser passes each
+    ///     entry to the child process unmodified. This is the safe path for shell wrappers
+    ///     (PowerShell/cmd), whose own parser would otherwise re-interpret a single re-tokenized
+    ///     <see cref="Arguments"/> string — a command-injection vector.
+    /// </summary>
+    public IReadOnlyList<string> ArgumentList { get; }
+
+    /// <summary>
+    ///     A mutable tokenised argument list that can be set after construction.
+    ///     When non-empty, the control adapter emits these via
+    ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the single
+    ///     <see cref="Arguments"/> string.
+    /// </summary>
+    /// <remarks>
+    ///     This property is used by <c>RunnerConfigurationFactory</c> to expose pre-tokenised
+    ///     arguments so hosts can bypass OS-level re-parsing of the combined argument string.
+    ///     Set it directly to preserve tokens that contain spaces.
+    /// </remarks>
+    public IReadOnlyList<string> ArgumentsList { get; set; } = Array.Empty<string>();
 
     /// <summary>
     ///     Whether to enable window creation or not when the Command's Process is run.
@@ -214,16 +243,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     public Encoding StandardErrorEncoding { get; }
 
     /// <summary>
-    ///     Disposes of the disposable properties in ProcessConfiguration.
-    /// </summary>
-    public void Dispose()
-    {
-        Credential.Dispose();
-        StandardInput?.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
     ///     Determines if a Process configuration is equal to another Process configuration.
     /// </summary>
     /// <param name="other">The other Process configuration to compare</param>
@@ -238,6 +257,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && EnvironmentVariables.Count == other.EnvironmentVariables.Count
                && EnvironmentVariables.Equals(other.EnvironmentVariables)
                && Arguments.Equals(other.Arguments)
+               && ArgumentList.SequenceEqual(other.ArgumentList)
                && ResourcePolicy.Equals(other.ResourcePolicy)
                && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
                && UseShellExecution.Equals(other.UseShellExecution)
@@ -277,8 +297,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
         hashCode.Add(TargetFilePath);
         hashCode.Add(Arguments);
+        foreach (string arg in ArgumentList)
+            hashCode.Add(arg);
         hashCode.Add(WorkingDirectoryPath);
-        foreach (var kvp in EnvironmentVariables)
+        foreach (KeyValuePair<string, string> kvp in EnvironmentVariables)
         {
             hashCode.Add(kvp.Key);
             hashCode.Add(kvp.Value);

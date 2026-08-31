@@ -8,6 +8,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -25,6 +26,10 @@ namespace CliInvoke.Core.Validation;
 public static class CommonValidationRules<TProcessResult>
     where TProcessResult : ProcessResult
 {
+    // Compiling a Regex is expensive; cache one instance per distinct pattern so the
+    // cost is paid only once instead of on every RequiresStandardOutputMatches call.
+    private static readonly ConcurrentDictionary<string, Regex> s_regexCache = new();
+
     /// <summary>
     ///     A predefined validation rule that ensures the process result's exit code is zero.
     /// </summary>
@@ -101,7 +106,8 @@ public static class CommonValidationRules<TProcessResult>
     {
         ArgumentException.ThrowIfNullOrEmpty(regex);
 
-        Regex compiled = new Regex(regex, RegexOptions.Compiled, TimeSpan.FromSeconds(2));
+        Regex compiled = s_regexCache.GetOrAdd(regex,
+            pattern => new Regex(pattern, RegexOptions.Compiled, TimeSpan.FromSeconds(2)));
 
         return result => result is BufferedProcessResult buffered
                          && compiled.IsMatch(buffered.StandardOutput);

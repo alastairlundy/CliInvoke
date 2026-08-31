@@ -7,8 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Core.Factories;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Processes;
+using CliInvoke.Core.Validation;
+using CliInvoke.Internal.Extensions;
 
 namespace CliInvoke;
 
@@ -36,8 +38,23 @@ internal class ProcessInvocationPipeline
     /// <typeparam name="TResult">The type of process result to return.</typeparam>
     /// <param name="ctx">The process invocation context containing configuration and mode.</param>
     /// <returns>The process result of type <typeparamref name="TResult"/>.</returns>
-    public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx) where TResult : ProcessResult
+    public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx)
+        where TResult : ProcessResult
     {
+        long? GetTruncationCap()
+        {
+            MiddlewareContext? middleware = ctx.Middleware;
+
+            if (middleware is not null &&
+                middleware.Items.TryGet<long>(TruncationDefaults.MaxBytesPerStreamKey,
+                    out long cap))
+                return cap;
+
+            return null;
+        }
+
+        long? truncationCap = GetTruncationCap();
+
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
             ctx.Configuration, ctx.ExitConfiguration);
 
@@ -55,28 +72,74 @@ internal class ProcessInvocationPipeline
 
                 return (TResult)new ProcessResult(
                     externalProcess.Configuration.TargetFilePath,
-                    //TODO: Look into whether exit code 0 here is valid.
                     0,
                     processId,
                     DateTime.UtcNow,
-                    DateTime.UtcNow);
+                    DateTime.UtcNow,
+                    canceled: false,
+                    signal: null);
             }
 
-            await externalProcess.StartAsync(ctx.CancellationToken);
+            // Raw awaits process exit (it does not drain redirected output). Buffered must be
+            // started WITHOUT awaiting exit so the capture methods can read the redirected streams
+            // concurrently with waiting for exit; awaiting exit first would deadlock when a child writes
+            // more than the OS pipe buffer and nothing is draining it yet.
+            if (ctx.Mode == InvocationMode.Raw)
+                await externalProcess.StartAsync(ctx.CancellationToken);
+            else
+                externalProcess.Start();
 
             // FireAndForget returns above (lines 46-63) without waiting.
-            // Only Raw, Buffered, and Piped reach this switch.
-            return ctx.Mode switch
+            // Only Raw and Buffered reach this switch.
+            TResult result = ctx.Mode switch
             {
-                InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(ctx.CancellationToken),
-                InvocationMode.Buffered => (TResult)(object)await externalProcess.CaptureBufferedResultAsync(ctx.CancellationToken),
-                InvocationMode.Piped => (TResult)(object)await externalProcess.CapturePipedResultAsync(ctx.CancellationToken),
+                InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(
+                    ctx.CancellationToken),
+                InvocationMode.Buffered => (TResult)(object)await externalProcess
+                    .CaptureBufferedResultAsync(
+                        ctx.CancellationToken, truncationCap, truncationCap),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
             };
+
+            ValidateResult(result, ctx.ExitConfiguration);
+
+            return result;
         }
         finally
         {
             externalProcess.Dispose();
+        }
+    
+
+        /// <summary>
+        ///     Evaluates the configured validation rules against a completed process result and throws
+        ///     when any rule fails.
+        /// </summary>
+        /// <typeparam name="TResult">The type of process result being validated.</typeparam>
+        /// <param name="result">The process result produced by the invocation.</param>
+        /// <param name="exitConfiguration">
+        ///     The exit configuration whose <see cref="ProcessExitConfiguration.ValidationRules" /> are
+        ///     evaluated, or <c>null</c> when no validation is configured.
+        /// </param>
+        /// <exception cref="ProcessValidationException">
+        ///     Thrown when <paramref name="exitConfiguration" /> declares a rule that the result fails.
+        /// </exception>
+        static void ValidateResult<TResult>(TResult result, ProcessExitConfiguration? exitConfiguration)
+            where TResult : ProcessResult
+        {
+            if (exitConfiguration is null)
+                return;
+
+            ValidationRule<ProcessResult>[] rules = exitConfiguration.ValidationRules;
+
+            if (rules is null)
+                return;
+
+            foreach (ValidationRule<ProcessResult> rule in rules)
+            {
+                if (!rule.Predicate(result))
+                    throw new ProcessValidationException(result, rule.GetFailureMessage(result));
+            }
         }
     }
 }

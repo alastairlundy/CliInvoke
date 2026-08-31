@@ -11,8 +11,8 @@
  */
 
 using System.Globalization;
-using System.Linq;
 using System.Text;
+using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Core.Configuration;
 
@@ -133,17 +133,29 @@ public sealed class ArgumentsSpec
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        List<string> filteredList = values.Where(x => _argumentValidationLogic.Invoke(x)).ToList();
+        StringBuilder? joined = null;
+        int validCount = 0;
 
-        if (filteredList.Count == 0)
+        foreach (string item in values)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            if (!_argumentValidationLogic.Invoke(item))
+                continue;
+
+            if (joined is null)
+                joined = new StringBuilder();
+            else
+                joined.Append(' ');
+
+            joined.Append(escape ? EscapeCharactersWithoutWrapping(item) : item);
+            validCount++;
+        }
+
+        if (validCount == 0)
             throw new ArgumentException("No valid arguments to add.");
 
-        List<string> processedList = escape
-            ? filteredList.Select(v => EscapeCharactersWithoutWrapping(v)).ToList()
-            : filteredList;
-
-        string joinedValues = string.Join(" ", processedList);
-        string wrappedValue = $"\"{joinedValues}\"";
+        string wrappedValue = $"\"{joined}\"";
 
         if (_buffer.Length is > 0 and < int.MaxValue)
             if (_buffer[^1] != ' ')
@@ -168,20 +180,31 @@ public sealed class ArgumentsSpec
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        List<IFormattable> valuesList = values.ToList();
+        StringBuilder? joined = null;
+        int validCount = 0;
 
-        if (valuesList.Count == 0)
+        foreach (IFormattable item in values)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            string? str = item.ToString(null, _formatProvider);
+
+            if (str is null || !_argumentValidationLogic.Invoke(str))
+                continue;
+
+            if (joined is null)
+                joined = new StringBuilder();
+            else
+                joined.Append(' ');
+
+            joined.Append(str);
+            validCount++;
+        }
+
+        if (validCount == 0)
             throw new ArgumentException("No valid arguments to add.");
 
-        List<string> valuesStrings = valuesList
-            .Select(x => x.ToString(null, _formatProvider)!)
-            .Where(x => _argumentValidationLogic.Invoke(x))
-            .ToList();
-
-        if (valuesStrings.Count == 0)
-            throw new ArgumentException("No valid arguments to add.");
-
-        string value = string.Join(' ', valuesStrings);
+        string value = joined!.ToString();
         string processedValue = escape ? EscapeCharactersWithoutWrapping(value) : value;
         string wrappedValue = $"\"{processedValue}\"";
 
@@ -207,59 +230,26 @@ public sealed class ArgumentsSpec
     /// <summary>
     ///     Escapes characters in a string without wrapping in quotes.
     /// </summary>
+    /// <remarks>
+    ///     Delegates to <see cref="ArgumentEscaper.EscapeInner"/> so argument escaping
+    ///     is platform-aware and consistent with the underlying C-runtime / POSIX shell
+    ///     argument parser. The previous JSON-style escaping (<c>\\</c>, <c>\"</c>,
+    ///     <c>\n</c>, ...) was unsafe for command lines and is no longer used.
+    /// </remarks>
     private string EscapeCharactersWithoutWrapping(string argument)
     {
         ArgumentNullException.ThrowIfNull(argument);
 
-        StringBuilder contentBuilder = new();
-
-        foreach (char c in argument)
-            switch (c)
-            {
-                case '\\': contentBuilder.Append("\\\\"); break;
-                case '\"': contentBuilder.Append("\\\""); break;
-                case '\n': contentBuilder.Append(@"\n"); break;
-                case '\r': contentBuilder.Append(@"\r"); break;
-                case '\t': contentBuilder.Append(@"\t"); break;
-                case '\b': contentBuilder.Append(@"\b"); break;
-                case '\f': contentBuilder.Append(@"\f"); break;
-                case '\v': contentBuilder.Append(@"\v"); break;
-                case '\a': contentBuilder.Append(@"\a"); break;
-                case '\e': contentBuilder.Append(@"\e"); break;
-                case '\0': contentBuilder.Append(@"\0"); break;
-                default:
-                    if (char.IsControl(c))
-                    {
-                        contentBuilder.AppendFormat(@"\u{0:X4}", (int)c);
-                    }
-                    else
-                    {
-                        contentBuilder.Append(c);
-                    }
-
-                    break;
-            }
-
-        return contentBuilder.ToString();
+        return ArgumentEscaper.EscapeInner(argument);
     }
 
     private string EscapeCharacters(string argument)
     {
         ArgumentNullException.ThrowIfNull(argument);
 
-        string escapedContent = EscapeCharactersWithoutWrapping(argument);
+        string escapedContent = ArgumentEscaper.EscapeInner(argument);
 
-        if (argument.StartsWith('"') && argument.EndsWith('"'))
-        {
-            return escapedContent;
-        }
-
-        if (escapedContent.EndsWith("\\\""))
-        {
-            return $"\"{escapedContent}";
-        }
-
-        return $"\"{escapedContent}\"";
+        return ArgumentEscaper.NeedsQuoting(argument) ? $"\"{escapedContent}\"" : escapedContent;
     }
 
     private bool IsValidArgument(IFormattable value, IFormatProvider provider)

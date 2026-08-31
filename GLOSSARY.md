@@ -43,3 +43,32 @@ Custom resolvers overriding `GetPathFileExtensions` must return lowercased exten
 ### 6. `CliRun` defaults facade (no static state)
 
 `CliRun` was previously a static facade backed by process-wide mutable state configured through `CliRun.UseExternalProcessFactory` / `CliRun.UseFilePathResolver`. Those `Use*` methods and their backing static fields/helpers were removed: every `Run*`/`FireAndForget` call now allocates a fresh `ProcessInvocationPipeline` (and a fresh `ExternalProcessFactory` with a default `FilePathResolver`) per call. There is therefore no shared lock or lazy-initialisation asymmetry to preserve — the historical `lock(_syncRoot)` double-check on the resolver no longer exists. Callers needing a custom factory or resolver must use `IProcessInvoker` (or DI) instead of `CliRun`.
+
+## Result Model
+
+### Canceled
+
+A result-model state indicating the library terminated the process through its cancellation machinery (timeout or requested cancellation), rather than the process exiting on its own.
+
+### Signal
+
+The POSIX signal that terminated a process. Surfaced on Unix only; absent on Windows.
+
+## Internal Visibility & Coupling
+
+### InternalsVisibleTo grant (IVT grant)
+
+An assembly-scoped grant (via `<InternalsVisibleTo>` in a `.csproj` or `InternalsVisibleToAttribute`) by which one CliInvoke package exposes all of its internal types to a named friend assembly.
+
+### Cross-package coupling point
+
+A dependency surface where one CliInvoke package consumes another package's internal types through an IVT grant, so a change to the internal can break the consuming package.
+
+### Polyfill leakage
+
+The failure mode where a granting package's internal helper types (e.g., Guard/Ensure/polyfill extensions) appear in the signatures of IVT-exposed internals, so the consuming package cannot resolve them and fails to compile; a small internal tweak then ripples errors across downstream packages.
+
+### Entrypoint package
+
+One of the CliInvoke packages (Core, CliInvoke, Extensions, Specializations) that provides a distinct consumer entrypoint into the ecosystem; by design it may require limited internal access to other packages.
+

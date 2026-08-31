@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -66,24 +66,35 @@ public class ShellDetector : IShellDetector
     {
         cancellationToken.Register(() => throw new TaskCanceledException());
 
-        using ProcessConfiguration execConfiguration = ProcessConfigurationFactory
+        ProcessConfiguration execConfiguration = ProcessConfigurationFactory
             .Create("ps", "-p $$ -o comm=");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
             execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
         FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
-            execResult.StandardOutput.Split(Environment.NewLine).First());
+            GetFirstLine(execResult.StandardOutput));
 
-        using ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
+        ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
             .Create(shellExeInfo.FullName, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
             shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
-        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l =>
-            l.ToLower().Contains("version") &&
-            l.Any(c => char.IsDigit(c)));
+        string? versionLine = null;
+
+        foreach (ReadOnlySpan<char> line in shellInfoResult.StandardOutput.AsSpan().EnumerateLines())
+        {
+            if (line.Contains("version".AsSpan(), StringComparison.OrdinalIgnoreCase) &&
+                line.IndexOfAny("0123456789".AsSpan()) >= 0)
+            {
+                versionLine = line.ToString();
+                break;
+            }
+        }
+
+        if (versionLine is null)
+            throw new InvalidOperationException("No version line was found in the shell output.");
 
         string[] commaSplit = versionLine.Split(',');
 
@@ -105,7 +116,7 @@ public class ShellDetector : IShellDetector
         {
             FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
-            using ProcessConfiguration powershellConfig = ProcessConfigurationFactory
+            ProcessConfiguration powershellConfig = ProcessConfigurationFactory
                 .Create(powershell5PlusFileInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
@@ -116,7 +127,7 @@ public class ShellDetector : IShellDetector
                 result.StandardOutput.Replace("v", string.Empty).Split(' ');
 
             string versionString = powershellResults.Last();
-            versionString = versionString.Substring(0, versionString.LastIndexOf('.') + 1);
+            versionString = versionString[..(versionString.LastIndexOf('.') + 1)];
 
             Version version = Version.GracefulParse(versionString);
 
@@ -127,13 +138,13 @@ public class ShellDetector : IShellDetector
         {
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
-            using ProcessConfiguration cmdConfig = ProcessConfigurationFactory
+            ProcessConfiguration cmdConfig = ProcessConfigurationFactory
                 .Create(cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
                 ProcessExitConfiguration.CreateGraceful(), cancellationToken);
 
-            string line = result.StandardOutput.Split(Environment.NewLine).First();
+            string line = GetFirstLine(result.StandardOutput);
 
             string versionString = line.Replace("Microsoft", string.Empty)
                 .Replace("Windows", string.Empty).Replace("]", string.Empty);
@@ -143,5 +154,19 @@ public class ShellDetector : IShellDetector
 
             return new ShellInformation("cmd", cmdExeInfo, cmdVersion);
         }
+    }
+
+    /// <summary>
+    ///     Returns the first line of the supplied text without allocating a full line array.
+    /// </summary>
+    private static string GetFirstLine(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+
+        foreach (ReadOnlySpan<char> line in text.AsSpan().EnumerateLines())
+            return line.ToString();
+
+        return string.Empty;
     }
 }

@@ -22,29 +22,10 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-alpha.9</Version>
-        <PackageReleaseNotes>#### 🆕 Additions
-- Added sealed `ArgumentsSpec` configuration seam
-- Added sealed `EnvironmentVariablesSpec` configuration seam
-- Added sealed `ProcessResourcePolicySpec` configuration seam
-- Added sealed `UserCredentialSpec` configuration seam with `IDisposable`
-- Split `SetWorkingSet` into independent `SetMinWorkingSet` and `SetMaxWorkingSet`
-
-#### ⚙️ Modifications
-- Changed `IProcessConfigurationBuilder` ConfigureXxx signatures to accept `Action&lt;XxxSpec&gt;`
-- Rewired `ProcessConfigurationBuilder` to hold and reuse shared spec instances
-- Deleted sub-builder interfaces and classes
-- Flowed environment variables and credentials through the `IProcessConfigurationBuilder` seam
-- Preserved argument escaping in `ProcessConfigurationFactory.Create`
-- Dropped unused `escapeArguments` param from `SetArguments(string)` overload
-- Relaxed `ProcessorAffinity` upper bound to accept valid bitmasks
-- Used correct bitmask upper bound for processor affinity
-- Snapshotted environment variables on `Build` to avoid aliasing
-- Copied `SecureString` on `SetPassword`/`Build` so disposing the spec does not invalidate the built credential
-- Improved error message when middleware type is not registered in DI
-
-#### 🐛 Bug Fixes
-- Fixed issues in `ProcessResultHelperExtensions`, `ConditionalMiddleware`, `ProcessMiddlewareBuilder`, `ProcessConfiguration`, and `RunnerConfigurationFactory`</PackageReleaseNotes>
+        <Version>3.0.0-beta.2</Version>
+        <PackageReleaseNotes>- `Canceled` and `Signal` properties added to `ProcessResult` for cancellation and signal handling
+- `IFilePathResolver`, `IProcessMiddleware`, and `MiddlewareChain` interfaces updated; `MiddlewareChain` now non-nullable
+- `InvocationMode` enum removed (no longer needed after Piped removal)</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>

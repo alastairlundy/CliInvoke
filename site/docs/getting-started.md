@@ -4,6 +4,11 @@ title: "Getting Started"
 
 # Getting Started
 
+> **New to CliInvoke? Start with `CliRun`.** It is the recommended default entry point — zero boilerplate,
+> no dependency injection required. Use `IProcessInvoker` when you need DI or middleware, and
+> `IExternalProcess` when you need process-level control. See [PATTERNS.md](PATTERNS.md) for a
+> [Which pattern should I use?](PATTERNS.md#which-pattern-should-i-use) decision tree.
+
 ## Installing CliInvoke
 The main way to install CliInvoke is using [nuget](https://www.nuget.org/packages/CliInvoke/) directly or through your IDE or Code Editor of choice.
 
@@ -137,7 +142,7 @@ Here are some simple examples of using CliInvoke. For more detailed examples, se
 using CliInvoke;
 using CliInvoke.Core;
 
-using ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version");
 ProcessResult result = await CliRun.RunAsync(configuration, ProcessExitConfiguration.CreateGraceful());
 Console.WriteLine($"Exit code: {result.ExitCode}");
 ```
@@ -147,7 +152,7 @@ Console.WriteLine($"Exit code: {result.ExitCode}");
 using CliInvoke;
 using CliInvoke.Core;
 
-using ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version");
 BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration, ProcessExitConfiguration.CreateGraceful());
 Console.WriteLine(result.StandardOutput);
 ```
@@ -165,7 +170,7 @@ services.AddCliInvoke();
 ServiceProvider provider = services.BuildServiceProvider();
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-using ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 Console.WriteLine(result.StandardOutput);
 ```
@@ -178,7 +183,7 @@ using CliInvoke.Core.Factories;
 using CliInvoke.Extensions;
 
 IExternalProcessFactory factory = provider.GetRequiredService<IExternalProcessFactory>();
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 using IExternalProcess process = factory.CreateExternalProcess(config);
 await process.StartAsync(CancellationToken.None);
 ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);

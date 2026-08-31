@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Runtime.InteropServices;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 
@@ -20,6 +21,18 @@ namespace CliInvoke.Tests;
 internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, IDisposable
 {
     private int _createCount;
+
+    /// <summary>
+    ///     When set, the next stub process will report this value for its
+    ///     <c>Canceled</c> state (used by TK006 tests).
+    /// </summary>
+    public bool DefaultCanceled { get; set; }
+
+    /// <summary>
+    ///     When set, the next stub process will report this value for
+    ///     <see cref="ProcessResult.Signal"/>-derived results (used by TK006 tests).
+    /// </summary>
+    public PosixSignal? DefaultSignal { get; set; }
 
     public int CreateCount => _createCount;
 
@@ -38,7 +51,11 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
     {
         _createCount++;
         LastConfiguration = configuration;
-        return new StubExternalProcess(configuration, ThrowOnStart);
+        return new StubExternalProcess(configuration, ThrowOnStart)
+        {
+            Canceled = DefaultCanceled,
+            Signal = DefaultSignal
+        };
     }
 
     public IExternalProcess CreateExternalProcess(ProcessConfiguration configuration,
@@ -47,7 +64,11 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
         _createCount++;
         LastConfiguration = configuration;
         LastExitConfiguration = exitConfiguration;
-        return new StubExternalProcess(configuration, exitConfiguration, ThrowOnStart);
+        return new StubExternalProcess(configuration, exitConfiguration, ThrowOnStart)
+        {
+            Canceled = DefaultCanceled,
+            Signal = DefaultSignal
+        };
     }
 
     public void Reset()
@@ -98,6 +119,10 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 
         public bool HasStarted { get; private set; }
 
+        public bool Canceled { get; set; }
+
+        public PosixSignal? Signal { get; set; }
+
         public bool IsDisposed { get; internal set; }
 
         public event EventHandler? Started;
@@ -140,25 +165,21 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
             DateTime now = DateTime.UtcNow;
             return Task.FromResult(new ProcessResult(
                 Configuration.TargetFilePath, exitCode: 0, processId: 0,
-                startTime: now, exitTime: now));
+                startTime: now, exitTime: now,
+                canceled: Canceled, signal: Signal));
         }
 
-        public Task<BufferedProcessResult> CaptureBufferedResultAsync(CancellationToken cancellationToken)
+        public Task<BufferedProcessResult> CaptureBufferedResultAsync(
+            CancellationToken cancellationToken,
+            long? maxStandardOutputBytes = null,
+            long? maxStandardErrorBytes = null)
         {
             DateTime now = DateTime.UtcNow;
             return Task.FromResult(new BufferedProcessResult(
                 Configuration.TargetFilePath, exitCode: 0, processId: 0,
                 standardOutput: string.Empty, standardError: string.Empty,
-                startTime: now, exitTime: now));
-        }
-
-        public Task<PipedProcessResult> CapturePipedResultAsync(CancellationToken cancellationToken)
-        {
-            DateTime now = DateTime.UtcNow;
-            return Task.FromResult(new PipedProcessResult(
-                Configuration.TargetFilePath, exitCode: 0, processId: 0,
                 startTime: now, exitTime: now,
-                standardOutput: Stream.Null, standardError: Stream.Null));
+                canceled: Canceled, signal: Signal, wasTruncated: false));
         }
 
         public Task Kill() => Task.CompletedTask;

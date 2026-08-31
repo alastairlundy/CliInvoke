@@ -34,7 +34,7 @@ var exitConfig = new ProcessExitConfiguration(
 );
 
 // Create a process configuration and execute with exit configuration
-using ProcessConfiguration config = new ProcessConfiguration("dotnet", "build");
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "build");
 BufferedProcessResult result = await CliRun.RunBufferedAsync(config, exitConfig);
 
 // Check for errors using the helper method
@@ -59,10 +59,6 @@ Detail the three main method groups (each with two overloads):
 2. **RunBufferedAsync** - Returns a `BufferedProcessResult` with exit code, standard output, and standard error
    - `RunBufferedAsync(string targetFilePath, string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null, CancellationToken cancellationToken = default)`
    - `RunBufferedAsync(ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)`
-
-3. **RunPipedAsync** - Returns a `PipedProcessResult` for scenarios requiring input/output piping
-   - `RunPipedAsync(string targetFilePath, string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null, CancellationToken cancellationToken = default)`
-   - `RunPipedAsync(ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)`
 
 ## Note on Static Usage
 Using the static `CliRun` class involves the following trade-offs:

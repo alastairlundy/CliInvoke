@@ -30,7 +30,7 @@ public class CliRunTests
     [Test]
     public async Task RunAsync_WithConfig_RunsProcessAndReturnsSuccess()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         ProcessResult result = await CliRun.RunAsync(configuration,
@@ -43,23 +43,10 @@ public class CliRunTests
     [Test]
     public async Task RunBufferedAsync_WithConfig_RunsProcessAndReturnsSuccess()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
-            ProcessExitConfiguration.CreateGraceful());
-
-        await Assert.That(result).IsNotNull();
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-    }
-
-    [Test]
-    public async Task RunPipedAsync_WithConfig_RunsProcessAndReturnsSuccess()
-    {
-        using ProcessConfiguration configuration =
-            new ProcessConfiguration(TargetFilePath, TargetArguments);
-
-        PipedProcessResult result = await CliRun.RunPipedAsync(configuration,
             ProcessExitConfiguration.CreateGraceful());
 
         await Assert.That(result).IsNotNull();
@@ -84,14 +71,7 @@ public class CliRunTests
         await Assert.That(result.ExitCode).IsEqualTo(0);
     }
 
-    [Test]
-    public async Task RunPipedAsync_WithStringArgs_RunsProcessAndReturnsSuccess()
-    {
-        PipedProcessResult result = await CliRun.RunPipedAsync(TargetFilePath, TargetArguments);
 
-        await Assert.That(result).IsNotNull();
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-    }
 
     [Test]
     public async Task RunAsync_WhenProcessCannotBeResolved_Throws()
@@ -104,7 +84,7 @@ public class CliRunTests
     [Test]
     public async Task FireAndForget_WithConfig_StartsProcessAndReturnsProcessId()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         int processId = CliRun.FireAndForget(configuration);
@@ -123,7 +103,7 @@ public class CliRunTests
     [Test]
     public async Task FireAndForget_WithInvalidConfig_Throws()
     {
-        using ProcessConfiguration configuration =
+        ProcessConfiguration configuration =
             new ProcessConfiguration("NONEXISTENT_COMMAND_ABC123.exe", "");
 
         await Assert.That(() => CliRun.FireAndForget(configuration))
