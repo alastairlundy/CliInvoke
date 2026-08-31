@@ -73,6 +73,7 @@ public class ProcessResultHelperExtensionsTests
         // Assert
         await Assert.That(caught).IsNotNull();
         await Assert.That(caught!.ExecutedProcessInfo).IsNotNull();
+        await Assert.That(caught.ExecutedProcessInfo!.Configuration).IsSameReferenceAs(config);
     }
 
     [Test]

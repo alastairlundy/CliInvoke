@@ -77,11 +77,11 @@ public class CommonValidationRulesTests
     }
 
     [Test]
-    public async Task RequiresStandardOutputMatches_NonBufferedResult_Fails()
+    public async Task RequiresStandardOutputMatches_NullResult_Fails()
     {
         Func<BufferedProcessResult, bool> rule =
             CommonValidationRules<BufferedProcessResult>.RequiresStandardOutputMatches("hello");
-        await Assert.That(rule(MakeResult(0) as BufferedProcessResult)).IsFalse();
+        await Assert.That(rule(null!)).IsFalse();
     }
 
     [Test]
@@ -102,11 +102,11 @@ public class CommonValidationRulesTests
     }
 
     [Test]
-    public async Task RequiresStandardErrorIsEmpty_NonBufferedResult_Passes()
+    public async Task RequiresStandardErrorIsEmpty_NullResult_Passes()
     {
         Func<BufferedProcessResult, bool> rule =
             CommonValidationRules<BufferedProcessResult>.RequiresStandardErrorIsEmpty();
-        await Assert.That(rule(MakeResult(0) as BufferedProcessResult)).IsTrue();
+        await Assert.That(rule(null!)).IsTrue();
     }
 
     [Test]
