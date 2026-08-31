@@ -22,7 +22,7 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-beta.1</Version>
+        <Version>3.0.0-beta.2</Version>
         <PackageReleaseNotes>- `Canceled` and `Signal` properties added to `ProcessResult` for cancellation and signal handling
 - `IFilePathResolver`, `IProcessMiddleware`, and `MiddlewareChain` interfaces updated; `MiddlewareChain` now non-nullable
 - `InvocationMode` enum removed (no longer needed after Piped removal)</PackageReleaseNotes>
