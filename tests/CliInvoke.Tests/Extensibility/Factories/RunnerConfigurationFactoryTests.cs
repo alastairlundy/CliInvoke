@@ -269,6 +269,8 @@ public class RunnerConfigurationFactoryTests
     [SupportedOSPlatform("windows")]
     public async Task Calibration_CmdRawSingleString_Ampersand_FiresMarker()
     {
+        SkipTestIfNotWindows();
+
         string marker = MarkerPath("CAL_CMD");
         RunRawSingleString("cmd.exe",
             $"/c \"whoami\" a\" & echo pwned>\"{marker}\"",
@@ -281,6 +283,8 @@ public class RunnerConfigurationFactoryTests
     [SupportedOSPlatform("windows")]
     public async Task Calibration_CmdRawSingleString_BareAmpersand_FiresMarker()
     {
+        SkipTestIfNotWindows();
+
         string marker = MarkerPath("CAL_CMD_BARE");
         RunRawSingleString("cmd.exe",
             $"/c whoami & echo pwned>\"{marker}\"",
@@ -441,6 +445,8 @@ public class RunnerConfigurationFactoryTests
     [SupportedOSPlatform("windows")]
     public async Task CmdRunner_WrapsBenignCommand_ExitCodeIsPropagated()
     {
+        SkipTestIfNotWindows();
+
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
         ProcessConfiguration target = BuildConfig("cmd.exe", "/c exit 42");
@@ -459,6 +465,8 @@ public class RunnerConfigurationFactoryTests
     [SupportedOSPlatform("windows")]
     public async Task CmdRunner_WrapsWhoami_RunsProgramAndReturnsZero()
     {
+        SkipTestIfNotWindows();
+
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
         ProcessConfiguration target = BuildConfig("whoami", string.Empty);
@@ -497,6 +505,12 @@ public class RunnerConfigurationFactoryTests
         await Assert.That(wrapped.ArgumentList).Contains(@"C:\some\app.exe");
         await Assert.That(wrapped.ArgumentList).Contains("--flag");
         await Assert.That(wrapped.ArgumentList).Contains("value");
+    }
+
+    private static void SkipTestIfNotWindows()
+    {
+        if (!OperatingSystem.IsWindows())
+            throw new SkipTestException("This test requires Windows (cmd.exe).");
     }
 
     private static void SkipTestIfNull(string? value, string reason)
