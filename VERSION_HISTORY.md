@@ -6,6 +6,10 @@
 ### 3.0
 | Version | Release Date | Changelog |
 |-|-|-|
+| 3.0.0 Beta 2 | August 31st 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-beta.2 |
+| 3.0.0 Beta 1 | August 30th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-beta.1 |
+| 3.0.0 Alpha 10 | August 25th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.10 |
+| 3.0.0 Alpha 9 | August 19th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.9 |
 | 3.0.0 Alpha 8 | August 13th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.8 |
 | 3.0.0 Alpha 7 | July 28th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.7 |
 | 3.0.0 Alpha 6 | July 19th 2026 | https://github.com/alastairlundy/CliInvoke/releases/3.0.0-alpha.6 |
@@ -18,16 +22,26 @@
 ### 2.10
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.10.5 | August 30th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.10.5 |
+| 2.10.4 | August 26th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.10.4 |
+| 2.10.3 | August 19th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.10.3 |
+| 2.10.2 | August 15th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.10.2 |
+| 2.10.1 | August 5th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.10.1 |
 | 2.10.0 | July 31st 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.10.0 |
 
 ### 2.9
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.9.4 | August 30th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.9.4 |
+| 2.9.3 | August 30th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.9.3 |
+| 2.9.2 | August 19th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.9.2 |
+| 2.9.1 | August 15th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.9.1 |
 | 2.9.0 | July 19th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.9.0 |
 
 ### 2.8
 | Version | Release Date | Changelog |
 |-|-|-|
+| 2.8.4 | August 30th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.8.4 |
 | 2.8.3 | June 30th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.8.3 |
 | 2.8.2 | June 12th 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.8.2 |
 | 2.8.1 | May 31st 2026 | https://github.com/alastairlundy/CliInvoke/releases/2.8.1 |
