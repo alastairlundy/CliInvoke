@@ -16,8 +16,6 @@
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>2.11.0</PackageVersion>
-        <AssemblyVersion>2.10.4.0</AssemblyVersion>
-        <FileVersion>2.10.4.0</FileVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
