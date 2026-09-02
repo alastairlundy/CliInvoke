@@ -113,15 +113,7 @@ public class ProcessResourcePolicyFuzzTests
     {
         var spec = new ProcessResourcePolicySpec();
 
-        try
-        {
-            spec.SetMaxWorkingSet(0);
-            return;
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            await Assert.That(true).IsTrue();
-        }
+        await Assert.That(() => spec.SetMaxWorkingSet(0)).Throws<ArgumentOutOfRangeException>();
     }
 
     [Test]

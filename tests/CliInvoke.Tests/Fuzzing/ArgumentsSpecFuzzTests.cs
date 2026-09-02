@@ -102,15 +102,7 @@ public class ArgumentsSpecFuzzTests
     {
         var spec = new ArgumentsSpec();
 
-        try
-        {
-            spec.AddEnumerable(Enumerable.Empty<string>(), escape: false);
-            return;
-        }
-        catch (ArgumentException)
-        {
-            await Assert.That(true).IsTrue();
-        }
+        await Assert.That(() => spec.AddEnumerable(Enumerable.Empty<string>(), escape: false)).Throws<ArgumentException>();
     }
 
     [Test]
@@ -118,15 +110,7 @@ public class ArgumentsSpecFuzzTests
     {
         var spec = new ArgumentsSpec();
 
-        try
-        {
-            spec.Add((string)null!, escape: false);
-            return;
-        }
-        catch (ArgumentNullException)
-        {
-            await Assert.That(true).IsTrue();
-        }
+        await Assert.That(() => spec.Add((string)null!, escape: false)).Throws<ArgumentNullException>();
     }
 
     [Test]
