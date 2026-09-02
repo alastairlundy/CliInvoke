@@ -128,6 +128,10 @@ internal class ProcessWrapper : Process
                 ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
 #pragma warning restore CA1416
             }
+            catch (InvalidOperationException)
+            {
+                // Process exited before we could set the resource policy.
+            }
             finally
             {
                 // Always resume the process — even if SetResourcePolicy throws —
