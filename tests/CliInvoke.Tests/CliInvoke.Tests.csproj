@@ -16,6 +16,7 @@
     <PackageReference Include="TUnit" />
     <PackageReference Include="Bogus" />
     <PackageReference Include="DotExtensions" />
+    <PackageReference Include="FsCheck" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />
