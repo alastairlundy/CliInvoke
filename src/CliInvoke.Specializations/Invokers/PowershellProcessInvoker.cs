@@ -9,6 +9,8 @@
 
 
 using CliInvoke.Specializations.Configurations;
+using CliInvoke.Specializations.Internal;
+
 #pragma warning disable CS0618 // Type or member is obsolete
 
 namespace CliInvoke.Specializations;
@@ -26,6 +28,7 @@ namespace CliInvoke.Specializations;
 [SupportedOSPlatform("macos")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("freebsd")]
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class PowershellProcessInvoker : RunnerProcessInvokerBase
 {
     /// <summary>

@@ -8,6 +8,7 @@
 */
 
 using CliInvoke.Specializations.Configurations;
+using CliInvoke.Specializations.Internal;
 
 namespace CliInvoke.Specializations;
 
@@ -15,6 +16,11 @@ namespace CliInvoke.Specializations;
 /// Represents a specialised invoker for executing command-line processes on Windows systems.
 /// Provides functionality to execute processes either with raw output, buffered output, or piped streams.
 /// </summary>
+[SupportedOSPlatform("windows")]
+[UnsupportedOSPlatform("macos")]
+[UnsupportedOSPlatform("linux")]
+[UnsupportedOSPlatform("freebsd")]
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class CmdProcessInvoker : RunnerProcessInvokerBase
 {
     /// <summary>
