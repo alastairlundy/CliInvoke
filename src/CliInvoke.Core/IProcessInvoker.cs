@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -62,6 +64,7 @@ public interface IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,

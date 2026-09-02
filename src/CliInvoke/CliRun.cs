@@ -245,6 +245,7 @@ public static class CliRun
     /// A task representing the asynchronous operation. The task result contains a <see cref="PipedProcessResult"/> object
     /// with details about the executed process, including piped output and exit information.
     /// </returns>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static async Task<PipedProcessResult> RunPipedAsync(
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null,

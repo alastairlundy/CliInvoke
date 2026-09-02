@@ -7,11 +7,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Core;
 
 /// <summary>
 /// A Piped ProcessResult containing a Process's or Command's StandardOutput and StandardError information.
 /// </summary>
+[Obsolete(DeprecationMessages.DeprecationV3)]
 public class PipedProcessResult
     : ProcessResult,
         IEquatable<PipedProcessResult>,

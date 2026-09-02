@@ -7,9 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Collections.Generic;
-using System.Linq;
-
 using CliInvoke.Builders;
 using CliInvoke.Core.Extensibility.Factories;
 using CliInvoke.Core.Internal;
@@ -85,7 +82,7 @@ public class RunnerProcessFactory : IRunnerProcessFactory
 
         ProcessConfiguration result = commandBuilder.Build();
 
-        // Expose the pre-tokenized form so hosts can bypass OS-level re-parsing of the
+        // Expose the pre-tokenised form so hosts can bypass OS-level re-parsing of the
         // combined argument string. Set it directly to preserve tokens that contain spaces.
         result.ArgumentsList = commandTokens;
 

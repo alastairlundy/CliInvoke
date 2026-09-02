@@ -118,6 +118,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete]
     public static async Task<PipedProcessResult> ExecutePipedAsync(
         this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,

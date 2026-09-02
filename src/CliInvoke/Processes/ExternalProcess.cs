@@ -274,6 +274,7 @@ public class ExternalProcess : IExternalProcess
     /// <returns>A task that represents the asynchronous operation. The result contains the piped process result when the method completes.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public async Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(
         CancellationToken cancellationToken)
     {
