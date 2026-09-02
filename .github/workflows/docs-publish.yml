@@ -18,6 +18,8 @@ jobs:
       name: github-pages
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
@@ -28,7 +30,7 @@ jobs:
             src/**/obj
           key: nuget-${{ runner.os }}-${{ hashFiles('src/**/*.csproj', 'Directory.Packages.props') }}
           restore-keys: nuget-${{ runner.os }}-
-      - name: Pre-build .NET projects for API docs
+      - name: Build .NET projects for API docs
         run: |
           dotnet build src/CliInvoke.Core -c Release
           dotnet build src/CliInvoke -c Release
@@ -38,9 +40,15 @@ jobs:
           path: site/.lunet/build/cache
           key: lunet-${{ hashFiles('site/config.scriban') }}
           restore-keys: lunet-
-      - id: lunet
-        name: Build and deploy Lunet site
-        uses: lunet-io/actions/lunet-build@2ea1efa0c38b53c50c3f7dd54aaf25ae4dfee6c7 # v1
+      - name: Install Lunet
+        run: |
+          dotnet tool install --global lunet --version "1.*"
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+      - name: Build site
+        working-directory: site
+        run: lunet --stacktrace build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
         with:
-          repository: alastairlundy/CliInvoke
-          site_path: site
+          path: site/.lunet/build/www
+      - uses: actions/deploy-pages@v4
