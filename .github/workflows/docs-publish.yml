@@ -32,7 +32,6 @@ jobs:
         run: |
           dotnet build src/CliInvoke.Core -c Release
           dotnet build src/CliInvoke -c Release
-          dotnet build src/CliInvoke.Extensions -c Release
           dotnet build src/CliInvoke.Specializations -c Release
       - uses: actions/cache@v4
         with:
