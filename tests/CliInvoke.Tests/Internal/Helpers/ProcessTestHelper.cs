@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using CliInvoke.Processes.Internal;
@@ -103,5 +104,28 @@ internal class ProcessTestHelper
     {
         string helperPath = GetSignalTrappingHelperPath();
         return CreateProcess(helperPath, $"\"{markerPath}\" {sleepSeconds}");
+    }
+
+    /// <summary>
+    ///     Polls a condition until it is true or the timeout expires, replacing fixed
+    ///     <c>Task.Delay</c> sleeps with a reliable wait mechanism.
+    /// </summary>
+    internal static async Task WaitForConditionAsync(
+        Func<bool> condition,
+        TimeSpan timeout,
+        int pollIntervalMs = 50,
+        string? failureMessage = null)
+    {
+        Stopwatch sw = Stopwatch.StartNew();
+        while (!condition())
+        {
+            if (sw.Elapsed >= timeout)
+            {
+                Assert.Fail(failureMessage ?? $"Condition not met within {timeout.TotalSeconds}s");
+                return;
+            }
+
+            await Task.Delay(pollIntervalMs);
+        }
     }
 }
