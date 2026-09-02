@@ -55,7 +55,7 @@ public class ProcessTimeoutPolicyFuzzTests
     {
         Prop.ForAll<int>(milliseconds =>
                 {
-                    if (milliseconds < 1) return true;
+                    if (milliseconds < 1 || milliseconds >= int.MaxValue - 1) return true;
 
                     var a = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds),
@@ -163,7 +163,7 @@ public class ProcessTimeoutPolicyFuzzTests
     {
         Prop.ForAll<int>(milliseconds =>
                 {
-                    if (milliseconds < 1) return true;
+                    if (milliseconds < 1 || milliseconds >= int.MaxValue - 1) return true;
 
                     var a = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds),

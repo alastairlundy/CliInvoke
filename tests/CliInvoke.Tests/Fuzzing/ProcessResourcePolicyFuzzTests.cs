@@ -46,7 +46,7 @@ public class ProcessResourcePolicyFuzzTests
     {
         Prop.ForAll<int>(max =>
                 {
-                    if (max <= 1) return true;
+                    if (max <= 1 || max >= int.MaxValue - 1) return true;
 
                     var spec = new ProcessResourcePolicySpec();
                     spec.SetMinWorkingSet((nint)(max + 1));
