@@ -46,9 +46,22 @@ public class ShellArgumentEscaperFuzzTests
             {
                 if (string.IsNullOrEmpty(value) || value.Contains('\n') || value.Contains('\r'))
                     return true;
-
+ 
                 string escaped = ShellArgumentEscaper.EscapeForPowerShell(value);
-                return escaped.Length >= value.Length;
+ 
+                // Verify each PowerShell metacharacter is properly escaped
+                foreach (char metachar in PowerShellMetacharacters)
+                {
+                    if (value.Contains(metachar))
+                    {
+                        // The escaped sequence should be backtick followed by the metachar
+                        string expectedEscaped = $"`{metachar}";
+                        if (!escaped.Contains(expectedEscaped))
+                            return false;
+                    }
+                }
+ 
+                return true;
             })
             .QuickCheckThrowOnFailure();
     }
@@ -89,9 +102,29 @@ public class ShellArgumentEscaperFuzzTests
             {
                 if (string.IsNullOrEmpty(value) || value.Contains('\n') || value.Contains('\r'))
                     return true;
-
+ 
                 string escaped = ShellArgumentEscaper.EscapeForCmd(value);
-                return escaped.Length >= value.Length;
+ 
+                // Verify each CMD metacharacter is properly escaped
+                foreach (char metachar in CmdMetacharacters)
+                {
+                    if (value.Contains(metachar))
+                    {
+                        // The escaped sequence should be caret followed by the metachar
+                        string expectedEscaped = $"^{metachar}";
+                        if (!escaped.Contains(expectedEscaped))
+                            return false;
+                    }
+                }
+ 
+                // Also check for double-quoted escape of double quotes
+                if (value.Contains('"'))
+                {
+                    if (!escaped.Contains("\"\""))
+                        return false;
+                }
+ 
+                return true;
             })
             .QuickCheckThrowOnFailure();
     }
