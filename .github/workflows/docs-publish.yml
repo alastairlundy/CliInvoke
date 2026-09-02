@@ -13,9 +13,15 @@ permissions:
 jobs:
   site:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment:
       name: github-pages
     steps:
+      - uses: actions/cache@v4
+        with:
+          path: site/.lunet/build/cache
+          key: lunet-${{ hashFiles('site/config.scriban', 'src/**/*.csproj') }}
+          restore-keys: lunet-
       - id: lunet
         name: Build and deploy Lunet site
         uses: lunet-io/actions/lunet-build@v1
