@@ -51,18 +51,19 @@ public class ArgumentTokenizerFuzzTests
     [Test]
     public void Tokenize_SpaceSeparatedWords_ProducesCorrectCount()
     {
-        Prop.ForAll<string>(value =>
+        Prop.ForAll<string>(word1 =>
             {
-                if (string.IsNullOrWhiteSpace(value) || value.Any(char.IsWhiteSpace) || value.Contains('"'))
-                    return true;
+                return Prop.ForAll<string>(word2 =>
+                    {
+                        if (string.IsNullOrWhiteSpace(word1) || string.IsNullOrWhiteSpace(word2) ||
+                            word1.Any(char.IsWhiteSpace) || word2.Any(char.IsWhiteSpace) ||
+                            word1.Contains('"') || word2.Contains('"'))
+                            return true;
 
-                string[] parts = value.Split(' ');
-                int expectedCount = parts.Count(p => p.Length > 0);
-                if (expectedCount < 2)
-                    return true;
-
-                IReadOnlyList<string> tokens = ArgumentTokenizer.Tokenize(value);
-                return tokens.Count == expectedCount;
+                        string input = word1 + " " + word2;
+                        IReadOnlyList<string> tokens = ArgumentTokenizer.Tokenize(input);
+                        return tokens.Count == 2 && tokens[0] == word1 && tokens[1] == word2;
+                    });
             })
             .QuickCheckThrowOnFailure();
     }
@@ -90,9 +91,9 @@ public class ArgumentTokenizerFuzzTests
                 if (string.IsNullOrWhiteSpace(value) || value.Contains('"'))
                     return true;
 
-                string input = "\"hello\"\"world\"";
+                string input = "\"" + value + "\"\"" + value + "\"";
                 IReadOnlyList<string> tokens = ArgumentTokenizer.Tokenize(input);
-                return tokens.Count == 1 && tokens[0] == "hello\"world";
+                return tokens.Count == 1 && tokens[0] == value + "\"" + value;
             })
             .QuickCheckThrowOnFailure();
     }
