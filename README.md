@@ -206,9 +206,9 @@ unless you have written permission from the maintainer. To request permission, o
 
 <a href="https://www.star-history.com/?repos=alastairlundy%2Fcliinvoke&type=date&logscale=&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&theme=dark&logscale&legend=top-left&sealed_token=h1uzYyzJYAg46ZWXSuf2_bPDCJnRasjV-VB06DK8CRLmjAXg8727LKwfi76Hu7ksNmIpIUD8RXHTquovJuQcCFlnkXAOjYaMjCA5J_I4GHXl3HhXtWrH_wrFMhjP0Ih3lM0Lybq8d8MZiVK86dyS2LnL3b90dirCckN1UvaDX6fggyHlB7y-E61gb6Fz" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&logscale&legend=top-left&sealed_token=h1uzYyzJYAg46ZWXSuf2_bPDCJnRasjV-VB06DK8CRLmjAXg8727LKwfi76Hu7ksNmIpIUD8RXHTquovJuQcCFlnkXAOjYaMjCA5J_I4GHXl3HhXtWrH_wrFMhjP0Ih3lM0Lybq8d8MZiVK86dyS2LnL3b90dirCckN1UvaDX6fggyHlB7y-E61gb6Fz" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&logscale&legend=top-left&sealed_token=h1uzYyzJYAg46ZWXSuf2_bPDCJnRasjV-VB06DK8CRLmjAXg8727LKwfi76Hu7ksNmIpIUD8RXHTquovJuQcCFlnkXAOjYaMjCA5J_I4GHXl3HhXtWrH_wrFMhjP0Ih3lM0Lybq8d8MZiVK86dyS2LnL3b90dirCckN1UvaDX6fggyHlB7y-E61gb6Fz" />
  </picture>
 </a>
 
