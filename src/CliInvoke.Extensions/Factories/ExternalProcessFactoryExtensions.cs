@@ -32,6 +32,7 @@ public static class ExternalProcessFactoryExtensions
         /// <param name="startInfo">The <see cref="ProcessStartInfo"/> used to configure the external process.</param>
         /// <returns>An implementation of <see cref="IExternalProcess"/> that represents the created external process.</returns>
         [Pure]
+        [Obsolete]
         public IExternalProcess CreateExternalProcess(ProcessStartInfo startInfo)
             => externalProcessFactory.CreateExternalProcess(ProcessConfiguration.FromProcessStartInfo(startInfo));
 
@@ -43,6 +44,7 @@ public static class ExternalProcessFactoryExtensions
         /// <param name="exitConfiguration">The process exit configuration details for configuring process exit behaviour.</param>
         /// <returns>An implementation of <see cref="IExternalProcess"/> that represents the created external process.</returns>
         [Pure]
+        [Obsolete]
         public IExternalProcess CreateExternalProcess(ProcessStartInfo startInfo,
             ProcessExitConfiguration exitConfiguration) =>
             externalProcessFactory.CreateExternalProcess(ProcessConfiguration.FromProcessStartInfo(startInfo),

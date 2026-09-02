@@ -15,7 +15,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.10.4</PackageVersion>
+        <PackageVersion>2.11.0</PackageVersion>
         <AssemblyVersion>2.10.4.0</AssemblyVersion>
         <FileVersion>2.10.4.0</FileVersion>
         <IncludeSymbols>true</IncludeSymbols>
@@ -23,15 +23,15 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.4
-* 🔒 Benefits from hardened shell argument escaping in CliInvoke.Core / CliInvoke (command-injection hardening for cmd/PowerShell specialisations)</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.11.0
+* Deprecated ``PowershellProcessInvoker`` and ``CmdProcessInvoker`` ahead of removal in v3</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>2.10.3.0</AssemblyVersion>
-        <FileVersion>2.10.3.0</FileVersion>
+        <AssemblyVersion>2.11.0.0</AssemblyVersion>
+        <FileVersion>2.11.0.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
