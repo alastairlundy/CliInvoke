@@ -13,9 +13,35 @@ permissions:
 jobs:
   site:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            src/**/obj
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/**/*.csproj', 'Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - name: Pre-build .NET projects for API docs
+        run: |
+          dotnet build src/CliInvoke.Core -c Release
+          dotnet build src/CliInvoke -c Release
+          dotnet build src/CliInvoke.Extensions -c Release
+          dotnet build src/CliInvoke.Specializations -c Release
+      - uses: actions/cache@v4
+        with:
+          path: site/.lunet/build/cache
+          key: lunet-${{ hashFiles('site/config.scriban') }}
+          restore-keys: lunet-
       - id: lunet
         name: Build and deploy Lunet site
         uses: lunet-io/actions/lunet-build@2ea1efa0c38b53c50c3f7dd54aaf25ae4dfee6c7 # v1
         with:
+          repository: alastairlundy/CliInvoke
           site_path: site
