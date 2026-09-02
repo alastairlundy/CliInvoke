@@ -44,15 +44,8 @@ public class VersionParseExtensionsFuzzTests
                 if (string.IsNullOrWhiteSpace(value) || !Enumerable.Any(value, char.IsDigit))
                     return true;
 
-                try
-                {
-                    Version result = Version.GracefulParse(value);
-                    return result.Major >= 0;
-                }
-                catch (ArgumentException)
-                {
-                    return true;
-                }
+                Version result = Version.GracefulParse(value);
+                return result.Major >= 0 && result.Minor >= 0;
             })
             .QuickCheckThrowOnFailure();
     }
@@ -149,8 +142,36 @@ public class VersionParseExtensionsFuzzTests
 
                 Version result = Version.GracefulParse(value);
 
+                // Parse each segment and compare with parsed components
+                if (!int.TryParse(segments[0], out int expectedMajor))
+                    return true;
+
+                if (result.Major != expectedMajor)
+                    return false;
+
                 if (segments.Length >= 2)
-                    return result.Minor >= 0;
+                {
+                    if (!int.TryParse(segments[1], out int expectedMinor))
+                        return true;
+                    if (result.Minor != expectedMinor)
+                        return false;
+                }
+
+                if (segments.Length >= 3)
+                {
+                    if (!int.TryParse(segments[2], out int expectedBuild))
+                        return true;
+                    if (result.Build != expectedBuild)
+                        return false;
+                }
+
+                if (segments.Length >= 4)
+                {
+                    if (!int.TryParse(segments[3], out int expectedRevision))
+                        return true;
+                    if (result.Revision != expectedRevision)
+                        return false;
+                }
 
                 return true;
             })
