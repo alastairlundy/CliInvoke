@@ -11,7 +11,7 @@ Versions that are currently supported with Bug Fixes and/or Security Fixes.
 | Version series | Versions Supported with Bug Fixes | Versions Supported with Security Fixes |
 |--| --|--|
 | 3.x | 3.0 | 3.0 |
-| 2.x | 2.9, 2.10 | 2.8, 2.9, 2.10 |
+| 2.x | 2.10, 2.11 | 2.9, 2.10, 2.11 |
 | 1.x | :x: | :x: |
 
 ## Reporting a Security Vulnerability
