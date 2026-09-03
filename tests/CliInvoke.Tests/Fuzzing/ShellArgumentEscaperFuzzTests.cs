@@ -46,22 +46,24 @@ public class ShellArgumentEscaperFuzzTests
             {
                 if (string.IsNullOrEmpty(value) || value.Contains('\n') || value.Contains('\r'))
                     return true;
- 
+
                 string escaped = ShellArgumentEscaper.EscapeForPowerShell(value);
- 
-                // Verify each PowerShell metacharacter is properly escaped
-                foreach (char metachar in PowerShellMetacharacters)
+
+                // Build expected output character-by-character, mirroring the escaper logic
+                var expected = new System.Text.StringBuilder(value.Length + 16);
+                foreach (char c in value)
                 {
-                    if (value.Contains(metachar))
+                    if (Array.IndexOf(PowerShellMetacharacters, c) >= 0)
                     {
-                        // The escaped sequence should be backtick followed by the metachar
-                        string expectedEscaped = $"`{metachar}";
-                        if (!escaped.Contains(expectedEscaped))
-                            return false;
+                        expected.Append('`').Append(c);
+                    }
+                    else
+                    {
+                        expected.Append(c);
                     }
                 }
- 
-                return true;
+
+                return escaped == expected.ToString();
             })
             .QuickCheckThrowOnFailure();
     }
@@ -102,29 +104,28 @@ public class ShellArgumentEscaperFuzzTests
             {
                 if (string.IsNullOrEmpty(value) || value.Contains('\n') || value.Contains('\r'))
                     return true;
- 
+
                 string escaped = ShellArgumentEscaper.EscapeForCmd(value);
- 
-                // Verify each CMD metacharacter is properly escaped
-                foreach (char metachar in CmdMetacharacters)
+
+                // Build expected output character-by-character, mirroring the escaper logic
+                var expected = new System.Text.StringBuilder(value.Length + 16);
+                foreach (char c in value)
                 {
-                    if (value.Contains(metachar))
+                    if (Array.IndexOf(CmdMetacharacters, c) >= 0)
                     {
-                        // The escaped sequence should be caret followed by the metachar
-                        string expectedEscaped = $"^{metachar}";
-                        if (!escaped.Contains(expectedEscaped))
-                            return false;
+                        expected.Append('^').Append(c);
+                    }
+                    else if (c == '"')
+                    {
+                        expected.Append("\"\"");
+                    }
+                    else
+                    {
+                        expected.Append(c);
                     }
                 }
- 
-                // Also check for double-quoted escape of double quotes
-                if (value.Contains('"'))
-                {
-                    if (!escaped.Contains("\"\""))
-                        return false;
-                }
- 
-                return true;
+
+                return escaped == expected.ToString();
             })
             .QuickCheckThrowOnFailure();
     }
