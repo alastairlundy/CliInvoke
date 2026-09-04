@@ -30,6 +30,7 @@ jobs:
             src/**/obj
           key: nuget-${{ runner.os }}-${{ hashFiles('src/**/*.csproj', 'Directory.Packages.props') }}
           restore-keys: nuget-${{ runner.os }}-
+          save-always: true
       - name: Build .NET projects for API docs
         run: |
           dotnet build src/CliInvoke.Core -c Release
@@ -40,6 +41,7 @@ jobs:
           path: site/.lunet/build/cache
           key: lunet-${{ hashFiles('site/config.scriban') }}
           restore-keys: lunet-
+          save-always: true
       - name: Install Lunet
         run: |
           dotnet tool install --global lunet --version "1.*"
