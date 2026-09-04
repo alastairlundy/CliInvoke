@@ -40,10 +40,6 @@ Custom resolvers overriding `GetPathFileExtensions` must return lowercased exten
 
 `AddCliInvoke` registers `IFilePathResolver` with the same lifetime as the global `lifetime` parameter (default `Scoped`). The resolver is not special-cased — a stateless service does not automatically become `Singleton`. Users who want a different lifetime opt in via `UseCustomFilePathResolver<TResolver>(ServiceLifetime)`.
 
-### 6. `CliRun` defaults facade (no static state)
-
-`CliRun` was previously a static facade backed by process-wide mutable state configured through `CliRun.UseExternalProcessFactory` / `CliRun.UseFilePathResolver`. Those `Use*` methods and their backing static fields/helpers were removed: every `Run*`/`FireAndForget` call now allocates a fresh `ProcessInvocationPipeline` (and a fresh `ExternalProcessFactory` with a default `FilePathResolver`) per call. There is therefore no shared lock or lazy-initialisation asymmetry to preserve — the historical `lock(_syncRoot)` double-check on the resolver no longer exists. Callers needing a custom factory or resolver must use `IProcessInvoker` (or DI) instead of `CliRun`.
-
 ## Result Model
 
 ### Canceled
