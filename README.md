@@ -52,20 +52,19 @@ The package(s) to install depends on your use case:
 
 * For use in a .NET library – Install the abstractions package, your developer users can install the Implementation and
   Dependency Injection packages.
-* For use in a .NET app – Install the implementation package and the Dependency Injection Extensions Package
+* For use in a .NET app – Install the implementation package. It includes DI registration and convenience helpers built in.
 
 | Project type / Need                                                          | Packages to install (dotnet add package ...)                                      | Notes                                                                        |
 |------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                  | Only the Core (abstractions) package — consumers can choose implementations. |
 | Library or app that needs concrete builders / implementations                | `CliInvoke.Core`, `CliInvoke`                                                     | Implementation package plus Core for models/abstractions.                    |
-| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions`                             | Includes DI registration and convenience extensions for easy setup, and some Middleware implementations.         |
+| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`                                                     | Includes DI registration and convenience helpers; some Middleware implementations are built into the main package.         |
 | Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed) | Adds Cmd/PowerShell and other specializations; include only when required.   |
 
 ### Links to packages
 
 [CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core)
 [CliInvoke Nuget](https://nuget.org/packages/CliInvoke)
-[CliInvoke.Extensions Nuget](https://nuget.org/packages/CliInvoke.Extensions)
 [CliInvoke.Specializations Nuget](https://nuget.org/packages/CliInvoke.Specializations)
 
 ## Supported Platforms
