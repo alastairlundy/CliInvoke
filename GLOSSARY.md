@@ -13,6 +13,10 @@ A layered interceptor pattern used to execute cross-cutting concerns (e.g., logg
 ### Process Invocation Context
 The state-bearing object passed through the Process Invocation Pipeline. It encapsulates the requested configuration, the execution mode (Basic, Buffered, or Piped), and the resulting process output. It serves as the the single source of truth for middleware to communicate changes and state across the pipeline.
 
+### Invocation Capability
+
+A parameter of the invocation contract that the caller states for the invocation to mean what they intend (e.g., validation rules, truncation cap). Distinct from a middleware concern: cross-cutting behavior composed around the invocation that the caller could omit without changing the invocation's meaning (e.g., logging, retry).
+
 
 ## Architectural Patterns
 
