@@ -144,4 +144,25 @@ public class InvocationContext
             Middleware = Middleware
         };
     }
+
+    /// <summary>
+    ///     Creates a new <see cref="InvocationContext"/> with the specified exit configuration
+    ///     while preserving all other context state.
+    /// </summary>
+    /// <param name="exitConfiguration">The new process exit configuration to use.</param>
+    /// <returns>A new invocation context with the updated exit configuration.</returns>
+    public InvocationContext WithExitConfiguration(ProcessExitConfiguration exitConfiguration)
+    {
+        ArgumentNullException.ThrowIfNull(exitConfiguration);
+
+        return new InvocationContext(
+            Configuration,
+            exitConfiguration,
+            Mode,
+            CancellationToken,
+            _sharedResult)
+        {
+            Middleware = Middleware
+        };
+    }
 }
