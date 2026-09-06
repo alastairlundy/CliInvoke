@@ -9,6 +9,7 @@
 
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility;
 using CliInvoke.Extensions.Middleware;
@@ -243,8 +244,7 @@ public static class DependencyInjectionExtensions
         services.TryAdd(ServiceDescriptor.Describe(
             typeof(RetryMiddleware),
             sp => new RetryMiddleware(
-                sp.GetService<IProcessResultValidator<ProcessResult>>()
-                    ?? new ProcessResultValidator<ProcessResult>([CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]),
+                sp.GetService<IRetryPolicy>() ?? RetryPolicies.ExitCodeZero(),
                 sp.GetService<RetryOptions>() ?? RetryOptions.Default),
             lifetime));
     }

@@ -8,30 +8,39 @@
    */
 
 using CliInvoke.Core.Middleware;
-using CliInvoke.Core.Validation;
-using CliInvoke.Validation;
 
 namespace CliInvoke.Extensions.Middleware.Retry;
+
+/// <summary>
+///     Provides pre-built <see cref="IRetryPolicy"/> implementations.
+/// </summary>
+public static class RetryPolicies
+{
+    /// <summary>
+    ///     Returns a policy that retries whenever the exit code is non-zero.
+    /// </summary>
+    /// <returns>An <see cref="IRetryPolicy"/> that retries on non-zero exit codes.</returns>
+    public static IRetryPolicy ExitCodeZero()
+        => new ExitCodeZeroRetryPolicy();
+
+    private sealed class ExitCodeZeroRetryPolicy : IRetryPolicy
+    {
+        public bool ShouldRetry(ProcessResult result, int completedAttempts)
+            => result.ExitCode != 0;
+    }
+}
 
 /// <summary>
 ///     Provides extension methods for configuring retry middleware on the process pipeline.
 /// </summary>
 public static class RetryMiddlewareExtensions
 {
-    /// <summary>
-    ///     Builds a default retryable-conditions validator equivalent to the one registered by
-    ///     <c>AddCliInvoke</c> (exit-code-zero classification).
-    /// </summary>
-    private static IProcessResultValidator<ProcessResult> DefaultRetryableValidator()
-        => new ProcessResultValidator<ProcessResult>(
-            [CommonValidationRules<ProcessResult>.ExitCodeZeroRule()]);
-
     /// <param name="builder">The middleware builder.</param>
     extension(IProcessMiddlewareBuilder builder)
     {
         /// <summary>
         ///     Adds retry middleware to the process pipeline using the default options and the
-        ///     default retryable-conditions validator (resolved from the dependency injection container).
+        ///     default retry policy (exit-code-zero, resolved from the dependency injection container).
         /// </summary>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="builder"/> is <c>null</c>.</exception>
@@ -43,23 +52,23 @@ public static class RetryMiddlewareExtensions
         }
 
         /// <summary>
-        ///     Adds retry middleware using a custom retryable-conditions validator and the default options.
+        ///     Adds retry middleware using a custom retry policy and the default options.
         /// </summary>
-        /// <param name="validator">The validator whose <c>ShouldRetry</c> decides whether to retry.</param>
+        /// <param name="retryPolicy">The policy that decides whether to retry.</param>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">
-        ///     Thrown when <paramref name="builder"/> or <paramref name="validator"/> is <c>null</c>.
+        ///     Thrown when <paramref name="builder"/> or <paramref name="retryPolicy"/> is <c>null</c>.
         /// </exception>
-        public IProcessMiddlewareBuilder UseRetryPolicy(IProcessResultValidator<ProcessResult> validator)
+        public IProcessMiddlewareBuilder UseRetryPolicy(IRetryPolicy retryPolicy)
         {
             ArgumentNullException.ThrowIfNull(builder);
-            ArgumentNullException.ThrowIfNull(validator);
+            ArgumentNullException.ThrowIfNull(retryPolicy);
 
-            return builder.UseMiddleware(new RetryMiddleware(validator, RetryOptions.Default));
+            return builder.UseMiddleware(new RetryMiddleware(retryPolicy, RetryOptions.Default));
         }
 
         /// <summary>
-        ///     Adds retry middleware using the default retryable-conditions validator and custom options.
+        ///     Adds retry middleware using the default retry policy and custom options.
         /// </summary>
         /// <param name="options">The retry options (attempts, base delay, strategy).</param>
         /// <returns>The builder for fluent chaining.</returns>
@@ -71,27 +80,27 @@ public static class RetryMiddlewareExtensions
             ArgumentNullException.ThrowIfNull(builder);
             ArgumentNullException.ThrowIfNull(options);
 
-            return builder.UseMiddleware(new RetryMiddleware(DefaultRetryableValidator(), options));
+            return builder.UseMiddleware(new RetryMiddleware(RetryPolicies.ExitCodeZero(), options));
         }
 
         /// <summary>
-        ///     Adds retry middleware using a custom retryable-conditions validator and custom options.
+        ///     Adds retry middleware using a custom retry policy and custom options.
         /// </summary>
-        /// <param name="validator">The validator whose <c>ShouldRetry</c> decides whether to retry.</param>
+        /// <param name="retryPolicy">The policy that decides whether to retry.</param>
         /// <param name="options">The retry options (attempts, base delay, strategy).</param>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">
-        ///     Thrown when <paramref name="builder"/>, <paramref name="validator"/>, or <paramref name="options"/> is <c>null</c>.
+        ///     Thrown when <paramref name="builder"/>, <paramref name="retryPolicy"/>, or <paramref name="options"/> is <c>null</c>.
         /// </exception>
         public IProcessMiddlewareBuilder UseRetryPolicy(
-            IProcessResultValidator<ProcessResult> validator,
+            IRetryPolicy retryPolicy,
             RetryOptions options)
         {
             ArgumentNullException.ThrowIfNull(builder);
-            ArgumentNullException.ThrowIfNull(validator);
+            ArgumentNullException.ThrowIfNull(retryPolicy);
             ArgumentNullException.ThrowIfNull(options);
 
-            return builder.UseMiddleware(new RetryMiddleware(validator, options));
+            return builder.UseMiddleware(new RetryMiddleware(retryPolicy, options));
         }
     }
 }

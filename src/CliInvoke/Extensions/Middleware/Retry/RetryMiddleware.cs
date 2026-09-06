@@ -8,7 +8,6 @@
    */
 
 using CliInvoke.Core.Middleware;
-using CliInvoke.Core.Validation;
 
 namespace CliInvoke.Extensions.Middleware.Retry;
 
@@ -22,16 +21,16 @@ namespace CliInvoke.Extensions.Middleware.Retry;
 /// </remarks>
 internal sealed class RetryMiddleware : IProcessMiddleware
 {
-    private readonly IProcessResultValidator<ProcessResult> _retryableConditions;
+    private readonly IRetryPolicy _retryPolicy;
     private readonly RetryOptions _options;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="RetryMiddleware"/> class.
     /// </summary>
-    /// <param name="retryableConditions">The validator whose <c>ShouldRetry</c> decides whether to retry.</param>
+    /// <param name="retryPolicy">The policy that decides whether to retry.</param>
     /// <param name="options">The retry options (attempts, base delay, strategy).</param>
     /// <exception cref="ArgumentNullException">
-    ///     Thrown when <paramref name="retryableConditions"/> or <paramref name="options"/> is <c>null</c>.
+    ///     Thrown when <paramref name="retryPolicy"/> or <paramref name="options"/> is <c>null</c>.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
     ///     Thrown when <paramref name="options"/>.<see cref="RetryOptions.MaxAttempts"/> is less than 1, since
@@ -39,9 +38,9 @@ internal sealed class RetryMiddleware : IProcessMiddleware
     ///     <paramref name="options"/>.<see cref="RetryOptions.BaseDelay"/> is negative (which would make the
     ///     first <see cref="Task.Delay"/> throw).
     /// </exception>
-    public RetryMiddleware(IProcessResultValidator<ProcessResult> retryableConditions, RetryOptions options)
+    public RetryMiddleware(IRetryPolicy retryPolicy, RetryOptions options)
     {
-        ArgumentNullException.ThrowIfNull(retryableConditions);
+        ArgumentNullException.ThrowIfNull(retryPolicy);
         ArgumentNullException.ThrowIfNull(options);
 
         if (options.MaxAttempts < 1)
@@ -54,7 +53,7 @@ internal sealed class RetryMiddleware : IProcessMiddleware
                 nameof(options),
                 "RetryOptions.BaseDelay must not be negative; a negative delay would cause Task.Delay to throw on the first retry.");
 
-        _retryableConditions = retryableConditions;
+        _retryPolicy = retryPolicy;
         _options = options;
     }
 
@@ -75,7 +74,7 @@ internal sealed class RetryMiddleware : IProcessMiddleware
             if (context.Result is null)
                 return;
 
-            if (!_retryableConditions.ShouldRetry(context.Result))
+            if (!_retryPolicy.ShouldRetry(context.Result, attempts))
                 return;
 
             if (attempts >= _options.MaxAttempts)
