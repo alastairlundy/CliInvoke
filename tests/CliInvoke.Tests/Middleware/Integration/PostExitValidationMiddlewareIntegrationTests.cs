@@ -134,7 +134,7 @@ public class PostExitValidationMiddlewareIntegrationTests
                 ProcessExitConfiguration.CreateGraceful()))
             .Throws<ProcessValidationException>();
 
-        await Assert.That(exception.Message).IsEqualTo("The first rule failed.");
+        await Assert.That(exception.Message).IsEqualTo("Process result failed validation: FirstFailingRule: The first rule failed.; SecondFailingRule: The second rule failed.");
     }
 
     [Test]
@@ -163,7 +163,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(config, exit))
             .Throws<ProcessValidationException>();
 
-        await Assert.That(exception.Message).IsEqualTo("The configuration rule failed.");
+        await Assert.That(exception.Message).IsEqualTo("Process result failed validation: ConfigRule: The configuration rule failed.; SugarRule: The sugar rule failed.");
     }
 
     [Test]

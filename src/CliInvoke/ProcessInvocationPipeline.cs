@@ -45,6 +45,30 @@ internal class ProcessInvocationPipeline
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
             ctx.Configuration, ctx.ExitConfiguration);
 
+        static void ValidateResult<TResult>(TResult result, ProcessExitConfiguration? exitConfiguration)
+            where TResult : ProcessResult
+        {
+            if (exitConfiguration is null)
+                return;
+
+            ValidationRule<ProcessResult>[] rules = exitConfiguration.ValidationRules;
+
+            if (rules is null)
+                return;
+
+            List<string> failures = [];
+
+            foreach (ValidationRule<ProcessResult> rule in rules)
+            {
+                if (!rule.Predicate(result))
+                    failures.Add($"{rule.Name}: {rule.GetFailureMessage(result)}");
+            }
+
+            if (failures.Count > 0)
+                throw new ProcessValidationException(result,
+                    "Process result failed validation: " + string.Join("; ", failures));
+        }
+
         try
         {
             if (ctx.Mode == InvocationMode.FireAndForget)
@@ -95,38 +119,6 @@ internal class ProcessInvocationPipeline
         finally
         {
             externalProcess.Dispose();
-        }
-    
-
-        /// <summary>
-        ///     Evaluates the configured validation rules against a completed process result and throws
-        ///     when any rule fails.
-        /// </summary>
-        /// <typeparam name="TResult">The type of process result being validated.</typeparam>
-        /// <param name="result">The process result produced by the invocation.</param>
-        /// <param name="exitConfiguration">
-        ///     The exit configuration whose <see cref="ProcessExitConfiguration.ValidationRules" /> are
-        ///     evaluated, or <c>null</c> when no validation is configured.
-        /// </param>
-        /// <exception cref="ProcessValidationException">
-        ///     Thrown when <paramref name="exitConfiguration" /> declares a rule that the result fails.
-        /// </exception>
-        static void ValidateResult<TResult>(TResult result, ProcessExitConfiguration? exitConfiguration)
-            where TResult : ProcessResult
-        {
-            if (exitConfiguration is null)
-                return;
-
-            ValidationRule<ProcessResult>[] rules = exitConfiguration.ValidationRules;
-
-            if (rules is null)
-                return;
-
-            foreach (ValidationRule<ProcessResult> rule in rules)
-            {
-                if (!rule.Predicate(result))
-                    throw new ProcessValidationException(result, rule.GetFailureMessage(result));
-            }
         }
     }
 }

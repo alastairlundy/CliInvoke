@@ -159,7 +159,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public override int GetHashCode()
     {
         return HashCode.Combine(TimeoutPolicy, CancellationThrowsException,
-            RequestedCancellationExitBehaviour, RequestedCancellationExitBehaviour,
+            RequestedCancellationExitBehaviour,
             ExceptionBehaviour, MaxBufferedOutputBytes);
     }
 
