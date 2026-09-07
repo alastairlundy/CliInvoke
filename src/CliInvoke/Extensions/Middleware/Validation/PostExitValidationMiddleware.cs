@@ -20,11 +20,6 @@ namespace CliInvoke.Extensions.Middleware.Validation;
 /// </summary>
 internal sealed class PostExitValidationMiddleware : IProcessMiddleware
 {
-    /// <summary>
-    ///     Initialises a new instance of the <see cref="PostExitValidationMiddleware"/> class.
-    /// </summary>
-    /// <param name="validator">The validator whose rules are merged into the exit configuration.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="validator"/> is <c>null</c>.</exception>
     public PostExitValidationMiddleware(IProcessResultValidator<ProcessResult> validator)
     {
         ArgumentNullException.ThrowIfNull(validator);
@@ -34,13 +29,6 @@ internal sealed class PostExitValidationMiddleware : IProcessMiddleware
 
     private readonly IProcessResultValidator<ProcessResult> _validator;
 
-    /// <summary>
-    ///     Merges the validator's rules onto the exit configuration (configuration rules first,
-    ///     validator rules appended, order preserved, no deduplication) and invokes the next stage.
-    /// </summary>
-    /// <param name="context">The current invocation context.</param>
-    /// <param name="next">The delegate to invoke the next middleware or the terminal pipeline.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task InvokeAsync(InvocationContext context, Func<InvocationContext, Task> next)
     {
         ArgumentNullException.ThrowIfNull(context);

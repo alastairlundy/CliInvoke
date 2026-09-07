@@ -244,7 +244,7 @@ public static class DependencyInjectionExtensions
         services.TryAdd(ServiceDescriptor.Describe(
             typeof(RetryMiddleware),
             sp => new RetryMiddleware(
-                sp.GetService<IRetryPolicy>() ?? RetryPolicies.ExitCodeZero(),
+                sp.GetService<IRetryClassifier>() ?? RetryConditions.ExitCodeZero(),
                 sp.GetService<RetryOptions>() ?? RetryOptions.Default),
             lifetime));
     }

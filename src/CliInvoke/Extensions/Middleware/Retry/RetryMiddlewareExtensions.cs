@@ -12,20 +12,20 @@ using CliInvoke.Core.Middleware;
 namespace CliInvoke.Extensions.Middleware.Retry;
 
 /// <summary>
-///     Provides pre-built <see cref="IRetryPolicy"/> implementations.
+///     Provides pre-built <see cref="IRetryClassifier"/> implementations.
 /// </summary>
-public static class RetryPolicies
+public static class RetryConditions
 {
     /// <summary>
-    ///     Returns a policy that retries whenever the exit code is non-zero.
+    ///     Returns a classifier that retries whenever the exit code is non-zero.
     /// </summary>
-    /// <returns>An <see cref="IRetryPolicy"/> that retries on non-zero exit codes.</returns>
-    public static IRetryPolicy ExitCodeZero()
-        => new ExitCodeZeroRetryPolicy();
+    /// <returns>An <see cref="IRetryClassifier"/> that retries on non-zero exit codes.</returns>
+    public static IRetryClassifier ExitCodeZero()
+        => new ExitCodeZeroClassifier();
 
-    private sealed class ExitCodeZeroRetryPolicy : IRetryPolicy
+    private sealed class ExitCodeZeroClassifier : IRetryClassifier
     {
-        public bool ShouldRetry(ProcessResult result, int completedAttempts)
+        public bool ShouldRetry(ProcessResult result)
             => result.ExitCode != 0;
     }
 }
@@ -40,7 +40,7 @@ public static class RetryMiddlewareExtensions
     {
         /// <summary>
         ///     Adds retry middleware to the process pipeline using the default options and the
-        ///     default retry policy (exit-code-zero, resolved from the dependency injection container).
+        ///     default retry classifier (exit-code-zero, resolved from the dependency injection container).
         /// </summary>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="builder"/> is <c>null</c>.</exception>
@@ -52,19 +52,19 @@ public static class RetryMiddlewareExtensions
         }
 
         /// <summary>
-        ///     Adds retry middleware using a custom retry policy and the default options.
+        ///     Adds retry middleware using a custom retry classifier and the default options.
         /// </summary>
-        /// <param name="retryPolicy">The policy that decides whether to retry.</param>
+        /// <param name="retryClassifier">The classifier that decides whether a result is retryable.</param>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">
-        ///     Thrown when <paramref name="builder"/> or <paramref name="retryPolicy"/> is <c>null</c>.
+        ///     Thrown when <paramref name="builder"/> or <paramref name="retryClassifier"/> is <c>null</c>.
         /// </exception>
-        public IProcessMiddlewareBuilder UseRetryPolicy(IRetryPolicy retryPolicy)
+        public IProcessMiddlewareBuilder UseRetryPolicy(IRetryClassifier retryClassifier)
         {
             ArgumentNullException.ThrowIfNull(builder);
-            ArgumentNullException.ThrowIfNull(retryPolicy);
+            ArgumentNullException.ThrowIfNull(retryClassifier);
 
-            return builder.UseMiddleware(new RetryMiddleware(retryPolicy, RetryOptions.Default));
+            return builder.UseMiddleware(new RetryMiddleware(retryClassifier, RetryOptions.Default));
         }
 
         /// <summary>
@@ -80,27 +80,27 @@ public static class RetryMiddlewareExtensions
             ArgumentNullException.ThrowIfNull(builder);
             ArgumentNullException.ThrowIfNull(options);
 
-            return builder.UseMiddleware(new RetryMiddleware(RetryPolicies.ExitCodeZero(), options));
+            return builder.UseMiddleware(new RetryMiddleware(RetryConditions.ExitCodeZero(), options));
         }
 
         /// <summary>
-        ///     Adds retry middleware using a custom retry policy and custom options.
+        ///     Adds retry middleware using a custom retry classifier and custom options.
         /// </summary>
-        /// <param name="retryPolicy">The policy that decides whether to retry.</param>
+        /// <param name="retryClassifier">The classifier that decides whether a result is retryable.</param>
         /// <param name="options">The retry options (attempts, base delay, strategy).</param>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">
-        ///     Thrown when <paramref name="builder"/>, <paramref name="retryPolicy"/>, or <paramref name="options"/> is <c>null</c>.
+        ///     Thrown when <paramref name="builder"/>, <paramref name="retryClassifier"/>, or <paramref name="options"/> is <c>null</c>.
         /// </exception>
         public IProcessMiddlewareBuilder UseRetryPolicy(
-            IRetryPolicy retryPolicy,
+            IRetryClassifier retryClassifier,
             RetryOptions options)
         {
             ArgumentNullException.ThrowIfNull(builder);
-            ArgumentNullException.ThrowIfNull(retryPolicy);
+            ArgumentNullException.ThrowIfNull(retryClassifier);
             ArgumentNullException.ThrowIfNull(options);
 
-            return builder.UseMiddleware(new RetryMiddleware(retryPolicy, options));
+            return builder.UseMiddleware(new RetryMiddleware(retryClassifier, options));
         }
     }
 }

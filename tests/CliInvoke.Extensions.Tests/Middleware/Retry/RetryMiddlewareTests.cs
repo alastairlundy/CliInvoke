@@ -28,11 +28,11 @@ public class RetryMiddlewareTests
             CancellationToken.None);
     }
 
-    private static IRetryPolicy AlwaysRetry()
-        => new AlwaysRetryPolicy();
+    private static IRetryClassifier AlwaysRetry()
+        => new AlwaysRetryClassifier();
 
-    private static IRetryPolicy NeverRetry()
-        => new NeverRetryPolicy();
+    private static IRetryClassifier NeverRetry()
+        => new NeverRetryClassifier();
 
     private static ProcessResult MakeResult()
         => new("dummy", 1, 1, DateTime.UtcNow, DateTime.UtcNow, false, null);
@@ -118,7 +118,7 @@ public class RetryMiddlewareTests
             MaxAttempts = 3,
             BaseDelay = TimeSpan.FromMilliseconds(1)
         };
-        RetryMiddleware middleware = new RetryMiddleware(RetryPolicies.ExitCodeZero(), options);
+        RetryMiddleware middleware = new RetryMiddleware(RetryConditions.ExitCodeZero(), options);
         InvocationContext ctx = CreateContext();
 
         int attempts = 0;
@@ -180,18 +180,18 @@ public class RetryMiddlewareTests
     public async Task UseRetryPolicy_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
-        // Register UseRetryPolicy() first, then replace the retry policy and process factory with stubs.
+        // Register UseRetryPolicy() first, then replace the retry classifier and process factory with stubs.
         // Registering after AddCliInvoke ensures our singleton registrations win over the ones it adds.
         services.AddCliInvoke(builder => builder.UseRetryPolicy());
 
-        // A retry policy that always classifies the result as retryable, plus a stub process factory that
+        // A retry classifier that always classifies the result as retryable, plus a stub process factory that
         // avoids spawning real processes. Executing through the resolved IProcessInvoker (not a
         // manually-built ProcessInvoker) proves the registration actually adds the middleware: if
         // UseRetryPolicy() stopped registering it, the stub would run once and the retry count would
         // not reach MaxAttempts.
-        CountingRetryPolicy policy = new CountingRetryPolicy();
+        CountingRetryClassifier policy = new CountingRetryClassifier();
         StubExternalProcessFactory factory = new StubExternalProcessFactory();
-        services.AddSingleton<IRetryPolicy>(policy);
+        services.AddSingleton<IRetryClassifier>(policy);
         services.AddSingleton<IExternalProcessFactory>(factory);
 
         IServiceProvider provider = services.BuildServiceProvider();
@@ -204,37 +204,11 @@ public class RetryMiddlewareTests
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
 
         // The retry middleware is registered and active: the retryable result is attempted
-        // MaxAttempts times rather than once, and the policy is consulted once per attempt.
+        // MaxAttempts times rather than once, and the classifier is consulted once per attempt.
         ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
         await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 
         await Assert.That(policy.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);
-    }
-
-    [Test]
-    public async Task InvokeAsync_CompletedAttempts_ArrivesOneBased()
-    {
-        RetryOptions options = new RetryOptions
-        {
-            MaxAttempts = 3,
-            BaseDelay = TimeSpan.FromMilliseconds(1),
-            Strategy = RetryBackoffStrategy.Fixed
-        };
-        AttemptRecordingPolicy policy = new AttemptRecordingPolicy();
-        RetryMiddleware middleware = new RetryMiddleware(policy, options);
-        InvocationContext ctx = CreateContext();
-
-        Func<InvocationContext, Task> next = c =>
-        {
-            c.Result = MakeResult();
-            return Task.CompletedTask;
-        };
-
-        await middleware.InvokeAsync(ctx, next);
-
-        // completedAttempts should be 1-based: 1, 2, 3
-        int[] expected = [1, 2, 3];
-        await Assert.That(policy.Attempts).IsEquivalentTo(expected);
     }
 
     [Test]
@@ -288,45 +262,31 @@ public class RetryMiddlewareTests
     }
 
     /// <summary>
-    ///     A retry policy that always returns <c>true</c> (retry).
+    ///     A retry classifier that always returns <c>true</c> (retry).
     /// </summary>
-    private sealed class AlwaysRetryPolicy : IRetryPolicy
+    private sealed class AlwaysRetryClassifier : IRetryClassifier
     {
-        public bool ShouldRetry(ProcessResult result, int completedAttempts) => true;
+        public bool ShouldRetry(ProcessResult result) => true;
     }
 
     /// <summary>
-    ///     A retry policy that always returns <c>false</c> (no retry).
+    ///     A retry classifier that always returns <c>false</c> (no retry).
     /// </summary>
-    private sealed class NeverRetryPolicy : IRetryPolicy
+    private sealed class NeverRetryClassifier : IRetryClassifier
     {
-        public bool ShouldRetry(ProcessResult result, int completedAttempts) => false;
+        public bool ShouldRetry(ProcessResult result) => false;
     }
 
     /// <summary>
-    ///     A retry policy that always returns <c>true</c> and records how many times it is consulted.
+    ///     A retry classifier that always returns <c>true</c> and records how many times it is consulted.
     /// </summary>
-    private sealed class CountingRetryPolicy : IRetryPolicy
+    private sealed class CountingRetryClassifier : IRetryClassifier
     {
         public int Calls;
 
-        public bool ShouldRetry(ProcessResult result, int completedAttempts)
+        public bool ShouldRetry(ProcessResult result)
         {
             Calls++;
-            return true;
-        }
-    }
-
-    /// <summary>
-    ///     A retry policy that records the completedAttempts values it receives, to verify 1-based counting.
-    /// </summary>
-    private sealed class AttemptRecordingPolicy : IRetryPolicy
-    {
-        public List<int> Attempts { get; } = [];
-
-        public bool ShouldRetry(ProcessResult result, int completedAttempts)
-        {
-            Attempts.Add(completedAttempts);
             return true;
         }
     }

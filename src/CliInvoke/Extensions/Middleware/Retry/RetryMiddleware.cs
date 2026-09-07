@@ -21,16 +21,16 @@ namespace CliInvoke.Extensions.Middleware.Retry;
 /// </remarks>
 internal sealed class RetryMiddleware : IProcessMiddleware
 {
-    private readonly IRetryPolicy _retryPolicy;
+    private readonly IRetryClassifier _retryClassifier;
     private readonly RetryOptions _options;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="RetryMiddleware"/> class.
     /// </summary>
-    /// <param name="retryPolicy">The policy that decides whether to retry.</param>
+    /// <param name="retryClassifier">The classifier that decides whether a result is retryable.</param>
     /// <param name="options">The retry options (attempts, base delay, strategy).</param>
     /// <exception cref="ArgumentNullException">
-    ///     Thrown when <paramref name="retryPolicy"/> or <paramref name="options"/> is <c>null</c>.
+    ///     Thrown when <paramref name="retryClassifier"/> or <paramref name="options"/> is <c>null</c>.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
     ///     Thrown when <paramref name="options"/>.<see cref="RetryOptions.MaxAttempts"/> is less than 1, since
@@ -38,9 +38,9 @@ internal sealed class RetryMiddleware : IProcessMiddleware
     ///     <paramref name="options"/>.<see cref="RetryOptions.BaseDelay"/> is negative (which would make the
     ///     first <see cref="Task.Delay"/> throw).
     /// </exception>
-    public RetryMiddleware(IRetryPolicy retryPolicy, RetryOptions options)
+    public RetryMiddleware(IRetryClassifier retryClassifier, RetryOptions options)
     {
-        ArgumentNullException.ThrowIfNull(retryPolicy);
+        ArgumentNullException.ThrowIfNull(retryClassifier);
         ArgumentNullException.ThrowIfNull(options);
 
         if (options.MaxAttempts < 1)
@@ -53,7 +53,7 @@ internal sealed class RetryMiddleware : IProcessMiddleware
                 nameof(options),
                 "RetryOptions.BaseDelay must not be negative; a negative delay would cause Task.Delay to throw on the first retry.");
 
-        _retryPolicy = retryPolicy;
+        _retryClassifier = retryClassifier;
         _options = options;
     }
 
@@ -74,7 +74,7 @@ internal sealed class RetryMiddleware : IProcessMiddleware
             if (context.Result is null)
                 return;
 
-            if (!_retryPolicy.ShouldRetry(context.Result, attempts))
+            if (!_retryClassifier.ShouldRetry(context.Result))
                 return;
 
             if (attempts >= _options.MaxAttempts)

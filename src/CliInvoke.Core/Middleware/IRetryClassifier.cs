@@ -10,24 +10,21 @@
 namespace CliInvoke.Core.Middleware;
 
 /// <summary>
-///     Decides whether a failed process result should be retried.
+///     Classifies whether a failed process result should be retried.
 /// </summary>
 /// <remarks>
 ///     Implementations classify results as retryable or terminal. The retry middleware
-///     consults this policy after each completed attempt to decide whether to re-invoke
+///     consults this classifier after each completed attempt to decide whether to re-invoke
 ///     the pipeline.
 /// </remarks>
-public interface IRetryPolicy
+public interface IRetryClassifier
 {
     /// <summary>
-    ///     Determines whether the specified process result warrants a retry.
+    ///     Classifies whether the specified process result should be retried.
     /// </summary>
     /// <param name="result">The result of the most recent process attempt.</param>
-    /// <param name="completedAttempts">
-    ///     The 1-based count of completed attempts at the time this decision is made.
-    /// </param>
     /// <returns>
     ///     <c>true</c> if the operation should be retried; otherwise, <c>false</c>.
     /// </returns>
-    bool ShouldRetry(ProcessResult result, int completedAttempts);
+    bool ShouldRetry(ProcessResult result);
 }
