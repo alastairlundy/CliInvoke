@@ -441,11 +441,25 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
         ProcessResourcePolicy resourcePolicy = _processResourcePolicySpec.Build();
         UserCredential credential = _userCredentialSpec.Build();
 
-        ProcessConfiguration configuration = new(_targetFilePath, arguments,
-            _redirectStandardInput, _outputRedirection,
-            _workingDirectoryPath, _requiresAdministratorPrivileges, environmentVariables,
-            credential, _standardInput, _standardInputEncoding, _standardOutputEncoding, _standardErrorEncoding, resourcePolicy, _enableWindowCreation,
-            _useShellExecution, _argumentList);
+        ProcessConfiguration configuration = new()
+        {
+            TargetFilePath = _targetFilePath,
+            Arguments = arguments,
+            RedirectStandardInput = _redirectStandardInput,
+            OutputRedirection = _outputRedirection,
+            WorkingDirectoryPath = _workingDirectoryPath,
+            RequiresAdministrator = _requiresAdministratorPrivileges,
+            EnvironmentVariables = environmentVariables,
+            Credential = credential,
+            StandardInput = _standardInput,
+            StandardInputEncoding = _standardInputEncoding,
+            StandardOutputEncoding = _standardOutputEncoding,
+            StandardErrorEncoding = _standardErrorEncoding,
+            ResourcePolicy = resourcePolicy,
+            WindowCreation = _enableWindowCreation,
+            UseShellExecution = _useShellExecution,
+            ArgumentList = _argumentList,
+        };
 
         return configuration;
     }

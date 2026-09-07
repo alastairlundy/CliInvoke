@@ -7,6 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
 namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
@@ -45,6 +48,7 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     ///     An optional verbatim argument list emitted via <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/>.
     ///     Used by the middleware to deliver the PowerShell wrapper without OS re-tokenization.
     /// </param>
+    [SetsRequiredMembers]
     public PowershellProcessConfiguration(
         string arguments,
         bool redirectStandardInput, bool outputRedirection = true,
@@ -54,36 +58,30 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false,
-        IEnumerable<string>? argumentList = null) : 
-        base(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
-            arguments, redirectStandardInput, outputRedirection, workingDirectoryPath,
-            requiresAdministrator, environmentVariables,
-            credentials,
-            standardInput,
-            standardInputEncoding, standardOutputEncoding,
-            standardErrorEncoding, processResourcePolicy,
-            windowCreation: windowCreation,
-            useShellExecution: useShellExecution,
-            argumentList: argumentList)
+        IEnumerable<string>? argumentList = null) :
+        base(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh", arguments, outputRedirection)
     {
-    }
+        RedirectStandardInput = redirectStandardInput;
+        RequiresAdministrator = requiresAdministrator;
+        Credential = credentials ?? UserCredential.Null;
 
-    /// <summary>
-    ///     The target file path of cross-platform PowerShell.
-    /// </summary>
-    /// <exception cref="PlatformNotSupportedException">
-    ///     Thrown if run on an operating system besides
-    ///     Windows, macOS, Linux, and FreeBSD.
-    /// </exception>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [UnsupportedOSPlatform("browser")]
-    [UnsupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("watchos")]
-    public new string TargetFilePath { get; }
+        if (standardInput is not null)
+            StandardInput = standardInput;
+
+        StandardInputEncoding = standardInputEncoding ?? Encoding.Default;
+        StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
+        StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
+        ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+        UseShellExecution = useShellExecution;
+        WindowCreation = windowCreation;
+
+        if (workingDirectoryPath is not null)
+            WorkingDirectoryPath = workingDirectoryPath;
+
+        if (environmentVariables is not null)
+            EnvironmentVariables = environmentVariables;
+
+        if (argumentList is not null)
+            ArgumentList = argumentList.ToArray();
+    }
 }

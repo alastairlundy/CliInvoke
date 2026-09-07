@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Text;
-
 using CliInvoke.Builders;
 using CliInvoke.Core.Configuration;
 
@@ -51,22 +49,14 @@ public static class ProcessConfigurationFactory
             throw new DirectoryNotFoundException(string.Format(
                 Resources.Exceptions_DirectoryNotFound_WorkingDirectory, workingDirectory));
         
-        return new ProcessConfiguration(
-            targetFilePath,
-            arguments,
-            redirectStandardInput: false,
-            outputRedirection,
-            workingDirectoryPath: workingDirectory,
-            requiresAdministrator: false,
-            environmentVariables:null,
-            UserCredential.Null,
-            standardInput: StreamWriter.Null,
-            standardInputEncoding: Encoding.Default,
-            standardOutputEncoding: Encoding.Default,
-            standardErrorEncoding: Encoding.Default,
-            ProcessResourcePolicy.Default,
-            windowCreation: enableWindowCreation,
-            useShellExecution: false);
+        return new ProcessConfiguration
+        {
+            TargetFilePath = targetFilePath,
+            Arguments = arguments,
+            OutputRedirection = outputRedirection,
+            WorkingDirectoryPath = workingDirectory ?? Directory.GetCurrentDirectory(),
+            WindowCreation = enableWindowCreation,
+        };
     }
 
     /// <summary>
@@ -139,21 +129,16 @@ public static class ProcessConfigurationFactory
         configureCredential?.Invoke(userCredentialSpec);
         UserCredential credential = userCredentialSpec.Build();
 
-        return new ProcessConfiguration(
-            targetFilePath,
-            builtArguments,
-            redirectStandardInput: false,
-            outputRedirection,
-            workingDirectoryPath: workingDirectory,
-            requiresAdministrator: false,
-            environmentVariables,
-            credential,
-            standardInput: StreamWriter.Null,
-            standardInputEncoding: Encoding.Default,
-            standardOutputEncoding: Encoding.Default,
-            standardErrorEncoding: Encoding.Default,
-            processResourcePolicy,
-            windowCreation: enableWindowCreation,
-            useShellExecution: false);
+        return new ProcessConfiguration
+        {
+            TargetFilePath = targetFilePath,
+            Arguments = builtArguments,
+            OutputRedirection = outputRedirection,
+            WorkingDirectoryPath = workingDirectory ?? Directory.GetCurrentDirectory(),
+            EnvironmentVariables = environmentVariables,
+            Credential = credential,
+            ResourcePolicy = processResourcePolicy,
+            WindowCreation = enableWindowCreation,
+        };
     }
 }

@@ -9,6 +9,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -19,130 +20,100 @@ namespace CliInvoke.Core;
 /// <summary>
 ///     A class to store Process configuration information.
 /// </summary>
+/// <remarks>
+///     The type is directly constructible via an object initializer, with init-only
+///     properties and a required <see cref="TargetFilePath"/>. Direct
+///     construction carries the same semantics as the convenience constructor: every
+///     property defaults to the value documented on the property, and init-time validation
+///     runs on <see cref="TargetFilePath"/> and <see cref="WorkingDirectoryPath"/>.
+/// </remarks>
 public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 {
+    private string _targetFilePath = null!;
+    private string _workingDirectoryPath = Directory.GetCurrentDirectory();
+    private IReadOnlyList<string> _argumentList = Array.Empty<string>();
+    private IReadOnlyDictionary<string, string> _environmentVariables =
+        ImmutableSortedDictionary<string, string>.Empty;
+
     /// <summary>
-    /// 
+    ///     Initialises a new instance of the <see cref="ProcessConfiguration" /> class with
+    ///     all properties taking the defaults documented on the corresponding properties.
     /// </summary>
-    /// <param name="targetFilePath"></param>
-    /// <param name="arguments"></param>
-    /// <param name="outputRedirection"></param>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="ArgumentNullException"></exception>
     /// <remarks>
-    ///     When environment variables are supplied via the full constructor, they are stored as an
-    ///     immutable, key-sorted snapshot; see the full constructor remarks for the implications on
-    ///     equality, hashing, and process execution.
+    ///     <see cref="TargetFilePath"/> is required and must be set via the object initializer.
     /// </remarks>
-    public ProcessConfiguration(string targetFilePath, string arguments = "", 
-        bool outputRedirection = true)
-        : this(targetFilePath, arguments, redirectStandardInput: false, outputRedirection: outputRedirection)
+    public ProcessConfiguration()
     {
     }
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="ProcessConfiguration" /> class
-    ///     with full control over all process configuration parameters.
+    ///     with the target file path, arguments, and output redirection setting; all other
+    ///     properties take the defaults documented on the corresponding properties.
     /// </summary>
     /// <param name="targetFilePath">The file path of the executable to be run.</param>
     /// <param name="arguments">The arguments to pass to the executable.</param>
-    /// <param name="redirectStandardInput">Whether to redirect standard input.</param>
     /// <param name="outputRedirection">Whether to redirect standard output and error.</param>
-    /// <param name="workingDirectoryPath">The working directory path to use, or <c>null</c> for the current directory.</param>
-    /// <param name="requiresAdministrator">Whether administrator privileges are required.</param>
-    /// <param name="environmentVariables">Environment variables to set, or <c>null</c> for none.</param>
-    /// <param name="credential">The user credential for execution, or <c>null</c> for none.</param>
-    /// <param name="standardInput">The standard input stream, or <c>null</c> for <see cref="StreamWriter.Null"/>.</param>
-    /// <param name="standardInputEncoding">The encoding for standard input.</param>
-    /// <param name="standardOutputEncoding">The encoding for standard output.</param>
-    /// <param name="standardErrorEncoding">The encoding for standard error.</param>
-    /// <param name="processResourcePolicy">The process resource policy, or <c>null</c> for defaults.</param>
-    /// <param name="windowCreation">Whether to enable window creation.</param>
-    /// <param name="useShellExecution">Whether to use shell execution.</param>
-    /// <remarks>
-    ///     The <paramref name="environmentVariables"/> collection is captured as an immutable
-    ///     snapshot sorted by key using ordinal comparison. This normalisation makes
-    ///     <see cref="Equals(ProcessConfiguration)"/> and <see cref="GetHashCode"/> order-independent
-    ///     (two configurations carrying the same variables in a different insertion order are considered
-    ///     equal) and avoids re-sorting on every hash code computation. Because environment variable
-    ///     ordering is irrelevant to the spawned process, this has no effect on process execution. The
-    ///     snapshot also isolates the configuration from later mutations made to the caller's original
-    ///     dictionary.
-    /// </remarks>
-    protected internal ProcessConfiguration(
-        string targetFilePath,
-        string arguments,
-        bool redirectStandardInput,
-        bool outputRedirection = true,
-        string? workingDirectoryPath = null,
-        bool requiresAdministrator = false,
-        IReadOnlyDictionary<string, string>? environmentVariables = null,
-        UserCredential? credential = null,
-        StreamWriter? standardInput = null,
-        Encoding? standardInputEncoding = null,
-        Encoding? standardOutputEncoding = null,
-        Encoding? standardErrorEncoding = null,
-        ProcessResourcePolicy? processResourcePolicy = null,
-        bool windowCreation = false,
-        bool useShellExecution = false,
-        IEnumerable<string>? argumentList = null)
+    /// <exception cref="ArgumentException">Thrown if <paramref name="targetFilePath" /> is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="arguments" /> is null.</exception>
+    [SetsRequiredMembers]
+    public ProcessConfiguration(string targetFilePath, string arguments = "",
+        bool outputRedirection = true)
     {
-        ArgumentException.ThrowIfNullOrEmpty(targetFilePath);
         ArgumentNullException.ThrowIfNull(arguments);
 
         TargetFilePath = targetFilePath;
-        ArgumentList = argumentList is null
-            ? Array.Empty<string>()
-            : argumentList.ToArray();
-        
-        RequiresAdministrator = requiresAdministrator;
         Arguments = arguments;
-        WorkingDirectoryPath = workingDirectoryPath ?? Directory.GetCurrentDirectory();
-        EnvironmentVariables = environmentVariables is null
-            ? ImmutableSortedDictionary<string, string>.Empty
-            : ImmutableSortedDictionary.CreateRange(StringComparer.Ordinal, environmentVariables);
-        Credential = credential ?? UserCredential.Null;
-
         OutputRedirection = outputRedirection;
-        ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
-
-        RedirectStandardInput = redirectStandardInput;
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        StandardInput = standardInput ?? StreamWriter.Null;
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        UseShellExecution = useShellExecution;
-        WindowCreation = windowCreation;
-
-        StandardInputEncoding = standardInputEncoding ?? Encoding.Default;
-        StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
-        StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
     }
 
     /// <summary>
     ///     Whether administrator privileges should be used when executing the Command.
     /// </summary>
-    public bool RequiresAdministrator { get; }
+    public bool RequiresAdministrator { get; init; }
 
     /// <summary>
     ///     The file path of the executable to be run and wrapped.
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown if set to null or empty.</exception>
     /// <remarks>
     ///     Not mutated after construction; for the resolved file path, see the result.
     ///     <see cref="ProcessResult.ExecutedFilePath"/>.
     /// </remarks>
-    public string TargetFilePath { get; init; }
+    public required string TargetFilePath
+    {
+        get => _targetFilePath;
+        init
+        {
+            ArgumentException.ThrowIfNullOrEmpty(value);
+            _targetFilePath = value;
+        }
+    }
 
     /// <summary>
     ///     The working directory path to be used when executing the Command.
     /// </summary>
-    public string WorkingDirectoryPath { get; }
+    /// <remarks>
+    ///     Defaults to <see cref="Directory.GetCurrentDirectory()"/> when not set.
+    /// </remarks>
+    /// <exception cref="DirectoryNotFoundException">Thrown if set to a directory that does not exist.</exception>
+    public string WorkingDirectoryPath
+    {
+        get => _workingDirectoryPath;
+        init
+        {
+            if (!Directory.Exists(value))
+                throw new DirectoryNotFoundException(string.Format(
+                    Resources.Exceptions_DirectoryNotFound_WorkingDirectory, value));
+
+            _workingDirectoryPath = value;
+        }
+    }
 
     /// <summary>
     ///     The arguments to be provided to the executable to be run.
     /// </summary>
-    public string Arguments { get; }
+    public string Arguments { get; init; } = string.Empty;
 
     /// <summary>
     ///     An optional verbatim argument list. When non-empty, the control adapter emits these via
@@ -152,35 +123,46 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     (PowerShell/cmd), whose own parser would otherwise re-interpret a single re-tokenized
     ///     <see cref="Arguments"/> string — a command-injection vector.
     /// </summary>
-    public IReadOnlyList<string> ArgumentList { get; }
-
-    /// <summary>
-    ///     A mutable tokenised argument list that can be set after construction.
-    ///     When non-empty, the control adapter emits these via
-    ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the single
-    ///     <see cref="Arguments"/> string.
-    /// </summary>
     /// <remarks>
-    ///     This property is used by <c>RunnerConfigurationFactory</c> to expose pre-tokenised
-    ///     arguments so hosts can bypass OS-level re-parsing of the combined argument string.
-    ///     Set it directly to preserve tokens that contain spaces.
+    ///     Any supplied list is captured as a snapshot; later mutations made to the caller's
+    ///     original collection are not reflected in the configuration.
     /// </remarks>
-    public IReadOnlyList<string> ArgumentsList { get; set; } = Array.Empty<string>();
+    public IReadOnlyList<string> ArgumentList
+    {
+        get => _argumentList;
+        init => _argumentList = value is null ? Array.Empty<string>() : value.ToArray();
+    }
 
     /// <summary>
     ///     Whether to enable window creation or not when the Command's Process is run.
     /// </summary>
-    public bool WindowCreation { get; }
+    public bool WindowCreation { get; init; }
 
     /// <summary>
     ///     The environment variables to be set.
     /// </summary>
-    public IReadOnlyDictionary<string, string> EnvironmentVariables { get; }
+    /// <remarks>
+    ///     Any supplied dictionary is captured as an immutable snapshot sorted by key using
+    ///     ordinal comparison. This normalisation makes <see cref="Equals(ProcessConfiguration)"/>
+    ///     and <see cref="GetHashCode"/> order-independent (two configurations carrying the same
+    ///     variables in a different insertion order are considered equal) and avoids re-sorting
+    ///     on every hash code computation. Because environment variable ordering is irrelevant
+    ///     to the spawned process, this has no effect on process execution. The snapshot also
+    ///     isolates the configuration from later mutations made to the caller's original
+    ///     dictionary.
+    /// </remarks>
+    public IReadOnlyDictionary<string, string> EnvironmentVariables
+    {
+        get => _environmentVariables;
+        init => _environmentVariables = value is null
+            ? ImmutableSortedDictionary<string, string>.Empty
+            : ImmutableSortedDictionary.CreateRange(StringComparer.Ordinal, value);
+    }
 
     /// <summary>
     ///     The credential to be used when executing the Command.
     /// </summary>
-    public UserCredential Credential { get; }
+    public UserCredential Credential { get; init; } = UserCredential.Null;
 
     /// <summary>
     ///     Whether to use Shell Execution or not when executing the Command.
@@ -191,7 +173,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// </remarks>
     /// <seealso
     ///     href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror" />
-    public bool UseShellExecution { get; }
+    public bool UseShellExecution { get; init; }
 
     /// <summary>
     ///     The Standard Input source to redirect Standard Input to if configured.
@@ -202,17 +184,19 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// </remarks>
     /// <seealso
     ///     href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror" />
-    public StreamWriter? StandardInput { get; }
+#pragma warning disable CS0618 // Type or member is obsolete
+    public StreamWriter? StandardInput { get; init; } = StreamWriter.Null;
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Whether to redirect the Standard Input.
     /// </summary>
-    public bool RedirectStandardInput { get; }
+    public bool RedirectStandardInput { get; init; }
 
     /// <summary>
     /// Whether to redirect process Standard Output and Error.
     /// </summary>
-    public bool OutputRedirection { get; }
+    public bool OutputRedirection { get; init; }
 
     /// <summary>
     ///     The Process Resource Policy to be used for executing the Command.
@@ -225,22 +209,22 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///         before configuring a property.
     ///     </para>
     /// </remarks>
-    public ProcessResourcePolicy ResourcePolicy { get; }
+    public ProcessResourcePolicy ResourcePolicy { get; init; } = ProcessResourcePolicy.Default;
 
     /// <summary>
     ///     The encoding to use for the Standard Input.
     /// </summary>
-    public Encoding StandardInputEncoding { get; }
+    public Encoding StandardInputEncoding { get; init; } = Encoding.Default;
 
     /// <summary>
     ///     The encoding to use for the Standard Output.
     /// </summary>
-    public Encoding StandardOutputEncoding { get; }
+    public Encoding StandardOutputEncoding { get; init; } = Encoding.Default;
 
     /// <summary>
     ///     The encoding to use for the Standard Error.
     /// </summary>
-    public Encoding StandardErrorEncoding { get; }
+    public Encoding StandardErrorEncoding { get; init; } = Encoding.Default;
 
     /// <summary>
     ///     Determines if a Process configuration is equal to another Process configuration.

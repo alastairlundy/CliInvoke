@@ -162,17 +162,6 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
 
         ProcessConfiguration result = commandBuilder.Build();
 
-        // Mirror the pre-tokenized form onto the mutable ArgumentsList so consumers that
-        // construct a ProcessConfiguration without going through the builder (and therefore
-        // have no read-only ArgumentList) can still bypass OS-level re-parsing. The
-        // adapter honours ArgumentsList as a fallback for exactly this reason.
-        //
-        // Only mirror when the canonical delivery is ArgumentList-based; mirroring the
-        // single-string cmd delivery would force it back through ProcessStartInfo.ArgumentList
-        // quoting and re-introduce the cmd.exe quoting mismatch this design is avoiding.
-        if (result.ArgumentList.Count > 0)
-            result.ArgumentsList = result.ArgumentList.ToList();
-
         return result;
     }
 }
