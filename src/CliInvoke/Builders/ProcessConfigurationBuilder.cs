@@ -20,7 +20,11 @@ namespace CliInvoke.Builders;
 #pragma warning disable CA1416
 
 /// <summary>
-///     Builder class for creating process configurations.
+///     Advanced builder for creating <see cref="ProcessConfiguration"/> instances.
+///     Use this builder when you need argument escaping via <see cref="ConfigureArguments(Action{ArgumentsSpec})"/>,
+///     user credential configuration via <see cref="ConfigureUserCredential(Action{UserCredentialSpec})"/>,
+///     or resource policy configuration via <see cref="ConfigureProcessResourcePolicy(Action{ProcessResourcePolicySpec})"/>.
+///     For all other cases, prefer direct init construction of <see cref="ProcessConfiguration"/>.
 /// </summary>
 public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
 {
@@ -206,10 +210,6 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     public IProcessConfigurationBuilder SetWorkingDirectory(string workingDirectoryPath)
     {
         ArgumentException.ThrowIfNullOrEmpty(workingDirectoryPath);
-
-        if (!Directory.Exists(workingDirectoryPath))
-            throw new DirectoryNotFoundException(
-                $"Directory '{workingDirectoryPath}' could not be found or does not exist.");
 
         _workingDirectoryPath = workingDirectoryPath;
 
