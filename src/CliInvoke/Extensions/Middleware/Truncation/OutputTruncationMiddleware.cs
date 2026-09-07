@@ -7,17 +7,17 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Core;
 using CliInvoke.Core.Middleware;
-using CliInvoke.Internal.Extensions;
 
 namespace CliInvoke.Extensions.Middleware;
 
 /// <summary>
-///     Opt-in middleware that publishes a per-stream output-truncation cap into
-///     <see cref="MiddlewareItems"/> before the remainder of the pipeline runs.
+///     Opt-in middleware that publishes a per-stream output-truncation cap into the exit
+///     configuration before the remainder of the pipeline runs.
 /// </summary>
 /// <remarks>
-///     The cap is written under <see cref="TruncationDefaults.MaxBytesPerStreamKey"/> so that the
+///     The cap is written via <see cref="InvocationContext.WithExitConfiguration"/> so that the
 ///     buffered-capture path (which runs downstream of this link) can truncate each stream as it is
 ///     read. This middleware only writes the cap; it does not perform truncation itself. It is ordered
 ///     upstream of <c>LoggingMiddleware</c> so logs reflect already-capped output
@@ -44,10 +44,8 @@ internal sealed class OutputTruncationMiddleware : IProcessMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        // Publish the cap before the terminal pipeline reads/captures output. The walkers assign
-        // context.Middleware before invoking the first link, but guard defensively in case it is null.
-        context.Middleware?.Items.Set<long>(TruncationDefaults.MaxBytesPerStreamKey, _options.MaxSize);
-
-        await next(context);
+        await next(context.WithExitConfiguration(
+            ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+                context.ExitConfiguration, _options.MaxSize)));
     }
 }

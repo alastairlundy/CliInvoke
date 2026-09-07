@@ -10,7 +10,6 @@
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Processes;
 using CliInvoke.Core.Validation;
-using CliInvoke.Internal.Extensions;
 
 namespace CliInvoke;
 
@@ -41,19 +40,7 @@ internal class ProcessInvocationPipeline
     public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx)
         where TResult : ProcessResult
     {
-        long? GetTruncationCap()
-        {
-            MiddlewareContext? middleware = ctx.Middleware;
-
-            if (middleware is not null &&
-                middleware.Items.TryGet<long>(TruncationDefaults.MaxBytesPerStreamKey,
-                    out long cap))
-                return cap;
-
-            return null;
-        }
-
-        long? truncationCap = GetTruncationCap();
+        long? truncationCap = ctx.ExitConfiguration?.MaxBufferedOutputBytes;
 
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
             ctx.Configuration, ctx.ExitConfiguration);
