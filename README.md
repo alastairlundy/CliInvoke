@@ -78,7 +78,7 @@ For more details see the [list of supported platforms](site/docs/Supported-Opera
 CliInvoke provides three core design patterns for invoking processes (with DI + Middleware and the
 platform Specializations as composition paths). See [PATTERNS.md](PATTERNS.md) for comprehensive
 documentation on each pattern, including a [Which pattern should I use?](PATTERNS.md#which-pattern-should-i-use)
-decision tree.
+decision tree and a [Constructing a ProcessConfiguration](PATTERNS.md#constructing-a-processconfiguration) guide.
 
 * **`CliRun`** – **Recommended default.** Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. **Start here if you are new to CliInvoke.**
 * **`IProcessInvoker`** – DI-centric pattern and support for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
@@ -120,6 +120,8 @@ For detailed documentation on all available patterns and when to use them, see [
 ### Advanced Configuration
 
 For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](site/docs/guides/configuration.md)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
+
+> Most configurations are built with direct init construction (see [Constructing a ProcessConfiguration](PATTERNS.md#constructing-a-processconfiguration)). The builder path is for argument escaping, user credentials, and resource policy features.
 
 ## Middleware
 

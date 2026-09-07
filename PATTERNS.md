@@ -17,11 +17,59 @@ Start from your situation — this is a short decision tree; follow the first br
 ## Table of Contents
 
 - [Which pattern should I use?](#which-pattern-should-i-use)
+- [Constructing a ProcessConfiguration](#constructing-a-processconfiguration)
 
 - [Beginner‑Friendly Pattern – `CliRun`](#beginner-friendly-pattern-­cliRun)
 - [End‑to‑End / DI‑Friendly Pattern – `IProcessInvoker`](#end-to-end--di-friendly-pattern‑iprocessinvoquer)
-- [Flexible / Process‑User Familiar Pattern – `ExternalProcess` & `ExternalProcessFactory`](#flexible--process‑user-familiar-pattern‑externalprocess--externalprocessfactory)
+- [Flexible / Process‑User Familiar Pattern – `ExternalProcess` & `ExternalProcessFactory`](#flexible--process‑user-familiar-pattern-externalprocess--externalprocessfactory)
 - [Summary of Trade‑offs](#summary-of-trade-offs)
+
+---
+
+## Constructing a ProcessConfiguration
+
+Every invocation pattern consumes a `ProcessConfiguration`. There are two ways to build one:
+
+### Default — Init construction
+
+For most scenarios, construct `ProcessConfiguration` directly using an object initializer. This is the recommended default: no builder, no factory, no DI required.
+
+```csharp
+ProcessConfiguration config = new()
+{
+    TargetFilePath = "dotnet",
+    Arguments = "--version",
+    OutputRedirection = true
+};
+```
+
+Or use the convenience constructor for the common case:
+
+```csharp
+ProcessConfiguration config = new("dotnet", "--version");
+```
+
+`TargetFilePath` is required and validated at construction time. `WorkingDirectoryPath` defaults to the current directory and throws `DirectoryNotFoundException` if set to a non-existent path.
+
+### Advanced — Builder path
+
+Use `ProcessConfigurationBuilder` when you need features that the init API cannot express:
+
+- **Argument escaping** — `ConfigureArguments(Action<ArgumentsSpec>)` wraps and validates individual arguments.
+- **User credential configuration** — `ConfigureUserCredential(Action<UserCredentialSpec>)` for Windows-only credential injection with `SecureString` password staging.
+- **Resource policy configuration** — `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` for processor affinity and resource settings.
+
+```csharp
+using CliInvoke.Builders;
+
+IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("dotnet")
+    .SetArguments(["--info"])
+    .SetOutputRedirection(true);
+
+ProcessConfiguration config = builder.Build();
+```
+
+The builder delegates to the same init-only properties under the hood; it adds escaping, credential spec, and resource policy callbacks on top.
 
 ---
 

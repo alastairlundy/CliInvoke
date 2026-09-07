@@ -165,7 +165,7 @@ services.AddCliInvoke();
 ServiceProvider provider = services.BuildServiceProvider();
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+ProcessConfiguration config = new("dotnet", "--version");
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 Console.WriteLine(result.StandardOutput);
 ```

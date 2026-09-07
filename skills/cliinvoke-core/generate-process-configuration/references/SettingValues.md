@@ -2,7 +2,7 @@
 
 This reference shows the simplest way to configure a process using only the direct methods of `ProcessConfigurationBuilder`.
 
-For simple use cases, utilizing `IProcessConfigurationBuilder` may be verbose or add unnecessary complexity; in such instances, the `ProcessConfigurationFactory` static factory may be a more efficient alternative. For the most basic scenarios, such as specifying only a file path and arguments, you can instantiate `ProcessConfiguration` directly.
+For simple use cases, you can construct `ProcessConfiguration` directly using an object initializer — this is the default and recommended approach. The builder adds argument escaping, user credential configuration, and resource policy features on top of init construction.
 
 ## Basic Value Configuration
 
