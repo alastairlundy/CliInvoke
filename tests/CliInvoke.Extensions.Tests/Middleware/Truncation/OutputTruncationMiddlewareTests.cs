@@ -50,7 +50,7 @@ public class OutputTruncationMiddlewareTests
     {
         MiddlewareItems items = new MiddlewareItems();
         InvocationContext ctx = CreateContext(items);
-        OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(new TruncationOptions { MaxSize = 2048 });
+        OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(new TruncationOptions { MaxBytes = 2048 });
         InvocationContext? downstream = null;
 
         await middleware.InvokeAsync(ctx, c =>

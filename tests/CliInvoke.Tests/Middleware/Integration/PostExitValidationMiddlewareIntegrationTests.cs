@@ -165,4 +165,75 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         await Assert.That(exception.Message).IsEqualTo("The configuration rule failed.");
     }
+
+    [Test]
+    public async Task UsePostExitValidation_EvaluatesEachRuleExactlyOnce_NoDoubleValidation()
+    {
+        const int configRuleCount = 3;
+        const int validatorRuleCount = 2;
+
+        int[] configInvocations = new int[configRuleCount];
+        int[] validatorInvocations = new int[validatorRuleCount];
+
+        ValidationRule<ProcessResult>[] configRules = new ValidationRule<ProcessResult>[configRuleCount];
+        for (int i = 0; i < configRuleCount; i++)
+        {
+            int index = i;
+            configRules[i] = new ValidationRule<ProcessResult>(
+                r =>
+                {
+                    configInvocations[index]++;
+                    return true;
+                },
+                $"ConfigRule-{i}");
+        }
+
+        ValidationRule<ProcessResult>[] validatorRules = new ValidationRule<ProcessResult>[validatorRuleCount];
+        for (int i = 0; i < validatorRuleCount; i++)
+        {
+            int index = i;
+            validatorRules[i] = new ValidationRule<ProcessResult>(
+                r =>
+                {
+                    validatorInvocations[index]++;
+                    return true;
+                },
+                $"ValidatorRule-{i}");
+        }
+
+        IProcessResultValidator<ProcessResult> validator = new ProcessResultValidator<ProcessResult>(validatorRules);
+
+        ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithValidationRules(
+            ProcessExitConfiguration.CreateGraceful(), configRules);
+
+        ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
+        builder.UsePostExitValidation(validator);
+        IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
+        ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
+
+        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+
+        ProcessResult result = await invoker.ExecuteAsync(config, exit);
+
+        await Assert.That(result.ExitCode).IsEqualTo(0);
+
+        int totalConfig = 0;
+        for (int i = 0; i < configRuleCount; i++)
+        {
+            await Assert.That(configInvocations[i]).IsEqualTo(1);
+            totalConfig += configInvocations[i];
+        }
+
+        int totalValidator = 0;
+        for (int i = 0; i < validatorRuleCount; i++)
+        {
+            await Assert.That(validatorInvocations[i]).IsEqualTo(1);
+            totalValidator += validatorInvocations[i];
+        }
+
+        // The merged set (config rules first, then validator rules) is evaluated exactly once by the
+        // pipeline; the middleware adds no post-next evaluation of its own rules.
+        await Assert.That(totalConfig).IsEqualTo(configRuleCount);
+        await Assert.That(totalValidator).IsEqualTo(validatorRuleCount);
+    }
 }

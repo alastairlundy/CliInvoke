@@ -40,7 +40,7 @@ public class BufferedCaptureNoDeadlockTests
     public async Task ExecuteBufferedAsync_LargeOutput_CompletesWithoutDeadlock_AndTruncates()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseOutputTruncation(new TruncationOptions { MaxSize = 4096 }));
+        services.AddCliInvoke(builder => builder.UseOutputTruncation(new TruncationOptions { MaxBytes = 4096 }));
         IProcessInvoker invoker = services.BuildServiceProvider().GetRequiredService<IProcessInvoker>();
 
         (string target, string arguments) = GetLargeOutputCommand();

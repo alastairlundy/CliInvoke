@@ -46,6 +46,6 @@ internal sealed class OutputTruncationMiddleware : IProcessMiddleware
 
         await next(context.WithExitConfiguration(
             ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
-                context.ExitConfiguration, _options.MaxSize)));
+                context.ExitConfiguration, _options.MaxBytes)));
     }
 }
