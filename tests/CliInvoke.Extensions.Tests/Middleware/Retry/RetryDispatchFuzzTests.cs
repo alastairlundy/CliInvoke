@@ -56,7 +56,7 @@ public class RetryDispatchFuzzTests
                 RetryMiddleware middleware = new RetryMiddleware(new ExitCodeNonZeroRetry(), options);
 
                 InvocationContext context = new InvocationContext(
-                    ProcessConfigurationFactory.Create("dotnet", "--version"),
+                    new ProcessConfiguration("dotnet", "--version"),
                     ProcessExitConfiguration.CreateGraceful(),
                     InvocationMode.Buffered,
                     CancellationToken.None);
@@ -93,7 +93,7 @@ public class RetryDispatchFuzzTests
                 RetryMiddleware middleware = new RetryMiddleware(new NeverRetry(), options);
 
                 InvocationContext context = new InvocationContext(
-                    ProcessConfigurationFactory.Create("dotnet", "--version"),
+                    new ProcessConfiguration("dotnet", "--version"),
                     ProcessExitConfiguration.CreateGraceful(),
                     InvocationMode.Buffered,
                     CancellationToken.None);

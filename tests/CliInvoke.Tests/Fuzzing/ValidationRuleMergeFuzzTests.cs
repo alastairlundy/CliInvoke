@@ -49,7 +49,7 @@ public class ValidationRuleMergeFuzzTests
                 IProcessMiddleware middleware = builder.Build()[0];
 
                 InvocationContext context = new InvocationContext(
-                    ProcessConfigurationFactory.Create("dotnet", "--version"),
+                    new ProcessConfiguration("dotnet", "--version"),
                     exit,
                     InvocationMode.Buffered,
                     CancellationToken.None);
@@ -112,7 +112,7 @@ public class ValidationRuleMergeFuzzTests
                 IProcessMiddleware middleware = builder.Build()[0];
 
                 InvocationContext context = new InvocationContext(
-                    ProcessConfigurationFactory.Create("dotnet", "--version"),
+                    new ProcessConfiguration("dotnet", "--version"),
                     exit,
                     InvocationMode.Buffered,
                     CancellationToken.None);

@@ -23,7 +23,7 @@ public class RetryMiddlewareTests
 {
     private static InvocationContext CreateContext()
     {
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
+        ProcessConfiguration config = new ProcessConfiguration("cmd.exe", "/C echo hi");
         return new InvocationContext(config, ProcessExitConfiguration.CreateGraceful(), InvocationMode.Buffered,
             CancellationToken.None);
     }
@@ -205,7 +205,7 @@ public class RetryMiddlewareTests
 
         // The retry middleware is registered and active: the retryable result is attempted
         // MaxAttempts times rather than once, and the classifier is consulted once per attempt.
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
+        ProcessConfiguration config = new ProcessConfiguration("cmd.exe", "/C echo hi");
         await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 
         await Assert.That(policy.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);

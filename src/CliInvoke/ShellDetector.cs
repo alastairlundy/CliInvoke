@@ -66,8 +66,7 @@ public class ShellDetector : IShellDetector
     {
         cancellationToken.Register(() => throw new TaskCanceledException());
 
-        ProcessConfiguration execConfiguration = ProcessConfigurationFactory
-            .Create("ps", "-p $$ -o comm=");
+        ProcessConfiguration execConfiguration = new ProcessConfiguration("ps", "-p $$ -o comm=");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
             execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
@@ -75,8 +74,8 @@ public class ShellDetector : IShellDetector
         FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
             GetFirstLine(execResult.StandardOutput));
 
-        ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
-            .Create(shellExeInfo.FullName, "--version");
+        ProcessConfiguration shellInfoProcessConfig = new ProcessConfiguration(
+            shellExeInfo.FullName, "--version");
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
             shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
@@ -116,8 +115,8 @@ public class ShellDetector : IShellDetector
         {
             FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
-            ProcessConfiguration powershellConfig = ProcessConfigurationFactory
-                .Create(powershell5PlusFileInfo.FullName, "");
+            ProcessConfiguration powershellConfig = new ProcessConfiguration(
+                powershell5PlusFileInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
                 powershellConfig,
@@ -138,8 +137,8 @@ public class ShellDetector : IShellDetector
         {
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
-            ProcessConfiguration cmdConfig = ProcessConfigurationFactory
-                .Create(cmdExeInfo.FullName, "");
+            ProcessConfiguration cmdConfig = new ProcessConfiguration(
+                cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
                 ProcessExitConfiguration.CreateGraceful(), cancellationToken);

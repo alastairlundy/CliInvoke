@@ -44,7 +44,7 @@ public class BufferedCaptureNoDeadlockTests
         IProcessInvoker invoker = services.BuildServiceProvider().GetRequiredService<IProcessInvoker>();
 
         (string target, string arguments) = GetLargeOutputCommand();
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(target, arguments);
+        ProcessConfiguration config = new ProcessConfiguration(target, arguments);
 
         // Wrap with a timeout so a regression (deadlock) fails fast instead of hanging the run.
         BufferedProcessResult result = await invoker

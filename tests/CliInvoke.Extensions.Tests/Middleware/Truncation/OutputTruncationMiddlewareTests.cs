@@ -20,7 +20,7 @@ public class OutputTruncationMiddlewareTests
 {
     private static InvocationContext CreateContext(MiddlewareItems items)
     {
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
+        ProcessConfiguration config = new ProcessConfiguration("cmd.exe", "/C echo hi");
         InvocationContext ctx = new InvocationContext(config, ProcessExitConfiguration.CreateGraceful(), InvocationMode.Buffered,
             CancellationToken.None);
         ctx.Middleware = new MiddlewareContext(_ => Task.CompletedTask, CancellationToken.None, items);

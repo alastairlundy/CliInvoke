@@ -31,7 +31,7 @@ internal class PipelineDispatchTests : IDisposable
     private InvocationContext CreateContext(InvocationMode mode,
         CancellationToken cancellationToken = default)
     {
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(_targetFilePath, "");
+        ProcessConfiguration config = new ProcessConfiguration(_targetFilePath, "");
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
         _configurations.Add(config);
         return new InvocationContext(config, exitConfig, mode, cancellationToken);

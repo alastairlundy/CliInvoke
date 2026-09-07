@@ -1,5 +1,6 @@
 using System;
 using CliInvoke;
+using CliInvoke.Builders;
 using CliInvoke.Core;
 using CliInvoke.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +27,9 @@ int randomNumber = Random.Shared.Next();
 
 Console.WriteLine($"Random number is {randomNumber}");
 
-ProcessConfiguration procConfig = ProcessConfigurationFactory.Create("echo", new[] { randomNumber.ToString() });
+using ProcessConfigurationBuilder builder = new("echo");
+builder.SetArguments(new[] { randomNumber.ToString() });
+ProcessConfiguration procConfig = builder.Build();
 
 BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procConfig);
 

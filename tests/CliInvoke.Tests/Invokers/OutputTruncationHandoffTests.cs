@@ -68,7 +68,7 @@ public class OutputTruncationHandoffTests
     {
         (string target, string arguments) = GetLargeOutputCommand();
 
-        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(target, arguments);
+        ProcessConfiguration configuration = new ProcessConfiguration(target, arguments);
         ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), 1000);
 
@@ -88,7 +88,7 @@ public class OutputTruncationHandoffTests
         IProcessInvoker invoker = services.BuildServiceProvider().GetRequiredService<IProcessInvoker>();
 
         (string target, string arguments) = GetLargeOutputCommand();
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(target, arguments);
+        ProcessConfiguration config = new ProcessConfiguration(target, arguments);
 
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
@@ -107,7 +107,7 @@ public class OutputTruncationHandoffTests
         IProcessInvoker invoker = services.BuildServiceProvider().GetRequiredService<IProcessInvoker>();
 
         (string target, string arguments) = GetLargeOutputCommand();
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(target, arguments);
+        ProcessConfiguration config = new ProcessConfiguration(target, arguments);
 
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
@@ -128,7 +128,7 @@ public class OutputTruncationHandoffTests
         IProcessInvoker invoker = services.BuildServiceProvider().GetRequiredService<IProcessInvoker>();
 
         (string target, string arguments) = GetLargeOutputCommand();
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(target, arguments);
+        ProcessConfiguration config = new ProcessConfiguration(target, arguments);
         ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), 1000);
 

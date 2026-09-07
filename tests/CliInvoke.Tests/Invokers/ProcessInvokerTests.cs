@@ -26,7 +26,7 @@ public class ProcessInvokerTests
 
         ProcessInvoker invoker = new ProcessInvoker(externalProcessFactory, new[] { configMiddleware }, null);
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,
@@ -72,7 +72,7 @@ public class ProcessInvokerTests
     {
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("FAKE.FILE", "");
+        ProcessConfiguration config = new ProcessConfiguration("FAKE.FILE", "");
 
         await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.CreateGraceful(), cancellationToken: CancellationToken.None)).Throws<FileNotFoundException>();

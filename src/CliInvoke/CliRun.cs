@@ -177,8 +177,8 @@ public static class CliRun
         // ExitConfiguration is unused by FireAndForget
         workingDirectory ??= Environment.CurrentDirectory;
 
-        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory, outputRedirection: false);
+        ProcessConfiguration configuration = new ProcessConfiguration(targetFilePath, arguments)
+            { OutputRedirection = false, WorkingDirectoryPath = workingDirectory };
 
         return FireAndForget(configuration);
     }
@@ -193,8 +193,8 @@ public static class CliRun
     {
         workingDirectory ??= Environment.CurrentDirectory;
 
-        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(
-            targetFilePath, arguments, workingDirectory, outputRedirection);
+        ProcessConfiguration configuration = new ProcessConfiguration(
+            targetFilePath, arguments, outputRedirection) { WorkingDirectoryPath = workingDirectory };
 
         ProcessExitConfiguration exitConfiguration = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(

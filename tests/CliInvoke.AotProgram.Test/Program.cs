@@ -39,7 +39,7 @@ int randomNumber = Random.Shared.Next();
 
 Console.WriteLine($"Random number is {randomNumber}");
 
-ProcessConfiguration procConfig = ProcessConfigurationFactory.Create("echo", randomNumber.ToString());
+ProcessConfiguration procConfig = new ProcessConfiguration("echo", randomNumber.ToString());
 
 BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procConfig);
 

@@ -155,7 +155,7 @@ public class DependencyInjectionExtensionTests
         IProcessInvoker invoker = scope.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         (string filePath, string arguments) = ResolveEchoCommand();
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(filePath, arguments);
+        ProcessConfiguration config = new ProcessConfiguration(filePath, arguments);
 
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,

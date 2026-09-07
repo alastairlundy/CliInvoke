@@ -71,7 +71,7 @@ public class PowerShellMiddlewareIntegrationTests
 
         IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         // PowerShellMiddleware rewrites the config so the real target becomes `pwsh`.
         // Verify the rewrite by confirming the process executed through pwsh (exit 0 with output).

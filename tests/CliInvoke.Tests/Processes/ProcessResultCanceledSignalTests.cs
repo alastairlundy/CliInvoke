@@ -24,7 +24,7 @@ public class ProcessResultCanceledSignalTests
 
     public ProcessResultCanceledSignalTests()
     {
-        _configuration = ProcessConfigurationFactory.Create(ProcessTestHelper.GetTargetFilePath(), string.Empty);
+        _configuration = new ProcessConfiguration(ProcessTestHelper.GetTargetFilePath(), string.Empty);
     }
 
     private static InvocationContext RawContext(ProcessConfiguration configuration)

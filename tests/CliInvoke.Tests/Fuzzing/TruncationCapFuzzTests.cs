@@ -105,7 +105,7 @@ public class TruncationCapFuzzTests
                 ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
                     ProcessExitConfiguration.CreateGraceful(), 1);
                 InvocationContext context = new InvocationContext(
-                    ProcessConfigurationFactory.Create("dotnet", "--version"),
+                    new ProcessConfiguration("dotnet", "--version"),
                     exit,
                     InvocationMode.Buffered,
                     CancellationToken.None);

@@ -29,7 +29,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         ProcessResult result = await invoker.ExecuteAsync(
             config,
@@ -47,7 +47,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
         ProcessConfiguration config =
-            ProcessConfigurationFactory.Create("dotnet", "--this-flag-does-not-exist");
+            new ProcessConfiguration("dotnet", "--this-flag-does-not-exist");
 
         ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(
                 config,
@@ -66,7 +66,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,
@@ -83,7 +83,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         ProcessExitConfiguration exit = new ProcessExitConfiguration
         {
@@ -106,7 +106,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         ProcessResult result = await invoker.ExecuteAsync(config, new ProcessExitConfiguration());
 
@@ -127,7 +127,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(
                 config,
@@ -150,7 +150,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         ProcessExitConfiguration exit = new ProcessExitConfiguration
         {
@@ -211,7 +211,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         IReadOnlyList<IProcessMiddleware> middlewares = builder.Build();
         ProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory(), middlewares, null);
 
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         ProcessResult result = await invoker.ExecuteAsync(config, exit);
 
