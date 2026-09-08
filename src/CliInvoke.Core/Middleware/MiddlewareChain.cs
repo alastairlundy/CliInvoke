@@ -78,6 +78,6 @@ internal sealed class MiddlewareChain
         context.Middleware = new MiddlewareContext(next, cancellationToken, _initialItems);
 
         // Invoke the outermost middleware (or the terminal if no middleware registered).
-        await next(context);
+        await next(context).ConfigureAwait(false);
     }
 }

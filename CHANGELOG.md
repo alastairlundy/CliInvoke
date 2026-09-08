@@ -64,6 +64,116 @@ change set. Themes:
 
 [3.0.0-alpha]: https://github.com/alastairlundy/CliInvoke/releases
 
+## Changes since 3.0.0-alpha.10 (bug-audit batch)
+
+### All Projects
+
+#### Breaking Changes
+
+- **Unix admin/credential requests now throw `PlatformNotSupportedException`.**
+  `UnixProcessControlAdapter.RequireRunningAsAdmin` and
+  `UnixProcessControlAdapter.SetUserCredential` (with a non-null credential) now
+  throw `PlatformNotSupportedException` instead of silently no-oping. This makes
+  the cross-platform contract honest — callers on Unix who relied on the silent
+  no-op must handle or guard the exception. Windows behaviour is unchanged.
+
+- **`null == null` now returns `true` for result, configuration, and
+  exception-info types.** `ProcessResult`, `BufferedProcessResult`,
+  `ProcessConfiguration`, and `ProcessExceptionInfo<TProcessResult>` equality
+  operators now implement standard null-safe semantics: `null == null` is `true`,
+  `null == x` is `false`, and the operators never throw. Previously `null == null`
+  could throw or return `false` depending on the type.
+
+- **`BufferedProcessResult` equality now includes `ProcessId`.** The
+  `Equals` and `GetHashCode` overrides consider `ProcessId`, matching the base
+  `ProcessResult` contract. Two results from the same command but different PIDs
+  now compare unequal — this is a stricter but correct contract.
+
+- **`UserCredential.GetHashCode` excludes `Password`.** The hash is computed
+  from `Domain`, `UserName`, and `LoadUserProfile` only. `Password` still
+  participates in `Equals` content comparison but never in the hash. Distinct
+  passwords with the same user/domain may collide — this is contract-legal and
+  documented. No `SecureString` unwrapping occurs in hash paths.
+
+- **Truncation `0`-cap is now a valid zero-byte cap.** Passing `0` as the
+  `maxStandardOutputBytes` or `maxStandardErrorBytes` cap now produces empty text
+  with the `WasTruncated` flag set. Previously `0` was treated as "no cap"
+  (same as `null`/negative). The three spellings are: `null` = no cap,
+  negative = no cap, `0` = zero-byte cap.
+
+- **Narrowed catch blocks surface previously swallowed failures.** Bare
+  `catch (Exception)` blocks across `ShellDetector`, `ProcessWrapper`, and
+  `ExternalProcess` have been narrowed to catch only their documented expected
+  exceptions. Unexpected exceptions (including `OperationCanceledException` in
+  the PowerShell-to-cmd fallback path) now propagate to the caller.
+
+#### Modifications
+
+- **`ConfigureAwait(false)` on every await site in `src`.** All await expressions
+  in library code now use `ConfigureAwait(false)` for correct continuation
+  semantics in library consumers. A package-free CI guard enforces this policy
+  on every build.
+
+- **Cancellation-reason race eliminated.** `WaitForExitOrForcefulTimeoutAsync`
+  and `CancelWithInterrupt` no longer use `CancellationToken.Register` callbacks.
+  The cancellation reason is computed at the catch point where the token is
+  known-canceled, eliminating the race between registration and reason read.
+
+- **`ExternalProcess` lifecycle synchronization.** `ExternalProcess` serializes
+  the start gate and `_processWrapper` swap under a private lock. Readers capture
+  the wrapper reference under the lock and operate on the snapshot, with long
+  awaits outside the lock. Cross-thread calls are now safe.
+
+- **`ShellDetector` Unix flow uses cancellation checkpoints.** The Unix
+  `ResolveDefaultShellAsync` flow no longer throws from a `Register` callback.
+  `ThrowIfCancellationRequested` checkpoints guard the flow so cancellation
+  surfaces promptly.
+
+- **`ForcefulExit` self-guards on exited processes.** `ProcessWrapper.ForcefulExit`
+  now checks `HasExited` and no-ops on an already-exited process, making the
+  unguarded `finally` call safe on normal exits.
+
+- **UTF-8 boundary truncation uses incremental decoding.** The capped read path
+  now uses `encoding.GetDecoder()` so split trailing multibyte sequences are held
+  back and dropped cleanly instead of producing U+FFFD replacement characters.
+
+- **Dead-code removal.** Dead OS platform terms in `UnixProcessControlAdapter`
+  and `WindowsProcessControlAdapter`, and an unreachable re-check in
+  `ProcessWrapper`, have been removed.
+
+- **Started event null-guard.** `ProcessWrapper` raises the `Started` event via
+  `Started?.Invoke(...)`, preventing `NullReferenceException` when no handler
+  is attached.
+
+- **`$HOME` stale-index fix.** `CachingFilePathResolver.EnumerateDirectories`
+  now expands `~` first and locates `$HOME` on the expanded string in a single
+  sequential pass, so the token index is never stale. Mixed `~`/`$HOME` entries
+  now expand correctly.
+
+- **`CachingFilePathResolver` key normalization.** Cache keys are normalized
+  per-OS casing rules (case-insensitive on Windows, as-is elsewhere). The benign
+  concurrent-compute race is documented in XML remarks.
+
+#### Bug Fixes
+
+- Retry delay overflow is caught and clamped to `Task.Delay` maximum.
+- `RetryMiddleware` XML docs now honestly state that retries apply to
+  classifier-approved results and that pipeline exceptions propagate without
+  retry.
+- `FromProcessStartInfo` XML docs document the per-stream redirect-flag
+  collapse via OR into the single `OutputRedirection` flag.
+- Validator registration methods use `Add{Lifetime}` after `RemoveAll` with
+  XML docs stating the single-threaded registration convention.
+- `FilePathResolver` Unix filename match now compares `f.Name` (extracted via
+  `Path.GetFileName`) on both platforms with documented inferred-directory
+  semantics for relative subpaths.
+
+#### Non-Source Code
+
+- CI guard enforces `ConfigureAwait(false)` on all await sites in `src`.
+- Release notes and README updated with all breaking changes and behaviour
+  changes.
+
 ## Changes since 3.0.0-alpha.10
 
 ### All Projects

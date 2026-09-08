@@ -50,10 +50,10 @@ public class ShellDetector : IShellDetector
         CancellationToken cancellationToken = default)
     {
         if (isUnix)
-            return await ResolveDefaultShellOnUnixAsync(cancellationToken);
+            return await ResolveDefaultShellOnUnixAsync(cancellationToken).ConfigureAwait(false);
 
         if (OperatingSystem.IsWindows())
-            return await ResolveDefaultShellOnWindowsAsync(cancellationToken);
+            return await ResolveDefaultShellOnWindowsAsync(cancellationToken).ConfigureAwait(false);
 
         throw new PlatformNotSupportedException();
     }
@@ -69,7 +69,7 @@ public class ShellDetector : IShellDetector
         cancellationToken.ThrowIfCancellationRequested();
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
-            execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+            execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -82,7 +82,7 @@ public class ShellDetector : IShellDetector
         cancellationToken.ThrowIfCancellationRequested();
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
-            shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+            shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -126,7 +126,7 @@ public class ShellDetector : IShellDetector
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
                 powershellConfig,
-                ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+                ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
 
             string[] powershellResults =
                 result.StandardOutput.Replace("v", string.Empty).Split(' ');
@@ -150,7 +150,7 @@ public class ShellDetector : IShellDetector
                 cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
-                ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+                ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
 
             string line = GetFirstLine(result.StandardOutput);
 

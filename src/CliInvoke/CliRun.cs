@@ -55,7 +55,7 @@ public static class CliRun
         (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
             BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: false);
 
-        return await RunAsync(configuration, exitConfiguration, cancellationToken);
+        return await RunAsync(configuration, exitConfiguration, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -119,7 +119,7 @@ public static class CliRun
         (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
             BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: true, maxBufferedOutputBytes);
 
-        return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
+        return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken).ConfigureAwait(false);
     }
 
 

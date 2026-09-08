@@ -96,7 +96,7 @@ internal class ProcessInvocationPipeline
             // concurrently with waiting for exit; awaiting exit first would deadlock when a child writes
             // more than the OS pipe buffer and nothing is draining it yet.
             if (ctx.Mode == InvocationMode.Raw)
-                await externalProcess.StartAsync(ctx.CancellationToken);
+                await externalProcess.StartAsync(ctx.CancellationToken).ConfigureAwait(false);
             else
                 externalProcess.Start();
 
@@ -105,10 +105,10 @@ internal class ProcessInvocationPipeline
             TResult result = ctx.Mode switch
             {
                 InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(
-                    ctx.CancellationToken),
+                    ctx.CancellationToken).ConfigureAwait(false),
                 InvocationMode.Buffered => (TResult)(object)await externalProcess
                     .CaptureBufferedResultAsync(
-                        ctx.CancellationToken, truncationCap, truncationCap),
+                        ctx.CancellationToken, truncationCap, truncationCap).ConfigureAwait(false),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
             };
 

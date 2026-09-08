@@ -272,9 +272,9 @@ internal class ProcessWrapper : Process
     {
         if (StartInfo.RedirectStandardInput)
         {
-            await StandardInput.FlushAsync(cancellationToken);
+            await StandardInput.FlushAsync(cancellationToken).ConfigureAwait(false);
             StandardInput.BaseStream.Position = 0;
-            await source.CopyToAsync(StandardInput.BaseStream, cancellationToken);
+            await source.CopyToAsync(StandardInput.BaseStream, cancellationToken).ConfigureAwait(false);
 
             return source.Equals(StandardInput.BaseStream);
         }
@@ -296,7 +296,7 @@ internal class ProcessWrapper : Process
 
         if (StartInfo.RedirectStandardOutput)
             if (StandardOutput != StreamReader.Null)
-                await StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken);
+                await StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
 
         return destination;
     }
@@ -315,7 +315,7 @@ internal class ProcessWrapper : Process
 
         if (StartInfo.RedirectStandardError)
             if (StandardError != StreamReader.Null)
-                await StandardError.BaseStream.CopyToAsync(destination, cancellationToken);
+                await StandardError.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
 
         return destination;
     }
@@ -487,7 +487,7 @@ internal class ProcessWrapper : Process
         if (processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero)
         {
             await WaitForExitOrCancellationAsync(processExitConfiguration,
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
             return;
         }
 
@@ -496,20 +496,20 @@ internal class ProcessWrapper : Process
             case ProcessExitBehaviour.WaitForExit:
             {
                 await WaitForExitOrCancellationAsync(processExitConfiguration,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
                 return;
             }
             case ProcessExitBehaviour.GracefulExit:
             default:
             {
                 await WaitForExitOrGracefulTimeoutAsync(processExitConfiguration,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
                 return;
             }
             case ProcessExitBehaviour.ForcefulExit:
             {
                 await WaitForExitOrForcefulTimeoutAsync(processExitConfiguration,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
                 return;
             }
         }
@@ -519,7 +519,7 @@ internal class ProcessWrapper : Process
         ProcessExitConfiguration processExitConfiguration,
         CancellationToken cancellationToken = default)
     {
-        await WaitForExitCoreAsync(processExitConfiguration, cancellationToken, isGraceful: false);
+        await WaitForExitCoreAsync(processExitConfiguration, cancellationToken, isGraceful: false).ConfigureAwait(false);
     }
     
     /// <summary>
@@ -540,7 +540,7 @@ internal class ProcessWrapper : Process
         ArgumentOutOfRangeException.ThrowIfLessThan(
             exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
 
-        await WaitForExitCoreAsync(exitConfiguration, cancellationToken, isGraceful: true, fallbackToForceful);
+        await WaitForExitCoreAsync(exitConfiguration, cancellationToken, isGraceful: true, fallbackToForceful).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -579,10 +579,10 @@ internal class ProcessWrapper : Process
         bool fallbackToForceful = true)
     {
         // Use semaphore to prevent simultaneous cancellation attempts
-        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
+        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
         {
             // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitSafeAsync(cancellationToken);
+            await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
             return;
         }
 
@@ -599,7 +599,7 @@ internal class ProcessWrapper : Process
                 await Task.WhenAny([
                     WaitForExitSafeAsync(cancellationToken),
                     cancelWithInterruptTask
-                ]);
+                ]).ConfigureAwait(false);
 
                 await Task.WhenAny([
                     Task.Delay(
@@ -607,7 +607,7 @@ internal class ProcessWrapper : Process
                             CalculatePostInterruptGracePeriodSeconds((int)processExitConfiguration.TimeoutPolicy.TimeoutThreshold.TotalSeconds)),
                         cancellationToken),
                     WaitForExitSafeAsync(cancellationToken)
-                ]);
+                ]).ConfigureAwait(false);
 
                 // Ensure the interrupt/timeout resolution has fully completed and persisted
                 // _cancellationReason before the caller reads Canceled. Otherwise the returned
@@ -615,20 +615,20 @@ internal class ProcessWrapper : Process
                 // terminated by the cancellation machinery. Only wait when the process did not
                 // exit on its own, so fast-exiting processes are not held for the full timeout.
                 if (!HasExited && !cancelWithInterruptTask.IsCompleted)
-                    await cancelWithInterruptTask;
+                    await cancelWithInterruptTask.ConfigureAwait(false);
 
                 if (!HasExited && fallbackToForceful)
                     ForcefulExit();
             }
             else
             {
-                await WaitForExitSafeAsync(cancellationToken);
+                await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (!isGraceful)
         {
             await CancelWithInterrupt(TimeSpan.Zero,
-                processExitConfiguration, cancellationToken);
+                processExitConfiguration, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception) when (!isGraceful)
         {
@@ -677,10 +677,10 @@ internal class ProcessWrapper : Process
         CancellationToken actualCancellationToken = cts.Token;
 
         // Use semaphore to prevent simultaneous cancellation attempts
-        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
+        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
         {
             // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitSafeAsync(cancellationToken);
+            await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
             // Dispose of the linked CTS to prevent resource leaks
             cts.Dispose();
             return;
@@ -688,7 +688,7 @@ internal class ProcessWrapper : Process
 
         try
         {
-            await WaitForExitSafeAsync(actualCancellationToken);
+            await WaitForExitSafeAsync(actualCancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -731,7 +731,7 @@ internal class ProcessWrapper : Process
 
         try
         {
-            await Task.Delay(timeoutThreshold, cancellationToken);
+            await Task.Delay(timeoutThreshold, cancellationToken).ConfigureAwait(false);
 
             if (HasExited)
                 return true;
@@ -742,7 +742,7 @@ internal class ProcessWrapper : Process
             _cancellationReason = CancellationReason.Timeout;
 
             return await ProcessControlAdapter.SendInterruptSignalAsync(this,
-                CancellationReason.Timeout, exitConfiguration, cancellationToken);
+                CancellationReason.Timeout, exitConfiguration, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -756,7 +756,7 @@ internal class ProcessWrapper : Process
             DateTime currentExpectedExitTime =
                 CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
 
-            cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason);
+            cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason).ConfigureAwait(false);
 
             CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
                 cancellationReason,

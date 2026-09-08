@@ -78,7 +78,7 @@ internal sealed class RetryMiddleware : IProcessMiddleware
 
         do
         {
-            await next(context);
+            await next(context).ConfigureAwait(false);
 
             attempts++;
 

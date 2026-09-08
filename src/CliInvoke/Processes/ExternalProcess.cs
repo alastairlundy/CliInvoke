@@ -165,7 +165,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             wrapper = _processWrapper;
         }
 
-        await wrapper.WaitForExitAsync(cancellationToken);
+        await wrapper.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -215,7 +215,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
 
         if (configuration.StandardInput is not null)
             await wrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -239,7 +239,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             wrapper = _processWrapper;
         }
 
-        await wrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
+        await wrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken).ConfigureAwait(false);
 
         ProcessResult result = new(
             wrapper.StartInfo.FileName,
@@ -294,7 +294,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         {
             await Task.WhenAll(
                 wrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                outputStrings);
+                outputStrings).ConfigureAwait(false);
 
             BufferedProcessResult result = new BufferedProcessResult(wrapper.StartInfo.FileName,
                 wrapper.ExitCode,
@@ -379,14 +379,14 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         {
             case ProcessExitBehaviour.ForcefulExit:
                 await wrapper.WaitForExitOrForcefulTimeoutAsync(ExitConfiguration,
-                    CancellationToken.None);
+                    CancellationToken.None).ConfigureAwait(false);
                 break;
             case ProcessExitBehaviour.GracefulExit:
                 await wrapper.WaitForExitOrGracefulTimeoutAsync(ExitConfiguration,
-                    CancellationToken.None);
+                    CancellationToken.None).ConfigureAwait(false);
                 break;
             case ProcessExitBehaviour.WaitForExit:
-                await wrapper.WaitForExitAsync(CancellationToken.None);
+                await wrapper.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
                 return;
             default:
                 wrapper.Kill();

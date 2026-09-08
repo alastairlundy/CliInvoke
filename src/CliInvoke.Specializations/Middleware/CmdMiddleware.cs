@@ -90,7 +90,7 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             argumentList: argumentList);
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
-        await next(newContext);
+        await next(newContext).ConfigureAwait(false);
 
         // The terminal ran against the rewritten context, so propagate its result back to the
         // original chain context that the caller reads from.

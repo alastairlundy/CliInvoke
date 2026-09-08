@@ -147,7 +147,7 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         bool sigTermSuccess = SendUnixSignal(process.Id, Sigterm);
 
         await Task.Delay(DelayBeforeSigintMilliseconds,
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
 
         return sigTermSuccess || SendUnixSignal(process.Id, Sigint);
     }
