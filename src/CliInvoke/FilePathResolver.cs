@@ -166,6 +166,13 @@ public class FilePathResolver : IFilePathResolver
     /// <param name="filePathToResolve">The file path to resolve.</param>
     /// <returns>The located <see cref="FileInfo"/>.</returns>
     /// <exception cref="FileNotFoundException">Thrown when no matching file is found.</exception>
+    /// <remarks>
+    /// For relative subpaths (e.g., "subdir/file.exe"), the directory component is inferred
+    /// from the path itself. If the directory cannot be determined, the current working
+    /// directory is used as a fallback. The method enumerates files in the inferred directory
+    /// (no recursion) and matches by filename using platform-appropriate comparison:
+    /// <c>OrdinalIgnoreCase</c> on Windows, <c>Ordinal</c> on Unix-like systems.
+    /// </remarks>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     protected virtual FileInfo LocateFileFromDirectory(string filePathToResolve)
@@ -184,8 +191,15 @@ public class FilePathResolver : IFilePathResolver
             if (directoryPath.Length == 0)
                 throw new Exception();
         }
-        catch
+        catch (Exception)
         {
+            // Fallback when directory inference fails: use current working directory.
+            // This catch handles any exception during directory path inference
+            // (e.g., ArgumentOutOfRangeException when filename not found in path,
+            // or when Path.GetDirectoryName returns null and string operations fail).
+            // Per glossary Try* catch discipline: broad catch acceptable here as
+            // LocateFileFromDirectory is not Try*-governed but serves as a fallback
+            // for the main resolution flow.
             directoryPath = Environment.CurrentDirectory;
         }
         
@@ -227,7 +241,7 @@ public class FilePathResolver : IFilePathResolver
                 return f;
             })
             .FirstOrDefault(f => OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)
-                : f.Name.Equals(filePathToResolve, StringComparison.Ordinal));
+                : f.Name.Equals(fileName, StringComparison.Ordinal));
 
         if (file is null)
             throw new FileNotFoundException(

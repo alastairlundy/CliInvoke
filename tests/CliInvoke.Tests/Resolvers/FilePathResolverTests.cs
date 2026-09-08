@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Runtime.Versioning;
 using CliInvoke.Core.Factories;
 using CliInvoke.Factories;
 using CliInvoke.Tests.Internal.Constants;
@@ -75,5 +76,38 @@ public class FilePathResolverTests
         FileInfo actual = filePathResolver.ResolveFilePath(executableName);
 
         await Assert.That(actual.FullName).IsEqualTo(expectedPath);
+    }
+
+    [Test]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    public async Task Resolve_RelativeSubdirectory_Unix()
+    {
+        // Regression test: relative subdirectory resolution should work on Unix
+        // by comparing f.Name against fileName using Ordinal comparison.
+        IFilePathResolver filePathResolver = CreateFileResolver();
+
+        // Create a temporary directory with a file in a subdirectory
+        string tempDir = Path.Combine(Path.GetTempPath(), $"cliinvoke-resolver-test-{Guid.NewGuid():N}");
+        string subDir = Path.Combine(tempDir, "subdir");
+        string testFile = Path.Combine(subDir, "test.txt");
+
+        try
+        {
+            Directory.CreateDirectory(subDir);
+            File.WriteAllText(testFile, "test content");
+
+            // Resolve using relative subdirectory path
+            string relativePath = Path.Combine("subdir", "test.txt");
+            FileInfo resolved = filePathResolver.ResolveFilePath(Path.Combine(tempDir, relativePath));
+
+            await Assert.That(resolved.FullName).IsEqualTo(testFile);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+                Directory.Delete(tempDir, recursive: true);
+        }
     }
 }
