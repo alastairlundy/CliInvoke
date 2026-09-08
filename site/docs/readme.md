@@ -88,7 +88,7 @@ jump straight to the relevant guide.
 | Pick between `CliRun`, `IProcessInvoker`, and `IExternalProcess` | [Choosing your Invocation Pattern](guides/choosing-invocation-pattern.md) |
 | Dispose the Resource-Owning Types correctly | [Resource Disposal](guides/resource-disposal.md) |
 | Install and set up the library | [Getting Started](getting-started.md) · [Quickstart](getting-started-quickstart.md) |
-| Migrate from v1 to v2 | [Migration Guides](migration-guides/) |
+| Migrate from v1 to v2, or v2 to v3 | [Migration Guides](migration-guides/) |
 | Look up a specific API | [API Reference](../api/) |
 
 ## All documentation
@@ -120,7 +120,7 @@ A flat index of every page in this Developer Portal.
 
 - [Building CliInvoke](building-cliinvoke.md) — build the library
   from source.
-- [Migration Guides](migration-guides/) — v1 → v2 and other
+- [Migration Guides](migration-guides/) — v1 → v2, v2 → v3, and other
   migrations.
 - [API Reference](../api/) — auto-generated API reference.
 
@@ -129,5 +129,5 @@ A flat index of every page in this Developer Portal.
 - [GitHub repository](https://github.com/alastairlundy/CliInvoke) —
   source, issues, and discussions.
 - [NuGet packages](https://www.nuget.org/packages/CliInvoke) —
-  `CliInvoke`, `CliInvoke.Core`, `CliInvoke.Extensions`, and
+  `CliInvoke`, `CliInvoke.Core`, and
   `CliInvoke.Specializations`.

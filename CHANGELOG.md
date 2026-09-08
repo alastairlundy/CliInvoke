@@ -4,9 +4,9 @@ All notable changes to CliInvoke are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/).
 
-## [3.0.0-alpha] - 3.0.0 pre-release line
+## [3.0.0-beta] - 3.0.0 pre-release line
 
-The 3.0.0-alpha line ships the design-smell triage as one coherent breaking
+The 3.0.0 pre-release line ships the design-smell triage as one coherent breaking
 change set. Themes:
 
 - `CliRun` is now a stateless, batteries-included defaults facade.
@@ -62,7 +62,7 @@ change set. Themes:
   `ProcessResult` is intentionally **not** sealed in this release (sealing is
   deferred).
 
-[3.0.0-alpha]: https://github.com/alastairlundy/CliInvoke/releases
+[3.0.0-beta]: https://github.com/alastairlundy/CliInvoke/releases
 
 ## Changes since 3.0.0-alpha.10 (bug-audit batch)
 
