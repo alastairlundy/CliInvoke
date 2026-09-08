@@ -80,7 +80,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     Not mutated after construction; for the resolved file path, see the result.
     ///     <see cref="ProcessResult.ExecutedFilePath"/>.
     /// </remarks>
-    public required string TargetFilePath
+    public string TargetFilePath
     {
         get => _targetFilePath;
         init
