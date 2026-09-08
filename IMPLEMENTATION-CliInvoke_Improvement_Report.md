@@ -51,7 +51,7 @@ The ledger resolves the plan into two release trains:
 
 ### 1.7 Docs
 
-- `PATTERNS.md` / README: position init construction as the default and the builder as the advanced path (escaping, credential specs) [`DECISIONS-CliInvoke-v4-improvements.md#T006`].
+- `DESIGN_PATTERNS.md` / README: position init construction as the default and the builder as the advanced path (escaping, credential specs) [`DECISIONS-CliInvoke-v4-improvements.md#T006`].
 
 ### 1.8 Tests — v3 pass
 

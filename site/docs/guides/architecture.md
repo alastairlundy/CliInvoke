@@ -486,7 +486,7 @@ scenario.
   the `IExternalProcess`, and the result.
 - [Troubleshooting](troubleshooting.md) — symptom-based diagnosis for
   leaks, hangs, exit-code mismatches, and file-not-found errors.
-- [`PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/PATTERNS.md) — full API-level detail for
+- [`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md) — full API-level detail for
   the three invocation patterns.
 - [`GLOSSARY.md`](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md) — the canonical glossary,
   including the definitions of the Process Invocation Pipeline and

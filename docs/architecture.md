@@ -8,7 +8,7 @@ to reason about where a change belongs.
 
 Out of scope: configuration model reference (see
 [site/docs/guides/configuration.md](../site/docs/guides/configuration.md)),
-pattern selection (see [PATTERNS.md](../PATTERNS.md)), and disposal
+pattern selection (see [DESIGN_PATTERNS.md](../DESIGN_PATTERNS.md)), and disposal
 rules (see README § Resource Cleanup). This page documents the
 **runtime** data-flow that turns a configuration into a process
 result.
@@ -241,7 +241,7 @@ Use the table below to decide which stage a change belongs to.
 ## Cross-References
 
 - [GLOSSARY.md](../GLOSSARY.md) — domain glossary.
-- [PATTERNS.md](../PATTERNS.md) — three invocation patterns and when
+- [DESIGN_PATTERNS.md](../DESIGN_PATTERNS.md) — three invocation patterns and when
   to use them.
 - [site/docs/guides/configuration.md](../site/docs/guides/configuration.md) —
   configuration model reference.

@@ -48,5 +48,5 @@ CliInvoke keeps the following design choices, which differ from CliWrap:
 
 ## References
 
-- [PATTERNS.md](../../PATTERNS.md) — the pattern decision tree.
+- [DESIGN_PATTERNS.md](../../DESIGN_PATTERNS.md) — the pattern decision tree.
 - [Resource Disposal Guide](../../site/docs/guides/resource-disposal.md) — caller-owned disposal rules.

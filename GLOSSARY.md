@@ -20,7 +20,7 @@ A parameter of the invocation contract that the caller states for the invocation
 
 ## Architectural Patterns
 
-For detailed definitions, target audiences, and usage examples of the architectural patterns used in CliInvoke, refer to **[PATTERNS.md](PATTERNS.md)**.
+For detailed definitions, target audiences, and usage examples of the architectural patterns used in CliInvoke, refer to **[DESIGN_PATTERNS.md](DESIGN_PATTERNS.md)**.
 
 ## Design Decisions
 

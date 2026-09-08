@@ -38,4 +38,4 @@ Remove all static state from `CliRun`. The public API now operates entirely on p
 
 - `docs/adr/0002-why-not-cliwrap.md` — design rationale for the three invocation patterns
 - `CONTRIBUTING.md` — IVT minimization and contribution guidelines
-- `PATTERNS.md` — pattern decision tree for choosing an invocation pattern
+- `DESIGN_PATTERNS.md` — pattern decision tree for choosing an invocation pattern

@@ -68,7 +68,7 @@ the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blo
 
 ## Design Patterns & When to Use Them
 
-CliInvoke.Core provides abstractions and types used by different design patterns. For comprehensive documentation on design patterns, see [PATTERNS.md](../../PATTERNS.md).
+CliInvoke.Core provides abstractions and types used by different design patterns. For comprehensive documentation on design patterns, see [DESIGN_PATTERNS.md](../../DESIGN_PATTERNS.md).
 
 * **`CliRun`** – Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. (Requires `CliInvoke` package)
 * **`IProcessInvoker`** – DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
