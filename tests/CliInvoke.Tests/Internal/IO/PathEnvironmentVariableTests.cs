@@ -14,6 +14,7 @@ using CliInvoke.Internal.IO;
 
 namespace CliInvoke.Tests.Internal.IO;
 
+[NotInParallel]
 public class PathEnvironmentVariableTests
 {
     private static string GetUserProfile() =>
@@ -85,7 +86,7 @@ public class PathEnvironmentVariableTests
 
         try
         {
-            string testEntry = "~/$HOME/bin";
+            string testEntry = "~$HOME/bin";
             Environment.SetEnvironmentVariable("PATH", testEntry);
 
             IEnumerable<string>? dirs = PathEnvironmentVariable.EnumerateDirectories();
