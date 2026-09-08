@@ -40,6 +40,17 @@ public static class ConfigurationExtensions
         ///     An instance of <see cref="ProcessConfiguration" /> with the configuration applied from
         ///     the provided <see cref="ProcessStartInfo" />.
         /// </returns>
+        /// <remarks>
+        ///     <see cref="ProcessStartInfo"/> exposes per-stream redirect flags
+        ///     (<see cref="ProcessStartInfo.RedirectStandardOutput"/> and
+        ///     <see cref="ProcessStartInfo.RedirectStandardError"/>), but
+        ///     <see cref="ProcessConfiguration"/> has a single
+        ///     <see cref="ProcessConfiguration.OutputRedirection"/> flag.
+        ///     The two per-stream flags are collapsed via a logical OR into that single flag, so the
+        ///     resulting configuration redirects output when either (or both) of the original flags
+        ///     was set. This is a lossy conversion; the individual per-stream information is not
+        ///     preserved.
+        /// </remarks>
         [Pure]
         public static ProcessConfiguration FromProcessStartInfo(ProcessStartInfo processStartInfo)
         {
