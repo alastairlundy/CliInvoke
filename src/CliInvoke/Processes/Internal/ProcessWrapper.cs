@@ -116,9 +116,9 @@ internal class ProcessWrapper : Process
             {
                 SuspendProcess();
             }
-            catch
+            catch (InvalidOperationException)
             {
-                // Process exited before we could suspend it, or suspend failed.
+                // Process exited before we could suspend it.
                 return;
             }
 
@@ -140,7 +140,7 @@ internal class ProcessWrapper : Process
                 {
                     ResumeProcess();
                 }
-                catch
+                catch (InvalidOperationException)
                 {
                     // The process may have already exited during SetResourcePolicy.
                     // Swallow the exception — the process is gone, nothing to resume.
@@ -173,8 +173,6 @@ internal class ProcessWrapper : Process
         {
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
         }
-
-        if (!HasStarted) return HasStarted;
 
         // Cache StandardOutput/StandardError StreamReaders while the process is still
         // guaranteed alive. These properties internally call EnsureState, which in
@@ -210,7 +208,7 @@ internal class ProcessWrapper : Process
         }
 
         StartTime = DateTime.UtcNow;
-        Started.Invoke(this, EventArgs.Empty);
+        Started?.Invoke(this, EventArgs.Empty);
 
         return HasStarted;
     }
@@ -427,13 +425,16 @@ internal class ProcessWrapper : Process
 
     internal void ForcefulExit()
     {
+        if (HasExited)
+            return;
+
         try
         {
             Kill(true);
         }
-        catch
+        catch (InvalidOperationException)
         {
-            Kill();
+            // Process exited between the HasExited check and Kill(true); nothing to do.
         }
     }
     
@@ -636,16 +637,6 @@ internal class ProcessWrapper : Process
 
         CancellationToken actualCancellationToken = cts.Token;
 
-        // Use a local variable to store the cancellation reason to avoid race conditions
-        CancellationReason cancellationReason = CancellationReason.NotKnown;
-
-        actualCancellationToken.Register(() =>
-        {
-            cancellationReason =
-                CancellationHelper.GetCancellationReason(expectedExitTime,
-                    cancellationToken);
-        });
-
         // Use semaphore to prevent simultaneous cancellation attempts
         if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
         {
@@ -659,10 +650,13 @@ internal class ProcessWrapper : Process
         try
         {
             await WaitForExitSafeAsync(actualCancellationToken);
-            _cancellationReason = cancellationReason;
         }
         catch (Exception exception)
         {
+            // Compute the cancellation reason at the catch point where the token is known-canceled.
+            CancellationReason cancellationReason =
+                CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+
             // Recalculate expected exit time in exception handler to avoid using stale values
             DateTime currentExpectedExitTime =
                 CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
@@ -694,20 +688,6 @@ internal class ProcessWrapper : Process
     private async Task<bool> CancelWithInterrupt(TimeSpan timeoutThreshold,
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
     {
-        DateTime expectedExitTime =
-            CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-
-        // Use a local variable to store the cancellation reason to avoid race conditions
-        CancellationReason cancellationReason = CancellationReason.NotKnown;
-
-        // Register the callback to update the cancellation reason
-        cancellationToken.Register(() =>
-        {
-            cancellationReason =
-                CancellationHelper.GetCancellationReason(expectedExitTime,
-                    cancellationToken);
-        });
-
         bool cancellationSuccess;
 
         try
@@ -720,20 +700,25 @@ internal class ProcessWrapper : Process
             // Reaching this point means the delay elapsed without the token being
             // canceled, i.e. a graceful timeout. Persist the resolved reason before
             // sending the interrupt so Canceled can be computed from it afterward.
-            cancellationReason = CancellationReason.Timeout;
-            _cancellationReason = cancellationReason;
+            _cancellationReason = CancellationReason.Timeout;
 
-            return  await ProcessControlAdapter.SendInterruptSignalAsync(this,
-                cancellationReason, exitConfiguration, cancellationToken);
+            return await ProcessControlAdapter.SendInterruptSignalAsync(this,
+                CancellationReason.Timeout, exitConfiguration, cancellationToken);
         }
         catch (Exception exception)
         {
+            // Compute the cancellation reason at the catch point where the token is known-canceled.
+            CancellationReason cancellationReason =
+                CancellationHelper.GetCancellationReason(
+                    CancellationHelper.CalculateExpectedExitTime(exitConfiguration),
+                    cancellationToken);
+
             // Recalculate expected exit time in exception handler to avoid using stale values
             DateTime currentExpectedExitTime =
                 CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-            
+
             cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason);
-            
+
             CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
                 cancellationReason,
                 exitConfiguration, exception);
