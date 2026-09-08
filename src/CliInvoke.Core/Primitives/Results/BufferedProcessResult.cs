@@ -103,6 +103,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
 
 #pragma warning disable CA1416
         return ExecutedFilePath == other.ExecutedFilePath &&
+               ProcessId == other.ProcessId &&
                StandardOutput == other.StandardOutput
                && StandardError == other.StandardError
                && ExitCode == other.ExitCode &&
@@ -143,10 +144,18 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        return HashCode.Combine(
-            HashCode.Combine(ExecutedFilePath, StandardOutput, StandardError, ExitCode,
-                StartTime, ExitTime, Canceled, Signal),
-            WasTruncated);
+        HashCode hash = new HashCode();
+        hash.Add(ExecutedFilePath);
+        hash.Add(ProcessId);
+        hash.Add(StandardOutput);
+        hash.Add(StandardError);
+        hash.Add(ExitCode);
+        hash.Add(StartTime);
+        hash.Add(ExitTime);
+        hash.Add(Canceled);
+        hash.Add(Signal);
+        hash.Add(WasTruncated);
+        return hash.ToHashCode();
 #pragma warning restore CA1416
     }
 
@@ -165,8 +174,13 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are equal to each other; false otherwise.</returns>
-    public static bool operator ==(BufferedProcessResult left, BufferedProcessResult? right) 
-        => Equals(left, right);
+    public static bool operator ==(BufferedProcessResult? left, BufferedProcessResult? right) 
+    {
+        if (left is null)
+            return right is null;
+
+        return left.Equals(right);
+    }
 
     /// <summary>
     ///     Determines if a BufferedProcessResult is not equal to another BufferedProcessResult.
@@ -174,6 +188,11 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">A BufferedProcessResult to be compared.</param>
     /// <param name="right">The other BufferedProcessResult to be compared.</param>
     /// <returns>True if both BufferedProcessResults are not equal to each other; false otherwise.</returns>
-    public static bool operator !=(BufferedProcessResult left, BufferedProcessResult? right) 
-        => !Equals(left, right);
+    public static bool operator !=(BufferedProcessResult? left, BufferedProcessResult? right) 
+    {
+        if (left is null)
+            return right is not null;
+
+        return !left.Equals(right);
+    }
 }

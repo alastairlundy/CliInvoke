@@ -220,4 +220,36 @@ public class UserCredentialTests
         // Assert - the credential still exposes the (now disposed) reference
         await Assert.That(credential.Password).IsSameReferenceAs(password);
     }
+
+    [Test]
+    public async Task GetHashCode_DifferentPasswordsSameUserDomain_AreEqual()
+    {
+        // Password is excluded from GetHashCode — distinct passwords with the same
+        // user/domain/loadProfile should produce the same hash code.
+        using SecureString passwordA = MakeSecureString("secret");
+        using SecureString passwordB = MakeSecureString("different");
+
+        UserCredential a = new("DOM", "user", passwordA, true);
+        UserCredential b = new("DOM", "user", passwordB, true);
+
+        await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
+    }
+
+    [Test]
+    public async Task GetHashCode_DifferentDomains_Differ()
+    {
+        UserCredential a = new("DOM1", "user", null, null);
+        UserCredential b = new("DOM2", "user", null, null);
+
+        await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
+    }
+
+    [Test]
+    public async Task GetHashCode_DifferentUserNames_Differ()
+    {
+        UserCredential a = new("DOM", "userA", null, null);
+        UserCredential b = new("DOM", "userB", null, null);
+
+        await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
+    }
 }
