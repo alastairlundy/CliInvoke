@@ -96,11 +96,24 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
 
     internal override void SetUserCredential(Process process, UserCredential credential)
     {
-        if (credential is not null)
-        {
+        if (credential is null)
+            return;
+
+        // An "empty" credential (all fields null) is a no-op, matching the
+        // WindowsProcessControlAdapter field-by-field semantics; only a populated
+        // credential is unsupported on Unix-like systems. ProcessConfiguration.Credential
+        // defaults to the non-null UserCredential.Null sentinel, so a null check alone
+        // would reject every default-configuration process start on Unix.
+#pragma warning disable CA1416
+        bool hasCredential = credential.UserName is not null
+            || credential.Domain is not null
+            || credential.Password is not null
+            || credential.LoadUserProfile is not null;
+#pragma warning restore CA1416
+
+        if (hasCredential)
             throw new PlatformNotSupportedException(
                 "Setting user credentials is not supported on Unix-like systems.");
-        }
     }
 
     internal override PosixSignal? GetTerminatingSignal(int exitCode)

@@ -53,4 +53,34 @@ public class ControlAdapterTests
         await Assert.That(() => adapter.SetUserCredential(dummyProcess, null!))
             .ThrowsNothing();
     }
+
+    [Test]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    public async Task UnixAdapter_SetUserCredential_NullSentinel_DoesNotThrow()
+    {
+        UnixProcessControlAdapter adapter = new UnixProcessControlAdapter();
+
+        using Process dummyProcess = new Process();
+        dummyProcess.StartInfo = new ProcessStartInfo("echo");
+
+        await Assert.That(() => adapter.SetUserCredential(dummyProcess, UserCredential.Null))
+            .ThrowsNothing();
+    }
+
+    [Test]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("freebsd")]
+    public async Task UnixAdapter_SetUserCredential_EmptyCredential_DoesNotThrow()
+    {
+        UnixProcessControlAdapter adapter = new UnixProcessControlAdapter();
+
+        using Process dummyProcess = new Process();
+        dummyProcess.StartInfo = new ProcessStartInfo("echo");
+
+        await Assert.That(() => adapter.SetUserCredential(dummyProcess, new UserCredential()))
+            .ThrowsNothing();
+    }
 }
