@@ -64,12 +64,14 @@ public class ShellDetector : IShellDetector
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
-        cancellationToken.Register(() => throw new TaskCanceledException());
-
         ProcessConfiguration execConfiguration = new ProcessConfiguration("ps", "-p $$ -o comm=");
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
             execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
             GetFirstLine(execResult.StandardOutput));
@@ -77,8 +79,12 @@ public class ShellDetector : IShellDetector
         ProcessConfiguration shellInfoProcessConfig = new ProcessConfiguration(
             shellExeInfo.FullName, "--version");
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
             shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         string? versionLine = null;
 
@@ -133,8 +139,11 @@ public class ShellDetector : IShellDetector
             return new ShellInformation(powershellResults.First(), powershell5PlusFileInfo,
                 version);
         }
-        catch
+        catch (Exception ex) when (ex is FileNotFoundException or InvalidOperationException)
         {
+            // Expected failures: pwsh.exe not found (FileNotFoundException) or shell output
+            // doesn't contain a parseable version line (InvalidOperationException).
+            // OperationCanceledException propagates naturally without falling through to cmd.
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
             ProcessConfiguration cmdConfig = new ProcessConfiguration(

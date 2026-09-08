@@ -1,5 +1,6 @@
 using CliInvoke;
 using CliInvoke.Core;
+using CliInvoke.Factories;
 using CliInvoke.Processes;
 using CliInvoke.Processes.Internal;
 using CliInvoke.Tests.Internal.Helpers;
@@ -89,6 +90,26 @@ public class GracefulCancellationTests
             if (File.Exists(markerPath))
                 File.Delete(markerPath);
         }
+    }
+
+    [Test]
+    public async Task ShellDetector_Cancellation_Propagates()
+    {
+        if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS() && !OperatingSystem.IsFreeBSD())
+        {
+            // ShellDetector Unix flow only runs on Unix-like systems
+            return;
+        }
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel(); // Pre-cancel the token
+
+        ShellDetector detector = new ShellDetector(
+            new ProcessInvoker(new ExternalProcessFactory()),
+            new FilePathResolver());
+
+        await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await detector.ResolveDefaultShellAsync(cts.Token));
     }
 
     [Test]
