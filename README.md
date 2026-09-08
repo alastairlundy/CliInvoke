@@ -23,7 +23,6 @@ Launch processes, redirect standard input and output streams, await process comp
 * [Middleware](#middleware)
 * [Resource Disposal](#resource-disposal)
 * [Documentation](#documentation)
-* [Breaking Changes (bug-audit batch)](#breaking-changes-bug-audit-batch)
 * [Contributing to CliInvoke](#how-to-contribute-to-cliinvoke)
 * [License](#license)
 * [Acknowledgements](#acknowledgements)
@@ -172,20 +171,6 @@ Full documentation is available in the [CliInvoke Developer Portal](site/docs/re
 > **[CHANGELOG.md](CHANGELOG.md)** for the full breaking-change list.
 
 Other guides: [Troubleshooting](site/docs/guides/troubleshooting.md) · [Migration Guides](site/docs/migration-guides/readme.md) · [Building from Source](site/docs/building-cliinvoke.md)
-
-## Breaking Changes (bug-audit batch)
-
-The following behaviour changes ship with the bug-audit batch. See
-**[CHANGELOG.md](CHANGELOG.md)** for full details.
-
-| Change | Impact | Migration |
-|--------|--------|-----------|
-| Unix admin/credential requests throw `PlatformNotSupportedException` | Code that called `RequireRunningAsAdmin` or `SetUserCredential` on Unix will now throw instead of silently no-oping. | Guard with `OperatingSystem.IsWindows()` or catch `PlatformNotSupportedException`. |
-| `null == null` returns `true` for result/config/exception-info types | Equality operators now follow standard null-safe semantics. | None required; behaviour is now conventional. |
-| `BufferedProcessResult` equality includes `ProcessId` | Two results from the same command with different PIDs compare unequal. | None required; this is a stricter, correct contract. |
-| `UserCredential.GetHashCode` excludes `Password` | Hash collisions are possible for distinct passwords with same user/domain. | None required; collisions are contract-legal. |
-| Truncation `0`-cap is a valid zero-byte cap | `0` now produces empty text with `WasTruncated = true` instead of being treated as "no cap". | Pass `null` or a negative value for the previous "no cap" behaviour. |
-| Narrowed catch blocks surface previously swallowed failures | Some exceptions that were previously caught and ignored now propagate. | Add catch blocks for the newly surfaced exceptions if your code depended on the old behaviour. |
 
 ## How to Build CliInvoke's code
 
