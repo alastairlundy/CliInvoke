@@ -15,11 +15,31 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>Hardened command construction in RunnerConfigurationFactory against malformed arguments.</PackageReleaseNotes>
+        <PackageReleaseNotes>
+### 🆕 Additions
+- Added `maxBufferedOutputBytes` to the `CliRun` string-args buffered path to enable capping buffered output size in memory.
+
+### ⚙️ Modifications
+- `OutputTruncationMiddleware` now reads the truncation cap from exit configuration instead of a string-keyed handoff, and `MaxSize` is now `MaxBytes`.
+- Reworked retry middleware around the classifier
+- Documented the redirect-flag OR collapse in `FromProcessStartInfo`.
+
+### 🗑️ Removals
+- Removed `ProcessConfigurationFactory`. Use init construction or the builder.
+
+### 🐛 Bug Fixes
+- Fixed a race in `ExternalProcess` where the start gate and wrapper swap could interleave. Both are now serialized under a private lock.
+- Fixed `ProcessWrapper` lifecycle issues: the cancellation reason is reported when caught, `ForcefulExit` guards against self-invocation, and event invocation is null-conditional.
+- Fixed flaky resource policy application on fast-exiting processes.
+- Fixed validator registration extensions to use `Add` instead of `TryAdd` so re-registration works.
+- Fixed `CachingFilePathResolver` cache keys to respect per-OS path casing rules.
+- Fixed a Unix `FilePathResolver` filename match issue.
+- Fixed `PathEnvironmentVariable` to expand `~` and `C:\Users` paths in a single pass.
+- The Unix control adapter now throws `PlatformNotSupportedException` for ``UserCredential``</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-beta.2</PackageVersion>
+        <PackageVersion>3.0.0-beta.3</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

@@ -16,16 +16,27 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile> 
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-beta.2</Version>
-        <PackageReleaseNotes>- `Canceled` and `Signal` properties added to `ProcessResult` for cancellation and signal handling
-- `IFilePathResolver`, `IProcessMiddleware`, and `MiddlewareChain` interfaces updated; `MiddlewareChain` now non-nullable
-- `InvocationMode` enum removed (no longer needed after Piped removal)</PackageReleaseNotes>
+        <Version>3.0.0-beta.3</Version>
+        <PackageVersion>3.0.0-beta.3</PackageVersion>
+        <PackageReleaseNotes>
+### 🆕 Additions
+- Added `IRetryClassifier`
+
+### ⚙️ Modifications
+- Narrowed exception catches and tightened the middleware chain.
+
+### 🗑️ Removals
+- Removed `ShouldRetry` from `IProcessResultValidator`. Validators now only validate; the retry classifier decides retries.
+
+### 🐛 Bug Fixes
+- Fixed null-unsafe equality operators on primitives.
+- Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
