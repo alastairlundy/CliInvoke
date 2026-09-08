@@ -329,17 +329,24 @@ internal class ProcessWrapper : Process
     /// </summary>
     /// <remarks>
     ///     This is a distinct overload of the base buffered-capture method on <see cref="Process"/>;
-    ///     the inherited method is NOT overridden. When a cap is <c>null</c> (or &lt;= 0) the stream is read
-    ///     in full, matching the prior behaviour.
+    ///     the inherited method is NOT overridden. The cap parameter supports three spellings:
+    ///     <list type="bullet">
+    ///         <item><c>null</c> — no cap is applied; the stream is read in full.</item>
+    ///         <item>Negative value — no cap is applied; equivalent to <c>null</c>.</item>
+    ///         <item><c>0</c> — a valid zero-byte cap producing empty text with the truncated flag set.</item>
+    ///         <item>Positive value — the stream is read up to that many bytes, then truncated.</item>
+    ///     </list>
     /// </remarks>
     /// <param name="cancellationToken">A cancellation token for the read operations.</param>
     /// <param name="maxStandardOutputBytes">
     ///     An optional maximum number of bytes to capture from standard output before truncating.
-    ///     <c>null</c> means no cap is applied.
+    ///     <c>null</c> or a negative value means no cap is applied.
+    ///     <c>0</c> is a valid zero-byte cap producing empty text with the truncated flag set.
     /// </param>
     /// <param name="maxStandardErrorBytes">
     ///     An optional maximum number of bytes to capture from standard error before truncating.
-    ///     <c>null</c> means no cap is applied.
+    ///     <c>null</c> or a negative value means no cap is applied.
+    ///     <c>0</c> is a valid zero-byte cap producing empty text with the truncated flag set.
     /// </param>
     /// <returns>
     ///     A tuple containing the captured standard output, standard error, and a flag indicating
@@ -365,6 +372,17 @@ internal class ProcessWrapper : Process
     ///     Reads a redirected stream into a string, copying at most <paramref name="maxBytes"/> bytes and
     ///     discarding any remainder (lossy truncation).
     /// </summary>
+    /// <remarks>
+    ///     The <paramref name="maxBytes"/> parameter supports three spellings:
+    ///     <list type="bullet">
+    ///         <item><c>null</c> — no cap; the stream is read in full.</item>
+    ///         <item>Negative value — no cap; equivalent to <c>null</c>.</item>
+    ///         <item><c>0</c> — a valid zero-byte cap producing empty text with the truncated flag set.</item>
+    ///         <item>Positive value — the stream is read up to that many bytes, then truncated.</item>
+    ///     </list>
+    ///     Multibyte sequences that straddle the cap boundary are decoded incrementally so that
+    ///     split trailing bytes are held back and dropped cleanly (no U+FFFD replacement characters).
+    /// </remarks>
     private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
         StreamReader reader,
         bool redirected,
@@ -377,11 +395,24 @@ internal class ProcessWrapper : Process
         Encoding encoding = reader.CurrentEncoding;
         Stream stream = reader.BaseStream;
 
-        if (maxBytes is null or <= 0)
+        // null or negative = no cap
+        if (maxBytes is null or < 0)
         {
             using MemoryStream memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
             return (encoding.GetString(memoryStream.ToArray()), false);
+        }
+
+        // 0 = valid zero-byte cap: empty text, truncated flag set
+        if (maxBytes == 0)
+        {
+            // Drain any existing data so the pipe is fully consumed.
+            byte[] drainBuffer = new byte[8192];
+            while (await stream.ReadAsync(drainBuffer, cancellationToken).ConfigureAwait(false) > 0)
+            {
+                // Remainder is discarded.
+            }
+            return (string.Empty, true);
         }
 
         byte[] buffer = new byte[8192];
@@ -418,7 +449,15 @@ internal class ProcessWrapper : Process
             // Remainder is discarded.
         }
 
-        return (encoding.GetString(outputStream.ToArray()), truncated);
+        // Use incremental decoding so split trailing multibyte sequences are
+        // held back and dropped cleanly instead of producing U+FFFD.
+        Decoder decoder = encoding.GetDecoder();
+        byte[] outputBytes = outputStream.ToArray();
+        int charCount = decoder.GetCharCount(outputBytes, 0, outputBytes.Length);
+        char[] chars = new char[charCount];
+        decoder.GetChars(outputBytes, 0, outputBytes.Length, chars, 0);
+
+        return (new string(chars), truncated);
     }
 
     #endregion

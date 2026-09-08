@@ -159,4 +159,79 @@ public class TruncationCapFuzzTests
         if (nullCapA.Equals(capped))
             throw new InvalidOperationException("A null-cap configuration was equal to a capped configuration.");
     }
+
+    [Test]
+    public void WithMaxBufferedOutputBytes_NegativeCap_IsStoredCorrectly()
+    {
+        // Negative caps are stored on the configuration and treated as no-cap at runtime
+        // (in ReadStreamCappedAsync). The configuration equality compares raw values,
+        // so a negative cap is distinct from null.
+        ProcessExitConfiguration negativeCap = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+            ProcessExitConfiguration.CreateGraceful(), -1);
+
+        if (negativeCap.MaxBufferedOutputBytes != -1)
+            throw new InvalidOperationException("Negative cap value was not preserved on the configuration.");
+    }
+
+    [Test]
+    public void WithMaxBufferedOutputBytes_ZeroCap_IsDistinctFromNullCap()
+    {
+        // 0 is a valid zero-byte cap and must be distinct from null (no cap).
+        ProcessExitConfiguration nullCap = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+            ProcessExitConfiguration.CreateGraceful(), null);
+        ProcessExitConfiguration zeroCap = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+            ProcessExitConfiguration.CreateGraceful(), 0);
+
+        if (zeroCap.MaxBufferedOutputBytes != 0)
+            throw new InvalidOperationException("Zero cap value was not preserved on the configuration.");
+
+        if (nullCap.Equals(zeroCap))
+            throw new InvalidOperationException("A null-cap and zero-cap configuration should not be equal.");
+    }
+
+    [Test]
+    public void WithMaxBufferedOutputBytes_CapBoundaryValues_RoundTrip()
+    {
+        // Verify that common cap boundary values (0, 1, 8192, etc.) round-trip correctly.
+        long[] boundaryValues = [0, 1, 8191, 8192, 8193, 65536, 1_000_000];
+
+        foreach (long cap in boundaryValues)
+        {
+            ProcessExitConfiguration original = ProcessExitConfiguration.CreateGraceful();
+            ProcessExitConfiguration updated = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(original, cap);
+
+            if (updated.MaxBufferedOutputBytes != cap)
+                throw new InvalidOperationException($"Cap value {cap} did not round-trip correctly.");
+        }
+    }
+
+    [Test]
+    public void UseOutputTruncation_WithZeroCap_PublishesZeroToExitConfiguration()
+    {
+        ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
+        builder.UseOutputTruncation(new TruncationOptions { MaxBytes = 0 });
+        IProcessMiddleware middleware = builder.Build()[0];
+
+        ProcessExitConfiguration exit = ProcessExitConfiguration.CreateGraceful();
+        InvocationContext context = new InvocationContext(
+            new ProcessConfiguration("dotnet", "--version"),
+            exit,
+            InvocationMode.Buffered,
+            CancellationToken.None);
+
+        ProcessExitConfiguration? captured = null;
+        Func<InvocationContext, Task> next = c =>
+        {
+            captured = c.ExitConfiguration;
+            return Task.CompletedTask;
+        };
+
+        middleware.InvokeAsync(context, next).GetAwaiter().GetResult();
+
+        if (captured is null)
+            throw new InvalidOperationException("The next was not invoked.");
+
+        if (captured.MaxBufferedOutputBytes != 0)
+            throw new InvalidOperationException($"Expected zero cap but got {captured.MaxBufferedOutputBytes}.");
+    }
 }

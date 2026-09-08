@@ -8,6 +8,7 @@
 */
 
 using System.Runtime.InteropServices;
+using System.Text;
 
 using CliInvoke.Processes;
 
@@ -59,5 +60,119 @@ public class TruncationTests
 
         await Assert.That(result.WasTruncated).IsFalse();
         await Assert.That(result.StandardOutput.Length).IsGreaterThan(1000);
+    }
+
+    [Test]
+    public async Task CaptureBufferedResultAsync_WithNegativeCap_DoesNotTruncate()
+    {
+        (string target, string arguments) = GetLargeOutputCommand();
+        ProcessConfiguration configuration = new ProcessConfiguration(target, arguments);
+        using ExternalProcess process = new(new FilePathResolver(), configuration,
+            ProcessExitConfiguration.CreateGraceful());
+
+        process.Start();
+
+        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, -1, -1);
+
+        await Assert.That(result.WasTruncated).IsFalse();
+        await Assert.That(result.StandardOutput.Length).IsGreaterThan(1000);
+    }
+
+    [Test]
+    public async Task CaptureBufferedResultAsync_WithZeroCap_ProducesEmptyTextAndTruncated()
+    {
+        (string target, string arguments) = GetLargeOutputCommand();
+        ProcessConfiguration configuration = new ProcessConfiguration(target, arguments);
+        using ExternalProcess process = new(new FilePathResolver(), configuration,
+            ProcessExitConfiguration.CreateGraceful());
+
+        process.Start();
+
+        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 0, 0);
+
+        await Assert.That(result.WasTruncated).IsTrue();
+        await Assert.That(result.StandardOutput).IsEmpty();
+        await Assert.That(result.StandardError).IsEmpty();
+    }
+
+    [Test]
+    public async Task CaptureBufferedResultAsync_WithMultibyteBoundary_NoReplacementCharacter()
+    {
+        // Build a payload with multibyte UTF-8 characters (e.g. Chinese characters).
+        // Each character is 3 bytes in UTF-8. Use a cap that cuts mid-character to
+        // verify the incremental decoder drops the split sequence cleanly.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // PowerShell approach: output multibyte characters then cap at an odd byte boundary.
+            ProcessConfiguration configuration = new ProcessConfiguration(
+                "powershell.exe",
+                "-NoProfile -Command \"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Write-Output '你好世界'\"");
+            using ExternalProcess process = new(new FilePathResolver(), configuration,
+                ProcessExitConfiguration.CreateGraceful());
+
+            process.Start();
+
+            // '你好世界' is 12 bytes in UTF-8. Cap at 7 bytes (cuts mid-character).
+            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 7, 7);
+
+            await Assert.That(result.WasTruncated).IsTrue();
+            await Assert.That(result.StandardOutput).DoesNotContain('\uFFFD');
+        }
+        else
+        {
+            // bash: printf writes raw UTF-8 bytes.
+            ProcessConfiguration configuration = new ProcessConfiguration(
+                "/bin/bash",
+                "-c \"printf '你好世界'\"");
+            using ExternalProcess process = new(new FilePathResolver(), configuration,
+                ProcessExitConfiguration.CreateGraceful());
+
+            process.Start();
+
+            // '你好世界' is 12 bytes in UTF-8. Cap at 7 bytes (cuts mid-character).
+            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 7, 7);
+
+            await Assert.That(result.WasTruncated).IsTrue();
+            await Assert.That(result.StandardOutput).DoesNotContain('\uFFFD');
+        }
+    }
+
+    [Test]
+    public async Task CaptureBufferedResultAsync_WithMultibyteBoundary_PartialCharactersDropped()
+    {
+        // Verify that when the cap splits a multibyte sequence, only complete characters
+        // are included in the output.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            ProcessConfiguration configuration = new ProcessConfiguration(
+                "powershell.exe",
+                "-NoProfile -Command \"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Write-Output '你好世界'\"");
+            using ExternalProcess process = new(new FilePathResolver(), configuration,
+                ProcessExitConfiguration.CreateGraceful());
+
+            process.Start();
+
+            // 3 bytes of '你' + 3 bytes of '好' = 6 bytes. Cap at 6 = 2 complete characters.
+            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 6, 6);
+
+            await Assert.That(result.WasTruncated).IsTrue();
+            await Assert.That(result.StandardOutput.Length).IsEqualTo(2);
+        }
+        else
+        {
+            ProcessConfiguration configuration = new ProcessConfiguration(
+                "/bin/bash",
+                "-c \"printf '你好世界'\"");
+            using ExternalProcess process = new(new FilePathResolver(), configuration,
+                ProcessExitConfiguration.CreateGraceful());
+
+            process.Start();
+
+            // 3 bytes of '你' + 3 bytes of '好' = 6 bytes. Cap at 6 = 2 complete characters.
+            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 6, 6);
+
+            await Assert.That(result.WasTruncated).IsTrue();
+            await Assert.That(result.StandardOutput.Length).IsEqualTo(2);
+        }
     }
 }
