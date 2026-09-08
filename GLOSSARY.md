@@ -18,6 +18,12 @@ The state-bearing object passed through the Process Invocation Pipeline. It enca
 A parameter of the invocation contract that the caller states for the invocation to mean what they intend (e.g., validation rules, truncation cap). Distinct from a middleware concern: cross-cutting behavior composed around the invocation that the caller could omit without changing the invocation's meaning (e.g., logging, retry).
 
 
+## Versioning Terms
+
+### v2-style code
+
+Code that uses APIs of the prior major version (v2) which the current GA removed or changed. A mechanical, surface-based classification, distinct from construction-style preference.
+
 ## Architectural Patterns
 
 For detailed definitions, target audiences, and usage examples of the architectural patterns used in CliInvoke, refer to **[DESIGN_PATTERNS.md](DESIGN_PATTERNS.md)**.
