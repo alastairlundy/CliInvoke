@@ -68,7 +68,6 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         if (OperatingSystem.IsMacOS()
             || OperatingSystem.IsMacCatalyst()
             || OperatingSystem.IsFreeBSD()
-            || OperatingSystem.IsWindows()
            )
         {
             if (resourcePolicy.MinWorkingSet is not null)
@@ -91,14 +90,17 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     [UnsupportedOSPlatform("windows")]
     internal override void RequireRunningAsAdmin(Process process)
     {
-        if (OperatingSystem.IsLinux() ||
-            OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
-            OperatingSystem.IsFreeBSD())
-            process.StartInfo.Verb = "sudo";
+        throw new PlatformNotSupportedException(
+            "Running as admin is not supported on Unix-like systems. Use sudo or run as root directly.");
     }
 
     internal override void SetUserCredential(Process process, UserCredential credential)
     {
+        if (credential is not null)
+        {
+            throw new PlatformNotSupportedException(
+                "Setting user credentials is not supported on Unix-like systems.");
+        }
     }
 
     internal override PosixSignal? GetTerminatingSignal(int exitCode)
