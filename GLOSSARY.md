@@ -22,7 +22,7 @@ A parameter of the invocation contract that the caller states for the invocation
 
 ### v2-style code
 
-Code that uses APIs of the prior major version (v2) which the current GA removed or changed. A mechanical, surface-based classification, distinct from construction-style preference.
+Code that a v3 migration must change: (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles — reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default. Deliberate advanced-builder usage (argument escaping, `UserCredentialSpec`/resource-policy callback flows) is not v2-style.
 
 ## Architectural Patterns
 
