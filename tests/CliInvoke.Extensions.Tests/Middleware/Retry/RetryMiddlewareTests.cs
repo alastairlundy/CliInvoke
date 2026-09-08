@@ -261,6 +261,77 @@ public class RetryMiddlewareTests
         await Assert.That(RetryMiddleware.ComputeDelay(2, options).Ticks).IsEqualTo(maxDelay.Ticks);
     }
 
+    [Test]
+    public async Task ComputeDelay_Exponential_LargeBaseDelay_ClampsToMaxTaskDelay()
+    {
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        RetryOptions options = new RetryOptions
+        {
+            BaseDelay = maxDelay,
+            Strategy = RetryBackoffStrategy.Exponential,
+            MaxAttempts = 50
+        };
+
+        TimeSpan delay = RetryMiddleware.ComputeDelay(2, options);
+
+        await Assert.That(delay.Ticks).IsEqualTo(maxDelay.Ticks);
+        await Assert.That(delay.Ticks).IsGreaterThanOrEqualTo(0);
+    }
+
+    [Test]
+    public async Task ComputeDelay_Linear_LargeAttemptCount_ClampsToMaxTaskDelay()
+    {
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        RetryOptions options = new RetryOptions
+        {
+            BaseDelay = maxDelay,
+            Strategy = RetryBackoffStrategy.Linear,
+            MaxAttempts = 50
+        };
+
+        TimeSpan delay = RetryMiddleware.ComputeDelay(2, options);
+
+        await Assert.That(delay.Ticks).IsEqualTo(maxDelay.Ticks);
+        await Assert.That(delay.Ticks).IsGreaterThanOrEqualTo(0);
+    }
+
+    [Test]
+    public async Task ComputeDelay_Exponential_HugeAttemptCount_ClampsToMaxTaskDelay()
+    {
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        RetryOptions options = new RetryOptions
+        {
+            BaseDelay = TimeSpan.FromMilliseconds(100),
+            Strategy = RetryBackoffStrategy.Exponential,
+            MaxAttempts = 1000
+        };
+
+        TimeSpan delay = RetryMiddleware.ComputeDelay(50, options);
+
+        await Assert.That(delay.Ticks).IsEqualTo(maxDelay.Ticks);
+        await Assert.That(delay.Ticks).IsGreaterThanOrEqualTo(0);
+    }
+
+    [Test]
+    public async Task ComputeDelay_CombinedLargeBaseDelayAndAttemptCount_AlwaysNonNegative()
+    {
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        RetryOptions options = new RetryOptions
+        {
+            BaseDelay = TimeSpan.FromMilliseconds(1000),
+            Strategy = RetryBackoffStrategy.Exponential,
+            MaxAttempts = int.MaxValue / 2
+        };
+
+        for (int attempt = 1; attempt <= 10; attempt++)
+        {
+            TimeSpan delay = RetryMiddleware.ComputeDelay(attempt, options);
+
+            await Assert.That(delay.Ticks).IsGreaterThanOrEqualTo(0);
+            await Assert.That(delay.Ticks).IsLessThanOrEqualTo(maxDelay.Ticks);
+        }
+    }
+
     /// <summary>
     ///     A retry classifier that always returns <c>true</c> (retry).
     /// </summary>

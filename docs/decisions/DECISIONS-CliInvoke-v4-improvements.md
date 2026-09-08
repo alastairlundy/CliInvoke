@@ -229,6 +229,21 @@ Session: technical-grilling over the v4 improvements plan (R7–R10 of `CliInvok
 - **Constraints**: The agent does not launch downstream workflows.
 - **Cites**: T008
 
-<!-- next-d: D008 -->
-<!-- next-t: T010 -->
-<!-- next-i: I017 -->
+### [I017] - ticket decomposition scope and output
+
+- **Prompt**: "Decomposing blueprint Part 1 only (v3 GA construction story) into tickets - (a) output target - GitHub Issues or local markdown files - (b) pull request grouping - one pull request or multiple - "
+- **User Response**: "Local markdown files" - "One PR (Recommended)"
+- **Resolution**: tickets publish as local markdown files; the set groups under a single v3 GA pull request; decomposition proceeds on blueprint Part 1 only.
+- **Notes**: user instruction preceding the session - "Only decompose v3 changes. Ignore v4 changes." - excludes the v4 train (D002, D003, T002, T003, T004) from ticket coverage; those records surface as intentionally uncovered in the coverage matrix.
+
+### [I018] - decomposition pattern and ticket set validation
+
+- **Prompt**: "The proposal above is the full v3 GA decomposition - five tickets, one pull request, published as local markdown under tickets/ after your approval.
+
+A few things to check:
+Which tickets, if any, would you combine, split, or rescope?
+Are there any spec requirements not yet covered by a ticket, or any ticket that doesn't trace back to a requirement?
+Are there any tickets where the `Blocked by` chain or Independent/Collaborative classification feels off?"
+- **User Response**: "agree with decomposition"
+- **Resolution**: clear pass - the five-ticket Domain-pattern decomposition, dependency chain, and all-Independent classification approved as proposed; tickets proceed to generation and publishing as local markdown under tickets/.
+- **Notes**: no combine, split, rescope, or coverage adjustments requested; one pull request grouping and local markdown target confirmed via I017.
