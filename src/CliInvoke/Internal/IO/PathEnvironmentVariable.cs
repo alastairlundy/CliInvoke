@@ -58,6 +58,12 @@ internal static class PathEnvironmentVariable
                 x = x.Trim();
                 x = Environment.ExpandEnvironmentVariables(x);
                 x = x.Trim('"');
+
+                if (x.StartsWith('~', StringComparison.OrdinalIgnoreCase))
+                {
+                    x = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{x[1..]}";
+                }
+
                 const string homeToken = "$HOME";
                 string userProfile = Environment.GetFolderPath(
                     Environment.SpecialFolder.UserProfile);
@@ -67,15 +73,9 @@ internal static class PathEnvironmentVariable
                     StringComparison.OrdinalIgnoreCase
                 );
 
-                if (x.StartsWith('~', StringComparison.OrdinalIgnoreCase))
-                {
-                    x = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{x[1..]}";
-                }
-
                 if (homeTokenIndex != -1)
                 {
-                    return
-                        $"{x.Substring(0, homeTokenIndex)}{userProfile}{x[(homeTokenIndex + homeToken.Length)..]}";
+                    x = $"{x.Substring(0, homeTokenIndex)}{userProfile}{x[(homeTokenIndex + homeToken.Length)..]}";
                 }
 
                 return x.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
