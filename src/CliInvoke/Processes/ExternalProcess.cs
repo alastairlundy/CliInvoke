@@ -19,6 +19,7 @@ namespace CliInvoke.Processes;
 public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 {
     private ProcessWrapper _processWrapper;
+    private readonly object _lifecycleLock = new();
     
     private readonly IFilePathResolver _filePathResolver;
 
@@ -53,12 +54,30 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     /// <summary>
     ///     Indicates whether the external process has exited.
     /// </summary>
-    public bool HasExited => _processWrapper.HasExited;
+    public bool HasExited
+    {
+        get
+        {
+            lock (_lifecycleLock)
+            {
+                return _processWrapper.HasExited;
+            }
+        }
+    }
 
     /// <summary>
     ///     Indicates whether the external process has started.
     /// </summary>
-    public bool HasStarted => _processWrapper.HasStarted;
+    public bool HasStarted
+    {
+        get
+        {
+            lock (_lifecycleLock)
+            {
+                return _processWrapper.HasStarted;
+            }
+        }
+    }
 
     /// <summary>
     ///     Represents an event that occurs when the external process starts.
@@ -85,20 +104,26 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     [UnsupportedOSPlatform("browser")]
     public int Start()
     {
-        if (HasStarted)
-            throw new InvalidOperationException("The process has already been started.");
+        ProcessWrapper wrapper;
+        lock (_lifecycleLock)
+        {
+            if (_processWrapper.HasStarted)
+                throw new InvalidOperationException("The process has already been started.");
 
-        FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
+            FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
 
-        _processWrapper.Dispose();
-        _processWrapper = new ProcessWrapper(Configuration, filePath);
+            _processWrapper.Dispose();
+            _processWrapper = new ProcessWrapper(Configuration, filePath);
 
-        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+            _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+            _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
 
-        _processWrapper.Start();
+            _processWrapper.Start();
 
-        return _processWrapper.Id;
+            wrapper = _processWrapper;
+        }
+
+        return wrapper.Id;
     }
 
     /// <summary>
@@ -121,20 +146,26 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     [UnsupportedOSPlatform("browser")]
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        if (HasStarted)
-            throw new InvalidOperationException("The process has already been started.");
+        ProcessWrapper wrapper;
+        lock (_lifecycleLock)
+        {
+            if (_processWrapper.HasStarted)
+                throw new InvalidOperationException("The process has already been started.");
 
-        FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
+            FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
 
-        _processWrapper.Dispose();
-        _processWrapper = new ProcessWrapper(Configuration, filePath);
+            _processWrapper.Dispose();
+            _processWrapper = new ProcessWrapper(Configuration, filePath);
 
-        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+            _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+            _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
 
-        _processWrapper.Start();
+            _processWrapper.Start();
 
-        await _processWrapper.WaitForExitAsync(cancellationToken);
+            wrapper = _processWrapper;
+        }
+
+        await wrapper.WaitForExitAsync(cancellationToken);
     }
 
     /// <summary>
@@ -159,25 +190,31 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     public async Task StartAsync(ProcessConfiguration configuration,
         CancellationToken cancellationToken)
     {
-        if (HasStarted)
-            throw new InvalidOperationException("The process has already been started.");
+        ProcessWrapper wrapper;
+        lock (_lifecycleLock)
+        {
+            if (_processWrapper.HasStarted)
+                throw new InvalidOperationException("The process has already been started.");
 
-        FileInfo filePath = await Task.FromResult(_filePathResolver.ResolveFilePath(configuration.TargetFilePath));
+            FileInfo filePath = _filePathResolver.ResolveFilePath(configuration.TargetFilePath);
 
-        _processWrapper.Dispose();
-        _processWrapper = new ProcessWrapper(configuration, filePath);
+            _processWrapper.Dispose();
+            _processWrapper = new ProcessWrapper(configuration, filePath);
 
-        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+            _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+            _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
 
-        if (configuration.StandardInput is not null
-            && configuration.StandardInput != StreamWriter.Null)
-            _processWrapper.StartInfo.RedirectStandardInput = true;
+            if (configuration.StandardInput is not null
+                && configuration.StandardInput != StreamWriter.Null)
+                _processWrapper.StartInfo.RedirectStandardInput = true;
 
-        _processWrapper.Start();
+            _processWrapper.Start();
+
+            wrapper = _processWrapper;
+        }
 
         if (configuration.StandardInput is not null)
-            await _processWrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
+            await wrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
                 cancellationToken);
     }
 
@@ -196,16 +233,22 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
-        await _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
+        ProcessWrapper wrapper;
+        lock (_lifecycleLock)
+        {
+            wrapper = _processWrapper;
+        }
+
+        await wrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
 
         ProcessResult result = new(
-            _processWrapper.StartInfo.FileName,
-            _processWrapper.ExitCode,
-            _processWrapper.Id,
-            _processWrapper.StartTime,
-            _processWrapper.ExitTime,
-            canceled: _processWrapper.Canceled,
-            signal: _processWrapper.Signal
+            wrapper.StartInfo.FileName,
+            wrapper.ExitCode,
+            wrapper.Id,
+            wrapper.StartTime,
+            wrapper.ExitTime,
+            canceled: wrapper.Canceled,
+            signal: wrapper.Signal
         );
 
         return result;
@@ -237,23 +280,29 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         long? maxStandardOutputBytes = null,
         long? maxStandardErrorBytes = null)
     {
+        ProcessWrapper wrapper;
+        lock (_lifecycleLock)
+        {
+            wrapper = _processWrapper;
+        }
+
         Task<(string StandardOutput, string StandardError, bool WasTruncated)> outputStrings = Configuration.OutputRedirection ?
-            _processWrapper.ReadAllTextAsync(cancellationToken, maxStandardOutputBytes, maxStandardErrorBytes)
+            wrapper.ReadAllTextAsync(cancellationToken, maxStandardOutputBytes, maxStandardErrorBytes)
             : Task.FromResult((string.Empty, string.Empty, false));
 
         try
         {
             await Task.WhenAll(
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
+                wrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
                 outputStrings);
 
-            BufferedProcessResult result = new BufferedProcessResult(_processWrapper.StartInfo.FileName,
-                _processWrapper.ExitCode,
-                _processWrapper.Id, outputStrings.Result.StandardOutput, outputStrings.Result.StandardError,
-                _processWrapper.StartTime,
-                _processWrapper.ExitTime,
-                canceled: _processWrapper.Canceled,
-                signal: _processWrapper.Signal,
+            BufferedProcessResult result = new BufferedProcessResult(wrapper.StartInfo.FileName,
+                wrapper.ExitCode,
+                wrapper.Id, outputStrings.Result.StandardOutput, outputStrings.Result.StandardError,
+                wrapper.StartTime,
+                wrapper.ExitTime,
+                canceled: wrapper.Canceled,
+                signal: wrapper.Signal,
                 wasTruncated: outputStrings.Result.WasTruncated);
 
             return result;
@@ -280,7 +329,13 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public void Suspend() => _processWrapper.SuspendProcess();
+    public void Suspend()
+    {
+        lock (_lifecycleLock)
+        {
+            _processWrapper.SuspendProcess();
+        }
+    }
 
     /// <summary>
     /// Resumes the execution of a suspended external process.
@@ -297,7 +352,13 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    public void Resume() => _processWrapper.ResumeProcess();
+    public void Resume()
+    {
+        lock (_lifecycleLock)
+        {
+            _processWrapper.ResumeProcess();
+        }
+    }
     
     /// <summary>
     ///     Terminates the associated external process based on the specified exit configuration.
@@ -308,21 +369,27 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     /// </exception>
     public async Task Kill()
     {
+        ProcessWrapper wrapper;
+        lock (_lifecycleLock)
+        {
+            wrapper = _processWrapper;
+        }
+
         switch (ExitConfiguration.RequestedCancellationExitBehaviour)
         {
             case ProcessExitBehaviour.ForcefulExit:
-                await _processWrapper.WaitForExitOrForcefulTimeoutAsync(ExitConfiguration,
+                await wrapper.WaitForExitOrForcefulTimeoutAsync(ExitConfiguration,
                     CancellationToken.None);
                 break;
             case ProcessExitBehaviour.GracefulExit:
-                await _processWrapper.WaitForExitOrGracefulTimeoutAsync(ExitConfiguration,
+                await wrapper.WaitForExitOrGracefulTimeoutAsync(ExitConfiguration,
                     CancellationToken.None);
                 break;
             case ProcessExitBehaviour.WaitForExit:
-                await _processWrapper.WaitForExitAsync(CancellationToken.None);
+                await wrapper.WaitForExitAsync(CancellationToken.None);
                 return;
             default:
-                _processWrapper.Kill();
+                wrapper.Kill();
                 break;
         }
     }
@@ -337,7 +404,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     /// </remarks>
     public void Dispose()
     {
-        _processWrapper.Dispose();
+        lock (_lifecycleLock)
+        {
+            _processWrapper.Dispose();
+        }
 
         GC.SuppressFinalize(this);
     }
