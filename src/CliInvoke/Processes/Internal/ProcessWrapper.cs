@@ -166,6 +166,10 @@ internal class ProcessWrapper : Process
         {
             HasStarted = false;
 
+            // ERROR_FILE_NOT_FOUND (2) or ERROR_PATH_NOT_FOUND (3)
+            if (exception.NativeErrorCode is 2 or 3)
+                throw new FileNotFoundException($"The file '{StartInfo.FileName}' was not found.", StartInfo.FileName, exception);
+
             throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
         }
 
@@ -564,8 +568,16 @@ internal class ProcessWrapper : Process
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (HasExited)
+            try
+            {
+                if (HasExited)
+                    return;
+            }
+            catch (ObjectDisposedException)
+            {
+                // Process was disposed externally; treat as exited.
                 return;
+            }
 
             await Task.Delay(pollIntervalMs, cancellationToken).ConfigureAwait(false);
         }
@@ -707,7 +719,15 @@ internal class ProcessWrapper : Process
         }
         finally
         {
-            ForcefulExit();
+            try
+            {
+                ForcefulExit();
+            }
+            catch (Exception)
+            {
+                // Best-effort kill; swallow any exception to avoid masking the original.
+            }
+
             cts.Dispose();
             if (acquired)
                 _cancellationSemaphore.Release();
