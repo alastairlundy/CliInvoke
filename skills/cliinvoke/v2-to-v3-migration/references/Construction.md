@@ -1,7 +1,7 @@
 # Construction Migration Reference
 
 This reference maps v2-style construction patterns to v3 replacements.
-It mirrors the [Shared Construction walkthrough](../../../site/docs/migration-guides/3.0.0.md#shared-construction-v3-default) in the migration guide.
+It mirrors the [Shared Construction walkthrough](../../../../site/docs/migration-guides/3.0.0.md#shared-construction-v3-default) in the migration guide.
 
 ## Default: init construction
 
@@ -114,5 +114,5 @@ ProcessConfiguration config = builder.Build();
 
 ## Cross-references
 
-- [Configuration guide](../../../site/docs/guides/configuration.md) — full configuration reference
-- [Migration guide — Shared Construction](../../../site/docs/migration-guides/3.0.0.md#shared-construction-v3-default)
+- [Configuration guide](../../../../site/docs/guides/configuration.md) — full configuration reference
+- [Migration guide — Shared Construction](../../../../site/docs/migration-guides/3.0.0.md#shared-construction-v3-default)

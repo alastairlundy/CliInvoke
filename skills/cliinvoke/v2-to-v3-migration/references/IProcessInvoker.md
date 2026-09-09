@@ -1,7 +1,7 @@
 # IProcessInvoker Migration Reference
 
 This reference maps v2-style `IProcessInvoker` / `ProcessInvoker`
-patterns to v3 replacements. It mirrors the [`IProcessInvoker` Users walkthrough](../../../site/docs/migration-guides/3.0.0.md#iprocessinvoker-users) in the migration guide.
+patterns to v3 replacements. It mirrors the [`IProcessInvoker` Users walkthrough](../../../../site/docs/migration-guides/3.0.0.md#iprocessinvoker-users) in the migration guide.
 
 ## ProcessInvoker constructor changes
 
@@ -69,6 +69,10 @@ Available middleware extensions:
 | `ProcessInvoker(factory, MiddlewareItems?)` | `ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items)` |
 | `ProcessInvoker(factory, IEnumerable<IProcessMiddleware>)` | `ProcessInvoker(factory, middleware, items: null)` |
 
+> These two partial overloads were the only two-arg forms. The surviving
+> constructors are `ProcessInvoker(IExternalProcessFactory)` and
+> `ProcessInvoker(IExternalProcessFactory, IEnumerable<IProcessMiddleware>, MiddlewareItems?)`.
+
 ## DI `configure` bindings
 
 The `configure` lambda in `AddCliInvoke` now uses the four-argument
@@ -80,6 +84,6 @@ services.AddCliInvoke(builder => builder.UseMiddleware<LoggingMiddleware>());
 
 ## Cross-references
 
-- [Configuration guide](../../../site/docs/guides/configuration.md) — consumer reference
-- [Migration guide — ProcessInvoker constructors](../../../site/docs/migration-guides/3.0.0.md#4-processinvoker-has-two-constructors)
-- [Architecture guide](../../../site/docs/guides/architecture.md)
+- [Configuration guide](../../../../site/docs/guides/configuration.md) — consumer reference
+- [Migration guide — ProcessInvoker constructors](../../../../site/docs/migration-guides/3.0.0.md#4-processinvoker-has-two-constructors)
+- [Architecture guide](../../../../site/docs/guides/architecture.md)

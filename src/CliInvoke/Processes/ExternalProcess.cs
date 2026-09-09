@@ -22,6 +22,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     private readonly object _lifecycleLock = new();
     private EventHandler? _startedHandler;
     private EventHandler? _exitedHandler;
+    private bool _disposed;
 
     private readonly IFilePathResolver _filePathResolver;
 
@@ -416,6 +417,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     {
         lock (_lifecycleLock)
         {
+            if (_disposed)
+                return;
+
+            _disposed = true;
             _processWrapper.Dispose();
         }
 

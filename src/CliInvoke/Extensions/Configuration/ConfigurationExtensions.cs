@@ -55,8 +55,9 @@ public static class ConfigurationExtensions
         public static ProcessConfiguration FromProcessStartInfo(ProcessStartInfo processStartInfo)
         {
             bool requiresAdministrator =
-                processStartInfo.Verb.StartsWith("runas", StringComparison.OrdinalIgnoreCase)
-                || processStartInfo.Verb.StartsWith("sudo", StringComparison.OrdinalIgnoreCase);
+                !string.IsNullOrEmpty(processStartInfo.Verb)
+                && (processStartInfo.Verb.StartsWith("runas", StringComparison.OrdinalIgnoreCase)
+                    || processStartInfo.Verb.StartsWith("sudo", StringComparison.OrdinalIgnoreCase));
 
             IEnumerable<KeyValuePair<string, string>> kvp = processStartInfo.Environment
                 .Where(kv => kv.Value is not null)
@@ -75,7 +76,6 @@ public static class ConfigurationExtensions
                 })
                 .UseShellExecution(processStartInfo.UseShellExecute)
                 .EnableWindowCreation(!processStartInfo.CreateNoWindow)
-                .SetWorkingDirectory(processStartInfo.WorkingDirectory)
                 .SetArguments(processStartInfo.Arguments)
                 .SetOutputRedirection( processStartInfo.RedirectStandardOutput ||  processStartInfo.RedirectStandardError)
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
@@ -84,6 +84,8 @@ public static class ConfigurationExtensions
                     processStartInfo.StandardInputEncoding,
                     processStartInfo.StandardOutputEncoding, processStartInfo.StandardErrorEncoding);
 
+            if (!string.IsNullOrEmpty(processStartInfo.WorkingDirectory))
+                processConfigurationBuilder.SetWorkingDirectory(processStartInfo.WorkingDirectory);
 
             if (requiresAdministrator)
                 processConfigurationBuilder.RequireAdministratorPrivileges();

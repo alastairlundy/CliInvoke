@@ -21,7 +21,7 @@ compatibility: Requires one or more CliInvoke NuGet packages (CliInvoke.Core, Cl
 
 ## v2-style code detection
 
-**v2-style code** is defined in [GLOSSARY.md](../../../../GLOSSARY.md) as:
+**v2-style code** is defined in [GLOSSARY.md](../../../GLOSSARY.md) as:
 
 > Code that a v3 migration must change: (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles — reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default.
 
@@ -37,8 +37,8 @@ Scan for these patterns to identify v2-style code:
 | `process.ExitConfiguration = ...` | Setter removed — pass at construction |
 | `ArgumentsList` property | Renamed to `ArgumentList` |
 | `PipedProcessResult` / `ExecutePipedAsync` / `RunPipedAsync` | Removed — use `IExternalProcess` for streaming |
-| `ProcessInvoker(factory, middleware)` | Two-arg constructor removed — use three-arg form |
-| `ExternalProcess(resolver, "path")` | Two-arg constructor removed — use constructor C |
+| `ProcessInvoker(factory, MiddlewareItems?)` or `ProcessInvoker(factory, IEnumerable<IProcessMiddleware>)` | Two-arg overloads removed — use three-arg form `ProcessInvoker(factory, middleware, items)` |
+| `ExternalProcess(resolver, targetPath)` or `ExternalProcess(config, exitConfig)` | Two-arg constructors removed — use constructor C `(resolver, configuration, exitConfig)` |
 | `new ProcessConfigurationBuilder()` as default | Use init construction instead; builder is advanced-only |
 | Subclassing `ExternalProcess` | Sealed in v3 |
 | Subclassing `ProcessConfigurationBuilder` | Sealed in v3 |

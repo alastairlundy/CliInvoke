@@ -151,7 +151,7 @@ internal class ProcessWrapper : Process
 
     private void OnExited(object? sender, EventArgs e)
     {
-        ExitTime = base.ExitTime;
+        ExitTime = base.ExitTime.ToUniversalTime();
     }
 
     internal event EventHandler Started;
@@ -475,6 +475,10 @@ internal class ProcessWrapper : Process
         catch (InvalidOperationException)
         {
             // Process exited between the HasExited check and Kill(true); nothing to do.
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            // Process handle may be invalid or access denied; nothing more we can do.
         }
     }
     

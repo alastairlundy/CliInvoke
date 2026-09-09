@@ -1,7 +1,7 @@
 # CliRun Migration Reference
 
 This reference maps v2-style `CliRun` static-call patterns to v3
-replacements. It mirrors the [`CliRun` Static-Call Users walkthrough](../../../site/docs/migration-guides/3.0.0.md#clirun-static-call-users) in the migration guide.
+replacements. It mirrors the [`CliRun` Static-Call Users walkthrough](../../../../site/docs/migration-guides/3.0.0.md#clirun-static-call-users) in the migration guide.
 
 ## CliRun is now stateless
 
@@ -67,6 +67,6 @@ IProcessInvoker invoker = new ProcessInvoker(myFactory);
 
 ## Cross-references
 
-- [ADR 0003 — CliRun defaults facade](../../../docs/adr/0003-cli-run-defaults-facade.md)
-- [Migration guide — CliRun](../../../site/docs/migration-guides/3.0.0.md#1-clirun-is-now-stateless)
-- [Choosing your Invocation Pattern](../../../site/docs/guides/choosing-invocation-pattern.md)
+- [ADR 0003 — CliRun defaults facade](../../../../docs/adr/0003-cli-run-defaults-facade.md)
+- [Migration guide — CliRun](../../../../site/docs/migration-guides/3.0.0.md#1-clirun-is-now-stateless)
+- [Choosing your Invocation Pattern](../../../../site/docs/guides/choosing-invocation-pattern.md)

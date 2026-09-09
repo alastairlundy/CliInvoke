@@ -1,7 +1,7 @@
 # IExternalProcess Migration Reference
 
 This reference maps v2-style `IExternalProcess` / `ExternalProcess`
-patterns to v3 replacements. It mirrors the [`IExternalProcess` Users walkthrough](../../../site/docs/migration-guides/3.0.0.md#iexternalprocess-users) in the migration guide.
+patterns to v3 replacements. It mirrors the [`IExternalProcess` Users walkthrough](../../../../site/docs/migration-guides/3.0.0.md#iexternalprocess-users) in the migration guide.
 
 ## ExternalProcess is sealed
 
@@ -85,8 +85,8 @@ The `ExecutePipedAsync`, `RunPipedAsync`, and
 
 ## Cross-references
 
-- [Configuration guide](../../../site/docs/guides/configuration.md) — consumer reference
-- [Resource Disposal guide](../../../site/docs/guides/resource-disposal.md) — ownership rules
-- [Migration guide — ExternalProcess](../../../site/docs/migration-guides/3.0.0.md#5-externalprocess-keeps-only-constructor-c)
-- [Migration guide — ExitConfiguration](../../../site/docs/migration-guides/3.0.0.md#3-exitconfiguration-is-read-only)
-- [Migration guide — PipedProcessResult](../../../site/docs/migration-guides/3.0.0.md#7-processresult-equality-is-symmetric)
+- [Configuration guide](../../../../site/docs/guides/configuration.md) — consumer reference
+- [Resource Disposal guide](../../../../site/docs/guides/resource-disposal.md) — ownership rules
+- [Migration guide — ExternalProcess](../../../../site/docs/migration-guides/3.0.0.md#5-externalprocess-keeps-only-constructor-c)
+- [Migration guide — ExitConfiguration](../../../../site/docs/migration-guides/3.0.0.md#3-exitconfiguration-is-read-only)
+- [Migration guide — PipedProcessResult](../../../../site/docs/migration-guides/3.0.0.md#7-processresult-equality-is-symmetric)
