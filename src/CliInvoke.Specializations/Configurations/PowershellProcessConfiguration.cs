@@ -121,19 +121,24 @@ public class PowershellProcessConfiguration : ProcessConfiguration
             ? Environment.SpecialFolder.ProgramFiles
             : Environment.SpecialFolder.ProgramFilesX86);
 
-        IEnumerable<string> directories = Directory.EnumerateDirectories(
+        string expectedFilePath = Directory.EnumerateDirectories(
                 $"{programFiles}{Path.DirectorySeparatorChar}Powershell")
             .Where(d => Regex.IsMatch(d, @"v\d+"))
-            .OrderByDescending(d => int.TryParse(d.Substring(1), out int _));
+            .Select(d => new { Dir = d, Version = ParseVersionFromPath(d) })
+            .Where(x => x.Version is not null)
+            .OrderByDescending(x => x.Version)
+            .Select(x => $"{x.Dir}{Path.DirectorySeparatorChar}pwsh.exe")
+            .FirstOrDefault(File.Exists)
+            ?? throw new FileNotFoundException(Resources.Exceptions_Powershell_NotInstalled);
 
-        foreach (string directory in directories)
-        {
-            string expectedFilePath = $"{directory}{Path.DirectorySeparatorChar}pwsh.exe";
-            
-            if (File.Exists(expectedFilePath))
-                return expectedFilePath;
-        }
+        return expectedFilePath;
+    }
 
-        throw new FileNotFoundException(Resources.Exceptions_Powershell_NotInstalled);
+    private static Version? ParseVersionFromPath(string path)
+    {
+        // Directory names look like "v7.4.1" — extract the version number after 'v'
+        string dirName = Path.GetFileName(path);
+        string versionStr = dirName.TrimStart('v');
+        return Version.TryParse(versionStr, out Version? v) ? v : null;
     }
 }

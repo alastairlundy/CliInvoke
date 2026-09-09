@@ -8,6 +8,7 @@
 */
 
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using CliInvoke.Core.Factories;
 
@@ -42,8 +43,8 @@ public class ShellDetector : IShellDetector
     /// </summary>
     /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation.</param>
     /// <returns>A task representing the asynchronous operation, returning a ShellInformation object with details about the detected shell.</returns>
-    [UnsupportedOSPlatform("IOS")]
-    [UnsupportedOSPlatform("tvOS")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ShellInformation> ResolveDefaultShellAsync(
         CancellationToken cancellationToken = default)
@@ -60,16 +61,11 @@ public class ShellDetector : IShellDetector
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
-        cancellationToken.Register(() => throw new TaskCanceledException());
-        
-        using ProcessConfiguration execConfiguration = _processConfigurationFactory
-            .Create("ps", "-p $$ -o comm=");
+        string? shellPath = Environment.GetEnvironmentVariable("SHELL");
+        if (string.IsNullOrWhiteSpace(shellPath))
+            throw new InvalidOperationException("The SHELL environment variable is not set.");
 
-        BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
-            execConfiguration, ProcessExitConfiguration.Default, false,
-            cancellationToken);
-
-        string shellExe = _filePathResolver.ResolveFilePath(execResult.StandardOutput.Split(Environment.NewLine).First());
+        string shellExe = _filePathResolver.ResolveFilePath(shellPath);
 
         using ProcessConfiguration shellInfoProcessConfig = _processConfigurationFactory
             .Create(shellExe, "--version");
@@ -78,16 +74,23 @@ public class ShellDetector : IShellDetector
             shellInfoProcessConfig, ProcessExitConfiguration.Default, false,
             cancellationToken);
         
-        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l => l.Contains("version", StringComparison.OrdinalIgnoreCase) &&
-            l.Any(c => char.IsDigit(c)));
-
-        string[] commaSplit = versionLine.Split(',');
+        // Parse version from output — works for bash ("GNU bash, version 5.2.15"),
+        // zsh ("zsh 5.9 ..."), fish ("fish, version 3.6.0"), etc.
+        string output = shellInfoResult.StandardOutput;
+        string? versionStr = null;
+        foreach (string line in output.Split(Environment.NewLine))
+        {
+            Match match = Regex.Match(line, @"(\d+\.\d+(?:\.\d+)*)");
+            if (match.Success)
+            {
+                versionStr = match.Groups[1].Value;
+                break;
+            }
+        }
         
-        string shellPrettyName = commaSplit.First();
+        Version shellVersion = versionStr is not null ? Version.GracefulParse(versionStr.Replace(".", string.Empty)) : new Version();
 
-        string versionString = commaSplit.Last().Replace(".", string.Empty);
-        
-        Version shellVersion = Version.GracefulParse(versionString);
+        string shellPrettyName = Path.GetFileNameWithoutExtension(shellExe);
         
         return new ShellInformation(shellPrettyName, 
             new FileInfo(shellExe), shellVersion);
@@ -119,6 +122,8 @@ public class ShellDetector : IShellDetector
         }
         catch
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             string cmdExe = _filePathResolver.ResolveFilePath("cmd.exe");
 
             using ProcessConfiguration cmdConfig = _processConfigurationFactory

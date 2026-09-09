@@ -23,8 +23,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <remarks>
     /// Note that this class is marked as obsolete and will be removed in a future version.
     ///</remarks>
-    public static ProcessPipeHandler Shared =>
-        new();
+    public static ProcessPipeHandler Shared { get; } = new();
 
     public ProcessPipeHandler()
     {
@@ -46,9 +45,8 @@ public class ProcessPipeHandler : IProcessPipeHandler
     {
         if (destination.StartInfo.RedirectStandardInput)
         {
-            await destination.StandardInput.FlushAsync(cancellationToken);
-            destination.StandardInput.BaseStream.Position = 0;
             await source.CopyToAsync(destination.StandardInput.BaseStream, cancellationToken);
+            await destination.StandardInput.BaseStream.FlushAsync(cancellationToken);
 
             return source.Equals(destination.StandardInput.BaseStream);
         }

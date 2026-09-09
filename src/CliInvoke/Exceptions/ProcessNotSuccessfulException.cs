@@ -75,9 +75,8 @@ public sealed class ProcessNotSuccessfulException : Exception
     public ProcessNotSuccessfulException(int exitCode, ProcessExceptionInfo process)
         : base(
             Resources.Exceptions_ProcessNotSuccessful_Specific.Replace(
-                "{y}",
-                exitCode.ToString().Replace("{x}", process.Configuration.TargetFilePath)
-            )
+                "{x}", process.Configuration.TargetFilePath
+            ).Replace("{y}", exitCode.ToString())
         )
     {
         ExecutedProcess = process;

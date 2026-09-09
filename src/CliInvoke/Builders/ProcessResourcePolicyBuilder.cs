@@ -117,10 +117,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     [SupportedOSPlatform("freebsd")]
     public IProcessResourcePolicyBuilder SetMaxWorkingSet(nint maxWorkingSet)
     {
-        nint minWorkingSet = _processResourcePolicy.MinWorkingSet ?? 
-#pragma warning disable CS8629
-                             (nint)ProcessResourcePolicy.Default.MinWorkingSet;
-#pragma warning restore CS8629
+        nint minWorkingSet = _processResourcePolicy.MinWorkingSet ?? 1;
         
         ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet, 
             minWorkingSet);

@@ -98,8 +98,8 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
                Id == other.Id &&
                ArgumentsConflict == other.ArgumentsConflict &&
                ProcessName == other.ProcessName &&
-               ResourcePolicy.Equals(other.ResourcePolicy) &&
-               Credential.Equals(Credential);
+                ResourcePolicy.Equals(other.ResourcePolicy) &&
+                object.Equals(Credential, other.Credential);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
     }
 
@@ -134,8 +134,8 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     /// <returns><c>true</c> if the two instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(ProcessExceptionInfo? left, ProcessExceptionInfo? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null)
+            return right is null;
         
         return left.Equals(right);
     }
@@ -148,8 +148,8 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     /// <returns><c>true</c> if the two specified instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(ProcessExceptionInfo? left, ProcessExceptionInfo? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null)
+            return right is not null;
 
         return !left.Equals(right);
     }
