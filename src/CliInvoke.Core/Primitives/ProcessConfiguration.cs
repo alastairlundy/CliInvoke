@@ -338,8 +338,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
             return false;
         }
 
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-
         return TargetFilePath.Equals(other.TargetFilePath)
                && EnvironmentVariables.Equals(other.EnvironmentVariables)
                && Arguments.Equals(other.Arguments)
@@ -349,10 +347,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && Credential.Equals(other.Credential)
                && RequiresAdministrator == other.RequiresAdministrator
                && WindowCreation == other.WindowCreation
-               && StandardInput.Equals(other.StandardInput)
+               && StreamsEqual(StandardInput, other.StandardInput)
 #pragma warning disable CS0618 // Type or member is obsolete
-               && StandardOutput.Equals(other.StandardOutput)
-               && StandardError.Equals(other.StandardError)
+               && StreamsEqual(StandardOutput, other.StandardOutput)
+               && StreamsEqual(StandardError, other.StandardError)
 #pragma warning restore CS0618 // Type or member is obsolete
                && RedirectStandardInput.Equals(other.RedirectStandardInput)
                && RedirectStandardOutput.Equals(other.RedirectStandardOutput)
@@ -360,7 +358,45 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
                && StandardInputEncoding.Equals(other.StandardInputEncoding)
                && StandardOutputEncoding.Equals(other.StandardOutputEncoding)
                && StandardErrorEncoding.Equals(other.StandardErrorEncoding);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+    }
+
+    private static bool StreamsEqual(StreamWriter? left, StreamWriter? right)
+    {
+        if (left is null && right is null) return true;
+        if (left is null || right is null) return false;
+        if (ReferenceEquals(left, right)) return true;
+
+        string? leftPath = GetStreamPath(left.BaseStream);
+        string? rightPath = GetStreamPath(right.BaseStream);
+
+        if (leftPath is not null && rightPath is not null)
+            return string.Equals(leftPath, rightPath, StringComparison.OrdinalIgnoreCase);
+
+        return ReferenceEquals(left.BaseStream, right.BaseStream);
+    }
+
+    private static bool StreamsEqual(StreamReader? left, StreamReader? right)
+    {
+        if (left is null && right is null) return true;
+        if (left is null || right is null) return false;
+        if (ReferenceEquals(left, right)) return true;
+
+        string? leftPath = GetStreamPath(left.BaseStream);
+        string? rightPath = GetStreamPath(right.BaseStream);
+
+        if (leftPath is not null && rightPath is not null)
+            return string.Equals(leftPath, rightPath, StringComparison.OrdinalIgnoreCase);
+
+        return ReferenceEquals(left.BaseStream, right.BaseStream);
+    }
+
+    private static string? GetStreamPath(Stream stream)
+    {
+        return stream switch
+        {
+            FileStream fs => fs.Name,
+            _ => null
+        };
     }
 
     /// <summary>
