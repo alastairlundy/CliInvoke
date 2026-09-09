@@ -37,7 +37,7 @@ internal static class ArgumentTokenizer
             return [];
 
         if (string.IsNullOrWhiteSpace(value))
-            return value.Length == 0 ? [string.Empty] : [];
+            return [];
 
         string text = value;
 
