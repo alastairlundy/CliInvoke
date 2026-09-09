@@ -239,7 +239,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 
         return TargetFilePath.Equals(other.TargetFilePath)
                && EnvironmentVariables.Count == other.EnvironmentVariables.Count
-               && EnvironmentVariables.Equals(other.EnvironmentVariables)
+               && EnvironmentVariables.SequenceEqual(other.EnvironmentVariables)
                && Arguments.Equals(other.Arguments)
                && ArgumentList.SequenceEqual(other.ArgumentList)
                && ResourcePolicy.Equals(other.ResourcePolicy)
@@ -248,7 +248,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
                && Credential.Equals(other.Credential)
                && RequiresAdministrator == other.RequiresAdministrator
                && WindowCreation == other.WindowCreation
-               && StandardInput.Equals(other.StandardInput)
+               && ReferenceEquals(StandardInput, other.StandardInput)
                && RedirectStandardInput.Equals(other.RedirectStandardInput)
                && OutputRedirection == other.OutputRedirection
                && StandardInputEncoding.Equals(other.StandardInputEncoding)
@@ -294,7 +294,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
         hashCode.Add(RequiresAdministrator);
         hashCode.Add(WindowCreation);
 
-        hashCode.Add(StandardInput);
+        hashCode.Add(StandardInput?.BaseStream);
         hashCode.Add(ResourcePolicy);
         hashCode.Add(StandardInputEncoding);
         hashCode.Add(StandardOutputEncoding);

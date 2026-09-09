@@ -64,7 +64,7 @@ public class ShellInformation : IEquatable<ShellInformation>
     {
         if (other is null) return false;
 
-        return Name == other.Name && Version == other.Version && TargetFilePath.Equals(other.TargetFilePath);
+        return Name == other.Name && Version == other.Version && TargetFilePath.FullName.Equals(other.TargetFilePath.FullName, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc />
@@ -82,7 +82,7 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(Name, Version, TargetFilePath);
+        return HashCode.Combine(Name, Version, TargetFilePath.FullName);
     }
 
     /// <summary>

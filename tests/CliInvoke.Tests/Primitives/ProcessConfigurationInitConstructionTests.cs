@@ -31,13 +31,16 @@ public class ProcessConfigurationInitConstructionTests
     [Test]
     public async Task Init_WithNonExistentWorkingDirectory_ThrowsDirectoryNotFoundException()
     {
-        // Arrange & Act & Assert
+        // Arrange
+        string nonExistentPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString(), "nonexistent");
+
+        // Act & Assert
         await Assert.That(() =>
         {
             ProcessConfiguration _ = new()
             {
                 TargetFilePath = "foo.exe",
-                WorkingDirectoryPath = @"C:\This\Directory\Does\Not\Exist\At\All"
+                WorkingDirectoryPath = nonExistentPath
             };
         }).Throws<DirectoryNotFoundException>();
     }

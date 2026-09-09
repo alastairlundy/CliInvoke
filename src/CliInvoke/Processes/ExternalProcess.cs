@@ -20,7 +20,9 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
 {
     private ProcessWrapper _processWrapper;
     private readonly object _lifecycleLock = new();
-    
+    private EventHandler? _startedHandler;
+    private EventHandler? _exitedHandler;
+
     private readonly IFilePathResolver _filePathResolver;
 
     /// <summary>
@@ -37,8 +39,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
 
-        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+        _startedHandler = (sender, args) => Started?.Invoke(sender, args);
+        _exitedHandler = (sender, args) => Exited?.Invoke(sender, args);
+        _processWrapper.Started += _startedHandler;
+        _processWrapper.Exited += _exitedHandler;
     }
 
     /// <summary>
@@ -112,11 +116,13 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
 
             FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
 
+            _processWrapper.Started -= _startedHandler;
+            _processWrapper.Exited -= _exitedHandler;
             _processWrapper.Dispose();
             _processWrapper = new ProcessWrapper(Configuration, filePath);
 
-            _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-            _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+            _processWrapper.Started += _startedHandler;
+            _processWrapper.Exited += _exitedHandler;
 
             _processWrapper.Start();
 
@@ -154,11 +160,13 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
 
             FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
 
+            _processWrapper.Started -= _startedHandler;
+            _processWrapper.Exited -= _exitedHandler;
             _processWrapper.Dispose();
             _processWrapper = new ProcessWrapper(Configuration, filePath);
 
-            _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-            _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+            _processWrapper.Started += _startedHandler;
+            _processWrapper.Exited += _exitedHandler;
 
             _processWrapper.Start();
 
@@ -198,11 +206,13 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
 
             FileInfo filePath = _filePathResolver.ResolveFilePath(configuration.TargetFilePath);
 
+            _processWrapper.Started -= _startedHandler;
+            _processWrapper.Exited -= _exitedHandler;
             _processWrapper.Dispose();
             _processWrapper = new ProcessWrapper(configuration, filePath);
 
-            _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
-            _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
+            _processWrapper.Started += _startedHandler;
+            _processWrapper.Exited += _exitedHandler;
 
             if (configuration.StandardInput is not null
                 && configuration.StandardInput != StreamWriter.Null)

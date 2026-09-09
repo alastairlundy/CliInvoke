@@ -52,7 +52,7 @@ internal class ProcessWrapper : Process
     }
 
     // Synchronisation primitive to prevent simultaneous cancellation attempts
-    internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
+    private readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
     // Resolved cancellation reason, persisted across the wait so Canceled can be computed afterward.
     private CancellationReason _cancellationReason = CancellationReason.NotKnown;
@@ -273,7 +273,6 @@ internal class ProcessWrapper : Process
         if (StartInfo.RedirectStandardInput)
         {
             await StandardInput.FlushAsync(cancellationToken).ConfigureAwait(false);
-            StandardInput.BaseStream.Position = 0;
             await source.CopyToAsync(StandardInput.BaseStream, cancellationToken).ConfigureAwait(false);
 
             return source.Equals(StandardInput.BaseStream);
@@ -298,6 +297,7 @@ internal class ProcessWrapper : Process
             if (StandardOutput != StreamReader.Null)
                 await StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
 
+        destination.Position = 0;
         return destination;
     }
 
@@ -317,6 +317,7 @@ internal class ProcessWrapper : Process
             if (StandardError != StreamReader.Null)
                 await StandardError.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
 
+        destination.Position = 0;
         return destination;
     }
     #endregion
@@ -676,15 +677,16 @@ internal class ProcessWrapper : Process
 
         CancellationToken actualCancellationToken = cts.Token;
 
+        bool acquired = false;
         // Use semaphore to prevent simultaneous cancellation attempts
         if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
         {
-            // Another cancellation is already in progress, wait for it to complete
             await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
-            // Dispose of the linked CTS to prevent resource leaks
             cts.Dispose();
             return;
         }
+
+        acquired = true;
 
         try
         {
@@ -692,11 +694,8 @@ internal class ProcessWrapper : Process
         }
         catch (Exception exception)
         {
-            // Compute the cancellation reason at the catch point where the token is known-canceled.
             CancellationReason cancellationReason =
                 CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
-
-            // Recalculate expected exit time in exception handler to avoid using stale values
             DateTime currentExpectedExitTime =
                 CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
             CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
@@ -706,10 +705,9 @@ internal class ProcessWrapper : Process
         finally
         {
             ForcefulExit();
-            // Dispose of the linked CTS to prevent resource leaks
-
             cts.Dispose();
-            _cancellationSemaphore.Release();
+            if (acquired)
+                _cancellationSemaphore.Release();
         }
     }
     

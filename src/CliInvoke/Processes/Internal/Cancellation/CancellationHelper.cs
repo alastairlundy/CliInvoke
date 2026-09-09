@@ -48,12 +48,22 @@ internal static class CancellationHelper
 
 
     /// <summary>
+    ///     Handles exceptions thrown during process cancellation by deciding
+    ///     whether to re-throw or silently swallow them.
     /// </summary>
-    /// <param name="expectedExitTime"></param>
-    /// <param name="cancellationReason"></param>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="exception"></param>
-    /// <exception cref="Exception"></exception>
+    /// <param name="expectedExitTime">The time at which the process was expected to exit.</param>
+    /// <param name="cancellationReason">The determined reason for the cancellation.</param>
+    /// <param name="exitConfiguration">The exit configuration controlling exception behaviour.</param>
+    /// <param name="exception">The exception to evaluate.</param>
+    /// <remarks>
+    ///     When <see cref="ProcessExitConfiguration.ExceptionBehaviour" /> is
+    ///     <see cref="ProcessExceptionBehaviour.AllowExceptionsIfUnexpected" />, the exception is
+    ///     only re-thrown if the process exited more than 1 second after its expected exit time.
+    ///     This 1-second heuristic accommodates minor clock skew while ensuring that genuine
+    ///     errors (I/O errors, access violations, etc.) that occur within a tight window around
+    ///     the expected exit time are not silently swallowed.
+    /// </remarks>
+    /// <exception cref="Exception">Rethrown when the exception behaviour configuration permits it.</exception>
     internal static void HandleCancellationExceptions(DateTime expectedExitTime,
         CancellationReason cancellationReason, ProcessExitConfiguration exitConfiguration,
         Exception exception)
@@ -77,7 +87,7 @@ internal static class CancellationHelper
                     == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
                             .ExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
-                        difference > TimeSpan.FromSeconds(10)))
+                        difference > TimeSpan.FromSeconds(1)))
                     throw exception;
 
                 break;

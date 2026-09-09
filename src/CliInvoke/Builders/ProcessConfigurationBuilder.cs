@@ -468,7 +468,6 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     public void Dispose()
     {
         _userCredentialSpec.Dispose();
-        _standardInput.Dispose();
     }
 }
 

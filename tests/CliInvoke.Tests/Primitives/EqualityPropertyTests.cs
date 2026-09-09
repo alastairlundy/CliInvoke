@@ -41,8 +41,7 @@ public class EqualityPropertyTests
         ProcessResult b = ArbitraryProcessResult();
         ProcessResult c = ArbitraryProcessResult();
 
-        if (a.Equals(b) && b.Equals(c))
-            await Assert.That(a.Equals(c)).IsTrue();
+        await Assert.That(a.Equals(c)).IsTrue();
     }
 
     [Test]
@@ -51,8 +50,7 @@ public class EqualityPropertyTests
         ProcessResult a = ArbitraryProcessResult();
         ProcessResult b = ArbitraryProcessResult();
 
-        if (a.Equals(b))
-            await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
+        await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
     }
 
     [Test]
@@ -79,8 +77,7 @@ public class EqualityPropertyTests
         BufferedProcessResult b = ArbitraryBufferedProcessResult();
         BufferedProcessResult c = ArbitraryBufferedProcessResult();
 
-        if (a.Equals(b) && b.Equals(c))
-            await Assert.That(a.Equals(c)).IsTrue();
+        await Assert.That(a.Equals(c)).IsTrue();
     }
 
     [Test]
@@ -89,8 +86,7 @@ public class EqualityPropertyTests
         BufferedProcessResult a = ArbitraryBufferedProcessResult();
         BufferedProcessResult b = ArbitraryBufferedProcessResult();
 
-        if (a.Equals(b))
-            await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
+        await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
     }
 
     [Test]
@@ -117,8 +113,7 @@ public class EqualityPropertyTests
         ProcessConfiguration b = new("foo.exe", "arg1");
         ProcessConfiguration c = new("foo.exe", "arg1");
 
-        if (a.Equals(b) && b.Equals(c))
-            await Assert.That(a.Equals(c)).IsTrue();
+        await Assert.That(a.Equals(c)).IsTrue();
     }
 
     [Test]
@@ -127,8 +122,7 @@ public class EqualityPropertyTests
         ProcessConfiguration a = new("foo.exe", "arg1");
         ProcessConfiguration b = new("foo.exe", "arg1");
 
-        if (a.Equals(b))
-            await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
+        await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
     }
 
     [Test]
@@ -155,8 +149,7 @@ public class EqualityPropertyTests
         ShellInformation b = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
         ShellInformation c = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
 
-        if (a.Equals(b) && b.Equals(c))
-            await Assert.That(a.Equals(c)).IsTrue();
+        await Assert.That(a.Equals(c)).IsTrue();
     }
 
     [Test]
@@ -165,8 +158,7 @@ public class EqualityPropertyTests
         ShellInformation a = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
         ShellInformation b = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
 
-        if (a.Equals(b))
-            await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
+        await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
     }
 
     [Test]
