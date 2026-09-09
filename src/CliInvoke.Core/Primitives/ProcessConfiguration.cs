@@ -248,7 +248,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
                && Credential.Equals(other.Credential)
                && RequiresAdministrator == other.RequiresAdministrator
                && WindowCreation == other.WindowCreation
-               && ReferenceEquals(StandardInput, other.StandardInput)
+               && ReferenceEquals(StandardInput?.BaseStream, other.StandardInput?.BaseStream)
                && RedirectStandardInput.Equals(other.RedirectStandardInput)
                && OutputRedirection == other.OutputRedirection
                && StandardInputEncoding.Equals(other.StandardInputEncoding)
