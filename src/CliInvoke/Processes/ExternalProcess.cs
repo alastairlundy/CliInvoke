@@ -204,7 +204,7 @@ public class ExternalProcess : IExternalProcess
 
             await waitForExit;
             await linkedCts.CancelAsync();
-            await Task.WhenAll(standardOutputStream, standardErrorStream);
+            await ObserveCancellation(standardOutputStream, standardErrorStream);
             
             ProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
@@ -257,7 +257,7 @@ public class ExternalProcess : IExternalProcess
 
             await waitForExit;
             await linkedCts.CancelAsync();
-            await Task.WhenAll(standardOutputString, standardErrorString);
+            await ObserveCancellation(standardOutputString, standardErrorString);
             
             BufferedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
@@ -301,7 +301,7 @@ public class ExternalProcess : IExternalProcess
 
             await waitForExit;
             await linkedCts.CancelAsync();
-            await Task.WhenAll(standardOutputStream, standardErrorStream);
+            await ObserveCancellation(standardOutputStream, standardErrorStream);
             
             PipedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, _processWrapper.StartTime, _processWrapper.ExitTime,
@@ -364,6 +364,22 @@ public class ExternalProcess : IExternalProcess
         {
             throw new ProcessNotSuccessfulException(new ProcessExceptionInfo(result,
                 Configuration));
+        }
+    }
+
+    private static async Task ObserveCancellation(params Task[] tasks)
+    {
+        try
+        {
+            await Task.WhenAll(tasks);
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected: pipe reads cancelled after process exit.
+        }
+        catch (AggregateException)
+        {
+            // Expected: multiple pipe reads cancelled after process exit.
         }
     }
 }
