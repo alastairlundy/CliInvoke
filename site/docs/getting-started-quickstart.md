@@ -8,7 +8,7 @@ layout: simple
 Install the package via NuGet:
 
 ```xml
-<PackageReference Include="CliInvoke" Version="3.0.0-beta.2" />
+<PackageReference Include="CliInvoke" Version="3.0.0" />
 ```
 
 Add services:
@@ -35,5 +35,3 @@ Console.WriteLine(output.StandardOutput);
 
 `CliRun` needs no dependency injection and no factories. When you need DI, middleware, or
 process-level control, see the full Getting Started guide and [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md).
-
-(Quickstart migrated from existing docs.)

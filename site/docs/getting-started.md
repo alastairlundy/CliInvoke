@@ -53,7 +53,7 @@ class Program
         // Register your other dependencies here
 
         // AddCliInvoke registers IProcessInvoker, IExternalProcessFactory,
-        // IProcessConfigurationBuilder, IRunnerConfigurationFactory and more.
+        // IProcessConfigurationBuilder, and related services.
         services.AddCliInvoke();
 
         // Build the service provider
@@ -81,13 +81,9 @@ Most developers using CliInvoke in their applications should use the ``AddCliInv
 using Microsoft.Extensions.DependencyInjection;
 
 using CliInvoke;
-using CliInvoke.Builders;
 using CliInvoke.Core;
-using CliInvoke.Core.Builders;
 using CliInvoke.Core.Extensibility;
-using CliInvoke.Core.Factories;
 using CliInvoke.Extensibility;
-using CliInvoke.Factories;
 
 namespace MyApp;
 
@@ -103,12 +99,8 @@ class Program
         // Register your other dependencies here
 
         services.AddSingleton<IFilePathResolver, FilePathResolver>();
-        services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
         services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
         services.AddSingleton<IProcessInvoker, ProcessInvoker>();
-
-        // Optional - register if you intend to run a Process Configuration through another Process.
-        services.AddSingleton<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
 
         // Build the service provider
         ServiceProvider = services.BuildServiceProvider();

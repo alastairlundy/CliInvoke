@@ -11,7 +11,7 @@ documents the configuration **models**, the relationship between the
 **invoker** that consumes them.
 
 If you only read one section, read
-[The Lifecycle](#the-lifecycle-builder--model--invoker) and the
+[Construction (the default)](#construction-the-default) and the
 [Reference Appendix](#reference-appendix).
 
 ## Goals
@@ -41,88 +41,138 @@ configuration; it reads the model, spawns a `System.Diagnostics.Process`,
 runs it, captures the result, and disposes the OS resources it
 allocated.
 
-## The Lifecycle: Builder → Model → Invoker
+## Construction (the default)
 
-Every CliInvoke invocation moves through three stages.
+In v3, **init construction is the default**. Every configuration model
+has a public constructor that accepts its required parameters
+positionally. The builder is reserved for advanced scenarios that the
+simple constructors cannot express.
 
-```text
-   ┌────────────┐    Build()    ┌──────────────────┐   ExecuteAsync    ┌──────────┐
-   │  Builder   │ ────────────► │  Configuration   │ ────────────────► │ Invoker  │
-   │ (mutable)  │               │     Model        │                   │ (executes)│
-   └────────────┘               │  (immutable)     │                   └──────────┘
-                                └──────────────────┘
-```
+### `ProcessConfiguration` — direct construction
 
-1. **Builder** — the caller assembles intent. Builders expose
-   `Set*`/`Configure*` methods that return `this` for chaining and
-   terminate with a `Build()` method.
-2. **Model** — `Build()` returns an immutable, value-equal
-   `ProcessConfiguration` (and any associated models it references,
-   such as `ProcessExitConfiguration` or `UserCredential`).
-3. **Consumer** — the caller hands the model to one of three
-   consumption paths: `IProcessInvoker.ExecuteAsync`,
-   `IExternalProcess.StartAsync` (followed by a separate capture
-   call), or the static `CliRun.RunAsync` family. Each consumer
-   reads the model and runs the process; the result is then obtained
-   from the returned task or, for `IExternalProcess`, by calling
-    `WaitForExitOrTimeoutAsync` / `CaptureBufferedResultAsync`
-    after the process has started.
+`ProcessConfiguration` is the only required model. `TargetFilePath` is
+a `required` init property — the constructor throws `ArgumentException`
+if it is null or empty. `WorkingDirectoryPath` validates the directory
+exists at init time and throws `DirectoryNotFoundException` if it does
+not.
 
-The same model can be reused across multiple invocations. The same
-builder can be used to produce multiple models, but only by calling
-`Build()` repeatedly; the builder itself is single-use-per-stage.
-
-## Builders Are Optional
-
-**You do not have to use a builder.** Every configuration model in this
-library has a public constructor that accepts its required parameters
-positionally. The builder is a convenience for cases where:
-
-- The configuration has many properties and you want to set only a
-  few of them.
-- The configuration needs to be assembled conditionally, in stages, or
-  from multiple sources.
-- The construction logic benefits from being expressed as a fluent
-  pipeline.
-
-If neither of these applies, construct the model directly:
+**Convenience constructor** — for the common case of target file path
+plus arguments:
 
 ```csharp
-// Direct construction — no builder.
-ProcessConfiguration config = new ProcessConfiguration(
-    targetFilePath: "git",
-    arguments: "status",
-    outputRedirection: true);
-
-ProcessResult result = await invoker.ExecuteAsync(config);
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 ```
 
-vs. the equivalent builder-based form:
+This sets `TargetFilePath`, `Arguments`, and `OutputRedirection` (which
+defaults to `true`); all other properties take their documented
+defaults.
+
+**Parameterless constructor with an object initializer** — when you
+need to set additional init-only properties:
 
 ```csharp
-// Builder-based construction.
-ProcessConfiguration config = new ProcessConfigurationBuilder()
-    .SetTargetFilePath("git")
-    .SetArguments("status")
-    .SetOutputRedirection(true)
-    .Build();
-
-ProcessResult result = await invoker.ExecuteAsync(config);
+ProcessConfiguration config = new ProcessConfiguration
+{
+    TargetFilePath = "dotnet",
+    Arguments = "--version",
+    OutputRedirection = true,
+    WorkingDirectoryPath = @"C:\my\project"
+};
 ```
 
-The two examples above produce identical models, but the builder and
-the direct constructor are **not** equivalent in general. Most defaults
-match, but there are several known differences in default values,
-validation, and argument handling that callers must be aware of. The
-builders are an ergonomic layer, not a thin wrapper.
+**ArgumentList** — replaces the v2 `ArgumentsList` property. When
+non-empty, the control adapter emits entries via
+`ProcessStartInfo.ArgumentList` instead of the single `Arguments`
+string, so the OS command-line parser passes each entry unmodified:
 
-This is a deliberate design choice. The configuration models are
-designed to be serializable, comparable, and stable across versions. The
-builders are designed for human callers; they are mutable, they
-allocate, and they can change shape between versions without breaking
-serialized models.
+```csharp
+ProcessConfiguration config = new ProcessConfiguration("dotnet")
+{
+    ArgumentList = ["--list-sdks", "--verbosity", "minimal"]
+};
+```
 
-### Differences from Direct Construction
+The model is mostly immutable: most properties have only a getter.
+`TargetFilePath`, `Arguments`, and `OutputRedirection` are mutable on
+the public surface for back-compat reasons — see the
+[Reference Appendix](#reference-appendix) for the exact mutability of
+each property.
+
+### `ProcessExitConfiguration` — direct construction
+
+```csharp
+ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(
+    ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(30)));
+```
+
+Or use the static factory for the common graceful case:
+
+```csharp
+ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
+```
+
+### `UserCredential` — direct construction
+
+```csharp
+UserCredential credential = new UserCredential
+{
+    Domain = "CONTOSO",
+    UserName = "admin",
+    Password = securePassword
+};
+```
+
+`UserCredential` implements `IDisposable` — see the
+[Resource Disposal](./resource-disposal.md) guide for ownership rules.
+
+### `ProcessResourcePolicy` — direct construction
+
+```csharp
+ProcessResourcePolicy policy = ProcessResourcePolicy.Default;
+```
+
+Or construct a custom policy:
+
+```csharp
+ProcessResourcePolicy policy = new ProcessResourcePolicy
+{
+    PriorityClass = ProcessPriorityClass.High
+};
+```
+
+## Builders — advanced
+
+The builder is **not required** and is positioned as an advanced
+construction path. Use the builder when you need features that the
+simple constructors cannot express:
+
+- **Argument escaping** — `ConfigureArguments(Action<ArgumentsSpec>)`
+  wraps and validates individual arguments, applying character escaping
+  (quotes, backslashes, control characters) before joining.
+- **User credential configuration** —
+  `ConfigureUserCredential(Action<UserCredentialSpec>)` for Windows-only
+  credential injection with `SecureString` password staging.
+- **Resource policy configuration** —
+  `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)`
+  for processor affinity and resource settings with internal pairing
+  logic (e.g., `SetMinWorkingSet` without a prior `SetMaxWorkingSet`
+  fabricates `Max = Min + 1`).
+
+```csharp
+using CliInvoke.Builders;
+
+IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("dotnet")
+    .SetArguments(["--info"])
+    .SetOutputRedirection(true);
+
+ProcessConfiguration config = builder.Build();
+```
+
+The builder delegates to the same init-only properties under the hood;
+it adds escaping, credential spec, and resource policy callbacks on
+top.
+
+### Differences from direct construction
 
 The builder and the direct constructor **do not always produce the
 same model** for the same input. Concretely:
@@ -132,41 +182,95 @@ same model** for the same input. Concretely:
   defaults it to `false`. `new ProcessConfiguration("git")` and
   `new ProcessConfigurationBuilder("git").Build()` produce
   configurations with different `OutputRedirection` values.
-  Callers relying on redirected output from a builder-built
-  configuration must call `SetOutputRedirection(true)` explicitly.
 - **Working-directory existence is validated by the builder, not the
   model.** `SetWorkingDirectory` throws `DirectoryNotFoundException`
-  if the directory does not exist. The model's constructor does not
-  perform this check; it stores the path verbatim.
-- **Argument validation differs.** `SetArguments(IEnumerable<string>)`
-  silently drops entries that the configured validation logic rejects
-  and throws `ArgumentException` if every entry is rejected. The model
-  takes the joined string as-is. When the default validation is in
-  use, this means the builder rejects all-null argument lists where
-  the model accepts them.
+  if the directory does not exist. The model's constructor also
+  validates via the `WorkingDirectoryPath` init setter.
 - **Argument escaping is applied by the builder.** `Add` and
-  `AddRange` on `ArgumentsSpec` apply character escaping (quotes,
-  backslashes, control characters) before joining. The model's
-  `Arguments` string is stored verbatim. For most real inputs the
-  escaping is a no-op, but the two paths can differ for arguments
-  containing `\\`, `"`, or control characters.
-- **`ProcessorAffinity` lower bound.** Both the model's
-  `ProcessResourcePolicy` and `ProcessResourcePolicySpec.SetProcessorAffinity`
-  require `processorAffinity >= 1` (a value of `0` selects no processor
-  and is rejected). There is no upper bound because a processor affinity
-  mask is a bitmask over processors, so any positive value is accepted.
+  `AddRange` on `ArgumentsSpec` apply character escaping before
+  joining. The model's `Arguments` string is stored verbatim.
 - **Working-set pairing in `ProcessResourcePolicySpec`.** Calling
   `SetMinWorkingSet` without a prior `SetMaxWorkingSet` fabricates
   `Max = Min + 1` so the resulting policy is internally consistent.
-  The model allows `Min` and `Max` to be set independently and will
-  accept a configuration with `Min = 100, Max = null`.
-- **`UserCredential.LoadUserProfile` default differs.** The model's
-  `new UserCredential()` defaults `LoadUserProfile` to `false`; the
-  spec's `new UserCredentialSpec().Build()` defaults it to
-  `null`. This difference is invisible through `ProcessConfiguration`,
-  whose default `Credential` is the all-null `UserCredential.Null`
-  singleton, and which the builder also produces by default. It only
-  surfaces when constructing a `UserCredential` directly.
+  The model allows `Min` and `Max` to be set independently.
+
+### Builder-methods-to-init-properties table
+
+| Builder method | Init property | Notes |
+|----------------|---------------|-------|
+| `SetTargetFilePath(string)` | `TargetFilePath` | Required in both paths |
+| `SetArguments(string)` | `Arguments` | Verbatim string |
+| `SetArguments(IEnumerable<string>)` | `ArgumentList` | Init-only |
+| `ConfigureArguments(Action<ArgumentsSpec>)` | *(no direct init)* | Escaping, validation |
+| `SetOutputRedirection(bool)` | `OutputRedirection` | Default differs: `true` (init) vs `false` (builder) |
+| `SetWorkingDirectory(string)` | `WorkingDirectoryPath` | Builder validates existence |
+| `SetWindowCreation(bool)` | `WindowCreation` | |
+| `ConfigureShellExecution()` | `UseShellExecution` | |
+| `ConfigureEnvironmentVariables(Action<EnvironmentVariablesSpec>)` | `EnvironmentVariables` | |
+| `ConfigureUserCredential(Action<UserCredentialSpec>)` | `Credential` | Advanced: `SecureString` staging |
+| `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` | `ResourcePolicy` | Advanced: pairing logic |
+
+### When to keep the builder
+
+The builder is the right choice when:
+
+- You need argument escaping (arguments containing `\`, `"`, or
+  control characters).
+- You need `UserCredentialSpec` for Windows-domain credential staging
+  with `SecureString`.
+- You need `ProcessResourcePolicySpec` for resource-policy callback
+  flows with internal pairing logic.
+- The configuration needs to be assembled conditionally, in stages,
+  or from multiple sources.
+
+## Dependency Injection
+
+`AddCliInvoke` (namespace `CliInvoke.Extensions`, ships in the
+`CliInvoke` package) registers all core services. Call it once at
+startup:
+
+```csharp
+services.AddCliInvoke();
+```
+
+You can configure the middleware pipeline when registering:
+
+```csharp
+services.AddCliInvoke(builder => builder.UseMiddleware<LoggingMiddleware>());
+```
+
+> If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations)
+> package's `UsePowerShell()`/`UseCmd()` middleware, also call
+> `AddCliInvokeSpecializations()` (same namespace) with the same
+> `ServiceLifetime` so those middleware types resolve from the container.
+
+## The Lifecycle: Construction → Model → Invoker
+
+Every CliInvoke invocation moves through three stages.
+
+```text
+   ┌──────────────┐    init / Build()   ┌──────────────────┐   ExecuteAsync    ┌──────────┐
+   │ Construction  │ ──────────────────► │  Configuration   │ ────────────────► │ Invoker  │
+   │ (init or build)│                    │     Model        │                   │ (executes)│
+   └──────────────┘                      │  (immutable)     │                   └──────────┘
+                                         └──────────────────┘
+```
+
+1. **Construction** — the caller creates the configuration, either
+   directly via init properties (the default) or via a builder
+   (advanced). Both paths produce an immutable `ProcessConfiguration`.
+2. **Model** — the configuration holds the data the invoker reads.
+   The model is independent of the construction path.
+3. **Consumer** — the caller hands the model to one of three
+   consumption paths: `IProcessInvoker.ExecuteAsync`,
+   `IExternalProcess.StartAsync` (followed by a separate capture
+   call), or the static `CliRun.RunAsync` family. Each consumer
+   reads the model and runs the process; the result is then obtained
+   from the returned task or, for `IExternalProcess`, by calling
+    `WaitForExitOrTimeoutAsync` / `CaptureBufferedResultAsync`
+    after the process has started.
+
+The same model can be reused across multiple invocations.
 
 ## The Configuration Models
 
@@ -197,14 +301,8 @@ arguments to pass, and the OS-level knobs that affect how the process
 is spawned (working directory, environment, redirection, credentials,
 resource policy, encodings).
 
-**Required constructor argument**: `TargetFilePath`. The constructor
+**Required init property**: `TargetFilePath`. The constructor
 throws `ArgumentException` if it is null or empty.
-
-The model is mostly immutable: most properties have only a getter.
-`TargetFilePath`, `Arguments`, and `OutputRedirection` are mutable on
-the public surface for back-compat reasons — see the
-[Reference Appendix](#reference-appendix) for the exact mutability of
-each property.
 
 **Relationship to other models**: A `ProcessConfiguration` may hold
 references to a `UserCredential` (via `Credential`) and a
@@ -241,7 +339,7 @@ its own internal default.
 (via `CancellationThrowsException`).
 
 **Relationship to the lifecycle**: The exit configuration is
-constructed in the same Builder → Model stage as the rest, but it is
+constructed in the same Construction → Model stage as the rest, but it is
 the **only** model that can vary between two invocations of the same
 `ProcessConfiguration` without changing the spawned process itself.
 
@@ -291,31 +389,6 @@ is left at the OS default.
 
 The model is value-equal and immutable.
 
-## The Builders
-
-There is one builder per model that has a non-trivial set of optional
-properties.
-
-| Configuration type | Produces | Defined in |
-|---------|----------|------------|
-| `IProcessConfigurationBuilder` | `ProcessConfiguration` | `src/CliInvoke.Core/Builders/IProcessConfigurationBuilder.cs` |
-| `ArgumentsSpec` | `string` (joined arguments) | `src/CliInvoke.Core/Configuration/ArgumentsSpec.cs` |
-| `EnvironmentVariablesSpec` | `IReadOnlyDictionary<string, string>` | `src/CliInvoke.Core/Configuration/EnvironmentVariablesSpec.cs` |
-| `ProcessResourcePolicySpec` | `ProcessResourcePolicy` | `src/CliInvoke.Core/Configuration/ProcessResourcePolicySpec.cs` |
-| `UserCredentialSpec` | `UserCredential` | `src/CliInvoke.Core/Configuration/UserCredentialSpec.cs` |
-
-All builders are **optional**. Every model they produce has a public
-constructor that bypasses the builder entirely. See
-[Builders Are Optional](#builders-are-optional) above.
-
-**The `Configure*` pattern**: Several `Configure*` methods accept an
-`Action<TSpec>` so the caller can configure a nested spec
-inline. For example,
-`IProcessConfigurationBuilder.ConfigureArguments(Action<ArgumentsSpec>)`
-runs the action against the shared `ArgumentsSpec` instance held by the
-builder and folds the result into the configuration being built. Repeated
-calls update the same staged arguments rather than starting from empty.
-
 ## The Consumers
 
 The third stage of the lifecycle has **three** consumption paths.
@@ -327,7 +400,7 @@ ergonomics, and level of control.
 |----------|------------|----------|----------|
 | `IProcessInvoker` | `src/CliInvoke.Core/IProcessInvoker.cs` | Fire-and-forget; runs to completion. | You want to run a process and get a result. |
 | `IExternalProcess` | `src/CliInvoke.Core/Processes/IExternalProcess.cs` | Long-lived handle to a running process. | You need to observe `Started`/`Exited` events, stream output, or interact with the process while it runs. |
-| `CliRun` (static) | `src/CliInvoke/Extensions/CliRun.cs` | Fire-and-forget; builds the configuration for you. | You want the shortest possible call and don't need to reuse the configuration. |
+| `CliRun` (static) | `src/CliInvoke/CliRun.cs` | Fire-and-forget; builds the configuration for you. | You want the shortest possible call and don't need to reuse the configuration. |
 
 ### `IProcessInvoker`
 
@@ -478,10 +551,10 @@ readability. Callers that need to configure anything beyond
 | Scenario | Recommended construction |
 |----------|--------------------------|
 | One-off command with a small fixed set of arguments | `CliRun.RunAsync(...)` (no model), or direct constructor on `ProcessConfiguration` |
-| Process with many optional properties set conditionally | `IProcessConfigurationBuilder` |
+| Process with many optional properties set conditionally | `IProcessConfigurationBuilder` (advanced) |
 | Need a per-invocation timeout but a shared process configuration | Direct constructor on `ProcessExitConfiguration` passed alongside |
-| Running as a different Windows user | Configure a `UserCredentialSpec` through the builder or call `Build()` to produce a `UserCredential`, then assign the model to `ProcessConfiguration.Credential` |
-| Constraining CPU or memory | Configure a `ProcessResourcePolicySpec` through the builder or call `Build()` to produce a `ProcessResourcePolicy`, then assign the model to `ProcessConfiguration.ResourcePolicy` |
+| Running as a different Windows user | Configure a `UserCredentialSpec` through the builder or construct a `UserCredential` directly |
+| Constraining CPU or memory | Construct a `ProcessResourcePolicy` directly or use `ProcessResourcePolicySpec` (advanced) |
 | Need to observe `Started`/`Exited` events or stream output while the process runs | `IExternalProcess` (via `IExternalProcessFactory`) |
 | Run from a static context without DI | `CliRun` |
 
@@ -606,6 +679,10 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExceptionBehaviour.cs`.
   `ProcessConfiguration` and `UserCredential`.
 - [Troubleshooting](./troubleshooting.md) — common configuration
   mistakes.
+- [Choosing your Invocation Pattern](./choosing-invocation-pattern.md) —
+  the three-pattern canon with decision tree.
+- [Migrating to 3.0.0](../migration-guides/3.0.0.md) — breaking changes
+  and upgrade guide.
 - API Reference — full type documentation.
 - Source files:
   - `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`
