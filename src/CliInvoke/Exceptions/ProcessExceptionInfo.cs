@@ -98,8 +98,8 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
                Id == other.Id &&
                ArgumentsConflict == other.ArgumentsConflict &&
                ProcessName == other.ProcessName &&
-               ResourcePolicy.Equals(other.ResourcePolicy) &&
-                Credential.Equals(other.Credential);
+                ResourcePolicy.Equals(other.ResourcePolicy) &&
+                object.Equals(Credential, other.Credential);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
     }
 
