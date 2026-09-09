@@ -60,14 +60,11 @@ public class ShellDetector : IShellDetector
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
-        using ProcessConfiguration execConfiguration = _processConfigurationFactory
-            .Create("bash", "-c 'ps -p $$ -o comm='");
+        string? shellPath = Environment.GetEnvironmentVariable("SHELL");
+        if (string.IsNullOrWhiteSpace(shellPath))
+            throw new InvalidOperationException("The SHELL environment variable is not set.");
 
-        BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
-            execConfiguration, ProcessExitConfiguration.Default, false,
-            cancellationToken);
-
-        string shellExe = _filePathResolver.ResolveFilePath(execResult.StandardOutput.Split(Environment.NewLine).First());
+        string shellExe = _filePathResolver.ResolveFilePath(shellPath);
 
         using ProcessConfiguration shellInfoProcessConfig = _processConfigurationFactory
             .Create(shellExe, "--version");
