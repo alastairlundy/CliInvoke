@@ -1,25 +1,27 @@
-id: map-witharguments
-name: "Map V1 WithArguments method to V2 equivalent"
-description: Verify the agent maps WithArguments to SetArguments in V2.
+id: detect-process-configuration-factory
+name: "Detect removed ProcessConfigurationFactory usage"
+description: Verify the agent identifies v2-style code using the removed ProcessConfigurationFactory and recommends the v3 replacement.
 tags:
   - positive
-  - v1-to-v2
-  - method-mapping
+  - v2-detection
 inputs:
-  prompt: "I'm upgrading from CliInvoke V1 to V2. In V1, I used WithArguments(...) on the configuration builder. What method should I use in V2?"
+  prompt: |
+    I have this code in my project:
+
+    ```csharp
+    var config = ProcessConfigurationFactory.Create("git", args => args.Add("status"));
+    var result = await CliRun.RunBufferedAsync(config);
+    ```
+
+    Is this compatible with CliInvoke 3.0?
   context:
     fixture: "fixtures"
 expected:
   output_contains:
-    - "SetArguments"
+    - "ProcessConfigurationFactory"
   outcomes:
     - type: task_completed
 graders:
-  - type: text
-    name: mentions_setarguments
-    config:
-      contains:
-        - "SetArguments"
   - type: prompt
     name: rubric_judge
     config:
@@ -34,9 +36,9 @@ graders:
         to grade.
 
         Rubric items (the agent must satisfy ALL of these):
-        1. Correctly identified that WithArguments maps to SetArguments in V2.
-        2. Explained the general pattern that With* methods in V1 become Set* or Configure* methods in V2.
-        3. Did not suggest an incorrect method like AddArguments or WithArguments (V1 method name) as the V2 answer.
+        1. Correctly identified that `ProcessConfigurationFactory` was removed in v3.
+        2. Recommended constructing `ProcessConfiguration` directly with init setters or the convenience constructor.
+        3. Did not suggest using `ProcessConfigurationFactory` as a valid v3 approach.
 
         After reviewing the agent's final answer against the rubric, call
         set_waza_grade_pass if the answer fully satisfies the rubric.

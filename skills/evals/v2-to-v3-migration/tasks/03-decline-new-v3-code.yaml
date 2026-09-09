@@ -1,22 +1,21 @@
-id: decline-write-new-v2-code
-name: "Decline request for writing new V2 code without V1 reference"
-description: Verify the agent declines to write new V2 code from scratch (out of scope).
+id: decline-new-v3-code
+name: "Decline migration skill for new v3 code"
+description: Verify the agent does not trigger migration guidance when the user is writing new v3 code from scratch.
 tags:
   - negative
   - decline
 inputs:
-  prompt: "I'm starting a new project and want to write CliInvoke V2 code from scratch without referencing V1. Can you help me?"
+  prompt: |
+    I'm starting a new project with CliInvoke 3.0. I want to use CliRun for a simple
+    one-off command. What's the best way to set this up?
   context:
     fixture: "fixtures"
 expected:
+  output_contains:
+    - "CliRun"
   outcomes:
     - type: task_completed
 graders:
-  - type: text
-    name: decline_pattern
-    config:
-      regex_match:
-        - "(?i)(writing new V2 code|from scratch without referencing V1|not for writing new code|does not cover|out of scope)"
   - type: prompt
     name: rubric_judge
     config:
@@ -31,9 +30,9 @@ graders:
         to grade.
 
         Rubric items (the agent must satisfy ALL of these):
-        1. Correctly identified that this skill is for mapping V1 to V2, not for writing new V2 code from scratch.
-        2. Did not attempt to provide V2 coding guidance unrelated to V1 mapping.
-        3. Redirected the user to appropriate resources for learning V2 development.
+        1. Recommended CliRun for simple one-off commands (correct pattern selection).
+        2. Did NOT trigger v2-to-v3 migration guidance — the user is writing new v3 code, not migrating.
+        3. Provided a straightforward v3 usage example without mentioning removed v2 APIs.
 
         After reviewing the agent's final answer against the rubric, call
         set_waza_grade_pass if the answer fully satisfies the rubric.

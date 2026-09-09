@@ -15,7 +15,7 @@ targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 ## When not to use
 - When the question is about general C#/.NET memory management, GC tuning, or `IDisposable` mechanics outside CliInvoke's specific types.
 - When building or executing a configuration — load `generate-process-configuration` or `select-execution-pattern` instead.
-- When migrating from V1 to V2 — load `cliinvoke-v1-to-v2-migration` for any disposal-related API renames.
+- When migrating from v2 to v3 — load `v2-to-v3-migration` for any disposal-related API changes.
 
 ## Middleware and Disposal
 
