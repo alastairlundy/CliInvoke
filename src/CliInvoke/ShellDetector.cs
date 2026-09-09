@@ -42,8 +42,8 @@ public class ShellDetector : IShellDetector
     /// </summary>
     /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation.</param>
     /// <returns>A task representing the asynchronous operation, returning a ShellInformation object with details about the detected shell.</returns>
-    [UnsupportedOSPlatform("IOS")]
-    [UnsupportedOSPlatform("tvOS")]
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ShellInformation> ResolveDefaultShellAsync(
         CancellationToken cancellationToken = default)
@@ -60,10 +60,8 @@ public class ShellDetector : IShellDetector
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
-        cancellationToken.Register(() => throw new TaskCanceledException());
-        
         using ProcessConfiguration execConfiguration = _processConfigurationFactory
-            .Create("ps", "-p $$ -o comm=");
+            .Create("bash", "-c 'ps -p $$ -o comm='");
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
             execConfiguration, ProcessExitConfiguration.Default, false,
@@ -119,6 +117,8 @@ public class ShellDetector : IShellDetector
         }
         catch
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             string cmdExe = _filePathResolver.ResolveFilePath("cmd.exe");
 
             using ProcessConfiguration cmdConfig = _processConfigurationFactory

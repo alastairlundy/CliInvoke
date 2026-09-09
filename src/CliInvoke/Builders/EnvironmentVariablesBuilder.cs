@@ -62,8 +62,8 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         ArgumentNullException.ThrowIfNull(vars);
         ArgumentNullException.ThrowIfNull(stringComparer);
 
-        _environmentVariables = new Dictionary<string, string>(vars, _stringComparer);
         _stringComparer = stringComparer;
+        _environmentVariables = new Dictionary<string, string>(vars, _stringComparer);
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
     }
 
@@ -79,7 +79,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentException.ThrowIfNullOrEmpty(value);
         
-        Dictionary<string, string> output = new(_environmentVariables);
+        Dictionary<string, string> output = new(_environmentVariables, _stringComparer);
 
         if (_throwExceptionIfDuplicateKeyFound)
         {
@@ -108,7 +108,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
 
         Dictionary<string, string> output = new(
             _environmentVariables,
-            StringComparer.Ordinal
+            _stringComparer
         );
 
         foreach (KeyValuePair<string, string> pair in variables)
@@ -166,7 +166,7 @@ public class EnvironmentVariablesBuilder : IEnvironmentVariablesBuilder
     /// Builds the dictionary of configured environment variables.
     /// </summary>
     /// <returns>A read-only dictionary containing the configured environment variables.</returns>
-    public IReadOnlyDictionary<string, string> Build() => _environmentVariables;
+    public IReadOnlyDictionary<string, string> Build() => new Dictionary<string, string>(_environmentVariables, _stringComparer);
 
     /// <summary>
     /// Deletes the environment variable values.

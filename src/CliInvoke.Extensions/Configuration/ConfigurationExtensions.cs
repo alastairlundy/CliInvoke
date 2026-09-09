@@ -59,8 +59,8 @@ public static class ConfigurationExtensions
         public static ProcessConfiguration FromProcessStartInfo(ProcessStartInfo processStartInfo)
         {
             bool requiresAdministrator =
-                processStartInfo.Verb.StartsWith("runas", StringComparison.OrdinalIgnoreCase)
-                || processStartInfo.Verb.StartsWith("sudo", StringComparison.OrdinalIgnoreCase);
+                (processStartInfo.Verb?.StartsWith("runas", StringComparison.OrdinalIgnoreCase) ?? false)
+                || (processStartInfo.Verb?.StartsWith("sudo", StringComparison.OrdinalIgnoreCase) ?? false);
 
             IEnvironmentVariablesBuilder environmentVariablesBuilder =
                 new EnvironmentVariablesBuilder();
@@ -81,8 +81,15 @@ public static class ConfigurationExtensions
 #pragma warning disable CS0618 // Type or member is obsolete
             processConfigurationBuilder = processConfigurationBuilder.SetEnvironmentVariables(environmentVars)
                 .ConfigureShellExecution(processStartInfo.UseShellExecute)
-                .ConfigureWindowCreation(!processStartInfo.CreateNoWindow)
-                .SetWorkingDirectory(processStartInfo.WorkingDirectory)
+                .ConfigureWindowCreation(!processStartInfo.CreateNoWindow);
+
+            if (!string.IsNullOrEmpty(processStartInfo.WorkingDirectory))
+            {
+                processConfigurationBuilder = processConfigurationBuilder
+                    .SetWorkingDirectory(processStartInfo.WorkingDirectory);
+            }
+
+            processConfigurationBuilder = processConfigurationBuilder
                 .SetArguments(processStartInfo.Arguments)
                 .RedirectStandardInput(processStartInfo.RedirectStandardInput)
                 .RedirectStandardOutput(processStartInfo.RedirectStandardOutput)
@@ -106,16 +113,16 @@ public static class ConfigurationExtensions
             IUserCredentialBuilder userCredentialBuilder = new  UserCredentialBuilder();
             
 #pragma warning disable CA1416
-            if(processStartInfo.Domain != string.Empty)
+            if(!string.IsNullOrEmpty(processStartInfo.Domain))
                 userCredentialBuilder = userCredentialBuilder.SetDomain(processStartInfo.Domain);
 
             if (processStartInfo.Password is not null)
-                userCredentialBuilder.SetPassword(processStartInfo.Password);
+                userCredentialBuilder = userCredentialBuilder.SetPassword(processStartInfo.Password);
 
-            if (processStartInfo.UserName != string.Empty)
-                userCredentialBuilder.SetUsername(processStartInfo.UserName);
+            if (!string.IsNullOrEmpty(processStartInfo.UserName))
+                userCredentialBuilder = userCredentialBuilder.SetUsername(processStartInfo.UserName);
 
-            userCredentialBuilder.LoadUserProfile(processStartInfo.LoadUserProfile);
+            userCredentialBuilder = userCredentialBuilder.LoadUserProfile(processStartInfo.LoadUserProfile);
             
             processConfigurationBuilder = processConfigurationBuilder.SetUserCredential(userCredentialBuilder.Build());
             
