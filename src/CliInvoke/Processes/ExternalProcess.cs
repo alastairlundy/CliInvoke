@@ -188,25 +188,23 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
+        using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
         Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
-                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
+                PipeStandardOutputAsync(_processWrapper, linkedCts.Token) 
             : Task.FromResult(Stream.Null);
         
         Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
-                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
+                PipeStandardErrorAsync(_processWrapper, linkedCts.Token) 
             : Task.FromResult(Stream.Null);
         
         try
         {
-            using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
             Task waitForExit = _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, linkedCts.Token);
 
-            Task[] tasks = [waitForExit, standardOutputStream, standardErrorStream];
-            await Task.WhenAll(tasks);
-
-            // After exit wait completes, cancel the pipe reads so they don't block on grandchild EOF
+            await waitForExit;
             await linkedCts.CancelAsync();
+            await Task.WhenAll(standardOutputStream, standardErrorStream);
             
             ProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
@@ -243,25 +241,23 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("tvos")]
     public async Task<BufferedProcessResult> WaitForBufferedExitOrTimeoutAsync(CancellationToken cancellationToken)
     {
+        using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
         Task<string> standardOutputString = Configuration.RedirectStandardOutput ? _processWrapper.StandardOutput
-                .ReadToEndAsync(cancellationToken) 
+                .ReadToEndAsync(linkedCts.Token) 
             : Task.FromResult(string.Empty);
 
         Task<string> standardErrorString = Configuration.RedirectStandardError
-            ? _processWrapper.StandardError.ReadToEndAsync(cancellationToken)
+            ? _processWrapper.StandardError.ReadToEndAsync(linkedCts.Token)
             : Task.FromResult(string.Empty);
         
         try
         {
-            using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
             Task waitForExit = _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, linkedCts.Token);
 
-            Task[] tasks = [waitForExit, standardOutputString, standardErrorString];
-            await Task.WhenAll(tasks);
-
-            // After exit wait completes, cancel the pipe reads so they don't block on grandchild EOF
+            await waitForExit;
             await linkedCts.CancelAsync();
+            await Task.WhenAll(standardOutputString, standardErrorString);
             
             BufferedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
@@ -289,25 +285,23 @@ public class ExternalProcess : IExternalProcess
     public async Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(
         CancellationToken cancellationToken)
     {
+        using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
         Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler
-                .PipeStandardOutputAsync(_processWrapper, cancellationToken)
+                .PipeStandardOutputAsync(_processWrapper, linkedCts.Token)
             : Task.FromResult(Stream.Null);
 
         Task<Stream> standardErrorStream = Configuration.RedirectStandardError
-            ? _processPipeHandler.PipeStandardErrorAsync(_processWrapper, cancellationToken)
+            ? _processPipeHandler.PipeStandardErrorAsync(_processWrapper, linkedCts.Token)
             : Task.FromResult(Stream.Null);
         
         try
         {
-            using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
             Task waitForExit = _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, linkedCts.Token);
 
-            Task[] tasks = [waitForExit, standardOutputStream, standardErrorStream];
-            await Task.WhenAll(tasks);
-
-            // After exit wait completes, cancel the pipe reads so they don't block on grandchild EOF
+            await waitForExit;
             await linkedCts.CancelAsync();
+            await Task.WhenAll(standardOutputStream, standardErrorStream);
             
             PipedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, _processWrapper.StartTime, _processWrapper.ExitTime,
