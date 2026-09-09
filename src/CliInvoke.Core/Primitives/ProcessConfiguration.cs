@@ -399,6 +399,20 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
         };
     }
 
+    private static int StreamHashCode(StreamWriter? writer)
+    {
+        if (writer is null) return 0;
+        string? path = GetStreamPath(writer.BaseStream);
+        return path is not null ? StringComparer.OrdinalIgnoreCase.GetHashCode(path) : writer.BaseStream?.GetHashCode() ?? 0;
+    }
+
+    private static int StreamHashCode(StreamReader? reader)
+    {
+        if (reader is null) return 0;
+        string? path = GetStreamPath(reader.BaseStream);
+        return path is not null ? StringComparer.OrdinalIgnoreCase.GetHashCode(path) : reader.BaseStream?.GetHashCode() ?? 0;
+    }
+
     /// <summary>
     /// Determines if a Process configuration is equal to another object.
     /// </summary>
@@ -434,10 +448,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
 
         hashCode.Add(Credential);
 
-        hashCode.Add(StandardInput);
+        hashCode.Add(StreamHashCode(StandardInput));
 #pragma warning disable CS0618 // Type or member is obsolete
-        hashCode.Add(StandardOutput);
-        hashCode.Add(StandardError);
+        hashCode.Add(StreamHashCode(StandardOutput));
+        hashCode.Add(StreamHashCode(StandardError));
 #pragma warning restore CS0618 // Type or member is obsolete
         hashCode.Add(ResourcePolicy);
         hashCode.Add(RequiresAdministrator);
