@@ -14,7 +14,7 @@ description: Guides the selection and installation of the correct CliInvoke NuGe
 ## When not to use
 - When fixing NuGet restore errors, version conflicts, or feed/source issues — this skill does not address package resolution problems.
 - When the question is about how to *use* a package after installation — load a skill specific to the API surface (e.g., `generate-process-configuration`, `select-execution-pattern`).
-- When migrating between major versions of CliInvoke — load `cliinvoke-v1-to-v2-migration` instead.
+- When migrating v2-style code to v3 — load `v2-to-v3-migration` instead.
 
 ## Installation Matrix
 

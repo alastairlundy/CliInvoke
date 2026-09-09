@@ -15,7 +15,7 @@ description: Guidance on choosing between CliRun, IProcessInvoker, and IExternal
 ## When not to use
 - When implementing the actual process logic — this skill only guides the choice of pattern. Once chosen, load a skill specific to the pattern (e.g., `generate-process-configuration` for building configurations, or the execution reference docs).
 - When the choice is already made and the question is about a specific API call or builder method.
-- When the user wants to migrate between CliInvoke major versions — load `cliinvoke-v1-to-v2-migration` instead.
+- When the user wants to migrate v2-style code to v3 — load `v2-to-v3-migration` instead.
 
 ## Decision Logic
 
