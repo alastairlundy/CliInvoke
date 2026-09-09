@@ -8,6 +8,7 @@
 */
 
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using CliInvoke.Core.Factories;
 
@@ -73,16 +74,23 @@ public class ShellDetector : IShellDetector
             shellInfoProcessConfig, ProcessExitConfiguration.Default, false,
             cancellationToken);
         
-        string versionLine = shellInfoResult.StandardOutput.Split(Environment.NewLine).First(l => l.ToLower().Contains("version") &&
-            l.Any(c => char.IsDigit(c)));
-
-        string[] commaSplit = versionLine.Split(',');
+        // Parse version from output — works for bash ("GNU bash, version 5.2.15"),
+        // zsh ("zsh 5.9 ..."), fish ("fish, version 3.6.0"), etc.
+        string output = shellInfoResult.StandardOutput;
+        string? versionStr = null;
+        foreach (string line in output.Split(Environment.NewLine))
+        {
+            Match match = Regex.Match(line, @"(\d+\.\d+(?:\.\d+)*)");
+            if (match.Success)
+            {
+                versionStr = match.Groups[1].Value;
+                break;
+            }
+        }
         
-        string shellPrettyName = commaSplit.First();
+        Version shellVersion = versionStr is not null ? Version.GracefulParse(versionStr.Replace(".", string.Empty)) : new Version();
 
-        string versionString = commaSplit.Last().Replace(".", string.Empty);
-        
-        Version shellVersion = Version.GracefulParse(versionString);
+        string shellPrettyName = Path.GetFileNameWithoutExtension(shellExe);
         
         return new ShellInformation(shellPrettyName, 
             new FileInfo(shellExe), shellVersion);
