@@ -101,7 +101,19 @@ internal
         catch(Win32Exception exception)
         {
             HasStarted = false;
-            throw new FileNotFoundException($"The file '{StartInfo.FileName}' could not be found or is not accessible.", exception);
+
+            const int ERROR_FILE_NOT_FOUND = 2;
+            const int ERROR_ACCESS_DENIED = 5;
+
+            throw exception.NativeErrorCode switch
+            {
+                ERROR_FILE_NOT_FOUND => new FileNotFoundException(
+                    $"The file '{StartInfo.FileName}' was not found.", exception),
+                ERROR_ACCESS_DENIED => new UnauthorizedAccessException(
+                    $"Access to the file '{StartInfo.FileName}' was denied.", exception),
+                _ => new InvalidOperationException(
+                    $"Failed to start process '{StartInfo.FileName}' (Win32 error {exception.NativeErrorCode}).", exception)
+            };
         }
 
         if (!HasStarted)
