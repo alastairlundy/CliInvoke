@@ -51,12 +51,20 @@ If you prefer to resolve an invoker from a dependency injection container, call 
 `CliInvoke.Extensions`, shipped in the main `CliInvoke` package). This registers the core services, the
 `IProcessInvoker` implementation, the `IRunnerConfigurationFactory`, and the `IExternalProcessFactory`.
 
-The Cmd and PowerShell specializations middleware (`UsePowerShell()` and `UseCmd()`) is **opt-in**: by default the
-registered invoker runs with no specializations middleware wired into its pipeline. To activate it, compose the
-middleware explicitly in the configure callback and register the Specializations middleware types with
-`AddCliInvokeSpecializations()` (namespace `CliInvoke.Extensions`, shipped in this package). The two calls are
-independent and can be chained in either order, but both must use the **same `ServiceLifetime`** — middleware
-lifetimes are matched to the invoker lifetime to avoid captive scoped-in-singleton dependencies:
+#### AddCliInvokeSpecializations
+
+`AddCliInvokeSpecializations()` (namespace `CliInvoke.Extensions`, shipped in this package) registers the
+Specializations middleware types — `PowerShellMiddleware`, `CmdMiddleware`, and `PowerShellMiddlewareOptions` —
+so that the convenience builder extensions `UsePowerShell()` and `UseCmd()` can resolve them from the DI
+container.
+
+> **`AddCliInvoke()` is required.** `AddCliInvokeSpecializations()` only registers middleware types; it does
+> **not** register core CliInvoke services. You **must** call `AddCliInvoke()` as well, or the invoker,
+> process factory, and other core services will not be available.
+
+Both registrations accept an optional `ServiceLifetime` parameter (default `Scoped`). The two calls are
+independent and can be chained in either order, but both must use the **same lifetime** — middleware lifetimes
+are matched to the invoker lifetime to avoid capturing scoped services into a singleton:
 
 ```csharp
 using CliInvoke.Extensions;
@@ -64,7 +72,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 ServiceCollection services = new ServiceCollection();
 
-// The specializations middleware is opt-in: compose it explicitly and register its types.
+// AddCliInvoke() is required — it registers core services.
+// AddCliInvokeSpecializations() registers the Cmd/PowerShell middleware types.
 services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd())
     .AddCliInvokeSpecializations();
 
