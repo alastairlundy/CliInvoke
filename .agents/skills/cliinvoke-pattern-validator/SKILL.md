@@ -46,6 +46,7 @@ Verify that high-level patterns do not depend on low-level implementation detail
 - [ ] No static dependencies were added to `IProcessInvoker` implementations.
 - [ ] `CliRun` remains a zero-boilerplate entry point.
 - [ ] The separation between Builders, Models, and Invokers is preserved.
+- [ ] The change does not introduce **v2-style code** (see `GLOSSARY.md`). Code is v2-style if (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles — reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default. **Carve-out**: deliberate advanced-builder usage (argument escaping, `UserCredentialSpec`/resource-policy callback flows) is legitimate and must not be flagged.
 
 ## Common Pitfalls
 
@@ -54,3 +55,4 @@ Verify that high-level patterns do not depend on low-level implementation detail
 | Adding complex logic to `CliRun` for convenience | Move logic into a new `IProcessInvoker` implementation or `ProcessConfiguration` extension. |
 | Creating `IExternalProcess` via `new` in DI contexts | Use `IExternalProcessFactory` to maintain testability and abstraction. |
 | Bypassing `IProcessInvoker` in `CliRun` | Ensure `CliRun` always delegates execution to the configured invoker. |
+| Emitting v2-style code (per `GLOSSARY.md` `v2-style code`) | Use init construction with `required` `TargetFilePath` as the default. Reach for `ProcessConfigurationBuilder` only when the use case requires argument escaping, `UserCredentialSpec`, or resource-policy callback flows. |
