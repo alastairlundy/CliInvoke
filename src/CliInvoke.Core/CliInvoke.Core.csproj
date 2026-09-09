@@ -22,8 +22,8 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0-beta.3</Version>
-        <PackageVersion>3.0.0-beta.3</PackageVersion>
+        <Version>3.0.0</Version>
+        <PackageVersion>3.0.0</PackageVersion>
         <PackageReleaseNotes>
 ### 🆕 Additions
 - Added `IRetryClassifier`
