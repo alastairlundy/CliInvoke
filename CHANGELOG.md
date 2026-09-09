@@ -170,8 +170,20 @@ Themes:
 - Fixed `ExternalProcess.StartAsync(config, ct)` to dispose the old wrapper and reattach event handlers.
 - Fixed code smells: null safety, an inverted condition, null equality, a dead override, and dictionary equality.
 - Sorted environment variables by key in `GetHashCode` for ordering independence.
+- `ShellInformation.GetHashCode` now hashes the target file path
+  case-insensitively, matching its `Equals` comparison. Instances whose paths
+  differ only in letter casing are equal and no longer land in different hash
+  buckets when used as dictionary or set keys.
 - Fixed the expected path in the `Resolve_CrossPlatform_PathEnv_Executable` test.
 - `Canceled` no longer reports `false` after graceful timeout cancellation.
+- Fixed the `AllowExceptionsIfUnexpected` cancellation window to measure actual
+  exit skew: the expected exit time is now captured when the wait begins instead
+  of being re-derived inside the exception handlers. Timeout cancellations that
+  resolve on time are swallowed, and genuine failures that resolve more than
+  1 second from the expected exit time are re-thrown. Previously the difference
+  was computed against a re-derived expected exit time, so it matched the
+  configured timeout threshold and exceptions were re-thrown for any timeout
+  longer than 1 second.
 - Deadlock resolved: buffered/piped capture now starts without awaiting process exit.
 - `LocateFileFromDirectory` rechecks resolved `FileInfo` existence before returning.
 - POSIX argument escaping fixed: `EscapeInner` double-backslashes before quotes and emits POSIX backslashes literally for correct round-tripping.

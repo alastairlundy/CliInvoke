@@ -587,6 +587,11 @@ internal class ProcessWrapper : Process
             return;
         }
 
+        // Captured before the wait so exception handling measures how far the
+        // cancellation resolved from the expected exit time.
+        DateTime expectedExitTime =
+            CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
+
         try
         {
             if (isGraceful)
@@ -633,12 +638,8 @@ internal class ProcessWrapper : Process
         }
         catch (Exception exception) when (!isGraceful)
         {
-            // Recalculate values in exception handler to avoid using stale values
-            DateTime currentExpectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
-
             CancellationHelper.HandleCancellationExceptions(
-                currentExpectedExitTime,
+                expectedExitTime,
                 CancellationReason.RequestedCancellation, processExitConfiguration,
                 exception);
         }
@@ -696,9 +697,7 @@ internal class ProcessWrapper : Process
         {
             CancellationReason cancellationReason =
                 CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
-            DateTime currentExpectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-            CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
+            CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                 cancellationReason, exitConfiguration, exception);
             _cancellationReason = cancellationReason;
         }
@@ -727,6 +726,10 @@ internal class ProcessWrapper : Process
     {
         bool cancellationSuccess;
 
+        // Captured before the wait so exception handling measures how far the
+        // cancellation resolved from the expected exit time.
+        DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+
         try
         {
             await Task.Delay(timeoutThreshold, cancellationToken).ConfigureAwait(false);
@@ -746,17 +749,11 @@ internal class ProcessWrapper : Process
         {
             // Compute the cancellation reason at the catch point where the token is known-canceled.
             CancellationReason cancellationReason =
-                CancellationHelper.GetCancellationReason(
-                    CancellationHelper.CalculateExpectedExitTime(exitConfiguration),
-                    cancellationToken);
-
-            // Recalculate expected exit time in exception handler to avoid using stale values
-            DateTime currentExpectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
+                CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
 
             cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason).ConfigureAwait(false);
 
-            CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
+            CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                 cancellationReason,
                 exitConfiguration, exception);
             _cancellationReason = cancellationReason;

@@ -82,7 +82,8 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(Name, Version, TargetFilePath.FullName);
+        return HashCode.Combine(Name, Version,
+            TargetFilePath.FullName.GetHashCode(StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

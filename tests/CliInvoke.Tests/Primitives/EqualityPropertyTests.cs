@@ -162,6 +162,16 @@ public class EqualityPropertyTests
     }
 
     [Test]
+    public async Task ShellInformation_CaseDifferingPaths_AreEqualWithEqualHashCodes()
+    {
+        ShellInformation a = new("bash", new FileInfo("C:\\SHELLS\\PWSH.EXE"), new Version(5, 1));
+        ShellInformation b = new("bash", new FileInfo("c:\\shells\\pwsh.exe"), new Version(5, 1));
+
+        await Assert.That(a.Equals(b)).IsTrue();
+        await Assert.That(b.GetHashCode()).IsEqualTo(a.GetHashCode());
+    }
+
+    [Test]
     public async Task ShellInformation_VersionDifference_DistinguishesEquality()
     {
         ShellInformation a = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
