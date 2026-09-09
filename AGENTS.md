@@ -10,8 +10,8 @@ CliInvoke — a .NET/C# library for launching and interacting with command-line 
 - **Solution**: `src/CliInvoke.sln`
 - **Packages** (each carries its own `Version`/`PackageVersion` and `PackageReleaseNotes` in its csproj):
   - `src/CliInvoke.Core/` — abstractions & models (`ProcessConfiguration`, results, middleware interfaces)
-  - `src/CliInvoke/` — implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers)
-  - `src/CliInvoke.Specializations/` — PowerShell/CMD middleware; also defines the DI entry point `AddCliInvoke` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Extensions`)
+  - `src/CliInvoke/` — implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers, including the `AddCliInvoke` DI entry point in `Extensions/DependencyInjection/AddCliInvokeExtensions.cs`, namespace `CliInvoke.Extensions`)
+  - `src/CliInvoke.Specializations/` — PowerShell/CMD middleware; also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Extensions`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
 - `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. `tests/CliInvoke.Extensions.Tests/` still exists and tests the folded-in extensions.
 - **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs only `tests/CliInvoke.Tests/`.
 - **Benchmarks**: `benchmarks/`.

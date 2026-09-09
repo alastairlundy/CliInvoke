@@ -451,7 +451,8 @@ propagation, or per-call metric emission — can be added by writing
 a new interceptor without modifying the invoker or the
 `IExternalProcess` interface. Callers who need to disable a
 default concern can do so by registering an alternative
-implementation through `CliInvoke.Extensions`.
+implementation through the `CliInvoke` package's DI helpers
+(namespace `CliInvoke.Extensions`).
 
 ## Where to customise
 

@@ -63,9 +63,10 @@ public class PowerShellMiddlewareIntegrationTests
         // The original target is `dotnet`, but the PowerShellMiddleware registered via
         // `UsePowerShell()` rewrites the configuration to run the command inside
         // `pwsh -NoProfile -Command "..."`. We wire the middleware onto a normal
-        // ProcessInvoker through the supported DI entry point; the dedicated
+        // ProcessInvoker through the supported DI entry points; the dedicated
         // `PowershellProcessInvoker` type was removed in favour of this pipeline.
         ServiceProvider provider = new ServiceCollection()
+            .AddCliInvokeSpecializations()
             .AddCliInvoke(builder => builder.UsePowerShell())
             .BuildServiceProvider();
 

@@ -1,6 +1,6 @@
 ---
 name: package-installation-choice
-description: Guides the selection and installation of the correct CliInvoke NuGet packages based on project type and requirements (Library vs App, Abstractions vs Implementation). USE FOR selecting the correct NuGet packages (Core, Implementation, Extensions, Specializations) based on project type (Library vs App). DO NOT USE FOR fixing NuGet restore errors.
+description: Guides the selection and installation of the correct CliInvoke NuGet packages based on project type and requirements (Library vs App, Abstractions vs Implementation). USE FOR selecting the correct NuGet packages (Core, Implementation, Specializations) based on project type (Library vs App). DO NOT USE FOR fixing NuGet restore errors.
 ---
 
 # Package Installation Choice
@@ -8,7 +8,7 @@ description: Guides the selection and installation of the correct CliInvoke NuGe
 ## When to Use
 - When starting a new CliInvoke-based project and deciding which NuGet packages to install.
 - When you need to determine the correct package set for a Library author versus an application (Console/Desktop).
-- When deciding whether to include `CliInvoke.Extensions` (DI helpers and middleware) or `CliInvoke.Specializations` (shell-specific features and platform middleware).
+- When deciding whether to include `CliInvoke` (DI helpers and middleware via `AddCliInvoke`) or `CliInvoke.Specializations` (shell-specific features and platform middleware).
 - When auditing an existing project's package references against the recommended installation matrix.
 
 ## When not to use
@@ -22,8 +22,8 @@ description: Guides the selection and installation of the correct CliInvoke NuGe
 | :--- | :--- | :--- |
 | **Library author** (abstractions only) | `CliInvoke.Core` | Only the Core (abstractions) package — consumers can choose implementations. |
 | **Library or app** (needs concrete builders/implementations) | `CliInvoke.Core`, `CliInvoke` | Implementation package plus Core for models/abstractions. |
-| **Desktop or Console application** (common case — use DI & convenience helpers) | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions` | Includes DI registration and convenience extensions for easy setup. |
-| **Platform-specific/shell specializations** (optional) | `CliInvoke.Specializations` | Adds Cmd/PowerShell and other specializations; install in addition to the packages above as needed. |
+| **Desktop or Console application** (common case — use DI & convenience helpers) | `CliInvoke.Core`, `CliInvoke` | `CliInvoke` includes the `AddCliInvoke` DI registration and convenience extensions for easy setup. |
+| **Platform-specific/shell specializations** (optional) | `CliInvoke.Specializations` | Adds Cmd/PowerShell and other specializations; install in addition to the packages above as needed. Its middleware types are registered with `AddCliInvokeSpecializations()`. |
 
 ## Key Installation Paths
 
@@ -35,9 +35,9 @@ If you are creating a library that defines process interactions but doesn't want
 
 ### 2. Application Development (Implementation Layer)
 If you are building a final application (Console, Desktop, etc.):
-- **Recommended**: Full Application Setup (`CliInvoke.Core`, `CliInvoke`, and `CliInvoke.Extensions`)
+- **Recommended**: Full Application Setup (`CliInvoke.Core` and `CliInvoke`)
 - **Required**: `CliInvoke.Core` and `CliInvoke`
-- **Optional**: `CliInvoke.Specializations` (if you specifically need Windows CMD or PowerShell support, **including** the `UsePowerShell` / `UseCmd` middleware).
+- **Optional**: `CliInvoke.Specializations` (if you specifically need Windows CMD or PowerShell support, **including** the `UsePowerShell` / `UseCmd` middleware — registered via that package's `AddCliInvokeSpecializations()`).
 
 ## Installation Commands
 
@@ -53,11 +53,10 @@ Depending on the choice above, use the following `dotnet add package` commands:
 - **Full Application Setup (Recommended)**:
   `dotnet add package CliInvoke.Core`
   `dotnet add package CliInvoke`
-  `dotnet add package CliInvoke.Extensions`
 
 - **Adding Specializations** (includes platform middleware):
   `dotnet add package CliInvoke.Specializations`
 
-> **Middleware note:** `CliInvoke.Extensions` provides the `UseLogging` and `UsePostExitValidation` middleware; `CliInvoke.Specializations` provides the `UsePowerShell` and `UseCmd` platform middleware. Both require the `ProcessInvoker` (from `CliInvoke`) — they are not available through `CliRun`.
+> **Middleware note:** `CliInvoke` (via `AddCliInvoke`) provides the `UseLogging` and `UsePostExitValidation` middleware; `CliInvoke.Specializations` provides the `UsePowerShell` and `UseCmd` platform middleware, registered via `AddCliInvokeSpecializations()` alongside `AddCliInvoke` (same `ServiceLifetime`). Both require the `ProcessInvoker` (from `CliInvoke`) — they are not available through `CliRun`.
 
 This is a pure knowledge skill and does not invoke external tools.

@@ -48,12 +48,15 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(config, ProcessExit
 ### Dependency Injection
 
 If you prefer to resolve an invoker from a dependency injection container, call `AddCliInvoke()` (namespace
-`CliInvoke.Extensions`). This registers the core services, the `IProcessInvoker` implementation, the
-`IRunnerConfigurationFactory`, and the `IExternalProcessFactory`.
+`CliInvoke.Extensions`, shipped in the main `CliInvoke` package). This registers the core services, the
+`IProcessInvoker` implementation, the `IRunnerConfigurationFactory`, and the `IExternalProcessFactory`.
 
 The Cmd and PowerShell specializations middleware (`UsePowerShell()` and `UseCmd()`) is **opt-in**: by default the
 registered invoker runs with no specializations middleware wired into its pipeline. To activate it, compose the
-middleware explicitly in the configure callback:
+middleware explicitly in the configure callback and register the Specializations middleware types with
+`AddCliInvokeSpecializations()` (namespace `CliInvoke.Extensions`, shipped in this package). The two calls are
+independent and can be chained in either order, but both must use the **same `ServiceLifetime`** — middleware
+lifetimes are matched to the invoker lifetime to avoid captive scoped-in-singleton dependencies:
 
 ```csharp
 using CliInvoke.Extensions;
@@ -61,11 +64,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 ServiceCollection services = new ServiceCollection();
 
-// The specializations middleware is opt-in: compose it explicitly.
-services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd());
+// The specializations middleware is opt-in: compose it explicitly and register its types.
+services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd())
+    .AddCliInvokeSpecializations();
 
 using IServiceProvider serviceProvider = services.BuildServiceProvider();
 ```
+
+> Calling `AddCliInvoke(builder => builder.UsePowerShell())` without `AddCliInvokeSpecializations()` compiles but
+> throws `InvalidOperationException` when the invoker is first resolved, because the `PowerShellMiddleware` type
+> is not registered in the container.
 
 ### CmdProcessConfiguration
 
@@ -163,7 +171,7 @@ In addition to the configuration classes above, CliInvoke.Specializations ships 
 `IProcessInvoker` with the relevant middleware (`CmdMiddleware` / `PowerShellMiddleware`) pre-applied. They let you run
 commands through `cmd.exe` / `pwsh` directly without manually building a runner configuration each time.
 
-Both are constructed from an `IExternalProcessFactory`, which `AddCliInvoke()` registers in the container:
+Both are constructed from an `IExternalProcessFactory`, which `AddCliInvoke()` (main `CliInvoke` package) registers in the container:
 
 ```csharp
 using CliInvoke.Core;

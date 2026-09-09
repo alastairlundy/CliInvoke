@@ -25,10 +25,10 @@ When configuring Nuget setup in your ``.csproj`` file, staying within a major ve
 ## Setting up CliInvoke
 
 ### Dependency Injection
-There are 2 main ways of setting up CliInvoke with dependency injection: manually, and using CliInvoke's ``AddCliInvoke`` configuration extension method from the ``CliInvoke.Extensions`` package.
+There are 2 main ways of setting up CliInvoke with dependency injection: manually, and using CliInvoke's ``AddCliInvoke`` configuration extension method (namespace ``CliInvoke.Extensions``), which ships in the ``CliInvoke`` package.
 
 #### Using ``AddCliInvoke``
-For this approach you'll need the ``CliInvoke.Extensions`` nuget package.
+For this approach you'll need the ``CliInvoke`` nuget package.
 
 If your project doesn't already use Dependency Injection, you can set it up as follows:
 
@@ -70,10 +70,12 @@ You can also configure the middleware pipeline when registering:
 services.AddCliInvoke(builder => builder.UseMiddleware<LoggingMiddleware>());
 ```
 
+> If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations) package's `UsePowerShell()`/`UseCmd()` middleware, also call `AddCliInvokeSpecializations()` (same namespace) with the same `ServiceLifetime` so those middleware types resolve from the container.
+
 #### Manual Setup
 This example manually registers ``IProcessInvoker`` and the other core CliInvoke services as Singletons.
 
-Most developers using CliInvoke in their applications should use the Extensions package's ``AddCliInvoke`` method instead of manually configuring Dependency Injection unless there is a good reason to avoid it.
+Most developers using CliInvoke in their applications should use the ``AddCliInvoke`` method instead of manually configuring Dependency Injection unless there is a good reason to avoid it.
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;

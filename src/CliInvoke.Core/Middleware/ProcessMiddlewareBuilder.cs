@@ -108,6 +108,6 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
     private static string FormatMissingServiceMessage(Type serviceType)
     {
         return $"No service of type '{serviceType.FullName}' has been registered. " +
-               $"Register the middleware type in the DI container before calling AddCliInvoke.";
+               $"Register the middleware type in the DI container before the service provider is built.";
     }
 }

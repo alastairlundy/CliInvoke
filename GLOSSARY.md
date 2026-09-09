@@ -50,6 +50,8 @@ Custom resolvers overriding `GetPathFileExtensions` must return lowercased exten
 
 `AddCliInvoke` registers `IFilePathResolver` with the same lifetime as the global `lifetime` parameter (default `Scoped`). The resolver is not special-cased — a stateless service does not automatically become `Singleton`. Users who want a different lifetime opt in via `UseCustomFilePathResolver<TResolver>(ServiceLifetime)`.
 
+The same lifetime-matching rule applies to the `AddCliInvokeSpecializations` add-on (CliInvoke.Specializations package): it must be called with the same `ServiceLifetime` as `AddCliInvoke`, because its middleware lifetimes are matched to the invoker lifetime to avoid captive scoped-in-singleton dependencies.
+
 ## Result Model
 
 ### Canceled

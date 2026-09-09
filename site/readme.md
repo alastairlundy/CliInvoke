@@ -24,7 +24,7 @@ provides the layer on top.
 
 The library targets .NET 10, runs on Windows, macOS,
 Linux, and BSD, and ships with first-class dependency-integration helpers
-through `CliInvoke.Extensions`.
+(`AddCliInvoke`, namespace `CliInvoke.Extensions`) in the `CliInvoke` package.
 
 ## What it offers
 

@@ -27,9 +27,10 @@ public interface IProcessMiddlewareBuilder
     /// </summary>
     /// <remarks>
     ///     When using DI, the type <typeparamref name="T"/> must be registered in the
-    ///     container before <see cref="Build"/> is called. Built-in middleware types
-    ///     (<c>LoggingMiddleware</c>, <c>PowerShellMiddleware</c>, <c>CmdMiddleware</c>)
-    ///     are registered automatically by <c>AddCliInvoke</c>.
+    ///     container before <see cref="Build"/> is called. Core built-in middleware types
+    ///     (<c>LoggingMiddleware</c>, <c>RetryMiddleware</c>) are registered automatically by
+    ///     <c>AddCliInvoke</c>; <c>PowerShellMiddleware</c> and <c>CmdMiddleware</c> are registered
+    ///     by <c>AddCliInvokeSpecializations</c> from the CliInvoke.Specializations package.
     /// </remarks>
     /// <typeparam name="T">A type implementing <see cref="IProcessMiddleware"/>.</typeparam>
     /// <returns>The builder for fluent chaining.</returns>

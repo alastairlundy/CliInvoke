@@ -415,8 +415,8 @@ lifecycle as a sequence of steps you orchestrate yourself:
 > ```
 
 `IExternalProcess` is constructed by `IExternalProcessFactory`
-(typically obtained via dependency injection in the `CliInvoke.Extensions`
-package) or by the `CliRun` static API below. The caller owns the
+(typically obtained via `AddCliInvoke` dependency injection, namespace
+`CliInvoke.Extensions`) or by the `CliRun` static API below. The caller owns the
 returned `IExternalProcess` and is responsible for disposing it —
 see the [Resource Disposal](./resource-disposal.md) guide.
 

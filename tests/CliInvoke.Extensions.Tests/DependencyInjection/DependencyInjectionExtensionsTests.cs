@@ -169,6 +169,7 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCliInvoke_WithConfigure_UsePowerShell_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
         services.AddCliInvoke(builder => builder.UsePowerShell());
         IServiceProvider provider = services.BuildServiceProvider();
 
@@ -183,6 +184,7 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCliInvoke_WithConfigure_UseCmd_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
         services.AddCliInvoke(builder => builder.UseCmd());
         IServiceProvider provider = services.BuildServiceProvider();
 
@@ -197,6 +199,7 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCliInvoke_WithConfigure_AllBuiltInMiddleware_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
         services.AddCliInvoke(builder =>
         {
             builder.UseLogging();
