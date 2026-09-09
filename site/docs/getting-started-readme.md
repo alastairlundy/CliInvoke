@@ -68,7 +68,9 @@ Most developers using CliInvoke in their applications should use the ``AddCliInv
 using Microsoft.Extensions.DependencyInjection;
 
 using CliInvoke;
+using CliInvoke.Builders;
 using CliInvoke.Core;
+using CliInvoke.Core.Builders;
 using CliInvoke.Core.Extensibility;
 using CliInvoke.Extensibility;
 
@@ -86,8 +88,10 @@ class Program
         // Register your other dependencies here
 
         services.AddSingleton<IFilePathResolver, FilePathResolver>();
+        services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
         services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
         services.AddSingleton<IProcessInvoker, ProcessInvoker>();
+        services.AddSingleton<IShellDetector, ShellDetector>();
 
         // Build the service provider
         ServiceProvider = services.BuildServiceProvider();

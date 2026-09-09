@@ -101,6 +101,7 @@ class Program
         services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
         services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
         services.AddSingleton<IProcessInvoker, ProcessInvoker>();
+        services.AddSingleton<IShellDetector, ShellDetector>();
 
         // Optional - register if you intend to run a Process Configuration through another Process.
         services.AddSingleton<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
