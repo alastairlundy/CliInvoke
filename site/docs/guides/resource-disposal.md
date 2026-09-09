@@ -79,11 +79,11 @@ independent of the configuration:
 using var stdin = new StreamWriter(new MemoryStream());
 using var credential = new UserCredential("domain", "user", password, false);
 
-ProcessConfiguration config = new ProcessConfigurationBuilder("cmd")
-    .SetArguments("/c echo hello")
-    .SetStandardInput(stdin)
-    .SetCredential(credential)
-    .Build();
+ProcessConfiguration config = new ProcessConfiguration("cmd", "/c echo hello")
+{
+    StandardInput = stdin,
+    Credential = credential
+};
 
 BufferedProcessResult result = await CliRun.RunBufferedAsync(config);
 // config falls out of scope without disposal; stdin and credential are
@@ -251,10 +251,10 @@ Use for `UserCredential` and `UserCredentialSpec`.
 using var credential = new UserCredential("domain", "user", password, false);
 using var spec = new UserCredentialSpec();
 
-ProcessConfiguration config = new ProcessConfigurationBuilder("cmd")
-    .SetArguments("/c echo hello")
-    .SetCredential(credential)
-    .Build();
+ProcessConfiguration config = new ProcessConfiguration("cmd", "/c echo hello")
+{
+    Credential = credential
+};
 // credential is disposed by its own `using` declaration; the
 // ProcessConfiguration never disposes it.
 ```

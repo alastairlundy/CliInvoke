@@ -23,7 +23,7 @@ layout: simple
 
 ## Notes
 
-- CliInvoke v1 and v2 shipped dedicated builder classes (`ArgumentsBuilder`, `EnvironmentVariablesBuilder` etc); v3+ replaces them with `ProcessConfiguration` Spec types (`ArgumentsSpec`, `EnvironmentVariablesSpec` etc). CliWrap provides dedicated builder classes plus a fluent `Command` chain via `Cli.Wrap(...)`.
+- CliInvoke v3+ uses init construction as the default and replaces dedicated builder classes with `Spec` types (`ArgumentsSpec`, `EnvironmentVariablesSpec` etc) for advanced scenarios. CliWrap provides dedicated builder classes plus a fluent `Command` chain via `Cli.Wrap(...)`.
 - CliWrap's repository also contains an informal Terms of Use document, separate from the
   MIT license; the project's stated position is that this is governance signalling rather
   than a binding license addendum. Fork maintainers should read both the MIT license and

@@ -33,11 +33,12 @@ minimise backtracking.
    pick the right pattern (`CliRun`, `IProcessInvoker`, or
    `IExternalProcess`) for your scenario before you write any code.
 2. **[Configuration](configuration.md)** — once you have a pattern, learn
-   what `ProcessConfiguration` owns, how its builder works, and what the
+   what `ProcessConfiguration` owns, how init construction works (the
+   default), when to use the builder (advanced), and what the
    defaults are.
 3. **[Resource Disposal](resource-disposal.md)** — every unmanaged handle
    and `SecureString` buffer in the library is owned by exactly one of the
-   five Resource-Owning Types; this guide documents the disposal contract
+   three Resource-Owning Types; this guide documents the disposal contract
    for each.
 4. **[Architecture](architecture.md)** — once you have written a few
    invocations, read this to understand the four-stage data-flow, the
@@ -62,7 +63,7 @@ when (and how) to migrate from one pattern to another as your needs grow.
 
 ### [Architecture](architecture.md)
 
-Explains the four-stage data-flow (Builder → Configuration Model → Invoker
+Explains the four-stage data-flow (Construction → Configuration Model → Invoker
 → Result), shows how the three invocation patterns map onto that flow, and
 documents the **Process Invocation Pipeline** — the layered pattern that
 keeps cross-cutting concerns (path resolution, runner wrapping, result
@@ -73,16 +74,16 @@ under the hood, or before you write a custom pipeline interceptor.
 ### [Configuration](configuration.md)
 
 The canonical reference for `ProcessConfiguration` and the related
-configuration models. Documents the builder lifecycle, the immutability
-invariants, every property on every model, and the default-value
-appendix. Read this when you are assembling a non-trivial configuration
-and need to know what a property does, what its default is, and which
-builder method to use.
+configuration models. Documents init construction (the default), the
+builder lifecycle (advanced), the immutability invariants, every property
+on every model, and the default-value appendix. Read this when you are
+assembling a non-trivial configuration and need to know what a property
+does, what its default is, and which builder method to use.
 
 ### [Resource Disposal](resource-disposal.md)
 
 Documents every public type in the library that implements `IDisposable`
-(and, where applicable, `IAsyncDisposable`) — there are exactly five — the
+(and, where applicable, `IAsyncDisposable`) — there are exactly three — the
 unmanaged resources they own, and the disposal patterns callers must
 follow. Read this before shipping code that creates processes in a loop,
 exposes processes to a long-running service, or handles `SecureString`

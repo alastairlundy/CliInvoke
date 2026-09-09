@@ -111,7 +111,7 @@ A flat index of every page in this Developer Portal.
   from configuration to result.
 - [Configuration](guides/configuration.md) — `ProcessConfiguration`,
   builders, defaults, and the reference appendix.
-- [Resource Disposal](guides/resource-disposal.md) — the five
+- [Resource Disposal](guides/resource-disposal.md) — the three
   Resource-Owning Types and the disposal patterns they require.
 - [Troubleshooting](guides/troubleshooting.md) — category-based
   failure diagnosis with detection methods.

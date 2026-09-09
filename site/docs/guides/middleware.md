@@ -114,7 +114,7 @@ The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Tr
 
 ## Result-ownership and disposal through the chain
 
-Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing the `ProcessConfiguration` you created. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
+Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing any `UserCredential` or `StreamWriter` you placed inside the `ProcessConfiguration`. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
 
 ## The result-swap rule
 
