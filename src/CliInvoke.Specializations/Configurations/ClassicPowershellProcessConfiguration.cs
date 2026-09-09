@@ -58,7 +58,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
         StreamWriter? standardInput = null, StreamReader? standardOutput = null, StreamReader? standardError = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
-        bool useShellExecution = false, bool windowCreation = false) : base("",
+        bool useShellExecution = false, bool windowCreation = false) : base("powershell.exe",
         redirectStandardInput, redirectStandardOutput, redirectStandardError,
         arguments,
         workingDirectoryPath,
@@ -87,7 +87,7 @@ public class ClassicPowershellProcessConfiguration : ProcessConfiguration
     public new string TargetFilePath =>
         OperatingSystem.IsWindows()
             ? $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}" +
-              $"System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe" 
+              $"WindowsPowerShell{Path.DirectorySeparatorChar}v1.0{Path.DirectorySeparatorChar}powershell.exe" 
             : throw new PlatformNotSupportedException(Resources
                 .Exceptions_ClassicPowershell_OnlySupportedOnWindows);
 }

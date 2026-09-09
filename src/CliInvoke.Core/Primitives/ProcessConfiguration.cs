@@ -437,10 +437,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <returns>True if both Process configurations are equal to each other; false otherwise.</returns>
     public static bool operator ==(ProcessConfiguration? left, ProcessConfiguration? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null)
+            return right is null;
 
-        return Equals(left, right);
+        return left.Equals(right);
     }
 
     /// <summary>
@@ -451,10 +451,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>, IDisposabl
     /// <returns>True if both Process configurations are not equal to each other; false otherwise.</returns>
     public static bool operator !=(ProcessConfiguration? left, ProcessConfiguration? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null)
+            return right is not null;
 
-        return !Equals(left, right);
+        return !left.Equals(right);
     }
 
     /// <summary>

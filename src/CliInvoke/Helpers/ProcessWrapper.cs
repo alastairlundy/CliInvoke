@@ -27,7 +27,7 @@ internal
     internal readonly SemaphoreSlim ForcefulExitLock = new(1, 1);
     
     // Track if forceful exit has been attempted to prevent double invocation
-    internal bool ForcefulExitAttempted = false;
+    internal volatile bool ForcefulExitAttempted = false;
     
     internal ProcessWrapper(ProcessConfiguration configuration,
         ProcessResourcePolicy? resourcePolicy)
@@ -64,8 +64,6 @@ internal
         #pragma warning disable CA1416
             this.SetResourcePolicy(ResourcePolicy);
         #pragma warning restore CA1416
-
-            ResumeProcess();
         }
         catch (InvalidOperationException)
         {
@@ -75,11 +73,21 @@ internal
         {
             // Process may have exited between starting and applying resource policy
         }
+        finally
+        {
+            try
+            {
+                if (!HasExited)
+                    ResumeProcess();
+            }
+            catch (InvalidOperationException) { }
+            catch (Win32Exception) { }
+        }
     }
 
     private void OnExited(object? sender, EventArgs e)
     {
-        ExitTime = base.ExitTime;
+        ExitTime = base.ExitTime.ToUniversalTime();
     }
 
     internal event EventHandler Started;
@@ -93,8 +101,7 @@ internal
         catch(Win32Exception exception)
         {
             HasStarted = false;
-
-            throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
+            throw new FileNotFoundException($"The file '{StartInfo.FileName}' could not be found or is not accessible.", exception);
         }
 
         if (!HasStarted)
@@ -102,8 +109,6 @@ internal
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
         }
 
-        if (!HasStarted) return HasStarted;
-        
         StartTime = DateTime.UtcNow;
         Started.Invoke(this, EventArgs.Empty);
         Id = base.Id;
@@ -113,7 +118,6 @@ internal
         }
         catch (InvalidOperationException)
         {
-            // Process may have exited before ProcessName could be read
             ProcessName = StartInfo.FileName;
         }
 
@@ -172,8 +176,15 @@ internal
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (HasExited)
+            try
+            {
+                if (HasExited)
+                    return;
+            }
+            catch (ObjectDisposedException)
+            {
                 return;
+            }
 
             await Task.Delay(pollIntervalMs, cancellationToken).ConfigureAwait(false);
         }
@@ -256,41 +267,47 @@ internal
             return;
         }
 
-        ProcessThreadCollection threads;
-        try
+        using (proc)
         {
-            threads = proc.Threads;
-        }
-        catch (InvalidOperationException)
-        {
-            // Process has exited; nothing to suspend.
-            return;
-        }
-
-        foreach (ProcessThread pt in threads)
-        {
-            IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
-            if (threadHandle == IntPtr.Zero) continue;
-
-            uint result = SuspendThread(threadHandle);
-            if (result == uint.MaxValue)
+            ProcessThreadCollection threads;
+            try
             {
-                int err = Marshal.GetLastWin32Error();
-                CloseHandle(threadHandle);
-                // ERROR_ACCESS_DENIED (5) can occur for certain systems or protected threads.
-                // Treat access denied as non-fatal and continue with other threads.
-                const int ERROR_ACCESS_DENIED = 5;
-                if (err == ERROR_ACCESS_DENIED)
-                    continue;
-
-                // If the process has exited since we started enumerating threads, treat that as benign and continue.
-                if (proc.HasExited)
-                    continue;
-
-                throw new InvalidOperationException($"SuspendThread failed for thread {pt.Id} with error {err}.");
+                threads = proc.Threads;
+            }
+            catch (InvalidOperationException)
+            {
+                // Process has exited; nothing to suspend.
+                return;
             }
 
-            CloseHandle(threadHandle);
+            foreach (ProcessThread pt in threads)
+            {
+                using (pt)
+                {
+                    IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
+                    if (threadHandle == IntPtr.Zero) continue;
+
+                    uint result = SuspendThread(threadHandle);
+                    if (result == uint.MaxValue)
+                    {
+                        int err = Marshal.GetLastWin32Error();
+                        CloseHandle(threadHandle);
+                        // ERROR_ACCESS_DENIED (5) can occur for certain systems or protected threads.
+                        // Treat access denied as non-fatal and continue with other threads.
+                        const int ERROR_ACCESS_DENIED = 5;
+                        if (err == ERROR_ACCESS_DENIED)
+                            continue;
+
+                        // If the process has exited since we started enumerating threads, treat that as benign and continue.
+                        if (proc.HasExited)
+                            continue;
+
+                        throw new InvalidOperationException($"SuspendThread failed for thread {pt.Id} with error {err}.");
+                    }
+
+                    CloseHandle(threadHandle);
+                }
+            }
         }
     }
 
@@ -309,40 +326,46 @@ internal
             return;
         }
 
-        ProcessThreadCollection threads;
-        try
+        using (proc)
         {
-            threads = proc.Threads;
-        }
-        catch (InvalidOperationException)
-        {
-            // Process has exited; nothing to resume.
-            return;
-        }
-
-        foreach (ProcessThread pt in threads)
-        {
-            IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
-            if (threadHandle == IntPtr.Zero) continue;
-
-            uint result = ResumeThread(threadHandle);
-            if (result == uint.MaxValue)
+            ProcessThreadCollection threads;
+            try
             {
-                int err = Marshal.GetLastWin32Error();
-                CloseHandle(threadHandle);
-                // ERROR_ACCESS_DENIED (5) can occur when resuming protected threads; ignore it.
-                const int ERROR_ACCESS_DENIED = 5;
-                if (err == ERROR_ACCESS_DENIED)
-                    continue;
-
-                // If the process has exited since we started enumerating threads, treat that as benign and continue.
-                if (proc.HasExited)
-                    continue;
-
-                throw new InvalidOperationException($"ResumeThread failed for thread {pt.Id} with error {err}.");
+                threads = proc.Threads;
+            }
+            catch (InvalidOperationException)
+            {
+                // Process has exited; nothing to resume.
+                return;
             }
 
-            CloseHandle(threadHandle);
+            foreach (ProcessThread pt in threads)
+            {
+                using (pt)
+                {
+                    IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
+                    if (threadHandle == IntPtr.Zero) continue;
+
+                    uint result = ResumeThread(threadHandle);
+                    if (result == uint.MaxValue)
+                    {
+                        int err = Marshal.GetLastWin32Error();
+                        CloseHandle(threadHandle);
+                        // ERROR_ACCESS_DENIED (5) can occur when resuming protected threads; ignore it.
+                        const int ERROR_ACCESS_DENIED = 5;
+                        if (err == ERROR_ACCESS_DENIED)
+                            continue;
+
+                        // If the process has exited since we started enumerating threads, treat that as benign and continue.
+                        if (proc.HasExited)
+                            continue;
+
+                        throw new InvalidOperationException($"ResumeThread failed for thread {pt.Id} with error {err}.");
+                    }
+
+                    CloseHandle(threadHandle);
+                }
+            }
         }
     }
 

@@ -86,7 +86,7 @@ public static class CliRun
         workingDirectory ??= Environment.CurrentDirectory;
 
         using ProcessConfiguration configuration = GetProcessConfigFactory().Create(targetFilePath,
-            arguments, workingDirectory);
+            arguments, builder => builder.SetWorkingDirectory(workingDirectory));
         
         timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
 
@@ -151,7 +151,7 @@ public static class CliRun
         workingDirectory ??= Environment.CurrentDirectory;
 
         using ProcessConfiguration configuration = GetProcessConfigFactory().Create(targetFilePath,
-            arguments, workingDirectory);
+            arguments, builder => builder.SetWorkingDirectory(workingDirectory));
         
         timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
 
@@ -218,7 +218,7 @@ public static class CliRun
         workingDirectory ??= Environment.CurrentDirectory;
         
         using ProcessConfiguration configuration = GetProcessConfigFactory().Create(targetFilePath,
-            arguments, workingDirectory);
+            arguments, builder => builder.SetWorkingDirectory(workingDirectory));
         
         timeoutTimeSpan ??= ProcessTimeoutPolicy.Default.TimeoutThreshold;
 

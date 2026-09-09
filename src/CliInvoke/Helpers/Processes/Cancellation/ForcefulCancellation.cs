@@ -23,7 +23,15 @@ internal static class ForcefulCancellation
             }
             catch
             {
-                process.Kill();
+                try { process.Kill(); }
+                catch (InvalidOperationException) { }
+            }
+
+            // Wait for process to actually exit after kill
+            if (!process.HasExited)
+            {
+                try { process.WaitForExit(5000); }
+                catch (InvalidOperationException) { }
             }
         }
 
@@ -88,7 +96,14 @@ internal static class ForcefulCancellation
                     if (!process.ForcefulExitAttempted && !process.HasExited)
                     {
                         process.ForcefulExitAttempted = true;
-                        process.ForcefulExit(cancellationExceptionBehavior);
+                        try
+                        {
+                            process.ForcefulExit(cancellationExceptionBehavior);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // Process may have already exited
+                        }
                     }
                 }
                 finally

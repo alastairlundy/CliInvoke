@@ -23,6 +23,7 @@ namespace CliInvoke.Processes;
 public class ExternalProcess : IExternalProcess
 {
     private ProcessWrapper _processWrapper;
+    private bool _disposed;
     
     private readonly IProcessPipeHandler _processPipeHandler;
     private readonly IFilePathResolver _filePathResolver;
@@ -158,10 +159,13 @@ public class ExternalProcess : IExternalProcess
     [UnsupportedOSPlatform("browser")]
     public async Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken)
     {
-        Configuration.TargetFilePath = _filePathResolver.ResolveFilePath(
-            Configuration.TargetFilePath);
+        configuration.TargetFilePath = _filePathResolver.ResolveFilePath(
+            configuration.TargetFilePath);
 
         _processWrapper = new ProcessWrapper(configuration, configuration.ResourcePolicy);
+        
+        _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
+        _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
         
         if (configuration.StandardInput is not null
             && configuration.StandardInput != StreamWriter.Null)
@@ -194,11 +198,15 @@ public class ExternalProcess : IExternalProcess
         
         try
         {
-            await Task.WhenAll([
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputStream,
-                standardErrorStream
-            ]);
+            using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            Task waitForExit = _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, linkedCts.Token);
+
+            Task[] tasks = [waitForExit, standardOutputStream, standardErrorStream];
+            await Task.WhenAll(tasks);
+
+            // After exit wait completes, cancel the pipe reads so they don't block on grandchild EOF
+            await linkedCts.CancelAsync();
             
             ProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
@@ -245,11 +253,15 @@ public class ExternalProcess : IExternalProcess
         
         try
         {
-            await Task.WhenAll([
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputString,
-                standardErrorString
-            ]);
+            using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            Task waitForExit = _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, linkedCts.Token);
+
+            Task[] tasks = [waitForExit, standardOutputString, standardErrorString];
+            await Task.WhenAll(tasks);
+
+            // After exit wait completes, cancel the pipe reads so they don't block on grandchild EOF
+            await linkedCts.CancelAsync();
             
             BufferedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
@@ -288,11 +300,15 @@ public class ExternalProcess : IExternalProcess
         
         try
         {
-            await Task.WhenAll([
-                _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                standardOutputStream,
-                standardErrorStream
-            ]);
+            using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            Task waitForExit = _processWrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, linkedCts.Token);
+
+            Task[] tasks = [waitForExit, standardOutputStream, standardErrorStream];
+            await Task.WhenAll(tasks);
+
+            // After exit wait completes, cancel the pipe reads so they don't block on grandchild EOF
+            await linkedCts.CancelAsync();
             
             PipedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, _processWrapper.StartTime, _processWrapper.ExitTime,
@@ -327,7 +343,8 @@ public class ExternalProcess : IExternalProcess
                     ExitConfiguration.CancellationExceptionBehavior, CancellationToken.None);
                 break;
             case ProcessCancellationMode.None:
-                _processWrapper.Kill();
+                try { _processWrapper.Kill(); }
+                catch (InvalidOperationException) { }
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -339,6 +356,8 @@ public class ExternalProcess : IExternalProcess
     /// </summary>
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
         Configuration.Dispose();
         _processWrapper.Dispose();
         
@@ -348,7 +367,7 @@ public class ExternalProcess : IExternalProcess
     private void ThrowIfProcessNotSuccessful(ProcessResult result)
     {
         if (ExitConfiguration.ResultValidation == ProcessResultValidation.ExitCodeZero
-            && _processWrapper.ExitCode != 0)
+            && result.ExitCode != 0)
         {
             throw new ProcessNotSuccessfulException(new ProcessExceptionInfo(result,
                 Configuration));

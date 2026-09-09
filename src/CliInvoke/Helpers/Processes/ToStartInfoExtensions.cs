@@ -47,7 +47,6 @@ internal static class ToStartInfoExtensions
                 RedirectStandardError = redirectStandardError,
             };
 
-#if NET8_0_OR_GREATER
             // When the configuration exposes pre-tokenized arguments and the process is
             // launched directly (no shell), pass each value through ArgumentList. The OS
             // quotes every token (escaping embedded quotes as "") so a value can never be
@@ -59,7 +58,6 @@ internal static class ToStartInfoExtensions
                 foreach (string argument in processConfiguration.ArgumentsList)
                     processStartInfo.ArgumentList.Add(argument);
             }
-#endif
         
             if (processConfiguration.RequiresAdministrator)
                 processStartInfo.RunAsAdministrator();

@@ -63,7 +63,7 @@ internal static partial class GracefulCancellation
                 // Wait for any of the three tasks to complete
                 Task[] tasks =
                 [
-                    process.WaitForExitSafeAsync(cancellationToken),
+                    process.WaitForExitSafeAsync(CancellationToken.None),
                     gracefulInterruptCancellation,
                     process.GracefulCancellationWithCancelToken(
                         timeoutThreshold + TimeSpan.FromSeconds(
@@ -78,7 +78,9 @@ internal static partial class GracefulCancellation
                 // If the process exited, we're done
                 if (completedTaskIndex == 0)
                 {
-                    return;
+                    // Verify the process actually exited; if not, fall through to forceful exit
+                    if (process.HasExited)
+                        return;
                 }
 
                 // If the graceful interrupt task completed, wait for the extended wait or process exit before forcing

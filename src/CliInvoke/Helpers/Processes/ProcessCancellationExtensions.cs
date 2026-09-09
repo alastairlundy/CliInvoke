@@ -62,7 +62,7 @@ internal static class ProcessCancellationExtensions
             catch (OperationCanceledException)
             {
                 await process.WaitForExitOrGracefulTimeoutAsync(TimeSpan.Zero, cancellationExceptionBehavior,
-                    cancellationToken, fallbackToForceful:true);
+                    CancellationToken.None, fallbackToForceful:true);
             }
             catch (Exception)
             {
@@ -75,7 +75,23 @@ internal static class ProcessCancellationExtensions
             {
                 if (!process.HasExited)
                 {
-                    process.ForcefulExit(cancellationExceptionBehavior);
+                    try
+                    {
+                        await process.ForcefulExitLock.WaitAsync(CancellationToken.None);
+                        try
+                        {
+                            if (!process.ForcefulExitAttempted && !process.HasExited)
+                            {
+                                process.ForcefulExitAttempted = true;
+                                process.ForcefulExit(cancellationExceptionBehavior);
+                            }
+                        }
+                        finally
+                        {
+                            process.ForcefulExitLock.Release();
+                        }
+                    }
+                    catch (InvalidOperationException) { }
                 }
             }
         }

@@ -33,7 +33,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         ProcessCancellationMode cancellationMode = ProcessCancellationMode.Graceful)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(timeoutThreshold.TotalMilliseconds);
-        ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
         TimeoutThreshold = timeoutThreshold;
         CancellationMode = cancellationMode;
@@ -167,12 +166,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         if (left is null || right is null)
             return false;
 
-        if (
-            left.CancellationMode == ProcessCancellationMode.None
-            && right.CancellationMode != ProcessCancellationMode.None
-        )
-            return false;
-
         return left.TimeoutThreshold < right.TimeoutThreshold;
     }
 
@@ -190,18 +183,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         if (left is null || right is null)
             return false;
 
-        if (
-            left.CancellationMode == ProcessCancellationMode.None
-            && right.CancellationMode != ProcessCancellationMode.None
-        )
-            return false;
-
-        if (
-            right.CancellationMode == ProcessCancellationMode.None
-            && left.CancellationMode != ProcessCancellationMode.None
-        )
-            return true;
-
         return left.TimeoutThreshold >= right.TimeoutThreshold;
     }
 
@@ -214,18 +195,6 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public static bool operator <=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null || right is null)
-            return false;
-
-        if (
-            left.CancellationMode == ProcessCancellationMode.None
-            && right.CancellationMode != ProcessCancellationMode.None
-        )
-            return true;
-
-        if (
-            right.CancellationMode == ProcessCancellationMode.None
-            && left.CancellationMode != ProcessCancellationMode.None
-        )
             return false;
 
         return left.TimeoutThreshold <= right.TimeoutThreshold;
