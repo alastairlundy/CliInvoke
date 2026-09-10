@@ -4,9 +4,9 @@ All notable changes to CliInvoke are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/).
 
-## [3.0.0] - 2026-09-09
+## [Unreleased]
 
-CliInvoke 3.0.0 is the first stable release of the v3 line. It ships the
+CliInvoke 3.0.0 is the first stable release of the v3 line (unreleased). It ships the
 design-smell triage as one coherent breaking-change set.
 
 Themes:
@@ -237,4 +237,4 @@ Themes:
 
 - Bumped `github/codeql-action/upload-sarif` from 4.37.7 to 4.37.8 in the Scorecard workflow.
 
-[3.0.0]: https://github.com/alastairlundy/CliInvoke/releases
+
