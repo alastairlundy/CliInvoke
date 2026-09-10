@@ -15,12 +15,18 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.5</PackageReleaseNotes>
+        <PackageReleaseNotes>#### 🐛  Bugs
+* Fixed``ShellDetector`` shell version parsing for non bash based shells
+* Fixed potentially inaccurate shell detection in ``ShellDetector`` on Unix based operating systems
+* Fixed internal ``ProcessWrapper`` class throwing the wrong exception in some cases such as Access being denied or file not being found
+* Fixed ``ExternalProcess`` not catching expected exceptions on pipe reads after process exits
+* Fixed potetial issues of pipe reads hanging in ``ExternalProcess``
+* Fixed null-safety in ProcessExceptionInfo.Equals for its ``UserCredential`` object named ``Credential``.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.10.5</PackageVersion>
-        <AssemblyVersion>2.10.5.0</AssemblyVersion>
+        <PackageVersion>2.10.6</PackageVersion>
+        <AssemblyVersion>2.10.6.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -33,7 +39,7 @@
              they do not leak into, or clash with, CliInvoke.Core's copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
-        <FileVersion>2.10.5.0</FileVersion>
+        <FileVersion>2.10.6.0</FileVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">
