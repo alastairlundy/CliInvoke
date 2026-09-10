@@ -20,13 +20,18 @@ namespace CliInvoke;
 /// <summary>
 /// Represents a detector for resolving the default shell on various operating systems.
 /// </summary>
-public class ShellDetector : IShellDetector
+public partial class ShellDetector : IShellDetector
 {
-    private static readonly Regex VersionRegex = new(@"(\d+\.\d+(?:\.\d+)*)", RegexOptions.Compiled);
-
     private readonly IProcessInvoker _processInvoker;
     private readonly IFilePathResolver _filePathResolver;
     private readonly IProcessConfigurationFactory _processConfigurationFactory;
+
+#if NET8_0_OR_GREATER
+    [GeneratedRegex(@"(\d+\.\d+(?:\.\d+)*)")]
+    private static partial Regex VersionRegex();
+#else
+    private static readonly Regex VersionRegex = new(@"(\d+\.\d+(?:\.\d+)*)", RegexOptions.Compiled);
+#endif
 
     /// <summary>
     /// Represents a detector for resolving the default shell on various operating systems.
@@ -82,7 +87,11 @@ public class ShellDetector : IShellDetector
         string? versionStr = null;
         foreach (string line in output.Split(Environment.NewLine))
         {
+#if NET8_0_OR_GREATER
+            Match match = VersionRegex().Match(line);
+#else
             Match match = VersionRegex.Match(line);
+#endif
             if (match.Success)
             {
                 versionStr = match.Groups[1].Value;
