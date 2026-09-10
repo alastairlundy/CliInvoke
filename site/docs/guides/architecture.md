@@ -416,9 +416,9 @@ runs the rewritten configuration as if it were the original.
 `IProcessResultValidator<TProcessResult>` answers the question
 *“is this result acceptable, or should we raise a failure?”*. The
 default implementation (`ProcessResultValidator<TProcessResult>`)
-evaluates a set of self-describing `ValidationRule<TProcessResult>`
+evaluates a set of self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
 rules. `Validate` returns a `bool` (all rules pass), while
-`GetValidationFailures` returns the per-rule `ValidationFailure`
+`GetValidationFailures` returns the per-rule <xref:CliInvoke.Core.Validation.ValidationFailure`1>
 instances so callers can surface detailed, rule-by-rule messages. The
 invoker raises a `ProcessNotSuccessfulException` when a validator
 configured for "must succeed" mode returns invalid. The post-exit
