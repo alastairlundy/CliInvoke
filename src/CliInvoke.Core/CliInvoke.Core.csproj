@@ -29,14 +29,15 @@
              CliInvoke/CliInvoke.Specializations and cause duplicate-definition (CS0433/CS0121)
              errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
-        <Version>2.11.0</Version>
+        <Version>2.11.1</Version>
         <AssemblyVersion>2.10.4.0</AssemblyVersion>
         <FileVersion>2.10.4.0</FileVersion>
-        <PackageReleaseNotes>* General Improvements
-* Deprecated ``PipedProcessResult`` ahead of removal in v3</PackageReleaseNotes>
+        <PackageReleaseNotes>#### 🐛  Bugs
+* Fixed an equality comparison bug in ``ProcessConfiguration`` ``Equals`` method
+* Fixed equality operators so that they handle null comparisons correctly</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.11.0.0</AssemblyVersion>
-        <FileVersion>2.11.0.0</FileVersion>
+        <AssemblyVersion>2.11.1.0</AssemblyVersion>
+        <FileVersion>2.11.1.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
