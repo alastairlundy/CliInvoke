@@ -34,7 +34,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
     ///     Initialises a new instance of the <see cref="CmdProcessConfiguration"/> class.
     /// </summary>
     /// <param name="arguments">The arguments to be passed to the command.</param>
-    /// <param name="outputRedirection"></param>
+    /// <param name="outputRedirection">Whether to redirect standard output and error streams.</param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator">
     ///     Indicates whether the command requires administrator
@@ -49,7 +49,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="processResourcePolicy">The process resource policy for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
-    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardInput">Whether to redirect standard input to the process.</param>
     /// <param name="argumentList">
     ///     An optional verbatim argument list emitted via <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/>.
     ///     Used by the middleware to deliver the cmd wrapper without OS re-tokenization.

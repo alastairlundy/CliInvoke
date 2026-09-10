@@ -12,8 +12,7 @@ using CliInvoke.Core.Validation;
 namespace CliInvoke.Validation;
 
 /// <summary>
-///     Represents a validator for process results. It provides functionality to validate a given
-///     process result against a set of specified rules.
+///     Validates process results against a set of rules.
 /// </summary>
 /// <typeparam name="TProcessResult">
 ///     The type of the process result being validated.

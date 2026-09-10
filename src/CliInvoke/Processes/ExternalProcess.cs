@@ -13,7 +13,7 @@ using CliInvoke.Processes.Internal;
 namespace CliInvoke.Processes;
 
 /// <summary>
-///     Represents an external process that can be run.
+///     Wraps a <see cref="System.Diagnostics.Process"/> for managed lifecycle control.
 /// </summary>
 // ReSharper disable once RedundantExtendsListEntry
 public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
@@ -46,14 +46,14 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         _processWrapper.Exited += _exitedHandler;
     }
 
-    /// <summary>
-    ///     Represents the configuration settings used by an external process.
-    /// </summary>
+/// <summary>
+///     Gets the <see cref="ProcessConfiguration"/> for this external process.
+/// </summary>
     public ProcessConfiguration Configuration { get; init; }
 
-    /// <summary>
-    ///     Represents the configuration for handling external process exit.
-    /// </summary>
+/// <summary>
+///     Gets the <see cref="ProcessExitConfiguration"/> controlling exit handling.
+/// </summary>
     public ProcessExitConfiguration ExitConfiguration { get; }
 
     /// <summary>
@@ -84,14 +84,14 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         }
     }
 
-    /// <summary>
-    ///     Represents an event that occurs when the external process starts.
-    /// </summary>
+/// <summary>
+///     Occurs when the process starts.
+/// </summary>
     public event EventHandler? Started;
 
-    /// <summary>
-    ///     Represents an event that occurs when the external process exits.
-    /// </summary>
+/// <summary>
+///     Occurs when the process exits.
+/// </summary>
     public event EventHandler? Exited;
 
     /// <summary>

@@ -14,7 +14,7 @@ using CliInvoke.Internal.Versions;
 namespace CliInvoke;
 
 /// <summary>
-///     Represents a detector for resolving the default shell on various operating systems.
+///     Resolves the default shell on Windows, macOS, and Linux.
 /// </summary>
 public class ShellDetector : IShellDetector
 {
@@ -23,9 +23,9 @@ public class ShellDetector : IShellDetector
 
     private readonly bool isUnix;
 
-    /// <summary>
-    ///     Represents a detector for resolving the default shell on various operating systems.
-    /// </summary>
+/// <summary>
+///     Initialises a new instance using the specified process invoker and file path resolver.
+/// </summary>
     public ShellDetector(IProcessInvoker processInvoker, IFilePathResolver filePathResolver)
     {
         _processInvoker = processInvoker;

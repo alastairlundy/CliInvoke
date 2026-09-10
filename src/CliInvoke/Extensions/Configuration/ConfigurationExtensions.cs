@@ -15,8 +15,7 @@ using CliInvoke.Builders;
 namespace CliInvoke.Extensions;
 
 /// <summary>
-///     Provides extension methods for working with configuration settings in the application,
-///     enhancing functionality and simplifying common configuration-related tasks.
+///     Extension methods for converting and transforming <see cref="ProcessConfiguration"/>.
 /// </summary>
 public static class ConfigurationExtensions
 {

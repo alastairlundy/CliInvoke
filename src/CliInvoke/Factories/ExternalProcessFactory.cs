@@ -13,7 +13,7 @@ using CliInvoke.Processes;
 namespace CliInvoke.Factories;
 
 /// <summary>
-///     Represents a factory for creating instances of the <see cref="ExternalProcess" /> class.
+///     Creates <see cref="ExternalProcess"/> instances from a <see cref="ProcessConfiguration"/>.
 /// </summary>
 public class ExternalProcessFactory : IExternalProcessFactory
 {

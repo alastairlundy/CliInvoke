@@ -18,8 +18,8 @@ using CliInvoke.Core.Internal;
 namespace CliInvoke.Extensibility;
 
 /// <summary>
-///     A class to allow creating a ProcessConfiguration that can be run through another Process'
-///     ProcessConfiguration.
+///     Creates a <see cref="ProcessConfiguration"/> that wraps another process's configuration
+///     for runner-based execution.
 /// </summary>
 public class RunnerConfigurationFactory : IRunnerConfigurationFactory
 {

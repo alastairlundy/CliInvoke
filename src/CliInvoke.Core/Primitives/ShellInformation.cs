@@ -32,18 +32,11 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <summary>
     ///     Gets or sets the name.
     /// </summary>
-    /// <remarks>
-    ///     Represents a property that holds the name associated with an instance of the ShellInformation
-    ///     class.
-    /// </remarks>
     public string Name { get; }
 
     /// <summary>
     ///     Gets or sets the target file path.
     /// </summary>
-    /// <remarks>
-    ///     Represents the path of a file that is targeted by an instance of the ShellInformation class.
-    /// </remarks>
     public FileInfo TargetFilePath { get; }
 
     /// <summary>

@@ -365,7 +365,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     ///     Configures whether shell execution should be used for the process.
     /// </summary>
     /// <param name="useShellExecution">True to use shell execution, false otherwise.</param>
-    /// <returns>The updated Process Configuration builder with the updated configuration information.</returns>
+    /// <returns>The same builder instance, with output redirection configured.</returns>
     /// <remarks>
     ///     Using Shell Execution whilst also Redirecting Standard Input will throw an Exception.
     ///     This is a known issue with the System Process class.
@@ -385,7 +385,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     ///     A boolean indicating whether to enable or disable window
     ///     creation.
     /// </param>
-    /// <returns>The updated Process Configuration builder with the updated window creation configuration.</returns>
+    /// <returns>The same builder instance, with window creation enabled or disabled.</returns>
     public IProcessConfigurationBuilder EnableWindowCreation(bool enableWindowCreation)
     {
         _enableWindowCreation = enableWindowCreation;
@@ -400,12 +400,9 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     ///     The encoding scheme to use for standard input.
     ///     Uses the Default Encoding if null.
     /// </param>
-    /// <param name="standardOutputEncoding"></param>
-    /// <param name="standardErrorEncoding"></param>
-    /// <returns>
-    ///     The updated Process Configuration builder with the updated encoding scheme configuration
-    ///     information.
-    /// </returns>
+    /// <param name="standardOutputEncoding">The encoding scheme to use for standard output.</param>
+    /// <param name="standardErrorEncoding">The encoding scheme to use for standard error.</param>
+    /// <returns>The same builder instance, with stream encodings set.</returns>
     public IProcessConfigurationBuilder SetEncoding(Encoding? standardInputEncoding = null,
         Encoding? standardOutputEncoding = null, Encoding? standardErrorEncoding = null)
     {

@@ -38,9 +38,9 @@ namespace CliInvoke.Extensions;
 /// </remarks>
 public static class AddCliInvokeExtensions
 {
-    /// <summary>
-    ///     Sets up Dependency Injection for CliInvoke's main interface-able types.
-    /// </summary>
+/// <summary>
+///     Registers CliInvoke's core types and middleware in the DI container.
+/// </summary>
     /// <param name="services">The service collection to add to.</param>
     /// <param name="lifetime">The service lifetime to use if specified; Scoped otherwise.</param>
     /// <returns>The updated service collection with the added CliInvoke services set up.</returns>
@@ -51,10 +51,10 @@ public static class AddCliInvokeExtensions
         return ConfigureCliInvokeServices(services, configure: null, lifetime);
     }
 
-    /// <summary>
-    ///     Sets up Dependency Injection for CliInvoke's main interface-able types,
-    ///     allowing fluent configuration of the middleware pipeline via a callback.
-    /// </summary>
+/// <summary>
+///     Registers CliInvoke's core types and middleware in the DI container,
+///     allowing fluent configuration of the middleware pipeline via a callback.
+/// </summary>
     /// <remarks>
     ///     The callback receives an <see cref="IProcessMiddlewareBuilder"/> and can compose
     ///     middleware using <c>UseMiddleware()</c>, <c>UseMiddleware&lt;T&gt;()</c>,
