@@ -3,7 +3,7 @@
 ## What this repo is
 CliInvoke — a .NET/C# library for launching and interacting with command-line processes (builders, configuration models, invokers, middleware, DI, and platform specializations).
 
-- Single TFM: `net10.0` (see `global.json` and csproj files). Current release line: `3.0.0-beta` — pre-release API; check `site/docs/migration-guides/3.0.0.md` before touching public API.
+- Single TFM: `net10.0` (see `global.json` and csproj files). Current release line: `3.0.0`.
 - Docs portal lives in `site/` (built with Lunet, published on GitHub release). Root `getting-started.md` is legacy — prefer `site/docs/`.
 
 ## Codebase Organization

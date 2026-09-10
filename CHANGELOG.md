@@ -214,7 +214,8 @@ Themes:
 - Middleware, configuration, and troubleshooting guides updated.
 - CI guard enforces `ConfigureAwait(false)` on all await sites in `src`.
 - Release notes and README updated with all breaking changes and behaviour changes.
-- External-process config-seam migration document moved to `docs/`.
+- External-process config-seam migration document absorbed into `site/docs/migration-guides/3.0.0.md` §9; standalone file removed.
+- Removed stale `3.0.0-beta` / `pre-release` labels from README, AGENTS.md, comparison table, and Specializations README.
 - Added missing license notices to example source files.
 - Updated stale documentation (benchmarks README, supported OS, building guide, architecture and configuration guides).
 - Fixed the getting-started docs: bumped the package version to 3.0.0 and corrected a non-compiling `WorkingDirectoryPath` example.
