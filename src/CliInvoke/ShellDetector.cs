@@ -22,6 +22,8 @@ namespace CliInvoke;
 /// </summary>
 public class ShellDetector : IShellDetector
 {
+    private static readonly Regex VersionRegex = new(@"(\d+\.\d+(?:\.\d+)*)", RegexOptions.Compiled);
+
     private readonly IProcessInvoker _processInvoker;
     private readonly IFilePathResolver _filePathResolver;
     private readonly IProcessConfigurationFactory _processConfigurationFactory;
@@ -80,7 +82,7 @@ public class ShellDetector : IShellDetector
         string? versionStr = null;
         foreach (string line in output.Split(Environment.NewLine))
         {
-            Match match = Regex.Match(line, @"(\d+\.\d+(?:\.\d+)*)");
+            Match match = VersionRegex.Match(line);
             if (match.Success)
             {
                 versionStr = match.Groups[1].Value;
