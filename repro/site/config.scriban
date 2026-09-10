@@ -25,7 +25,8 @@ with api.dotnet
   config = "Release"
   properties = { TargetFramework: "net10.0" }
   projects = [
-    { name: "MyLib", path: "../src/MyLib/MyLib.csproj" }
+    { name: "MyLib", path: "../src/MyLib/MyLib.csproj" },
+    { name: "MyLib.Extensions", path: "../src/MyLib.Extensions/MyLib.Extensions.csproj" }
   ]
 end
 

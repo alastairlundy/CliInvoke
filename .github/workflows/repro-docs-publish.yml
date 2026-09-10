@@ -22,7 +22,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Build .NET projects for API docs
-        run: dotnet build repro/src/MyLib -c Release
+        run: |
+          dotnet build repro/src/MyLib -c Release
+          dotnet build repro/src/MyLib.Extensions -c Release
       - name: Install Lunet
         run: |
           dotnet tool install --global lunet --version "1.*"
