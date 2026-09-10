@@ -9,10 +9,7 @@
 
 using System.Linq;
 using System.Text.RegularExpressions;
-
 using CliInvoke.Core.Factories;
-
-using DotExtensions.Platforms;
 using DotExtensions.Versions;
 
 namespace CliInvoke;
@@ -33,6 +30,8 @@ public partial class ShellDetector : IShellDetector
     private static readonly Regex VersionRegex = new(@"(\d+\.\d+(?:\.\d+)*)", RegexOptions.Compiled);
 #endif
 
+    private readonly bool isUnix;
+    
     /// <summary>
     /// Represents a detector for resolving the default shell on various operating systems.
     /// </summary>
@@ -43,6 +42,9 @@ public partial class ShellDetector : IShellDetector
         _processInvoker = processInvoker;
         _filePathResolver = filePathResolver;
         _processConfigurationFactory = processConfigurationFactory;
+
+        isUnix = OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD() ||
+                 OperatingSystem.IsMacCatalyst();
     }
 
     /// <summary>
@@ -56,7 +58,7 @@ public partial class ShellDetector : IShellDetector
     public async Task<ShellInformation> ResolveDefaultShellAsync(
         CancellationToken cancellationToken = default)
     {
-        if (OperatingSystem.IsUnix())
+        if (isUnix)
             return await ResolveDefaultShellOnUnixAsync(cancellationToken);
      
         if(OperatingSystem.IsWindows())
