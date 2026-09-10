@@ -87,7 +87,7 @@ For detailed implementation examples on creating external processes, see the fol
 
 | Pitfall | Solution |
 | :--- | :--- |
-| Using `CliRun` in a service that already utilizes DI | Switch to `IProcessInvoker` to leverage existing DI registrations and improve testability. |
+| Using `CliRun` in a service that already utilizes DI | Switch to `IProcessInvoker` to reuse existing DI registrations and improve testability. |
 | Using `IProcessInvoker` for interactive shells | Switch to `IExternalProcess` to allow real-time interaction with the process. |
 | Needing logging, result validation, or PowerShell/`cmd` wrapping on every call | Use the fluent `Use*` extension methods on `ProcessInvoker` (e.g., `.UseLogging().UsePostExitValidation(PostExitValidation.ExitCodeIsZero())`) instead of hand-writing the cross-cutting logic in each call site. |
 | Reaching for middleware but starting from `CliRun` | `CliRun` has no middleware support; construct a `ProcessInvoker` (optionally with `IEnumerable<IProcessMiddleware>` or `MiddlewareItems`) and use the `Use*` methods instead. |

@@ -80,7 +80,7 @@ BufferedProcessResult result = await process.CaptureBufferedResultAsync(Cancella
 
 ### Note on Direct Instantiation
 
-Directly instantiating `ExternalProcess` is generally discouraged in favor of `IExternalProcessFactory`. Using the factory provides a consistent layer of abstraction, allowing for easier testing (via mocking) and ensuring that the creation logic remains decoupled from the implementation.
+Directly instantiating `ExternalProcess` is generally discouraged in favor of `IExternalProcessFactory`. Using the factory provides a consistent layer of abstraction, making testing easier (via mocking) and keeping creation logic decoupled from the implementation.
 
 ## Middleware Coverage
 

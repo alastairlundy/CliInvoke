@@ -29,6 +29,8 @@ A PID is only unique while the process is running. After termination, the OS can
 **Property values go stale without `Refresh()`.**
 Properties like `WorkingSet64`, `PrivateMemorySize64`, `TotalProcessorTime`, `HandleCount`, `MainWindowTitle`, `Modules`, and `Threads` are all cached together. Reading any one caches the rest. Values do not update until you call `Refresh()`. The set of properties that form a "group" varies by OS.
 
+**CliInvoke**: `ProcessResult` is an immutable DTO. All properties are snapshotted at `Start()` time and never read from the live process again, so staleness is not a concern.
+
 **`StartTime` is unavailable on Unix after exit if not cached.**
 On Windows, `StartTime` can be read after the process exits (if a handle is available). On Unix, the value is cached on first access. If you read it after the process has exited and it was never previously read, you get `InvalidOperationException`. Windows does not have this problem.
 
@@ -87,6 +89,8 @@ See [dotnet/runtime#42556](https://github.com/dotnet/runtime/issues/42556).
 **`WaitForExitAsync` hangs when grandchild processes outlive the parent.**
 On Linux with stdout/stderr redirected, `WaitForExitAsync` blocks until all descendant processes terminate, not just the direct child. If the child spawns long-running grandchildren, the async wait hangs indefinitely. See [dotnet/runtime#98347](https://github.com/dotnet/runtime/issues/98347).
 
+**CliInvoke**: `WaitForExitSafeAsync()` polls `HasExited` on the process handle itself via `Task.Delay(200ms)`, not `WaitForExitAsync()`. `HasExited` checks the direct process only and does not wait for descendants.
+
 **`WaitForExit()` (parameterless) hangs when child processes keep pipes open.**
 On Windows, if descendant processes inherit stdout/stderr pipes and keep them open, the parameterless `WaitForExit()` never returns because it waits for pipe EOF. See [dotnet/runtime#51277](https://github.com/dotnet/runtime/issues/51277).
 
@@ -117,6 +121,8 @@ See [dotnet/runtime#81896](https://github.com/dotnet/runtime/issues/81896).
 **`HasExited` can return `true` before async output events finish.**
 The parameterized `WaitForExit(timeout)` can return `true` while asynchronous output processing is still underway. Microsoft recommends always calling the parameterless `WaitForExit()` after the parameterized overload to flush events.
 
+**CliInvoke**: Does not use `BeginOutputReadLine` or event-based output reading. Reads streams directly via `CopyToAsync`, so there are no async output events to flush.
+
 ---
 
 ### 4. Stream deadlocks
@@ -145,8 +151,12 @@ string output = process.StandardOutput.ReadToEnd();
 **Two-stream deadlock: reading both stdout and stderr synchronously.**
 Reading stdout fully, then reading stderr fully, deadlocks if the child writes enough to stderr to fill its buffer while stdout's buffer is also full. Use async reads on at least one stream to avoid this.
 
+**CliInvoke**: `ReadAllTextAsync()` drains both stdout and stderr concurrently via `Task.WhenAll`. Neither stream blocks the other.
+
 **Cannot mix sync and async reads on the same stream.**
 Once `BeginOutputReadLine()` is called, calling `StandardOutput.ReadToEnd()` later throws `InvalidOperationException`. You can mix modes across different streams, but not the same one.
+
+**CliInvoke**: Does not call `BeginOutputReadLine()`. Reads `StandardOutput.BaseStream` directly via `CopyToAsync`, so the sync/async mixing restriction never applies.
 
 **Parameterized `WaitForExit` does not flush async output.**
 `WaitForExit(int milliseconds)` can return before async event handlers have completed. Always call the parameterless overload after it:
@@ -155,6 +165,8 @@ Once `BeginOutputReadLine()` is called, calling `StandardOutput.ReadToEnd()` lat
 process.WaitForExit(5000);
 process.WaitForExit(); // flush async output events
 ```
+
+**CliInvoke**: Does not use parameterized `WaitForExit`. The pipeline reads streams directly and polls `HasExited` separately, so there are no events to flush.
 
 ---
 
