@@ -63,7 +63,7 @@ Exactly **three** `IDisposable` types: `IExternalProcess`, `UserCredential`, `Us
 - Follow `CONTRIBUTING.md`; fill in every section of `.github/pull_request_template.md`.
 - Small, focused changes with tests passing; update `site/docs`/README when usage or public API changes.
 - **IVT grants are minimized**: new `InternalsVisibleTo` grants need justification (`docs/adr/0001-ivt-minimization.md`); unused grants are removed.
-- **Writing public-facing text** (READMEs, docs, guides, skill descriptions): load the `unslop` skill and apply its checklist before committing. AI-sloppy prose is a recurring issue in this repo.
+- **Writing public-facing text** (READMEs, docs, guides, skill descriptions): load the `unslop` skill and apply its checklist before committing.
 
 ## Specialized workflows (skills)
 | Scenario | Skill to Load |
