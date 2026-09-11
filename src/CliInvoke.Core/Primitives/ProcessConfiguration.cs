@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -21,7 +20,7 @@ namespace CliInvoke.Core;
 ///     A class to store Process configuration information.
 /// </summary>
 /// <remarks>
-///     The type is directly constructible via an object initializer, with init-only
+///     The type is directly constructible via an object initialiser, with init-only
 ///     properties and a required <see cref="TargetFilePath"/>. Direct
 ///     construction carries the same semantics as the convenience constructor: every
 ///     property defaults to the value documented on the property, and init-time validation
@@ -29,18 +28,12 @@ namespace CliInvoke.Core;
 /// </remarks>
 public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 {
-    private string _targetFilePath = null!;
-    private string _workingDirectoryPath = Directory.GetCurrentDirectory();
-    private IReadOnlyList<string> _argumentList = Array.Empty<string>();
-    private IReadOnlyDictionary<string, string> _environmentVariables =
-        ImmutableSortedDictionary<string, string>.Empty;
-
     /// <summary>
     ///     Initialises a new instance of the <see cref="ProcessConfiguration" /> class with
     ///     all properties taking the defaults documented on the corresponding properties.
     /// </summary>
     /// <remarks>
-    ///     <see cref="TargetFilePath"/> is required and must be set via the object initializer.
+    ///     <see cref="TargetFilePath"/> is required and must be set via the object initialiser.
     /// </remarks>
     public ProcessConfiguration()
     {
@@ -80,15 +73,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     Not mutated after construction; for the resolved file path, see the result.
     ///     <see cref="ProcessResult.ExecutedFilePath"/>.
     /// </remarks>
-    public string TargetFilePath
-    {
-        get => _targetFilePath;
-        init
-        {
-            ArgumentException.ThrowIfNullOrEmpty(value);
-            _targetFilePath = value;
-        }
-    }
+    public required string TargetFilePath { get; init; }
 
     /// <summary>
     ///     The working directory path to be used when executing the Command.
@@ -99,16 +84,16 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <exception cref="DirectoryNotFoundException">Thrown if set to a directory that does not exist.</exception>
     public string WorkingDirectoryPath
     {
-        get => _workingDirectoryPath;
+        get;
         init
         {
             if (!Directory.Exists(value))
                 throw new DirectoryNotFoundException(string.Format(
                     Resources.Exceptions_DirectoryNotFound_WorkingDirectory, value));
 
-            _workingDirectoryPath = value;
+            field = value;
         }
-    }
+    } = Directory.GetCurrentDirectory();
 
     /// <summary>
     ///     The arguments to be provided to the executable to be run.
@@ -127,11 +112,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     Any supplied list is captured as a snapshot; later mutations made to the caller's
     ///     original collection are not reflected in the configuration.
     /// </remarks>
-    public IReadOnlyList<string> ArgumentList
-    {
-        get => _argumentList;
-        init => _argumentList = value is null ? Array.Empty<string>() : value.ToArray();
-    }
+    public IReadOnlyList<string> ArgumentList { get; init; } = [];
 
     /// <summary>
     ///     Whether to enable window creation or not when the Command's Process is run.
@@ -153,11 +134,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// </remarks>
     public IReadOnlyDictionary<string, string> EnvironmentVariables
     {
-        get => _environmentVariables;
-        init => _environmentVariables = value is null
-            ? ImmutableSortedDictionary<string, string>.Empty
-            : ImmutableSortedDictionary.CreateRange(StringComparer.Ordinal, value);
-    }
+        get;
+        init => field = ImmutableSortedDictionary.CreateRange(StringComparer.Ordinal, value);
+    } = ImmutableSortedDictionary<string, string>.Empty;
 
     /// <summary>
     ///     The credential to be used when executing the Command.
@@ -184,9 +163,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// </remarks>
     /// <seealso
     ///     href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandarderror" />
-#pragma warning disable CS0618 // Type or member is obsolete
     public StreamWriter? StandardInput { get; init; } = StreamWriter.Null;
-#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Whether to redirect the Standard Input.
@@ -234,9 +211,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     public bool Equals(ProcessConfiguration? other)
     {
         if (other is null) return false;
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-
+        
         return TargetFilePath.Equals(other.TargetFilePath)
                && EnvironmentVariables.Count == other.EnvironmentVariables.Count
                && EnvironmentVariables.SequenceEqual(other.EnvironmentVariables)
@@ -254,7 +229,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
                && StandardInputEncoding.Equals(other.StandardInputEncoding)
                && StandardOutputEncoding.Equals(other.StandardOutputEncoding)
                && StandardErrorEncoding.Equals(other.StandardErrorEncoding);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
     }
 
     /// <summary>
