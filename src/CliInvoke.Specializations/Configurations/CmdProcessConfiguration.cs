@@ -64,7 +64,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false,
         IEnumerable<string>? argumentList = null) :
-        base("cmd.exe", string.Empty, outputRedirection)
+        base("cmd.exe", arguments, outputRedirection)
     {
         RedirectStandardInput = redirectStandardInput;
         RequiresAdministrator = requiresAdministrator;

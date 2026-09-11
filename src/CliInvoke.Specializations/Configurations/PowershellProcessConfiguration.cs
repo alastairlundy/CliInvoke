@@ -28,12 +28,6 @@ namespace CliInvoke.Specializations.Configurations;
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
-    ///     Gets the resolved file path of the PowerShell executable for the current operating system,
-    ///     delegating to the base configuration's per-OS resolution.
-    /// </summary>
-    public new string TargetFilePath => base.TargetFilePath;
-
-    /// <summary>
     ///     Initializes a new instance of the <see cref="PowershellProcessConfiguration"/> class.
     /// </summary>
     /// <param name="arguments">The arguments to be passed to the command.</param>
