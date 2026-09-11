@@ -136,6 +136,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
         init
         {
             ArgumentNullException.ThrowIfNull(value);
+
+            if (value.Count == 1) 
+                ArgumentException.ThrowIfNullOrEmpty(value[0]);
+            
             field = [.. value];
         }
     } = [];
