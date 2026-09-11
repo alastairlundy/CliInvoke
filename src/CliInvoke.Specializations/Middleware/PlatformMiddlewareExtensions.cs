@@ -21,9 +21,9 @@ public static class PlatformMiddlewareExtensions
         ///     Adds <see cref="PowerShellMiddleware"/> to the process invocation pipeline.
         /// </summary>
         /// <remarks>
-        ///     Configure <see cref="PowerShellMiddlewareOptions"/> via the dependency injection
+        ///     Configure <see cref="ShellMiddlewareOptions"/> via the dependency injection
         ///     container to customise window-creation and shell-execution behaviour.
-        ///     When no options are registered, <see cref="PowerShellMiddlewareOptions.Default"/> is used.
+        ///     When no options are registered, <see cref="ShellMiddlewareOptions.Default"/> is used.
         /// </remarks>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">

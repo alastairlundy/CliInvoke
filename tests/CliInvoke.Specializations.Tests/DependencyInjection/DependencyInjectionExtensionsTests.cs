@@ -52,18 +52,18 @@ public class DependencyInjectionExtensionsTests
     [Test]
     public async Task AddCliInvokeSpecializations_ConsumerRegisteredOptions_WinsOverDefault()
     {
-        PowerShellMiddlewareOptions customOptions = new PowerShellMiddlewareOptions
+        ShellMiddlewareOptions customOptions = new ShellMiddlewareOptions
         {
             WindowCreation = true
         };
 
         IServiceCollection services = new ServiceCollection();
-        services.AddSingleton<PowerShellMiddlewareOptions>(customOptions);
+        services.AddSingleton<ShellMiddlewareOptions>(customOptions);
         services.AddCliInvokeSpecializations();
         services.AddCliInvoke(builder => builder.UsePowerShell());
         using ServiceProvider provider = services.BuildServiceProvider();
 
-        PowerShellMiddlewareOptions? resolved = provider.GetService<PowerShellMiddlewareOptions>();
+        ShellMiddlewareOptions? resolved = provider.GetService<ShellMiddlewareOptions>();
 
         await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved).IsSameReferenceAs(customOptions);

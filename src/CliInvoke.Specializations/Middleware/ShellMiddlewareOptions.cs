@@ -10,19 +10,19 @@
 namespace CliInvoke.Specializations.Middleware;
 
 /// <summary>
-///     Configuration options for <see cref="PowerShellMiddleware"/>.
+///     Configuration options for <see cref="DefaultShellMiddleware"/> and <see cref="PowerShellMiddleware"/>.
 /// </summary>
 /// <remarks>
 ///     Register an instance of this type in the dependency injection container
-///     to customise PowerShell wrapping behaviour. When no instance is registered,
+///     to customise Shell wrapping behaviour. When no instance is registered,
 ///     <see cref="Default"/> is used.
 /// </remarks>
-public sealed class PowerShellMiddlewareOptions
+public sealed class ShellMiddlewareOptions
 {
     /// <summary>
     ///     Gets the default options instance with both flags set to <c>false</c>.
     /// </summary>
-    public static PowerShellMiddlewareOptions Default { get; } = new();
+    public static ShellMiddlewareOptions Default { get; } = new();
 
     /// <summary>
     ///     Gets or sets a value indicating whether PowerShell should create a new window when launched.

@@ -11,7 +11,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CliInvoke.Extensions;
-using CliInvoke.Specializations;
 using CliInvoke.Specializations.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Core.Exceptions;
@@ -96,7 +95,7 @@ public class PowerShellMiddlewareIntegrationTests
     [Test]
     public async Task PowerShellMiddlewareOptions_Default_HasExpectedValues()
     {
-        PowerShellMiddlewareOptions options = PowerShellMiddlewareOptions.Default;
+        ShellMiddlewareOptions options = ShellMiddlewareOptions.Default;
 
         await Assert.That(options.WindowCreation).IsFalse();
         await Assert.That(options.UseShellExecution).IsFalse();
@@ -105,7 +104,7 @@ public class PowerShellMiddlewareIntegrationTests
     [Test]
     public async Task PowerShellMiddlewareOptions_CanCustomiseProperties()
     {
-        PowerShellMiddlewareOptions options = new PowerShellMiddlewareOptions
+        ShellMiddlewareOptions options = new ShellMiddlewareOptions
         {
             WindowCreation = true,
             UseShellExecution = true

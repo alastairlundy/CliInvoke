@@ -34,18 +34,18 @@ namespace CliInvoke.Specializations.Middleware;
 [UnsupportedOSPlatform("watchos")]
 internal sealed class PowerShellMiddleware : IProcessMiddleware
 {
-    private readonly PowerShellMiddlewareOptions _options;
+    private readonly ShellMiddlewareOptions _options;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="PowerShellMiddleware"/> class with
-    ///     default options (<see cref="PowerShellMiddlewareOptions.Default"/>).
+    ///     default options (<see cref="ShellMiddlewareOptions.Default"/>).
     /// </summary>
     /// <param name="options">
-    ///     The PowerShell middleware options. Defaults to <see cref="PowerShellMiddlewareOptions.Default"/>.
+    ///     The PowerShell middleware options. Defaults to <see cref="ShellMiddlewareOptions.Default"/>.
     /// </param>
-    public PowerShellMiddleware(PowerShellMiddlewareOptions? options = null)
+    public PowerShellMiddleware(ShellMiddlewareOptions? options = null)
     {
-        _options = options ?? PowerShellMiddlewareOptions.Default;
+        _options = options ?? ShellMiddlewareOptions.Default;
     }
 
     /// <inheritdoc />
