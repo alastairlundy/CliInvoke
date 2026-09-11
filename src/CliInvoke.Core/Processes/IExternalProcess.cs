@@ -118,18 +118,7 @@ public interface IExternalProcess : IDisposable
         long? maxStandardErrorBytes = null);
 
     /// <summary>
+    ///     Terminates the associated external process.
     /// </summary>
-    /// <param name="cancellationToken">
-    ///     A cancellation token that can be used by other objects or threads
-    ///     to receive notice of cancellation.
-    /// </param>
-    /// <returns></returns>
-    /// <summary>
-    ///     Terminates the associated external process based on the specified exit configuration.
-    /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown when an invalid value is provided for
-    ///     ExitConfiguration, TimeoutPolicy, or CancellationMode.
-    /// </exception>
     Task Kill();
 }

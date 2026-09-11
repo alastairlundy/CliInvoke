@@ -23,9 +23,6 @@ public static class ProcessResultHelperExtensions
         /// <summary>
         /// Throws an exception if the process result is determined to be unsuccessful based on the given validator.
         /// </summary>
-        /// <typeparam name="TProcessResult">
-        /// The type of the process result being validated. Must inherit from the <see cref="ProcessResult"/> class.
-        /// </typeparam>
         /// <param name="validator">
         /// A validator that performs validation rules on the process result to determine its success or failure.
         /// </param>

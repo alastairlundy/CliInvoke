@@ -12,7 +12,6 @@ using CliInvoke.Core.Internal;
 namespace CliInvoke.Specializations.Middleware;
 
 [UnsupportedOSPlatform("browser")]
-[UnsupportedOSPlatform("android")]
 [UnsupportedOSPlatform("ios")]
 [UnsupportedOSPlatform("tvos")]
 [UnsupportedOSPlatform("watchos")]
