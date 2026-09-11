@@ -357,7 +357,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
             spec.SetMaxWorkingSet(processResourcePolicy.MaxWorkingSet);
 
             spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity ??
-                                      (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+                                      (nint)ProcessResourcePolicy.Default.ProcessorAffinity!);
         });
     }
 

@@ -33,10 +33,6 @@ public static class CommonValidationRules<TProcessResult>
     /// <summary>
     ///     A predefined validation rule that ensures the process result's exit code is zero.
     /// </summary>
-    /// <typeparam name="TProcessResult">
-    ///     The type of the process result being validated, constrained to derive from
-    ///     <see cref="ProcessResult" />.
-    /// </typeparam>
     /// <returns>
     ///     A function that evaluates to true if the exit code of the process result equals zero;
     ///     otherwise, false.

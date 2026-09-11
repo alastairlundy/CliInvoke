@@ -44,9 +44,11 @@ public interface IProcessConfigurationBuilder
     ///     Sets a pre-tokenised argument list. When non-empty, the control adapter emits these via
     ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the single
     ///     <see cref="ProcessConfiguration.Arguments"/> string, so the operating-system command-line
-    ///     parser passes each entry to the child process unmodified. This is the safe path for
-    ///     shell wrappers (PowerShell / cmd), whose own parser would otherwise re-interpret a single
-    ///     re-tokenised <see cref="ProcessConfiguration.Arguments"/> string — a command-injection vector.
+    ///     parser passes each entry to the child process unmodified. <b>If both
+    ///     <see cref="ProcessConfiguration.Arguments"/> and the argument list are set, the argument
+    ///     list takes precedence.</b> This is the safe path for shell wrappers (PowerShell / cmd),
+    ///     whose own parser would otherwise re-interpret a single re-tokenised
+    ///     <see cref="ProcessConfiguration.Arguments"/> string — a command-injection vector.
     /// </summary>
     /// <param name="argumentList">The pre-tokenised argument list.</param>
     /// <returns>The new IProcessConfigurationBuilder with the updated argument list.</returns>

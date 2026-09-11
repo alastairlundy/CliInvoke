@@ -146,7 +146,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                     .EnablePriorityBoost);
 
                 resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity ??
-                                                  (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+                                                  (nint)ProcessResourcePolicy.Default.ProcessorAffinity!);
             })
             .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)

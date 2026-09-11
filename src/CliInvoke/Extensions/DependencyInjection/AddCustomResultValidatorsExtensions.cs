@@ -23,7 +23,7 @@ namespace CliInvoke.Extensions;
 ///         is added.
 ///     </para>
 ///     <para>
-///         Each call removes any existing validator for <typeparamref name="TProcessResult"/>
+///     Each call removes any existing validator for the given process result type
 ///         via <c>RemoveAll</c> and then adds the new registration with <c>Add</c>, so the
 ///         last registration wins. Calling these methods after the service provider has been
 ///         built is not supported.
