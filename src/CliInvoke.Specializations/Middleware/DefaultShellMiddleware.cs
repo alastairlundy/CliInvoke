@@ -48,7 +48,7 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
 
         bool isCmd =
             shell.TargetFilePath.Name.Equals("cmd.exe", StringComparison.OrdinalIgnoreCase);
-        bool isPowerShell = shell.TargetFilePath.Name.TrimEnd(".exe")
+        bool isPowerShell = Path.GetFileNameWithoutExtension(shell.TargetFilePath.Name)
             .Equals("pwsh", StringComparison.OrdinalIgnoreCase);
         
         if (isCmd)
@@ -107,6 +107,7 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
             StandardErrorEncoding =  src.StandardErrorEncoding,
             StandardInputEncoding =  src.StandardInputEncoding,
             StandardOutputEncoding =  src.StandardOutputEncoding,
+            ResourcePolicy = src.ResourcePolicy,
             EnvironmentVariables = new Dictionary<string, string>(src.EnvironmentVariables),
             RequiresAdministrator = src.RequiresAdministrator,
             WindowCreation = _options.WindowCreation,

@@ -103,6 +103,13 @@ public static class DependencyInjectionExtensions
                 lifetime));
 
             services.TryAdd(ServiceDescriptor.Describe(
+                typeof(PowerShellMiddleware),
+                sp => new DefaultShellMiddleware(
+                    sp.GetRequiredService<IShellDetector>(),
+                    sp.GetService<ShellMiddlewareOptions>()),
+                lifetime));
+            
+            services.TryAdd(ServiceDescriptor.Describe(
                 typeof(CmdMiddleware),
                 _ => new CmdMiddleware(),
                 lifetime));

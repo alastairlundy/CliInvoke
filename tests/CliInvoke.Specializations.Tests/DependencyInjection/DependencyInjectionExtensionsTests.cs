@@ -58,7 +58,7 @@ public class DependencyInjectionExtensionsTests
         };
 
         IServiceCollection services = new ServiceCollection();
-        services.AddSingleton<ShellMiddlewareOptions>(customOptions);
+        services.AddSingleton(customOptions);
         services.AddCliInvokeSpecializations();
         services.AddCliInvoke(builder => builder.UsePowerShell());
         using ServiceProvider provider = services.BuildServiceProvider();
