@@ -6,9 +6,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
-using CliInvoke;
-using CliInvoke.Core.Processes;
-using CliInvoke.Tests.Internal.Helpers;
 
 namespace CliInvoke.Tests.Builders;
 

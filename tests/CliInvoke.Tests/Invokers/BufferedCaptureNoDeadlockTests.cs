@@ -8,10 +8,6 @@
 */
 
 using System.Runtime.InteropServices;
-
-using CliInvoke;
-using CliInvoke.Core;
-using CliInvoke.Core.Processes;
 using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware;
 using Microsoft.Extensions.DependencyInjection;

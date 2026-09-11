@@ -1,5 +1,4 @@
 using System;
-using CliInvoke;
 using CliInvoke.Builders;
 using CliInvoke.Core;
 using CliInvoke.Extensions;

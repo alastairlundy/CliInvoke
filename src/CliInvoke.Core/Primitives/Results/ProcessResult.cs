@@ -13,9 +13,7 @@
      See THIRD_PARTY_NOTICES.txt for a full copy of the MIT LICENSE.
  */
 
-using System;
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 
 namespace CliInvoke.Core;
 

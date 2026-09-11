@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using CliInvoke.Core.Middleware;
-using CliInvoke.Core.Validation;
 using CliInvoke.Extensions.Middleware.Retry;
 using FsCheck;
 using FsCheck.Fluent;

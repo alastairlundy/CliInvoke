@@ -8,8 +8,6 @@
 */
 
 using System.Runtime.InteropServices;
-using System.Text;
-
 using CliInvoke.Processes;
 
 namespace CliInvoke.Tests.Processes;

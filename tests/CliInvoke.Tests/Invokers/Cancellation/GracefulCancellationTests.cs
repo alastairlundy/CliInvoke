@@ -1,9 +1,6 @@
-using CliInvoke;
-using CliInvoke.Core;
 using CliInvoke.Factories;
 using CliInvoke.Processes;
 using CliInvoke.Processes.Internal;
-using CliInvoke.Tests.Internal.Helpers;
 
 namespace CliInvoke.Tests.Invokers.Cancellation;
 

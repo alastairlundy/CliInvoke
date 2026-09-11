@@ -8,10 +8,7 @@
  */
 
 using System.Collections.Generic;
-using System.Globalization;
-
 using CliInvoke.Core.Configuration;
-using CliInvoke.Tests.Helpers;
 
 namespace CliInvoke.Tests.Configuration;
 

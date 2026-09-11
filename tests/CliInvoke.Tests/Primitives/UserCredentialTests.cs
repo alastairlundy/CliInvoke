@@ -8,10 +8,7 @@
  */
 
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Versioning;
 using System.Security;
-
-using CliInvoke.Core;
 
 namespace CliInvoke.Tests.Primitives;
 

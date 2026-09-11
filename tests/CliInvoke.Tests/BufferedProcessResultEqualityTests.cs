@@ -8,7 +8,6 @@
 */
 
 using System.Collections.Generic;
-using CliInvoke.Core;
 
 namespace CliInvoke.Tests;
 

@@ -7,11 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Versioning;
-
-using CliInvoke.Core;
 using CliInvoke.Core.Configuration;
 
 namespace CliInvoke.Tests.Configuration;

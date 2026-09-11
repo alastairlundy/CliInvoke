@@ -7,14 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Threading.Tasks;
-
-using CliInvoke;
-using CliInvoke.Builders;
-using CliInvoke.Core;
 using CliInvoke.Core.Extensibility;
 using CliInvoke.Extensibility;
 using CliInvoke.Factories;

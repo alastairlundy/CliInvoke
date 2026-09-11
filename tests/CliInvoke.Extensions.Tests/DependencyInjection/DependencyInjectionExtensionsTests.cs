@@ -8,15 +8,9 @@
 */
 
 using System.Runtime.InteropServices;
-using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
-using CliInvoke.Extensions;
-using CliInvoke.Extensions.Middleware;
-using CliInvoke.Extensions.Middleware.Validation;
-using CliInvoke.Factories;
+using CliInvoke.Specializations;
 using CliInvoke.Specializations.Middleware;
-using CliInvoke.Validation;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Extensions.Tests.DependencyInjection;
 

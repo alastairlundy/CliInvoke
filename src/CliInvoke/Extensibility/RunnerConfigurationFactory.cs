@@ -9,9 +9,6 @@
 
 #pragma warning disable CA1416
 
-using System.Collections.Generic;
-using System.Linq;
-
 using CliInvoke.Builders;
 using CliInvoke.Core.Internal;
 

@@ -7,10 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Core;
 using CliInvoke.Extensions.Caching;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CliInvoke.Extensions.Tests.Caching;

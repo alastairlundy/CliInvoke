@@ -1,7 +1,5 @@
 using System;
 using System.CommandLine;
-using System.CommandLine.Parsing;
-using System.Threading;
 using System.Threading.Tasks;
 using CliInvoke.Benchmarking.MockDataSimTool.Commands;
 

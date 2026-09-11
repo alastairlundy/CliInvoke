@@ -1,6 +1,3 @@
-using CliInvoke.Core;
-using FsCheck;
-
 namespace CliInvoke.Tests.Primitives;
 
 /// <summary>

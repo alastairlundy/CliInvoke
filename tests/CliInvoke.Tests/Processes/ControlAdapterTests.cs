@@ -1,6 +1,4 @@
 using System.Runtime.Versioning;
-
-using CliInvoke.Core;
 using CliInvoke.Processes.Internal.ControlAdapters;
 
 namespace CliInvoke.Tests.Processes;

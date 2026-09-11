@@ -7,12 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Collections.Generic;
 using CliInvoke.Core.Factories;
-using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Processes;
 using CliInvoke.Extensions.Middleware.Retry;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Extensions.Tests.Middleware.Retry;
 

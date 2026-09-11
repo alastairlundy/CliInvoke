@@ -12,7 +12,6 @@
 // ReSharper disable UnusedMember.Global
 
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace CliInvoke.Specializations.Configurations;
 

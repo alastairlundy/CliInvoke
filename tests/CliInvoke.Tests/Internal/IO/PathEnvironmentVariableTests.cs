@@ -9,7 +9,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using CliInvoke.Internal.IO;
 
 namespace CliInvoke.Tests.Internal.IO;

@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using CliInvoke;
 using CliInvoke.Core;
 using CliInvoke.Extensions;
 using Microsoft.Extensions.DependencyInjection;

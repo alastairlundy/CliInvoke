@@ -1,8 +1,6 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using CliInvoke.Processes.Internal;
-using CliInvoke.Tests.Internal.Constants;
 
 namespace CliInvoke.Tests.Internal.Helpers;
 

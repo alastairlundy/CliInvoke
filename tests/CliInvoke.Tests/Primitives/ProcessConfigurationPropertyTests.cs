@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-
-using CliInvoke.Core.Configuration;
 using FsCheck;
 using FsCheck.Fluent;
 

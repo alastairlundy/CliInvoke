@@ -11,13 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
-using CliInvoke.Core;
-using CliInvoke.Core.Factories;
-using CliInvoke.Core.Middleware;
-using CliInvoke.Factories;
-using CliInvoke.Specializations;
 using CliInvoke.Specializations.Middleware;
-using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Specializations.Tests.Middleware;
 
