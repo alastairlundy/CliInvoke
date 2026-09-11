@@ -86,6 +86,65 @@ public static class ShellArgumentEscaper
     }
 
     /// <summary>
+    ///     Escapes a value so it is treated as literal data inside a POSIX shell
+    ///     <c>-c</c> string. Prevents variable expansion (<c>$var</c>),
+    ///     command substitution (<c>`...`</c>), globbing (<c>*</c>, <c>?</c>,
+    ///     <c>[...]</c>), redirection (<c>&lt;</c>, <c>&gt;</c>),
+    ///     command chaining (<c>;</c>, <c>&amp;</c>, <c>|</c>), and quoting breaks.
+    /// </summary>
+    /// <param name="value">The raw argument value to escape.</param>
+    /// <returns>The escaped value, safe to embed in a POSIX shell command.</returns>
+    public static string EscapeForPosixShell(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return value ?? string.Empty;
+
+        StringBuilder builder = new(value.Length + 16);
+
+        foreach (char c in value)
+        {
+            switch (c)
+            {
+                // POSIX shell escape character is the backslash.
+                case '\\':
+                case '$':
+                case '`':
+                case '"':
+                case '\'':
+                case '!':
+                case '&':
+                case '|':
+                case ';':
+                case '(':
+                case ')':
+                case '<':
+                case '>':
+                case '{':
+                case '}':
+                case '[':
+                case ']':
+                case '~':
+                case '#':
+                case '*':
+                case '?':
+                    builder.Append('\\').Append(c);
+                    break;
+                case '\n':
+                    // A bare newline would terminate the shell command; drop it.
+                    break;
+                case '\r':
+                    // Drop bare carriage returns.
+                    break;
+                default:
+                    builder.Append(c);
+                    break;
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>
     ///     Escapes a value so it is treated as literal data on the
     ///     <c>cmd.exe /c</c> command line. Prevents command chaining
     ///     (<c>&amp;</c>, <c>|</c>), redirection (<c>&lt;</c>, <c>&gt;</c>),
