@@ -81,7 +81,7 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
             : $"& \"{safePath}\" {safeArgs}";
 
         // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
-        // re-tokenize it before PowerShell parses it. A single re-tokenized Arguments string
+        // re-tokenise it before PowerShell parses it. A single re-tokenised Arguments string
         // would let a '"' in the value break the OS-level quoting and let PowerShell reassemble
         // a second command (command-injection). ArgumentList is passed through unchanged.
         IReadOnlyList<string> argumentList =
@@ -92,17 +92,17 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
             wrappedCommand,
         ];
 
-        // The specialization configuration class is the single source of truth for the
+        // The specialisation configuration class is the single source of truth for the
         // pwsh target path and shell flags; this middleware just supplies the wrapped command and
         // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration newConfig = new PowershellProcessConfiguration(
             string.Empty,
             src.RedirectStandardInput,
-            outputRedirection: context.Mode != InvocationMode.Raw,
+            context.Mode != InvocationMode.Raw,
             workingDirectoryPath: src.WorkingDirectoryPath,
             requiresAdministrator: src.RequiresAdministrator,
-            environmentVariables: new Dictionary<string, string>(src.EnvironmentVariables),
+            new Dictionary<string, string>(src.EnvironmentVariables),
             credentials: src.Credential,
             standardInput: src.StandardInput,
             standardInputEncoding: src.StandardInputEncoding,

@@ -87,7 +87,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
             EnvironmentVariables = environmentVariables;
 
         if (argumentList is not null)
-            ArgumentList = argumentList.ToArray();
+            ArgumentList = [.. argumentList];
 
         // The base TargetFilePath (required, init-only) is the single source of truth for
         // the resolved cmd.exe path; the constructor resolves the system cmd.exe location.

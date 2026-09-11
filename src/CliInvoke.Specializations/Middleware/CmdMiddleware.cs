@@ -64,7 +64,7 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             : $"\"{safePath}\" {safeArgs}";
 
         // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
-        // re-tokenize it before cmd.exe parses it. A single re-tokenized Arguments string
+        // re-tokenise it before cmd.exe parses it. A single re-tokenised Arguments string
         // (the historical implementation) let a '"' in the value break the OS-level quoting and
         // inject additional cmd commands (command-injection). ArgumentList is passed through unchanged.
         IReadOnlyList<string> argumentList = ["/c", wrappedCommand];
