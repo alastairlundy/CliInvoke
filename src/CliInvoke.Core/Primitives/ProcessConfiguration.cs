@@ -98,13 +98,22 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <summary>
     ///     The arguments to be provided to the executable to be run.
     /// </summary>
+    /// <remarks>
+    ///     When <see cref="ArgumentList"/> is non-empty, the control adapter ignores this
+    ///     property and emits <see cref="ArgumentList"/> via
+    ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead. This
+    ///     prevents the double-parse command-injection vector where a re-tokenised
+    ///     <c>Arguments</c> string is re-interpreted by a wrapped shell.
+    /// </remarks>
     public string Arguments { get; init; } = string.Empty;
 
     /// <summary>
     ///     An optional verbatim argument list. When non-empty, the control adapter emits these via
     ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the single
     ///     <see cref="Arguments"/> string, so the operating-system command-line parser passes each
-    ///     entry to the child process unmodified. This is the safe path for shell wrappers
+    ///     entry to the child process unmodified. <b>If both <see cref="Arguments"/> and
+    ///     <see cref="ArgumentList"/> are set, <see cref="ArgumentList"/> takes precedence and
+    ///     <see cref="Arguments"/> is ignored.</b> This is the safe path for shell wrappers
     ///     (PowerShell/cmd), whose own parser would otherwise re-interpret a single re-tokenized
     ///     <see cref="Arguments"/> string — a command-injection vector.
     /// </summary>

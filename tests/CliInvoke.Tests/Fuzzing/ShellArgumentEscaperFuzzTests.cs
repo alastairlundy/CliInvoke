@@ -25,6 +25,68 @@ public class ShellArgumentEscaperFuzzTests
     private static readonly char[] CmdMetacharacters =
         ['^', '&', '|', '<', '>', '%'];
 
+    private static readonly char[] PosixShellMetacharacters =
+        ['\\', '$', '`', '"', '\'', '!', '&', '|', ';', '(', ')',
+         '<', '>', '{', '}', '[', ']', '~', '#', '*', '?'];
+
+    [Test]
+    public void EscapeForPosixShell_NullOrEmpty_ReturnsEmpty()
+    {
+        Prop.ForAll<string?>(value =>
+                {
+                    if (value is not null and { Length: > 0 })
+                        return true;
+
+                    string result = ShellArgumentEscaper.EscapeForPosixShell(value);
+                    return result == string.Empty;
+                })
+            .QuickCheckThrowOnFailure();
+    }
+
+    [Test]
+    public void EscapeForPosixShell_OutputContainsNoUnescapedMetacharacters()
+    {
+        Prop.ForAll<string>(value =>
+            {
+                if (string.IsNullOrEmpty(value) || value.Contains('\n') || value.Contains('\r'))
+                    return true;
+
+                string escaped = ShellArgumentEscaper.EscapeForPosixShell(value);
+
+                // Build expected output character-by-character, mirroring the escaper logic
+                var expected = new System.Text.StringBuilder(value.Length + 16);
+                foreach (char c in value)
+                {
+                    if (Array.IndexOf(PosixShellMetacharacters, c) >= 0)
+                    {
+                        expected.Append('\\').Append(c);
+                    }
+                    else
+                    {
+                        expected.Append(c);
+                    }
+                }
+
+                return escaped == expected.ToString();
+            })
+            .QuickCheckThrowOnFailure();
+    }
+
+    [Test]
+    public void EscapeForPosixShell_NonSpecialCharactersPassThroughUnchanged()
+    {
+        Prop.ForAll<string>(value =>
+            {
+                if (string.IsNullOrEmpty(value) ||
+                    Enumerable.Any(value, c => char.IsControl(c) || Array.IndexOf(PosixShellMetacharacters, c) >= 0))
+                    return true;
+
+                string escaped = ShellArgumentEscaper.EscapeForPosixShell(value);
+                return escaped == value;
+            })
+            .QuickCheckThrowOnFailure();
+    }
+
     [Test]
     public void EscapeForPowerShell_NullOrEmpty_ReturnsEmpty()
     {

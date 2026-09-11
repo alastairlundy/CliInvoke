@@ -50,6 +50,38 @@ public class DependencyInjectionExtensionsTests
     }
 
     [Test]
+    public async Task AddCliInvokeSpecializations_WithUseDefaultShell_ResolvesConfiguredInvoker()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
+        services.AddCliInvoke(builder => builder.UseDefaultShell());
+        using ServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
+        DefaultShellMiddleware? middleware = scope.ServiceProvider.GetService<DefaultShellMiddleware>();
+
+        await Assert.That(invoker).IsNotNull();
+        await Assert.That(middleware).IsNotNull();
+    }
+
+    [Test]
+    public async Task AddCliInvokeSpecializations_SingletonLifetime_ResolvesDefaultShellMiddlewareFromRootProvider()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvoke(ServiceLifetime.Singleton);
+        services.AddCliInvokeSpecializations(ServiceLifetime.Singleton);
+        using ServiceProvider provider = services.BuildServiceProvider(
+            new ServiceProviderOptions { ValidateScopes = true });
+
+        // The Scoped default would fail this resolution with scope validation enabled;
+        // Singleton registrations resolve from the root (non-scoped) provider.
+        DefaultShellMiddleware? middleware = provider.GetService<DefaultShellMiddleware>();
+
+        await Assert.That(middleware).IsNotNull();
+    }
+
+    [Test]
     public async Task AddCliInvokeSpecializations_ConsumerRegisteredOptions_WinsOverDefault()
     {
         ShellMiddlewareOptions customOptions = new ShellMiddlewareOptions

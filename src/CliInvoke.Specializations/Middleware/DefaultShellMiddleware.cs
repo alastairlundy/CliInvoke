@@ -11,6 +11,9 @@ using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Specializations.Middleware;
 
+/// <summary>
+/// 
+/// </summary>
 [UnsupportedOSPlatform("browser")]
 [UnsupportedOSPlatform("ios")]
 [UnsupportedOSPlatform("tvos")]
@@ -20,12 +23,23 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
     private readonly IShellDetector _shellDetector;
     private readonly ShellMiddlewareOptions _options;
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="shellDetector"></param>
+    /// <param name="options"></param>
     public DefaultShellMiddleware(IShellDetector shellDetector, ShellMiddlewareOptions? options = null)
     {
         _shellDetector = shellDetector;
         _options = options ?? ShellMiddlewareOptions.Default;
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="next"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     public async Task InvokeAsync(InvocationContext context, Func<InvocationContext, Task> next)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -38,18 +52,20 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
         string originalPath = context.Configuration.TargetFilePath;
         string originalArgs = context.Configuration.Arguments;
 
+        string shellName = Path.GetFileNameWithoutExtension(shell.TargetFilePath.Name);
+
+        bool isCmd = shellName.Equals("cmd", StringComparison.OrdinalIgnoreCase);
+        bool isPowerShell =
+            shellName.Equals("pwsh", StringComparison.OrdinalIgnoreCase) ||
+            shellName.Equals("powershell", StringComparison.OrdinalIgnoreCase);
+
         // Escape both the target and the arguments so they are passed to the
         // wrapped command as literal data. Without this, shell metacharacters in
         // the arguments (e.g. ';', '|', '&', '$(...)') would be re-interpreted by
-        // PowerShell as additional commands — a command-injection risk.
+        // the shell as additional commands — a command-injection risk.
         string safePath;
         string safeArgs;
 
-        bool isCmd =
-            shell.TargetFilePath.Name.Equals("cmd.exe", StringComparison.OrdinalIgnoreCase);
-        bool isPowerShell = Path.GetFileNameWithoutExtension(shell.TargetFilePath.Name)
-            .Equals("pwsh", StringComparison.OrdinalIgnoreCase);
-        
         if (isCmd)
         {
             safePath = ShellArgumentEscaper.EscapeForCmd(originalPath);
@@ -62,43 +78,59 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
         }
         else
         {
-            safePath = ShellArgumentEscaper.EscapeForPowerShell(originalPath);
-            safeArgs = ShellArgumentEscaper.EscapeForPowerShell(originalArgs);
+            safePath = ShellArgumentEscaper.EscapeForPosixShell(originalPath);
+            safeArgs = ShellArgumentEscaper.EscapeForPosixShell(originalArgs);
         }
-        
-        string wrappedCommand = string.IsNullOrWhiteSpace(safeArgs)
-            ? $"& \"{safePath}\""
-            : $"& \"{safePath}\" {safeArgs}";
 
-        // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
-        // re-tokenise it before PowerShell parses it. A single re-tokenised Arguments string
-        // would let a '"' in the value break the OS-level quoting and let PowerShell reassemble
-        // a second command (command-injection). ArgumentList is passed through unchanged.
+        string innerCommand;
         IReadOnlyList<string> argumentList;
 
         if (isPowerShell)
         {
+            // PowerShell uses the & call operator to invoke the command.
+            innerCommand = string.IsNullOrWhiteSpace(safeArgs)
+                ? $"& \"{safePath}\""
+                : $"& \"{safePath}\" {safeArgs}";
+
+            // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
+            // re-tokenise it before PowerShell parses it. A single re-tokenised Arguments string
+            // would let a '"' in the value break the OS-level quoting and let PowerShell reassemble
+            // a second command (command-injection). ArgumentList is passed through unchanged.
             argumentList = [
                 "-NoProfile",
                 "-NonInteractive",
                 "-Command",
-                wrappedCommand,
+                innerCommand,
+            ];
+        }
+        else if (isCmd)
+        {
+            innerCommand = string.IsNullOrWhiteSpace(safeArgs)
+                ? $"\"{safePath}\""
+                : $"\"{safePath}\" {safeArgs}";
+
+            argumentList = [
+                "/c",
+                innerCommand,
             ];
         }
         else
         {
+            // POSIX shells use -c to execute a command string.
+            innerCommand = string.IsNullOrWhiteSpace(safeArgs)
+                ? $"\"{safePath}\""
+                : $"\"{safePath}\" {safeArgs}";
+
             argumentList = [
-                wrappedCommand,
+                "-c",
+                innerCommand,
             ];
         }
 
-        // The specialisation configuration class is the single source of truth for the
-        // pwsh target path and shell flags; this middleware just supplies the wrapped command and
-        // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration newConfig = new()
         {
-            TargetFilePath = string.Empty,
+            TargetFilePath = shell.TargetFilePath.FullName,
             RedirectStandardInput = src.RedirectStandardInput,
             OutputRedirection = context.Mode != InvocationMode.Raw,
             WorkingDirectoryPath = src.WorkingDirectoryPath,

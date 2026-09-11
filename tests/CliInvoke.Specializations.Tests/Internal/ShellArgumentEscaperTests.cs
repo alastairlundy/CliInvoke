@@ -53,11 +53,41 @@ public class ShellArgumentEscaperTests
     }
 
     [Test]
+    public async Task EscapeForPosixShell_NeutralisesCommandSeparators()
+    {
+        string escaped = ShellArgumentEscaper.EscapeForPosixShell("echo hi ; Get-Process");
+        await Assert.That(escaped).IsEqualTo("echo hi \\; Get-Process");
+    }
+
+    [Test]
+    public async Task EscapeForPosixShell_NeutralisesVariableExpansion()
+    {
+        string escaped = ShellArgumentEscaper.EscapeForPosixShell("$(Get-Content secret.txt)");
+        await Assert.That(escaped).IsEqualTo("\\$\\(Get-Content secret.txt\\)");
+    }
+
+    [Test]
+    public async Task EscapeForPosixShell_NeutralisesPipesAndAmpersand()
+    {
+        string escaped = ShellArgumentEscaper.EscapeForPosixShell("a | b & c");
+        await Assert.That(escaped).IsEqualTo("a \\| b \\& c");
+    }
+
+    [Test]
+    public async Task EscapeForPosixShell_NeutralisesGlobbing()
+    {
+        string escaped = ShellArgumentEscaper.EscapeForPosixShell("*.txt");
+        await Assert.That(escaped).IsEqualTo("\\*.txt");
+    }
+
+    [Test]
     public async Task Escape_PreservesPlainArguments()
     {
         await Assert.That(ShellArgumentEscaper.EscapeForPowerShell("--version"))
             .IsEqualTo("--version");
         await Assert.That(ShellArgumentEscaper.EscapeForCmd("--version"))
+            .IsEqualTo("--version");
+        await Assert.That(ShellArgumentEscaper.EscapeForPosixShell("--version"))
             .IsEqualTo("--version");
     }
 }

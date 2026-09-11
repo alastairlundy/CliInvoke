@@ -22,11 +22,12 @@ public static class DependencyInjectionExtensions
     {
         /// <summary>
         ///     Registers the CliInvoke Specializations middleware types
-        ///     (<see cref="PowerShellMiddleware"/>, <see cref="CmdMiddleware"/>) and their options POCO
+        ///     (<see cref="PowerShellMiddleware"/>, <see cref="CmdMiddleware"/>,
+        ///     <see cref="DefaultShellMiddleware"/>) and their options POCO
         ///     in the service collection so the type-based
         ///     <see cref="IProcessMiddlewareBuilder.UseMiddleware{T}"/> overload (used by the convenience
-        ///     extensions <c>UsePowerShell()</c> and <c>UseCmd()</c>) can resolve them from the
-        ///     dependency injection container.
+        ///     extensions <c>UsePowerShell()</c>, <c>UseCmd()</c>, and <c>UseDefaultShell()</c>) can
+        ///     resolve them from the dependency injection container.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -80,9 +81,11 @@ public static class DependencyInjectionExtensions
         ///     All registrations use <see cref="ServiceCollectionDescriptorExtensions.TryAdd(IServiceCollection, ServiceDescriptor)"/>
         ///     so that a consumer-supplied registration for any of these types takes precedence. The
         ///     middleware lifetimes match the invoker lifetime to avoid capturing scoped services into a
-        ///     singleton. <see cref="PowerShellMiddleware"/> falls back to
-        ///     <see cref="ShellMiddlewareOptions.Default"/> when no
+        ///     singleton. <see cref="PowerShellMiddleware"/> and <see cref="DefaultShellMiddleware"/> fall
+        ///     back to <see cref="ShellMiddlewareOptions.Default"/> when no
         ///     <see cref="ShellMiddlewareOptions"/> is registered.
+        ///     <see cref="DefaultShellMiddleware"/> additionally requires
+        ///     <see cref="IShellDetector"/>, registered by <c>AddCliInvoke</c>.
         /// </remarks>
         /// <param name="lifetime">The service lifetime to register the middleware with.</param>
         private void RegisterPlatformMiddleware(ServiceLifetime lifetime)
@@ -103,7 +106,7 @@ public static class DependencyInjectionExtensions
                 lifetime));
 
             services.TryAdd(ServiceDescriptor.Describe(
-                typeof(PowerShellMiddleware),
+                typeof(DefaultShellMiddleware),
                 sp => new DefaultShellMiddleware(
                     sp.GetRequiredService<IShellDetector>(),
                     sp.GetService<ShellMiddlewareOptions>()),

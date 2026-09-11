@@ -74,10 +74,19 @@ public static class PlatformMiddlewareExtensions
         }
 
         /// <summary>
-        /// 
+        ///     Adds <see cref="DefaultShellMiddleware"/> to the process invocation pipeline, wrapping
+        ///     the original command in the detected default shell (pwsh, Windows PowerShell, or cmd).
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <remarks>
+        ///     Requires <see cref="IShellDetector"/> to be registered (via <c>AddCliInvoke</c>) and
+        ///     <see cref="ShellMiddlewareOptions"/> (registered by <c>AddCliInvokeSpecializations</c>).
+        ///     Detected shells other than pwsh, powershell, and cmd throw
+        ///     <see cref="PlatformNotSupportedException"/> at invocation time.
+        /// </remarks>
+        /// <returns>The builder for fluent chaining.</returns>
+        /// <exception cref="ArgumentNullException">
+        ///     Thrown when <paramref name="builder"/> is <c>null</c>.
+        /// </exception>
         [UnsupportedOSPlatform("browser")]
         [UnsupportedOSPlatform("ios")]
         [UnsupportedOSPlatform("tvos")]
