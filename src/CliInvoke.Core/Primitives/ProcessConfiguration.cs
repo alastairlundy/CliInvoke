@@ -79,7 +79,6 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
         init
         {
             ArgumentException.ThrowIfNullOrEmpty(value);
-            
             field = value;
         }
     }
@@ -134,7 +133,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     public IReadOnlyList<string> ArgumentList
     {
         get;
-        init => field = value is null ? [] : value.ToArray();
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            field = [.. value];
+        }
     } = [];
 
     /// <summary>
