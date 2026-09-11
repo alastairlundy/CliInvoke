@@ -72,5 +72,23 @@ public static class PlatformMiddlewareExtensions
 
             return builder;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [UnsupportedOSPlatform("browser")]
+        [UnsupportedOSPlatform("ios")]
+        [UnsupportedOSPlatform("tvos")]
+        [UnsupportedOSPlatform("watchos")]
+        public IProcessMiddlewareBuilder UseDefaultShell()
+        {
+            ArgumentNullException.ThrowIfNull(builder);
+
+            builder.UseMiddleware<DefaultShellMiddleware>();
+
+            return builder;
+        }
     }
 }
