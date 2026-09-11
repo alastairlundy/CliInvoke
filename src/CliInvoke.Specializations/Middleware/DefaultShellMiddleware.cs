@@ -107,6 +107,7 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
             StandardErrorEncoding =  src.StandardErrorEncoding,
             StandardInputEncoding =  src.StandardInputEncoding,
             StandardOutputEncoding =  src.StandardOutputEncoding,
+            StandardInput = src.StandardInput,
             ResourcePolicy = src.ResourcePolicy,
             EnvironmentVariables = new Dictionary<string, string>(src.EnvironmentVariables),
             RequiresAdministrator = src.RequiresAdministrator,
