@@ -455,7 +455,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
             ResourcePolicy = resourcePolicy,
             WindowCreation = _enableWindowCreation,
             UseShellExecution = _useShellExecution,
-            ArgumentList = _argumentList,
+            ArgumentList = _argumentList ?? [],
         };
 
         return configuration;

@@ -128,9 +128,14 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// </summary>
     /// <remarks>
     ///     Any supplied list is captured as a snapshot; later mutations made to the caller's
-    ///     original collection are not reflected in the configuration.
+    ///     original collection are not reflected in the configuration. A null list is
+    ///     normalised to an empty snapshot.
     /// </remarks>
-    public IReadOnlyList<string> ArgumentList { get; init; } = [];
+    public IReadOnlyList<string> ArgumentList
+    {
+        get;
+        init => field = value is null ? [] : value.ToArray();
+    } = [];
 
     /// <summary>
     ///     Whether to enable window creation or not when the Command's Process is run.

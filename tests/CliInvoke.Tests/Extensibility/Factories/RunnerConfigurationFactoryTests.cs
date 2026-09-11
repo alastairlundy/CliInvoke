@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using CliInvoke.Core.Extensibility;
@@ -123,10 +124,15 @@ public class RunnerConfigurationFactoryTests
         ProcessConfiguration target = BuildConfig(targetFilePath, targetArguments);
         ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
 
-        // Structural sanity: the factory must populate the read-only ArgumentList so the
-        // adapter emits via ProcessStartInfo.ArgumentList and not the single Arguments string.
-        bool structuralOk =
-            wrapped.ArgumentList.Count > 0;
+        // Structural sanity: the delivery shape must match the runner category.
+        // PowerShell runners deliver via the read-only ArgumentList so the adapter
+        // emits via ProcessStartInfo.ArgumentList and not the single Arguments string;
+        // cmd runners deliberately deliver via the cmd-escaped single string instead
+        // (cmd /c's parser does not match .NET's ArgumentList quoting).
+        bool runnerIsCmd = runner.TargetFilePath.IndexOf("cmd", StringComparison.OrdinalIgnoreCase) >= 0;
+        bool structuralOk = runnerIsCmd
+            ? wrapped.ArgumentList.Count == 0 && !string.IsNullOrEmpty(wrapped.Arguments)
+            : wrapped.ArgumentList.Count > 0;
 
         if (!structuralOk) return false;
 
@@ -389,6 +395,8 @@ public class RunnerConfigurationFactoryTests
     [SupportedOSPlatform("windows")]
     public async Task CmdRunner_QuoteAndAmpersand_DoesNotFireMarker()
     {
+        SkipTestIfNotWindows();
+
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
 
@@ -404,6 +412,8 @@ public class RunnerConfigurationFactoryTests
     [SupportedOSPlatform("windows")]
     public async Task CmdRunner_BareAmpersand_DoesNotFireMarker()
     {
+        SkipTestIfNotWindows();
+
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
 
@@ -419,6 +429,8 @@ public class RunnerConfigurationFactoryTests
     [SupportedOSPlatform("windows")]
     public async Task CmdRunner_DoubledQuoteAndAmpersand_DoesNotFireMarker()
     {
+        SkipTestIfNotWindows();
+
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
 
