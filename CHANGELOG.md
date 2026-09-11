@@ -82,11 +82,11 @@ Themes:
 - **`BufferedProcessResult` equality now includes `ProcessId`.** The
   `Equals` and `GetHashCode` overrides consider `ProcessId`, matching the base
   `ProcessResult` contract. Two results from the same command but different PIDs
-  now compare unequal — this is a stricter but correct contract.
+  now compare unequal. This is a stricter but correct contract.
 - **`UserCredential.GetHashCode` excludes `Password`.** The hash is computed
   from `Domain`, `UserName`, and `LoadUserProfile` only. `Password` still
   participates in `Equals` content comparison but never in the hash. Distinct
-  passwords with the same user/domain may collide — this is contract-legal and
+  passwords with the same user/domain may collide. This is contract-legal and
   documented. No `SecureString` unwrapping occurs in hash paths.
 - **Truncation `0`-cap is now a valid zero-byte cap.** Passing `0` as the
   `maxStandardOutputBytes` or `maxStandardErrorBytes` cap now produces empty text
@@ -102,7 +102,7 @@ Themes:
   `UnixProcessControlAdapter.RequireRunningAsAdmin` and
   `UnixProcessControlAdapter.SetUserCredential` (with a non-null credential) now
   throw `PlatformNotSupportedException` instead of silently no-oping. This makes
-  the cross-platform contract honest — callers on Unix who relied on the silent
+  the cross-platform contract honest. Callers on Unix who relied on the silent
   no-op must handle or guard the exception. Windows behaviour is unchanged.
 - **`Configuration` is init-only on `IExternalProcess` and `ExternalProcess`.**
 - **`TargetFilePath` is init-only** and the `ProcessWrapper` constructor adjusted
@@ -121,7 +121,7 @@ Themes:
 - `ArgumentsSpec` internals reworked.
 - `UseRetryPolicy` DI registration fixed to decorate the active (last) `IFilePathResolver` registration.
 - Default `IProcessResultValidator.ShouldRetry` inverted to `!Validate(result)`.
-- Retry delay clamped to `Task.Delay` maximum; negative `RetryOptions.BaseDelay` and `MaxAttempts` below 1 now rejected.
+- Negative `RetryOptions.BaseDelay` and `MaxAttempts` below 1 are now rejected.
 - Per-call allocations eliminated in result parsing and argument building.
 - LINQ usage removed from `ProcessConfiguration` to cut allocations.
 - Extension types relocated into `src/CliInvoke/Extensions` tree.
@@ -147,7 +147,6 @@ Themes:
 - Migration guides for 3.0.0 and v1-to-v2 refreshed.
 - Getting-started and architecture documentation refreshed.
 - Middleware, configuration, and troubleshooting guides updated.
-- CI guard enforces `ConfigureAwait(false)` on all await sites in `src`.
 - Release notes and README updated with all breaking changes and behaviour changes.
 - External-process config-seam migration document absorbed into `site/docs/migration-guides/3.0.0.md` §9; standalone file removed.
 - Removed stale `3.0.0-beta` / `pre-release` labels from README, AGENTS.md, comparison table, and Specializations README.
@@ -190,7 +189,7 @@ Themes:
 
 ### Fixed
 
-- Fixed `ProcessResult` equality asymmetry and audited the result subclasses (`BufferedProcessResult`, `PipedProcessResult`).
+- Fixed `ProcessResult` equality asymmetry and audited the result subclasses (`BufferedProcessResult`).
 - Fixed an issue with the `BufferedProcessResult.Equals` method.
 - Fixed `ExternalProcess` to resolve the file path at `Start`/`StartAsync` without mutating the provided `Configuration`.
 - Fixed `ExternalProcess.StartAsync(config, ct)` to dispose the old wrapper and reattach event handlers.
@@ -235,56 +234,53 @@ Themes:
 
 ### Fixed
 
-- Fixed an equality comparison bug in ``ProcessConfiguration`` ``Equals`` method
+- Fixed an equality comparison bug in the `ProcessConfiguration` `Equals` method
 - Fixed equality operators so that they handle null comparisons correctly
-- Fixed``ShellDetector`` shell version parsing for non bash based shells
-- Fixed potentially inaccurate shell detection in ``ShellDetector`` on Unix based operating systems
-- Fixed internal ``ProcessWrapper`` class throwing the wrong exception in some cases such as Access being denied or file not being found
-- Fixed ``ExternalProcess`` not catching expected exceptions on pipe reads after process exits
-- Fixed potetial issues of pipe reads hanging in ``ExternalProcess``
-- Fixed null-safety in ProcessExceptionInfo.Equals for its ``UserCredential`` object named ``Credential``.
-- Cleaned up ``PowershellProcessConfiguration`` executable lookup
+- Fixed `ShellDetector` shell version parsing for non bash based shells
+- Fixed potentially inaccurate shell detection in `ShellDetector` on Unix based operating systems
+- Fixed internal `ProcessWrapper` class throwing the wrong exception in some cases such as Access being denied or file not being found
+- Fixed `ExternalProcess` not catching expected exceptions on pipe reads after process exits
+- Fixed potential issues of pipe reads hanging in `ExternalProcess`
+- Fixed null-safety in ProcessExceptionInfo.Equals for its `UserCredential` object named `Credential`.
+- Cleaned up `PowershellProcessConfiguration` executable lookup
 
 ### Changed
 
 - Updated to use CliInvoke.Core 2.10.6 and CliInvoke 2.10.6
-- Updated ``Microsoft.Extensions.DependencyInjection.Abstractions`` from 10.0.11 to 10.0.12
+- Updated `Microsoft.Extensions.DependencyInjection.Abstractions` from 10.0.11 to 10.0.12
 
 ## [2.11.0] - 2026-09-02
 
 ### Changed
 
-- General Improvements
-- Updated to use CliInvoke.Core 2.11.0
-- Improved ``FilePathResolver`` path resolution performance
-- Improved ``ShellDetector`` detection performance
+- Improved `FilePathResolver` path resolution performance
+- Improved `ShellDetector` detection performance
 - Updated to use CliInvoke.Core 2.11.0 and CliInvoke 2.11.0
-- Updated to use CliInvoke.Core 2.11.0
 
 ### Deprecated
 
-- Deprecated ``PipedProcessResult`` ahead of removal in v3
+- Deprecated `PipedProcessResult` ahead of removal in v3
 - Deprecated some extensions for removal in v3
-- Deprecated ``PowershellProcessInvoker`` and ``CmdProcessInvoker`` ahead of removal in v3
+- Deprecated `PowershellProcessInvoker` and `CmdProcessInvoker` ahead of removal in v3
 
 ## [2.10.6] - 2026-09-10
 
 ### Fixed
 
-- Fixed an equality comparison bug in ``ProcessConfiguration`` ``Equals`` method
+- Fixed an equality comparison bug in the `ProcessConfiguration` `Equals` method
 - Fixed equality operators so that they handle null comparisons correctly
-- Fixed``ShellDetector`` shell version parsing for non bash based shells
-- Fixed potentially inaccurate shell detection in ``ShellDetector`` on Unix based operating systems
-- Fixed internal ``ProcessWrapper`` class throwing the wrong exception in some cases such as Access being denied or file not being found
-- Fixed ``ExternalProcess`` not catching expected exceptions on pipe reads after process exits
-- Fixed potetial issues of pipe reads hanging in ``ExternalProcess``
-- Fixed null-safety in ProcessExceptionInfo.Equals for its ``UserCredential`` object named ``Credential``.
-- Cleaned up ``PowershellProcessConfiguration`` executable lookup
+- Fixed `ShellDetector` shell version parsing for non bash based shells
+- Fixed potentially inaccurate shell detection in `ShellDetector` on Unix based operating systems
+- Fixed internal `ProcessWrapper` class throwing the wrong exception in some cases such as Access being denied or file not being found
+- Fixed `ExternalProcess` not catching expected exceptions on pipe reads after process exits
+- Fixed potential issues of pipe reads hanging in `ExternalProcess`
+- Fixed null-safety in ProcessExceptionInfo.Equals for its `UserCredential` object named `Credential`.
+- Cleaned up `PowershellProcessConfiguration` executable lookup
 
 ### Changed
 
 - Updated to use CliInvoke.Core 2.10.6 and CliInvoke 2.10.6
-- Updated ``Microsoft.Extensions.DependencyInjection.Abstractions`` from 10.0.11 to 10.0.12
+- Updated `Microsoft.Extensions.DependencyInjection.Abstractions` from 10.0.11 to 10.0.12
 
 ## [2.10.5] - 2026-08-30
 
@@ -294,32 +290,26 @@ Themes:
 
 ### Changed
 
-- Updated to use CliInvoke.Core 2.10.5
 - Updated to use CliInvoke.Core 2.10.5 and CliInvoke 2.10.5
-- Updated to use CliInvoke.Core 2.10.5
 
 ## [2.10.4] - 2026-08-26
 
 ### Changed
 
-- General Improvements
-- Updated to use CliInvoke.Core 2.10.4
-- Improved security when running processes creating using ``RunnerProcessFactory``
 - Updated to use CliInvoke.Core 2.10.4 and CliInvoke 2.10.4
-- Updated to use CliInvoke.Core 2.10.4
+- Improved security when running processes created using `RunnerProcessFactory`
 - Improved security when running processes via Specialization powered configurations and invokers.
 
 ## [2.10.3] - 2026-08-19
 
 ### Fixed
 
-- Fixed ``ProcessConfiguration.Equals`` to correctly compare ``RequiresAdministrator`` and ``WindowCreation`` properties instead of comparing ``ResourcePolicy`` twice, and added both properties to ``GetHashCode`` for consistency
-- Fixed ``RunnerProcessFactory.CreateRunnerConfiguration`` to chain ``RequireAdministratorPrivileges()`` on the existing builder instead of replacing it with a fresh one, preserving all accumulated configuration when admin privileges are required
+- Fixed `ProcessConfiguration.Equals` to correctly compare `RequiresAdministrator` and `WindowCreation` properties instead of comparing `ResourcePolicy` twice, and added both properties to `GetHashCode` for consistency
+- Fixed `RunnerProcessFactory.CreateRunnerConfiguration` to chain `RequireAdministratorPrivileges()` on the existing builder instead of replacing it with a fresh one, preserving all accumulated configuration when admin privileges are required
 
 ### Changed
 
 - Updated to use CliInvoke.Core 2.10.3 and CliInvoke 2.10.3
-- Updated to use CliInvoke.Core 2.10.3
 
 ## [2.10.2] - 2026-08-15
 
@@ -332,17 +322,15 @@ Themes:
 ### Changed
 
 - Updated Polyfill version from 11.0.1 to 11.2.0
-- Updated to use CliInvoke.Core 2.10.2
 - Updated DotExtensions from 10.5.0 to 10.5.1
 - Updated to use CliInvoke.Core 2.10.2 and CliInvoke 2.10.2
-- Updated to use CliInvoke.Core 2.10.2
 
 ## [2.10.1] - 2026-08-05
 
 ### Fixed
 
-- Fixed potential race conditions in ``ProcessWrapper``'s ``Start`` method for fast exiting processes.
-- Fixed an issue where ``WaitForExitAsync`` waiting for End Of File would block indefinitely on piped outputs
+- Fixed potential race conditions in `ProcessWrapper`'s `Start` method for fast exiting processes.
+- Fixed an issue where `WaitForExitAsync` waiting for End Of File would block indefinitely on piped outputs
 
 ### Changed
 
@@ -352,13 +340,12 @@ Themes:
 
 ### Added
 
-- Added a constructor overload that accepts ``IEnumerable<string>`` in ``ProcessConfiguration``.
+- Added a constructor overload that accepts `IEnumerable<string>` in `ProcessConfiguration`.
 
 ### Changed
 
-- Reduced code duplication in ``ProcessConfiguration`` constructors.
-- Improved formatting in ``ProcessConfiguration``.
-- Updated ``ProcessConfiguration``.
+- Reduced code duplication in `ProcessConfiguration` constructors.
+- Improved formatting in `ProcessConfiguration`.
 - Updated DotExtensions from 10.4.0 to 10.5.0.
 
 ## [2.9.4] - 2026-08-30
@@ -385,9 +372,7 @@ Themes:
 
 ### Changed
 
-- Updated to use CliInvoke.Core 2.9.3
 - Updated to use CliInvoke.Core 2.9.3 and CliInvoke 2.9.3
-- Updated to use CliInvoke.Core 2.9.3
 
 ## [2.9.2] - 2026-08-19
 
@@ -399,7 +384,6 @@ Themes:
 ### Changed
 
 - Updated to use CliInvoke.Core 2.9.2 and CliInvoke 2.9.2
-- Updated to use CliInvoke.Core 2.9.2
 
 ## [2.9.1] - 2026-08-15
 
@@ -412,10 +396,8 @@ Themes:
 ### Changed
 
 - Updated Polyfill version from 11.0.1 to 11.0.2
-- Updated to use CliInvoke.Core 2.9.1
 - Updated DotExtensions from 10.4.0 to 10.5.1
 - Updated to use CliInvoke.Core 2.9.1 and CliInvoke 2.9.1
-- Updated to use CliInvoke.Core 2.9.1
 
 ## [2.9.0] - 2026-07-19
 
@@ -452,120 +434,112 @@ Themes:
 
 ### Changed
 
-- Updated to use CliInvoke.Core 2.8.4
 - Updated to use CliInvoke.Core 2.8.4 and CliInvoke 2.8.4
-- Updated to use CliInvoke.Core 2.8.4
 
 ## [2.8.3] - 2026-06-30
 
 ### Fixed
 
-- Fixed ``ProcessTimeoutPolicy.Default`` so it uses the parameterless constructor (3 minutes) rather than being hardcoded to 30 minutes, aligning the static ``Default`` value with the documented default-constructor behavior.
-- Fixed ``ProcessResourcePolicy`` constructor throwing an exception if ProcessorAffinity was set to 1 or less (minimum supported value is 1 (0x0001))
-- Fixed an issue where the ``ProcessResourcePolicy`` constructor would not throw an Exception if ProcessorAffinity was set to a number greater than the 2x the ``Environment.ProcessorCount`` property
-- Changed ``UserCredential.LoadUserProfile`` to default to ``null`` instead of ``false``, so that the builder-produced ``UserCredential`` matches the configuration's actual default
+- Fixed `ProcessTimeoutPolicy.Default` so it uses the parameterless constructor (3 minutes) rather than being hardcoded to 30 minutes, aligning the static `Default` value with the documented default-constructor behavior.
+- Fixed `ProcessResourcePolicy` constructor throwing an exception if ProcessorAffinity was set to 1 or less (minimum supported value is 1 (0x0001))
+- Fixed an issue where the `ProcessResourcePolicy` constructor would not throw an Exception if ProcessorAffinity was set to a number greater than the 2x the `Environment.ProcessorCount` property
+- Changed `UserCredential.LoadUserProfile` to default to `null` instead of `false`, so that the builder-produced `UserCredential` matches the configuration's actual default
 
 ### Changed
 
-- Updated ``.gitignore`` to exclude ``/waza-results`` and ``skills-lock.json``.
-- Bumped ``Polyfill`` from ``10.8.1`` to ``10.11.2``.
+- Updated `.gitignore` to exclude `/waza-results` and `skills-lock.json`.
+- Bumped `Polyfill` from `10.8.1` to `10.11.2`.
 - Updated to use CliInvoke.Core 2.8.3 and CliInvoke 2.8.3
-- Updated to use CliInvoke.Core 2.8.3
 
 ## [2.8.2] - 2026-06-12
 
 ### Changed
 
-- Updated ``.gitignore`` to include agent skills and Lunet build artifacts.
-- Updated ``Polyfill`` from 10.7.0 to 10.8.1.
-- Updated ``DotExtensions`` from 10.3.2 to 10.3.3.
-- Updated ``Microsoft.Extensions.DependencyInjection.Abstractions`` from 10.0.8 to 10.0.9.
+- Updated `.gitignore` to include agent skills and Lunet build artifacts.
+- Updated `Polyfill` from 10.7.0 to 10.8.1.
+- Updated `DotExtensions` from 10.3.2 to 10.3.3.
+- Updated `Microsoft.Extensions.DependencyInjection.Abstractions` from 10.0.8 to 10.0.9.
 
 ## [2.8.1] - 2026-05-31
 
 ### Fixed
 
-- Fixed an issue where timeout threshold wasn't Reduced to 3 minutes
-- Fixed a Dependency Injection ambiguous constructor issue in ``ProcessInvoker``
-- Fixed an issue with ``ExternalProcess`` where ``WaitForBufferedExitOrTimeout`` would cause an exception to be thrown
-- Fixed Dependency Injection registration issues with ``ProcessInvoker``
-- Fixed a Dependency Injection ambiguous constructor issue in ``ProcessInvoker``
+- Fixed an issue where timeout threshold wasn't reduced to 3 minutes
+- Fixed a Dependency Injection ambiguous constructor issue in `ProcessInvoker`
+- Fixed an issue with `ExternalProcess` where `WaitForBufferedExitOrTimeout` would cause an exception to be thrown
+- Fixed Dependency Injection registration issues with `ProcessInvoker`
+- Fixed a Dependency Injection ambiguous constructor issue in `ProcessInvoker`
 
 ### Changed
 
 - Updated to use CliInvoke.Core 2.8.1 and CliInvoke 2.8.1
-- Updated to use CliInvoke.Core 2.8.0
 
 ## [2.8.0] - 2026-05-31
 
 ### Added
 
-- Added ``WaitForPipedExitOrTimeoutAsync`` to ``IExternalProcess``
-- Added ``WaitForPipedExitOrTimeoutAsync`` to ``ExternalProcess``
+- Added `WaitForPipedExitOrTimeoutAsync` to `IExternalProcess`
+- Added `WaitForPipedExitOrTimeoutAsync` to `ExternalProcess`
 
 ### Changed
 
 - Reduced timeout threshold to 3 minutes
-- Refactored ``ProcessInvoker`` class to internally use ``IExternalProcessFactory`` and ``IExternalProcess`` to reduce code duplication
+- Refactored `ProcessInvoker` class to internally use `IExternalProcessFactory` and `IExternalProcess` to reduce code duplication
 - Updated to use CliInvoke.Core 2.8.0 and CliInvoke 2.8.0
-- Updated to use CliInvoke.Core 2.8.0
 
 ## [2.7.1] - 2026-05-31
 
 ### Changed
 
 - Update internal Polyfill version from 10.5.1 to 10.7.0
-- Reduced private helper method code usage in ``ProcessInvoker``
+- Reduced private helper method code usage in `ProcessInvoker`
 - Updated to use CliInvoke.Core 2.7.1 and CliInvoke 2.7.1
-- Updated to use CliInvoke.Core 2.7.1
 
 ## [2.7.0] - 2026-05-16
 
 ### Added
 
-- Added a simpler overload to ``ProcessConfiguration``
+- Added a simpler overload to `ProcessConfiguration`
 - Added a simpler overload to `ProcessExitConfiguration`.
-- Ported `CliRun` facade to `CliInvoke` 2.7 — CliRun is a new beginner-friendly entry point providing static RunAsync / Run*Async methods for simple process invocation without boilerplate (zero DI setup required, but allows optional DI injection of some services)
+- Ported `CliRun` facade to `CliInvoke` 2.7. CliRun is a new beginner-friendly entry point providing static RunAsync / Run*Async methods for simple process invocation without boilerplate (zero DI setup required, but allows optional DI injection of some services)
 
 ### Changed
 
 - Backported README improvements and PATTERNS.md from v3.
 - Updated test dependencies.
-- General project cleanup and .gitignore updates.
-- Reduced timeout threshold to 10 minutes - A future minor version may reduce this further
-- Improve ProcessConfiguration ``ToString`` method performance
+- Updated `.gitignore`.
+- Reduced timeout threshold to 10 minutes. A future minor version may reduce this further.
+- Improve ProcessConfiguration `ToString` method performance
 - Updated `ProcessWrapper` for improved handling.
 - Addressed potential Resource Policy setting race condition.
 - Updated to use CliInvoke.Core 2.7.0 and CliInvoke 2.7.0
-- Updated to use CliInvoke.Core 2.7.0
 - Minor xml doc comment tweaks
 
 ## [2.6.0] - 2026-04-26
 
 ### Added
 
-- Added a new ProcessConfiguration constructor - This is intended to replace the original constructor
+- Added a new ProcessConfiguration constructor. This is intended to replace the original constructor
 
 ### Changed
 
 - Reduced compiler warnings and disabled obsolete warnings
 - Updated DotExtensions to version 10.3.0
 - Switched to using DotExtensions' PATH Environment variable resolving code from DotPrimitives and removed dependency on DotPrimitives
-- Added a static ``Shared`` instance to ``FilePathResolver``
+- Added a static `Shared` instance to `FilePathResolver`
 - General formatting improvements and spelling corrections
 - Updated to use CliInvoke.Core 2.6.0 and CliInvoke 2.6.0
-- Updated to use CliInvoke.Core 2.6.0
-- Added a test for ``PowershellProcessInvoker``
+- Added a test for `PowershellProcessInvoker`
 
 ### Deprecated
 
-- Deprecated ``IProcessConfigurationFactory`` - This will be removed in CliInvoke v3
-- Deprecated the original ProcessConfiguration constructor - This will be removed in CliInvoke v3
-- Deprecated ``ProcessConfigurationFactory`` - This is replaced by a static Factory class in CliInvoke v3
+- Deprecated `IProcessConfigurationFactory`. This will be removed in CliInvoke v3
+- Deprecated the original ProcessConfiguration constructor. This will be removed in CliInvoke v3
+- Deprecated `ProcessConfigurationFactory`. This is replaced by a static Factory class in CliInvoke v3
 
 ### Fixed
 
-- Fixed an issue with ``PowershellProcessInvoker`` that would cause it to throw an ArgumentException upon instantiation - This will be backported to 2.5.x
+- Fixed an issue with `PowershellProcessInvoker` that would cause it to throw an ArgumentException upon instantiation. This will be backported to 2.5.x
 
 ## [2.5.4] - 2026-04-26
 
@@ -575,20 +549,18 @@ Themes:
 - Updated DotExtensions version from 10.2.0 to 10.2.3
 - Updated Microsoft.Extensions.DependencyInjection.Abstractions version from 10.0.5 to 10.0.7
 - Updated to use CliInvoke.Core 2.5.4 and CliInvoke 2.5.4
-- Updated to use CliInvoke.Core 2.5.4
 
 ## [2.5.3] - 2026-04-12
 
 ### Changed
 
 - Updated internal Polyfill version from 9.23.0 to 10.1.1
-- Removed deprecation of ``IFilePathResolver`` interface - The ``ResolveFilePath`` method signature in the interface is deprecated and will be replaced with a new method signature in CliInvoke v3
+- Removed deprecation of `IFilePathResolver` interface. The `ResolveFilePath` method signature in the interface is deprecated and will be replaced with a new method signature in CliInvoke v3
 - Updated DotPrimitives version from 4.3.3 to 4.4.0
 - Updated DotExtensions version from 10.1.1 to 10.2.0
 - README fixes
-- Removed deprecation of ``FilePathResolver`` class- The ``ResolveFilePath`` method signature in the class is deprecated and will be replaced with a new method signature in CliInvoke v3
+- Removed deprecation of `FilePathResolver` class. The `ResolveFilePath` method signature in the class is deprecated and will be replaced with a new method signature in CliInvoke v3
 - Updated to use CliInvoke.Core 2.5.3 and CliInvoke 2.5.3
-- Updated to use CliInvoke.Core 2.5.3
 
 ## [2.5.2] - 2026-04-02
 
@@ -597,15 +569,14 @@ Themes:
 - Updated internal Polyfill version from 9.22.0 to 9.23.0
 - Updated DotExtensions version from 10.0.0 to 10.1.1
 - Updated to use CliInvoke.Core 2.5.2 and CliInvoke 2.5.2
-- Updated to use CliInvoke.Core 2.5.2
 
 ### Deprecated
 
-- Deprecated ``IProcessPipeHandler`` for removal in CliInvoke v3
-- Deprecated ``RunnerProcessInvokerBase`` for removal in CliInvoke v3
-- Deprecated ``DefaultRunnerProcessInvoker`` for removal in CliInvoke v3
-- Deprecated ``ProcessPipeHandler`` for removal in CliInvoke v3
-- Deprecated ``AddDerivedRunnerProcessInvoker`` and  ``AddDefaultRunnerProcessInvoker`` methods for removal in CliInvoke v3
+- Deprecated `IProcessPipeHandler` for removal in CliInvoke v3
+- Deprecated `RunnerProcessInvokerBase` for removal in CliInvoke v3
+- Deprecated `DefaultRunnerProcessInvoker` for removal in CliInvoke v3
+- Deprecated `ProcessPipeHandler` for removal in CliInvoke v3
+- Deprecated `AddDerivedRunnerProcessInvoker` and  `AddDefaultRunnerProcessInvoker` methods for removal in CliInvoke v3
 
 ### Fixed
 
@@ -617,38 +588,37 @@ Themes:
 
 ### Changed
 
-- Updated AoT Compatibility property in ``CliInvoke.Core.csproj`` to only be set to true on .NET 8+
-- Reduced warnings regarding supported and unsupported OSes in ``IProcessResourcePolicyBuilder``
-- Updated AoT Compatibility property in ``CliInvoke.csproj`` to only be set to true on .NET 8+
-- Reduced warnings regarding supported and unsupported OSes in ``ProcessResourcePolicyBuilder``
+- Updated AOT Compatibility property in `CliInvoke.Core.csproj` to only be set to true on .NET 8+
+- Reduced warnings regarding supported and unsupported OSes in `IProcessResourcePolicyBuilder`
+- Updated AOT Compatibility property in `CliInvoke.csproj` to only be set to true on .NET 8+
+- Reduced warnings regarding supported and unsupported OSes in `ProcessResourcePolicyBuilder`
 - Updated to use CliInvoke.Core 2.5.1 and CliInvoke 2.5.1
-- Updated AoT Compatibility property in ``CliInvoke.Extensions.csproj`` to only be set to true on .NET 8+
-- Updated AoT Compatibility property in ``CliInvoke.Specializations.csproj`` to only be set to true on .NET 8+
+- Updated AOT Compatibility property in `CliInvoke.Extensions.csproj` to only be set to true on .NET 8+
+- Updated AOT Compatibility property in `CliInvoke.Specializations.csproj` to only be set to true on .NET 8+
 
 ### Fixed
 
-- Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AoT compatible despite CliInvoke advertising itself as Trimming Safe and AoT compatible. It is now fixed to be Trimming safe and AoT compatible on .NET 8+ - This fix is also backported to CliInvoke 2.4 via version 2.4.4
+- Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AOT compatible despite CliInvoke advertising itself as Trimming safe and AOT compatible. It is now fixed to be Trimming safe and AOT compatible on .NET 8+. This fix is also backported to CliInvoke 2.4 via version 2.4.4
 
 ## [2.5.0] - 2026-03-18
 
 ### Added
 
-- Added ``IExternalProcessFactory``, an interface for easily creating ``IExternalProcess`` instances.
-- Added ``ExternalProcessFactory``, the implementation of ``IExternalProcessFactory`` for easily creating ``IExternalProcess`` instances.
-- Added support for ``IExternalProcessFactory`` and ``ExternalProcessFactory``
+- Added `IExternalProcessFactory`, an interface for easily creating `IExternalProcess` instances.
+- Added `ExternalProcessFactory`, the implementation of `IExternalProcessFactory` for easily creating `IExternalProcess` instances.
+- Added support for `IExternalProcessFactory` and `ExternalProcessFactory`
 
 ### Changed
 
 - Updated DotExtensions version from 9.7.4 to 10.0.0
 - Updated DotPrimitives version from 4.3.2 to 4.3.3
 - Updated to use CliInvoke.Core 2.5.0 and CliInvoke 2.5.0
-- Updated CliInvoke.Core 2.5.0
 
 ### Deprecated
 
-- Deprecated ``IProcessConfigurationBuilder``'s ``SetStandardOutputPipe`` and ``SetStandardErrorPipe`` methods for removal in CliInvoke.Core v3
-- Deprecated ``ProcessConfigurationBuilder``'s ``SetStandardOutputPipe`` and ``SetStandardErrorPipe`` methods for removal in CliInvoke v3
-- Deprecated ``ProcessConfiguration``'s ``FromStartInfo`` static extension method as deprecated for removal in CliInvoke v3 - This is being replaced with a replacement method called ``FromProcessStartInfo``
+- Deprecated `IProcessConfigurationBuilder`'s `SetStandardOutputPipe` and `SetStandardErrorPipe` methods for removal in CliInvoke.Core v3
+- Deprecated `ProcessConfigurationBuilder`'s `SetStandardOutputPipe` and `SetStandardErrorPipe` methods for removal in CliInvoke v3
+- Deprecated `ProcessConfiguration`'s `FromStartInfo` static extension method as deprecated for removal in CliInvoke v3. This is being replaced with a replacement method called `FromProcessStartInfo`
 
 ### Fixed
 
@@ -661,7 +631,6 @@ Themes:
 - Updated internal Polyfill version from 9.22.0 to 9.23.0
 - Updated DotExtensions version from 9.7.4 to 9.7.5
 - Updated to use CliInvoke.Core 2.4.5 and CliInvoke 2.4.5
-- Updated to use CliInvoke.Core 2.4.5
 
 ### Fixed
 
@@ -673,15 +642,15 @@ Themes:
 
 ### Changed
 
-- Updated AoT Compatibility property in ``CliInvoke.Core.csproj`` to only be set to true on .NET 8+
-- Updated AoT Compatibility property in ``CliInvoke.csproj`` to only be set to true on .NET 8+
+- Updated AOT Compatibility property in `CliInvoke.Core.csproj` to only be set to true on .NET 8+
+- Updated AOT Compatibility property in `CliInvoke.csproj` to only be set to true on .NET 8+
 - Updated to use CliInvoke.Core 2.4.4 and CliInvoke 2.4.4
-- Updated AoT Compatibility property in ``CliInvoke.Extensions.csproj`` to only be set to true on .NET 8+
-- Updated AoT Compatibility property in ``CliInvoke.Specializations.csproj`` to only be set to true on .NET 8+
+- Updated AOT Compatibility property in `CliInvoke.Extensions.csproj` to only be set to true on .NET 8+
+- Updated AOT Compatibility property in `CliInvoke.Specializations.csproj` to only be set to true on .NET 8+
 
 ### Fixed
 
-- Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AoT compatible despite CliInvoke advertising itself as Trimming Safe and AoT compatible. It is now fixed to be Trimming safe and AoT compatible on .NET 8+
+- Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AOT compatible despite CliInvoke advertising itself as Trimming safe and AOT compatible. It is now fixed to be Trimming safe and AOT compatible on .NET 8+
 
 ## [2.4.3] - 2026-03-18
 
@@ -689,12 +658,12 @@ Themes:
 
 - Updated internal Polyfill version from 9.20.0 to 9.22.0
 - Updated to use CliInvoke.Core 2.4.3 and CliInvoke 2.4.3
-- Added FreeBSD as a supported OS attribute for ``PowershellProcessInvoker``
+- Added FreeBSD as a supported OS attribute for `PowershellProcessInvoker`
 
 ### Fixed
 
-- Fixed an issue where ``ProcessPipeHandler`` didn't make use of the CancellationToken passed to its methods
-- Removed nuisance OS Support warnings for ``ProcessPipeHandler``
+- Fixed an issue where `ProcessPipeHandler` didn't make use of the CancellationToken passed to its methods
+- Removed nuisance OS Support warnings for `ProcessPipeHandler`
 
 ## [2.4.2] - 2026-03-14
 
@@ -705,10 +674,10 @@ Themes:
 
 ### Fixed
 
-- Fixed an issue where ``RunnerProcessFactory`` failed to adequately apply runner configuration arguments and runner process arguments to a runner process.
-- Fixed an issue where ``ProcessInvoker``'s ``ExecuteAsync`` method would attempt Standard Input Redirection without checking first if it was requested
-- Fixed an issue with ``CmdProcessConfiguration`` that would cause an Argument exception to be thrown if instantiated due to an empty or whitespace string parameter value in the constructor
-- Fixed an issue with ``CmdProcessConfiguration`` that caused cmd to stay open after being executed
+- Fixed an issue where `RunnerProcessFactory` failed to adequately apply runner configuration arguments and runner process arguments to a runner process.
+- Fixed an issue where `ProcessInvoker`'s `ExecuteAsync` method would attempt Standard Input Redirection without checking first if it was requested
+- Fixed an issue with `CmdProcessConfiguration` that would cause an Argument exception to be thrown if instantiated due to an empty or whitespace string parameter value in the constructor
+- Fixed an issue with `CmdProcessConfiguration` that caused cmd to stay open after being executed
 
 ## [2.4.1] - 2026-03-12
 
@@ -716,22 +685,19 @@ Themes:
 
 - Switched to using Central Package Management
 - Updated internal Polyfill version from 9.12.0 to 9.18.0
-- Updated internal Polyfill version from 9.12.0 to 9.18.0
 - Updated DotExtensions version from 9.7.0 to 9.7.3
-- Updated ``Microsoft.Extensions.DependencyInjection.Abstractions`` version from 10.0.3 to 10.0.4
-- Updated to use CliInvoke.Core 2.4.1 and CliInvoke 2.4,1
-- Updated internal Polyfill version from 9.12.0 to 9.18.0
-- Updated to use CliInvoke.Core 2.4.1
+- Updated `Microsoft.Extensions.DependencyInjection.Abstractions` version from 10.0.3 to 10.0.4
+- Updated to use CliInvoke.Core 2.4.1 and CliInvoke 2.4.1
 
 ## [2.4.0] - 2026-02-24
 
 ### Added
 
-- Added ``IShellDetector`` interface for detecting default system Shell
-- Added ``IExternalProcess`` (the interface for ``ExternalProcess``) - This is not an injectable service and exists to facilitate a possible future ``ExternalProcess`` Factory pattern, and/or allow alternate implementations.
-- Added ``ShellDetector`` implementation of ``IShellDetector`` for detecting default system Shell
-- Added ``ExternalProcess`` - An alternative to the Process Invokation design pattern. This version makes use of CliInvoke v2's file path resolver and process pipe handling as well as internal CliInvoke helper code.
-- Added registration of ``IShellDetector`` and ``ShellDetector`` in ``AddCliInvoke`` method
+- Added `IShellDetector` interface for detecting default system Shell
+- Added `IExternalProcess` (the interface for `ExternalProcess`). This is not an injectable service and exists to facilitate a possible future `ExternalProcess` Factory pattern, and/or allow alternate implementations.
+- Added `ShellDetector` implementation of `IShellDetector` for detecting default system Shell
+- Added `ExternalProcess`. An alternative to the Process Invocation design pattern. This version makes use of CliInvoke v2's file path resolver and process pipe handling as well as internal CliInvoke helper code.
+- Added registration of `IShellDetector` and `ShellDetector` in `AddCliInvoke` method
 
 ### Changed
 
@@ -742,23 +708,17 @@ Themes:
 ### Changed
 
 - Updated internal Polyfill version from 9.9.0 to 9.10.0
-- Updated internal Polyfill version from 9.9.0 to 9.10.0
 - Updated DotExtensions version from 9.6.2 to 9.7.0
 - Updated to use CliInvoke.Core 2.3.4 and CliInvoke 2.3.4
-- Updated internal Polyfill version from 9.9.0 to 9.10.0
-- Updated to use CliInvoke.Core 2.3.4
 
 ## [2.3.3] - 2026-02-15
 
 ### Changed
 
 - Updated internal Polyfill version from 9.8.1 to 9.9.0
-- Updated internal Polyfill version from 9.8.1 to 9.9.0
 - Updated DotPrimitives version from 4.3.1 to 4.3.2
 - Updated DotExtensions version from 9.6.1 to 9.6.2
 - Updated to use CliInvoke.Core 2.3.3 and CliInvoke 2.3.3
-- Updated internal Polyfill version from 9.8.1 to 9.9.0
-- Updated to use CliInvoke.Core 2.3.3
 
 ## [2.3.2] - 2026-02-14
 
@@ -768,7 +728,6 @@ Themes:
 - Backported readme improvements
 - Updated to use Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.2 to 10.0.3
 - Updated to use CliInvoke.Core 2.3.2 and CliInvoke 2.3.2
-- Updated to use CliInvoke.Core 2.3.2
 
 ### Fixed
 
@@ -778,7 +737,6 @@ Themes:
 
 ### Changed
 
-- Update dependencies.
 - Refactor `WaitForExitNoTimeoutAsync` to use `WaitForExitOrGracefulTimeoutAsync` with fallback to forceful.
 - Extract `GracefulInterruptCancellation` method in `GracefulCancellation`.
 
@@ -786,35 +744,33 @@ Themes:
 
 ### Added
 
-- Added CancellationToken support to ``IProcessPipeHandler``
-- Added ``IProcessResultValidator<TProcessResult>`` This is the replacement for ``ProcessResultValidation``.
-- Added ``CommonValidationRules`` static class for common Validation Rules
+- Added CancellationToken support to `IProcessPipeHandler`
+- Added `IProcessResultValidator<TProcessResult>` This is the replacement for `ProcessResultValidation`.
+- Added `CommonValidationRules` static class for common Validation Rules
 - Added Graceful Cancellation via Signals on Windows and Unix
-- Added ``ProcessResultValidator<TProcessResult>`` implementation
-- Added CancellationToken support to ``ProcessPipeHandler``
-- Added DI registration of ``IProcessResultValidator<ProcessResult>``, ``IProcessResultValidator<BufferedProcessResult>``, and ``IProcessResultValidator<PipedProcessResult>`` in ``AddCliInvoke`` method
-- Added ``AddValidationRules<TProcessResult>Func<TProcessResult, bool>[] validationRules, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)`` DI registration method
-- Added ``AddCustomResultValidators<TProcessResult, TProcessResultValidator>(TProcessResultValidator validator, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)`` DI registration method
+- Added `ProcessResultValidator<TProcessResult>` implementation
+- Added CancellationToken support to `ProcessPipeHandler`
+- Added DI registration of `IProcessResultValidator<ProcessResult>`, `IProcessResultValidator<BufferedProcessResult>`, and `IProcessResultValidator<PipedProcessResult>` in `AddCliInvoke` method
+- Added `AddValidationRules<TProcessResult>Func<TProcessResult, bool>[] validationRules, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)` DI registration method
+- Added `AddCustomResultValidators<TProcessResult, TProcessResultValidator>(TProcessResultValidator validator, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)` DI registration method
 
 ### Changed
 
-- Replaced manual ``ArgumentOutOfRangeException`` instantiation and throwing with cleaner Throw method calls
-- Updated ``ProcessExceptionInfo`` class
-- Updated ``ProcessConfigurationFactory`` to use default ``ArgumentsBuilder`` validation
-- Updated ``ArgumentsBuilder`` logic to allow setting empty arguments
-- Removed unnecessary Process ``HasStarted`` internal helper method - ``ProcessWrapper``'s ``HasStarted`` property is used instead
-- Replaced manual ``ArgumentOutOfRangeException`` instantiation and throwing with cleaner Throw method calls
-- Reduced code duplication in ``ProcessInvoker`` implementation class
+- Replaced manual `ArgumentOutOfRangeException` instantiation and throwing with cleaner Throw method calls
+- Updated `ProcessExceptionInfo` class
+- Updated `ProcessConfigurationFactory` to use default `ArgumentsBuilder` validation
+- Updated `ArgumentsBuilder` logic to allow setting empty arguments
+- Removed unnecessary Process `HasStarted` internal helper method. `ProcessWrapper`'s `HasStarted` property is used instead
+- Reduced code duplication in `ProcessInvoker` implementation class
 - Updated to use CliInvoke.Core 2.3.0 and CliInvoke 2.3.0
-- Updated to use CliInvoke.Core 2.3.0
 
 ### Deprecated
 
-- Deprecated ``ProcessConfiguration``'s ``StandardOutput`` and ``StandardError`` properties - These will be removed in CliInvoke.Core v3
-- Deprecated ``ProcessResultValidation`` enum - This will be replaced with a new Result Validation system in CliInvoke.Core v3
-- Deprecated ``ResultValidation`` property in ``ProcessExitConfiguration`` - This will be replaced in CliInvoke.Core v3
-- Deprecated ``ProcessResult``'s ``WasSuccessful`` property
-- Deprecated ``IFilePathResolver`` interface - This will be removed in version 3. CliInvoke uses File Path Resolving as an implementation detail and CliInvoke main package will migrate to use an alternative file path resolving interface
+- Deprecated `ProcessConfiguration`'s `StandardOutput` and `StandardError` properties. These will be removed in CliInvoke.Core v3
+- Deprecated `ProcessResultValidation` enum. This will be replaced with a new Result Validation system in CliInvoke.Core v3
+- Deprecated `ResultValidation` property in `ProcessExitConfiguration`. This will be replaced in CliInvoke.Core v3
+- Deprecated `ProcessResult`'s `WasSuccessful` property
+- Deprecated `IFilePathResolver` interface. This will be removed in version 3. CliInvoke uses File Path Resolving as an implementation detail and CliInvoke main package will migrate to use an alternative file path resolving interface
 
 ### Fixed
 
@@ -825,18 +781,15 @@ Themes:
 ### Changed
 
 - Updated internal Polyfill version from 9.6.0 to 9.7.4
-- Updated internal Polyfill version from 9.6.0 to 9.7.4
 - Updated DotPrimitives version from 4.1.0 to 4.2.0
 - Updated DotExtensions version from 9.3.1 to 9.4.1
 - Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.1 to 10.0.2
 - Updated to use CliInvoke.Core 2.2.1 and CliInvoke 2.2.1
-- Updated internal Polyfill version from 9.6.0 to 9.7.4
-- Updated to use CliInvoke.Core 2.2.1
 
 ### Fixed
 
-- Fixed an issue where an empty StandardOutput in ``BufferedProcessResult`` constructor would throw an ArgumentException
-- Fixed an issue with ``ProcessInvoker`` exit code validation logic if exit code validation fails
+- Fixed an issue where an empty StandardOutput in `BufferedProcessResult` constructor would throw an ArgumentException
+- Fixed an issue with `ProcessInvoker` exit code validation logic if exit code validation fails
 
 ## [2.2.0] - 2025-12-29
 
@@ -887,22 +840,20 @@ Themes:
 ### Fixed
 
 - Fixed an issue where Cancellation Token is ignored in some circumstances
-- Fixed an issue where ``ProcessWrapper`` could attempt to apply a Resource Policy to a Process even if the Process hasn't started successfully
-- Fixed an issue where ``ProcessInvoker``'s ``ExecutePipedAsync`` method would attempt to redirect Standard Input before the process has started
+- Fixed an issue where `ProcessWrapper` could attempt to apply a Resource Policy to a Process even if the Process hasn't started successfully
+- Fixed an issue where `ProcessInvoker`'s `ExecutePipedAsync` method would attempt to redirect Standard Input before the process has started
 
 ## [2.1.4] - 2025-12-26
 
 ### Changed
 
 - Update internal Polyfill version from 9.3.4 to 9.5.0
-- Update internal Polyfill version from 9.3.4 to 9.5.0
 - Update to CliInvoke 2.1.4
-- Update internal Polyfill version from 9.3.4 to 9.5.0
 - Replaced outdated package Ids and namespaces in readmes and some file headers.
 
 ### Fixed
 
-- Fixed an issue with Standard Input incorrectly being applied to ``ProcessWrapper`` (CliInvoke's internal Process wrapper class) in ``ProcessInvoker``
+- Fixed an issue with Standard Input incorrectly being applied to `ProcessWrapper` (CliInvoke's internal Process wrapper class) in `ProcessInvoker`
 
 ## [2.1.3] - 2025-12-18
 
@@ -919,8 +870,6 @@ Themes:
 ### Changed
 
 - Updated to Polyfill version 9.3.4 from 9.1.0
-- Updated to Polyfill version 9.3.4 from 9.1.0
-- Updated to Polyfill version 9.3.4 from 9.1.0
 - Updated to Microsoft.Extensions.DependencyInjection.Abstractions version 10.0.1 from 10.0.0
 
 ## [2.1.1] - 2025-11-18
@@ -928,9 +877,7 @@ Themes:
 ### Changed
 
 - Added Trimming test project
-- Added AoT test project
-- Update to internal Polyfill version 9.1.0 from 9.0.3
-- Update to internal Polyfill version 9.1.0 from 9.0.3
+- Added AOT test project
 - Update to internal Polyfill version 9.1.0 from 9.0.3
 
 ### Fixed
@@ -943,22 +890,20 @@ Themes:
 ### Added
 
 - Added .NET 10  TFM and switched to C# language version 14
-- Added Trimming Support and AoT support
-- Added ``UseCustomFilePathResolver<TResolver>`` extension member method to register custom File Path Resolver implementations - This uses C# 14's extension members system and thus requires C# 14
+- Added Trimming Support and AOT support
+- Added `UseCustomFilePathResolver<TResolver>` extension member method to register custom File Path Resolver implementations. This uses C# 14's extension members system and thus requires C# 14
 
 ### Changed
 
-- Renamed namespaces to start with ``CliInvoke`` instead of ``AlastairLundy.CliInvoke``
-- Updated ``IUserCredentialBuilder`` to not accept null strings
+- Renamed namespaces to start with `CliInvoke` instead of `AlastairLundy.CliInvoke`
+- Updated `IUserCredentialBuilder` to not accept null strings
 - Updated internal Polyfill version from 8.9.1 to 9.0.3
-- Improved ``FilePathResolver`` resolving logic
-- Updated ``UserCredentialBuilder`` to not accept null strings
-- Add .NET Standard 2.0 fallback for null checks using Polyfill's ``Ensure`` static methods
-- Updated internal Polyfill version from 8.9.1 to 9.0.3
+- Improved `FilePathResolver` resolving logic
+- Updated `UserCredentialBuilder` to not accept null strings
+- Add .NET Standard 2.0 fallback for null checks using Polyfill's `Ensure` static methods
 - Removed dependency on DotExtensions
 - Updated to use CliInvoke Core 2.1.0
-- Updated internal Polyfill version from 8.9.1 to 9.0.3
-- Updated ``Microsoft.Extensions.DependencyInjection.Abstractions`` from 9.0.10 to 10.0.0
+- Updated `Microsoft.Extensions.DependencyInjection.Abstractions` from 9.0.10 to 10.0.0
 
 ## [2.0.1] - 2025-11-18
 
@@ -966,10 +911,8 @@ Themes:
 
 - Update internal Polyfill version from 8.9.1 to 9.1.0
 - Updated DotExtensions from 8.6.3 to 9.0.0
-- Update internal Polyfill version from 8.9.1 to 9.1.0
 - Update Core and Main to 2.0.1
 - Update Microsoft.Extensions.DependencyInjection.Abstractions from 9.0.10 to 9.0.11
-- Update internal Polyfill version from 8.9.1 to 9.1.0
 
 ## [2.0.0] - 2025-10-28
 
@@ -977,12 +920,12 @@ Themes:
 
 - Added `IProcessConfigurationFactory`
 - Added abstract class `RunnerProcessInvokerBase` that inherits from `IProcessInvoker`
-- Added `IRunnerProcessFactory` - An interface for creating Processes that run other processes.
+- Added `IRunnerProcessFactory`. An interface for creating Processes that run other processes.
 - Added support for Graceful Cancellation after specified Timeout
 - Added support for Forceful Cancellation after specified Timeout
-- Added `ProcessCancellationExceptionBehaviour` enum to enable configuring Cancellation Exception behaviour (i.e. suppressing the exception, allowing it, or allowing the exception if unexpected) - This has been added as a property to `ProcessExitConfiguration`, with updates to the class to support the addition.
-- Added `DefaultProcessRunnerInvoker` - The default implementation of RunnerProcessInvokerBase
-- Added `RunnerProcessCreator` - A class implementation of `IRunnerProcessCreator` for creating Processes that run other processes.
+- Added `ProcessCancellationExceptionBehaviour` enum to enable configuring Cancellation Exception behaviour (i.e. suppressing the exception, allowing it, or allowing the exception if unexpected). This has been added as a property to `ProcessExitConfiguration`, with updates to the class to support the addition.
+- Added `DefaultProcessRunnerInvoker`. The default implementation of RunnerProcessInvokerBase
+- Added `RunnerProcessCreator`. A class implementation of `IRunnerProcessCreator` for creating Processes that run other processes.
 - Added `IProcessConfigurationFactory` and `ProcessConfigurationFactory` dependency injection setup to the `AddCliInvoke` extension method
 - Added convenience extension methods that make CliInvoke more ergonomic to use.
 
@@ -1004,15 +947,14 @@ Themes:
 - Moved Builder implementations from `CliInvoke` to `CliInvoke.Core`
 - Moved `FilePathResolver` into CliInvoke.Core directly
 - Moved `IFilePathResolver` into CliInvoke.Core directly
-- Stability improvements
 - Renamed `IEnvironmentVariablesBuilder` methods to avoid ambiguous method usage
 - Renamed `EnvironmentVariablesBuilder` methods to avoid ambiguous method usage
 - Restructured `IProcessInvoker` interface with methods for `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync`
 
 ### Removed
 
-- Removed `CliCommandConfiguration` - This has been replaced by `ProcessConfiguration`
-- Removed `ICliCommandConfigurationBuilder` and `CliCommandConfigurationBuilder` - These have been replaced by `IProcessConfigurationBuilder` and `ProcessConfigurationBuilder` respectively
+- Removed `CliCommandConfiguration`. This has been replaced by `ProcessConfiguration`
+- Removed `ICliCommandConfigurationBuilder` and `CliCommandConfigurationBuilder`. These have been replaced by `IProcessConfigurationBuilder` and `ProcessConfigurationBuilder` respectively
 - Removed `ICliCommandInvoker` and `CliCommandInvoker` This has been replaced with `IProcessInvoker`
 - Removed `StartInfo` property from `ProcessConfiguration`
 - Removed Primitives subnamespace
@@ -1020,7 +962,6 @@ Themes:
 - Removed redundant constructor in `ProcessConfiguration`
 - Removed `UserCredential` `IsSupportedOnCurrentOs` extension method
 - Removed `IProcessFactory`
-- Removed `IProcessTimeoutPolicyBuilder` and `ProcessTimeoutPolicyBuilder` - These builders added hardly any benefit for the complexity they added
-- Removed deprecated code
+- Removed `IProcessTimeoutPolicyBuilder` and `ProcessTimeoutPolicyBuilder`. These builders added hardly any benefit for the complexity they added
 - Removed `ProcessFactory`
 

@@ -5,7 +5,7 @@ Stable releases prior to 2.0. For current releases, see [CHANGELOG.md](CHANGELOG
 ## [1.6.1.1] - 2025-10-14
 
 ### Fixed
-- Fixed an issue where ``FilePathResolver`` would fail to correctly resolve a file path
+- Fixed an issue where `FilePathResolver` would fail to correctly resolve a file path
 - Fixed several issues where exceptions would be thrown upon exiting a Process
 - Fixed an issue where a short running Process could throw an exception if setting Process Resource Policy was attempted
 
@@ -16,23 +16,22 @@ Stable releases prior to 2.0. For current releases, see [CHANGELOG.md](CHANGELOG
 - Updated DotExtensions from 8.5.1 to 8.6.2 for .NET 8+ TFMs
 
 ### Deprecated
-- (Core package) Deprecated ``IProcessFactory`` for removal in v2
-- (Main package) Deprecated ``ProcessFactory`` for removal in v2
+- (Core package) Deprecated `IProcessFactory` for removal in v2
+- (Main package) Deprecated `ProcessFactory` for removal in v2
 
 ## [1.6.0] - 2025-10-01
 
 ### Added
 - Added constructor overload for ProcessRunner class that doesn't rely on the deprecated IProcessRunnerUtility interface
-- Added FilePathResolver.cs directly into CliInvoke since Resyslib.IO is no longer maintained - This is a backport of CliInvoke v2's File Path Resolving logic but in the same interface that v1 was using.
+- Added FilePathResolver.cs directly into CliInvoke since Resyslib.IO is no longer maintained. This is a backport of CliInvoke v2's File Path Resolving logic but in the same interface that v1 was using.
 
 ### Changed
 - Updated DotExtensions on .NET 8 and newer from 8.3.0 to 8.5.0
 - Updated internal Polyfill usage on .NET Standard 2 from 8.8.1 to 8.9.0
-- Stability improvements
 
 ### Deprecated
 - Deprecated some extension methods and constructors in classes for removal in v2.
-- Deprecated CliCommandInvoker class for removal in v2 - The intended replacement in v2 is ProcessInvoker.
+- Deprecated CliCommandInvoker class for removal in v2. The intended replacement in v2 is ProcessInvoker.
 
 ### Fixed
 - Fixed an issue where CliInvoke for .NET 10 (as an implicit TFM) would depend on DotExtensions 7.7.0 instead of 8.x
@@ -59,17 +58,17 @@ Stable releases prior to 2.0. For current releases, see [CHANGELOG.md](CHANGELOG
 ## [1.5.0] - 2025-07-30
 
 ### Added
-- Added ``ProcessInvoker`` the replacement for ``ProcessRunner`` - Please use ``ProcessInvoker`` instead going forward.
+- Added `ProcessInvoker` the replacement for `ProcessRunner`. Please use `ProcessInvoker` instead going forward.
 
 ### Changed
 - Updated DotExtensions from 7.5.1 to 7.6.2
 - Updated internal Polyfill usage from 8.7.0 to 8.7.3
-- Moved ``ProcessFactory`` from its Legacy namespace into the main CliInvoke namespace
-- Moved ``ProcessPipeHandler`` from its Legacy namespace into the ``CliInvoke.Piping`` namespace
+- Moved `ProcessFactory` from its Legacy namespace into the main CliInvoke namespace
+- Moved `ProcessPipeHandler` from its Legacy namespace into the `CliInvoke.Piping` namespace
 
 ### Deprecated
-- Deprecated ``ProcessRunner`` class
-- Deprecated ``ICommandProcessFactory`` interface
+- Deprecated `ProcessRunner` class
+- Deprecated `ICommandProcessFactory` interface
 
 ## [1.4.5] - 2025-07-10
 
@@ -107,7 +106,7 @@ Stable releases prior to 2.0. For current releases, see [CHANGELOG.md](CHANGELOG
 - Update DotExtensions from 6.8.0 to 7.1.1, and Polyfill from 7.31.0 to 7.33.0
 
 ### Fixed
-- Add missing ``ProcessConfigurationBuilder`` to CliInvoke
+- Add missing `ProcessConfigurationBuilder` to CliInvoke
 
 ## [1.3.1] - 2025-05-23
 
@@ -140,7 +139,7 @@ Stable releases prior to 2.0. For current releases, see [CHANGELOG.md](CHANGELOG
 - Update dependencies
 
 ### Deprecated
-- Deprecate CommandProcessFactory ``CreateProcess`` method
+- Deprecate CommandProcessFactory `CreateProcess` method
 
 ## [1.0.0] - 2025-03-02
 
