@@ -78,7 +78,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
         get;
         init
         {
-            ArgumentNullException.ThrowIfNull(value);
+            ArgumentException.ThrowIfNullOrEmpty(value);
             
             field = value;
         }
