@@ -73,7 +73,16 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     Not mutated after construction; for the resolved file path, see the result.
     ///     <see cref="ProcessResult.ExecutedFilePath"/>.
     /// </remarks>
-    public required string TargetFilePath { get; init; }
+    public required string TargetFilePath
+    {
+        get;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            
+            field = value;
+        }
+    }
 
     /// <summary>
     ///     The working directory path to be used when executing the Command.
