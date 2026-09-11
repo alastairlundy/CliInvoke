@@ -39,13 +39,13 @@ internal class ProcessInvocationPipeline
     public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx)
         where TResult : ProcessResult
     {
-        long? truncationCap = ctx.ExitConfiguration?.MaxBufferedOutputBytes;
+        long? truncationCap = ctx.ExitConfiguration.MaxBufferedOutputBytes;
 
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
             ctx.Configuration, ctx.ExitConfiguration);
 
-        static void ValidateResult<TResult>(TResult result, ProcessExitConfiguration? exitConfiguration)
-            where TResult : ProcessResult
+        static void ValidateResult<TProcessResult>(TProcessResult result, ProcessExitConfiguration? exitConfiguration)
+            where TProcessResult : ProcessResult
         {
             if (exitConfiguration is null)
                 return;
