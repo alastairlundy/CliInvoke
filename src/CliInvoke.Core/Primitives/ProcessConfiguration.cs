@@ -128,7 +128,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <remarks>
     ///     Any supplied list is captured as a snapshot; later mutations made to the caller's
     ///     original collection are not reflected in the configuration. A null list is
-    ///     normalised to an empty snapshot.
+    ///     rejected with an <see cref="ArgumentNullException"/>.
     /// </remarks>
     public IReadOnlyList<string> ArgumentList
     {

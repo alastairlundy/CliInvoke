@@ -42,17 +42,14 @@ public class ProcessConfigurationArgumentsListTests
     }
 
     [Test]
-    public async Task ArgumentList_NullBecomesEmpty()
+    public async Task ArgumentList_Null_ThrowsArgumentNullException()
     {
-        // Arrange & Act
-        ProcessConfiguration config = new()
+        // Arrange & Act & Assert
+        await Assert.That(() => _ = new ProcessConfiguration()
         {
             TargetFilePath = "foo.exe",
             ArgumentList = null!
-        };
-
-        // Assert
-        await Assert.That(config.ArgumentList).IsEmpty();
+        }).Throws<ArgumentNullException>();
     }
 
     [Test]
