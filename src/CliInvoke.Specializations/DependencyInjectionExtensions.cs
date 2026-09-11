@@ -10,7 +10,7 @@
 using CliInvoke.Core.Middleware;
 using CliInvoke.Specializations.Middleware;
 
-namespace CliInvoke.Extensions;
+namespace CliInvoke.Specializations;
 
 /// <summary>
 ///     Provides extension methods for configuring dependency injection for CliInvoke's
