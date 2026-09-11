@@ -7,6 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
 namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
@@ -25,10 +28,16 @@ namespace CliInvoke.Specializations.Configurations;
 public class PowershellProcessConfiguration : ProcessConfiguration
 {
     /// <summary>
+    ///     Gets the resolved file path of the PowerShell executable for the current operating system,
+    ///     delegating to the base configuration's per-OS resolution.
+    /// </summary>
+    public new string TargetFilePath => base.TargetFilePath;
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="PowershellProcessConfiguration"/> class.
     /// </summary>
     /// <param name="arguments">The arguments to be passed to the command.</param>
-    /// <param name="outputRedirection"></param>
+    /// <param name="outputRedirection">Whether to redirect standard output and error streams.</param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator"> Indicates whether the command requires administrator privileges.</param>
     /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
@@ -40,11 +49,12 @@ public class PowershellProcessConfiguration : ProcessConfiguration
     /// <param name="processResourcePolicy">The processor resource policy for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
-    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardInput">Whether to redirect standard input to the process.</param>
     /// <param name="argumentList">
     ///     An optional verbatim argument list emitted via <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/>.
     ///     Used by the middleware to deliver the PowerShell wrapper without OS re-tokenization.
     /// </param>
+    [SetsRequiredMembers]
     public PowershellProcessConfiguration(
         string arguments,
         bool redirectStandardInput, bool outputRedirection = true,
@@ -54,36 +64,30 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false,
-        IEnumerable<string>? argumentList = null) : 
-        base(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
-            arguments, redirectStandardInput, outputRedirection, workingDirectoryPath,
-            requiresAdministrator, environmentVariables,
-            credentials,
-            standardInput,
-            standardInputEncoding, standardOutputEncoding,
-            standardErrorEncoding, processResourcePolicy,
-            windowCreation: windowCreation,
-            useShellExecution: useShellExecution,
-            argumentList: argumentList)
+        IEnumerable<string>? argumentList = null) :
+        base(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh", arguments, outputRedirection)
     {
-    }
+        RedirectStandardInput = redirectStandardInput;
+        RequiresAdministrator = requiresAdministrator;
+        Credential = credentials ?? UserCredential.Null;
 
-    /// <summary>
-    ///     The target file path of cross-platform PowerShell.
-    /// </summary>
-    /// <exception cref="PlatformNotSupportedException">
-    ///     Thrown if run on an operating system besides
-    ///     Windows, macOS, Linux, and FreeBSD.
-    /// </exception>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("maccatalyst")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
-    [UnsupportedOSPlatform("browser")]
-    [UnsupportedOSPlatform("android")]
-    [UnsupportedOSPlatform("ios")]
-    [UnsupportedOSPlatform("tvos")]
-    [UnsupportedOSPlatform("watchos")]
-    public new string TargetFilePath { get; }
+        if (standardInput is not null)
+            StandardInput = standardInput;
+
+        StandardInputEncoding = standardInputEncoding ?? Encoding.Default;
+        StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
+        StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
+        ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+        UseShellExecution = useShellExecution;
+        WindowCreation = windowCreation;
+
+        if (workingDirectoryPath is not null)
+            WorkingDirectoryPath = workingDirectoryPath;
+
+        if (environmentVariables is not null)
+            EnvironmentVariables = environmentVariables;
+
+        if (argumentList is not null)
+            ArgumentList = argumentList.ToArray();
+    }
 }

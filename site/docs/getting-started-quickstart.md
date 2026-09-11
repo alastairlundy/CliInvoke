@@ -34,6 +34,4 @@ Console.WriteLine(output.StandardOutput);
 ```
 
 `CliRun` needs no dependency injection and no factories. When you need DI, middleware, or
-process-level control, see the full Getting Started guide and [PATTERNS.md](PATTERNS.md).
-
-(Quickstart migrated from existing docs.)
+process-level control, see the full Getting Started guide and [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md).

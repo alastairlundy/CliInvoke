@@ -11,6 +11,9 @@
 
 // ReSharper disable UnusedMember.Global
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
 namespace CliInvoke.Specializations.Configurations;
 
 /// <summary>
@@ -31,7 +34,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
     ///     Initialises a new instance of the <see cref="CmdProcessConfiguration"/> class.
     /// </summary>
     /// <param name="arguments">The arguments to be passed to the command.</param>
-    /// <param name="outputRedirection"></param>
+    /// <param name="outputRedirection">Whether to redirect standard output and error streams.</param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator">
     ///     Indicates whether the command requires administrator
@@ -46,11 +49,12 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <param name="processResourcePolicy">The process resource policy for the command.</param>
     /// <param name="useShellExecution">Indicates whether to use the shell to execute the command.</param>
     /// <param name="windowCreation">Indicates whether to create a new window for the command.</param>
-    /// <param name="redirectStandardInput"></param>
+    /// <param name="redirectStandardInput">Whether to redirect standard input to the process.</param>
     /// <param name="argumentList">
     ///     An optional verbatim argument list emitted via <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/>.
     ///     Used by the middleware to deliver the cmd wrapper without OS re-tokenization.
     /// </param>
+    [SetsRequiredMembers]
     public CmdProcessConfiguration(string arguments,
         bool redirectStandardInput, bool outputRedirection = true,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
@@ -60,29 +64,36 @@ public class CmdProcessConfiguration : ProcessConfiguration
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
         bool useShellExecution = false, bool windowCreation = false,
         IEnumerable<string>? argumentList = null) :
-        base("cmd.exe", string.Empty,
-            redirectStandardInput, outputRedirection,
-            workingDirectoryPath, requiresAdministrator, environmentVariables, credentials,
-            standardInput, standardInputEncoding, standardOutputEncoding,
-            standardErrorEncoding,
-            processResourcePolicy,
-            windowCreation, useShellExecution, argumentList)
+        base("cmd.exe", string.Empty, outputRedirection)
     {
-        base.TargetFilePath = TargetFilePath;
-    }
+        RedirectStandardInput = redirectStandardInput;
+        RequiresAdministrator = requiresAdministrator;
+        Credential = credentials ?? UserCredential.Null;
 
+        if (standardInput is not null)
+            StandardInput = standardInput;
 
-    /// <summary>
-    ///     The target file path of Cmd.
-    /// </summary>
-    /// <exception cref="PlatformNotSupportedException">
-    ///     Thrown if not run on a Windows-based operating
-    ///     system.
-    /// </exception>
-    [SupportedOSPlatform("windows")]
-    public new string TargetFilePath =>
-        OperatingSystem.IsWindows()
+        StandardInputEncoding = standardInputEncoding ?? Encoding.Default;
+        StandardOutputEncoding = standardOutputEncoding ?? Encoding.Default;
+        StandardErrorEncoding = standardErrorEncoding ?? Encoding.Default;
+        ResourcePolicy = processResourcePolicy ?? ProcessResourcePolicy.Default;
+        UseShellExecution = useShellExecution;
+        WindowCreation = windowCreation;
+
+        if (workingDirectoryPath is not null)
+            WorkingDirectoryPath = workingDirectoryPath;
+
+        if (environmentVariables is not null)
+            EnvironmentVariables = environmentVariables;
+
+        if (argumentList is not null)
+            ArgumentList = argumentList.ToArray();
+
+        // The base TargetFilePath (required, init-only) is the single source of truth for
+        // the resolved cmd.exe path; the constructor resolves the system cmd.exe location.
+        TargetFilePath = OperatingSystem.IsWindows()
             ? $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}cmd.exe"
             : throw new PlatformNotSupportedException(Resources
                 .Exceptions_Cmd_OnlySupportedOnWindows);
+    }
 }

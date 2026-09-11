@@ -11,7 +11,7 @@
 
 CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
 
-Launch processes, redirect standard input and output streams, await process completion, and much more.
+Launch processes, redirect standard input and output streams, and await process completion.
 
 ## Table of Contents
 
@@ -29,9 +29,9 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Features
 
-* Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
+* Clear separation of concerns between Process Configuration Builders and Process Configuration Models.
 * Supports .NET 10 and has few dependencies.
-* Has Dependency Injection extensions to make using it a breeze.
+* Dependency Injection extensions register `IProcessInvoker`, `IExternalProcessFactory`, and middleware from a single `AddCliInvoke()` call.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
   Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
@@ -52,38 +52,37 @@ The package(s) to install depends on your use case:
 
 * For use in a .NET library – Install the abstractions package, your developer users can install the Implementation and
   Dependency Injection packages.
-* For use in a .NET app – Install the implementation package and the Dependency Injection Extensions Package
+* For use in a .NET app – Install the implementation package. It includes DI registration and convenience helpers built in.
 
 | Project type / Need                                                          | Packages to install (dotnet add package ...)                                      | Notes                                                                        |
 |------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                  | Only the Core (abstractions) package — consumers can choose implementations. |
 | Library or app that needs concrete builders / implementations                | `CliInvoke.Core`, `CliInvoke`                                                     | Implementation package plus Core for models/abstractions.                    |
-| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`, `CliInvoke.Extensions`                             | Includes DI registration and convenience extensions for easy setup, and some Middleware implementations.         |
+| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`                                                     | Includes DI registration and convenience helpers; some Middleware implementations are built into the main package.         |
 | Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed) | Adds Cmd/PowerShell and other specializations; include only when required.   |
 
 ### Links to packages
 
 [CliInvoke.Core Nuget](https://nuget.org/packages/CliInvoke.Core)
 [CliInvoke Nuget](https://nuget.org/packages/CliInvoke)
-[CliInvoke.Extensions Nuget](https://nuget.org/packages/CliInvoke.Extensions)
 [CliInvoke.Specializations Nuget](https://nuget.org/packages/CliInvoke.Specializations)
 
 ## Supported Platforms
 
-CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
+CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android.
 
 For more details see the [list of supported platforms](site/docs/Supported-OperatingSystems.md)
 
 ## Design Patterns & When to Use Them
 
 CliInvoke provides three core design patterns for invoking processes (with DI + Middleware and the
-platform Specializations as composition paths). See [PATTERNS.md](PATTERNS.md) for comprehensive
-documentation on each pattern, including a [Which pattern should I use?](PATTERNS.md#which-pattern-should-i-use)
-decision tree.
+platform Specializations as composition paths). See [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md) for comprehensive
+documentation on each pattern, including a [Which pattern should I use?](DESIGN_PATTERNS.md#which-invocation-pattern-should-i-use)
+decision tree and a [Configuration Patterns](DESIGN_PATTERNS.md#configuration-patterns) guide.
 
-* **`CliRun`** – **Recommended default.** Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. **Start here if you are new to CliInvoke.**
-* **`IProcessInvoker`** – DI-centric pattern and support for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
-* **`IExternalProcess` & `IExternalProcessFactory`** – Process-like API with DI support, rich capability, stable and predictable behaviour. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
+* **`CliRun`** — Recommended default. Beginner-friendly entrypoint for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. Start here if you are new to CliInvoke.
+* **`IProcessInvoker`** — DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
+* **`IExternalProcess` & `IExternalProcessFactory`** — Process-like API with DI support. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
 
 > **New to CliInvoke? Start with `CliRun`** — it is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control. See [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md) for the design rationale.
 
@@ -116,17 +115,19 @@ Console.WriteLine(result.StandardError);
 
 `CliRun` is ideal for scripting, quick prototypes, and basic command execution where you don't need dependency injection or advanced configuration.
 
-For detailed documentation on all available patterns and when to use them, see [PATTERNS.md](PATTERNS.md).
+For detailed documentation on all available patterns and when to use them, see [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md).
 
 ### Advanced Configuration
 
 For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](site/docs/guides/configuration.md)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
 
+> Most configurations are built with direct init construction (see [Configuration Patterns](DESIGN_PATTERNS.md#configuration-patterns)). The builder path is for argument escaping, user credentials, and resource policy features.
+
 ## Middleware
 
 CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns — logging, validation, platform selection, retries — around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`) remain identical.
 
-Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`.
+Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`. `UsePowerShell`/`UseCmd` additionally require registering the Specializations middleware types via `AddCliInvokeSpecializations()` from the `CliInvoke.Specializations` package — see that package's README.
 
 For the full guide — constructor details, the `IProcessMiddleware` contract, DI configuration, result ownership, and the result-swap rule — see the **[Middleware Guide](site/docs/guides/middleware.md)**.
 
@@ -139,7 +140,7 @@ For the full guide — constructor details, the `IProcessMiddleware` contract, D
 > |---|-------------------------|-------------------------------------------------------------------|
 > | 1 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
 > | 2 | `UserCredential`        | `SecureString` password buffer                                    |
-> | 3 | `UserCredentialSpec` | `SecureString` password buffer staged for `Build()`               |
+> | 3 | `UserCredentialSpec`  | `SecureString` password buffer staged for `Build()`               |
 >
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 >
@@ -160,16 +161,7 @@ Full documentation is available in the [CliInvoke Developer Portal](site/docs/re
 | **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](site/docs/getting-started.md) → [Configuration](site/docs/guides/configuration.md)                                                                                                     |
 | **Power User** — "I need full lifecycle control"                   | [Choosing your Invocation Pattern → IExternalProcess](site/docs/guides/choosing-invocation-pattern.md#iexternalprocess--power-user-lifecycle-control) → [Architecture](site/docs/guides/architecture.md) |
 
-> [!NOTE]
-> **Upgrading to 3.0.0?** The `CliRun.UseExternalProcessFactory` / `CliRun.UseFilePathResolver`
-> methods, the configurable `ExitConfiguration` setter, and several `ProcessInvoker` /
-> `ExternalProcess` constructors were removed. `CliRun` is now a stateless
-> batteries-included facade; callers needing a custom factory or resolver should use
-> `IProcessInvoker` (or the DI container) instead. See the
-> **[3.0.0 Migration Guide](site/docs/migration-guides/3.0.0.md)** and
-> **[CHANGELOG.md](CHANGELOG.md)** for the full breaking-change list.
-
-Other guides: [Troubleshooting](site/docs/guides/troubleshooting.md) · [Migration Guides](site/docs/migration-guides/readme.md) · [Building from Source](site/docs/building-cliinvoke.md)
+Other guides: [Troubleshooting](site/docs/guides/troubleshooting.md), [Migration Guides](site/docs/migration-guides/readme.md), [Building from Source](site/docs/building-cliinvoke.md)
 
 ## How to Build CliInvoke's code
 
@@ -206,9 +198,9 @@ unless you have written permission from the maintainer. To request permission, o
 
 <a href="https://www.star-history.com/?repos=alastairlundy%2Fcliinvoke&type=date&logscale=&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&theme=dark&logscale&legend=top-left&sealed_token=h1uzYyzJYAg46ZWXSuf2_bPDCJnRasjV-VB06DK8CRLmjAXg8727LKwfi76Hu7ksNmIpIUD8RXHTquovJuQcCFlnkXAOjYaMjCA5J_I4GHXl3HhXtWrH_wrFMhjP0Ih3lM0Lybq8d8MZiVK86dyS2LnL3b90dirCckN1UvaDX6fggyHlB7y-E61gb6Fz" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&logscale&legend=top-left&sealed_token=h1uzYyzJYAg46ZWXSuf2_bPDCJnRasjV-VB06DK8CRLmjAXg8727LKwfi76Hu7ksNmIpIUD8RXHTquovJuQcCFlnkXAOjYaMjCA5J_I4GHXl3HhXtWrH_wrFMhjP0Ih3lM0Lybq8d8MZiVK86dyS2LnL3b90dirCckN1UvaDX6fggyHlB7y-E61gb6Fz" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=alastairlundy/cliinvoke&type=date&logscale&legend=top-left&sealed_token=h1uzYyzJYAg46ZWXSuf2_bPDCJnRasjV-VB06DK8CRLmjAXg8727LKwfi76Hu7ksNmIpIUD8RXHTquovJuQcCFlnkXAOjYaMjCA5J_I4GHXl3HhXtWrH_wrFMhjP0Ih3lM0Lybq8d8MZiVK86dyS2LnL3b90dirCckN1UvaDX6fggyHlB7y-E61gb6Fz" />
  </picture>
 </a>
 
@@ -216,7 +208,7 @@ unless you have written permission from the maintainer. To request permission, o
 
 ### Projects
 
-This project would like to thank the following projects for their work:
+Thanks to these projects:
 
 * [CliWrap](https://github.com/Tyrrrz/CliWrap/) for inspiring this project
 * [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying older TFM support

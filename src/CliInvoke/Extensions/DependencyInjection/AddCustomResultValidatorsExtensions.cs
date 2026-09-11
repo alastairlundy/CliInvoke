@@ -15,6 +15,20 @@ namespace CliInvoke.Extensions;
 /// <summary>
 ///     Provides extension methods to customize result validators for CliInvoke.
 /// </summary>
+/// <remarks>
+///     <para>
+///         These methods follow a single-threaded registration convention:
+///         <see cref="IServiceCollection"/> is not thread-safe by design and is intended to be
+///         populated during application startup before the service provider is built. No locking
+///         is added.
+///     </para>
+///     <para>
+///         Each call removes any existing validator for <typeparamref name="TProcessResult"/>
+///         via <c>RemoveAll</c> and then adds the new registration with <c>Add</c>, so the
+///         last registration wins. Calling these methods after the service provider has been
+///         built is not supported.
+///     </para>
+/// </remarks>
 public static class AddCustomResultValidatorsExtensions
 {
     extension(IServiceCollection services)
@@ -56,15 +70,15 @@ public static class AddCustomResultValidatorsExtensions
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Scoped:
-                    services.TryAddScoped<IProcessResultValidator<TProcessResult>>(_ =>
+                    services.AddScoped<IProcessResultValidator<TProcessResult>>(_ =>
                         new ProcessResultValidator<TProcessResult>(validationRules));
                     break;
                 case ServiceLifetime.Singleton:
-                    services.TryAddSingleton<IProcessResultValidator<TProcessResult>>(_ =>
+                    services.AddSingleton<IProcessResultValidator<TProcessResult>>(_ =>
                         new ProcessResultValidator<TProcessResult>(validationRules));
                     break;
                 case ServiceLifetime.Transient:
-                    services.TryAddTransient<IProcessResultValidator<TProcessResult>>(_ =>
+                    services.AddTransient<IProcessResultValidator<TProcessResult>>(_ =>
                         new ProcessResultValidator<TProcessResult>(validationRules));
                     break;
                 default:
@@ -111,14 +125,14 @@ public static class AddCustomResultValidatorsExtensions
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Scoped:
-                    services.TryAddScoped<IProcessResultValidator<TProcessResult>>(_ => validator);
+                    services.AddScoped<IProcessResultValidator<TProcessResult>>(_ => validator);
                     break;
                 case ServiceLifetime.Singleton:
-                    services.TryAddSingleton<IProcessResultValidator<TProcessResult>>(_ =>
+                    services.AddSingleton<IProcessResultValidator<TProcessResult>>(_ =>
                         validator);
                     break;
                 case ServiceLifetime.Transient:
-                    services.TryAddTransient<IProcessResultValidator<TProcessResult>>(_ =>
+                    services.AddTransient<IProcessResultValidator<TProcessResult>>(_ =>
                         validator);
                     break;
                 default:

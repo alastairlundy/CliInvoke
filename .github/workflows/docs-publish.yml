@@ -13,9 +13,38 @@ permissions:
 jobs:
   site:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
     steps:
-      - id: lunet
-        name: Build and deploy Lunet site
-        uses: lunet-io/actions/lunet-build@2ea1efa0c38b53c50c3f7dd54aaf25ae4dfee6c7 # v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          site_path: site
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.nuget/packages
+            src/**/obj
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/**/*.csproj', 'Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+          save-always: true
+      - name: Build .NET projects for API docs
+        run: |
+          dotnet build src/CliInvoke.Core -c Release
+          dotnet build src/CliInvoke -c Release
+          dotnet build src/CliInvoke.Specializations -c Release
+      - name: Install Lunet
+        run: |
+          dotnet tool install --global lunet --version "1.*"
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+      - name: Build site
+        working-directory: site
+        run: lunet --stacktrace build
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site/.lunet/build/www
+      - uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

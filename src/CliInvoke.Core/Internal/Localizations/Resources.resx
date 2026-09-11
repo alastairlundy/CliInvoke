@@ -53,6 +53,9 @@
     <data name="Exceptions.TargetFilePath.NullOrEmpty" xml:space="preserve">
         <value>The provided target file path cannot be null or empty.</value>
     </data>
+    <data name="Exceptions.DirectoryNotFound.WorkingDirectory" xml:space="preserve">
+        <value>Working directory '{0}' does not exist.</value>
+    </data>
     <data name="Exceptions.ProcessTimeoutPolicy.Timeout.LessThanZero" xml:space="preserve">
         <value>Timeout threshold must be greater than or equal to zero. Value was {x}.</value>
     </data>

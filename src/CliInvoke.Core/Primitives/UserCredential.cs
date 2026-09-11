@@ -171,18 +171,24 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <summary>
     ///     Returns the hash code for the current user credential.
     /// </summary>
+    /// <remarks>
+    ///     The hash includes <see cref="Domain"/>, <see cref="UserName"/>, and
+    ///     <see cref="LoadUserProfile"/> only. <see cref="Password"/> participates in
+    ///     <see cref="Equals(UserCredential?)"/> content comparison but is intentionally
+    ///     excluded from the hash code to avoid unwrapping or hashing secret material.
+    ///     Note: distinct passwords with the same user and domain may share the same hash code.
+    /// </remarks>
     /// <returns>The hash code for the current user credential.</returns>
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        // If all fields are null, return a consistent hash code
-        if (Domain is null && UserName is null && Password is null && LoadUserProfile is null)
+        // If all non-secret fields are null, return a consistent hash code
+        if (Domain is null && UserName is null && LoadUserProfile is null)
             return 0;
 
         HashCode hash = new HashCode();
         hash.Add(Domain);
         hash.Add(UserName);
-        hash.Add(Password);
         hash.Add(LoadUserProfile);
         return hash.ToHashCode();
 #pragma warning restore CA1416

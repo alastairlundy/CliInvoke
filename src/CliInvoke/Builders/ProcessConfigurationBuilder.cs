@@ -20,7 +20,11 @@ namespace CliInvoke.Builders;
 #pragma warning disable CA1416
 
 /// <summary>
-///     Builder class for creating process configurations.
+///     Advanced builder for creating <see cref="ProcessConfiguration"/> instances.
+///     Use this builder when you need argument escaping via <see cref="ConfigureArguments(Action{ArgumentsSpec})"/>,
+///     user credential configuration via <see cref="ConfigureUserCredential(Action{UserCredentialSpec})"/>,
+///     or resource policy configuration via <see cref="ConfigureProcessResourcePolicy(Action{ProcessResourcePolicySpec})"/>.
+///     For all other cases, prefer direct init construction of <see cref="ProcessConfiguration"/>.
 /// </summary>
 public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
 {
@@ -207,10 +211,6 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     {
         ArgumentException.ThrowIfNullOrEmpty(workingDirectoryPath);
 
-        if (!Directory.Exists(workingDirectoryPath))
-            throw new DirectoryNotFoundException(
-                $"Directory '{workingDirectoryPath}' could not be found or does not exist.");
-
         _workingDirectoryPath = workingDirectoryPath;
 
         return this;
@@ -365,7 +365,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     ///     Configures whether shell execution should be used for the process.
     /// </summary>
     /// <param name="useShellExecution">True to use shell execution, false otherwise.</param>
-    /// <returns>The updated Process Configuration builder with the updated configuration information.</returns>
+    /// <returns>The same builder instance, with output redirection configured.</returns>
     /// <remarks>
     ///     Using Shell Execution whilst also Redirecting Standard Input will throw an Exception.
     ///     This is a known issue with the System Process class.
@@ -385,7 +385,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     ///     A boolean indicating whether to enable or disable window
     ///     creation.
     /// </param>
-    /// <returns>The updated Process Configuration builder with the updated window creation configuration.</returns>
+    /// <returns>The same builder instance, with window creation enabled or disabled.</returns>
     public IProcessConfigurationBuilder EnableWindowCreation(bool enableWindowCreation)
     {
         _enableWindowCreation = enableWindowCreation;
@@ -400,12 +400,9 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     ///     The encoding scheme to use for standard input.
     ///     Uses the Default Encoding if null.
     /// </param>
-    /// <param name="standardOutputEncoding"></param>
-    /// <param name="standardErrorEncoding"></param>
-    /// <returns>
-    ///     The updated Process Configuration builder with the updated encoding scheme configuration
-    ///     information.
-    /// </returns>
+    /// <param name="standardOutputEncoding">The encoding scheme to use for standard output.</param>
+    /// <param name="standardErrorEncoding">The encoding scheme to use for standard error.</param>
+    /// <returns>The same builder instance, with stream encodings set.</returns>
     public IProcessConfigurationBuilder SetEncoding(Encoding? standardInputEncoding = null,
         Encoding? standardOutputEncoding = null, Encoding? standardErrorEncoding = null)
     {
@@ -441,11 +438,25 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
         ProcessResourcePolicy resourcePolicy = _processResourcePolicySpec.Build();
         UserCredential credential = _userCredentialSpec.Build();
 
-        ProcessConfiguration configuration = new(_targetFilePath, arguments,
-            _redirectStandardInput, _outputRedirection,
-            _workingDirectoryPath, _requiresAdministratorPrivileges, environmentVariables,
-            credential, _standardInput, _standardInputEncoding, _standardOutputEncoding, _standardErrorEncoding, resourcePolicy, _enableWindowCreation,
-            _useShellExecution, _argumentList);
+        ProcessConfiguration configuration = new()
+        {
+            TargetFilePath = _targetFilePath,
+            Arguments = arguments,
+            RedirectStandardInput = _redirectStandardInput,
+            OutputRedirection = _outputRedirection,
+            WorkingDirectoryPath = _workingDirectoryPath,
+            RequiresAdministrator = _requiresAdministratorPrivileges,
+            EnvironmentVariables = environmentVariables,
+            Credential = credential,
+            StandardInput = _standardInput,
+            StandardInputEncoding = _standardInputEncoding,
+            StandardOutputEncoding = _standardOutputEncoding,
+            StandardErrorEncoding = _standardErrorEncoding,
+            ResourcePolicy = resourcePolicy,
+            WindowCreation = _enableWindowCreation,
+            UseShellExecution = _useShellExecution,
+            ArgumentList = _argumentList,
+        };
 
         return configuration;
     }
@@ -454,7 +465,6 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     public void Dispose()
     {
         _userCredentialSpec.Dispose();
-        _standardInput.Dispose();
     }
 }
 

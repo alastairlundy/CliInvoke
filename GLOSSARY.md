@@ -11,12 +11,22 @@ A type within the library that manages unmanaged OS resources (such as pipes, fi
 A layered interceptor pattern used to execute cross-cutting concerns (e.g., logging, path resolution, result validation) around the execution of an external process. The pipeline wraps the core process orchestration, allowing modifications to the configuration before execution and modifications to the result after execution.
 
 ### Process Invocation Context
-The state-bearing object passed through the Process Invocation Pipeline. It encapsulates the requested configuration, the execution mode (Basic, Buffered, or Piped), and the resulting process output. It serves as the the single source of truth for middleware to communicate changes and state across the pipeline.
+The state-bearing object passed through the Process Invocation Pipeline. It encapsulates the requested configuration, the execution mode (Basic, Buffered, or Piped), and the resulting process output. It is the single source of truth for middleware to communicate changes and state across the pipeline.
 
+### Invocation Capability
+
+A parameter of the invocation contract that the caller states for the invocation to mean what they intend (e.g., validation rules, truncation cap). Distinct from a middleware concern: cross-cutting behavior composed around the invocation that the caller could omit without changing the invocation's meaning (e.g., logging, retry).
+
+
+## Versioning Terms
+
+### v2-style code
+
+Code that a v3 migration must change: (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles — reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default. Deliberate advanced-builder usage (argument escaping, `UserCredentialSpec`/resource-policy callback flows) is not v2-style.
 
 ## Architectural Patterns
 
-For detailed definitions, target audiences, and usage examples of the architectural patterns used in CliInvoke, refer to **[PATTERNS.md](PATTERNS.md)**.
+For detailed definitions, target audiences, and usage examples of the architectural patterns used in CliInvoke, refer to **[DESIGN_PATTERNS.md](DESIGN_PATTERNS.md)**.
 
 ## Design Decisions
 
@@ -40,9 +50,7 @@ Custom resolvers overriding `GetPathFileExtensions` must return lowercased exten
 
 `AddCliInvoke` registers `IFilePathResolver` with the same lifetime as the global `lifetime` parameter (default `Scoped`). The resolver is not special-cased — a stateless service does not automatically become `Singleton`. Users who want a different lifetime opt in via `UseCustomFilePathResolver<TResolver>(ServiceLifetime)`.
 
-### 6. `CliRun` defaults facade (no static state)
-
-`CliRun` was previously a static facade backed by process-wide mutable state configured through `CliRun.UseExternalProcessFactory` / `CliRun.UseFilePathResolver`. Those `Use*` methods and their backing static fields/helpers were removed: every `Run*`/`FireAndForget` call now allocates a fresh `ProcessInvocationPipeline` (and a fresh `ExternalProcessFactory` with a default `FilePathResolver`) per call. There is therefore no shared lock or lazy-initialisation asymmetry to preserve — the historical `lock(_syncRoot)` double-check on the resolver no longer exists. Callers needing a custom factory or resolver must use `IProcessInvoker` (or DI) instead of `CliRun`.
+The same lifetime-matching rule applies to the `AddCliInvokeSpecializations` add-on (CliInvoke.Specializations package): it must be called with the same `ServiceLifetime` as `AddCliInvoke`, because its middleware lifetimes are matched to the invoker lifetime to avoid captive scoped-in-singleton dependencies.
 
 ## Result Model
 

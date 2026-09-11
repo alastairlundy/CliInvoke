@@ -3,9 +3,12 @@ title: Migration Guides
 layout: simple
 ---
 
-Migration guidance and v1-to-v2 migration resources.
+Migration guidance and migration resources.
 
-- [Migrating to 3.0.0](3.0.0.md) — breaking changes on the `3.0.0-alpha` line
+- [Migrating to 3.0.0](3.0.0.md) — v2 to v3 breaking changes
+
+### Legacy (for users still on v1)
+
 - [v1 to v2: Removed Classes](migration-v1-to-v2-Removed-Classes.md)
 - [v1 to v2: Removed Methods](migration-v1-to-v2-Removed-Methods.md)
 - [v1 to v2: Method Signature Changes](migration-v1-to-v2-Method-Signature-Changes.md)

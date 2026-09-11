@@ -48,12 +48,27 @@ internal static class CancellationHelper
 
 
     /// <summary>
+    ///     Handles exceptions thrown during process cancellation by deciding
+    ///     whether to re-throw or silently swallow them.
     /// </summary>
-    /// <param name="expectedExitTime"></param>
-    /// <param name="cancellationReason"></param>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="exception"></param>
-    /// <exception cref="Exception"></exception>
+    /// <param name="expectedExitTime">
+    ///     The time at which the process was expected to exit, captured when the wait began.
+    ///     Callers must not re-derive this value inside an exception handler; doing so makes the
+    ///     difference below measure the configured timeout threshold instead of the actual skew.
+    /// </param>
+    /// <param name="cancellationReason">The determined reason for the cancellation.</param>
+    /// <param name="exitConfiguration">The exit configuration controlling exception behaviour.</param>
+    /// <param name="exception">The exception to evaluate.</param>
+    /// <remarks>
+    ///     When <see cref="ProcessExitConfiguration.ExceptionBehaviour" /> is
+    ///     <see cref="ProcessExceptionBehaviour.AllowExceptionsIfUnexpected" /> and the reason is a
+    ///     timeout or an unknown reason, the exception is re-thrown only if the cancellation
+    ///     resolved more than 1 second before or after <paramref name="expectedExitTime" />.
+    ///     Exceptions raised by an on-time timeout cancellation resolve within milliseconds of the
+    ///     expected exit time and are swallowed; genuine failures (I/O errors, access violations,
+    ///     etc.) resolve outside that window and propagate to the caller.
+    /// </remarks>
+    /// <exception cref="Exception">Rethrown when the exception behaviour configuration permits it.</exception>
     internal static void HandleCancellationExceptions(DateTime expectedExitTime,
         CancellationReason cancellationReason, ProcessExitConfiguration exitConfiguration,
         Exception exception)
@@ -77,7 +92,7 @@ internal static class CancellationHelper
                     == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
                             .ExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
-                        difference > TimeSpan.FromSeconds(10)))
+                        difference > TimeSpan.FromSeconds(1)))
                     throw exception;
 
                 break;

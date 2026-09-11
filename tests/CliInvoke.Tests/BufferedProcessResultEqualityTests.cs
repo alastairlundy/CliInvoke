@@ -74,4 +74,60 @@ public class BufferedProcessResultEqualityTests
 
         await Assert.That(first.Equals(second)).IsTrue();
     }
+
+    [Test]
+    public async Task Equals_DistinguishesResultsThatDifferOnlyByProcessId()
+    {
+        BufferedProcessResult a = new BufferedProcessResult(
+            "tool", exitCode: 0, processId: 1, standardOutput: "out", standardError: "err",
+            startTime: FixedTime, exitTime: FixedTime, canceled: false, signal: null);
+        BufferedProcessResult b = new BufferedProcessResult(
+            "tool", exitCode: 0, processId: 2, standardOutput: "out", standardError: "err",
+            startTime: FixedTime, exitTime: FixedTime, canceled: false, signal: null);
+
+        await Assert.That(a.Equals(b)).IsFalse();
+    }
+
+    [Test]
+    public async Task GetHashCode_DiffersWhenProcessIdDiffers()
+    {
+        BufferedProcessResult a = new BufferedProcessResult(
+            "tool", exitCode: 0, processId: 1, standardOutput: "out", standardError: "err",
+            startTime: FixedTime, exitTime: FixedTime, canceled: false, signal: null);
+        BufferedProcessResult b = new BufferedProcessResult(
+            "tool", exitCode: 0, processId: 2, standardOutput: "out", standardError: "err",
+            startTime: FixedTime, exitTime: FixedTime, canceled: false, signal: null);
+
+        await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
+    }
+
+    [Test]
+    public async Task NullEqualsNull_IsTrue()
+    {
+        BufferedProcessResult? a = null;
+        BufferedProcessResult? b = null;
+
+        await Assert.That(a == b).IsTrue();
+        await Assert.That(a != b).IsFalse();
+    }
+
+    [Test]
+    public async Task NullEqualsNonNull_IsFalse()
+    {
+        BufferedProcessResult? a = null;
+        BufferedProcessResult b = Create(false);
+
+        await Assert.That(a == b).IsFalse();
+        await Assert.That(a != b).IsTrue();
+    }
+
+    [Test]
+    public async Task NonNullEqualsNull_IsFalse()
+    {
+        BufferedProcessResult a = Create(false);
+        BufferedProcessResult? b = null;
+
+        await Assert.That(a == b).IsFalse();
+        await Assert.That(a != b).IsTrue();
+    }
 }

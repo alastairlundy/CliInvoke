@@ -6,8 +6,8 @@ title: "Getting Started"
 
 > **New to CliInvoke? Start with `CliRun`.** It is the recommended default entry point — zero boilerplate,
 > no dependency injection required. Use `IProcessInvoker` when you need DI or middleware, and
-> `IExternalProcess` when you need process-level control. See [PATTERNS.md](PATTERNS.md) for a
-> [Which pattern should I use?](PATTERNS.md#which-pattern-should-i-use) decision tree.
+> `IExternalProcess` when you need process-level control. See [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md) for a
+> [Which pattern should I use?](DESIGN_PATTERNS.md#which-invocation-pattern-should-i-use) decision tree.
 
 ## Installing CliInvoke
 The main way to install CliInvoke is using [nuget](https://www.nuget.org/packages/CliInvoke/) directly or through your IDE or Code Editor of choice.
@@ -25,10 +25,10 @@ When configuring Nuget setup in your ``.csproj`` file, staying within a major ve
 ## Setting up CliInvoke
 
 ### Dependency Injection
-There are 2 main ways of setting up CliInvoke with dependency injection: manually, and using CliInvoke's ``AddCliInvoke`` configuration extension method from the ``CliInvoke.Extensions`` package.
+There are 2 main ways of setting up CliInvoke with dependency injection: manually, and using CliInvoke's ``AddCliInvoke`` configuration extension method (namespace ``CliInvoke.Extensions``), which ships in the ``CliInvoke`` package.
 
 #### Using ``AddCliInvoke``
-For this approach you'll need the ``CliInvoke.Extensions`` nuget package.
+For this approach you'll need the ``CliInvoke`` nuget package.
 
 If your project doesn't already use Dependency Injection, you can set it up as follows:
 
@@ -53,7 +53,7 @@ class Program
         // Register your other dependencies here
 
         // AddCliInvoke registers IProcessInvoker, IExternalProcessFactory,
-        // IProcessConfigurationBuilder, IRunnerConfigurationFactory and more.
+        // IProcessConfigurationBuilder, and related services.
         services.AddCliInvoke();
 
         // Build the service provider
@@ -70,10 +70,12 @@ You can also configure the middleware pipeline when registering:
 services.AddCliInvoke(builder => builder.UseMiddleware<LoggingMiddleware>());
 ```
 
+> If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations) package's `UsePowerShell()`/`UseCmd()` middleware, also call `AddCliInvokeSpecializations()` (same namespace) with the same `ServiceLifetime` so those middleware types resolve from the container.
+
 #### Manual Setup
 This example manually registers ``IProcessInvoker`` and the other core CliInvoke services as Singletons.
 
-Most developers using CliInvoke in their applications should use the Extensions package's ``AddCliInvoke`` method instead of manually configuring Dependency Injection unless there is a good reason to avoid it.
+Most developers using CliInvoke in their applications should use the ``AddCliInvoke`` method instead of manually configuring Dependency Injection unless there is a good reason to avoid it.
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
@@ -83,9 +85,7 @@ using CliInvoke.Builders;
 using CliInvoke.Core;
 using CliInvoke.Core.Builders;
 using CliInvoke.Core.Extensibility;
-using CliInvoke.Core.Factories;
 using CliInvoke.Extensibility;
-using CliInvoke.Factories;
 
 namespace MyApp;
 
@@ -104,9 +104,7 @@ class Program
         services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
         services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
         services.AddSingleton<IProcessInvoker, ProcessInvoker>();
-
-        // Optional - register if you intend to run a Process Configuration through another Process.
-        services.AddSingleton<IRunnerConfigurationFactory, RunnerConfigurationFactory>();
+        services.AddSingleton<IShellDetector, ShellDetector>();
 
         // Build the service provider
         ServiceProvider = services.BuildServiceProvider();
@@ -170,7 +168,7 @@ services.AddCliInvoke();
 ServiceProvider provider = services.BuildServiceProvider();
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-ProcessConfiguration config = ProcessConfigurationFactory.Create("dotnet", "--version");
+ProcessConfiguration config = new("dotnet", "--version");
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 Console.WriteLine(result.StandardOutput);
 ```

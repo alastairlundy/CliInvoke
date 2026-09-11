@@ -35,14 +35,15 @@ internal sealed class ConditionalMiddleware : IProcessMiddleware
     /// <inheritdoc />
     public async Task InvokeAsync(InvocationContext context, Func<InvocationContext, Task> next)
     {
-        if (await _predicate(context))
+        if (await _predicate(context).ConfigureAwait(false))
         {
-            MiddlewareChain subChain = new MiddlewareChain(_subPipeline, next);
-            await subChain.RunAsync(context, context.CancellationToken);
+            MiddlewareItems? currentItems = context.Middleware?.Items;
+            MiddlewareChain subChain = new MiddlewareChain(_subPipeline, next, currentItems);
+            await subChain.RunAsync(context, context.CancellationToken).ConfigureAwait(false);
         }
         else
         {
-            await next(context);
+            await next(context).ConfigureAwait(false);
         }
     }
 }

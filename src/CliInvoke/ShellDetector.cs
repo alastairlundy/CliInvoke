@@ -14,7 +14,7 @@ using CliInvoke.Internal.Versions;
 namespace CliInvoke;
 
 /// <summary>
-///     Represents a detector for resolving the default shell on various operating systems.
+///     Resolves the default shell on Windows, macOS, and Linux.
 /// </summary>
 public class ShellDetector : IShellDetector
 {
@@ -23,9 +23,9 @@ public class ShellDetector : IShellDetector
 
     private readonly bool isUnix;
 
-    /// <summary>
-    ///     Represents a detector for resolving the default shell on various operating systems.
-    /// </summary>
+/// <summary>
+///     Initialises a new instance using the specified process invoker and file path resolver.
+/// </summary>
     public ShellDetector(IProcessInvoker processInvoker, IFilePathResolver filePathResolver)
     {
         _processInvoker = processInvoker;
@@ -50,10 +50,10 @@ public class ShellDetector : IShellDetector
         CancellationToken cancellationToken = default)
     {
         if (isUnix)
-            return await ResolveDefaultShellOnUnixAsync(cancellationToken);
+            return await ResolveDefaultShellOnUnixAsync(cancellationToken).ConfigureAwait(false);
 
         if (OperatingSystem.IsWindows())
-            return await ResolveDefaultShellOnWindowsAsync(cancellationToken);
+            return await ResolveDefaultShellOnWindowsAsync(cancellationToken).ConfigureAwait(false);
 
         throw new PlatformNotSupportedException();
     }
@@ -64,22 +64,27 @@ public class ShellDetector : IShellDetector
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
-        cancellationToken.Register(() => throw new TaskCanceledException());
+        ProcessConfiguration execConfiguration = new ProcessConfiguration("ps", "-p $$ -o comm=");
 
-        ProcessConfiguration execConfiguration = ProcessConfigurationFactory
-            .Create("ps", "-p $$ -o comm=");
+        cancellationToken.ThrowIfCancellationRequested();
 
         BufferedProcessResult execResult = await _processInvoker.ExecuteBufferedAsync(
-            execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+            execConfiguration, ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         FileInfo shellExeInfo = _filePathResolver.ResolveFilePath(
             GetFirstLine(execResult.StandardOutput));
 
-        ProcessConfiguration shellInfoProcessConfig = ProcessConfigurationFactory
-            .Create(shellExeInfo.FullName, "--version");
+        ProcessConfiguration shellInfoProcessConfig = new ProcessConfiguration(
+            shellExeInfo.FullName, "--version");
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         BufferedProcessResult shellInfoResult = await _processInvoker.ExecuteBufferedAsync(
-            shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+            shellInfoProcessConfig, ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         string? versionLine = null;
 
@@ -116,12 +121,12 @@ public class ShellDetector : IShellDetector
         {
             FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
-            ProcessConfiguration powershellConfig = ProcessConfigurationFactory
-                .Create(powershell5PlusFileInfo.FullName, "");
+            ProcessConfiguration powershellConfig = new ProcessConfiguration(
+                powershell5PlusFileInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
                 powershellConfig,
-                ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+                ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
 
             string[] powershellResults =
                 result.StandardOutput.Replace("v", string.Empty).Split(' ');
@@ -134,15 +139,18 @@ public class ShellDetector : IShellDetector
             return new ShellInformation(powershellResults.First(), powershell5PlusFileInfo,
                 version);
         }
-        catch
+        catch (Exception ex) when (ex is FileNotFoundException or InvalidOperationException)
         {
+            // Expected failures: pwsh.exe not found (FileNotFoundException) or shell output
+            // doesn't contain a parseable version line (InvalidOperationException).
+            // OperationCanceledException propagates naturally without falling through to cmd.
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
-            ProcessConfiguration cmdConfig = ProcessConfigurationFactory
-                .Create(cmdExeInfo.FullName, "");
+            ProcessConfiguration cmdConfig = new ProcessConfiguration(
+                cmdExeInfo.FullName, "");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
-                ProcessExitConfiguration.CreateGraceful(), cancellationToken);
+                ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
 
             string line = GetFirstLine(result.StandardOutput);
 

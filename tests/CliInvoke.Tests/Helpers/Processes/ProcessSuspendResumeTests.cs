@@ -40,10 +40,11 @@ public class ProcessSuspendResumeTests
             await Assert.That(process.HasStarted).IsTrue();
 
             process.SuspendProcess();
-            // Allow suspend to take effect
-            await Task.Delay(500);
 
-            await Assert.That(process.HasExited).IsFalse();
+            await ProcessTestHelper.WaitForConditionAsync(
+                () => !process.HasExited,
+                TimeSpan.FromSeconds(3),
+                failureMessage: "Process exited before suspend could take effect");
 
             process.ResumeProcess();
 

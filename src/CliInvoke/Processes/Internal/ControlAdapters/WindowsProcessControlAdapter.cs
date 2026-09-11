@@ -134,7 +134,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
                 Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
             );
 
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        if (OperatingSystem.IsWindows())
             if (resourcePolicy.ProcessorAffinity is not null)
                 process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
 

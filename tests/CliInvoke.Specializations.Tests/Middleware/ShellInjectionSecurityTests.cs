@@ -47,7 +47,7 @@ public class ShellInjectionSecurityTests
     }
 
     private static ProcessConfiguration MakeConfig(string target, string args)
-        => ProcessConfigurationFactory.Create(target, args);
+        => new ProcessConfiguration(target, args);
 
     [Test]
     [SupportedOSPlatform("windows")]

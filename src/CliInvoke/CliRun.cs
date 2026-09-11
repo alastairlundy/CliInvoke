@@ -55,7 +55,7 @@ public static class CliRun
         (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
             BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: false);
 
-        return await RunAsync(configuration, exitConfiguration, cancellationToken);
+        return await RunAsync(configuration, exitConfiguration, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -101,6 +101,10 @@ public static class CliRun
     /// <param name="timeoutTimeSpan">
     /// The maximum duration that the process can run before timing out. If null, a default timeout is applied.
     /// </param>
+    /// <param name="maxBufferedOutputBytes">
+    /// The maximum number of bytes of combined standard output and standard error to buffer before truncation
+    /// is applied. If null, the default cap is used. Applies only to buffered capture.
+    /// </param>
     /// <param name="cancellationToken">
     /// A token to monitor for cancellation requests, allowing the operation to be cancelled before it completes.
     /// </param>
@@ -110,12 +114,12 @@ public static class CliRun
     /// </returns>
     public static async Task<BufferedProcessResult> RunBufferedAsync(string targetFilePath,
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
-        CancellationToken cancellationToken = default)
+        long? maxBufferedOutputBytes = null, CancellationToken cancellationToken = default)
     {
         (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
-            BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: true);
+            BuildStringArgsConfig(targetFilePath, arguments, workingDirectory, timeoutTimeSpan, outputRedirection: true, maxBufferedOutputBytes);
 
-        return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken);
+        return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken).ConfigureAwait(false);
     }
 
 
@@ -173,8 +177,8 @@ public static class CliRun
         // ExitConfiguration is unused by FireAndForget
         workingDirectory ??= Environment.CurrentDirectory;
 
-        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(targetFilePath,
-            arguments, workingDirectory, outputRedirection: false);
+        ProcessConfiguration configuration = new ProcessConfiguration(targetFilePath, arguments)
+            { OutputRedirection = false, WorkingDirectoryPath = workingDirectory };
 
         return FireAndForget(configuration);
     }
@@ -184,15 +188,18 @@ public static class CliRun
     ///     shared by the string-argument overloads, applying the default working directory and timeout policy.
     /// </summary>
     private static (ProcessConfiguration Configuration, ProcessExitConfiguration ExitConfiguration) BuildStringArgsConfig(
-        string targetFilePath, string arguments, string? workingDirectory, TimeSpan? timeoutTimeSpan, bool outputRedirection)
+        string targetFilePath, string arguments, string? workingDirectory, TimeSpan? timeoutTimeSpan, bool outputRedirection,
+        long? maxBufferedOutputBytes = null)
     {
         workingDirectory ??= Environment.CurrentDirectory;
 
-        ProcessConfiguration configuration = ProcessConfigurationFactory.Create(
-            targetFilePath, arguments, workingDirectory, outputRedirection);
+        ProcessConfiguration configuration = new ProcessConfiguration(
+            targetFilePath, arguments, outputRedirection) { WorkingDirectoryPath = workingDirectory };
 
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.CreateGraceful(
-            ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan ?? ProcessTimeoutPolicy.Default.TimeoutThreshold));
+        ProcessExitConfiguration exitConfiguration = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+            ProcessExitConfiguration.CreateGraceful(
+                ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan ?? ProcessTimeoutPolicy.Default.TimeoutThreshold)),
+            maxBufferedOutputBytes);
 
         return (configuration, exitConfiguration);
     }

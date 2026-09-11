@@ -24,7 +24,7 @@ provides the layer on top.
 
 The library targets .NET 10, runs on Windows, macOS,
 Linux, and BSD, and ships with first-class dependency-integration helpers
-through `CliInvoke.Extensions`.
+(`AddCliInvoke`, namespace `CliInvoke.Extensions`) in the `CliInvoke` package.
 
 ## What it offers
 
@@ -51,7 +51,7 @@ practical to use day-to-day:
   with sensible defaults. See the
   [Configuration guide](docs/guides/configuration.md) for the full
   reference.
-- **Resource disposal** — five
+- **Resource disposal** — three
   [Resource-Owning Types](docs/guides/resource-disposal.md) own every
   unmanaged handle and `SecureString` buffer; the
   [Resource Disposal guide](docs/guides/resource-disposal.md) documents
@@ -113,7 +113,7 @@ output, send signals, or replace components for advanced scenarios.
    and the Process Invocation Pipeline so you can reason about where a
    customisation belongs.
 3. [Resource Disposal](docs/guides/resource-disposal.md) — the disposal
-   contract for the five Resource-Owning Types, including
+   contract for the three Resource-Owning Types, including
    `IExternalProcess`.
 
 ### If you have a specific task

@@ -13,7 +13,7 @@ Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/bl
 
 ## Usage
 
-CliInvoke.Specializations comes with two specializations as of 3.0.0 (currently in pre-release as `3.0.0-beta.1`):
+CliInvoke.Specializations ships two specializations:
 
 - [CmdProcessConfiguration](#cmdprocessconfiguration) — An easier way to execute processes and commands through
   Windows' `cmd.exe`.
@@ -26,8 +26,7 @@ executable.
 
 ### Quick start with CliRun
 
-The fastest way to run a specialization configuration is via the static `CliRun` helper. It handles process creation
-and disposal for you, so you only need to build the configuration and await the result.
+The fastest path is the static `CliRun` helper. Build a configuration and await the result.
 
 ```csharp
 using CliInvoke;
@@ -39,7 +38,7 @@ using PowershellProcessConfiguration config = new PowershellProcessConfiguration
 
 BufferedProcessResult result = await CliRun.RunBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 
-// result.StandardOutput contains the captured output; result.ExitCode holds the process exit code.
+
 ```
 
 `CliRun` also exposes `RunAsync` (returns a `ProcessResult`) and
@@ -48,12 +47,23 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(config, ProcessExit
 ### Dependency Injection
 
 If you prefer to resolve an invoker from a dependency injection container, call `AddCliInvoke()` (namespace
-`CliInvoke.Extensions`). This registers the core services, the `IProcessInvoker` implementation, the
-`IRunnerConfigurationFactory`, and the `IExternalProcessFactory`.
+`CliInvoke.Extensions`, shipped in the main `CliInvoke` package). This registers the core services, the
+`IProcessInvoker` implementation, the `IRunnerConfigurationFactory`, and the `IExternalProcessFactory`.
 
-The Cmd and PowerShell specializations middleware (`UsePowerShell()` and `UseCmd()`) is **opt-in**: by default the
-registered invoker runs with no specializations middleware wired into its pipeline. To activate it, compose the
-middleware explicitly in the configure callback:
+#### AddCliInvokeSpecializations
+
+`AddCliInvokeSpecializations()` (namespace `CliInvoke.Extensions`, shipped in this package) registers the
+Specializations middleware types — `PowerShellMiddleware`, `CmdMiddleware`, and `PowerShellMiddlewareOptions` —
+so that the convenience builder extensions `UsePowerShell()` and `UseCmd()` can resolve them from the DI
+container.
+
+> **`AddCliInvoke()` is required.** `AddCliInvokeSpecializations()` only registers middleware types; it does
+> **not** register core CliInvoke services. You **must** call `AddCliInvoke()` as well, or the invoker,
+> process factory, and other core services will not be available.
+
+Both registrations accept an optional `ServiceLifetime` parameter (default `Scoped`). The two calls are
+independent and can be chained in either order, but both must use the **same lifetime** — middleware lifetimes
+are matched to the invoker lifetime to avoid capturing scoped services into a singleton:
 
 ```csharp
 using CliInvoke.Extensions;
@@ -61,11 +71,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 ServiceCollection services = new ServiceCollection();
 
-// The specializations middleware is opt-in: compose it explicitly.
-services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd());
+// AddCliInvoke() is required — it registers core services.
+// AddCliInvokeSpecializations() registers the Cmd/PowerShell middleware types.
+services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd())
+    .AddCliInvokeSpecializations();
 
 using IServiceProvider serviceProvider = services.BuildServiceProvider();
 ```
+
+> Calling `AddCliInvoke(builder => builder.UsePowerShell())` without `AddCliInvokeSpecializations()` compiles but
+> throws `InvalidOperationException` when the invoker is first resolved, because the `PowerShellMiddleware` type
+> is not registered in the container.
 
 ### CmdProcessConfiguration
 
@@ -77,59 +93,30 @@ using CliInvoke.Core;
 using CliInvoke.Core.Extensibility;
 using CliInvoke.Specializations.Configurations;
 
-// ServiceProvider and Dependency Injection code ommitted for clarity
+    // DI setup omitted for clarity
 
 IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 IRunnerConfigurationFactory _runnerConfigurationFactory = serviceProvider.GetRequiredService<IRunnerConfigurationFactory>();
 
-// Create your runner configuration.
 ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
-    // redirectStandardInput, outputRedirection, workingDirectoryPath
     false, true, Environment.SystemDirectory);
 
-// Create your configuration to be run.
 ProcessConfiguration config = new ProcessConfiguration("Path/To/Exe", "With/Arguments");
-
-// Creates a ProcessConfiguration that will use the runner configuration to run the desired configuration.
 ProcessConfiguration processToRun = _runnerConfigurationFactory.CreateRunnerConfiguration(config, runnerConfig);
 
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
 ```
 
-If the result of the command being run is not of concern you can call `ExecuteAsync()` instead of
-`ExecuteBufferedAsync()` and ignore the returned `ProcessResult` like so:
+To discard the output, call `ExecuteAsync()` instead:
 
 ```csharp
-using CliInvoke;
-using CliInvoke.Core;
-using CliInvoke.Core.Extensibility;
-using CliInvoke.Specializations.Configurations;
-
-// ServiceProvider and Dependency Injection code ommitted for clarity
-
-IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-IRunnerConfigurationFactory _runnerConfigurationFactory = serviceProvider.GetRequiredService<IRunnerConfigurationFactory>();
-
-// Create your runner configuration.
-ProcessConfiguration runnerConfig = new CmdProcessConfiguration("Your arguments go here",
-    // redirectStandardInput, outputRedirection, workingDirectoryPath
-    false, true, Environment.SystemDirectory);
-
-// Create your configuration to be run.
-ProcessConfiguration config = new ProcessConfiguration("Path/To/Exe", "With/Arguments");
-
-// Creates a ProcessConfiguration that will use the runner configuration to run the desired configuration.
-ProcessConfiguration processToRun = _runnerConfigurationFactory.CreateRunnerConfiguration(config, runnerConfig);
-
+// Same setup as above, then:
 ProcessResult result = await _processInvoker.ExecuteAsync(processToRun);
 ```
 
 ### PowershellProcessConfiguration
 
-The `PowershellProcessConfiguration`'s `TargetFilePath` points to the installed copy of cross-platform PowerShell if it
-is installed.
-
-This is only supported on platforms that cross-platform PowerShell supports.
+`PowershellProcessConfiguration.TargetFilePath` points to the installed copy of cross-platform PowerShell. Supported on the platforms that `pwsh` supports.
 
 ```csharp
 using CliInvoke;
@@ -137,20 +124,15 @@ using CliInvoke.Core;
 using CliInvoke.Core.Extensibility;
 using CliInvoke.Specializations.Configurations;
 
-// ServiceProvider and Dependency Injection code ommitted for clarity
+// DI setup omitted for clarity
 
 IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 IRunnerConfigurationFactory _runnerConfigurationFactory = serviceProvider.GetRequiredService<IRunnerConfigurationFactory>();
 
-// Create your runner configuration.
 ProcessConfiguration runnerConfig = new PowershellProcessConfiguration("-Command Get-Process",
-    // redirectStandardInput, outputRedirection
     false, true);
 
-// Create your configuration to be run.
 ProcessConfiguration config = new ProcessConfiguration("Path/To/Exe", "With/Arguments");
-
-// Creates a ProcessConfiguration that will use the runner configuration to run the desired configuration.
 ProcessConfiguration processToRun = _runnerConfigurationFactory.CreateRunnerConfiguration(config, runnerConfig);
 
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
@@ -158,12 +140,12 @@ BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(proces
 
 ### Dedicated invokers
 
-In addition to the configuration classes above, CliInvoke.Specializations ships two convenience invoker wrappers —
-`CmdProcessInvoker` and `PowershellProcessInvoker` (namespace `CliInvoke.Specializations`) — that implement
-`IProcessInvoker` with the relevant middleware (`CmdMiddleware` / `PowerShellMiddleware`) pre-applied. They let you run
-commands through `cmd.exe` / `pwsh` directly without manually building a runner configuration each time.
+CliInvoke.Specializations also ships two convenience invoker wrappers — `CmdProcessInvoker` and
+`PowershellProcessInvoker` (namespace `CliInvoke.Specializations`) — that implement `IProcessInvoker`
+with the relevant middleware (`CmdMiddleware` / `PowerShellMiddleware`) applied. They run commands
+through `cmd.exe` / `pwsh` directly without manually building a runner configuration.
 
-Both are constructed from an `IExternalProcessFactory`, which `AddCliInvoke()` registers in the container:
+Both are constructed from an `IExternalProcessFactory`, which `AddCliInvoke()` (main `CliInvoke` package) registers in the container:
 
 ```csharp
 using CliInvoke.Core;

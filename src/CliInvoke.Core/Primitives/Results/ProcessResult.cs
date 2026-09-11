@@ -177,8 +177,8 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// </returns>
     public static bool Equals(ProcessResult? left, ProcessResult? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null)
+            return right is null;
 
         return left.Equals(right);
     }
@@ -192,8 +192,11 @@ public class ProcessResult : IEquatable<ProcessResult>
     ///     <c>true</c> if the specified <see cref="ProcessResult" /> instances are equal; otherwise,
     ///     <c>false</c>.
     /// </returns>
-    public static bool operator ==(ProcessResult left, ProcessResult? right)
+    public static bool operator ==(ProcessResult? left, ProcessResult? right)
     {
+        if (left is null)
+            return right is null;
+
         return left.Equals(right);
     }
 
@@ -206,8 +209,11 @@ public class ProcessResult : IEquatable<ProcessResult>
     ///     <c>true</c> if the specified <see cref="ProcessResult" /> instances are not equal; otherwise,
     ///     <c>false</c>.
     /// </returns>
-    public static bool operator !=(ProcessResult left, ProcessResult? right)
+    public static bool operator !=(ProcessResult? left, ProcessResult? right)
     {
+        if (left is null)
+            return right is not null;
+
         return !left.Equals(right);
     }
 }

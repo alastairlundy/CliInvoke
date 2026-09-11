@@ -13,7 +13,6 @@ global using System.Threading.Tasks;
 global using CliInvoke.Core;
 global using CliInvoke.Core.Builders;
 global using CliInvoke.Core.Exceptions;
-global using CliInvoke.Internal;
 global using CliInvoke.Internal.Localizations;
 
 global using System.Diagnostics.CodeAnalysis;

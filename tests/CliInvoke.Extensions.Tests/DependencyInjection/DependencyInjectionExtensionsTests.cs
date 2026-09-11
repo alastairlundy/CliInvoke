@@ -9,6 +9,7 @@
 
 using System.Runtime.InteropServices;
 using CliInvoke.Core.Middleware;
+using CliInvoke.Core.Validation;
 using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
@@ -155,7 +156,7 @@ public class DependencyInjectionExtensionsTests
         IProcessInvoker invoker = scope.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         (string filePath, string arguments) = ResolveEchoCommand();
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(filePath, arguments);
+        ProcessConfiguration config = new ProcessConfiguration(filePath, arguments);
 
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,
@@ -168,6 +169,7 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCliInvoke_WithConfigure_UsePowerShell_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
         services.AddCliInvoke(builder => builder.UsePowerShell());
         IServiceProvider provider = services.BuildServiceProvider();
 
@@ -182,6 +184,7 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCliInvoke_WithConfigure_UseCmd_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
         services.AddCliInvoke(builder => builder.UseCmd());
         IServiceProvider provider = services.BuildServiceProvider();
 
@@ -196,6 +199,7 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCliInvoke_WithConfigure_AllBuiltInMiddleware_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
         services.AddCliInvoke(builder =>
         {
             builder.UseLogging();
@@ -210,5 +214,78 @@ public class DependencyInjectionExtensionsTests
 
         await Assert.That(invoker).IsNotNull();
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
+    }
+
+    [Test]
+    public async Task AddValidationRules_RegistersValidator()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddValidationRules<ProcessResult>(
+            [result => result.ExitCode == 0]);
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessResultValidator<ProcessResult>? validator =
+            scope.ServiceProvider.GetService<IProcessResultValidator<ProcessResult>>();
+
+        await Assert.That(validator).IsNotNull();
+        await Assert.That(validator).IsTypeOf<ProcessResultValidator<ProcessResult>>();
+    }
+
+    [Test]
+    public async Task AddValidationRules_DoubleCall_LastRegistrationWins()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddValidationRules<ProcessResult>(
+            [result => result.ExitCode == 0]);
+        services.AddValidationRules<ProcessResult>(
+            [result => result.ExitCode != 0]);
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessResultValidator<ProcessResult>? validator =
+            scope.ServiceProvider.GetService<IProcessResultValidator<ProcessResult>>();
+
+        await Assert.That(validator).IsNotNull();
+    }
+
+    [Test]
+    public async Task AddCustomResultValidators_RegistersValidator()
+    {
+        var customValidator = new ProcessResultValidator<ProcessResult>(
+            [result => result.ExitCode == 0]);
+
+        IServiceCollection services = new ServiceCollection();
+        services.AddCustomResultValidators<ProcessResult, ProcessResultValidator<ProcessResult>>(
+            customValidator);
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessResultValidator<ProcessResult>? resolved =
+            scope.ServiceProvider.GetService<IProcessResultValidator<ProcessResult>>();
+
+        await Assert.That(resolved).IsNotNull();
+        await Assert.That(resolved).IsSameReferenceAs(customValidator);
+    }
+
+    [Test]
+    public async Task AddCustomResultValidators_DoubleCall_LastRegistrationWins()
+    {
+        var first = new ProcessResultValidator<ProcessResult>(
+            [result => result.ExitCode == 0]);
+        var second = new ProcessResultValidator<ProcessResult>(
+            [result => result.ExitCode != 0]);
+
+        IServiceCollection services = new ServiceCollection();
+        services.AddCustomResultValidators<ProcessResult, ProcessResultValidator<ProcessResult>>(first);
+        services.AddCustomResultValidators<ProcessResult, ProcessResultValidator<ProcessResult>>(second);
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessResultValidator<ProcessResult>? resolved =
+            scope.ServiceProvider.GetService<IProcessResultValidator<ProcessResult>>();
+
+        await Assert.That(resolved).IsNotNull();
+        await Assert.That(resolved).IsSameReferenceAs(second);
     }
 }

@@ -8,13 +8,13 @@
 
 CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
 
-Launch processes, redirect standard input and output streams, await process completion and much more.
+Launch processes, redirect standard input and output streams, and await process completion.
 
 ## Features
 
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
 * Supports .NET 10 and has few dependencies.
-* Has Dependency Injection extensions to make using it a breeze.
+* Dependency Injection extensions register `IProcessInvoker`, `IExternalProcessFactory`, and middleware from a single `AddCliInvoke()` call.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
   Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
@@ -33,7 +33,7 @@ Launch processes, redirect standard input and output streams, await process comp
 
 ## Installing CliInvoke
 
-CliInvoke is available on [the Nuget Gallery](https://nuget.org) but call be also installed via the ``dotnet`` sdk cli.
+CliInvoke is available on [the Nuget Gallery](https://nuget.org) but can also be installed via the `dotnet` CLI.
 
 The package(s) to install depends on your use case:
 
@@ -76,7 +76,7 @@ dotnet add package CliInvoke.Specializations
 
 ## Supported Platforms
 
-CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
+CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android.
 
 For more details see
 the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/Supported-OperatingSystems.md)
@@ -102,7 +102,7 @@ using CliInvoke;
 
 using Microsoft.Extensions.DependencyInjection;
 
-// Dependency Injection setup code ommitted for clarity
+// Dependency Injection setup code omitted for clarity
 
 // Get IExternalProcessFactory 
 IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
@@ -128,7 +128,7 @@ using CliInvoke;
 
 using Microsoft.Extensions.DependencyInjection;
 
-// Dependency Injection setup code ommitted for clarity
+// Dependency Injection setup code omitted for clarity
 
 // Get IExternalProcessFactory 
 IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
@@ -225,7 +225,7 @@ your third party licenses txt file or as a separate txt file.
 
 ### Projects
 
-This project would like to thank the following projects for their work:
+Thanks to these projects:
 
 * [CliWrap](https://github.com/Tyrrrz/CliWrap/) for inspiring this project
 * [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying .NET Standard 2.0 support

@@ -31,7 +31,7 @@ Key Abstractions:
 
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
 * Supports .NET 10 and has few dependencies.
-* Has Dependency Injection extensions to make using it a breeze.
+* Dependency Injection extensions register `IProcessInvoker`, `IExternalProcessFactory`, and middleware from a single `AddCliInvoke()` call.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
   Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
@@ -61,14 +61,14 @@ via the Nuget website.
 
 ## Supported Platforms
 
-CliInvoke supports Windows, macOS, Linux, FreeBSD, Android, and potentially some other operating systems.
+CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android.
 
 For more details see
 the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/Supported-OperatingSystems.md)
 
 ## Design Patterns & When to Use Them
 
-CliInvoke.Core provides abstractions and types used by different design patterns. For comprehensive documentation on design patterns, see [PATTERNS.md](../../PATTERNS.md).
+CliInvoke.Core provides abstractions and types used by different design patterns. For comprehensive documentation on design patterns, see [DESIGN_PATTERNS.md](../../DESIGN_PATTERNS.md).
 
 * **`CliRun`** – Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. (Requires `CliInvoke` package)
 * **`IProcessInvoker`** – DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
@@ -94,7 +94,7 @@ using CliInvoke.Core;
 
 using Microsoft.Extensions.DependencyInjection;
 
-// Dependency Injection setup code ommitted for clarity
+// Dependency Injection setup code omitted for clarity
 
 // Get IExternalProcessFactory 
 IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
@@ -119,7 +119,7 @@ using CliInvoke.Core;
 
 using Microsoft.Extensions.DependencyInjection;
 
-// Dependency Injection setup code ommitted for clarity
+// Dependency Injection setup code omitted for clarity
 
 // Get IExternalProcessFactory 
 IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
@@ -316,7 +316,7 @@ ProcessExitConfiguration noTimeout = new ProcessExitConfiguration(ProcessTimeout
 
 ### Projects
 
-This project would like to thank the following projects for their work:
+Thanks to these projects:
 
 * [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying older TFM support
 

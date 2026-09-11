@@ -40,11 +40,11 @@ public class BufferedCaptureNoDeadlockTests
     public async Task ExecuteBufferedAsync_LargeOutput_CompletesWithoutDeadlock_AndTruncates()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseOutputTruncation(new TruncationOptions { MaxSize = 4096 }));
+        services.AddCliInvoke(builder => builder.UseOutputTruncation(new TruncationOptions { MaxBytes = 4096 }));
         IProcessInvoker invoker = services.BuildServiceProvider().GetRequiredService<IProcessInvoker>();
 
         (string target, string arguments) = GetLargeOutputCommand();
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(target, arguments);
+        ProcessConfiguration config = new ProcessConfiguration(target, arguments);
 
         // Wrap with a timeout so a regression (deadlock) fails fast instead of hanging the run.
         BufferedProcessResult result = await invoker

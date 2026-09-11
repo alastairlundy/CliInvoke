@@ -11,9 +11,14 @@ helps you pick the right pattern for your scenario and understand how to
 migrate between them as your needs grow.
 
 If you need the full API-level detail for each pattern, see
-[`PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/PATTERNS.md).
+[`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md).
 For the internal data-flow, see
 [Architecture](architecture.md).
+
+> **Upgrading from v2?** See the
+> [Migrating to 3.0.0](../migration-guides/3.0.0.md) guide for
+> breaking changes, before/after examples, and the full walkthrough of
+> v2-style code replacements.
 
 ## The three patterns at a glance
 
@@ -113,6 +118,7 @@ You get results with a single line of code — no DI container, no factories.
 // Register in DI
 using CliInvoke.Core;
 using CliInvoke;
+using CliInvoke.Extensions;
 
 services.AddCliInvoke();
 // IProcessInvoker is registered automatically.
@@ -120,8 +126,7 @@ services.AddCliInvoke();
 // Later in your code
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-ProcessConfiguration config = new(
-    "dotnet", "--info", true);
+ProcessConfiguration config = new("dotnet", "--version");
 
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
     config, ProcessExitConfiguration.CreateGraceful());
@@ -169,8 +174,7 @@ using CliInvoke.Factories;
 
 IExternalProcessFactory factory = new ExternalProcessFactory();
 
-ProcessConfiguration config = new(
-    "dotnet", "--runtime", true);
+ProcessConfiguration config = new("dotnet", "--version");
 using IExternalProcess process = factory.CreateExternalProcess(config);
 
 await process.StartAsync();
@@ -192,8 +196,7 @@ services.AddCliInvoke();
 IExternalProcessFactory factory =
     provider.GetRequiredService<IExternalProcessFactory>();
 
-ProcessConfiguration config = new(
-    "dotnet", "--runtime", true);
+ProcessConfiguration config = new("dotnet", "--version");
 using IExternalProcess process = factory.CreateExternalProcess(config);
 
 await process.StartAsync();
@@ -233,8 +236,7 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(
 // After: IProcessInvoker
 IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
-ProcessConfiguration config = new(
-    "dotnet", "--version", true);
+ProcessConfiguration config = new("dotnet", "--version");
 
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config);
 ```
@@ -273,6 +275,23 @@ BufferedProcessResult result = await process.CaptureBufferedResultAsync(
 
 ---
 
+## v2 → v3 migration
+
+If you are upgrading from v2, the [Migrating to 3.0.0](../migration-guides/3.0.0.md) guide
+covers every breaking change including:
+
+- `CliRun.UseExternalProcessFactory` / `CliRun.UseFilePathResolver` removal
+- `ExitConfiguration` becoming read-only at construction
+- `ProcessConfigurationFactory` removal (use init construction)
+- `ArgumentsList` → `ArgumentList` rename
+- `ExternalProcess` sealed with constructor C only
+
+See the [Shared Construction](../migration-guides/3.0.0.md#shared-construction-v3-default)
+walkthrough for the init-first construction story that replaces v2
+builder-default patterns.
+
+---
+
 ## Summary of trade-offs
 
 | Pattern | Beginner friendly | Handles resource disposal | Testable | Lifecycle control | Boilerplate |
@@ -293,7 +312,8 @@ controlling start/stop sequences, or building process-aware libraries.
 
 ## Further reading
 
-- [`PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/PATTERNS.md) — full API reference for each pattern.
+- [`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md) — full API reference for each pattern.
 - [Architecture](architecture.md) — internal data-flow and implementation mapping.
 - [Configuration](configuration.md) — configuration model reference and builders.
 - [Resource Disposal](resource-disposal.md) — ownership and disposal rules.
+- [Migrating to 3.0.0](../migration-guides/3.0.0.md) — breaking changes and upgrade guide.

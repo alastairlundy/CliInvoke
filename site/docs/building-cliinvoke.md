@@ -64,7 +64,7 @@ To manually build a project for release, enter ``dotnet build -c Release /p:Cont
 Builds should generally always include Source Link and symbol packages if intended for wider distribution.
 
 ## Licensing
-CliInvoke.Extensions is licensed under the MPL 2.0 license. If you modify any of the package's files then the modified files must remain licensed under the MPL 2.0 .
+CliInvoke is licensed under the MPL 2.0 license. If you modify any of the package's files then the modified files must remain licensed under the MPL 2.0 .
 
 If you use this package in your project please make an exact copy of the contents of the LICENSE.txt file available either in your third party licenses txt file or as a separate txt file.
 

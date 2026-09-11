@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using CliInvoke.Core.Validation;
+
 namespace CliInvoke.Core;
 
 /// <summary>
@@ -74,5 +76,45 @@ public static class ProcessExitConfigurationCreationExtensions
             => ProcessExitConfiguration.Create(new ProcessTimeoutPolicy(
                 timeoutPolicy.TimeoutThreshold, timeoutPolicy.Enabled,
                 ProcessExitBehaviour.ForcefulExit));
+
+        /// <summary>
+        /// Creates a new <see cref="ProcessExitConfiguration"/> with the specified validation rules,
+        /// replacing any existing rules while preserving all other properties.
+        /// </summary>
+        /// <param name="config">The source configuration to copy from.</param>
+        /// <param name="rules">The validation rules to apply to the process result.</param>
+        /// <returns>A new configuration instance with the updated validation rules.</returns>
+        public static ProcessExitConfiguration WithValidationRules(ProcessExitConfiguration config, params ValidationRule<ProcessResult>[] rules)
+        {
+            return new ProcessExitConfiguration(
+                config.TimeoutPolicy,
+                config.RequestedCancellationExitBehaviour,
+                config.ExceptionBehaviour,
+                config.CancellationThrowsException)
+            {
+                ValidationRules = rules,
+                MaxBufferedOutputBytes = config.MaxBufferedOutputBytes
+            };
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="ProcessExitConfiguration"/> with the specified buffer cap,
+        /// preserving all other properties.
+        /// </summary>
+        /// <param name="config">The source configuration to copy from.</param>
+        /// <param name="cap">The maximum number of bytes of standard output to buffer, or <c>null</c> for unbounded.</param>
+        /// <returns>A new configuration instance with the updated buffer cap.</returns>
+        public static ProcessExitConfiguration WithMaxBufferedOutputBytes(ProcessExitConfiguration config, long? cap)
+        {
+            return new ProcessExitConfiguration(
+                config.TimeoutPolicy,
+                config.RequestedCancellationExitBehaviour,
+                config.ExceptionBehaviour,
+                config.CancellationThrowsException)
+            {
+                ValidationRules = config.ValidationRules,
+                MaxBufferedOutputBytes = cap
+            };
+        }
     }
 }

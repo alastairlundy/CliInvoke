@@ -52,7 +52,7 @@ internal class ProcessWrapper : Process
     }
 
     // Synchronisation primitive to prevent simultaneous cancellation attempts
-    internal readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
+    private readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
     // Resolved cancellation reason, persisted across the wait so Canceled can be computed afterward.
     private CancellationReason _cancellationReason = CancellationReason.NotKnown;
@@ -116,9 +116,9 @@ internal class ProcessWrapper : Process
             {
                 SuspendProcess();
             }
-            catch
+            catch (InvalidOperationException)
             {
-                // Process exited before we could suspend it, or suspend failed.
+                // Process exited before we could suspend it.
                 return;
             }
 
@@ -128,6 +128,10 @@ internal class ProcessWrapper : Process
                 ProcessControlAdapter.SetResourcePolicy(this, ResourcePolicy);
 #pragma warning restore CA1416
             }
+            catch (InvalidOperationException)
+            {
+                // Process exited before we could set the resource policy.
+            }
             finally
             {
                 // Always resume the process — even if SetResourcePolicy throws —
@@ -136,7 +140,7 @@ internal class ProcessWrapper : Process
                 {
                     ResumeProcess();
                 }
-                catch
+                catch (InvalidOperationException)
                 {
                     // The process may have already exited during SetResourcePolicy.
                     // Swallow the exception — the process is gone, nothing to resume.
@@ -147,7 +151,7 @@ internal class ProcessWrapper : Process
 
     private void OnExited(object? sender, EventArgs e)
     {
-        ExitTime = base.ExitTime;
+        ExitTime = base.ExitTime.ToUniversalTime();
     }
 
     internal event EventHandler Started;
@@ -162,6 +166,10 @@ internal class ProcessWrapper : Process
         {
             HasStarted = false;
 
+            // ERROR_FILE_NOT_FOUND (2) or ERROR_PATH_NOT_FOUND (3)
+            if (exception.NativeErrorCode is 2 or 3)
+                throw new FileNotFoundException($"The file '{StartInfo.FileName}' was not found.", StartInfo.FileName, exception);
+
             throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
         }
 
@@ -169,8 +177,6 @@ internal class ProcessWrapper : Process
         {
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
         }
-
-        if (!HasStarted) return HasStarted;
 
         // Cache StandardOutput/StandardError StreamReaders while the process is still
         // guaranteed alive. These properties internally call EnsureState, which in
@@ -206,7 +212,7 @@ internal class ProcessWrapper : Process
         }
 
         StartTime = DateTime.UtcNow;
-        Started.Invoke(this, EventArgs.Empty);
+        Started?.Invoke(this, EventArgs.Empty);
 
         return HasStarted;
     }
@@ -270,9 +276,8 @@ internal class ProcessWrapper : Process
     {
         if (StartInfo.RedirectStandardInput)
         {
-            await StandardInput.FlushAsync(cancellationToken);
-            StandardInput.BaseStream.Position = 0;
-            await source.CopyToAsync(StandardInput.BaseStream, cancellationToken);
+            await StandardInput.FlushAsync(cancellationToken).ConfigureAwait(false);
+            await source.CopyToAsync(StandardInput.BaseStream, cancellationToken).ConfigureAwait(false);
 
             return source.Equals(StandardInput.BaseStream);
         }
@@ -294,8 +299,9 @@ internal class ProcessWrapper : Process
 
         if (StartInfo.RedirectStandardOutput)
             if (StandardOutput != StreamReader.Null)
-                await StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken);
+                await StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
 
+        destination.Position = 0;
         return destination;
     }
 
@@ -313,8 +319,9 @@ internal class ProcessWrapper : Process
 
         if (StartInfo.RedirectStandardError)
             if (StandardError != StreamReader.Null)
-                await StandardError.BaseStream.CopyToAsync(destination, cancellationToken);
+                await StandardError.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
 
+        destination.Position = 0;
         return destination;
     }
     #endregion
@@ -327,17 +334,24 @@ internal class ProcessWrapper : Process
     /// </summary>
     /// <remarks>
     ///     This is a distinct overload of the base buffered-capture method on <see cref="Process"/>;
-    ///     the inherited method is NOT overridden. When a cap is <c>null</c> (or &lt;= 0) the stream is read
-    ///     in full, matching the prior behaviour.
+    ///     the inherited method is NOT overridden. The cap parameter supports three spellings:
+    ///     <list type="bullet">
+    ///         <item><c>null</c> — no cap is applied; the stream is read in full.</item>
+    ///         <item>Negative value — no cap is applied; equivalent to <c>null</c>.</item>
+    ///         <item><c>0</c> — a valid zero-byte cap producing empty text with the truncated flag set.</item>
+    ///         <item>Positive value — the stream is read up to that many bytes, then truncated.</item>
+    ///     </list>
     /// </remarks>
     /// <param name="cancellationToken">A cancellation token for the read operations.</param>
     /// <param name="maxStandardOutputBytes">
     ///     An optional maximum number of bytes to capture from standard output before truncating.
-    ///     <c>null</c> means no cap is applied.
+    ///     <c>null</c> or a negative value means no cap is applied.
+    ///     <c>0</c> is a valid zero-byte cap producing empty text with the truncated flag set.
     /// </param>
     /// <param name="maxStandardErrorBytes">
     ///     An optional maximum number of bytes to capture from standard error before truncating.
-    ///     <c>null</c> means no cap is applied.
+    ///     <c>null</c> or a negative value means no cap is applied.
+    ///     <c>0</c> is a valid zero-byte cap producing empty text with the truncated flag set.
     /// </param>
     /// <returns>
     ///     A tuple containing the captured standard output, standard error, and a flag indicating
@@ -363,6 +377,17 @@ internal class ProcessWrapper : Process
     ///     Reads a redirected stream into a string, copying at most <paramref name="maxBytes"/> bytes and
     ///     discarding any remainder (lossy truncation).
     /// </summary>
+    /// <remarks>
+    ///     The <paramref name="maxBytes"/> parameter supports three spellings:
+    ///     <list type="bullet">
+    ///         <item><c>null</c> — no cap; the stream is read in full.</item>
+    ///         <item>Negative value — no cap; equivalent to <c>null</c>.</item>
+    ///         <item><c>0</c> — a valid zero-byte cap producing empty text with the truncated flag set.</item>
+    ///         <item>Positive value — the stream is read up to that many bytes, then truncated.</item>
+    ///     </list>
+    ///     Multibyte sequences that straddle the cap boundary are decoded incrementally so that
+    ///     split trailing bytes are held back and dropped cleanly (no U+FFFD replacement characters).
+    /// </remarks>
     private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
         StreamReader reader,
         bool redirected,
@@ -375,11 +400,24 @@ internal class ProcessWrapper : Process
         Encoding encoding = reader.CurrentEncoding;
         Stream stream = reader.BaseStream;
 
-        if (maxBytes is null or <= 0)
+        // null or negative = no cap
+        if (maxBytes is null or < 0)
         {
             using MemoryStream memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
             return (encoding.GetString(memoryStream.ToArray()), false);
+        }
+
+        // 0 = valid zero-byte cap: empty text, truncated flag set
+        if (maxBytes == 0)
+        {
+            // Drain any existing data so the pipe is fully consumed.
+            byte[] drainBuffer = new byte[8192];
+            while (await stream.ReadAsync(drainBuffer, cancellationToken).ConfigureAwait(false) > 0)
+            {
+                // Remainder is discarded.
+            }
+            return (string.Empty, true);
         }
 
         byte[] buffer = new byte[8192];
@@ -416,20 +454,35 @@ internal class ProcessWrapper : Process
             // Remainder is discarded.
         }
 
-        return (encoding.GetString(outputStream.ToArray()), truncated);
+        // Use incremental decoding so split trailing multibyte sequences are
+        // held back and dropped cleanly instead of producing U+FFFD.
+        Decoder decoder = encoding.GetDecoder();
+        byte[] outputBytes = outputStream.ToArray();
+        int charCount = decoder.GetCharCount(outputBytes, 0, outputBytes.Length);
+        char[] chars = new char[charCount];
+        decoder.GetChars(outputBytes, 0, outputBytes.Length, chars, 0);
+
+        return (new string(chars), truncated);
     }
 
     #endregion
 
     internal void ForcefulExit()
     {
+        if (HasExited)
+            return;
+
         try
         {
             Kill(true);
         }
-        catch
+        catch (InvalidOperationException)
         {
-            Kill();
+            // Process exited between the HasExited check and Kill(true); nothing to do.
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            // Process handle may be invalid or access denied; nothing more we can do.
         }
     }
     
@@ -443,7 +496,7 @@ internal class ProcessWrapper : Process
         if (processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero)
         {
             await WaitForExitOrCancellationAsync(processExitConfiguration,
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
             return;
         }
 
@@ -452,20 +505,20 @@ internal class ProcessWrapper : Process
             case ProcessExitBehaviour.WaitForExit:
             {
                 await WaitForExitOrCancellationAsync(processExitConfiguration,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
                 return;
             }
             case ProcessExitBehaviour.GracefulExit:
             default:
             {
                 await WaitForExitOrGracefulTimeoutAsync(processExitConfiguration,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
                 return;
             }
             case ProcessExitBehaviour.ForcefulExit:
             {
                 await WaitForExitOrForcefulTimeoutAsync(processExitConfiguration,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
                 return;
             }
         }
@@ -475,7 +528,7 @@ internal class ProcessWrapper : Process
         ProcessExitConfiguration processExitConfiguration,
         CancellationToken cancellationToken = default)
     {
-        await WaitForExitCoreAsync(processExitConfiguration, cancellationToken, isGraceful: false);
+        await WaitForExitCoreAsync(processExitConfiguration, cancellationToken, isGraceful: false).ConfigureAwait(false);
     }
     
     /// <summary>
@@ -496,7 +549,7 @@ internal class ProcessWrapper : Process
         ArgumentOutOfRangeException.ThrowIfLessThan(
             exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
 
-        await WaitForExitCoreAsync(exitConfiguration, cancellationToken, isGraceful: true, fallbackToForceful);
+        await WaitForExitCoreAsync(exitConfiguration, cancellationToken, isGraceful: true, fallbackToForceful).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -515,8 +568,16 @@ internal class ProcessWrapper : Process
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (HasExited)
+            try
+            {
+                if (HasExited)
+                    return;
+            }
+            catch (ObjectDisposedException)
+            {
+                // Process was disposed externally; treat as exited.
                 return;
+            }
 
             await Task.Delay(pollIntervalMs, cancellationToken).ConfigureAwait(false);
         }
@@ -535,12 +596,17 @@ internal class ProcessWrapper : Process
         bool fallbackToForceful = true)
     {
         // Use semaphore to prevent simultaneous cancellation attempts
-        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
+        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
         {
             // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitSafeAsync(cancellationToken);
+            await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
             return;
         }
+
+        // Captured before the wait so exception handling measures how far the
+        // cancellation resolved from the expected exit time.
+        DateTime expectedExitTime =
+            CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
 
         try
         {
@@ -555,7 +621,7 @@ internal class ProcessWrapper : Process
                 await Task.WhenAny([
                     WaitForExitSafeAsync(cancellationToken),
                     cancelWithInterruptTask
-                ]);
+                ]).ConfigureAwait(false);
 
                 await Task.WhenAny([
                     Task.Delay(
@@ -563,7 +629,7 @@ internal class ProcessWrapper : Process
                             CalculatePostInterruptGracePeriodSeconds((int)processExitConfiguration.TimeoutPolicy.TimeoutThreshold.TotalSeconds)),
                         cancellationToken),
                     WaitForExitSafeAsync(cancellationToken)
-                ]);
+                ]).ConfigureAwait(false);
 
                 // Ensure the interrupt/timeout resolution has fully completed and persisted
                 // _cancellationReason before the caller reads Canceled. Otherwise the returned
@@ -571,29 +637,25 @@ internal class ProcessWrapper : Process
                 // terminated by the cancellation machinery. Only wait when the process did not
                 // exit on its own, so fast-exiting processes are not held for the full timeout.
                 if (!HasExited && !cancelWithInterruptTask.IsCompleted)
-                    await cancelWithInterruptTask;
+                    await cancelWithInterruptTask.ConfigureAwait(false);
 
                 if (!HasExited && fallbackToForceful)
                     ForcefulExit();
             }
             else
             {
-                await WaitForExitSafeAsync(cancellationToken);
+                await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (!isGraceful)
         {
             await CancelWithInterrupt(TimeSpan.Zero,
-                processExitConfiguration, cancellationToken);
+                processExitConfiguration, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception) when (!isGraceful)
         {
-            // Recalculate values in exception handler to avoid using stale values
-            DateTime currentExpectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
-
             CancellationHelper.HandleCancellationExceptions(
-                currentExpectedExitTime,
+                expectedExitTime,
                 CancellationReason.RequestedCancellation, processExitConfiguration,
                 exception);
         }
@@ -632,47 +694,43 @@ internal class ProcessWrapper : Process
 
         CancellationToken actualCancellationToken = cts.Token;
 
-        // Use a local variable to store the cancellation reason to avoid race conditions
-        CancellationReason cancellationReason = CancellationReason.NotKnown;
-
-        actualCancellationToken.Register(() =>
-        {
-            cancellationReason =
-                CancellationHelper.GetCancellationReason(expectedExitTime,
-                    cancellationToken);
-        });
-
+        bool acquired = false;
         // Use semaphore to prevent simultaneous cancellation attempts
-        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken))
+        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
         {
-            // Another cancellation is already in progress, wait for it to complete
-            await WaitForExitSafeAsync(cancellationToken);
-            // Dispose of the linked CTS to prevent resource leaks
+            await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
             cts.Dispose();
             return;
         }
 
+        acquired = true;
+
         try
         {
-            await WaitForExitSafeAsync(actualCancellationToken);
-            _cancellationReason = cancellationReason;
+            await WaitForExitSafeAsync(actualCancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
-            // Recalculate expected exit time in exception handler to avoid using stale values
-            DateTime currentExpectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-            CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
+            CancellationReason cancellationReason =
+                CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+            CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                 cancellationReason, exitConfiguration, exception);
             _cancellationReason = cancellationReason;
         }
         finally
         {
-            ForcefulExit();
-            // Dispose of the linked CTS to prevent resource leaks
+            try
+            {
+                ForcefulExit();
+            }
+            catch (Exception)
+            {
+                // Best-effort kill; swallow any exception to avoid masking the original.
+            }
 
             cts.Dispose();
-            _cancellationSemaphore.Release();
+            if (acquired)
+                _cancellationSemaphore.Release();
         }
     }
     
@@ -690,25 +748,15 @@ internal class ProcessWrapper : Process
     private async Task<bool> CancelWithInterrupt(TimeSpan timeoutThreshold,
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
     {
-        DateTime expectedExitTime =
-            CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-
-        // Use a local variable to store the cancellation reason to avoid race conditions
-        CancellationReason cancellationReason = CancellationReason.NotKnown;
-
-        // Register the callback to update the cancellation reason
-        cancellationToken.Register(() =>
-        {
-            cancellationReason =
-                CancellationHelper.GetCancellationReason(expectedExitTime,
-                    cancellationToken);
-        });
-
         bool cancellationSuccess;
+
+        // Captured before the wait so exception handling measures how far the
+        // cancellation resolved from the expected exit time.
+        DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
 
         try
         {
-            await Task.Delay(timeoutThreshold, cancellationToken);
+            await Task.Delay(timeoutThreshold, cancellationToken).ConfigureAwait(false);
 
             if (HasExited)
                 return true;
@@ -716,21 +764,20 @@ internal class ProcessWrapper : Process
             // Reaching this point means the delay elapsed without the token being
             // canceled, i.e. a graceful timeout. Persist the resolved reason before
             // sending the interrupt so Canceled can be computed from it afterward.
-            cancellationReason = CancellationReason.Timeout;
-            _cancellationReason = cancellationReason;
+            _cancellationReason = CancellationReason.Timeout;
 
-            return  await ProcessControlAdapter.SendInterruptSignalAsync(this,
-                cancellationReason, exitConfiguration, cancellationToken);
+            return await ProcessControlAdapter.SendInterruptSignalAsync(this,
+                CancellationReason.Timeout, exitConfiguration, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
-            // Recalculate expected exit time in exception handler to avoid using stale values
-            DateTime currentExpectedExitTime =
-                CancellationHelper.CalculateExpectedExitTime(exitConfiguration);
-            
-            cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason);
-            
-            CancellationHelper.HandleCancellationExceptions(currentExpectedExitTime,
+            // Compute the cancellation reason at the catch point where the token is known-canceled.
+            CancellationReason cancellationReason =
+                CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+
+            cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason).ConfigureAwait(false);
+
+            CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                 cancellationReason,
                 exitConfiguration, exception);
             _cancellationReason = cancellationReason;

@@ -15,11 +15,21 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>Hardened command construction in RunnerConfigurationFactory against malformed arguments.</PackageReleaseNotes>
+        <PackageReleaseNotes>#### 🐛 Bug Fixes
+
+- Fixed `ExternalProcess` event handler leak — handlers are now properly unsubscribed before re-subscribing on `Start`/`StartAsync`
+- Fixed null-safe config conversion, double-dispose guard, and `ExitTime` UTC handling in `ExternalProcess`
+- Fixed `ProcessWrapper` error resilience for fast-exiting processes
+- Fixed `CancellationHelper` exit-skew window — expected exit time is now captured when the wait begins instead of being re-derived in exception handlers
+
+#### ⚙️ Modifications
+- Moved `AddCliInvoke` DI registration into this package from `CliInvoke.Specializations`
+- Cleaned up stale `GlobalUsings.cs` entry
+- Cleaned up XML doc comments on `ExternalProcess`, `ProcessWrapper`, `ShellDetector`, and `ProcessResultValidator`</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-beta.2</PackageVersion>
+        <PackageVersion>3.0.0-rc.1</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -42,7 +52,6 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
-        <InternalsVisibleTo Include="CliInvoke.Specializations"/>
         <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
     </ItemGroup>
 

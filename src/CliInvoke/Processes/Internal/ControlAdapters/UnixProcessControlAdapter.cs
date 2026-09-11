@@ -68,7 +68,6 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         if (OperatingSystem.IsMacOS()
             || OperatingSystem.IsMacCatalyst()
             || OperatingSystem.IsFreeBSD()
-            || OperatingSystem.IsWindows()
            )
         {
             if (resourcePolicy.MinWorkingSet is not null)
@@ -91,14 +90,30 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     [UnsupportedOSPlatform("windows")]
     internal override void RequireRunningAsAdmin(Process process)
     {
-        if (OperatingSystem.IsLinux() ||
-            OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
-            OperatingSystem.IsFreeBSD())
-            process.StartInfo.Verb = "sudo";
+        throw new PlatformNotSupportedException(
+            "Running as admin is not supported on Unix-like systems. Use sudo or run as root directly.");
     }
 
     internal override void SetUserCredential(Process process, UserCredential credential)
     {
+        if (credential is null)
+            return;
+
+        // An "empty" credential (all fields null) is a no-op, matching the
+        // WindowsProcessControlAdapter field-by-field semantics; only a populated
+        // credential is unsupported on Unix-like systems. ProcessConfiguration.Credential
+        // defaults to the non-null UserCredential.Null sentinel, so a null check alone
+        // would reject every default-configuration process start on Unix.
+#pragma warning disable CA1416
+        bool hasCredential = credential.UserName is not null
+            || credential.Domain is not null
+            || credential.Password is not null
+            || credential.LoadUserProfile is not null;
+#pragma warning restore CA1416
+
+        if (hasCredential)
+            throw new PlatformNotSupportedException(
+                "Setting user credentials is not supported on Unix-like systems.");
     }
 
     internal override PosixSignal? GetTerminatingSignal(int exitCode)
@@ -145,7 +160,7 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         bool sigTermSuccess = SendUnixSignal(process.Id, Sigterm);
 
         await Task.Delay(DelayBeforeSigintMilliseconds,
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
 
         return sigTermSuccess || SendUnixSignal(process.Id, Sigint);
     }

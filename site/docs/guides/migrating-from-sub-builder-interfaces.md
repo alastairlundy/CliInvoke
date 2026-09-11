@@ -12,6 +12,13 @@ CliInvoke v3.0.0 replaces the four sub-builder interfaces with sealed
 configuration spec classes. This guide shows what changed and how to
 update your code.
 
+> **In v3, init construction is the default.** The builder and its
+> spec classes are reserved for advanced scenarios (argument escaping,
+> `UserCredentialSpec`, resource-policy callback flows). If you are
+> writing new code, use `ProcessConfiguration` init construction
+> directly — see the [Configuration guide](configuration.md) for the
+> recommended construction story.
+
 ## What changed
 
 The following interfaces and their concrete builder implementations

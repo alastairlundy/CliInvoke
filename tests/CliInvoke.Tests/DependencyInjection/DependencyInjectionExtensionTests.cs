@@ -13,6 +13,7 @@ using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Factories;
+using CliInvoke.Specializations.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -155,12 +156,43 @@ public class DependencyInjectionExtensionTests
         IProcessInvoker invoker = scope.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         (string filePath, string arguments) = ResolveEchoCommand();
-        ProcessConfiguration config = ProcessConfigurationFactory.Create(filePath, arguments);
+        ProcessConfiguration config = new ProcessConfiguration(filePath, arguments);
 
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,
             ProcessExitConfiguration.CreateGraceful());
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task AddCliInvoke_WithConfigure_UsePowerShell_WithSpecializations_ResolvesInvoker()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
+        services.AddCliInvoke(builder => builder.UsePowerShell());
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
+
+        await Assert.That(invoker).IsNotNull();
+        await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
+    }
+
+    [Test]
+    public async Task AddCliInvoke_WithConfigure_UsePowerShell_WithoutSpecializations_ThrowsOnInvokerResolution()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvoke(builder => builder.UsePowerShell());
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        // PowerShellMiddleware is only registered by AddCliInvokeSpecializations in the
+        // CliInvoke.Specializations package; without it the pipeline build fails when
+        // the invoker is first resolved.
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
+            () => provider.GetService<IProcessInvoker>());
+
+        await Assert.That(exception.Message).Contains("PowerShellMiddleware");
     }
 }

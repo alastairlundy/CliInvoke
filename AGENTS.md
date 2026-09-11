@@ -1,78 +1,76 @@
 # CliInvoke Agent Guidelines
 
 ## What this repo is
-CliInvoke — a .NET/C# library for running and interacting with command-line processes (builders, configuration models, invokers, DI helpers and optional specializations).
+CliInvoke — a .NET/C# library for launching and interacting with command-line processes (builders, configuration models, invokers, middleware, DI, and platform specializations).
 
-- Languages & targets: C#/.NET. Primary target: .NET 10. 
-- Structure: Small-to-medium .NET library with multiple projects under src/.
+- Single TFM: `net10.0` (see `global.json` and csproj files). Current release line: `3.0.0`.
+- Docs portal lives in `site/` (built with Lunet, published on GitHub release). Root `getting-started.md` is legacy — prefer `site/docs/`.
 
 ## Codebase Organization
 - **Solution**: `src/CliInvoke.sln`
-- **Projects**:
-  - `src/CliInvoke.Core/` - Abstractions and models
-  - `src/CliInvoke/` - Main implementation
-  - `src/CliInvoke.Extensions/` - DI and helpers
-  - `src/CliInvoke.Specializations/` - Platform-specific features
-- **Tests**: Located in `tests/` folder, uses TUnit framework.
-- **Infrastructure**:
-  - Root: `README.md`, `CONTRIBUTING.md`
-  - Build Guidance: `site/docs/building-cliinvoke.md`
-  - CI Workflows: `.github/workflows/*` (test.yml, publish.yml, scorecard.yml)
-  - Other: `benchmarks/`, `.assets/`, `THIRD_PARTY_NOTICES.txt`
-- **SDK**: Respect `global.json` (currently .NET 10.0) - matches CI.
+- **Packages** (each carries its own `Version`/`PackageVersion` and `PackageReleaseNotes` in its csproj):
+  - `src/CliInvoke.Core/` — abstractions & models (`ProcessConfiguration`, results, middleware interfaces)
+  - `src/CliInvoke/` — implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers, including the `AddCliInvoke` DI entry point in `Extensions/DependencyInjection/AddCliInvokeExtensions.cs`, namespace `CliInvoke.Extensions`)
+  - `src/CliInvoke.Specializations/` — PowerShell/CMD middleware; also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Extensions`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
+- `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. `tests/CliInvoke.Extensions.Tests/` still exists and tests the folded-in extensions.
+- **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs only `tests/CliInvoke.Tests/`.
+- **Benchmarks**: `benchmarks/`.
+- **SDK**: `global.json` pins .NET 10 SDK (`rollForward: latestFeature`). Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
 
-## Important Conventions
-- **Working directory**: CI tests are executed from `tests/CliInvoke.Tests/` (see `.github/workflows/test.yml`). Match this when reproducing issues.
-- **Target framework**: net10.0 (see csproj files)
-- **Testing**: Uses TUnit framework - `dotnet test` discovers and runs tests.
-- **Resource disposal**: Refer to the Resource Cleanup section in `README.md` for guidance on disposing key types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec`.
-- **Versioning**: Update csproj version and changelog for releases.
+## Build & Test (replicate CI order)
+From repo root (see `.github/workflows/test.yml`):
+1. `bash scripts/guard-configureawait.sh src` — **ConfigureAwait guard, hard CI gate run before build.** Every `await` in `src/` must have `.ConfigureAwait(false)`; `await foreach`/`await using` are exempt. Run via Git Bash/WSL on Windows.
+2. `dotnet build src/CliInvoke.sln`
+3. From `tests/CliInvoke.Tests/`: `dotnet test`
 
-## Common Gotchas
-- SDK mismatch: Check `dotnet --version` vs `global.json` if build fails with TFM errors.
-- Packaging: Use the `cliinvoke-publish-and-package` skill when testing changes across projects or preparing releases.
-- External processes: Tests calling executables may behave differently across OSes. Prefer running in Ubuntu-latest/containers to replicate CI failures accurately.
-- SourceLink / CI: release builds in CI expect SourceLink and symbol generation. Use `/p:ContinuousIntegrationBuild=true` to replicate CI/release behavior.
+Other gates/quirks:
+- **XML doc comments are build errors**: `Directory.Build.props` escalates CS1574/1580/1581/1584/1658/1734/1762 to errors. Keep `<summary>`/`<paramref>`/`<see>` valid on public API.
+- **`ImplicitUsings` disabled**; `LangVersion` 14; Nullable enabled. Style: `src/.editorconfig` (no `var` for built-ins, separate using groups, 100-col max).
+- **Central Package Management**: `src/`, `tests/`, `benchmarks/` each have their own `Directory.Packages.props`. New `PackageReference` requires a matching `PackageVersion` there — no `Version=` attributes in csprojs.
+- **AOT & trimming**: src packages are `IsAotCompatible` + `IsTrimmable` — avoid reflection-dependent APIs.
 
-## Developer Expectations for PRs
-- Small, focused changes with tests passing.
-- If adding features or changing behavior, include or update tests under tests/ and run dotnet test locally.
-- Update docs/README where usage or public API changed.
-- If modifying core that other projects consume, validate by packing core and restoring the other projects from that local feed.
+## Invocation patterns (architecture)
+Three patterns, documented in `DESIGN_PATTERNS.md` (includes a decision tree):
+- **`CliRun`** — static, stateless, batteries-included facade; recommended default (`RunAsync`/`RunBufferedAsync` with string-args overloads). Allocates a fresh pipeline per call; no process-wide configurable state.
+- **`IProcessInvoker`** — DI-centric; the only pattern that flows through the middleware chain.
+- **`IExternalProcess` / `IExternalProcessFactory`** — process-like lifecycle control; does **not** flow through middleware (the bypass pattern).
+- Built-in middleware: `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd` (+ retry/truncation extensions). Middleware returns the process result **un-disposed** to the caller.
+- Middleware state split: **DI** resolves framework services (loggers, validators, lifetimes); **`MiddlewareItems`** is the ad-hoc per-invocation bag shared between middleware (same split as `HttpContext.RequestServices` vs `HttpContext.Items`).
+- Construction default: init construction with `required` `TargetFilePath`. `ProcessConfigurationBuilder` is only for argument escaping, `UserCredentialSpec`, and resource-policy callback flows — reaching for the builder by habit is "v2-style code" (see `GLOSSARY.md`).
+- Load the `cliinvoke-pattern-validator` skill when adding or changing invocation code.
 
-When making changes, prefer to open/modify files under src/ and run tests targeting src/CliInvoke/ for fast feedback.
+## Resource disposal
+Exactly **three** `IDisposable` types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec` (see README "Resource Disposal"). `ProcessConfiguration` is not disposable; `StandardInput`/`UserCredential` placed inside it remain the caller's responsibility.
 
-## Contributing and PR workflow
-- **Follow `CONTRIBUTING.md`** for all contributions. Read it before making non-trivial changes; it defines branching, commit, and review expectations.
-- **Use `.github/pull_request_template.md`** whenever you open or draft a pull request on behalf of a user. Fill in every section (What changed, Why it was changed, Testing, Documentation, Contribution Policy compliance, Authorship) so the PR is ready for review without further editing.
+## Domain conventions (details in GLOSSARY.md — do not "fix" these)
+- `FilePathResolverBase.ResolveFilePath`: PATH lookup first, then directory recursion — a performance contract; reordering requires a new ADR.
+- `Get*` returns materialized arrays; `Enumerate*` returns lazy `IEnumerable` — intentional naming asymmetry.
+- Custom `GetPathFileExtensions` overrides must return **lowercased** extensions or matching silently fails.
+- `Try*` methods must never propagate exceptions (catch `Exception` by convention).
 
-## Specialized Workflows
-The following skills are available to handle specific operational tasks. Load them when the corresponding scenario arises:
+## Packaging & releases
+- Use the `cliinvoke-publish-and-package` skill for releases and cross-project testing (it requires running `cliinvoke-inner-loop` first).
+- Release-style build: `dotnet build src/CliInvoke.sln -c Release /p:ContinuousIntegrationBuild=true` (SourceLink + snupkg expected in CI).
+- Cross-project testing: pack Core to a local feed and restore dependents with `-s ./nupkgs`; `UsePublishedPackages=true` with `-p:CliInvokeCoreVersion=...` / `-p:CliInvokeVersion=...` switches project refs to package refs.
+- `publish.yml` is manual (`workflow_dispatch` with `core-version` and `main-version` inputs).
+- Update the csproj `PackageVersion`/`PackageReleaseNotes` **and** `CHANGELOG.md` for releases.
 
+## Testing notes
+- TUnit + FsCheck (property tests) + Bogus.
+- Tests spawn real executables (`dotnet`, `powershell.exe`, `pwsh`); PowerShell middleware tests skip when `pwsh` is not on PATH (e.g., Windows CI). OS-dependent behavior — replicate CI on ubuntu-latest when in doubt.
+
+## PRs & contributing
+- Follow `CONTRIBUTING.md`; fill in every section of `.github/pull_request_template.md`.
+- Small, focused changes with tests passing; update `site/docs`/README when usage or public API changes.
+- **IVT grants are minimized**: new `InternalsVisibleTo` grants need justification (`docs/adr/0001-ivt-minimization.md`); unused grants are removed.
+- **Writing public-facing text** (READMEs, docs, guides, skill descriptions): load the `unslop` skill and apply its checklist before committing.
+
+## Specialized workflows (skills)
 | Scenario | Skill to Load |
 |----------|--------------|
-| Daily development: restoring, building, and running tests | `cliinvoke-inner-loop` |
-| Local NuGet packing for cross-project testing | `cliinvoke-publish-and-package` |
-| Production release: versioning and publishing to NuGet | `cliinvoke-publish-and-package` |
-
-## Middleware Patterns
-
-### Middleware asymmetry across invocation patterns
-
-Middleware applies to `ProcessInvoker` and `IProcessInvoker` only. The three invocation patterns have different middleware coverage:
-
-- **`ProcessInvoker` / `IProcessInvoker`** — full middleware support. Every invocation flows through the registered middleware chain.
-- **`IExternalProcess`** — does **not** flow through middleware. This is the bypass pattern for direct process execution.
-- **`CliInvoke.Specializations`** — can be used via middleware extensions (e.g., `UsePowerShell`, `UseCmd`) but is not required to do so. Specializations that bypass the invoker do not go through middleware.
-
-### DI and `MiddlewareItems` coexistence
-
-DI and `MiddlewareItems` serve complementary purposes and coexist in the middleware pipeline:
-
-- **DI** handles framework services with proper lifetime and scope management — loggers, validators, options, and other registered services.
-- **`MiddlewareItems`** handles ad-hoc per-invocation state shared between middleware instances — a custom validation result, a per-invocation correlation id, or any other ad-hoc data that does not belong in the DI container.
-
-This mirrors the ASP.NET Core precedent where `HttpContext.RequestServices` provides DI-resolved services and `HttpContext.Items` provides an ad-hoc dictionary for per-request state.
+| Daily development: restore, build, and run tests | `cliinvoke-inner-loop` |
+| Local NuGet packing / release publishing | `cliinvoke-publish-and-package` |
+| Invocation-pattern changes | `cliinvoke-pattern-validator` |
 
 ## Agent skills
 

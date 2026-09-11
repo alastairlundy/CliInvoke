@@ -8,7 +8,6 @@
    */
 
 using CliInvoke.Core.Middleware;
-using CliInvoke.Core.Validation;
 
 namespace CliInvoke.Extensions.Middleware.Retry;
 
@@ -17,21 +16,32 @@ namespace CliInvoke.Extensions.Middleware.Retry;
 ///     applying the configured backoff between attempts.
 /// </summary>
 /// <remarks>
-///     Retries by default for classified (retryable) failures; callers should avoid this middleware for
-///     non-idempotent invocations (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
+///     <para>
+///         Retries apply only to results classified as retryable by the configured
+///         <see cref="IRetryClassifier"/>. Exceptions thrown by the downstream pipeline propagate
+///         directly to the caller without being retried.
+///     </para>
+///     <para>
+///         Retries by default for classified (retryable) failures; callers should avoid this middleware
+///         for non-idempotent invocations (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
+///     </para>
+///     <para>
+///         This middleware applies to the <c>ProcessInvoker</c> pattern only; <c>IExternalProcess</c>
+///         bypasses middleware entirely.
+///     </para>
 /// </remarks>
 internal sealed class RetryMiddleware : IProcessMiddleware
 {
-    private readonly IProcessResultValidator<ProcessResult> _retryableConditions;
+    private readonly IRetryClassifier _retryClassifier;
     private readonly RetryOptions _options;
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="RetryMiddleware"/> class.
     /// </summary>
-    /// <param name="retryableConditions">The validator whose <c>ShouldRetry</c> decides whether to retry.</param>
+    /// <param name="retryClassifier">The classifier that decides whether a result is retryable.</param>
     /// <param name="options">The retry options (attempts, base delay, strategy).</param>
     /// <exception cref="ArgumentNullException">
-    ///     Thrown when <paramref name="retryableConditions"/> or <paramref name="options"/> is <c>null</c>.
+    ///     Thrown when <paramref name="retryClassifier"/> or <paramref name="options"/> is <c>null</c>.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
     ///     Thrown when <paramref name="options"/>.<see cref="RetryOptions.MaxAttempts"/> is less than 1, since
@@ -39,9 +49,9 @@ internal sealed class RetryMiddleware : IProcessMiddleware
     ///     <paramref name="options"/>.<see cref="RetryOptions.BaseDelay"/> is negative (which would make the
     ///     first <see cref="Task.Delay"/> throw).
     /// </exception>
-    public RetryMiddleware(IProcessResultValidator<ProcessResult> retryableConditions, RetryOptions options)
+    public RetryMiddleware(IRetryClassifier retryClassifier, RetryOptions options)
     {
-        ArgumentNullException.ThrowIfNull(retryableConditions);
+        ArgumentNullException.ThrowIfNull(retryClassifier);
         ArgumentNullException.ThrowIfNull(options);
 
         if (options.MaxAttempts < 1)
@@ -54,7 +64,7 @@ internal sealed class RetryMiddleware : IProcessMiddleware
                 nameof(options),
                 "RetryOptions.BaseDelay must not be negative; a negative delay would cause Task.Delay to throw on the first retry.");
 
-        _retryableConditions = retryableConditions;
+        _retryClassifier = retryClassifier;
         _options = options;
     }
 
@@ -68,14 +78,14 @@ internal sealed class RetryMiddleware : IProcessMiddleware
 
         do
         {
-            await next(context);
+            await next(context).ConfigureAwait(false);
 
             attempts++;
 
             if (context.Result is null)
                 return;
 
-            if (!_retryableConditions.ShouldRetry(context.Result))
+            if (!_retryClassifier.ShouldRetry(context.Result))
                 return;
 
             if (attempts >= _options.MaxAttempts)
@@ -94,17 +104,23 @@ internal sealed class RetryMiddleware : IProcessMiddleware
 
     internal static TimeSpan ComputeDelay(int completedAttempts, RetryOptions options)
     {
-        TimeSpan delay = options.Strategy switch
+        try
         {
-            RetryBackoffStrategy.Fixed => options.BaseDelay,
-            RetryBackoffStrategy.Exponential => TimeSpan.FromTicks(
-                options.BaseDelay.Ticks * (long)Math.Pow(2, completedAttempts - 1)),
-            RetryBackoffStrategy.Linear => TimeSpan.FromTicks(options.BaseDelay.Ticks * completedAttempts),
-            _ => options.BaseDelay
-        };
+            TimeSpan delay = options.Strategy switch
+            {
+                RetryBackoffStrategy.Fixed => options.BaseDelay,
+                RetryBackoffStrategy.Exponential =>
+                    TimeSpan.FromTicks(checked(options.BaseDelay.Ticks * (long)Math.Pow(2, completedAttempts - 1))),
+                RetryBackoffStrategy.Linear =>
+                    TimeSpan.FromTicks(checked(options.BaseDelay.Ticks * completedAttempts)),
+                _ => options.BaseDelay
+            };
 
-        // Clamp to the largest value Task.Delay accepts; valid settings are unaffected for realistic
-        // attempt counts, and this prevents ArgumentOutOfRangeException on exponential overflow.
-        return delay > MaxTaskDelay ? MaxTaskDelay : delay;
+            return delay > MaxTaskDelay ? MaxTaskDelay : delay;
+        }
+        catch (OverflowException)
+        {
+            return MaxTaskDelay;
+        }
     }
 }

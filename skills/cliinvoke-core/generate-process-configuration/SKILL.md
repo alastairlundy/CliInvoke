@@ -1,6 +1,6 @@
 ---
 name: generate-process-configuration
-description: Guidance on correctly utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, ensuring proper build and redirection setup. USE FOR guidelines on utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, including build and redirection setup. DO NOT USE FOR executing the resulting configuration.
+description: Guidance on correctly utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, with proper build and redirection setup. USE FOR guidelines on utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, including build and redirection setup. DO NOT USE FOR executing the resulting configuration.
 compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, or CliInvoke.Specialization)
 targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 ---
@@ -15,7 +15,7 @@ targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 ## When not to use
 - When executing the resulting configuration — this skill covers *building* the configuration, not running it. For execution, load `select-execution-pattern` to choose an invoker.
 - When managing disposal of `ProcessConfiguration` — load `implement-resource-lifecycle` instead.
-- When migrating from V1 builder methods (`With*`) to V2 (`Set*`/`Configure*`) — load `cliinvoke-v1-to-v2-migration`.
+- When migrating from v2-style code to v3 — load `v2-to-v3-migration`.
 
 ## Mental Model: Stage 1 of the Process Invocation Pipeline
 

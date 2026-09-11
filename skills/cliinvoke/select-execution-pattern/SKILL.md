@@ -15,7 +15,7 @@ description: Guidance on choosing between CliRun, IProcessInvoker, and IExternal
 ## When not to use
 - When implementing the actual process logic — this skill only guides the choice of pattern. Once chosen, load a skill specific to the pattern (e.g., `generate-process-configuration` for building configurations, or the execution reference docs).
 - When the choice is already made and the question is about a specific API call or builder method.
-- When the user wants to migrate between CliInvoke major versions — load `cliinvoke-v1-to-v2-migration` instead.
+- When the user wants to migrate v2-style code to v3 — load `v2-to-v3-migration` instead.
 
 ## Decision Logic
 
@@ -87,7 +87,7 @@ For detailed implementation examples on creating external processes, see the fol
 
 | Pitfall | Solution |
 | :--- | :--- |
-| Using `CliRun` in a service that already utilizes DI | Switch to `IProcessInvoker` to leverage existing DI registrations and improve testability. |
+| Using `CliRun` in a service that already utilizes DI | Switch to `IProcessInvoker` to reuse existing DI registrations and improve testability. |
 | Using `IProcessInvoker` for interactive shells | Switch to `IExternalProcess` to allow real-time interaction with the process. |
 | Needing logging, result validation, or PowerShell/`cmd` wrapping on every call | Use the fluent `Use*` extension methods on `ProcessInvoker` (e.g., `.UseLogging().UsePostExitValidation(PostExitValidation.ExitCodeIsZero())`) instead of hand-writing the cross-cutting logic in each call site. |
 | Reaching for middleware but starting from `CliRun` | `CliRun` has no middleware support; construct a `ProcessInvoker` (optionally with `IEnumerable<IProcessMiddleware>` or `MiddlewareItems`) and use the `Use*` methods instead. |

@@ -14,7 +14,11 @@ using CliInvoke.Core.Configuration;
 namespace CliInvoke.Core.Builders;
 
 /// <summary>
-///     An interface that defines fluent builder methods for configuring a Process Configuration.
+///     Advanced builder interface for creating <see cref="ProcessConfiguration"/> instances.
+///     Use this builder when you need argument escaping via <see cref="ConfigureArguments(Action{ArgumentsSpec})"/>,
+///     user credential configuration via <see cref="ConfigureUserCredential(Action{UserCredentialSpec})"/>,
+///     or resource policy configuration via <see cref="ConfigureProcessResourcePolicy(Action{ProcessResourcePolicySpec})"/>.
+///     For all other cases, prefer direct init construction of <see cref="ProcessConfiguration"/>.
 /// </summary>
 public interface IProcessConfigurationBuilder
 {

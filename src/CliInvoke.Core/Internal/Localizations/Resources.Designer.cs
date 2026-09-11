@@ -114,6 +114,15 @@ namespace CliInvoke.Core.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Working directory '{0}' does not exist..
+        /// </summary>
+        internal static string Exceptions_DirectoryNotFound_WorkingDirectory {
+            get {
+                return ResourceManager.GetString("Exceptions.DirectoryNotFound.WorkingDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The executed process was not successful and returned an exit code of {x}..
         /// </summary>
         internal static string Exceptions_ProcessNotSuccessful_Generic {

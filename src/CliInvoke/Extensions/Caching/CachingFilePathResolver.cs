@@ -17,8 +17,19 @@ namespace CliInvoke.Extensions.Caching;
 ///     (PATH-first per GLOSSARY DD1) on a cache miss.
 /// </summary>
 /// <remarks>
-///     Lives in <c>CliInvoke.Extensions</c>; <c>CliInvoke.Core</c> remains free of caching concerns
-///     (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
+///     <para>
+///         Lives in <c>CliInvoke.Extensions</c>; <c>CliInvoke.Core</c> remains free of caching concerns
+///         (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
+///     </para>
+///     <para>
+///         Cache keys are normalised per OS casing rules: case-insensitive on Windows,
+///         as-is elsewhere. Two lookups that differ only by case share one cache entry on Windows.
+///     </para>
+///     <para>
+///         A benign concurrent-compute race exists: two threads resolving the same target
+///         simultaneously may both call the inner resolver and write to the cache. The result is
+///         idempotent and the extra work is harmless; no single-flight lock is used.
+///     </para>
 /// </remarks>
 public sealed class CachingFilePathResolver : IFilePathResolver
 {
@@ -49,12 +60,14 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     /// <inheritdoc />
     public FileInfo ResolveFilePath(string filePathToResolve)
     {
-        if (TryGetVerified(filePathToResolve, out FileInfo? cached) && cached is not null)
+        string key = NormalizeKey(filePathToResolve);
+
+        if (TryGetVerified(key, out FileInfo? cached) && cached is not null)
             return cached;
 
         FileInfo resolved = _inner.ResolveFilePath(filePathToResolve);
 
-        Cache(filePathToResolve, resolved.FullName);
+        Cache(key, resolved.FullName);
 
         return resolved;
     }
@@ -62,7 +75,9 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     /// <inheritdoc />
     public bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath)
     {
-        if (TryGetVerified(filePathToResolve, out FileInfo? cached) && cached is not null)
+        string key = NormalizeKey(filePathToResolve);
+
+        if (TryGetVerified(key, out FileInfo? cached) && cached is not null)
         {
             resolvedFilePath = cached;
             return true;
@@ -70,7 +85,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
 
         if (_inner.TryResolveFilePath(filePathToResolve, out FileInfo? innerResolved) && innerResolved is not null)
         {
-            Cache(filePathToResolve, innerResolved.FullName);
+            Cache(key, innerResolved.FullName);
             resolvedFilePath = innerResolved;
             return true;
         }
@@ -115,5 +130,12 @@ public sealed class CachingFilePathResolver : IFilePathResolver
             entryOptions.RegisterPostEvictionCallback(_options.PostEvictionCallback);
 
         _cache.Set(key, absolutePath, entryOptions);
+    }
+
+    private static string NormalizeKey(string key)
+    {
+        return OperatingSystem.IsWindows()
+            ? key.ToUpperInvariant()
+            : key;
     }
 }

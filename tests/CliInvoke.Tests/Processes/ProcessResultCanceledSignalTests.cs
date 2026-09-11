@@ -24,7 +24,7 @@ public class ProcessResultCanceledSignalTests
 
     public ProcessResultCanceledSignalTests()
     {
-        _configuration = ProcessConfigurationFactory.Create(ProcessTestHelper.GetTargetFilePath(), string.Empty);
+        _configuration = new ProcessConfiguration(ProcessTestHelper.GetTargetFilePath(), string.Empty);
     }
 
     private static InvocationContext RawContext(ProcessConfiguration configuration)
@@ -141,8 +141,10 @@ public class ProcessResultCanceledSignalTests
 
         try
         {
-            // Give the helper a moment to be running before delivering SIGTERM.
-            await Task.Delay(200, CancellationToken.None);
+            await ProcessTestHelper.WaitForConditionAsync(
+                () => process.HasStarted && !process.HasExited,
+                TimeSpan.FromSeconds(5),
+                failureMessage: "Process did not start within 5s");
 
             // Process.Kill() terminates a Unix process with SIGKILL (exit code 137), not
             // SIGTERM (exit code 143), so send the expected signal explicitly.

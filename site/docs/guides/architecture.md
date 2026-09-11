@@ -36,11 +36,13 @@ canonical definitions in
 [`GLOSSARY.md`](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md#core-concepts).
 
 A **Builder** is a fluent, mutable object used to assemble a configuration
-model. Each builder is a short-lived staging area whose only job is to
-produce exactly one model via `Build()`. The produced model is independent
-of the builder — they do not share lifetime. Examples:
-`ProcessConfigurationBuilder`, `ArgumentsSpec`, `EnvironmentVariablesSpec`,
-`UserCredentialSpec`.
+model (advanced path). Each builder is a short-lived staging area whose
+only job is to produce exactly one model via `Build()`. The produced model
+is independent of the builder — they do not share lifetime. In v3,
+init construction is the default; the builder is reserved for argument
+escaping, `UserCredentialSpec`, and resource-policy callback flows.
+Examples: `ProcessConfigurationBuilder`, `ArgumentsSpec`,
+`EnvironmentVariablesSpec`, `UserCredentialSpec`.
 
 A **Configuration Model** is an immutable, value-bearing object that
 describes one aspect of how a process should be run. Models in this
@@ -70,7 +72,7 @@ result after execution.
 
 A **Process Invocation Context** is the conceptual state-bearing object
 that moves through the pipeline. It encapsulates the requested
-configuration, the execution mode (Basic, Buffered, or Piped), the
+configuration, the execution mode (Basic or Buffered), the
 runner configuration (if any), and the resulting process output. Each
 cross-cutting concern reads from and writes to the context, and the
 context is the single source of truth that travels from the start of
@@ -79,48 +81,66 @@ the pipeline to the end.
 A **Resource-Owning Type** is any CliInvoke type that holds, directly or
 transitively, an unmanaged resource (pipes, file handles, process
 threads) or a sensitive managed resource (`SecureString`). The library
-exposes exactly five; see the
+exposes exactly three; see the
 [Resource Disposal guide](resource-disposal.md) for the full list.
 
-## The data-flow: Builder → Model → Invoker → Result
+## The data-flow: Construction → Model → Invoker → Result
 
 Every CliInvoke invocation moves through four stages, regardless of which
 pattern the caller uses.
 
 ```text
-   ┌────────────┐   Build()   ┌──────────────────┐  ExecuteAsync   ┌──────────┐
-   │  Builder   │ ──────────► │  Configuration   │ ──────────────► │ Invoker  │
-   │ (mutable)  │             │      Model       │                 │ (executes)│
-   └────────────┘             │   (immutable)    │                 └────┬─────┘
-                              └──────────────────┘                      │
-                                                                        ▼
-                              ┌──────────────────┐   await    ┌──────────────────┐
-                              │ Process Result   │ ◄────────── │   Pipeline +     │
-                              │   (immutable)    │             │   IExternalProcess│
-                              └──────────────────┘             └──────────────────┘
+   ┌──────────────┐   init / Build()   ┌──────────────────┐  ExecuteAsync   ┌──────────┐
+   │ Construction  │ ─────────────────► │  Configuration   │ ──────────────► │ Invoker  │
+   │ (init or build)│                   │      Model       │                 │ (executes)│
+   └──────────────┘                     │   (immutable)    │                 └────┬─────┘
+                                        └──────────────────┘                      │
+                                                                                   ▼
+                                        ┌──────────────────┐   await    ┌──────────────────┐
+                                        │ Process Result   │ ◄────────── │   Pipeline +     │
+                                        │   (immutable)    │             │   IExternalProcess│
+                                        └──────────────────┘             └──────────────────┘
 ```
 
 ```mermaid
 flowchart LR
-    A[Builder<br/>fluent, mutable] -->|Build()| B[Configuration Model<br/>immutable, value-equal]
+    A[Construction<br/>init or builder] -->|init / Build()| B[Configuration Model<br/>immutable, value-equal]
     B -->|ExecuteAsync| C[Invoker<br/>ProcessInvoker]
     C -->|StartAsync| D[Pipeline + IExternalProcess]
     D -->|await| E[Process Result<br/>immutable]
     E -->|returned| C
 ```
 
-### Stage 1 — Builder
+### Stage 1 — Construction
 
-The builder is the caller's staging area. It exposes `Set*` and
-`Configure*` methods that return `this` for chaining and terminate with
-a `Build()` method that returns the configuration model. The builder
-holds mutable state for the duration of the assembly; the moment
-`Build()` is called, the builder's job is done and the model is
-independent of it.
+In v3, **init construction is the default**. The caller creates the
+configuration either directly via init properties (the default) or via
+a builder (advanced). Both paths produce an immutable `ProcessConfiguration`.
+
+**Direct construction** (recommended default):
+
+```csharp
+ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+```
+
+**Builder construction** (advanced — for escaping, credentials, policy):
+
+```csharp
+using CliInvoke.Builders;
+
+IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("dotnet")
+    .SetArguments(["--info"])
+    .SetOutputRedirection(true);
+
+ProcessConfiguration config = builder.Build();
+```
 
 Key types in this stage:
 
-- `ProcessConfigurationBuilder` — assembles `ProcessConfiguration`.
+- `ProcessConfiguration` — directly constructible via init setters with
+  required `TargetFilePath`.
+- `ProcessConfigurationBuilder` — assembles `ProcessConfiguration`
+  (advanced: escaping, `UserCredentialSpec`, resource-policy callbacks).
 - `ArgumentsSpec` — assembles the argument list.
 - `EnvironmentVariablesSpec` — assembles the environment-variable
   dictionary.
@@ -131,16 +151,17 @@ Key types in this stage:
 produces a model; calling `Build()` again produces a *new* model
 (mutations between calls do not retroactively change models already
 produced). The builder is **not** required — every model also exposes
-a public constructor — but it is the recommended way to assemble
-configurations with many optional properties.
+a public constructor — but it is the advanced path for configurations
+that need argument escaping, credential staging, or resource-policy
+callback flows.
 
 ### Stage 2 — Configuration Model
 
-`Build()` returns an immutable, value-equal `ProcessConfiguration`. The
-model is the single thing that travels from the caller's code into the
-library's execution layer. It is read by the invoker and by every
-cross-cutting concern in the pipeline; nothing in the library is allowed
-to mutate it after construction.
+Construction (Stage 1) returns an immutable, value-equal
+`ProcessConfiguration`. The model is the single thing that travels from
+the caller's code into the library's execution layer. It is read by the
+invoker and by every cross-cutting concern in the pipeline; nothing in
+the library is allowed to mutate it after construction.
 
 Key types in this stage:
 
@@ -158,8 +179,8 @@ Key types in this stage:
 - The same model can be reused across multiple invocations; it carries
   no per-call state.
 - The caller that constructed the model owns its lifetime and is
-  responsible for disposing it (it is one of the five
-  [Resource-Owning Types](resource-disposal.md#the-five-disposable-types)).
+  responsible for disposing it (it is one of the three
+  [Resource-Owning Types](resource-disposal.md#the-three-disposable-types)).
 
 ### Stage 3 — Invoker
 
@@ -232,9 +253,9 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(
     "dotnet", "--version");
 ```
 
-Internally, `CliRun` constructs a `ProcessConfigurationBuilder`,
-configures it from the method arguments, calls `Build()` (Stage 1 →
-Stage 2), constructs a fresh `ExternalProcessFactory` with a default `FilePathResolver`
+Internally, `CliRun` constructs a `ProcessConfiguration` via init
+construction from the method arguments (Stage 1 → Stage 2), constructs
+a fresh `ExternalProcessFactory` with a default `FilePathResolver`
 (there is no longer any shared, configurable static state — a new factory is
 allocated per call), delegates to a `ProcessInvoker` (Stage 3), and returns the result
 (Stage 4).
@@ -306,7 +327,7 @@ contract for both the configuration and the `IExternalProcess`.
 
 ### Where each pattern enters and exits
 
-| Pattern | Stage 1 (Builder) | Stage 2 (Model) | Stage 3 (Invoker / Process) | Stage 4 (Result) |
+| Pattern | Stage 1 (Construction) | Stage 2 (Model) | Stage 3 (Invoker / Process) | Stage 4 (Result) |
 |---|---|---|---|---|
 | `CliRun` | Library (implicit) | Library (implicit) | Library (default invoker) | Library returns |
 | `IProcessInvoker` | Caller | Caller | Library (resolved from DI) | Library returns |
@@ -337,7 +358,7 @@ truth that flows from start to finish.
         │  │ Configuration    │ ──────► │  (built up by      │    │
         │  │ (immutable)      │         │   each stage)      │    │
         │  └──────────────────┘         └────────────────────┘    │
-        │  Execution mode: Basic / Buffered / Piped               │
+        │  Execution mode: Basic / Buffered                              │
         │  Runner configuration: optional                          │
         └─────────────────────────────────────────────────────────┘
                                   │
@@ -395,9 +416,9 @@ runs the rewritten configuration as if it were the original.
 `IProcessResultValidator<TProcessResult>` answers the question
 *“is this result acceptable, or should we raise a failure?”*. The
 default implementation (`ProcessResultValidator<TProcessResult>`)
-evaluates a set of self-describing `ValidationRule<TProcessResult>`
+evaluates a set of self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
 rules. `Validate` returns a `bool` (all rules pass), while
-`GetValidationFailures` returns the per-rule `ValidationFailure`
+`GetValidationFailures` returns the per-rule <xref:CliInvoke.Core.Validation.ValidationFailure`1>
 instances so callers can surface detailed, rule-by-rule messages. The
 invoker raises a `ProcessNotSuccessfulException` when a validator
 configured for "must succeed" mode returns invalid. The post-exit
@@ -451,7 +472,8 @@ propagation, or per-call metric emission — can be added by writing
 a new interceptor without modifying the invoker or the
 `IExternalProcess` interface. Callers who need to disable a
 default concern can do so by registering an alternative
-implementation through `CliInvoke.Extensions`.
+implementation through the `CliInvoke` package's DI helpers
+(namespace `CliInvoke.Extensions`).
 
 ## Where to customise
 
@@ -482,12 +504,14 @@ scenario.
   `ProcessConfiguration`, the builder lifecycle, and the
   default-value appendix.
 - [Resource Disposal](resource-disposal.md) — the disposal contract
-  for the five Resource-Owning Types, including the configuration,
+  for the three Resource-Owning Types, including the configuration,
   the `IExternalProcess`, and the result.
 - [Troubleshooting](troubleshooting.md) — symptom-based diagnosis for
   leaks, hangs, exit-code mismatches, and file-not-found errors.
-- [`PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/PATTERNS.md) — full API-level detail for
+- [`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md) — full API-level detail for
   the three invocation patterns.
+- [Migrating to 3.0.0](../migration-guides/3.0.0.md) — breaking changes
+  and upgrade guide.
 - [`GLOSSARY.md`](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md) — the canonical glossary,
   including the definitions of the Process Invocation Pipeline and
   the Process Invocation Context.

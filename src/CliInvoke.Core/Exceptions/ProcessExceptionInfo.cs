@@ -177,8 +177,8 @@ public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionI
     /// <returns><c>true</c> if the two instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(ProcessExceptionInfo<TProcessResult>? left, ProcessExceptionInfo<TProcessResult>? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null)
+            return right is null;
 
         return left.Equals(right);
     }
@@ -192,8 +192,8 @@ public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionI
     /// <returns><c>true</c> if the two specified instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(ProcessExceptionInfo<TProcessResult>? left, ProcessExceptionInfo<TProcessResult>? right)
     {
-        if (left is null || right is null)
-            return false;
+        if (left is null)
+            return right is not null;
 
         return !left.Equals(right);
     }

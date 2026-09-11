@@ -31,7 +31,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath, "");
+            new ProcessConfiguration(_targetFilePath, "");
 
         ProcessResult result =
             await processInvoker.ExecuteAsync(config,
@@ -48,7 +48,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath, "");
+            new ProcessConfiguration(_targetFilePath, "");
 
         BufferedProcessResult result =
             await processInvoker.ExecuteBufferedAsync(config,
@@ -65,7 +65,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath, "");
+            new ProcessConfiguration(_targetFilePath, "");
 
         await Assert.That(async () =>
                 await processInvoker.ExecuteAsync(config,
@@ -81,7 +81,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config =
-            ProcessConfigurationFactory.Create(_targetFilePath, "");
+            new ProcessConfiguration(_targetFilePath, "");
 
         await Assert.That(async () =>
                 await processInvoker.ExecuteBufferedAsync(config,

@@ -33,10 +33,13 @@ internal static class ArgumentTokenizer
     /// <returns>The tokenised values; empty when <paramref name="value" /> is empty.</returns>
     internal static IReadOnlyList<string> Tokenize(string? value)
     {
+        if (value is null)
+            return [];
+
         if (string.IsNullOrWhiteSpace(value))
             return [];
 
-        string text = value!;
+        string text = value;
 
         List<string> tokens = new();
         StringBuilder current = new();

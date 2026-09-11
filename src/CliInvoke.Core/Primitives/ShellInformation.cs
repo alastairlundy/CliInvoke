@@ -32,18 +32,11 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <summary>
     ///     Gets or sets the name.
     /// </summary>
-    /// <remarks>
-    ///     Represents a property that holds the name associated with an instance of the ShellInformation
-    ///     class.
-    /// </remarks>
     public string Name { get; }
 
     /// <summary>
     ///     Gets or sets the target file path.
     /// </summary>
-    /// <remarks>
-    ///     Represents the path of a file that is targeted by an instance of the ShellInformation class.
-    /// </remarks>
     public FileInfo TargetFilePath { get; }
 
     /// <summary>
@@ -64,7 +57,7 @@ public class ShellInformation : IEquatable<ShellInformation>
     {
         if (other is null) return false;
 
-        return Name == other.Name && TargetFilePath.Equals(other.TargetFilePath);
+        return Name == other.Name && Version == other.Version && TargetFilePath.FullName.Equals(other.TargetFilePath.FullName, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc />
@@ -82,7 +75,8 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(Name, Version, TargetFilePath);
+        return HashCode.Combine(Name, Version,
+            TargetFilePath.FullName.GetHashCode(StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

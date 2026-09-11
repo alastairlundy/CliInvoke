@@ -33,4 +33,34 @@ public class ProcessConfigurationTests
         await Assert.That(() => new ProcessConfiguration(null!, "arg1"))
             .Throws<ArgumentException>();
     }
+
+    [Test]
+    public async Task NullEqualsNull_IsTrue()
+    {
+        ProcessConfiguration? a = null;
+        ProcessConfiguration? b = null;
+
+        await Assert.That(a == b).IsTrue();
+        await Assert.That(a != b).IsFalse();
+    }
+
+    [Test]
+    public async Task NullEqualsNonNull_IsFalse()
+    {
+        ProcessConfiguration? a = null;
+        ProcessConfiguration b = new("foo.exe");
+
+        await Assert.That(a == b).IsFalse();
+        await Assert.That(a != b).IsTrue();
+    }
+
+    [Test]
+    public async Task NonNullEqualsNull_IsFalse()
+    {
+        ProcessConfiguration a = new("foo.exe");
+        ProcessConfiguration? b = null;
+
+        await Assert.That(a == b).IsFalse();
+        await Assert.That(a != b).IsTrue();
+    }
 }

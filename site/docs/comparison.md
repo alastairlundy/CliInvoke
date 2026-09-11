@@ -17,13 +17,13 @@ layout: simple
 | Support for Process/Command Timeout                                        |      ✅      |                              :warning:, limited to cancelling via CancellationToken                              | :warning:, limited to cancelling via CancellationToken |           :warning:, limited to cancelling via CancellationToken           |
 | Graceful Cancellation Support via SIGTERM/SIGINT Signals                   |  ✅, 2.3.0+  |          ⚠️, requires bundled .NET Framework console helper on Windows                                          |                           ❌                           |                                     ❌                                     |
 | Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                        |                           ✅                           |                                     ✅                                     |
-| Middleware / cross-cutting pipeline                                       | ✅ (v3 pre-release; `IProcessMiddleware` chain via `ProcessInvoker`) | ❌ | ❌ | ❌ |
+| Middleware / cross-cutting pipeline                                       | ✅ (`IProcessMiddleware` chain via `ProcessInvoker`) | ❌ | ❌ | ❌ |
 | License                                                                    |     MPL‑2.0     |                                  MIT                                                                              |                         MIT                          |                     MIT (.NET Runtime)                                  |
 | Fork / maintenance notes                                                   | MPL‑2.0 file‑level copyleft — retain MPL notice on copied files  | Test projects depend on a source‑available (non‑OSI) library; check its license before redistributing the test suite | MIT, no additional terms                              | Governed by the .NET Runtime project                            |
 
 ## Notes
 
-- CliInvoke v1 and v2 shipped dedicated builder classes (`ArgumentsBuilder`, `EnvironmentVariablesBuilder` etc); v3+ replaces them with `ProcessConfiguration` Spec types (`ArgumentsSpec`, `EnvironmentVariablesSpec` etc). CliWrap provides dedicated builder classes plus a fluent `Command` chain via `Cli.Wrap(...)`.
+- CliInvoke v3+ uses init construction as the default and replaces dedicated builder classes with `Spec` types (`ArgumentsSpec`, `EnvironmentVariablesSpec` etc) for advanced scenarios. CliWrap provides dedicated builder classes plus a fluent `Command` chain via `Cli.Wrap(...)`.
 - CliWrap's repository also contains an informal Terms of Use document, separate from the
   MIT license; the project's stated position is that this is governance signalling rather
   than a binding license addendum. Fork maintainers should read both the MIT license and

@@ -67,8 +67,8 @@ public class ProcessInvoker : IProcessInvoker
     {
         ProcessResult result = ctx.Mode switch
         {
-            InvocationMode.Raw => await _pipeline.InvokeAsync<ProcessResult>(ctx),
-            InvocationMode.Buffered => await _pipeline.InvokeAsync<BufferedProcessResult>(ctx),
+            InvocationMode.Raw => await _pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(false),
+            InvocationMode.Buffered => await _pipeline.InvokeAsync<BufferedProcessResult>(ctx).ConfigureAwait(false),
             _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
         };
 
@@ -81,7 +81,7 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     private async Task<TResult> InvokeThroughChainAsync<TResult>(InvocationContext ctx) where TResult : ProcessResult
     {
-        await _chain.RunAsync(ctx, ctx.CancellationToken);
+        await _chain.RunAsync(ctx, ctx.CancellationToken).ConfigureAwait(false);
 
         if (ctx.Result is null)
         {
@@ -123,7 +123,7 @@ public class ProcessInvoker : IProcessInvoker
             InvocationMode.Raw,
             cancellationToken);
 
-        return await InvokeThroughChainAsync<ProcessResult>(ctx);
+        return await InvokeThroughChainAsync<ProcessResult>(ctx).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ public class ProcessInvoker : IProcessInvoker
             InvocationMode.Buffered,
             cancellationToken);
 
-        return await InvokeThroughChainAsync<BufferedProcessResult>(ctx);
+        return await InvokeThroughChainAsync<BufferedProcessResult>(ctx).ConfigureAwait(false);
     }
 
     /// <summary>

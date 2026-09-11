@@ -129,11 +129,10 @@ public class RunnerConfigurationFactoryTests
         ProcessConfiguration target = BuildConfig(targetFilePath, targetArguments);
         ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
 
-        // Structural sanity: the factory must populate the read-only ArgumentList (or the
-        // mutable ArgumentsList) so the adapter emits via ProcessStartInfo.ArgumentList
-        // and not the single Arguments string.
+        // Structural sanity: the factory must populate the read-only ArgumentList so the
+        // adapter emits via ProcessStartInfo.ArgumentList and not the single Arguments string.
         bool structuralOk =
-            wrapped.ArgumentList.Count > 0 || wrapped.ArgumentsList.Count > 0;
+            wrapped.ArgumentList.Count > 0;
 
         if (!structuralOk) return false;
 

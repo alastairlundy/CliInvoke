@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using System.Runtime.InteropServices;
 using CliInvoke.Extensions.Caching;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -92,5 +93,65 @@ public class CachingFilePathResolverTests
 
         await Assert.That(inner.ResolveCount).IsEqualTo(1);
         await Assert.That(result.FullName).IsEqualTo(existing);
+    }
+
+    [Test]
+    public async Task ResolveFilePath_WindowsCaseInsensitive_CachesSameEntry()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return;
+        }
+
+        string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
+        var inner = new FakeResolver(existing);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var resolver = new CachingFilePathResolver(inner, cache);
+
+        FileInfo first = resolver.ResolveFilePath("Tool");
+        FileInfo second = resolver.ResolveFilePath("tool");
+
+        // On Windows, both keys normalise to the same entry — inner runs once.
+        await Assert.That(inner.ResolveCount).IsEqualTo(1);
+        await Assert.That(first.FullName).IsEqualTo(second.FullName);
+    }
+
+    [Test]
+    public async Task TryResolveFilePath_WindowsCaseInsensitive_CachesSameEntry()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return;
+        }
+
+        string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
+        var inner = new FakeResolver(existing);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var resolver = new CachingFilePathResolver(inner, cache);
+
+        bool firstOk = resolver.TryResolveFilePath("Tool", out FileInfo? first);
+        bool secondOk = resolver.TryResolveFilePath("tool", out FileInfo? second);
+
+        await Assert.That(firstOk).IsTrue();
+        await Assert.That(secondOk).IsTrue();
+        await Assert.That(inner.TryResolveCount).IsEqualTo(1);
+        await Assert.That(first!.FullName).IsEqualTo(second!.FullName);
+    }
+
+    [Test]
+    public async Task ResolveFilePath_CacheHit_FileExistsReVerified()
+    {
+        string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
+        var inner = new FakeResolver(existing);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var resolver = new CachingFilePathResolver(inner, cache);
+
+        FileInfo first = resolver.ResolveFilePath("tool");
+        FileInfo second = resolver.ResolveFilePath("tool");
+
+        // Second call hits cache — re-verified via File.Exists.
+        await Assert.That(inner.ResolveCount).IsEqualTo(1);
+        await Assert.That(first.Exists).IsTrue();
+        await Assert.That(second.Exists).IsTrue();
     }
 }

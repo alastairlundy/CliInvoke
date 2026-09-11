@@ -14,6 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="TUnit" />
+    <PackageReference Include="FsCheck" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />

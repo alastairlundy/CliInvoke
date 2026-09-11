@@ -7,12 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using System.Collections.Generic;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Processes;
-using CliInvoke.Core.Validation;
 using CliInvoke.Extensions.Middleware.Retry;
-using CliInvoke.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Extensions.Tests.Middleware.Retry;
@@ -24,16 +23,16 @@ public class RetryMiddlewareTests
 {
     private static InvocationContext CreateContext()
     {
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
+        ProcessConfiguration config = new ProcessConfiguration("cmd.exe", "/C echo hi");
         return new InvocationContext(config, ProcessExitConfiguration.CreateGraceful(), InvocationMode.Buffered,
             CancellationToken.None);
     }
 
-    private static IProcessResultValidator<ProcessResult> AlwaysRetry()
-        => new ProcessResultValidator<ProcessResult>([_ => false]);
+    private static IRetryClassifier AlwaysRetry()
+        => new AlwaysRetryClassifier();
 
-    private static IProcessResultValidator<ProcessResult> NeverRetry()
-        => new ProcessResultValidator<ProcessResult>([_ => true]);
+    private static IRetryClassifier NeverRetry()
+        => new NeverRetryClassifier();
 
     private static ProcessResult MakeResult()
         => new("dummy", 1, 1, DateTime.UtcNow, DateTime.UtcNow, false, null);
@@ -111,21 +110,15 @@ public class RetryMiddlewareTests
         await Assert.That(attempts).IsEqualTo(1);
     }
 
-    private static IProcessResultValidator<ProcessResult> RequiresExitCodeZeroValidator()
-        => new ProcessResultValidator<ProcessResult>(
-            [CommonValidationRules<ProcessResult>.RequiresExitCodeZero]);
-
     [Test]
-    public async Task InvokeAsync_DoesNotRetry_WhenDefaultValidatorResultSucceeds()
+    public async Task InvokeAsync_DoesNotRetry_WhenExitCodeZero()
     {
-        // The default policy uses RequiresExitCodeZero, so a zero-exit (validated) result must stop
-        // after the first attempt and must not repeat process side effects.
         RetryOptions options = new RetryOptions
         {
             MaxAttempts = 3,
             BaseDelay = TimeSpan.FromMilliseconds(1)
         };
-        RetryMiddleware middleware = new RetryMiddleware(RequiresExitCodeZeroValidator(), options);
+        RetryMiddleware middleware = new RetryMiddleware(RetryConditions.ExitCodeZero(), options);
         InvocationContext ctx = CreateContext();
 
         int attempts = 0;
@@ -187,18 +180,18 @@ public class RetryMiddlewareTests
     public async Task UseRetryPolicy_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
-        // Register UseRetryPolicy() first, then replace the validator and process factory with stubs.
+        // Register UseRetryPolicy() first, then replace the retry classifier and process factory with stubs.
         // Registering after AddCliInvoke ensures our singleton registrations win over the ones it adds.
         services.AddCliInvoke(builder => builder.UseRetryPolicy());
 
-        // A validator that always classifies the result as retryable, plus a stub process factory that
+        // A retry classifier that always classifies the result as retryable, plus a stub process factory that
         // avoids spawning real processes. Executing through the resolved IProcessInvoker (not a
         // manually-built ProcessInvoker) proves the registration actually adds the middleware: if
         // UseRetryPolicy() stopped registering it, the stub would run once and the retry count would
         // not reach MaxAttempts.
-        CountingRetryValidator validator = new CountingRetryValidator();
+        CountingRetryClassifier policy = new CountingRetryClassifier();
         StubExternalProcessFactory factory = new StubExternalProcessFactory();
-        services.AddSingleton<IProcessResultValidator<ProcessResult>>(validator);
+        services.AddSingleton<IRetryClassifier>(policy);
         services.AddSingleton<IExternalProcessFactory>(factory);
 
         IServiceProvider provider = services.BuildServiceProvider();
@@ -211,11 +204,11 @@ public class RetryMiddlewareTests
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
 
         // The retry middleware is registered and active: the retryable result is attempted
-        // MaxAttempts times rather than once, and the validator is consulted once per attempt.
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
+        // MaxAttempts times rather than once, and the classifier is consulted once per attempt.
+        ProcessConfiguration config = new ProcessConfiguration("cmd.exe", "/C echo hi");
         await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 
-        await Assert.That(validator.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);
+        await Assert.That(policy.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);
     }
 
     [Test]
@@ -268,23 +261,105 @@ public class RetryMiddlewareTests
         await Assert.That(RetryMiddleware.ComputeDelay(2, options).Ticks).IsEqualTo(maxDelay.Ticks);
     }
 
+    [Test]
+    public async Task ComputeDelay_Exponential_LargeBaseDelay_ClampsToMaxTaskDelay()
+    {
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        RetryOptions options = new RetryOptions
+        {
+            BaseDelay = maxDelay,
+            Strategy = RetryBackoffStrategy.Exponential,
+            MaxAttempts = 50
+        };
+
+        TimeSpan delay = RetryMiddleware.ComputeDelay(2, options);
+
+        await Assert.That(delay.Ticks).IsEqualTo(maxDelay.Ticks);
+        await Assert.That(delay.Ticks).IsGreaterThanOrEqualTo(0);
+    }
+
+    [Test]
+    public async Task ComputeDelay_Linear_LargeAttemptCount_ClampsToMaxTaskDelay()
+    {
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        RetryOptions options = new RetryOptions
+        {
+            BaseDelay = maxDelay,
+            Strategy = RetryBackoffStrategy.Linear,
+            MaxAttempts = 50
+        };
+
+        TimeSpan delay = RetryMiddleware.ComputeDelay(2, options);
+
+        await Assert.That(delay.Ticks).IsEqualTo(maxDelay.Ticks);
+        await Assert.That(delay.Ticks).IsGreaterThanOrEqualTo(0);
+    }
+
+    [Test]
+    public async Task ComputeDelay_Exponential_HugeAttemptCount_ClampsToMaxTaskDelay()
+    {
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        RetryOptions options = new RetryOptions
+        {
+            BaseDelay = TimeSpan.FromMilliseconds(100),
+            Strategy = RetryBackoffStrategy.Exponential,
+            MaxAttempts = 1000
+        };
+
+        TimeSpan delay = RetryMiddleware.ComputeDelay(50, options);
+
+        await Assert.That(delay.Ticks).IsEqualTo(maxDelay.Ticks);
+        await Assert.That(delay.Ticks).IsGreaterThanOrEqualTo(0);
+    }
+
+    [Test]
+    public async Task ComputeDelay_CombinedLargeBaseDelayAndAttemptCount_AlwaysNonNegative()
+    {
+        TimeSpan maxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
+        RetryOptions options = new RetryOptions
+        {
+            BaseDelay = TimeSpan.FromMilliseconds(1000),
+            Strategy = RetryBackoffStrategy.Exponential,
+            MaxAttempts = int.MaxValue / 2
+        };
+
+        for (int attempt = 1; attempt <= 10; attempt++)
+        {
+            TimeSpan delay = RetryMiddleware.ComputeDelay(attempt, options);
+
+            await Assert.That(delay.Ticks).IsGreaterThanOrEqualTo(0);
+            await Assert.That(delay.Ticks).IsLessThanOrEqualTo(maxDelay.Ticks);
+        }
+    }
+
     /// <summary>
-    ///     A validator that always classifies the result as retryable (Validate returns false, so the
-    ///     default <c>ShouldRetry => !Validate</c> returns true) and records how many times it is consulted.
+    ///     A retry classifier that always returns <c>true</c> (retry).
     /// </summary>
-    private sealed class CountingRetryValidator : IProcessResultValidator<ProcessResult>
+    private sealed class AlwaysRetryClassifier : IRetryClassifier
+    {
+        public bool ShouldRetry(ProcessResult result) => true;
+    }
+
+    /// <summary>
+    ///     A retry classifier that always returns <c>false</c> (no retry).
+    /// </summary>
+    private sealed class NeverRetryClassifier : IRetryClassifier
+    {
+        public bool ShouldRetry(ProcessResult result) => false;
+    }
+
+    /// <summary>
+    ///     A retry classifier that always returns <c>true</c> and records how many times it is consulted.
+    /// </summary>
+    private sealed class CountingRetryClassifier : IRetryClassifier
     {
         public int Calls;
 
-        public ValidationRule<ProcessResult>[] ValidationRules => [new ValidationRule<ProcessResult>(_ => false)];
-
-        public bool Validate(ProcessResult result)
+        public bool ShouldRetry(ProcessResult result)
         {
             Calls++;
-            return false;
+            return true;
         }
-
-        public ValidationFailure<ProcessResult>[] GetValidationFailures(ProcessResult result) => [];
     }
 
     /// <summary>

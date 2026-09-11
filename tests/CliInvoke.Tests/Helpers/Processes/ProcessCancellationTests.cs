@@ -42,11 +42,10 @@ public class ProcessCancellationTests
                 Assert.Fail(diagnostic);
             }
 
-            await Task.Delay(1000, CancellationToken.None);
-
-            bool actual = Process.GetProcesses().Any(x => x.Id == processId);
-
-            await Assert.That(actual).IsFalse();
+            await ProcessTestHelper.WaitForConditionAsync(
+                () => !Process.GetProcesses().Any(x => x.Id == processId),
+                TimeSpan.FromSeconds(5),
+                failureMessage: $"Process {processId} still running 5s after cancellation");
         }
         finally
         {
@@ -99,11 +98,10 @@ public class ProcessCancellationTests
                 Assert.Fail(diagnostic);
             }
 
-            await Task.Delay(1000, CancellationToken.None);
-
-            bool actual = Process.GetProcesses().Any(x => x.Id == processId);
-
-            await Assert.That(actual).IsFalse();
+            await ProcessTestHelper.WaitForConditionAsync(
+                () => !Process.GetProcesses().Any(x => x.Id == processId),
+                TimeSpan.FromSeconds(5),
+                failureMessage: $"Process {processId} still running 5s after cancellation");
         }
         finally
         {

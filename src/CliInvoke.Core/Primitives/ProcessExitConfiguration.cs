@@ -104,6 +104,12 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ValidationRule<ProcessResult>[] ValidationRules { get; init; } = [];
 
     /// <summary>
+    ///     Gets the maximum number of bytes of standard output to buffer. When <c>null</c>,
+    ///     the output is unbounded. This property participates in equality comparisons.
+    /// </summary>
+    public long? MaxBufferedOutputBytes { get; init; }
+
+    /// <summary>
     ///     Determines whether the specified <see cref="ProcessExitConfiguration" /> is equal to the
     ///     current instance.
     /// </summary>
@@ -123,7 +129,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
         return TimeoutPolicy.Equals(other.TimeoutPolicy) &&
                CancellationThrowsException == other.CancellationThrowsException &&
                ExceptionBehaviour == other.ExceptionBehaviour &&
-               RequestedCancellationExitBehaviour ==  other.RequestedCancellationExitBehaviour;
+               RequestedCancellationExitBehaviour ==  other.RequestedCancellationExitBehaviour &&
+               MaxBufferedOutputBytes == other.MaxBufferedOutputBytes;
     }
 
     /// <summary>
@@ -152,8 +159,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public override int GetHashCode()
     {
         return HashCode.Combine(TimeoutPolicy, CancellationThrowsException,
-            RequestedCancellationExitBehaviour, RequestedCancellationExitBehaviour,
-            ExceptionBehaviour);
+            RequestedCancellationExitBehaviour,
+            ExceptionBehaviour, MaxBufferedOutputBytes);
     }
 
     /// <summary>

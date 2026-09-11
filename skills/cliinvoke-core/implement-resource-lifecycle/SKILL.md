@@ -7,7 +7,7 @@ targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 # Implement Resource Lifecycle
 
 ## When to Use
-- When auditing code for proper disposal of CliInvoke's mandatory disposable types: `IExternalProcess`, `UserCredential`, and the credential-build type for your version — `UserCredentialBuilder` on 2.x or `UserCredentialSpec` on 3.0. (`ProcessConfiguration` is **not** disposable — it is a plain immutable value object; the caller still owns disposal of any `StandardInput` stream and `UserCredential` placed inside it.)
+- When auditing code for proper disposal of CliInvoke's mandatory disposable types: `IExternalProcess`, `UserCredential`, and the credential-build type for your version — `UserCredentialBuilder` on 2.x or `UserCredentialSpec` on 3.0+. (`ProcessConfiguration` is **not** disposable — it is a plain immutable value object; the caller still owns disposal of any `StandardInput` stream and `UserCredential` placed inside it.)
 - When deciding between `using` and `await using` in async methods.
 - When investigating a suspected handle leak, memory pressure, or `SecureString` retention issue.
 - When the user asks about `SecureString` cleanup or process/stream lifetime in CliInvoke.
@@ -15,7 +15,7 @@ targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 ## When not to use
 - When the question is about general C#/.NET memory management, GC tuning, or `IDisposable` mechanics outside CliInvoke's specific types.
 - When building or executing a configuration — load `generate-process-configuration` or `select-execution-pattern` instead.
-- When migrating from V1 to V2 — load `cliinvoke-v1-to-v2-migration` for any disposal-related API renames.
+- When migrating from v2 to v3 — load `v2-to-v3-migration` for any disposal-related API changes.
 
 ## Middleware and Disposal
 
@@ -23,8 +23,8 @@ If you configure `ProcessInvoker` with middleware (`UseLogging`, `UsePostExitVal
 
 ## Mandatory Disposable Types
 
-The following types MUST be disposed of (three on the 2.x API, four once
-`UserCredentialSpec` ships in 3.0). Failure to do so can lead to handle
+The following types MUST be disposed of (three on the 2.x API, four on
+3.0+). Failure to do so can lead to handle
 leaks, memory pressure, or sensitive data remaining in memory.
 
 > **`ProcessConfiguration` is NOT disposable.** It is a plain immutable
@@ -47,7 +47,7 @@ leaks, memory pressure, or sensitive data remaining in memory.
 - **Reason**: A sealed configuration seam that holds a `SecureString` for passwords during credential construction. Implements `IDisposable` to clear the secure string from memory.
 - **Pattern**: Always wrap the spec in a `using` block.
 - **Timing**: Dispose immediately after calling `.Build()`.
-- **Note**: This is the **3.0** replacement for the 2.x `UserCredentialBuilder`. Prefer it in new code **once you are on CliInvoke 3.0** (see the version note in `skills/README.md`).
+- **Note**: This is the **3.0+** replacement for the 2.x `UserCredentialBuilder`. Prefer it in new code on CliInvoke 3.0+ (see the version note in `skills/README.md`).
 - **Example**:
   ```csharp
   UserCredential credential;
@@ -59,11 +59,11 @@ leaks, memory pressure, or sensitive data remaining in memory.
   // spec disposed here; SecureString cleared from memory
   ```
 
-### 4. `UserCredentialBuilder` (CliInvoke 2.x — current released API)
+### 4. `UserCredentialBuilder` (CliInvoke 2.x — legacy API)
 - **Reason**: Holds a `SecureString` during the construction of credentials.
 - **Pattern**: Always wrap the builder in a `using` block.
 - **Timing**: Dispose immediately after calling `.Build()`.
-- **Note**: This is the **current released (2.x)** type. It is superseded by `UserCredentialSpec` in 3.0; use `UserCredentialSpec` once you move to 3.0.
+- **Note**: This is the **2.x** type. It is superseded by `UserCredentialSpec` in 3.0+; use `UserCredentialSpec` on CliInvoke 3.0+.
 - **Example**: See [UserCredentialBuilder.md](./references/UserCredentialBuilder.md)
 
 ## Implementation Checklist

@@ -15,8 +15,7 @@ using CliInvoke.Builders;
 namespace CliInvoke.Extensions;
 
 /// <summary>
-///     Provides extension methods for working with configuration settings in the application,
-///     enhancing functionality and simplifying common configuration-related tasks.
+///     Extension methods for converting and transforming <see cref="ProcessConfiguration"/>.
 /// </summary>
 public static class ConfigurationExtensions
 {
@@ -40,12 +39,24 @@ public static class ConfigurationExtensions
         ///     An instance of <see cref="ProcessConfiguration" /> with the configuration applied from
         ///     the provided <see cref="ProcessStartInfo" />.
         /// </returns>
+        /// <remarks>
+        ///     <see cref="ProcessStartInfo"/> exposes per-stream redirect flags
+        ///     (<see cref="ProcessStartInfo.RedirectStandardOutput"/> and
+        ///     <see cref="ProcessStartInfo.RedirectStandardError"/>), but
+        ///     <see cref="ProcessConfiguration"/> has a single
+        ///     <see cref="ProcessConfiguration.OutputRedirection"/> flag.
+        ///     The two per-stream flags are collapsed via a logical OR into that single flag, so the
+        ///     resulting configuration redirects output when either (or both) of the original flags
+        ///     was set. This is a lossy conversion; the individual per-stream information is not
+        ///     preserved.
+        /// </remarks>
         [Pure]
         public static ProcessConfiguration FromProcessStartInfo(ProcessStartInfo processStartInfo)
         {
             bool requiresAdministrator =
-                processStartInfo.Verb.StartsWith("runas", StringComparison.OrdinalIgnoreCase)
-                || processStartInfo.Verb.StartsWith("sudo", StringComparison.OrdinalIgnoreCase);
+                !string.IsNullOrEmpty(processStartInfo.Verb)
+                && (processStartInfo.Verb.StartsWith("runas", StringComparison.OrdinalIgnoreCase)
+                    || processStartInfo.Verb.StartsWith("sudo", StringComparison.OrdinalIgnoreCase));
 
             IEnumerable<KeyValuePair<string, string>> kvp = processStartInfo.Environment
                 .Where(kv => kv.Value is not null)
@@ -64,7 +75,6 @@ public static class ConfigurationExtensions
                 })
                 .UseShellExecution(processStartInfo.UseShellExecute)
                 .EnableWindowCreation(!processStartInfo.CreateNoWindow)
-                .SetWorkingDirectory(processStartInfo.WorkingDirectory)
                 .SetArguments(processStartInfo.Arguments)
                 .SetOutputRedirection( processStartInfo.RedirectStandardOutput ||  processStartInfo.RedirectStandardError)
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
@@ -73,6 +83,8 @@ public static class ConfigurationExtensions
                     processStartInfo.StandardInputEncoding,
                     processStartInfo.StandardOutputEncoding, processStartInfo.StandardErrorEncoding);
 
+            if (!string.IsNullOrEmpty(processStartInfo.WorkingDirectory))
+                processConfigurationBuilder.SetWorkingDirectory(processStartInfo.WorkingDirectory);
 
             if (requiresAdministrator)
                 processConfigurationBuilder.RequireAdministratorPrivileges();

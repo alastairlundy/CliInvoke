@@ -10,7 +10,6 @@
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Processes;
 using CliInvoke.Core.Validation;
-using CliInvoke.Internal.Extensions;
 
 namespace CliInvoke;
 
@@ -41,22 +40,34 @@ internal class ProcessInvocationPipeline
     public async Task<TResult> InvokeAsync<TResult>(InvocationContext ctx)
         where TResult : ProcessResult
     {
-        long? GetTruncationCap()
-        {
-            MiddlewareContext? middleware = ctx.Middleware;
-
-            if (middleware is not null &&
-                middleware.Items.TryGet<long>(TruncationDefaults.MaxBytesPerStreamKey,
-                    out long cap))
-                return cap;
-
-            return null;
-        }
-
-        long? truncationCap = GetTruncationCap();
+        long? truncationCap = ctx.ExitConfiguration?.MaxBufferedOutputBytes;
 
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
             ctx.Configuration, ctx.ExitConfiguration);
+
+        static void ValidateResult<TResult>(TResult result, ProcessExitConfiguration? exitConfiguration)
+            where TResult : ProcessResult
+        {
+            if (exitConfiguration is null)
+                return;
+
+            ValidationRule<ProcessResult>[] rules = exitConfiguration.ValidationRules;
+
+            if (rules is null)
+                return;
+
+            List<string> failures = [];
+
+            foreach (ValidationRule<ProcessResult> rule in rules)
+            {
+                if (!rule.Predicate(result))
+                    failures.Add($"{rule.Name}: {rule.GetFailureMessage(result)}");
+            }
+
+            if (failures.Count > 0)
+                throw new ProcessValidationException(result,
+                    "Process result failed validation: " + string.Join("; ", failures));
+        }
 
         try
         {
@@ -85,7 +96,7 @@ internal class ProcessInvocationPipeline
             // concurrently with waiting for exit; awaiting exit first would deadlock when a child writes
             // more than the OS pipe buffer and nothing is draining it yet.
             if (ctx.Mode == InvocationMode.Raw)
-                await externalProcess.StartAsync(ctx.CancellationToken);
+                await externalProcess.StartAsync(ctx.CancellationToken).ConfigureAwait(false);
             else
                 externalProcess.Start();
 
@@ -94,10 +105,10 @@ internal class ProcessInvocationPipeline
             TResult result = ctx.Mode switch
             {
                 InvocationMode.Raw => (TResult)await externalProcess.WaitForExitOrTimeoutAsync(
-                    ctx.CancellationToken),
+                    ctx.CancellationToken).ConfigureAwait(false),
                 InvocationMode.Buffered => (TResult)(object)await externalProcess
                     .CaptureBufferedResultAsync(
-                        ctx.CancellationToken, truncationCap, truncationCap),
+                        ctx.CancellationToken, truncationCap, truncationCap).ConfigureAwait(false),
                 _ => throw new InvalidOperationException($"Unsupported invocation mode: {ctx.Mode}")
             };
 
@@ -108,38 +119,6 @@ internal class ProcessInvocationPipeline
         finally
         {
             externalProcess.Dispose();
-        }
-    
-
-        /// <summary>
-        ///     Evaluates the configured validation rules against a completed process result and throws
-        ///     when any rule fails.
-        /// </summary>
-        /// <typeparam name="TResult">The type of process result being validated.</typeparam>
-        /// <param name="result">The process result produced by the invocation.</param>
-        /// <param name="exitConfiguration">
-        ///     The exit configuration whose <see cref="ProcessExitConfiguration.ValidationRules" /> are
-        ///     evaluated, or <c>null</c> when no validation is configured.
-        /// </param>
-        /// <exception cref="ProcessValidationException">
-        ///     Thrown when <paramref name="exitConfiguration" /> declares a rule that the result fails.
-        /// </exception>
-        static void ValidateResult<TResult>(TResult result, ProcessExitConfiguration? exitConfiguration)
-            where TResult : ProcessResult
-        {
-            if (exitConfiguration is null)
-                return;
-
-            ValidationRule<ProcessResult>[] rules = exitConfiguration.ValidationRules;
-
-            if (rules is null)
-                return;
-
-            foreach (ValidationRule<ProcessResult> rule in rules)
-            {
-                if (!rule.Predicate(result))
-                    throw new ProcessValidationException(result, rule.GetFailureMessage(result));
-            }
         }
     }
 }

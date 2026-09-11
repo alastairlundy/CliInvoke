@@ -7,7 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Internal.Extensions;
+using CliInvoke.Core;
+using CliInvoke.Core.Middleware;
 
 namespace CliInvoke.Extensions.Tests.Middleware.Truncation;
 
@@ -19,7 +20,7 @@ public class OutputTruncationMiddlewareTests
 {
     private static InvocationContext CreateContext(MiddlewareItems items)
     {
-        ProcessConfiguration config = ProcessConfigurationFactory.Create("cmd.exe", "/C echo hi");
+        ProcessConfiguration config = new ProcessConfiguration("cmd.exe", "/C echo hi");
         InvocationContext ctx = new InvocationContext(config, ProcessExitConfiguration.CreateGraceful(), InvocationMode.Buffered,
             CancellationToken.None);
         ctx.Middleware = new MiddlewareContext(_ => Task.CompletedTask, CancellationToken.None, items);
@@ -27,27 +28,39 @@ public class OutputTruncationMiddlewareTests
     }
 
     [Test]
-    public async Task InvokeAsync_WritesDefaultCap_ToMiddlewareItems()
+    public async Task InvokeAsync_WritesDefaultCap_ToExitConfiguration()
     {
         MiddlewareItems items = new MiddlewareItems();
         InvocationContext ctx = CreateContext(items);
         OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(TruncationOptions.Default);
+        InvocationContext? downstream = null;
 
-        await middleware.InvokeAsync(ctx, c => Task.CompletedTask);
+        await middleware.InvokeAsync(ctx, c =>
+        {
+            downstream = c;
+            return Task.CompletedTask;
+        });
 
-        await Assert.That(items.Get<long>(TruncationDefaults.MaxBytesPerStreamKey)).IsEqualTo(1_048_576);
+        await Assert.That(downstream).IsNotNull();
+        await Assert.That(downstream!.ExitConfiguration.MaxBufferedOutputBytes).IsEqualTo(1_048_576);
     }
 
     [Test]
-    public async Task InvokeAsync_WritesConfiguredCap_ToMiddlewareItems()
+    public async Task InvokeAsync_WritesConfiguredCap_ToExitConfiguration()
     {
         MiddlewareItems items = new MiddlewareItems();
         InvocationContext ctx = CreateContext(items);
-        OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(new TruncationOptions { MaxSize = 2048 });
+        OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(new TruncationOptions { MaxBytes = 2048 });
+        InvocationContext? downstream = null;
 
-        await middleware.InvokeAsync(ctx, c => Task.CompletedTask);
+        await middleware.InvokeAsync(ctx, c =>
+        {
+            downstream = c;
+            return Task.CompletedTask;
+        });
 
-        await Assert.That(items.Get<long>(TruncationDefaults.MaxBytesPerStreamKey)).IsEqualTo(2048);
+        await Assert.That(downstream).IsNotNull();
+        await Assert.That(downstream!.ExitConfiguration.MaxBufferedOutputBytes).IsEqualTo(2048);
     }
 
     [Test]

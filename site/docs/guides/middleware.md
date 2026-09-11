@@ -59,6 +59,7 @@ The public API is the **builder extension methods** (`UseLogging`, `UsePostExitV
 
 ```csharp
 using CliInvoke;
+using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware;            // UseLogging
 using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation
 using CliInvoke.Specializations.Middleware;        // UsePowerShell, UseCmd
@@ -69,6 +70,7 @@ builder.Services.AddCliInvoke(builder =>
     builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
     builder.UsePowerShell();
 });
+builder.Services.AddCliInvokeSpecializations(); // registers the platform middleware types
 ```
 
 * `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). A built-in heuristic redacts the values following the sensitive flags (`--password`, `--token`, `--api-key`); captured stdout/stderr lines are redacted too. To apply an organisation-wide secret taxonomy instead, construct `LoggingMiddleware` with a `Func<string?, string>?` redactor (for example Microsoft's `Microsoft.Extensions.Compliance.Redaction` `IRedactorProvider`) — the built-in heuristic is used when no redactor is supplied. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
@@ -87,9 +89,11 @@ builder.Services.AddCliInvoke(builder =>
 
   `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
 
+  The `PowerShellMiddleware`/`CmdMiddleware` types behind `UsePowerShell()`/`UseCmd()` are registered in the DI container by `AddCliInvokeSpecializations()` (shipped in the `CliInvoke.Specializations` package). Call it alongside `AddCliInvoke` with the same `ServiceLifetime`; without it, resolving the invoker throws `InvalidOperationException` because the middleware types are not registered.
+
 ## Configuring middleware through DI
 
-Middleware does not need to be wired by hand when you register CliInvoke through `Microsoft.Extensions.DependencyInjection`. The `AddCliInvoke(IServiceCollection, Action<IProcessMiddlewareBuilder>, ServiceLifetime)` overload in `CliInvoke.Extensions.DependencyInjection.DependencyInjectionExtensions` accepts a callback that receives an `IProcessMiddlewareBuilder` and configures the middleware pipeline:
+Middleware does not need to be wired by hand when you register CliInvoke through `Microsoft.Extensions.DependencyInjection`. The `AddCliInvoke(IServiceCollection, Action<IProcessMiddlewareBuilder>, ServiceLifetime)` overload in `CliInvoke.Extensions.AddCliInvokeExtensions` accepts a callback that receives an `IProcessMiddlewareBuilder` and configures the middleware pipeline:
 
 ```csharp
 using CliInvoke;
@@ -110,7 +114,7 @@ The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Tr
 
 ## Result-ownership and disposal through the chain
 
-Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing the `ProcessConfiguration` you created. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
+Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing any `UserCredential` or `StreamWriter` you placed inside the `ProcessConfiguration`. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
 
 ## The result-swap rule
 

@@ -14,18 +14,11 @@ namespace CliInvoke.Core.Middleware;
 ///     executing from the first registered middleware to the terminal pipeline.
 /// </summary>
 /// <remarks>
-///     <see cref="MiddlewareChain"/> is the engine that realises the middleware contract
-///     defined by <see cref="IProcessMiddleware"/>. It composes the registered middleware
-///     into a single nested-await (Russian-doll) pipeline: the chain is built from the last
-///     middleware inward, wrapping each around the next until the terminal delegate (the
-///     process invocation) sits at the centre. At run time the outermost middleware executes
-///     first and control unwinds back out through each layer once the process completes. A
-///     per-step <see cref="MiddlewareContext"/> carrying any seeded <see cref="MiddlewareItems"/>
-///     is exposed to every middleware via <c>InvocationContext.Middleware</c>, so framework
-///     services such as an <c>ILogger</c> injected through <see cref="MiddlewareItems"/> remain
-///     reachable throughout the chain. Middleware always run in registration order; the chain is
-///     <c>internal sealed</c> because it is an implementation detail of the invoker, not part of
-///     the public API surface.
+///     Composes the registered middleware into a nested-await (Russian-doll) pipeline.
+///     The outermost middleware executes first and control unwinds back through each layer.
+///     A per-step <see cref="MiddlewareContext"/> carrying seeded <see cref="MiddlewareItems"/>
+///     is exposed to every middleware via <c>InvocationContext.Middleware</c>. The chain is
+///     <c>internal sealed</c> because it is an implementation detail of the invoker.
 /// </remarks>
 internal sealed class MiddlewareChain
 {
@@ -78,6 +71,6 @@ internal sealed class MiddlewareChain
         context.Middleware = new MiddlewareContext(next, cancellationToken, _initialItems);
 
         // Invoke the outermost middleware (or the terminal if no middleware registered).
-        await next(context);
+        await next(context).ConfigureAwait(false);
     }
 }

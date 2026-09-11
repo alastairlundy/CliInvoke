@@ -72,4 +72,46 @@ public async Task ProcessResult_SignalDifference_AffectsEquality()
     await Assert.That(signaled.Equals(noSignal)).IsFalse();
     await Assert.That(noSignal.GetHashCode()).IsNotEqualTo(signaled.GetHashCode());
     }
+
+    [Test]
+    public async Task ProcessResult_NullEqualsNull_IsTrue()
+    {
+        ProcessResult? a = null;
+        ProcessResult? b = null;
+
+        await Assert.That(a == b).IsTrue();
+        await Assert.That(a != b).IsFalse();
+    }
+
+    [Test]
+    public async Task ProcessResult_NullEqualsNonNull_IsFalse()
+    {
+        ProcessResult? a = null;
+        ProcessResult b = MakeBase();
+
+        await Assert.That(a == b).IsFalse();
+        await Assert.That(a != b).IsTrue();
+    }
+
+    [Test]
+    public async Task ProcessResult_NonNullEqualsNull_IsFalse()
+    {
+        ProcessResult a = MakeBase();
+        ProcessResult? b = null;
+
+        await Assert.That(a == b).IsFalse();
+        await Assert.That(a != b).IsTrue();
+    }
+
+    [Test]
+    public async Task ProcessResult_ProcessIdDifference_AffectsEquality()
+    {
+        ProcessResult a = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
+            new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: null);
+        ProcessResult b = new("foo.exe", 0, 2, new DateTime(2026, 1, 1, 0, 0, 0),
+            new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: null);
+
+        await Assert.That(a.Equals(b)).IsFalse();
+        await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
+    }
 }

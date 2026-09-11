@@ -7,7 +7,7 @@ The functionality in this package relies on the `wc` program, which is available
 ### Notes
 This library is built on **CliInvoke v3**. Consumers must register CliInvoke with Dependency Injection before using the counters.
 
-For apps using `Microsoft.Extensions.DependencyInjection` or `Microsoft.Extensions.Hosting`, install `CliInvoke.Extensions` and call the `AddCliInvoke` service collection extension method. This registers `IProcessInvoker`, `IFilePathResolver`, and the rest of CliInvoke's services:
+For apps using `Microsoft.Extensions.DependencyInjection` or `Microsoft.Extensions.Hosting`, install the `CliInvoke` package and call the `AddCliInvoke` service collection extension method. This registers `IProcessInvoker`, `IFilePathResolver`, and the rest of CliInvoke's services:
 
 ```csharp
 using CliInvoke.Extensions;

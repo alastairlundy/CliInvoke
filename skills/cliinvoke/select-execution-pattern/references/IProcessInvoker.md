@@ -7,6 +7,7 @@ This reference explains how to use the `IProcessInvoker` interface to execute pr
 The `IProcessInvoker` service is designed to be obtained from a dependency injection container. This ensures proper abstraction and allows the library to manage the concrete implementation of the process invoker.
 
 ### Basic DI Usage
+
 ```csharp
 using CliInvoke.Core;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 // Resolve IProcessInvoker from service provider
 IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-// Create process configuration
+// Create process configuration using the v3 convenience constructor
 ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
 // Execute the process and capture buffered output
@@ -33,6 +34,7 @@ else
 ```
 
 ### Usage with Process Exit Configuration
+
 For more control over process execution (such as setting timeouts), you can provide a `ProcessExitConfiguration`:
 
 ```csharp
@@ -77,54 +79,81 @@ The `IProcessInvoker` interface provides two methods for executing processes:
 2. `ExecuteBufferedAsync` - Returns a `BufferedProcessResult` with exit code, standard output, and standard error
 
 All methods follow the same parameter pattern:
+
 - `ProcessConfiguration` - Required configuration for the process
 - `ProcessExitConfiguration?` - Optional configuration for process exit behavior (timeout, etc.)
 - `CancellationToken` - Optional cancellation token
 
 ### Note on DI Usage
+
 Using dependency injection to obtain `IProcessInvoker` provides several benefits:
+
 - Abstraction from the concrete `ProcessInvoker` implementation
 - Easier testing through mocking of the `IProcessInvoker` interface
 - Centralized management of service lifetimes
 - Consistency with other CliInvoke services like `IExternalProcessFactory`
 
 ### Adding Middleware (Cross-cutting Concerns)
-`ProcessInvoker` can be configured with an optional **middleware** chain that wraps the terminal Process Invocation Pipeline (Configuration → Invoke → OS Process → Result) in registration order. The public API is the fluent `Use*` extension methods — each returns a *new* `ProcessInvoker`, so they compose. Call sites (`ExecuteAsync` / `ExecuteBufferedAsync`) are **unchanged** with or without middleware.
+
+`ProcessInvoker` can be configured with an optional **middleware** chain that wraps the terminal Process Invocation Pipeline (Configuration → Invoke → OS Process → Result) in registration order. The public API is the fluent `Use*` extension methods on `IProcessMiddlewareBuilder`. Call sites (`ExecuteAsync` / `ExecuteBufferedAsync`) are **unchanged** with or without middleware.
+
+#### Via DI (Recommended)
+
+Register middleware through `AddCliInvoke` — the callback receives an `IProcessMiddlewareBuilder`:
 
 ```csharp
-using CliInvoke;                                  // ProcessInvoker
-using CliInvoke.Core;                             // IExternalProcessFactory
-using CliInvoke.Core.Middleware;                  // MiddlewareItems
+using CliInvoke.Extensions;                      // AddCliInvoke
+using CliInvoke.Extensions.Middleware;            // UseLogging
+using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation
+using CliInvoke.Specializations.Middleware;       // UsePowerShell, UseCmd
+
+services.AddCliInvoke(builder =>
+{
+    builder.UseLogging();
+    builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+    // builder.UsePowerShell();  // optional platform middleware
+    // builder.UseCmd();         // Windows-only
+});
+```
+
+#### Without DI
+
+Build the middleware list via `ProcessMiddlewareBuilder`, then pass it to the `ProcessInvoker` constructor:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Core.Middleware;                  // ProcessMiddlewareBuilder, IProcessMiddleware
 using CliInvoke.Extensions.Middleware;            // UseLogging
 using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation, PostExitValidation
-using CliInvoke.Specializations.Middleware;       // UsePowerShell, UseCmd
 
 IExternalProcessFactory factory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
 
-// Logging on every invocation (resolves an ILogger from the MiddlewareItems bag, if seeded):
-ProcessInvoker loggingInvoker = new ProcessInvoker(factory).UseLogging();
+// Build the middleware list — the builder resolves types via its resolver delegate:
+ProcessMiddlewareBuilder mb = new(serviceProvider);
+mb.UseLogging();
+mb.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+IReadOnlyList<IProcessMiddleware> middlewares = mb.Build();
 
-// Validate the result after exit (throws ProcessValidationException on failure):
-ProcessInvoker validatedInvoker = new ProcessInvoker(factory)
-    .UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
-
-// Run the command inside PowerShell Core / Windows cmd.exe:
-ProcessInvoker psInvoker = new ProcessInvoker(factory).UsePowerShell();
-ProcessInvoker cmdInvoker = new ProcessInvoker(factory).UseCmd();   // Windows-only
-
-// Compose freely — each Use* returns a new ProcessInvoker:
-ProcessInvoker invoker = new ProcessInvoker(factory)
-    .UseLogging()
-    .UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
-
-// Seed shared services (e.g. an ILogger) via the MiddlewareItems bag:
-var items = new MiddlewareItems();
-items.Set("Logger", myLogger);
-ProcessInvoker seededInvoker = new ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items).UseLogging();
+// Pass the materialised list to the invoker constructor:
+ProcessInvoker invoker = new ProcessInvoker(factory, middlewares, null);
 
 // Call sites are identical to the non-middleware path:
 ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config);
 ```
+
+#### Seeding shared services via MiddlewareItems
+
+Use `MiddlewareItems` to inject framework-level services (e.g. an `ILogger`) that middleware can read from `InvocationContext.Middleware`:
+
+```csharp
+var items = new MiddlewareItems();
+items.Set("Logger", myLogger);
+ProcessInvoker invoker = new ProcessInvoker(factory, middlewares, items);
+```
+
+### Middleware Coverage
+
+`IProcessInvoker` / `ProcessInvoker` is the **primary middleware entrypoint**. Every invocation through these types flows through the registered middleware chain. This applies whether the invoker was resolved from DI or constructed manually. Middleware does not apply to `CliRun` or `IExternalProcess` — see the middleware asymmetry documentation in the execution-pattern selection skill for details.
 
 **Disposal through the chain:** middleware returns the process result **un-disposed** (exactly as without middleware). You remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration` you created. `ProcessConfiguration` itself is not disposable. See the `implement-resource-lifecycle` skill for the full ownership checklist.

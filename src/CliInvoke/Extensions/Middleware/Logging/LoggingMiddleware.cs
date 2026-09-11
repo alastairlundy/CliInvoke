@@ -77,7 +77,7 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
             context.Configuration.TargetFilePath,
             sanitizedArgs);
 
-        await next(context);
+        await next(context).ConfigureAwait(false);
 
         if (context.Result is null)
             return;

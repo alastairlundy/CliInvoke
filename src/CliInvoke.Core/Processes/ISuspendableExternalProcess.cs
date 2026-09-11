@@ -18,11 +18,6 @@ public interface ISuspendableExternalProcess : IExternalProcess
     /// <summary>
     /// Suspends the execution of the external process.
     /// </summary>
-    /// <remarks>
-    /// This method allows pausing the execution of an external process that implements
-    /// the <see cref="ISuspendableExternalProcess" /> interface. Suspending a process may
-    /// release resources held by the process or pause its operation without terminating it.
-    /// </remarks>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the process is not in a state that allows suspension, such as when it has not started
     /// or has already exited.
@@ -32,11 +27,6 @@ public interface ISuspendableExternalProcess : IExternalProcess
     /// <summary>
     /// Resumes the execution of the external process.
     /// </summary>
-    /// <remarks>
-    /// This method resumes an external process that was previously suspended using the
-    /// <see cref="ISuspendableExternalProcess.Suspend" /> method. Resuming a suspended process
-    /// allows it to continue its operations from the point where it was paused.
-    /// </remarks>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the process cannot be resumed, such as if it has not been started, is not currently suspended,
     /// or has already exited.

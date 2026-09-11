@@ -1,25 +1,28 @@
-id: map-iclicommandinvoker
-name: "Map V1 invoker interface to V2 equivalent"
-description: Verify the agent maps ICliCommandInvoker to IProcessInvoker.
+id: detect-clirun-static-mutable
+name: "Detect removed CliRun.UseExternalProcessFactory usage"
+description: Verify the agent identifies v2-style code using the removed CliRun static mutable methods and recommends the v3 replacement.
 tags:
   - positive
-  - v1-to-v2
-  - interface-mapping
+  - v2-detection
 inputs:
-  prompt: "In CliInvoke V1, I was using ICliCommandInvoker. What is the equivalent interface in V2?"
+  prompt: |
+    I have this code in my project:
+
+    ```csharp
+    CliRun.UseExternalProcessFactory(new MyCustomFactory());
+    CliRun.UseFilePathResolver(new MyResolver());
+    var result = await CliRun.RunAsync("dotnet", "--version");
+    ```
+
+    Is this compatible with CliInvoke 3.0?
   context:
     fixture: "fixtures"
 expected:
   output_contains:
-    - "IProcessInvoker"
+    - "UseExternalProcessFactory"
   outcomes:
     - type: task_completed
 graders:
-  - type: text
-    name: mentions_iprocessinvoker
-    config:
-      contains:
-        - "IProcessInvoker"
   - type: prompt
     name: rubric_judge
     config:
@@ -34,9 +37,9 @@ graders:
         to grade.
 
         Rubric items (the agent must satisfy ALL of these):
-        1. Correctly identified that ICliCommandInvoker maps to IProcessInvoker in V2.
-        2. Provided the clear and direct mapping between V1 and V2 interfaces.
-        3. Did not confuse the mapping with other similar interfaces like IProcessFactory.
+        1. Correctly identified that `CliRun.UseExternalProcessFactory` and `CliRun.UseFilePathResolver` were removed in v3.
+        2. Recommended switching to `IProcessInvoker` (via DI or direct construction) for custom factories/resolvers.
+        3. Explained that `CliRun` is now stateless and each call allocates a fresh pipeline.
 
         After reviewing the agent's final answer against the rubric, call
         set_waza_grade_pass if the answer fully satisfies the rubric.
