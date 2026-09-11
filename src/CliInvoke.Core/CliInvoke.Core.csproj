@@ -23,20 +23,20 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.0.0</Version>
-        <PackageVersion>3.0.0</PackageVersion>
-        <PackageReleaseNotes>
-### 🆕 Additions
-- Added `IRetryClassifier`
+        <PackageVersion>3.0.0-rc.1</PackageVersion>
+        <PackageReleaseNotes>#### 🐛 Bug Fixes
 
-### ⚙️ Modifications
-- Narrowed exception catches and tightened the middleware chain.
+- Fixed `StandardInput.BaseStream` equality comparison in `ProcessConfiguration` — was comparing wrapper objects instead of underlying streams
+- Fixed `ArgumentTokenizer` empty-string special case that could cause incorrect tokenization
+- Added null guard to `ArgumentTokenizer` for error resilience
+- Fixed `ShellInformation` file path comparison to use case-insensitive matching, aligning `Equals` and `GetHashCode`
+- Fixed `ProcessConfiguration.EnvironmentVariables` dictionary equality to use `SequenceEqual` instead of reference equality
+- Fixed `ProcessConfiguration.StandardInput` to use reference equality instead of `.Equals`
 
-### 🗑️ Removals
-- Removed `ShouldRetry` from `IProcessResultValidator`. Validators now only validate; the retry classifier decides retries.
+#### ⚙️ Modifications
 
-### 🐛 Bug Fixes
-- Fixed null-unsafe equality operators on primitives.
-- Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`</PackageReleaseNotes>
+- Removed `ISuspendableExternalProcess` interface (absorbed into sealed `ExternalProcess`)
+- Cleaned up XML doc comments on `MiddlewareChain`, `InvocationContext`, and `ShellInformation`</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>

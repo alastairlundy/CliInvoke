@@ -15,31 +15,21 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>
-### 🆕 Additions
-- Added `maxBufferedOutputBytes` to the `CliRun` string-args buffered path to enable capping buffered output size in memory.
+        <PackageReleaseNotes>#### 🐛 Bug Fixes
 
-### ⚙️ Modifications
-- `OutputTruncationMiddleware` now reads the truncation cap from exit configuration instead of a string-keyed handoff, and `MaxSize` is now `MaxBytes`.
-- Reworked retry middleware around the classifier
-- Documented the redirect-flag OR collapse in `FromProcessStartInfo`.
+- Fixed `ExternalProcess` event handler leak — handlers are now properly unsubscribed before re-subscribing on `Start`/`StartAsync`
+- Fixed null-safe config conversion, double-dispose guard, and `ExitTime` UTC handling in `ExternalProcess`
+- Fixed `ProcessWrapper` error resilience for fast-exiting processes
+- Fixed `CancellationHelper` exit-skew window — expected exit time is now captured when the wait begins instead of being re-derived in exception handlers
 
-### 🗑️ Removals
-- Removed `ProcessConfigurationFactory`. Use init construction or the builder.
-
-### 🐛 Bug Fixes
-- Fixed a race in `ExternalProcess` where the start gate and wrapper swap could interleave. Both are now serialized under a private lock.
-- Fixed `ProcessWrapper` lifecycle issues: the cancellation reason is reported when caught, `ForcefulExit` guards against self-invocation, and event invocation is null-conditional.
-- Fixed flaky resource policy application on fast-exiting processes.
-- Fixed validator registration extensions to use `Add` instead of `TryAdd` so re-registration works.
-- Fixed `CachingFilePathResolver` cache keys to respect per-OS path casing rules.
-- Fixed a Unix `FilePathResolver` filename match issue.
-- Fixed `PathEnvironmentVariable` to expand `~` and `C:\Users` paths in a single pass.
-- The Unix control adapter now throws `PlatformNotSupportedException` for ``UserCredential``</PackageReleaseNotes>
+#### ⚙️ Modifications
+- Moved `AddCliInvoke` DI registration into this package from `CliInvoke.Specializations`
+- Cleaned up stale `GlobalUsings.cs` entry
+- Cleaned up XML doc comments on `ExternalProcess`, `ProcessWrapper`, `ShellDetector`, and `ProcessResultValidator`</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0</PackageVersion>
+        <PackageVersion>3.0.0-rc.1</PackageVersion>
         <AssemblyVersion></AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

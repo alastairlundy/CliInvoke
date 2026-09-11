@@ -12,15 +12,18 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0</PackageVersion>
+        <PackageVersion>3.0.0-rc.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>### ⚙️ Modifications
-- `PowershellProcessConfiguration.TargetFilePath` now delegates to its base configuration.
-- Updated DI extensions for the retry classifier rename and carried the init-only configuration change through `CmdProcessConfiguration` and `PowershellProcessConfiguration`.</PackageReleaseNotes>
+        <PackageReleaseNotes>
+#### ⚙️ Modifications
+
+- Simplified `DependencyInjectionExtensions` after `AddCliInvoke` was moved to the main package
+- Cleaned up stale pre-release labels in README
+- Cleaned up XML doc comments on `CmdProcessConfiguration` and `PowershellProcessConfiguration`</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
