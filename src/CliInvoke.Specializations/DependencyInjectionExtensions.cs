@@ -21,37 +21,32 @@ public static class DependencyInjectionExtensions
     extension(IServiceCollection services)
     {
         /// <summary>
-        ///     Registers the CliInvoke Specializations middleware types
+        ///     Registers the Specializations middleware types
         ///     (<see cref="PowerShellMiddleware"/>, <see cref="CmdMiddleware"/>,
         ///     <see cref="DefaultShellMiddleware"/>) and their options POCO
-        ///     in the service collection so the type-based
-        ///     <see cref="IProcessMiddlewareBuilder.UseMiddleware{T}"/> overload (used by the convenience
-        ///     extensions <c>UsePowerShell()</c>, <c>UseCmd()</c>, and <c>UseDefaultShell()</c>) can
+        ///     so the type-based <see cref="IProcessMiddlewareBuilder.UseMiddleware{T}"/> overload
+        ///     (used by <c>UsePowerShell()</c>, <c>UseCmd()</c>, <c>UseDefaultShell()</c>) can
         ///     resolve them from the dependency injection container.
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         Call this method alongside <c>AddCliInvoke</c> from the main CliInvoke package, which
-        ///         registers CliInvoke's core services and core built-in middleware; the two
-        ///         registrations are independent and can be chained in either order.
+        ///         Call this alongside <c>AddCliInvoke</c>, which registers core services and middleware.
+        ///         The two registrations are independent and can be chained in either order.
         ///     </para>
         ///     <para>
-        ///         <paramref name="lifetime"/> must match the lifetime passed to <c>AddCliInvoke</c>:
-        ///         middleware lifetimes are matched to the invoker lifetime to avoid capturing scoped
-        ///         services into a singleton (captive dependency). Middleware registered with a lifetime
-        ///         that differs from the <c>IProcessInvoker</c> lifetime may be captured by a
-        ///         longer-lived service.
+        ///         <paramref name="lifetime"/> must match the value passed to <c>AddCliInvoke</c>.
+        ///         Mismatched lifetimes risk capturing scoped services into a singleton.
         ///     </para>
         ///     <para>
-        ///         All registrations use <see cref="ServiceCollectionDescriptorExtensions.TryAdd(IServiceCollection, ServiceDescriptor)"/>
-        ///         so that a consumer-supplied registration for any of these types takes precedence.
+        ///         Registrations use <see cref="ServiceCollectionDescriptorExtensions.TryAdd(IServiceCollection, ServiceDescriptor)"/>
+        ///         so consumer-supplied registrations take precedence.
         ///     </para>
         /// </remarks>
-        /// <param name="lifetime">The service lifetime to use if specified; Scoped otherwise.</param>
-        /// <returns>The updated service collection with the added CliInvoke Specializations middleware set up.</returns>
+        /// <param name="lifetime">The service lifetime to use; defaults to <see cref="ServiceLifetime.Scoped"/>.</param>
+        /// <returns>The service collection with the Specializations middleware registered.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        ///     Thrown if an invalid value is provided for <paramref name="lifetime"/>. Valid values are
-        ///     Scoped, Singleton, and Transient.
+        ///     Thrown if <paramref name="lifetime"/> is not <see cref="ServiceLifetime.Scoped"/>,
+        ///     <see cref="ServiceLifetime.Singleton"/>, or <see cref="ServiceLifetime.Transient"/>.
         /// </exception>
         public IServiceCollection AddCliInvokeSpecializations(ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
@@ -72,20 +67,18 @@ public static class DependencyInjectionExtensions
         }
 
         /// <summary>
-        ///     Registers the Specializations middleware types and their options POCO in the service
-        ///     collection so the type-based <see cref="IProcessMiddlewareBuilder.UseMiddleware{T}"/> overload
-        ///     (used by the convenience extensions <c>UsePowerShell</c>, <c>UseCmd</c>)
-        ///     can resolve them from the dependency injection container.
+        ///     Registers the Specializations middleware types and their options POCO
+        ///     so the type-based <see cref="IProcessMiddlewareBuilder.UseMiddleware{T}"/> overload
+        ///     (used by <c>UsePowerShell</c>, <c>UseCmd</c>) can resolve them from DI.
         /// </summary>
         /// <remarks>
-        ///     All registrations use <see cref="ServiceCollectionDescriptorExtensions.TryAdd(IServiceCollection, ServiceDescriptor)"/>
-        ///     so that a consumer-supplied registration for any of these types takes precedence. The
-        ///     middleware lifetimes match the invoker lifetime to avoid capturing scoped services into a
-        ///     singleton. <see cref="PowerShellMiddleware"/> and <see cref="DefaultShellMiddleware"/> fall
-        ///     back to <see cref="ShellMiddlewareOptions.Default"/> when no
-        ///     <see cref="ShellMiddlewareOptions"/> is registered.
-        ///     <see cref="DefaultShellMiddleware"/> additionally requires
-        ///     <see cref="IShellDetector"/>, registered by <c>AddCliInvoke</c>.
+        ///     Registrations use <see cref="ServiceCollectionDescriptorExtensions.TryAdd(IServiceCollection, ServiceDescriptor)"/>
+        ///     so consumer-supplied registrations take precedence. Middleware lifetimes match the
+        ///     invoker lifetime to avoid captive dependencies. <see cref="PowerShellMiddleware"/> and
+        ///     <see cref="DefaultShellMiddleware"/> fall back to <see cref="ShellMiddlewareOptions.Default"/>
+        ///     when no <see cref="ShellMiddlewareOptions"/> is registered.
+        ///     <see cref="DefaultShellMiddleware"/> also requires <see cref="IShellDetector"/>,
+        ///     registered by <c>AddCliInvoke</c>.
         /// </remarks>
         /// <param name="lifetime">The service lifetime to register the middleware with.</param>
         private void RegisterPlatformMiddleware(ServiceLifetime lifetime)

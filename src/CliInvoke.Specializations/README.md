@@ -53,9 +53,13 @@ If you prefer to resolve an invoker from a dependency injection container, call 
 #### AddCliInvokeSpecializations
 
 `AddCliInvokeSpecializations()` (namespace `CliInvoke.Extensions`, shipped in this package) registers the
-Specializations middleware types — `PowerShellMiddleware`, `CmdMiddleware`, and `PowerShellMiddlewareOptions` —
-so that the convenience builder extensions `UsePowerShell()` and `UseCmd()` can resolve them from the DI
-container.
+Specializations middleware types — `PowerShellMiddleware`, `CmdMiddleware`, `DefaultShellMiddleware`, and
+`ShellMiddlewareOptions` — so that the convenience builder extensions `UsePowerShell()`, `UseCmd()`, and
+`UseDefaultShell()` can resolve them from the DI container.
+
+`DefaultShellMiddleware` detects the user's default shell (pwsh, Windows PowerShell, or cmd) and wraps the
+command in it automatically. Use it when you want cross-platform shell detection instead of targeting a
+specific shell.
 
 > **`AddCliInvoke()` is required.** `AddCliInvokeSpecializations()` only registers middleware types; it does
 > **not** register core CliInvoke services. You **must** call `AddCliInvoke()` as well, or the invoker,
@@ -72,7 +76,7 @@ using Microsoft.Extensions.DependencyInjection;
 ServiceCollection services = new ServiceCollection();
 
 // AddCliInvoke() is required — it registers core services.
-// AddCliInvokeSpecializations() registers the Cmd/PowerShell middleware types.
+// AddCliInvokeSpecializations() registers the Cmd/PowerShell/DefaultShell middleware types.
 services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd())
     .AddCliInvokeSpecializations();
 

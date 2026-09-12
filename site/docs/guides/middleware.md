@@ -75,21 +75,23 @@ builder.Services.AddCliInvokeSpecializations(); // registers the platform middle
 
 * `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). A built-in heuristic redacts the values following the sensitive flags (`--password`, `--token`, `--api-key`); captured stdout/stderr lines are redacted too. To apply an organisation-wide secret taxonomy instead, construct `LoggingMiddleware` with a `Func<string?, string>?` redactor (for example Microsoft's `Microsoft.Extensions.Compliance.Redaction` `IRedactorProvider`) — the built-in heuristic is used when no redactor is supplied. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
 * `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
-* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. To configure non-default behaviour, register `PowerShellMiddlewareOptions` (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties) in the DI container — for example:
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. To configure non-default behaviour, register `ShellMiddlewareOptions` (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties) in the DI container — for example:
 
   ```csharp
-  using CliInvoke.Specializations.Middleware; // PowerShellMiddlewareOptions
+  using CliInvoke.Specializations.Middleware; // ShellMiddlewareOptions
 
-  services.Configure<PowerShellMiddlewareOptions>(o =>
+  services.Configure<ShellMiddlewareOptions>(o =>
   {
       o.WindowCreation = true;
       o.UseShellExecution = true;
   });
   ```
 
+* `UseDefaultShell` — detects the user's default shell (pwsh, Windows PowerShell, or cmd) via `IShellDetector` and wraps the command in it automatically. Use this instead of `UsePowerShell`/`UseCmd` when you want cross-platform shell detection without committing to a specific shell. Requires `IShellDetector` (registered by `AddCliInvoke`).
+
   `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
 
-  The `PowerShellMiddleware`/`CmdMiddleware` types behind `UsePowerShell()`/`UseCmd()` are registered in the DI container by `AddCliInvokeSpecializations()` (shipped in the `CliInvoke.Specializations` package). Call it alongside `AddCliInvoke` with the same `ServiceLifetime`; without it, resolving the invoker throws `InvalidOperationException` because the middleware types are not registered.
+  The `PowerShellMiddleware`/`CmdMiddleware`/`DefaultShellMiddleware` types behind `UsePowerShell()`/`UseCmd()`/`UseDefaultShell()` are registered in the DI container by `AddCliInvokeSpecializations()` (shipped in the `CliInvoke.Specializations` package). Call it alongside `AddCliInvoke` with the same `ServiceLifetime`; without it, resolving the invoker throws `InvalidOperationException` because the middleware types are not registered.
 
 ## Configuring middleware through DI
 

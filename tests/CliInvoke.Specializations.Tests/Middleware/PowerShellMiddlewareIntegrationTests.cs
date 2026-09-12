@@ -93,7 +93,7 @@ public class PowerShellMiddlewareIntegrationTests
     }
 
     [Test]
-    public async Task PowerShellMiddlewareOptions_Default_HasExpectedValues()
+    public async Task ShellMiddlewareOptions_Default_HasExpectedValues()
     {
         ShellMiddlewareOptions options = ShellMiddlewareOptions.Default;
 
@@ -102,7 +102,7 @@ public class PowerShellMiddlewareIntegrationTests
     }
 
     [Test]
-    public async Task PowerShellMiddlewareOptions_CanCustomiseProperties()
+    public async Task ShellMiddlewareOptions_CanCustomiseProperties()
     {
         ShellMiddlewareOptions options = new ShellMiddlewareOptions
         {
