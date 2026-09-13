@@ -42,6 +42,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static async Task<ProcessResult> ExecuteAsync(
         this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
@@ -80,6 +81,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static async Task<BufferedProcessResult> ExecuteBufferedAsync(
         this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
@@ -118,7 +120,7 @@ public static class ConfigurationInvokationExtensions
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
 #endif
-    [Obsolete]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static async Task<PipedProcessResult> ExecutePipedAsync(
         this ProcessConfiguration processConfiguration,
         IProcessInvoker processConfigurationInvoker,
