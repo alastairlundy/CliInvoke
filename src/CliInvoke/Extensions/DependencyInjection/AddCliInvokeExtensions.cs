@@ -38,9 +38,9 @@ namespace CliInvoke.Extensions;
 /// </remarks>
 public static class AddCliInvokeExtensions
 {
-/// <summary>
-///     Registers CliInvoke's core types and middleware in the DI container.
-/// </summary>
+    /// <summary>
+    ///     Registers CliInvoke's core types and middleware in the DI container.
+    /// </summary>
     /// <param name="services">The service collection to add to.</param>
     /// <param name="lifetime">The service lifetime to use if specified; Scoped otherwise.</param>
     /// <returns>The updated service collection with the added CliInvoke services set up.</returns>

@@ -39,5 +39,4 @@ public static class LoggingMiddlewareExtensions
             return builder;
         }
     }
-
 }
