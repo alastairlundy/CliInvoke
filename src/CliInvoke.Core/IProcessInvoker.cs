@@ -62,6 +62,7 @@ public interface IProcessInvoker
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("watchos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,

@@ -112,6 +112,7 @@ public class ProcessInvoker : IProcessInvoker
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public async Task<PipedProcessResult> ExecutePipedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,

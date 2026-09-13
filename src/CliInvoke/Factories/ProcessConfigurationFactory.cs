@@ -25,6 +25,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     /// <param name="arguments">The arguments to pass to the Command upon execution.</param>
     /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
     [Pure]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public ProcessConfiguration Create(string targetFilePath, params string[] arguments) =>
         Create(targetFilePath, arguments, null);
 
@@ -36,6 +37,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
     /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
     [Pure]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public ProcessConfiguration Create(
         string targetFilePath,
         string arguments,
@@ -65,6 +67,7 @@ public class ProcessConfigurationFactory : IProcessConfigurationFactory
     /// <param name="configureBuilder">Actions to apply to the internal <see cref="IProcessConfigurationBuilder"/> if not null.</param>
     /// <returns>The <see cref="ProcessConfiguration"/> created from the configured parameters.</returns>
     [Pure]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public ProcessConfiguration Create(
         string targetFilePath,
         IEnumerable<string> arguments,

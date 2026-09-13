@@ -304,6 +304,7 @@ public class ExternalProcess : IExternalProcess
     /// typically caused by a grandchild process holding a pipe open.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public async Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(
         CancellationToken cancellationToken)
     {

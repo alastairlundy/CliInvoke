@@ -85,6 +85,7 @@ public interface IExternalProcess : IDisposable
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the asynchronous operation. The result contains the piped process result when the method completes.</returns>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(
         CancellationToken cancellationToken);
 }
