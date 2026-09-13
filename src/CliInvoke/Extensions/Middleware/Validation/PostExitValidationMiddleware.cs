@@ -40,6 +40,6 @@ internal sealed class PostExitValidationMiddleware : IProcessMiddleware
         ];
 
         await next(context.WithExitConfiguration(
-            ProcessExitConfigurationCreationExtensions.WithValidationRules(context.ExitConfiguration, mergedRules))).ConfigureAwait(false);
+            ProcessExitConfiguration.WithValidationRules(context.ExitConfiguration, mergedRules))).ConfigureAwait(false);
     }
 }

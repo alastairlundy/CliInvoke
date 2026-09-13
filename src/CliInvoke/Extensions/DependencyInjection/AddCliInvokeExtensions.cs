@@ -48,7 +48,7 @@ public static class AddCliInvokeExtensions
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         // Null configure means "register default invoker with no custom middleware".
-        return ConfigureCliInvokeServices(services, configure: null, lifetime);
+        return services.ConfigureCliInvokeServices(configure: null, lifetime);
     }
 
     /// <param name="services">The service collection to add to.</param>
@@ -78,7 +78,7 @@ public static class AddCliInvokeExtensions
 
             // configure is validated non-null here; the Core method accepts nullable
             // because the parameterless overload intentionally passes null.
-            return ConfigureCliInvokeServices(services, configure, lifetime);
+            return services.ConfigureCliInvokeServices(configure, lifetime);
         }
     }
 

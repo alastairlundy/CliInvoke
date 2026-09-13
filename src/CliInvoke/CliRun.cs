@@ -196,7 +196,7 @@ public static class CliRun
         ProcessConfiguration configuration = new ProcessConfiguration(
             targetFilePath, arguments, outputRedirection) { WorkingDirectoryPath = workingDirectory };
 
-        ProcessExitConfiguration exitConfiguration = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(
                 ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan ?? ProcessTimeoutPolicy.Default.TimeoutThreshold)),
             maxBufferedOutputBytes);
