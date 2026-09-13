@@ -10,25 +10,6 @@
 namespace CliInvoke.Extensions.Middleware.Retry;
 
 /// <summary>
-///     Provides pre-built <see cref="IRetryClassifier"/> implementations.
-/// </summary>
-public static class RetryConditions
-{
-    /// <summary>
-    ///     Returns a classifier that retries whenever the exit code is non-zero.
-    /// </summary>
-    /// <returns>An <see cref="IRetryClassifier"/> that retries on non-zero exit codes.</returns>
-    public static IRetryClassifier ExitCodeZero()
-        => new ExitCodeZeroClassifier();
-
-    private sealed class ExitCodeZeroClassifier : IRetryClassifier
-    {
-        public bool ShouldRetry(ProcessResult result)
-            => result.ExitCode != 0;
-    }
-}
-
-/// <summary>
 ///     Provides extension methods for configuring retry middleware on the process pipeline.
 /// </summary>
 public static class RetryMiddlewareExtensions
