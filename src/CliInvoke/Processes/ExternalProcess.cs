@@ -22,6 +22,8 @@ namespace CliInvoke.Processes;
 /// </summary>
 public class ExternalProcess : IExternalProcess
 {
+    private const int DrainGracePeriodSeconds = 5;
+    
     private ProcessWrapper _processWrapper;
     private bool _disposed;
     
@@ -181,9 +183,13 @@ public class ExternalProcess : IExternalProcess
 
     /// <summary>
     /// Asynchronously waits for the process to exit or a specified timeout period elapses.
+    /// After exit, redirects are drained to natural pipe EOF with a 5-second grace period.
+    /// If the grace period expires before drains complete, a <see cref="TimeoutException"/> is thrown.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
+    /// <exception cref="TimeoutException">Thrown when post-exit pipe draining exceeds the 5-second grace period,
+    /// typically caused by a grandchild process holding a pipe open.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken)
@@ -191,11 +197,11 @@ public class ExternalProcess : IExternalProcess
         using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler.
-                PipeStandardOutputAsync(_processWrapper, linkedCts.Token) 
+                PipeStandardOutputAsync(_processWrapper, cancellationToken) 
             : Task.FromResult(Stream.Null);
         
         Task<Stream> standardErrorStream = Configuration.RedirectStandardError ? _processPipeHandler.
-                PipeStandardErrorAsync(_processWrapper, linkedCts.Token) 
+                PipeStandardErrorAsync(_processWrapper, cancellationToken) 
             : Task.FromResult(Stream.Null);
         
         try
@@ -204,7 +210,15 @@ public class ExternalProcess : IExternalProcess
 
             await waitForExit;
             await linkedCts.CancelAsync();
-            await ObserveCancellation(standardOutputStream, standardErrorStream);
+            
+            Stream standardOutput = await standardOutputStream;
+            Stream standardError = await standardErrorStream;
+            
+            if(Configuration.StandardOutput is not null)
+                await DrainReadsAsync([standardOutput.CopyToAsync(Configuration.StandardOutput.BaseStream, cancellationToken)], cancellationToken);
+            
+            if(Configuration.StandardError is not null)
+                await DrainReadsAsync([standardError.CopyToAsync(Configuration.StandardError.BaseStream, cancellationToken)], cancellationToken);
             
             ProcessResult result = new(
                 _processWrapper.StartInfo.FileName,
@@ -213,12 +227,6 @@ public class ExternalProcess : IExternalProcess
                 _processWrapper.StartTime,
                 _processWrapper.ExitTime
             );
-
-            if(Configuration.StandardOutput is not null)
-                await standardOutputStream.Result.CopyToAsync(Configuration.StandardOutput.BaseStream, cancellationToken);
-            
-            if(Configuration.StandardError is not null)
-                await standardErrorStream.Result.CopyToAsync(Configuration.StandardError.BaseStream, cancellationToken);
 
             ThrowIfProcessNotSuccessful(result);
 
@@ -234,9 +242,13 @@ public class ExternalProcess : IExternalProcess
 
     /// <summary>
     /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
+    /// After exit, stdout/stderr reads are drained to natural pipe EOF with a 5-second grace period.
+    /// If the grace period expires before drains complete, a <see cref="TimeoutException"/> is thrown.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the asynchronous operation. The result contains the buffered process result when the method completes.</returns>
+    /// <exception cref="TimeoutException">Thrown when post-exit pipe draining exceeds the 5-second grace period,
+    /// typically caused by a grandchild process holding a pipe open.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<BufferedProcessResult> WaitForBufferedExitOrTimeoutAsync(CancellationToken cancellationToken)
@@ -244,11 +256,11 @@ public class ExternalProcess : IExternalProcess
         using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         Task<string> standardOutputString = Configuration.RedirectStandardOutput ? _processWrapper.StandardOutput
-                .ReadToEndAsync(linkedCts.Token) 
+                .ReadToEndAsync(cancellationToken) 
             : Task.FromResult(string.Empty);
 
         Task<string> standardErrorString = Configuration.RedirectStandardError
-            ? _processWrapper.StandardError.ReadToEndAsync(linkedCts.Token)
+            ? _processWrapper.StandardError.ReadToEndAsync(cancellationToken)
             : Task.FromResult(string.Empty);
         
         try
@@ -257,7 +269,13 @@ public class ExternalProcess : IExternalProcess
 
             await waitForExit;
             await linkedCts.CancelAsync();
-            await ObserveCancellation(standardOutputString, standardErrorString);
+            
+            await DrainReadsAsync(
+                [
+                    standardOutputString,
+                    standardErrorString
+                ],
+                cancellationToken);
             
             BufferedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
@@ -277,9 +295,13 @@ public class ExternalProcess : IExternalProcess
     
     /// <summary>
     /// Asynchronously waits for the external process to exit or a specified timeout period elapses.
+    /// After exit, redirects are drained to natural pipe EOF with a 5-second grace period.
+    /// If the grace period expires before drains complete, a <see cref="TimeoutException"/> is thrown.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the asynchronous operation. The result contains the piped process result when the method completes.</returns>
+    /// <exception cref="TimeoutException">Thrown when post-exit pipe draining exceeds the 5-second grace period,
+    /// typically caused by a grandchild process holding a pipe open.</exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public async Task<PipedProcessResult> WaitForPipedExitOrTimeoutAsync(
@@ -288,11 +310,11 @@ public class ExternalProcess : IExternalProcess
         using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         Task<Stream> standardOutputStream = Configuration.RedirectStandardOutput ? _processPipeHandler
-                .PipeStandardOutputAsync(_processWrapper, linkedCts.Token)
+                .PipeStandardOutputAsync(_processWrapper, cancellationToken)
             : Task.FromResult(Stream.Null);
 
         Task<Stream> standardErrorStream = Configuration.RedirectStandardError
-            ? _processPipeHandler.PipeStandardErrorAsync(_processWrapper, linkedCts.Token)
+            ? _processPipeHandler.PipeStandardErrorAsync(_processWrapper, cancellationToken)
             : Task.FromResult(Stream.Null);
         
         try
@@ -301,11 +323,13 @@ public class ExternalProcess : IExternalProcess
 
             await waitForExit;
             await linkedCts.CancelAsync();
-            await ObserveCancellation(standardOutputStream, standardErrorStream);
+            
+            Stream standardOutput = await standardOutputStream;
+            Stream standardError = await standardErrorStream;
             
             PipedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, _processWrapper.StartTime, _processWrapper.ExitTime,
-                await standardOutputStream, await standardErrorStream);
+                standardOutput, standardError);
 
             ThrowIfProcessNotSuccessful(result);
 
@@ -367,19 +391,23 @@ public class ExternalProcess : IExternalProcess
         }
     }
 
-    private static async Task ObserveCancellation(params Task[] tasks)
+    private static async Task DrainReadsAsync(Task[] reads, CancellationToken callerToken)
     {
-        try
+        Task drain = Task.WhenAll(reads);
+        Task completed = await Task.WhenAny(drain, Task.Delay(TimeSpan.FromSeconds(DrainGracePeriodSeconds), callerToken));
+        
+        if (completed == drain)
         {
-            await Task.WhenAll(tasks);
+            return;
         }
-        catch (OperationCanceledException)
+        
+        if (!callerToken.IsCancellationRequested)
         {
-            // Expected: pipe reads cancelled after process exit.
+            throw new TimeoutException(
+                "CliInvoke could not finish draining redirected output after process exit; " +
+                "redirected pipes may be held open by a grandchild process (dotnet/runtime#51277).");
         }
-        catch (AggregateException)
-        {
-            // Expected: multiple pipe reads cancelled after process exit.
-        }
+        
+        await Task.WhenAll(reads);
     }
 }
