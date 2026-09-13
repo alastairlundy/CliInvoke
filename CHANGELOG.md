@@ -6,10 +6,9 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
-## [Unreleased]
+## [3.0.0] - 2026-09-13
 
-CliInvoke 3.0.0 is the first stable release of the v3 line (unreleased). It ships the
-design-smell triage as one coherent breaking-change set.
+CliInvoke 3.0.0 is the first stable release of the v3 line.
 
 Themes:
 
@@ -43,6 +42,11 @@ Themes:
 - `ProcessExitConfiguration` for exit-code and signal validation.
 - Localization resources in `CliInvoke` (`Resources.resx` / `Resources.Designer.cs`).
 - `maxBufferedOutputBytes` on `CliRun` string-args buffered path for capping buffered output size.
+
+- `DefaultShellMiddleware` that auto-detects the user's default shell and wraps commands in it.
+- `UseDefaultShell()` convenience extension method on `IProcessMiddlewareBuilder`.
+- `ShellArgumentEscaper.EscapeForPosixShell` for POSIX shell (bash/zsh/fish) escaping.
+- `ShellMiddlewareOptions` for configuring shell wrapping behaviour (renamed from `PowerShellMiddlewareOptions`).
 
 ### Changed
 
@@ -115,6 +119,12 @@ Themes:
 - Solution layout cleaned: `Middleware` folder removed, `Extensions.Tests` wired.
 - Process launch and logging paths made more robust.
 - `AddEnumerable` now fails fast on null entries.
+
+- **`ProcessConfiguration.TargetFilePath` is now `required`.** Object initialisers must set this property.
+- **`ProcessConfiguration.ArgumentList` rejects null and takes precedence over `Arguments`.** A null list throws `ArgumentNullException`; when both `Arguments` and `ArgumentList` are set, `ArgumentList` wins.
+- **`ProcessConfiguration` uses C# 14 `field` keyword** for backing fields, removing manual backing-field declarations.
+- DI extensions converted to C# 14 extension blocks.
+- `ProcessInvocationPipeline` accesses `ExitConfiguration.MaxBufferedOutputBytes` directly (null-safety fix).
 - `BufferedProcessResult.WasTruncated` made immutable and included in equality.
 - Shell argument escaping tightened; `ShellArgumentEscaper` relocated to `Specializations`.
 - `PathEnvironmentVariable` moved to `CliInvoke`; `FilePathResolverBase` dropped.
@@ -227,6 +237,7 @@ Themes:
 - Fixed `CachingFilePathResolver` cache keys to respect per-OS path casing rules.
 - Fixed a Unix `FilePathResolver` filename match issue.
 - Fixed `PathEnvironmentVariable` to expand `~` and `C:\Users` paths in a single pass.
+- Fixed stale `PowerShellMiddlewareOptions` references in docs, tests, and middleware guide (renamed to `ShellMiddlewareOptions`).
 - Fixed null-unsafe equality operators on primitives.
 - Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`.
 
