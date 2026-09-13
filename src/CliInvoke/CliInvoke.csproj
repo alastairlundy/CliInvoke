@@ -116,4 +116,8 @@
             <Link>icon.png</Link>
         </None>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions\" />
+    </ItemGroup>
 </Project>
