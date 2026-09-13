@@ -23,7 +23,7 @@ These skills are distributed as a standard agent-skills directory and can be ins
 The quickest way to try a skill without installing anything:
 
 ```bash
-npx skills use alastairlundy/CliInvoke@main --skill select-execution-pattern --agent opencode
+npx skills use alastairlundy/CliInvoke --skill select-execution-pattern
 ```
 
 This fetches the skill, writes the files to a temp directory, and starts your agent with the skill loaded.
@@ -33,25 +33,19 @@ This fetches the skill, writes the files to a temp directory, and starts your ag
 Install all CliInvoke skills into your project's agent configuration:
 
 ```bash
-npx skills add alastairlundy/CliInvoke@main
+npx skills add alastairlundy/CliInvoke
 ```
 
 Or install a specific skill by name:
 
 ```bash
-npx skills add alastairlundy/CliInvoke@main --skill select-execution-pattern
+npx skills add alastairlundy/CliInvoke --skill select-execution-pattern
 ```
 
 Install globally (user-level, not project-specific):
 
 ```bash
-npx skills add alastairlundy/CliInvoke@main -g
-```
-
-Target a specific agent:
-
-```bash
-npx skills add alastairlundy/CliInvoke@main -a opencode
+npx skills add alastairlundy/CliInvoke -g
 ```
 
 ### Available skills
