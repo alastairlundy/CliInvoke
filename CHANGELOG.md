@@ -230,6 +230,26 @@ Themes:
 - Fixed null-unsafe equality operators on primitives.
 - Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`.
 
+## [2.11.2] - 2026-09-13
+
+### Deprecated
+
+- Deprecated `IProcessConfigurationFactory` methods for removal in v3
+- Deprecated `ProcessPipeHandler.Shared` for removal in v3
+- Deprecated `ProcessConfigurationFactory` methods for removal in v3
+- Deprecated `PowershellProcessInvoker` methods for removal in v3
+- Deprecated `CmdProcessInvoker` methods for removal in v3
+- Deprecated several extension methods for removal in v3
+
+### Fixed
+
+- Fixed a race condition in EOF pipe reads. Running the same process concurrently could throw `OperationCanceledException`.
+
+### Changed
+
+- Updated internal Polyfill from 11.2.0 to 11.3.0
+- Updated to use CliInvoke.Core 2.11.2 and CliInvoke 2.11.2
+
 ## [2.11.1] - 2026-09-10
 
 ### Fixed
@@ -262,6 +282,21 @@ Themes:
 - Deprecated `PipedProcessResult` ahead of removal in v3
 - Deprecated some extensions for removal in v3
 - Deprecated `PowershellProcessInvoker` and `CmdProcessInvoker` ahead of removal in v3
+
+## [2.10.7] - 2026-09-13
+
+### Deprecated
+
+- Backported `PipedProcessResult` deprecation warnings from the 2.11.x line
+
+### Fixed
+
+- Fixed the same EOF pipe read race condition as 2.11.2
+- Fixed a deprecation warning in extensions
+
+### Changed
+
+- Updated to use CliInvoke.Core 2.10.7, CliInvoke 2.10.7, and CliInvoke.Specializations 2.10.7
 
 ## [2.10.6] - 2026-09-10
 
