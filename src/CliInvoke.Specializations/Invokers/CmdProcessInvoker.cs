@@ -41,6 +41,7 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public CmdProcessInvoker(IProcessInvoker processInvoker, IRunnerProcessFactory runnerProcessFactory, bool windowCreation = true,
         bool redirectOutputs = true) :
         base(processInvoker, runnerProcessFactory, new CmdProcessConfiguration(arguments: "", false,
@@ -68,6 +69,7 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public new async Task<ProcessResult> ExecuteAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null,
@@ -102,6 +104,7 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public new async Task<BufferedProcessResult> ExecuteBufferedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
@@ -133,6 +136,7 @@ public class CmdProcessInvoker : RunnerProcessInvokerBase
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public new async Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)

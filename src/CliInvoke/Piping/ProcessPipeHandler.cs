@@ -23,6 +23,7 @@ public class ProcessPipeHandler : IProcessPipeHandler
     /// <remarks>
     /// Note that this class is marked as obsolete and will be removed in a future version.
     ///</remarks>
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public static ProcessPipeHandler Shared { get; } = new();
 
     public ProcessPipeHandler()

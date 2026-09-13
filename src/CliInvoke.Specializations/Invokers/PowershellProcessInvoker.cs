@@ -43,6 +43,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public PowershellProcessInvoker(IProcessInvoker processInvoker,
         IRunnerProcessFactory runnerProcessFactory, IFilePathResolver filePathResolver,
         bool windowCreation = true, bool redirectOutputs = true)
@@ -66,6 +67,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public new Task<ProcessResult> ExecuteAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
@@ -91,6 +93,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public new Task<BufferedProcessResult> ExecuteBufferedAsync(
         ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
@@ -117,6 +120,7 @@ public class PowershellProcessInvoker : RunnerProcessInvokerBase
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
+    [Obsolete(DeprecationMessages.DeprecationV3)]
     public new Task<PipedProcessResult> ExecutePipedAsync(ProcessConfiguration processConfiguration,
         ProcessExitConfiguration? processExitConfiguration = null, bool disposeOfConfig = true,
         CancellationToken cancellationToken = default)
