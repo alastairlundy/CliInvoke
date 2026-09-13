@@ -9,7 +9,7 @@
 
 using CliInvoke.Core.Middleware;
 
-namespace CliInvoke.Extensions.Middleware;
+namespace CliInvoke.Extensions.Middleware.Truncation;
 
 /// <summary>
 ///     Opt-in middleware that publishes a per-stream output-truncation cap into the exit

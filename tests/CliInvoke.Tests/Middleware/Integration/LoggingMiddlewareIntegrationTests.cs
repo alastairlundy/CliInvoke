@@ -11,10 +11,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using CliInvoke.Core.Middleware;
-using CliInvoke.Extensions.Middleware;
+using CliInvoke.Extensions.Middleware.Logging;
 using CliInvoke.Factories;
 
 using Microsoft.Extensions.Logging;
+using LoggingMiddleware = CliInvoke.Extensions.Middleware.Logging.LoggingMiddleware;
 
 namespace CliInvoke.Tests.Middleware.Integration;
 

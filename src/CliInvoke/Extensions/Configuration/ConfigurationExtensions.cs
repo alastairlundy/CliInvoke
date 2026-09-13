@@ -12,7 +12,7 @@ using System.Linq;
 
 using CliInvoke.Builders;
 
-namespace CliInvoke.Extensions;
+namespace CliInvoke.Extensions.Configuration;
 
 /// <summary>
 ///     Extension methods for converting and transforming <see cref="ProcessConfiguration"/>.

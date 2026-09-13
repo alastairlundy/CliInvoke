@@ -9,6 +9,7 @@
 
 using System.Runtime.InteropServices;
 using CliInvoke.Core.Validation;
+using CliInvoke.Extensions.Middleware.Logging;
 using CliInvoke.Specializations;
 using CliInvoke.Specializations.Middleware;
 

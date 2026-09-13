@@ -11,12 +11,13 @@ using CliInvoke.Builders;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility;
-using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Retry;
 using CliInvoke.Factories;
 using CliInvoke.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+
+using LoggingMiddleware = CliInvoke.Extensions.Middleware.Logging.LoggingMiddleware;
 
 namespace CliInvoke.Extensions;
 

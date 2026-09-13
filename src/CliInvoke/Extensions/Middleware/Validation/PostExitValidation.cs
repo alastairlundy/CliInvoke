@@ -10,7 +10,7 @@
 using CliInvoke.Core.Validation;
 using CliInvoke.Validation;
 
-namespace CliInvoke.Extensions.Middleware;
+namespace CliInvoke.Extensions.Middleware.Validation;
 
 /// <summary>
 ///     Factory helpers that build <see cref="IProcessResultValidator{ProcessResult}"/> instances

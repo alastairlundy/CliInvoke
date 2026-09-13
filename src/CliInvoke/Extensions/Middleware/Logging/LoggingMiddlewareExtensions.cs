@@ -9,7 +9,7 @@
 
 using CliInvoke.Core.Middleware;
 
-namespace CliInvoke.Extensions.Middleware;
+namespace CliInvoke.Extensions.Middleware.Logging;
 
 /// <summary>
 ///     Provides extension methods for configuring logging middleware.

@@ -14,7 +14,7 @@ using CliInvoke.Core.Middleware;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace CliInvoke.Extensions.Middleware;
+namespace CliInvoke.Extensions.Middleware.Logging;
 
 /// <summary>
 ///     Middleware that logs process invocation entry and exit information.

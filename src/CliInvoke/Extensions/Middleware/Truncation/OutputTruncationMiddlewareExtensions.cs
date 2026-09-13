@@ -8,6 +8,7 @@
 */
 
 using CliInvoke.Core.Middleware;
+using CliInvoke.Extensions.Middleware.Truncation;
 
 namespace CliInvoke.Extensions.Middleware;
 

@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Extensions.Middleware.Truncation;
+
 namespace CliInvoke.Extensions.Tests.Middleware.Truncation;
 
 /// <summary>

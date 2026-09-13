@@ -9,12 +9,12 @@
 
 using System.Runtime.InteropServices;
 using CliInvoke.Extensions;
-using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Specializations;
 using CliInvoke.Specializations.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using LoggingMiddleware = CliInvoke.Extensions.Middleware.Logging.LoggingMiddleware;
 
 namespace CliInvoke.Tests.DependencyInjection;
 
