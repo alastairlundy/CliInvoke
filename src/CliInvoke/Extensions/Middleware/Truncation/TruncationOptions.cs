@@ -7,9 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Extensions.Middleware.Truncation;
-
-namespace CliInvoke.Extensions.Middleware;
+namespace CliInvoke.Extensions.Middleware.Truncation;
 
 /// <summary>
 ///     Configuration options for <see cref="OutputTruncationMiddleware"/>.

@@ -7,9 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using CliInvoke.Extensions.Middleware.Truncation;
-
-namespace CliInvoke.Extensions.Middleware;
+namespace CliInvoke.Extensions.Middleware.Truncation;
 
 /// <summary>
 ///     Provides extension methods for configuring output-truncation middleware on the process pipeline.

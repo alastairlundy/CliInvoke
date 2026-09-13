@@ -10,6 +10,7 @@
 using System.Runtime.InteropServices;
 using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware;
+using CliInvoke.Extensions.Middleware.Truncation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Tests.Invokers;

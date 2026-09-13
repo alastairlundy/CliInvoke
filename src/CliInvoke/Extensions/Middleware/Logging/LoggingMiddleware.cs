@@ -116,11 +116,11 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
     /// </summary>
     /// <remarks>
     ///     When a custom <see cref="_redactor"/> was supplied it is applied to the whole value.
-    ///     Otherwise a built-in heuristic redacts the value following the <c>--password</c>,
+    ///     Otherwise, a built-in heuristic redacts the value following the <c>--password</c>,
     ///     <c>--token</c>, and <c>--api-key</c> flags (both <c>--flag value</c> and
     ///     <c>--flag=value</c> forms, including single-/double-quoted values).
     ///     <para>
-    ///         Values carrying no recognizable signal cannot be auto-redacted; callers handling
+    ///         Values carrying no recognisable signal cannot be auto-redacted; callers handling
     ///         such secrets should supply a redactor (e.g. Microsoft's
     ///         <c>Microsoft.Extensions.Compliance.Redaction</c>).
     ///     </para>
