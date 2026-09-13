@@ -8,7 +8,6 @@
  */
 
 using CliInvoke.Core.Extensibility.Factories;
-using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Core.Extensibility;
 

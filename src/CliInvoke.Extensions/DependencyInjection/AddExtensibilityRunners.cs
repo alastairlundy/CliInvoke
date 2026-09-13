@@ -8,7 +8,6 @@
 */
 
 using CliInvoke.Extensibility;
-using CliInvoke.Internal;
 
 namespace CliInvoke.Extensions;
 

@@ -8,7 +8,6 @@
    */
 
 using CliInvoke.Core.Builders;
-using CliInvoke.Core.Internal;
 
 namespace CliInvoke.Core.Factories;
 

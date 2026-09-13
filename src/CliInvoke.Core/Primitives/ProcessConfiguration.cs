@@ -12,7 +12,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 
 using CliInvoke.Core.Builders;
-using CliInvoke.Core.Internal;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 

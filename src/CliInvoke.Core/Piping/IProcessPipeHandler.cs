@@ -9,8 +9,6 @@
 
 using System.Diagnostics;
 
-using CliInvoke.Core.Internal;
-
 namespace CliInvoke.Core.Piping;
 
 /// <summary>

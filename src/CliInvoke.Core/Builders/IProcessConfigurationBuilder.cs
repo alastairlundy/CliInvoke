@@ -9,8 +9,6 @@
 
 using System.Text;
 
-using CliInvoke.Core.Internal;
-
 namespace CliInvoke.Core.Builders;
 
 /// <summary>

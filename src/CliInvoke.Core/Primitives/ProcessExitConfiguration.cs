@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core.Internal;
 #pragma warning disable CS0618 // Type or member is obsolete
 
 namespace CliInvoke.Core;
