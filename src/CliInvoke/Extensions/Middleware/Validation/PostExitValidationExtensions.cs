@@ -8,9 +8,8 @@
    */
 
 using CliInvoke.Core.Validation;
-using CliInvoke.Extensions.Middleware.Validation;
 
-namespace CliInvoke.Extensions.Middleware;
+namespace CliInvoke.Extensions.Middleware.Validation;
 
 /// <summary>
 ///     Provides extension methods for configuring post-exit validation middleware.
@@ -38,5 +37,4 @@ public static class PostExitValidationExtensions
             return builder;
         }
     }
-
 }

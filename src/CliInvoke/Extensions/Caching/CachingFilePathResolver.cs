@@ -98,7 +98,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     ///     Reads a cached absolute path and re-verifies it still exists before trusting it.
     /// </summary>
     /// <remarks>
-    ///     Caching the resolved <see cref="FileInfo"/> by raw target name created a TOCTOU /
+    ///     Caching the resolved <see cref="FileInfo"/> by raw target name created a TOCTOU (Time Of Check Time Of Use) /
     ///     cache-poisoning window: the PATH or working directory could change, or the file could
     ///     be replaced (e.g. via a symlink swap), between the cache write and process start. We now
     ///     cache only the absolute path string and re-check <see cref="File.Exists"/> on every hit,
