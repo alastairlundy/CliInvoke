@@ -8,7 +8,6 @@
 */
 
 using CliInvoke.Builders;
-using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
 using CliInvoke.Extensibility;
 using CliInvoke.Extensions.Middleware.Retry;

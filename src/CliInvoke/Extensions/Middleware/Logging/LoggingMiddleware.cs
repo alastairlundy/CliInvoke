@@ -9,8 +9,6 @@
 
 using System.Text.RegularExpressions;
 
-using CliInvoke.Core.Middleware;
-
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
