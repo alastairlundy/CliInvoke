@@ -75,8 +75,8 @@ public class ArgumentsBuilderTests
         IArgumentsBuilder builder = new ArgumentsBuilder();
         string[] values = ["a\nb", "c\"d"];
 
-        // Expect the two escaped values to be joined with a space and wrapped in quotes:
-        const string expected = "\"a\\nb c\\\"d\"";
+        // Each value is individually escaped and quoted, space-separated:
+        const string expected = "\"a\\nb\" \"c\\\"d\"";
         
         IArgumentsBuilder result = builder.AddEnumerable(values, true);
 
