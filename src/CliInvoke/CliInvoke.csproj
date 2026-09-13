@@ -15,22 +15,24 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### 🐛 Bug Fixes
-
-- Fixed `ExternalProcess` event handler leak — handlers are now properly unsubscribed before re-subscribing on `Start`/`StartAsync`
-- Fixed null-safe config conversion, double-dispose guard, and `ExitTime` UTC handling in `ExternalProcess`
-- Fixed `ProcessWrapper` error resilience for fast-exiting processes
-- Fixed `CancellationHelper` exit-skew window — expected exit time is now captured when the wait begins instead of being re-derived in exception handlers
-
-#### ⚙️ Modifications
-- Moved `AddCliInvoke` DI registration into this package from `CliInvoke.Specializations`
-- Cleaned up stale `GlobalUsings.cs` entry
-- Cleaned up XML doc comments on `ExternalProcess`, `ProcessWrapper`, `ShellDetector`, and `ProcessResultValidator`</PackageReleaseNotes>
+        <PackageReleaseNotes>CliRun is stateless: UseExternalProcessFactory and UseFilePathResolver removed; each call allocates fresh pipeline
+ExternalProcess sealed
+ProcessConfigurationBuilder sealed, positioned for advanced scenarios only
+AddCliInvoke moved here from CliInvoke.Specializations (namespace unchanged). Chain .AddCliInvokeSpecializations() for middleware.
+AddCliInvoke overload with configure callback
+Built-in middleware registered in AddCliInvoke so UseMiddleware&lt;T&gt;() resolves them
+ProcessMiddlewareBuilder (public) with UseMiddleware/UseWhen
+Output truncation middleware, CachingFilePathResolver, retry middleware, logging middleware, post-exit validation middleware
+maxBufferedOutputBytes on CliRun buffered path
+CliInvoke.Extensions folded in; dead IVT grants stripped
+Localization resources
+ConfigureAwait(false) enforced on every await in src
+Per-call allocation reductions in result parsing and argument building</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0-rc.1</PackageVersion>
-        <AssemblyVersion></AssemblyVersion>
+        <PackageVersion>3.0.0</PackageVersion>
+        <AssemblyVersion>3.0.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -38,6 +40,7 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
+        <FileVersion>3.0.0.0</FileVersion>
 <!--
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
 -->

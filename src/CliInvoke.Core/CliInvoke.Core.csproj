@@ -23,22 +23,27 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.0.0</Version>
-        <PackageVersion>3.0.0-rc.1</PackageVersion>
-        <PackageReleaseNotes>#### 🐛 Bug Fixes
-
-- Fixed `StandardInput.BaseStream` equality comparison in `ProcessConfiguration` — was comparing wrapper objects instead of underlying streams
-- Fixed `ArgumentTokenizer` empty-string special case that could cause incorrect tokenization
-- Added null guard to `ArgumentTokenizer` for error resilience
-- Fixed `ShellInformation` file path comparison to use case-insensitive matching, aligning `Equals` and `GetHashCode`
-- Fixed `ProcessConfiguration.EnvironmentVariables` dictionary equality to use `SequenceEqual` instead of reference equality
-- Fixed `ProcessConfiguration.StandardInput` to use reference equality instead of `.Equals`
-
-#### ⚙️ Modifications
-
-- Removed `ISuspendableExternalProcess` interface (absorbed into sealed `ExternalProcess`)
-- Cleaned up XML doc comments on `MiddlewareChain`, `InvocationContext`, and `ShellInformation`</PackageReleaseNotes>
+        <PackageVersion>3.0.0</PackageVersion>
+        <PackageReleaseNotes>ProcessConfiguration init-only construction, required TargetFilePath, ArgumentList replacing ArgumentsList
+ProcessConfigurationFactory removed
+Working-directory validation moved to construction
+New Spec types: ArgumentsSpec, EnvironmentVariablesSpec, UserCredentialSpec, ProcessResourcePolicySpec
+IProcessConfigurationBuilder ConfigureXxx signatures changed to Action&lt;XxxSpec&gt;
+IExternalProcess and ExternalProcess constructors reduced, Configuration init-only
+ProcessInvoker constructors reduced to two
+ProcessResult: new Canceled, Signal, ExecutedFilePath properties; symmetric equality; null-safe equality operators
+BufferedProcessResult: WasTruncated immutable, included in equality, ProcessId in equality
+ProcessExitConfiguration for exit-code and signal validation
+IProcessResultValidator, CommonValidationRules, ValidationRule
+ProcessValidationException type
+MiddlewareChain, InvocationContext (renamed from ProcessInvocationContext), MiddlewareItems
+IRetryClassifier
+UserCredential.GetHashCode excludes Password
+IDisposable dropped from ProcessConfiguration
+.NET Standard 2.0, .NET 8, .NET 9 support dropped; net10.0 only, C# 14</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion></AssemblyVersion>
+        <AssemblyVersion>3.0.0.0</AssemblyVersion>
+        <FileVersion>3.0.0.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>
