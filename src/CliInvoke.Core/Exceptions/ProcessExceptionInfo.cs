@@ -15,6 +15,10 @@ namespace CliInvoke.Core.Exceptions;
 public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionInfo<TProcessResult>>, IDisposable
     where TProcessResult : ProcessResult
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="result"></param>
     public ProcessExceptionInfo(TProcessResult result)
     {
         Result = result;

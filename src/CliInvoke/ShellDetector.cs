@@ -23,9 +23,9 @@ public class ShellDetector : IShellDetector
 
     private readonly bool isUnix;
 
-/// <summary>
-///     Initialises a new instance using the specified process invoker and file path resolver.
-/// </summary>
+    /// <summary>
+    ///     Initialises a new instance using the specified process invoker and file path resolver.
+    /// </summary>
     public ShellDetector(IProcessInvoker processInvoker, IFilePathResolver filePathResolver)
     {
         _processInvoker = processInvoker;
@@ -122,7 +122,7 @@ public class ShellDetector : IShellDetector
             FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
             ProcessConfiguration powershellConfig = new ProcessConfiguration(
-                powershell5PlusFileInfo.FullName, "");
+                powershell5PlusFileInfo.FullName);
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
                 powershellConfig,
@@ -147,7 +147,7 @@ public class ShellDetector : IShellDetector
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
             ProcessConfiguration cmdConfig = new ProcessConfiguration(
-                cmdExeInfo.FullName, "");
+                cmdExeInfo.FullName);
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
                 ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);

@@ -105,7 +105,7 @@ public static class CommonValidationRules<TProcessResult>
         Regex compiled = s_regexCache.GetOrAdd(regex,
             pattern => new Regex(pattern, RegexOptions.Compiled, TimeSpan.FromSeconds(2)));
 
-        return result => result is BufferedProcessResult buffered
+        return result => result is { } buffered
                          && compiled.IsMatch(buffered.StandardOutput);
     }
 
@@ -120,7 +120,7 @@ public static class CommonValidationRules<TProcessResult>
     /// </returns>
     public static Func<BufferedProcessResult, bool> RequiresStandardErrorIsEmpty()
     {
-        return result => result is not BufferedProcessResult buffered
+        return result => result is not { } buffered
                          || string.IsNullOrWhiteSpace(buffered.StandardError);
     }
 

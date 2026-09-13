@@ -97,7 +97,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     ///     These rules are evaluated by the invocation pipeline once the process result is produced. A
     ///     failing rule causes the pipeline to throw a
     ///     <see cref="CliInvoke.Core.Exceptions.ProcessValidationException" />. This property is
-    ///     intentionally excluded from <see cref="IEquatable{ProcessExitConfiguration}.Equals" /> and
+    ///     intentionally excluded from <see cref="ProcessExitConfiguration"/>'s Equals method. /> and
     ///     <see cref="GetHashCode" /> because validation rules are delegate-based and are not
     ///     value-compared.
     /// </remarks>

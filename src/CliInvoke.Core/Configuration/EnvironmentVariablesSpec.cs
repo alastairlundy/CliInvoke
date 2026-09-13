@@ -19,7 +19,6 @@ namespace CliInvoke.Core.Configuration;
 public sealed class EnvironmentVariablesSpec
 {
     private readonly Dictionary<string, string> _environmentVariables;
-    private readonly StringComparer _stringComparer;
     private readonly bool _throwExceptionIfDuplicateKeyFound;
 
     /// <summary>
@@ -29,8 +28,7 @@ public sealed class EnvironmentVariablesSpec
     public EnvironmentVariablesSpec()
     {
         _throwExceptionIfDuplicateKeyFound = true;
-        _stringComparer = StringComparer.Ordinal;
-        _environmentVariables = new Dictionary<string, string>(_stringComparer);
+        _environmentVariables = new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
     /// <summary>
@@ -46,9 +44,8 @@ public sealed class EnvironmentVariablesSpec
     {
         ArgumentNullException.ThrowIfNull(stringComparer);
 
-        _stringComparer = stringComparer;
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
-        _environmentVariables = new Dictionary<string, string>(_stringComparer);
+        _environmentVariables = new Dictionary<string, string>(stringComparer);
     }
 
     /// <summary>

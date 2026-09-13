@@ -108,7 +108,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     {
         verified = null;
 
-        if (!_cache.TryGetValue<string>(key, out string? cachedPath) || cachedPath is null)
+        if (!_cache.TryGetValue(key, out string? cachedPath) || cachedPath is null)
             return false;
 
         if (!File.Exists(cachedPath))

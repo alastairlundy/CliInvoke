@@ -105,6 +105,5 @@ public sealed class UserCredentialSpec : IDisposable
 
         _password?.Dispose();
         _disposed = true;
-        GC.SuppressFinalize(this);
     }
 }

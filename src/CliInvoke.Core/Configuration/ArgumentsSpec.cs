@@ -187,9 +187,9 @@ public sealed class ArgumentsSpec
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            string? str = item.ToString(null, _formatProvider);
+            string str = item.ToString(null, _formatProvider);
 
-            if (str is null || !_argumentValidationLogic.Invoke(str))
+            if (string.IsNullOrEmpty(str) || !_argumentValidationLogic.Invoke(str))
                 continue;
 
             if (joined is null)
@@ -204,7 +204,10 @@ public sealed class ArgumentsSpec
         if (validCount == 0)
             throw new ArgumentException("No valid arguments to add.");
 
-        string value = joined!.ToString();
+        if (joined is null)
+            joined = new StringBuilder();
+        
+        string value = joined.ToString();
         string processedValue = escape ? EscapeCharactersWithoutWrapping(value) : value;
         string wrappedValue = $"\"{processedValue}\"";
 
