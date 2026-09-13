@@ -18,7 +18,6 @@ using System.Runtime.CompilerServices;
 using CliInvoke.Builders;
 using CliInvoke.Core.Builders;
 using CliInvoke.Helpers.Processes;
-using CliInvoke.Internal;
 
 namespace CliInvoke.Extensions;
 
