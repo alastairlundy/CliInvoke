@@ -56,6 +56,13 @@ Per-call allocation reductions in result parsing and argument building</PackageR
             <_Parameter1>CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
         <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
+        <!--
+            Cross-package middleware consumption: CliInvoke.Specializations shell
+            middleware must access internal rewriting helpers (ShellRewriter, enums,
+            ArgumentTokenizer). Promotion to public rejected — no extensibility goal;
+            a Specializations home impossible — no reference direction from Core.
+        -->
+        <InternalsVisibleTo Include="CliInvoke.Specializations"/>
     </ItemGroup>
 
 <!--    <ItemGroup>

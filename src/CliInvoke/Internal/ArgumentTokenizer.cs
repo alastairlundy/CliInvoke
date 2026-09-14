@@ -1,5 +1,5 @@
 /*
-    CliInvoke.Core
+    CliInvoke
     Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,7 +9,7 @@
 
 using System.Text;
 
-namespace CliInvoke.Core.Internal;
+namespace CliInvoke.Internal;
 
 /// <summary>
 ///     Splits a single command-line argument string into discrete tokens using the
