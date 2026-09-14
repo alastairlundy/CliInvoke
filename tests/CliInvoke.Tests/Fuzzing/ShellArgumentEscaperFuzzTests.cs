@@ -8,16 +8,16 @@
  */
 
 using System.Linq;
-using CliInvoke.Core.Internal;
+using CliInvoke.Internal;
 using FsCheck;
 using FsCheck.Fluent;
 
 namespace CliInvoke.Tests.Fuzzing;
 
 /// <summary>
-///     Property-based fuzz tests for <see cref="ShellArgumentEscaper"/>.
+///     Property-based fuzz tests for <see cref="ShellRewriter"/> shell escaping methods.
 /// </summary>
-public class ShellArgumentEscaperFuzzTests
+public class ShellRewriterFuzzTests
 {
     private static readonly char[] PowerShellMetacharacters =
         ['`', '$', ';', '|', '&', '(', ')', '{', '}', '<', '>', '"', '\''];
@@ -37,7 +37,7 @@ public class ShellArgumentEscaperFuzzTests
                     if (value is not null and { Length: > 0 })
                         return true;
 
-                    string result = ShellArgumentEscaper.EscapeForPosixShell(value);
+                    string result = ShellRewriter.EscapeForPosixShell(value);
                     return result == string.Empty;
                 })
             .QuickCheckThrowOnFailure();
@@ -51,7 +51,7 @@ public class ShellArgumentEscaperFuzzTests
                 if (string.IsNullOrEmpty(value) || value.Contains('\n') || value.Contains('\r'))
                     return true;
 
-                string escaped = ShellArgumentEscaper.EscapeForPosixShell(value);
+                string escaped = ShellRewriter.EscapeForPosixShell(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
                 var expected = new System.Text.StringBuilder(value.Length + 16);
@@ -81,7 +81,7 @@ public class ShellArgumentEscaperFuzzTests
                     Enumerable.Any(value, c => char.IsControl(c) || Array.IndexOf(PosixShellMetacharacters, c) >= 0))
                     return true;
 
-                string escaped = ShellArgumentEscaper.EscapeForPosixShell(value);
+                string escaped = ShellRewriter.EscapeForPosixShell(value);
                 return escaped == value;
             })
             .QuickCheckThrowOnFailure();
@@ -95,7 +95,7 @@ public class ShellArgumentEscaperFuzzTests
                     if (value is not null and { Length: > 0 })
                         return true;
 
-                    string result = ShellArgumentEscaper.EscapeForPowerShell(value);
+                    string result = ShellRewriter.EscapeForPowerShell(value);
                     return result == string.Empty;
                 })
             .QuickCheckThrowOnFailure();
@@ -109,7 +109,7 @@ public class ShellArgumentEscaperFuzzTests
                 if (string.IsNullOrEmpty(value) || value.Contains('\n') || value.Contains('\r'))
                     return true;
 
-                string escaped = ShellArgumentEscaper.EscapeForPowerShell(value);
+                string escaped = ShellRewriter.EscapeForPowerShell(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
                 var expected = new System.Text.StringBuilder(value.Length + 16);
@@ -139,7 +139,7 @@ public class ShellArgumentEscaperFuzzTests
                     Enumerable.Any(value, c => char.IsControl(c) || Array.IndexOf(PowerShellMetacharacters, c) >= 0))
                     return true;
 
-                string escaped = ShellArgumentEscaper.EscapeForPowerShell(value);
+                string escaped = ShellRewriter.EscapeForPowerShell(value);
                 return escaped == value;
             })
             .QuickCheckThrowOnFailure();
@@ -153,7 +153,7 @@ public class ShellArgumentEscaperFuzzTests
                     if (value is not null and { Length: > 0 })
                         return true;
 
-                    string result = ShellArgumentEscaper.EscapeForCmd(value);
+                    string result = ShellRewriter.EscapeForCmd(value);
                     return result == string.Empty;
                 })
             .QuickCheckThrowOnFailure();
@@ -167,7 +167,7 @@ public class ShellArgumentEscaperFuzzTests
                 if (string.IsNullOrEmpty(value) || value.Contains('\n') || value.Contains('\r'))
                     return true;
 
-                string escaped = ShellArgumentEscaper.EscapeForCmd(value);
+                string escaped = ShellRewriter.EscapeForCmd(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
                 var expected = new System.Text.StringBuilder(value.Length + 16);
@@ -201,7 +201,7 @@ public class ShellArgumentEscaperFuzzTests
                     Enumerable.Any(value, c => char.IsControl(c) || Array.IndexOf(CmdMetacharacters, c) >= 0 || c == '"'))
                     return true;
 
-                string escaped = ShellArgumentEscaper.EscapeForCmd(value);
+                string escaped = ShellRewriter.EscapeForCmd(value);
                 return escaped == value;
             })
             .QuickCheckThrowOnFailure();

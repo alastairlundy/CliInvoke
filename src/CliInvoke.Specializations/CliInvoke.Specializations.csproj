@@ -22,7 +22,6 @@
 PowerShellMiddleware, CmdMiddleware, DefaultShellMiddleware and their UsePowerShell/UseCmd/UseDefaultShell extensions
 ShellMiddlewareOptions (renamed from PowerShellMiddlewareOptions)
 ShellArgumentEscaper.EscapeForPosixShell for POSIX shell escaping
-ShellArgumentEscaper relocated here with hardened escaping
 IFilePathResolver removed from PowershellProcessConfiguration, PowershellProcessInvoker, and PowerShellMiddleware constructors
 CmdProcessInvoker and PowershellProcessInvoker wrapper types deleted. Use middleware instead.
 Specialized invokers refactored into thin wrappers over ProcessInvoker + middleware</PackageReleaseNotes>
