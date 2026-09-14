@@ -12,7 +12,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0</PackageVersion>
+        <PackageVersion>3.1.0</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -21,17 +21,19 @@
         <PackageReleaseNotes>AddCliInvokeSpecializations is the registration entry point (must chain with AddCliInvoke, same ServiceLifetime)
 PowerShellMiddleware, CmdMiddleware, DefaultShellMiddleware and their UsePowerShell/UseCmd/UseDefaultShell extensions
 ShellMiddlewareOptions (renamed from PowerShellMiddlewareOptions)
-ShellArgumentEscaper.EscapeForPosixShell for POSIX shell escaping
 IFilePathResolver removed from PowershellProcessConfiguration, PowershellProcessInvoker, and PowerShellMiddleware constructors
 CmdProcessInvoker and PowershellProcessInvoker wrapper types deleted. Use middleware instead.
-Specialized invokers refactored into thin wrappers over ProcessInvoker + middleware</PackageReleaseNotes>
+Specialized invokers refactored into thin wrappers over ProcessInvoker + middleware
+PowershellProcessConfiguration deprecated: use ProcessConfiguration + UsePowerShell() middleware
+CmdProcessConfiguration deprecated: use ProcessConfiguration + UseCmd() middleware
+Subclasses will be removed in 4.0</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>3.0.0</AssemblyVersion>
-        <FileVersion>3.0.0</FileVersion>
+        <AssemblyVersion>3.1.0</AssemblyVersion>
+        <FileVersion>3.1.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

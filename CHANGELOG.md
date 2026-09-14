@@ -6,6 +6,44 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
+## [3.1.0] - unreleased
+
+CliInvoke 3.1.0 ships the shell-wrapping deepening as a single train.
+
+Themes:
+
+- Shell wrapping is now delivered via the shell middleware on plain
+  `ProcessConfiguration` — the old `PowershellProcessConfiguration` and
+  `CmdProcessConfiguration` subclasses are deprecated (scheduled for removal
+  in 4.0).
+- `ShellArgumentEscaper` is no longer public; escaping is an internal
+  concern of the `ShellRewriter` composition core.
+- Escaper unit tests live beside the code's new home; FsCheck property
+  tests prove metacharacters never produce a second command for every
+  shell kind and delivery combination.
+
+> **Migration:** replace `PowershellProcessConfiguration` /
+> `CmdProcessConfiguration` with plain `ProcessConfiguration` + the
+> appropriate shell wrapping middleware (`UsePowerShell` / `UseCmd`).
+> The subclasses will be removed in 4.0.
+
+### Changed
+
+- **`ShellArgumentEscaper` de-publicized.** The escaper type is now
+  `internal`; callers should rely on the shell middleware or
+  `ShellRewriter` composition core instead.
+- **`PowershellProcessConfiguration` deprecated.** Marked with
+  `[Obsolete]`; will be removed in 4.0. Use plain `ProcessConfiguration`
+  + `UsePowerShell()` middleware.
+- **`CmdProcessConfiguration` deprecated.** Marked with
+  `[Obsolete]`; will be removed in 4.0. Use plain `ProcessConfiguration`
+  + `UseCmd()` middleware.
+
+### Fixed
+
+- Escaper fuzz tests now exercise the `ShellRewriter` composition paths
+  for all three shell kinds (PowerShell, Cmd, Posix).
+
 ## [3.0.0] - 2026-09-13
 
 CliInvoke 3.0.0 is the first stable release of the v3 line.

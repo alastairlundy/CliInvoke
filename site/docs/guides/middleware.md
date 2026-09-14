@@ -87,6 +87,26 @@ builder.Services.AddCliInvokeSpecializations(); // registers the platform middle
   });
   ```
 
+  Shell wrapping is delivered via the shell middleware on plain `ProcessConfiguration`.
+  The `ShellArgumentEscaper` type is no longer public — escaping is an internal concern
+  of the `ShellRewriter` composition core. Callers should rely on the middleware or the
+  `ShellRewriter` directly for shell-escaped command composition.
+
+### Deprecated subclasses
+
+`PowershellProcessConfiguration` and `CmdProcessConfiguration` are deprecated as of
+3.1.0 and will be removed in 4.0. Use plain `ProcessConfiguration` with the
+appropriate shell wrapping middleware instead:
+
+```csharp
+// Before (deprecated):
+var config = new PowershellProcessConfiguration(arguments: "Get-Process");
+
+// After:
+var config = new ProcessConfiguration("pwsh", "Get-Process");
+// Register UsePowerShell() in the middleware pipeline
+```
+
 * `UseDefaultShell` — detects the user's default shell (pwsh, Windows PowerShell, or cmd) via `IShellDetector` and wraps the command in it automatically. Use this instead of `UsePowerShell`/`UseCmd` when you want cross-platform shell detection without committing to a specific shell. Requires `IShellDetector` (registered by `AddCliInvoke`).
 
   `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
