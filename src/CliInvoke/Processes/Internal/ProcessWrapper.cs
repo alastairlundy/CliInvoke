@@ -155,7 +155,51 @@ internal class ProcessWrapper : Process
     }
 
     internal event EventHandler Started;
-    
+
+    /// <summary>
+    ///     Maps a <see cref="Win32Exception"/> thrown during process start to the
+    ///     natural .NET exception type for the given <see cref="Win32Exception.NativeErrorCode"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Known codes: 2/3 → <see cref="FileNotFoundException"/>,
+    ///     5 → <see cref="UnauthorizedAccessException"/>,
+    ///     193 → <see cref="BadImageFormatException"/>.
+    ///     All other codes produce a descriptive <see cref="Exception"/> carrying
+    ///     the file path and native error code.
+    /// </remarks>
+    internal static Exception MapWin32ExceptionToStartFailureException(
+        Win32Exception exception,
+        string targetFilePath)
+    {
+        return exception.NativeErrorCode switch
+        {
+            // ERROR_FILE_NOT_FOUND (2) or ERROR_PATH_NOT_FOUND (3)
+            2 or 3 =>
+                new FileNotFoundException(
+                    $"The file '{targetFilePath}' was not found.",
+                    targetFilePath,
+                    exception),
+
+            // ERROR_ACCESS_DENIED (5)
+            5 =>
+                new UnauthorizedAccessException(
+                    $"The current user does not have permission to execute the file '{targetFilePath}'.",
+                    exception),
+
+            // ERROR_BAD_EXE_FORMAT (193)
+            193 =>
+                new BadImageFormatException(
+                    $"The file '{targetFilePath}' is not a valid executable image.",
+                    exception),
+
+            // Unknown codes — descriptive fallback
+            _ =>
+                new Exception(
+                    $"Failed to start process '{targetFilePath}' (Win32 error code {exception.NativeErrorCode}).",
+                    exception),
+        };
+    }
+
     public new bool Start()
     {
         try
@@ -166,11 +210,7 @@ internal class ProcessWrapper : Process
         {
             HasStarted = false;
 
-            // ERROR_FILE_NOT_FOUND (2) or ERROR_PATH_NOT_FOUND (3)
-            if (exception.NativeErrorCode is 2 or 3)
-                throw new FileNotFoundException($"The file '{StartInfo.FileName}' was not found.", StartInfo.FileName, exception);
-
-            throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
+            throw MapWin32ExceptionToStartFailureException(exception, StartInfo.FileName);
         }
 
         if (!HasStarted)
