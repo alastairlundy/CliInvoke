@@ -1,3 +1,12 @@
+/*
+    CliInvoke
+    Copyright (C) 2024-2026  Alastair Lundy
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+   */
+
 using System.ComponentModel;
 
 using CliInvoke.Processes.Internal;
@@ -78,7 +87,7 @@ public class StartFailureExceptionMappingTests
     }
 
     [Test]
-    public async Task ErrorCode206_UnknownCode_Fallback()
+    public async Task ErrorCode206_UnknownCode_RethrowsOriginalWin32Exception()
     {
         Win32Exception exception = new Win32Exception(206);
 
@@ -86,20 +95,20 @@ public class StartFailureExceptionMappingTests
             ProcessWrapper.MapWin32ExceptionToStartFailureException(
                 exception, "C:\\test\\app.exe");
 
-        await Assert.That(result.Message).Contains("206");
-        await Assert.That(result.Message)
-            .Contains("C:\\test\\app.exe");
+        await Assert.That(result).IsTypeOf<Win32Exception>();
+        await Assert.That(((Win32Exception)result).NativeErrorCode).IsEqualTo(206);
     }
 
     [Test]
-    public async Task ErrorCode206_UnknownCode_FallbackIsGenericException()
+    public async Task ErrorCode9999_UnknownCode_RethrowsOriginalWin32Exception()
     {
-        Win32Exception exception = new Win32Exception(206);
+        Win32Exception exception = new Win32Exception(9999);
 
         Exception result =
             ProcessWrapper.MapWin32ExceptionToStartFailureException(
-                exception, "C:\\test\\app.exe");
+                exception, "/opt/bin/app");
 
-        await Assert.That(result).IsTypeOf<Exception>();
+        await Assert.That(result).IsTypeOf<Win32Exception>();
+        await Assert.That(((Win32Exception)result).NativeErrorCode).IsEqualTo(9999);
     }
 }

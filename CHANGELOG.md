@@ -6,6 +6,25 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
+## [Unreleased]
+
+### Added
+
+- Windows command-line length pre-start check: when the assembled command line exceeds the
+  Windows `CreateProcess` limit (~32,767 characters), an `ArgumentException` is thrown before
+  process start, replacing the cryptic Win32 error 206. The check runs against the resolved
+  absolute executable path and is skipped when `UseShellExecute` is enabled.
+
+### Changed
+
+- **Start-failure exception mapping for unknown Win32 error codes.** Previously every
+  non-file-not-found start failure surfaced as `UnauthorizedAccessException`. Known codes now
+  map to their natural .NET types (`FileNotFoundException` for Win32 codes 2/3,
+  `UnauthorizedAccessException` for code 5, `BadImageFormatException` for code 193), and all
+  other codes rethrow the original `Win32Exception` (carrying `NativeErrorCode`). Callers that
+  caught `UnauthorizedAccessException` around invocations to handle arbitrary start failures
+  should catch `Win32Exception` for unknown codes instead.
+
 ## [3.0.0] - 2026-09-13
 
 CliInvoke 3.0.0 is the first stable release of the v3 line.

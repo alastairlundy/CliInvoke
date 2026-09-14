@@ -64,9 +64,6 @@ internal abstract class BaseProcessControlAdapter
                 processStartInfo.ArgumentList.Add(arg);
         }
 
-        if (OperatingSystem.IsWindows())
-            ValidateCommandLineLength(processStartInfo);
-
         if (processConfiguration.RequiresAdministrator)
             RequireRunningAsAdmin(process);
 
@@ -90,8 +87,31 @@ internal abstract class BaseProcessControlAdapter
         process.StartInfo = processStartInfo;
     }
     
-    private static void ValidateCommandLineLength(ProcessStartInfo processStartInfo)
+    /// <summary>
+    ///     Validates the assembled command-line length against the Windows
+    ///     <c>CreateProcess</c> limit of approximately 32,767 characters.
+    /// </summary>
+    /// <remarks>
+    ///     Must be called after <see cref="ProcessStartInfo.FileName"/> has been set to the
+    ///     <em>resolved</em> executable path — a short <c>TargetFilePath</c> such as
+    ///     <c>"dotnet.exe"</c> can resolve via PATH lookup to a much longer absolute path,
+    ///     so validating the unresolved name would under-measure the real command line.
+    ///     <para>
+    ///     The estimate is approximate: it adds a separator per argument and quotes for
+    ///     arguments containing spaces, but does not quote <see cref="ProcessStartInfo.FileName"/>
+    ///     itself (+2 chars when it contains spaces). Skipped when
+    ///     <see cref="ProcessStartInfo.UseShellExecute"/> is <c>true</c>, where the
+    ///     <c>CreateProcess</c> limit does not apply the same way.
+    ///     </para>
+    /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the estimated command-line length exceeds the Windows limit.
+    /// </exception>
+    internal static void ValidateCommandLineLength(ProcessStartInfo processStartInfo)
     {
+        if (processStartInfo.UseShellExecute)
+            return;
+
         const int windowsCommandLineLengthLimit = 32_767;
 
         int totalLength = processStartInfo.FileName.Length;
@@ -115,9 +135,9 @@ internal abstract class BaseProcessControlAdapter
         if (totalLength > windowsCommandLineLengthLimit)
         {
             throw new ArgumentException(
-                $"The assembled command line is approximately {totalLength} characters long, " +
-                $"which exceeds the Windows CreateProcess limit of approximately " +
-                $"{windowsCommandLineLengthLimit} characters. " +
+                $"The assembled command line for '{processStartInfo.FileName}' is approximately " +
+                $"{totalLength} characters long, which exceeds the Windows CreateProcess limit of " +
+                $"approximately {windowsCommandLineLengthLimit} characters. " +
                 $"Note that this limit is approximate.");
         }
     }
