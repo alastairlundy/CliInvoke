@@ -64,6 +64,9 @@ internal abstract class BaseProcessControlAdapter
                 processStartInfo.ArgumentList.Add(arg);
         }
 
+        if (OperatingSystem.IsWindows())
+            ValidateCommandLineLength(processStartInfo);
+
         if (processConfiguration.RequiresAdministrator)
             RequireRunningAsAdmin(process);
 
@@ -87,6 +90,38 @@ internal abstract class BaseProcessControlAdapter
         process.StartInfo = processStartInfo;
     }
     
+    private static void ValidateCommandLineLength(ProcessStartInfo processStartInfo)
+    {
+        const int windowsCommandLineLengthLimit = 32_767;
+
+        int totalLength = processStartInfo.FileName.Length;
+
+        if (processStartInfo.ArgumentList.Count > 0)
+        {
+            foreach (string arg in processStartInfo.ArgumentList)
+            {
+                totalLength += 1;
+                totalLength += arg.Length;
+                if (arg.Contains(' ', StringComparison.Ordinal))
+                    totalLength += 2;
+            }
+        }
+        else if (!string.IsNullOrEmpty(processStartInfo.Arguments))
+        {
+            totalLength += 1;
+            totalLength += processStartInfo.Arguments.Length;
+        }
+
+        if (totalLength > windowsCommandLineLengthLimit)
+        {
+            throw new ArgumentException(
+                $"The assembled command line is approximately {totalLength} characters long, " +
+                $"which exceeds the Windows CreateProcess limit of approximately " +
+                $"{windowsCommandLineLengthLimit} characters. " +
+                $"Note that this limit is approximate.");
+        }
+    }
+
     private void SetEnvironmentVariables(
         Process process, IReadOnlyDictionary<string, string> environmentVariables)
     {
