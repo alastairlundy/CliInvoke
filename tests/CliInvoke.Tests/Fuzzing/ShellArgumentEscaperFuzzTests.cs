@@ -15,7 +15,8 @@ using FsCheck.Fluent;
 namespace CliInvoke.Tests.Fuzzing;
 
 /// <summary>
-///     Property-based fuzz tests for <see cref="ShellRewriter"/> shell escaping methods.
+///     Property-based fuzz tests for <see cref="ShellRewriter"/> shell escaping methods
+///     and composition paths.
 /// </summary>
 public class ShellRewriterFuzzTests
 {
@@ -203,6 +204,83 @@ public class ShellRewriterFuzzTests
 
                 string escaped = ShellRewriter.EscapeForCmd(value);
                 return escaped == value;
+            })
+            .QuickCheckThrowOnFailure();
+    }
+
+    [Test]
+    public void Rewrite_PowerShell_ArgumentListDelivery_ShellPathIsSetCorrectly()
+    {
+        Prop.ForAll<string>(targetPath =>
+            {
+                if (string.IsNullOrEmpty(targetPath) || targetPath.Contains('\n') || targetPath.Contains('\r'))
+                    return true;
+
+                ProcessConfiguration source = new(targetPath, "arg1 arg2");
+                ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+                    source,
+                    shellTargetPath: "pwsh.exe",
+                    runnerArgs: string.Empty,
+                    kind: ShellKind.PowerShell,
+                    delivery: ShellDelivery.ArgumentList,
+                    windowCreation: false,
+                    useShellExecution: false);
+
+                return rewritten.TargetFilePath == "pwsh.exe" &&
+                       rewritten.ArgumentList.Count == 4 &&
+                       rewritten.ArgumentList[0] == "-NoProfile" &&
+                       rewritten.ArgumentList[1] == "-NonInteractive" &&
+                       rewritten.ArgumentList[2] == "-Command";
+            })
+            .QuickCheckThrowOnFailure();
+    }
+
+    [Test]
+    public void Rewrite_Cmd_ArgumentsDelivery_ShellPathIsSetCorrectly()
+    {
+        Prop.ForAll<string>(targetPath =>
+            {
+                if (string.IsNullOrEmpty(targetPath) || targetPath.Contains('\n') || targetPath.Contains('\r'))
+                    return true;
+
+                ProcessConfiguration source = new(targetPath, "arg1 arg2");
+                ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+                    source,
+                    shellTargetPath: "cmd.exe",
+                    runnerArgs: string.Empty,
+                    kind: ShellKind.Cmd,
+                    delivery: ShellDelivery.Arguments,
+                    windowCreation: false,
+                    useShellExecution: false);
+
+                return rewritten.TargetFilePath == "cmd.exe" &&
+                       rewritten.ArgumentList.Count == 0 &&
+                       !string.IsNullOrEmpty(rewritten.Arguments);
+            })
+            .QuickCheckThrowOnFailure();
+    }
+
+    [Test]
+    public void Rewrite_Posix_ArgumentListDelivery_ShellPathIsSetCorrectly()
+    {
+        Prop.ForAll<string>(targetPath =>
+            {
+                if (string.IsNullOrEmpty(targetPath) || targetPath.Contains('\n') || targetPath.Contains('\r'))
+                    return true;
+
+                ProcessConfiguration source = new(targetPath, "arg1 arg2");
+                ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+                    source,
+                    shellTargetPath: "/bin/sh",
+                    runnerArgs: string.Empty,
+                    kind: ShellKind.Posix,
+                    delivery: ShellDelivery.ArgumentList,
+                    windowCreation: false,
+                    useShellExecution: false);
+
+                return rewritten.TargetFilePath == "/bin/sh" &&
+                       rewritten.ArgumentList.Count == 1 &&
+                       rewritten.Arguments == string.Empty;
             })
             .QuickCheckThrowOnFailure();
     }
