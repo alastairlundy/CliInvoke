@@ -80,7 +80,6 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                 runnerProcessConfig.TargetFilePath,
                 runnerProcessConfig.Arguments,
                 ShellKind.PowerShell,
-                ShellDelivery.ArgumentList,
                 windowCreation: processConfigToBeRun.WindowCreation,
                 useShellExecution: processConfigToBeRun.UseShellExecution);
 
@@ -97,7 +96,6 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                 runnerProcessConfig.TargetFilePath,
                 runnerProcessConfig.Arguments,
                 ShellKind.Cmd,
-                ShellDelivery.Arguments,
                 windowCreation: processConfigToBeRun.WindowCreation,
                 useShellExecution: processConfigToBeRun.UseShellExecution);
 

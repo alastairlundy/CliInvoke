@@ -15,8 +15,9 @@ using FsCheck.Fluent;
 namespace CliInvoke.Tests.Fuzzing;
 
 /// <summary>
-///     Property-based tests proving that metacharacters in target paths or arguments
-///     never produce a second command for every shell kind × delivery combination.
+///     Property-based tests proving that, for every shell kind, metacharacters in
+///     target paths or arguments never produce a second command, and that the
+///     caller-owned shell switches are delivered so the wrapped command actually runs.
 /// </summary>
 public class ShellRewriterMetacharacterPropertyTests
 {
@@ -31,7 +32,7 @@ public class ShellRewriterMetacharacterPropertyTests
          '<', '>', '{', '}', '[', ']', '~', '#', '*', '?'];
 
     [Test]
-    public void PowerShell_ArgumentList_MetacharactersInTarget_NeverProduceSecondCommand()
+    public void PowerShell_ArgumentList_RunnerSwitchesAppearBeforeScript()
     {
         Prop.ForAll<string>(targetPath =>
             {
@@ -42,19 +43,19 @@ public class ShellRewriterMetacharacterPropertyTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "pwsh.exe",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "-NoProfile -NonInteractive -Command",
                     kind: ShellKind.PowerShell,
-                    delivery: ShellDelivery.ArgumentList,
                     windowCreation: false,
                     useShellExecution: false);
 
-                // The -Command argument should be a single element with the escaped path
-                string command = rewritten.ArgumentList[3];
-                return command.Contains("& \"") &&
-                       rewritten.ArgumentList.Count == 4 &&
+                // The middleware-owned switches must be discrete entries preceding the
+                // script entry, and the script must be a single escaped command element.
+                return rewritten.ArgumentList.Count == 4 &&
                        rewritten.ArgumentList[0] == "-NoProfile" &&
                        rewritten.ArgumentList[1] == "-NonInteractive" &&
-                       rewritten.ArgumentList[2] == "-Command";
+                       rewritten.ArgumentList[2] == "-Command" &&
+                       rewritten.ArgumentList[3].Contains("& \"") &&
+                       rewritten.Arguments == string.Empty;
             })
             .QuickCheckThrowOnFailure();
     }
@@ -71,25 +72,21 @@ public class ShellRewriterMetacharacterPropertyTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "pwsh.exe",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "-NoProfile -NonInteractive -Command",
                     kind: ShellKind.PowerShell,
-                    delivery: ShellDelivery.ArgumentList,
                     windowCreation: false,
                     useShellExecution: false);
 
-                // The -Command argument should contain the escaped arguments
-                string command = rewritten.ArgumentList[3];
-                return command.Contains("& \"prog.exe\"") &&
+                string script = rewritten.ArgumentList[3];
+                return script.Contains("& \"prog.exe\"") &&
                        rewritten.ArgumentList.Count == 4 &&
-                       rewritten.ArgumentList[0] == "-NoProfile" &&
-                       rewritten.ArgumentList[1] == "-NonInteractive" &&
                        rewritten.ArgumentList[2] == "-Command";
             })
             .QuickCheckThrowOnFailure();
     }
 
     [Test]
-    public void Cmd_Arguments_MetacharactersInTarget_NeverProduceSecondCommand()
+    public void Cmd_Arguments_StartsWithCSwitch()
     {
         Prop.ForAll<string>(targetPath =>
             {
@@ -100,14 +97,15 @@ public class ShellRewriterMetacharacterPropertyTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "cmd.exe",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "/c",
                     kind: ShellKind.Cmd,
-                    delivery: ShellDelivery.Arguments,
                     windowCreation: false,
                     useShellExecution: false);
 
-                // The Arguments string should contain the escaped path and no ArgumentList
-                return rewritten.Arguments.Contains("\"") &&
+                // Without the leading /c, cmd.exe starts interactively and never runs
+                // the wrapped command; assert the switch is present and first.
+                return rewritten.Arguments.StartsWith("/c ") &&
+                       rewritten.Arguments.Contains("\"") &&
                        rewritten.ArgumentList.Count == 0;
             })
             .QuickCheckThrowOnFailure();
@@ -125,21 +123,21 @@ public class ShellRewriterMetacharacterPropertyTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "cmd.exe",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "/c",
                     kind: ShellKind.Cmd,
-                    delivery: ShellDelivery.Arguments,
                     windowCreation: false,
                     useShellExecution: false);
 
-                // The Arguments string should contain the escaped arguments and no ArgumentList
-                return rewritten.Arguments.Contains("\"prog.exe\"") &&
+                string command = rewritten.Arguments.Substring("/c ".Length);
+                return command.StartsWith("\"prog.exe\" ") &&
+                       !command.Contains("&&") &&
                        rewritten.ArgumentList.Count == 0;
             })
             .QuickCheckThrowOnFailure();
     }
 
     [Test]
-    public void Posix_ArgumentList_MetacharactersInTarget_NeverProduceSecondCommand()
+    public void Posix_ArgumentList_CSwitchPrecedesScriptWithoutCallOperator()
     {
         Prop.ForAll<string>(targetPath =>
             {
@@ -150,16 +148,17 @@ public class ShellRewriterMetacharacterPropertyTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "/bin/sh",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "-c",
                     kind: ShellKind.Posix,
-                    delivery: ShellDelivery.ArgumentList,
                     windowCreation: false,
                     useShellExecution: false);
 
-                // The script argument should contain the escaped path and be a single element
-                string script = rewritten.ArgumentList[0];
-                return script.Contains("& \"") &&
-                       rewritten.ArgumentList.Count == 1 &&
+                // Without -c the shell would treat the script as a file path, and the
+                // script must not use the PowerShell & call operator (POSIX syntax error).
+                return rewritten.ArgumentList.Count == 2 &&
+                       rewritten.ArgumentList[0] == "-c" &&
+                       rewritten.ArgumentList[1].StartsWith("\"") &&
+                       !rewritten.ArgumentList[1].StartsWith("& ") &&
                        rewritten.Arguments == string.Empty;
             })
             .QuickCheckThrowOnFailure();
@@ -177,17 +176,15 @@ public class ShellRewriterMetacharacterPropertyTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "/bin/sh",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "-c",
                     kind: ShellKind.Posix,
-                    delivery: ShellDelivery.ArgumentList,
                     windowCreation: false,
                     useShellExecution: false);
 
-                // The script argument should contain the escaped arguments and be a single element
-                string script = rewritten.ArgumentList[0];
-                return script.Contains("& \"prog.exe\"") &&
-                       rewritten.ArgumentList.Count == 1 &&
-                       rewritten.Arguments == string.Empty;
+                string script = rewritten.ArgumentList[1];
+                return script.StartsWith("\"prog.exe\" ") &&
+                       !script.StartsWith("& ") &&
+                       rewritten.ArgumentList.Count == 2;
             })
             .QuickCheckThrowOnFailure();
     }

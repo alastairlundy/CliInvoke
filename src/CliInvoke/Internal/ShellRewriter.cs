@@ -189,13 +189,14 @@ internal static class ShellRewriter
     ///     when the target has already been resolved).
     /// </param>
     /// <param name="runnerArgs">
-    ///     Optional runner-level arguments to prepend to the composed inner command.
-    ///     For <see cref="ShellDelivery.ArgumentList"/> delivery these are appended as
-    ///     discrete tokens before the script entry; for
-    ///     <see cref="ShellDelivery.Arguments"/> delivery the raw string is prepended.
+    ///     Optional runner-level arguments, including shell switches owned by the caller
+    ///     (e.g. <c>-NoProfile -NonInteractive -Command</c>, <c>/c</c>, or <c>-c</c>).
+    ///     For the <see cref="ShellKind.PowerShell"/> and <see cref="ShellKind.Posix"/>
+    ///     kinds these are tokenized and added as discrete argument-list entries before
+    ///     the script entry; for the <see cref="ShellKind.Cmd"/> kind the raw string is
+    ///     prepended to the composed command.
     /// </param>
     /// <param name="kind">The target shell for escaping and composition.</param>
-    /// <param name="delivery">How the composed command is delivered to the target process.</param>
     /// <param name="windowCreation">Whether to enable window creation for the spawned process.</param>
     /// <param name="useShellExecution">Whether to use shell execution for the spawned process.</param>
     /// <returns>
@@ -209,7 +210,6 @@ internal static class ShellRewriter
         string shellTargetPath,
         string runnerArgs,
         ShellKind kind,
-        ShellDelivery delivery,
         bool windowCreation,
         bool useShellExecution)
     {
@@ -230,11 +230,8 @@ internal static class ShellRewriter
                         ? ArgumentTokenizer.Tokenize(runnerArgs)
                         : Array.Empty<string>();
 
-                List<string> argumentList = new(runnerArgList.Count + 4);
+                List<string> argumentList = new(runnerArgList.Count + 1);
                 argumentList.AddRange(runnerArgList);
-                argumentList.Add("-NoProfile");
-                argumentList.Add("-NonInteractive");
-                argumentList.Add("-Command");
                 argumentList.Add(script);
 
                 return new ProcessConfiguration
@@ -299,8 +296,8 @@ internal static class ShellRewriter
                 string safeArgs = EscapeForPosixShell(
                     source.Arguments);
                 string script = string.IsNullOrWhiteSpace(safeArgs)
-                    ? $"& \"{safePath}\""
-                    : $"& \"{safePath}\" {safeArgs}";
+                    ? $"\"{safePath}\""
+                    : $"\"{safePath}\" {safeArgs}";
 
                 IReadOnlyList<string> runnerArgList =
                     !string.IsNullOrWhiteSpace(runnerArgs)

@@ -66,9 +66,8 @@ internal sealed class CmdMiddleware : IProcessMiddleware
         ProcessConfiguration rewritten = ShellRewriter.Rewrite(
             source,
             shellTargetPath: "cmd.exe",
-            runnerArgs: string.Empty,
+            runnerArgs: "/c",
             kind: ShellKind.Cmd,
-            delivery: ShellDelivery.Arguments,
             windowCreation: src.WindowCreation,
             useShellExecution: src.UseShellExecution);
 

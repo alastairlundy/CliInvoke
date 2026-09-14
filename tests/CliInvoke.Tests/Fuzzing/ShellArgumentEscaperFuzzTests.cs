@@ -220,17 +220,15 @@ public class ShellRewriterFuzzTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "pwsh.exe",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "-NoProfile -NonInteractive -Command",
                     kind: ShellKind.PowerShell,
-                    delivery: ShellDelivery.ArgumentList,
                     windowCreation: false,
                     useShellExecution: false);
 
                 return rewritten.TargetFilePath == "pwsh.exe" &&
                        rewritten.ArgumentList.Count == 4 &&
-                       rewritten.ArgumentList[0] == "-NoProfile" &&
-                       rewritten.ArgumentList[1] == "-NonInteractive" &&
-                       rewritten.ArgumentList[2] == "-Command";
+                       rewritten.ArgumentList[2] == "-Command" &&
+                       rewritten.ArgumentList[^1].Contains("& \"");
             })
             .QuickCheckThrowOnFailure();
     }
@@ -247,9 +245,8 @@ public class ShellRewriterFuzzTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "cmd.exe",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "/c",
                     kind: ShellKind.Cmd,
-                    delivery: ShellDelivery.Arguments,
                     windowCreation: false,
                     useShellExecution: false);
 
@@ -272,14 +269,14 @@ public class ShellRewriterFuzzTests
                 ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                     source,
                     shellTargetPath: "/bin/sh",
-                    runnerArgs: string.Empty,
+                    runnerArgs: "-c",
                     kind: ShellKind.Posix,
-                    delivery: ShellDelivery.ArgumentList,
                     windowCreation: false,
                     useShellExecution: false);
 
                 return rewritten.TargetFilePath == "/bin/sh" &&
-                       rewritten.ArgumentList.Count == 1 &&
+                       rewritten.ArgumentList.Count == 2 &&
+                       rewritten.ArgumentList[0] == "-c" &&
                        rewritten.Arguments == string.Empty;
             })
             .QuickCheckThrowOnFailure();

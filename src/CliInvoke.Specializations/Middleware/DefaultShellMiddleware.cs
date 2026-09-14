@@ -73,12 +73,20 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
             ResourcePolicy = src.ResourcePolicy,
         };
 
+        // Shell switches are caller-owned: each kind needs its own execution switch to
+        // make the composed inner command run rather than being ignored.
+        string runnerArgs = kind switch
+        {
+            ShellKind.Cmd => "/c",
+            ShellKind.PowerShell => "-Command",
+            _ => "-c"
+        };
+
         ProcessConfiguration rewritten = ShellRewriter.Rewrite(
             source,
             shellTargetPath: shell.TargetFilePath.FullName,
-            runnerArgs: string.Empty,
+            runnerArgs: runnerArgs,
             kind: kind,
-            delivery: kind == ShellKind.Cmd ? ShellDelivery.Arguments : ShellDelivery.ArgumentList,
             windowCreation: _options.WindowCreation,
             useShellExecution: _options.UseShellExecution);
 
