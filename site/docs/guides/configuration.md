@@ -669,6 +669,12 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExitBehaviour.cs`.
 | `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, fall back to a `CancellationTokenSource`. |
 | `ForcefulExit` | `2` | Forcefully terminate the process and all child processes. |
 
+> **Note on `ForcefulExit`**: The tree-kill is best-effort, matching
+> .NET's own `Kill(entireProcessTree: true)` semantics. Descendants
+> spawned while the tree is being killed may survive. CliInvoke does
+> not add a post-kill delay or a second kill pass — this mirrors the
+> documented behavior of `Process.Kill(entireProcessTree: true)`.
+
 #### `ProcessExceptionBehaviour`
 
 Defined in `src/CliInvoke.Core/Primitives/ProcessExceptionBehaviour.cs`.
