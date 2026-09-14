@@ -94,13 +94,11 @@ public class ShellInjectionSecurityTests
 
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 
-        await Assert.That(rewritten.Arguments).IsEqualTo(string.Empty);
-        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(2);
-        await Assert.That(rewritten.ArgumentList[0]).IsEqualTo("/c");
-
-        string command = rewritten.ArgumentList[1];
-        await Assert.That(command).StartsWith("\"");
-        await Assert.That(command).Contains("^&", StringComparison.Ordinal);
+        // Cmd uses Arguments-string delivery (not ArgumentList) because cmd.exe
+        // applies its own quote-stripping rules. The escaper neutralises metacharacters.
+        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(0);
+        await Assert.That(rewritten.Arguments).IsNotEqualTo(string.Empty);
+        await Assert.That(rewritten.Arguments).Contains("^&", StringComparison.Ordinal);
     }
 
     private static string? ResolvePwshPath()

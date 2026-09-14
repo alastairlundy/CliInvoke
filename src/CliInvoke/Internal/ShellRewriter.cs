@@ -76,8 +76,11 @@ internal static class ShellRewriter
                         ? ArgumentTokenizer.Tokenize(runnerArgs)
                         : Array.Empty<string>();
 
-                List<string> argumentList = new(runnerArgList.Count + 1);
+                List<string> argumentList = new(runnerArgList.Count + 4);
                 argumentList.AddRange(runnerArgList);
+                argumentList.Add("-NoProfile");
+                argumentList.Add("-NonInteractive");
+                argumentList.Add("-Command");
                 argumentList.Add(script);
 
                 return new ProcessConfiguration

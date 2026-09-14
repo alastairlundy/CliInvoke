@@ -7,8 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core.Internal;
-using CliInvoke.Specializations.Configurations;
+using CliInvoke.Internal;
 
 namespace CliInvoke.Specializations.Middleware;
 
@@ -66,59 +65,34 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
 
         ThrowIfUnsupported();
 
-        string originalPath = context.Configuration.TargetFilePath;
-        string originalArgs = context.Configuration.Arguments;
-
-        // Escape both the target and the arguments so they are passed to the
-        // wrapped command as literal data. Without this, shell metacharacters in
-        // the arguments (e.g. ';', '|', '&', '$(...)') would be re-interpreted by
-        // PowerShell as additional commands — a command-injection risk.
-        string safePath = ShellArgumentEscaper.EscapeForPowerShell(originalPath);
-        string safeArgs = ShellArgumentEscaper.EscapeForPowerShell(originalArgs);
-
-        string wrappedCommand = string.IsNullOrWhiteSpace(safeArgs)
-            ? $"& \"{safePath}\""
-            : $"& \"{safePath}\" {safeArgs}";
-
-        // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
-        // re-tokenise it before PowerShell parses it. A single re-tokenised Arguments string
-        // would let a '"' in the value break the OS-level quoting and let PowerShell reassemble
-        // a second command (command-injection). ArgumentList is passed through unchanged.
-        IReadOnlyList<string> argumentList =
-        [
-            "-NoProfile",
-            "-NonInteractive",
-            "-Command",
-            wrappedCommand,
-        ];
-
-        // The specialisation configuration class is the single source of truth for the
-        // pwsh target path and shell flags; this middleware just supplies the wrapped command and
-        // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
-        ProcessConfiguration newConfig = new PowershellProcessConfiguration(
-            string.Empty,
-            src.RedirectStandardInput,
-            context.Mode != InvocationMode.Raw,
-            workingDirectoryPath: src.WorkingDirectoryPath,
-            requiresAdministrator: src.RequiresAdministrator,
-            new Dictionary<string, string>(src.EnvironmentVariables),
-            credentials: src.Credential,
-            standardInput: src.StandardInput,
-            standardInputEncoding: src.StandardInputEncoding,
-            standardOutputEncoding: src.StandardOutputEncoding,
-            standardErrorEncoding: src.StandardErrorEncoding,
-            processResourcePolicy: src.ResourcePolicy,
-            windowCreation: _options.WindowCreation,
-            useShellExecution: _options.UseShellExecution,
-            argumentList: argumentList);
+        ProcessConfiguration source = new(src.TargetFilePath, src.Arguments, outputRedirection: context.Mode != InvocationMode.Raw)
+        {
+            RedirectStandardInput = src.RedirectStandardInput,
+            RequiresAdministrator = src.RequiresAdministrator,
+            WorkingDirectoryPath = src.WorkingDirectoryPath,
+            EnvironmentVariables = new Dictionary<string, string>(src.EnvironmentVariables),
+            Credential = src.Credential,
+            StandardInput = src.StandardInput,
+            StandardInputEncoding = src.StandardInputEncoding,
+            StandardOutputEncoding = src.StandardOutputEncoding,
+            StandardErrorEncoding = src.StandardErrorEncoding,
+            ResourcePolicy = src.ResourcePolicy,
+        };
 
-        InvocationContext newContext = context.WithConfiguration(newConfig);
+        ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+            source,
+            shellTargetPath: OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
+            runnerArgs: string.Empty,
+            kind: ShellKind.PowerShell,
+            delivery: ShellDelivery.ArgumentList,
+            windowCreation: _options.WindowCreation,
+            useShellExecution: _options.UseShellExecution);
+
+        InvocationContext newContext = context.WithConfiguration(rewritten);
 
         await next(newContext).ConfigureAwait(false);
 
-        // The terminal ran against the rewritten context, so propagate its result back to the
-        // original chain context that the caller reads from.
         context.Result = newContext.Result;
     }
 
