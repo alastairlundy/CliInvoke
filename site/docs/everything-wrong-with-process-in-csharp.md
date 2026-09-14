@@ -244,6 +244,8 @@ On Windows, `CreateProcess` has a ~32,767 character limit for the full command l
 **`WorkingDirectory` semantics depend on `UseShellExecute`.**
 When `UseShellExecute = true`, an empty `WorkingDirectory` means "current directory contains the executable." When `false`, it means "use the hosting process's current directory." The same property has different semantics depending on another property's value.
 
+**CliInvoke**: `WorkingDirectoryPath` defaults to `Directory.GetCurrentDirectory()`, so the child process always inherits the caller's current directory — the behavior is consistent regardless of `UseShellExecute`. When you set a non-empty `WorkingDirectoryPath`, CliInvoke validates the directory exists at construction time. The adapter passes the value to `ProcessStartInfo.WorkingDirectory` with no normalization.
+
 **Redirects require `UseShellExecute = false`.**
 You cannot redirect stdin, stdout, or stderr when `UseShellExecute` is `true`. This is a hard constraint that surprises developers coming from `cmd.exe` workflows.
 
