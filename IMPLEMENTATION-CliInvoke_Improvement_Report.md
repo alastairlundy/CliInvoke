@@ -61,7 +61,7 @@ The ledger resolves the plan into two release trains:
 
 ---
 
-## Part 2 — v4: capability surfaces (not yet implemented)
+## Part 2 — v4: capability surfaces (not yet implemented; semantics resolved — `DECISIONS-CliInvoke-v4-improvements.md#D008`–`#D015`)
 
 ### 2.1 `src/CliInvoke.Core/IProcessInvoker.cs`
 
@@ -75,15 +75,22 @@ The ledger resolves the plan into two release trains:
 
 - `PipeSource` factories: `Null`, `FromStream`, `FromFile`, `FromBytes`, `FromString`, `FromDelegate` [`DECISIONS-CliInvoke-v4-improvements.md#T004`].
 - `PipeTarget` factories: `Null`, `ToStream`, `ToFile`, `ToStringBuilder`, `ToDelegate`, `Merge` [`DECISIONS-CliInvoke-v4-improvements.md#T004`].
+- Each variant is a **public `sealed record`** with static factory conveniences on the abstract base; constructors are inaccessible so the variant set stays closed and external derivation is impossible. Variant payloads (e.g., `FileInfo`) are frozen API commitments — document each in `site/docs` [`DECISIONS-CliInvoke-v4-improvements.md#D012`].
+- Using `sealed record` variants (net10.0 / C# 14) rather than C# 15 `union` types; migrate to `union`/`closed` hierarchies at the first net11 TFM bump — a follow-up decision, not part of v4 [`DECISIONS-CliInvoke-v4-improvements.md#D012`, `DECISIONS-CliInvoke-v4-improvements.md#T001`].
+- `PipeTarget.Merge` requires **≥ 2 targets**; construction throws for fewer — no degenerate wrappers exist. Duplicate handling and multi-target Merge equality/hash semantics are blueprint details for the record variants [`DECISIONS-CliInvoke-v4-improvements.md#D013`].
 - No pipe type starts or owns a process [`DECISIONS-CliInvoke-v4-improvements.md#D003`].
 
 ### 2.4 `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs` (v4 additive)
 
-- Init properties for the stdin pipe source and the standard output/error targets; equality gains pipe-reference fields (reference equality, matching the `StandardInput` precedent) [`DECISIONS-CliInvoke-v4-improvements.md#T004`].
+- **stdin is superseded**: the new `PipeSource` stdin init property replaces `StandardInput: StreamWriter?` and `ProcessConfigurationBuilder.SetStandardInputPipe(StreamWriter)`. Those two members become `[Obsolete]` in the v3 line **post-GA** (a future 3.x release — the v3 GA construction story itself is untouched) and are **removed in v4**. Migrators use `PipeSource.FromStream` (e.g., `StreamWriter.BaseStream`). See `docs/adr/0004-standard-input-supersede.md` [`DECISIONS-CliInvoke-v4-improvements.md#D009`].
+- Init properties for the stdin `PipeSource` and the standard output/error `PipeTarget`s; equality gains pipe-reference fields anchored on the base instance (reference equality, matching the `StandardInput` precedent — variant records carry value equality but the config anchor is the base reference) [`DECISIONS-CliInvoke-v4-improvements.md#T004`, `DECISIONS-CliInvoke-v4-improvements.md#D012`].
+- **Contradiction throws at init**: attaching a non-Null `PipeTarget` while `OutputRedirection` is false throws. The flag retains meaning only for the buffered/no-redirection cases when no target is attached [`DECISIONS-CliInvoke-v4-improvements.md#D010`].
 
 ### 2.5 `src/CliInvoke/ProcessInvocationPipeline.cs`
 
-- `ListenAsync` implementation: a streaming invocation mode; events produced as they happen; the middleware chain flows around the stream; `ValidationRules` evaluate after the `Exited` event; cancellation/timeout reuses `ProcessExitConfiguration` machinery [`DECISIONS-CliInvoke-v4-improvements.md#T003`].
+- `ListenAsync` implementation: a streaming invocation mode; events produced as they happen; `ValidationRules` evaluate after the `Exited` event; cancellation/timeout reuses `ProcessExitConfiguration` machinery [`DECISIONS-CliInvoke-v4-improvements.md#T003`].
+- **Always tee**: every pipeline event flows to both the attached `PipeTarget`s and the caller's enumeration; user targets behave as one merge branch in the same event set (internal machinery, distinct from the public `Merge` contract). Pull pacing is preserved — event production paces to consumption, and slow event consumption must not corrupt target delivery (make this a testable tee back-pressure assertion) [`DECISIONS-CliInvoke-v4-improvements.md#D011`].
+- **Lifecycle source**: `StartedProcessEvent`/`ExitedProcessEvent` are synthesized by subscribing to the `ExternalProcess` `Started`/`Exited` event handlers — the one source of truth; no independent pipeline wiring. `ProcessWrapper`'s `HasStarted`/`HasExited` guard semantics are unchanged, but the pipeline is a second subscriber [`DECISIONS-CliInvoke-v4-improvements.md#D015`].
 
 ### 2.6 `src/CliInvoke/CliRun.cs`
 
@@ -91,14 +98,17 @@ The ledger resolves the plan into two release trains:
 
 ### 2.7 Middleware contract
 
-- Define streaming-mode behavior for `IProcessMiddleware`/`InvocationContext` (how pre-next/post-next wrap a stream) [`DECISIONS-CliInvoke-v4-improvements.md#T003`].
+- Streaming mode is uniform: middleware wraps the tee'd stream the same way regardless of whether pipe targets are attached — no conditional event semantics [`DECISIONS-CliInvoke-v4-improvements.md#D011`].
+- Middleware may pattern-match attached pipe kinds (e.g., branch on `PipeTarget ToFile` vs `ToStream`) — the reason variants are public sealed records rather than hidden impls [`DECISIONS-CliInvoke-v4-improvements.md#D012`].
+- Bypass stays orthogonal: `IExternalProcess` gains no streaming member; the event-authority question was explored and declined (streaming was considered as a property of the process handle and rejected — it would widen the bypass pattern and re-open `D003`-style ownership questions) [`DECISIONS-CliInvoke-v4-improvements.md#D015`, `DECISIONS-CliInvoke-v4-improvements.md#D003`].
 
 ### 2.8 Tests — v4 pass
 
-- `ListenAsync` pipeline flow (middleware tee, post-`Exited` validation), pipe attachment, and property tests for pipe normalization [`DECISIONS-CliInvoke-v4-improvements.md#T007`].
+- `ListenAsync` pipeline flow (teed event/target delivery with slow-consumer back-pressure safety, post-`Exited` validation), pipe attachment, init validation (`D010` contradiction throws), `Merge` ≥ 2 construction, and property tests over the record-variant equality surface [`DECISIONS-CliInvoke-v4-improvements.md#T007`, `DECISIONS-CliInvoke-v4-improvements.md#D011`, `DECISIONS-CliInvoke-v4-improvements.md#D013`].
+- Obsolescence assertion: the superseded `StandardInput`/`SetStandardInputPipe` members carry `[Obsolete]` with a migration message pointing at `PipeSource.FromStream` (compile-checked, CI-enforceable) [`DECISIONS-CliInvoke-v4-improvements.md#D009`].
 
 ---
 
 ## Ledger Reference
 
-`DECISIONS-CliInvoke-v4-improvements.md`: D001 (goal), D002 (pull event stream), D003 (data redirection + Merge), D004 (keep SecureString; R10 dropped), D005 (config as middle tier), D006 (factory removed), D007 (ride v3 GA), T001 (foundation locked), T002 (Core invoker member), T003 (full pipeline flow), T004 (Core pipe types, config attachment), T005 (init + required target), T006 (builder kept), T007 (migrate + property tests), T008 (blueprint output), T009 (manual handoff).
+`DECISIONS-CliInvoke-v4-improvements.md`: D001 (goal), D002 (pull event stream), D003 (data redirection + Merge), D004 (keep SecureString; R10 dropped), D005 (config as middle tier), D006 (factory removed), D007 (ride v3 GA), D008 (v4 semantics session goal), D009 (stdin superseded by PipeSource; obsolete in v3.x post-GA, removed v4 — `docs/adr/0004`), D010 (redirection flag contradiction throws), D011 (always-tee event/target flow), D012 (public sealed record variants; unions at net11 bump), D013 (Merge requires ≥ 2), D014 (v4 stabilising pre-release train), D015 (lifecycle events sourced from ExternalProcess handlers), T001 (foundation locked), T002 (Core invoker member), T003 (full pipeline flow), T004 (Core pipe types, config attachment), T005 (init + required target), T006 (builder kept), T007 (migrate + property tests), T008 (blueprint output), T009 (manual handoff).

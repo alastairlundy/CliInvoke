@@ -247,3 +247,69 @@ Are there any tickets where the `Blocked by` chain or Independent/Collaborative 
 - **User Response**: "agree with decomposition"
 - **Resolution**: clear pass - the five-ticket Domain-pattern decomposition, dependency chain, and all-Independent classification approved as proposed; tickets proceed to generation and publishing as local markdown under tickets/.
 - **Notes**: no combine, split, rescope, or coverage adjustments requested; one pull request grouping and local markdown target confirmed via I017.
+
+### [D008] - session goal
+
+- **Driver**: the user wants the open pipe/streaming semantics surfaced during the CliWrap-shape review resolved into ledger records and the blueprint amended.
+- **Resolved Answer**: "Grill me on these decisions" - five proposed branches confirmed open; ledger continuation into `DECISIONS-CliInvoke-v4-improvements.md`; track: concept-then-implementation with a blueprint amendment (§2.3-2.7) as the Phase 2 output.
+- **Normalized Requirement**: The session shall resolve the pipe-attachment, redirection-flag, streaming-tee, pipe-shape, and Merge-semantics decisions and record them in this ledger for the blueprint amendment to cite.
+- **Constraints**: The linked spec `CliInvoke_Improvement_Report.md` is absent from disk; spec references cite `IMPLEMENTATION-CliInvoke_Improvement_Report.md` §sections and ledger anchors. All five initial branches confirmed open (user: "All 5 are open"). Branch ID plan: goal `D008`; branches `D009`-`D013`; user-added branches on release timing and `ExternalProcess` event handlers appended after.
+
+### [D009] - stdin mechanism fate
+
+- **Driver**: the user wants one stdin mechanism with no permanent dual-knob surface or undocumented precedence.
+- **Resolved Answer**: "Option A - supersede outright; but deprecate/make obsolete in a future v3 version prior to removal in v4"
+- **Normalized Requirement**: v4 stdin shall be a `PipeSource`-only init property; `ProcessConfiguration.StandardInput` (`StreamWriter?`) and `ProcessConfigurationBuilder.SetStandardInputPipe(StreamWriter)` shall be made obsolete in the v3 line post-GA and removed in v4.
+- **Constraints**: Obsolescence lands post-GA in the v3.x line - the v3 GA construction story itself is untouched (`DECISIONS-CliInvoke-v4-improvements.md#D007` not violated; its no-ceremony rule began at GA). Migration path documented via `PipeSource.FromStream` (e.g., `StreamWriter.BaseStream`). Reference-equality precedent transfers to the new stdin property.
+- **Cites**: D005, D007, T004, T005
+
+### [D010] - redirection flag semantics
+
+- **Driver**: the user wants contradictory configuration state to fail at construction rather than adapt silently.
+- **Resolved Answer**: "Option A - contradiction throws at init"
+- **Normalized Requirement**: Attaching a non-Null `PipeTarget` while `OutputRedirection` is false shall throw at init; the flag retains meaning only for the buffered/no-redirection cases when no target is attached.
+- **Constraints**: Covers stdout/stderr target properties; `UseShellExecution` interplay and equality/hash wording deferred to the blueprint amendment; `ToString` output unsurprising (no silent flag rewrite because contradictory states are unrepresentable).
+- **Cites**: D005, T004, T005
+
+### [D011] - PipeTarget × ListenAsync tee semantics
+
+- **Driver**: the user wants uniform event flow regardless of target attachment so middleware sees the same stream in every mode.
+- **Resolved Answer**: "Option A - always tee, with attached targets treated as one Merge branch"
+- **Normalized Requirement**: Pipeline events shall always flow to both the attached `PipeTarget`s and the caller's `ListenAsync` stream; the internal tee treats user targets as one merge branch in the same event set.
+- **Constraints**: Pull pacing preserved per `DECISIONS-CliInvoke-v4-improvements.md#D002` - event production paces to consumption; tee machinery must keep pacing fair (slow event consumers may not corrupt target delivery, cancellation machinery applies); target-side Merge composition unchanged (`DECISIONS-CliInvoke-v4-improvements.md#D003`); middleware wrapping mechanics remain blueprint §2.7 amendment scope.
+- **Cites**: D002, D003, T003
+
+### [D015] - ListenAsync × ExternalProcess lifecycle handlers
+
+- **Prompt**: "For D015 – ListenAsync × ExternalProcess lifecycle handlers: pick an option, hybridize, or provide your own answer." (preceded by an informational clarification of what Option C - streaming on `IExternalProcess` - would look like; user asked for clarification, not a decision, then picked)
+- **User Response**: "D015: Option A"
+- **Driver**: the user wants a single source of truth for process lifecycle moments while keeping the bypass pattern orthogonal.
+- **Resolved Answer**: "Option A - the pipeline subscribes to `ExternalProcess.Started`/`Exited` and synthesizes `StartedProcessEvent`/`ExitedProcessEvent` from them"
+- **Normalized Requirement**: `ProcessInvocationPipeline` shall derive its lifecycle events from the existing `ExternalProcess` `Started`/`Exited` event handlers as the one source of truth; no independent lifecycle wiring is added.
+- **Constraints**: `ProcessWrapper`'s `HasStarted`/`HasExited` guard story must account for the pipeline as a second subscriber (guard semantics unchanged); `HasExited` polling guards stay out of scope; the bypass pattern stays un-widened - streaming-on-`IExternalProcess` was explored, clarified, and **declined** (rejected alternative: event surface as an `IExternalProcess` property, re-opening `DECISIONS-CliInvoke-v4-improvements.md#D003`-style ownership questions); event vocabulary per blueprint §2.2.
+- **Cites**: T003, D003, D011
+
+### [D012] - pipe variant exposure
+
+- **Prompt**: "For D012 – pipe variant exposure: pick an option, hybridize, or provide your own answer."
+- **User Response**: "D012: Option A using C# 15's Union types" → contradiction raised against `DECISIONS-CliInvoke-v4-improvements.md#T001` (union types require .NET 11 / C# 15; runtime `UnionAttribute` still stabilising across .NET 11 previews) → "D012: Option B"
+- **Driver**: the user wants middleware pattern matching over attached pipe kinds, without destabilising the locked foundation to chase a preview language feature.
+- **Resolved Answer**: "Option B - public sealed record variants now on net10.0/C# 14; migrate to `union` (or `closed` hierarchies) at the first net11 TFM bump"
+- **Normalized Requirement**: Each `PipeSource`/`PipeTarget` variant (`FromStream`, `ToFile`, …) shall be a public `sealed record` with static factory conveniences on the abstract base; the variant set stays closed and no external derivation is possible.
+- **Constraints**: Variant payloads (e.g., `FileInfo`) become frozen public API commitments - blueprint amendment must document each; union/closed-hierarchy migration at the net11 TFM bump is a follow-up decision, not part of v4; reference equality on the base is preserved for configuration equality (`DECISIONS-CliInvoke-v4-improvements.md#T005` precedent) - record value equality exists on variants but the config equality anchor is the base instance.
+- **Cites**: D003, D009, D011, T001, T003, T005
+
+### [D013] - Merge normalization
+
+- **Driver**: the user wants an honest Merge contract with no degenerate wrappers and no equality surprises.
+- **Resolved Answer**: "Option C - Merge requires ≥ 2 targets; construction throws for fewer"
+- **Normalized Requirement**: `PipeTarget.Merge` shall throw at construction when given fewer than two targets; degenerate merge wrappers (single-element or empty) shall not exist.
+- **Constraints**: Duplicates within a Merge set and equality/hash semantics for multi-target Merges are blueprint-amendment details; the internal tee's target branch seeding (`DECISIONS-CliInvoke-v4-improvements.md#D011`) uses merge machinery internally and is unaffected by the public contract; callers building target lists dynamically must guard before calling Merge.
+- **Cites**: D003, D011, T003
+
+### [D014] - v3 vs v4 release timing
+
+- **Driver**: the user wants the v4 capability surfaces validated against real usage without destabilising the freshly shipped v3 GA line.
+- **Resolved Answer**: "Option A - stabilising 4.0.0 pre-release alongside a supported stable v3"
+- **Normalized Requirement**: v4 shall ship as a stabilising `4.0.0-alpha/beta` train alongside the latest stable v3 line, creating a dated removal window for the `D009` stdin obsolescence plan.
+- **Constraints**: v3 remains the latest stable release; feature scope stays event stream + pipes (`D002`, `D003`, `T002`-`T004`); the pre-release train's TFM plan interacts with the pending `D012` confirmation (union types require .NET 11 / C# 15).
