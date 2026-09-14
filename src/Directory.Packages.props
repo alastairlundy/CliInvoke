@@ -4,8 +4,8 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Polyfill" Version="11.2.0" />
-    <PackageVersion Include="DotExtensions" Version="10.5.1" />
+    <PackageVersion Include="Polyfill" Version="11.3.0" />
+    <PackageVersion Include="DotExtensions" Version="[10.5.1, 11.0.0)" />
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
   </ItemGroup>
@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
     <!-- set CliInvokeCoreVersion in the workflow -->
-    <PackageVersion Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
-    <PackageVersion Include="CliInvoke" Version="$(CliInvokeVersion)" />
+    <PackageVersion Include="CliInvoke.Core" Version="[$(CliInvokeCoreVersion), 3.0.0)" />
+    <PackageVersion Include="CliInvoke" Version="[$(CliInvokeVersion), 3.0.0)" />
   </ItemGroup>
 </Project>
