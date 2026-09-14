@@ -10,14 +10,14 @@
 
 The ledger resolves the plan into two release trains:
 
-- **v3 GA (pre-GA, current `3.0.0-beta.2` line)** — the construction story: init conversion, factory removal, builder positioning. Records: `D005`, `D006`, `D007`, `T005`, `T006`.
+- **v3 GA (current `3.0.0` line)** — the construction story: init conversion, factory removal, builder positioning. Records: `D005`, `D006`, `D007`, `T005`, `T006`. **Completed.**
 - **v4 (post-GA)** — the capability surfaces: event stream and pipes. Records: `D002`, `D003`, `T002`, `T003`, `T004`.
 - **Explicitly not in v3:** `ListenAsync`, `ProcessEvent`, `PipeSource`, `PipeTarget` (user clarification, `DECISIONS-CliInvoke-v4-improvements.md#I009`).
 - **Dropped from the plan:** R10 (`UserCredential`/`SecureString` rework) — `DECISIONS-CliInvoke-v4-improvements.md#D004`.
 
 ---
 
-## Part 1 — v3 GA: construction story
+## Part 1 — v3 GA: construction story ✅ Completed
 
 ### 1.1 `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`
 
@@ -30,38 +30,38 @@ The ledger resolves the plan into two release trains:
 
 ### 1.2 `src/CliInvoke/Extensions/ProcessConfigurationFactory.cs`
 
-- Delete the file (both `Create` overloads) [`DECISIONS-CliInvoke-v4-improvements.md#D006`, `DECISIONS-CliInvoke-v4-improvements.md#D007`].
+- ~~Delete the file (both `Create` overloads)~~ [`DECISIONS-CliInvoke-v4-improvements.md#D006`, `DECISIONS-CliInvoke-v4-improvements.md#D007`]. **Done** — file removed.
 
 ### 1.3 `src/CliInvoke/CliRun.cs`
 
-- `BuildStringArgsConfig` (line 190) and `FireAndForget(string)` (line 175) construct `ProcessConfiguration` directly via init instead of the factory [`DECISIONS-CliInvoke-v4-improvements.md#D006`].
+- ~~`BuildStringArgsConfig` (line 190) and `FireAndForget(string)` (line 175) construct `ProcessConfiguration` directly via init instead of the factory~~ [`DECISIONS-CliInvoke-v4-improvements.md#D006`]. **Done** — both paths use init construction.
 
 ### 1.4 `src/CliInvoke/ShellDetector.cs`
 
-- The four construction sites (lines 69, 78, 119, 141) construct directly [`DECISIONS-CliInvoke-v4-improvements.md#D006`].
+- ~~The four construction sites (lines 69, 78, 119, 141) construct directly~~ [`DECISIONS-CliInvoke-v4-improvements.md#D006`]. **Done**.
 
 ### 1.5 `src/CliInvoke/Extensibility/RunnerConfigurationFactory.cs`
 
-- Adapt `ArgumentsList` writes to `ArgumentList` [`DECISIONS-CliInvoke-v4-improvements.md#T005`].
+- ~~Adapt `ArgumentsList` writes to `ArgumentList`~~ [`DECISIONS-CliInvoke-v4-improvements.md#T005`]. **Done**.
 
 ### 1.6 `src/CliInvoke/Builders/ProcessConfigurationBuilder.cs` + `src/CliInvoke.Core/Builders/IProcessConfigurationBuilder.cs`
 
-- Keep the builder for argument escaping and `UserCredentialSpec`/resource-policy callback flows; init construction becomes the documented default [`DECISIONS-CliInvoke-v4-improvements.md#T006`].
-- `Set*` methods delegate to the init properties where applicable; `Build()` semantics unchanged; DI registration in Specializations unchanged [`DECISIONS-CliInvoke-v4-improvements.md#T006`].
+- ~~Keep the builder for argument escaping and `UserCredentialSpec`/resource-policy callback flows; init construction becomes the documented default~~ [`DECISIONS-CliInvoke-v4-improvements.md#T006`]. **Done** — builder remains for advanced scenarios.
+- ~~`Set*` methods delegate to the init properties where applicable; `Build()` semantics unchanged; DI registration in Specializations unchanged~~ [`DECISIONS-CliInvoke-v4-improvements.md#T006`]. **Done**.
 
 ### 1.7 Docs
 
-- `DESIGN_PATTERNS.md` / README: position init construction as the default and the builder as the advanced path (escaping, credential specs) [`DECISIONS-CliInvoke-v4-improvements.md#T006`].
+- ~~`DESIGN_PATTERNS.md` / README: position init construction as the default and the builder as the advanced path (escaping, credential specs)~~ [`DECISIONS-CliInvoke-v4-improvements.md#T006`]. **Done**.
 
 ### 1.8 Tests — v3 pass
 
-- Migrate the ~20 `ProcessConfigurationFactory.Create` call sites (CliRun paths, invoker tests, middleware integration tests, Specializations tests, AOT/trimming programs) [`DECISIONS-CliInvoke-v4-improvements.md#T007`, `DECISIONS-CliInvoke-v4-improvements.md#D006`].
-- New coverage: init validation (target, working directory), `required` enforcement, `ArgumentsList` merge [`DECISIONS-CliInvoke-v4-improvements.md#T007`].
-- FsCheck property tests: equality/hash stability across environment-variable insertion order; snapshot isolation from caller dictionaries [`DECISIONS-CliInvoke-v4-improvements.md#T007`].
+- ~~Migrate the ~20 `ProcessConfigurationFactory.Create` call sites (CliRun paths, invoker tests, middleware integration tests, Specializations tests, AOT/trimming programs)~~ [`DECISIONS-CliInvoke-v4-improvements.md#T007`, `DECISIONS-CliInvoke-v4-improvements.md#D006`]. **Done**.
+- ~~New coverage: init validation (target, working directory), `required` enforcement, `ArgumentsList` merge~~ [`DECISIONS-CliInvoke-v4-improvements.md#T007`]. **Done**.
+- ~~FsCheck property tests: equality/hash stability across environment-variable insertion order; snapshot isolation from caller dictionaries~~ [`DECISIONS-CliInvoke-v4-improvements.md#T007`]. **Done**.
 
 ---
 
-## Part 2 — v4: capability surfaces
+## Part 2 — v4: capability surfaces (not yet implemented)
 
 ### 2.1 `src/CliInvoke.Core/IProcessInvoker.cs`
 
