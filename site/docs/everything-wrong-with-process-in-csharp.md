@@ -255,3 +255,5 @@ You cannot redirect stdin, stdout, or stderr when `UseShellExecute` is `true`. T
 ```csharp
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 ```
+
+**CliInvoke**: The three encoding properties (`StandardInputEncoding`, `StandardOutputEncoding`, `StandardErrorEncoding`) default to `Encoding.Default`, which is UTF-8 on .NET 10 and later. Each encoding is applied only when its corresponding stream is redirected, so callers can override per-stream without affecting others.

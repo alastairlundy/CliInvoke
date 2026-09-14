@@ -586,6 +586,14 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 | `StandardOutputEncoding` | `Encoding` | `Encoding.Default` | Read-only | 191 |
 | `StandardErrorEncoding` | `Encoding` | `Encoding.Default` | Read-only | 196 |
 
+> **Note on encodings**: `Encoding.Default` is UTF-8 on .NET 10 and
+> later. Each encoding property is applied by the control adapter only
+> when its corresponding stream is redirected: `StandardInputEncoding`
+> when `RedirectStandardInput` is `true`, and `StandardOutputEncoding` /
+> `StandardErrorEncoding` when `OutputRedirection` is `true`. Callers
+> can override per-stream via the init properties without affecting the
+> other streams.
+
 > **Note on `OutputRedirection`**: This is the master switch for
 > stdout/stderr redirection. When `false`, neither stream is captured
 > and the invoker's buffered/piped result types cannot be used.
