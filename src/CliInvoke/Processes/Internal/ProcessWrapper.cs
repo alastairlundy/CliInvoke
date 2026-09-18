@@ -64,6 +64,13 @@ internal class ProcessWrapper : Process
         ResourcePolicy = configuration.ResourcePolicy;
         ProcessControlAdapter.ApplyConfiguration(this, configuration);
         StartInfo.FileName = resolvedFilePath.FullName;
+
+        // Validated here rather than in ApplyConfiguration: the resolved absolute path can be
+        // substantially longer than the unresolved TargetFilePath (PATH lookup / recursion),
+        // so measuring before this overwrite would under-count the real command line.
+        if (OperatingSystem.IsWindows())
+            BaseProcessControlAdapter.ValidateCommandLineLength(StartInfo);
+
         ProcessName = StartInfo.FileName;
         EnableRaisingEvents = true;
         Exited += OnExited;
@@ -155,7 +162,49 @@ internal class ProcessWrapper : Process
     }
 
     internal event EventHandler Started;
-    
+
+    /// <summary>
+    ///     Maps a <see cref="Win32Exception"/> thrown during process start to the
+    ///     natural .NET exception type for the given <see cref="Win32Exception.NativeErrorCode"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Known codes: 2/3 → <see cref="FileNotFoundException"/>,
+    ///     5 → <see cref="UnauthorizedAccessException"/>,
+    ///     193 → <see cref="BadImageFormatException"/>.
+    ///     All other codes rethrow the original <see cref="Win32Exception"/>, preserving its
+    ///     <see cref="Win32Exception.NativeErrorCode"/> so callers can catch it specifically.
+    /// </remarks>
+    internal static Exception MapWin32ExceptionToStartFailureException(
+        Win32Exception exception,
+        string targetFilePath)
+    {
+        return exception.NativeErrorCode switch
+        {
+            // ERROR_FILE_NOT_FOUND (2) or ERROR_PATH_NOT_FOUND (3)
+            2 or 3 =>
+                new FileNotFoundException(
+                    $"The file '{targetFilePath}' was not found.",
+                    targetFilePath,
+                    exception),
+
+            // ERROR_ACCESS_DENIED (5)
+            5 =>
+                new UnauthorizedAccessException(
+                    $"The current user does not have permission to execute the file '{targetFilePath}'.",
+                    exception),
+
+            // ERROR_BAD_EXE_FORMAT (193)
+            193 =>
+                new BadImageFormatException(
+                    $"The file '{targetFilePath}' is not a valid executable image.",
+                    exception),
+
+            // Unknown codes — rethrow the original so callers can catch Win32Exception
+            // and inspect NativeErrorCode rather than being forced into catch (Exception).
+            _ => exception,
+        };
+    }
+
     public new bool Start()
     {
         try
@@ -166,11 +215,7 @@ internal class ProcessWrapper : Process
         {
             HasStarted = false;
 
-            // ERROR_FILE_NOT_FOUND (2) or ERROR_PATH_NOT_FOUND (3)
-            if (exception.NativeErrorCode is 2 or 3)
-                throw new FileNotFoundException($"The file '{StartInfo.FileName}' was not found.", StartInfo.FileName, exception);
-
-            throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
+            throw MapWin32ExceptionToStartFailureException(exception, StartInfo.FileName);
         }
 
         if (!HasStarted)

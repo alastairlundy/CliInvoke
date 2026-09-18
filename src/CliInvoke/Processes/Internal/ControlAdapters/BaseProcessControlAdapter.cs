@@ -87,6 +87,144 @@ internal abstract class BaseProcessControlAdapter
         process.StartInfo = processStartInfo;
     }
     
+    /// <summary>
+    ///     Validates the assembled command-line length against the Windows
+    ///     <c>CreateProcess</c> limit of approximately 32,767 characters.
+    /// </summary>
+    /// <remarks>
+    ///     Must be called after <see cref="ProcessStartInfo.FileName"/> has been set to the
+    ///     <em>resolved</em> executable path — a short <c>TargetFilePath</c> such as
+    ///     <c>"dotnet.exe"</c> can resolve via PATH lookup to a much longer absolute path,
+    ///     so validating the unresolved name would under-measure the real command line.
+    ///     <para>
+    ///     The calculation mirrors the command line the .NET runtime actually serializes for
+    ///     <c>CreateProcess</c> when <see cref="ProcessStartInfo.UseShellExecute"/> is
+    ///     <c>false</c>: the instance name is wrapped in quotes unless it is already fully
+    ///     quoted (<see cref="ProcessStartInfo.FileName"/> + 2 chars, after trimming), each
+    ///     <see cref="ProcessStartInfo.ArgumentList"/> entry is measured using the runtime's
+    ///     argument quoting rules (quotes, escaped quotes, and doubled
+    ///     backslash runs) separated by single spaces, and a verbatim
+    ///     <see cref="ProcessStartInfo.Arguments"/> string is measured after one leading
+    ///     separator. Skipped when <see cref="ProcessStartInfo.UseShellExecute"/> is
+    ///     <c>true</c>, where the <c>CreateProcess</c> limit does not apply the same way.
+    ///     </para>
+    /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the measured command-line length is equal to or greater than the Windows limit.
+    /// </exception>
+    internal static void ValidateCommandLineLength(ProcessStartInfo processStartInfo)
+    {
+        if (processStartInfo.UseShellExecute)
+            return;
+
+        const int windowsCommandLineLengthLimit = 32_767;
+
+        int totalLength = GetQuotedFileNameLength(processStartInfo.FileName);
+
+        IReadOnlyList<string> argumentList = processStartInfo.ArgumentList;
+        if (argumentList.Count > 0)
+        {
+            for (int i = 0; i < argumentList.Count; i++)
+            {
+                if (i > 0)
+                    totalLength += 1;
+                totalLength += GetSerializedArgumentLength(argumentList[i]);
+            }
+        }
+        else if (!string.IsNullOrEmpty(processStartInfo.Arguments))
+        {
+            totalLength += 1;
+            totalLength += processStartInfo.Arguments.Length;
+        }
+
+        if (totalLength >= windowsCommandLineLengthLimit)
+        {
+            throw new ArgumentException(
+                $"The assembled command line for '{processStartInfo.FileName}' is approximately " +
+                $"{totalLength} characters long, which is at or above the Windows CreateProcess " +
+                $"limit of approximately {windowsCommandLineLengthLimit} characters. " +
+                $"Note that this limit is approximate and includes the null terminator.");
+        }
+    }
+
+    /// <summary>
+    ///     Measures how the .NET runtime serializes <see cref="ProcessStartInfo"/> into the
+    ///     <c>lpCommandLine</c> string passed to <c>CreateProcess</c>: the trimmed
+    ///     <see cref="ProcessStartInfo.FileName"/> wrapped in opening and closing quotes,
+    ///     unless it already starts and ends with a quote.
+    /// </summary>
+    private static int GetQuotedFileNameLength(string fileName)
+    {
+        ReadOnlySpan<char> trimmed = fileName.AsSpan().Trim();
+        bool alreadyFullyQuoted =
+            trimmed.Length >= 2 && trimmed[0] == '"' && trimmed[trimmed.Length - 1] == '"';
+
+        int length = trimmed.Length;
+        return alreadyFullyQuoted ? length : length + 2;
+    }
+
+    /// <summary>
+    ///     Measures how the .NET runtime serializes a <see cref="ProcessStartInfo.ArgumentList"/> single
+    ///     <see cref="ProcessStartInfo.ArgumentList"/> entry: bare when it contains no
+    ///     whitespace or quotes; otherwise wrapped in quotes with quote characters escaped
+    ///     as <c>\"</c> and backslash runs doubled when adjacent to a quote.
+    /// </summary>
+    private static int GetSerializedArgumentLength(string argument)
+    {
+        if (argument.Length != 0 && ContainsNoWhitespaceOrQuotes(argument))
+            return argument.Length;
+
+        int length = 2;
+        int idx = 0;
+        while (idx < argument.Length)
+        {
+            if (argument[idx] == '\\')
+            {
+                int backslashRun = 0;
+                while (idx < argument.Length && argument[idx] == '\\')
+                {
+                    idx++;
+                    backslashRun++;
+                }
+
+                if (idx == argument.Length)
+                {
+                    // Closing quote follows, so the runtime doubles the run.
+                    length += backslashRun * 2;
+                }
+                else if (argument[idx] == '"')
+                {
+                    // Doubled run plus escaping backslash + escaped quote.
+                    length += backslashRun * 2 + 2;
+                    idx++;
+                }
+                else
+                {
+                    length += backslashRun;
+                }
+            }
+            else
+            {
+                length += argument[idx] == '"' ? 2 : 1;
+                idx++;
+            }
+        }
+
+        return length;
+    }
+
+    private static bool ContainsNoWhitespaceOrQuotes(string value)
+    {
+        for (int i = 0; i < value.Length; i++)
+        {
+            char current = value[i];
+            if (char.IsWhiteSpace(current) || current == '"')
+                return false;
+        }
+
+        return true;
+    }
+
     private void SetEnvironmentVariables(
         Process process, IReadOnlyDictionary<string, string> environmentVariables)
     {
