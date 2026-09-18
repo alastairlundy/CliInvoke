@@ -670,7 +670,7 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExitBehaviour.cs`.
 |-------|---------|---------|
 | `WaitForExit` | `0` | Run until the process exits on its own. |
 | `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, fall back to a `CancellationTokenSource`. |
-| `ForcefulExit` | `2` | Forcefully terminate the process and all child processes. |
+| `ForcefulExit` | `2` | Forcefully terminate the process and attempt to terminate all child processes. |
 
 > **Note on `ForcefulExit`**: The tree-kill is best-effort, matching
 > .NET's own `Kill(entireProcessTree: true)` semantics. Descendants
