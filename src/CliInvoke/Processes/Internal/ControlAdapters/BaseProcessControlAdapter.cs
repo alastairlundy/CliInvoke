@@ -110,7 +110,7 @@ internal abstract class BaseProcessControlAdapter
     ///     </para>
     /// </remarks>
     /// <exception cref="ArgumentException">
-    /// Thrown when the measured command-line length exceeds the Windows limit.
+    /// Thrown when the measured command-line length is equal to or greater than the Windows limit.
     /// </exception>
     internal static void ValidateCommandLineLength(ProcessStartInfo processStartInfo)
     {
@@ -137,13 +137,13 @@ internal abstract class BaseProcessControlAdapter
             totalLength += processStartInfo.Arguments.Length;
         }
 
-        if (totalLength > windowsCommandLineLengthLimit)
+        if (totalLength >= windowsCommandLineLengthLimit)
         {
             throw new ArgumentException(
                 $"The assembled command line for '{processStartInfo.FileName}' is approximately " +
-                $"{totalLength} characters long, which exceeds the Windows CreateProcess limit of " +
-                $"approximately {windowsCommandLineLengthLimit} characters. " +
-                $"Note that this limit is approximate.");
+                $"{totalLength} characters long, which is at or above the Windows CreateProcess " +
+                $"limit of approximately {windowsCommandLineLengthLimit} characters. " +
+                $"Note that this limit is approximate and includes the null terminator.");
         }
     }
 
