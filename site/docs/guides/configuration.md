@@ -53,10 +53,10 @@ simple constructors cannot express.
 `ProcessConfiguration` is the only required model. `TargetFilePath` is
 a `required` init property — the constructor throws `ArgumentException`
 if it is null or empty. `WorkingDirectoryPath` defaults to
-`Directory.GetCurrentDirectory()`, so the child process inherits the
-caller's current directory when the property is not explicitly set. When
-set to a non-empty value, it validates the directory exists at init time
-and throws `DirectoryNotFoundException` if it does not.
+`Directory.GetCurrentDirectory()`, so the caller's current directory is
+the configured starting point when the property is not explicitly set.
+When set to a non-empty value, it validates the directory exists at init
+time and throws `DirectoryNotFoundException` if it does not.
 
 **Convenience constructor** — for the common case of target file path
 plus arguments:
