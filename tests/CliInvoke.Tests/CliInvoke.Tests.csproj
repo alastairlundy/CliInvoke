@@ -15,7 +15,6 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="TUnit" />
     <PackageReference Include="Bogus" />
-    <PackageReference Include="DotExtensions" />
     <PackageReference Include="FsCheck" />
   </ItemGroup>
   <ItemGroup>
