@@ -591,7 +591,8 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 > **Note on encodings**: `Encoding.Default` is UTF-8 on .NET 10 and
 > later. Each encoding property is applied by the control adapter only
 > when its corresponding stream is redirected: `StandardInputEncoding`
-> when `RedirectStandardInput` is `true`, and `StandardOutputEncoding` /
+> only when both `RedirectStandardInput` is `true` and `StandardInput`
+> is non-null, and `StandardOutputEncoding` /
 > `StandardErrorEncoding` when `OutputRedirection` is `true`. Callers
 > can override per-stream via the init properties without affecting the
 > other streams.
