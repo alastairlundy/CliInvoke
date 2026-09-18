@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
 
@@ -20,6 +21,9 @@ public class CommandLineLengthCheckTests
     [SupportedOSPlatform("windows")]
     public async Task Arguments_ExceedingWindowsLimit_ThrowsArgumentException()
     {
+        if (!OperatingSystem.IsWindows())
+            return;
+
         string longArgument = new string('a', 33_000);
 
         ProcessConfiguration configuration = new ProcessConfiguration("dotnet.exe")
@@ -37,6 +41,9 @@ public class CommandLineLengthCheckTests
     [SupportedOSPlatform("windows")]
     public async Task ArgumentList_ExceedingWindowsLimit_ThrowsArgumentException()
     {
+        if (!OperatingSystem.IsWindows())
+            return;
+
         List<string> args = new List<string>();
 
         for (int i = 0; i < 100; i++)
