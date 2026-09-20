@@ -51,6 +51,7 @@ internal sealed class CmdMiddleware : IProcessMiddleware
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration source = new(src.TargetFilePath, src.Arguments, outputRedirection: context.Mode != InvocationMode.Raw)
         {
+            ArgumentList = src.ArgumentList,
             RedirectStandardInput = src.RedirectStandardInput,
             RequiresAdministrator = src.RequiresAdministrator,
             WorkingDirectoryPath = src.WorkingDirectoryPath,
