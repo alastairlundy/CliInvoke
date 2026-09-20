@@ -204,4 +204,4 @@ using PowershellProcessConfiguration config = new PowershellProcessConfiguration
 BufferedProcessResult result = await CliRun.RunBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 ```
 
-You can also route invocations through PowerShell or Cmd using the ``UsePowerShell()`` / ``UseCmd()`` middleware extensions.
+You can also route invocations through PowerShell or Cmd using the ``UsePowerShell()`` / ``UseCmd()`` middleware extensions. To wrap only some invocations (for example, only `.ps1` files) while others run directly, see [Wrapping only some invocations in a shell](guides/middleware.md#wrapping-only-some-invocations-in-a-shell) in the middleware guide.
