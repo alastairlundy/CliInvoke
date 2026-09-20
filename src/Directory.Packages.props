@@ -15,7 +15,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
     <!-- set CliInvokeCoreVersion in the workflow -->
-    <PackageVersion Include="CliInvoke.Core" Version="$(CliInvokeCoreVersion)" />
-    <PackageVersion Include="CliInvoke" Version="$(CliInvokeVersion)" />
+    <PackageVersion Include="CliInvoke.Core" Version="[$(CliInvokeCoreVersion), 3.0.0)" />
+    <PackageVersion Include="CliInvoke" Version="[$(CliInvokeVersion), 3.0.0)" />
   </ItemGroup>
 </Project>

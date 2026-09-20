@@ -60,8 +60,8 @@ jobs:
       # Pack the builds to ./nupkgs as well (so all resulting nupkgs end up in ./nupkgs)
       - name: Pack Specializations and Main into local feed
         run: |
-          dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs /p:CliInvokeCoreVersion=${{ inputs.core-version }}
-          dotnet pack src/CliInvoke -c Release -o ./nupkgs /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+          dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+          dotnet pack src/CliInvoke -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
 
       # Authenticate to NuGet (OIDC)
       - name: NuGet login (OIDC → temp API key)
