@@ -39,37 +39,43 @@ jobs:
       - name: Build Core
         run: dotnet build src/CliInvoke.Core -c Release
 
-      # Pack Core into ./nupkgs
+      # Pack Core into ./nupkgs (local feed for the steps below)
       - name: Pack Core to local feed
         run: dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs
 
-      # Use local feed for Specializations
+      # Specializations: resolve CliInvoke.Core from the local feed so the packed
+      # dependency is capped to [core-version, 3.0.0) and can never float to v3.
+      # An explicit build is required: pack --no-restore does not reliably
+      # materialize all target-framework outputs on a cold tree.
       - name: Restore Specializations from local feed + NuGet.org
-        run: dotnet restore src/CliInvoke.Specializations -s ./nupkgs -s https://api.nuget.org/v3/index.json
+        run: dotnet restore src/CliInvoke.Specializations -s ./nupkgs -s https://api.nuget.org/v3/index.json /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
 
       - name: Build Specializations (resolves CliInvoke.Core from local feed)
-        run: dotnet build src/CliInvoke.Specializations -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }}
+        run: dotnet build src/CliInvoke.Specializations -c Release --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
 
-      # Use local feed for main
+      - name: Pack Specializations into local feed
+        run: dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+
+      # Main: same pattern, packed after Specializations so ordering is Core -> Main.
       - name: Restore Main from local feed + NuGet.org
-        run: dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json
+        run: dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
 
       - name: Build Main (resolves CliInvoke.Core from local feed)
-        run: dotnet build src/CliInvoke -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }}
+        run: dotnet build src/CliInvoke -c Release --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
 
-      # Use local feed for extensions
+      - name: Pack Main into local feed
+        run: dotnet pack src/CliInvoke -c Release -o ./nupkgs --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+
+      # Extensions: restored last so both CliInvoke.Core and CliInvoke
+      # 2.11.3.1 equivalents are already in the local feed.
       - name: Restore Extensions from local feed + NuGet.org
-        run: dotnet restore src/CliInvoke.Extensions -s ./nupkgs -s https://api.nuget.org/v3/index.json
+        run: dotnet restore src/CliInvoke.Extensions -s ./nupkgs -s https://api.nuget.org/v3/index.json /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }} -p:CliInvokeVersion=${{ inputs.main-version }}
 
-      - name: Build Extensions (resolves CliInvoke.Core from local feed)
-        run: dotnet build src/CliInvoke.Extensions -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }} -p:CliInvokeVersion=${{ inputs.main-version }}
+      - name: Build Extensions (resolves CliInvoke.Core/CliInvoke from local feed)
+        run: dotnet build src/CliInvoke.Extensions -c Release --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }} -p:CliInvokeVersion=${{ inputs.main-version }}
 
-      # Pack the builds to ./nupkgs as well (so all resulting nupkgs end up in ./nupkgs)
-      - name: Pack Specializations and Main into local feed
-        run: |
-          dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
-          dotnet pack src/CliInvoke -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
-          dotnet pack src/CliInvoke.Extensions -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}  -p:CliInvokeVersion=${{ inputs.main-version }}
+      - name: Pack Extensions into local feed
+        run: dotnet pack src/CliInvoke.Extensions -c Release -o ./nupkgs --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }} -p:CliInvokeVersion=${{ inputs.main-version }}
 
 
       # Authenticate to NuGet (OIDC)

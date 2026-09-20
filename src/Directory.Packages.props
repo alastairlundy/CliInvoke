@@ -12,9 +12,14 @@
   <PropertyGroup>
     <!-- default false, CI can set to true -->
     <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
+    <!-- Default to the current 2.11.x patch so the ranges below are always well-formed,
+         even for local builds that use ProjectReference. CI overrides via -p. -->
+    <CliInvokeCoreVersion Condition="'$(CliInvokeCoreVersion)'==''">2.11.3.1</CliInvokeCoreVersion>
+    <CliInvokeVersion Condition="'$(CliInvokeVersion)'==''">2.11.3.1</CliInvokeVersion>
   </PropertyGroup>
-  <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
-    <!-- set CliInvokeCoreVersion in the workflow -->
+  <ItemGroup>
+    <!-- Always defined so every 2.11.x package caps its CliInvoke.* dependencies below 3.0.0,
+         regardless of whether the build uses ProjectReference or PackageReference. -->
     <PackageVersion Include="CliInvoke.Core" Version="[$(CliInvokeCoreVersion), 3.0.0)" />
     <PackageVersion Include="CliInvoke" Version="[$(CliInvokeVersion), 3.0.0)" />
   </ItemGroup>
