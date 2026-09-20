@@ -81,7 +81,7 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
     /// <inheritdoc />
     public ValidationFailure<TProcessResult>[] GetValidationFailures(TProcessResult result)
     {
-        List<ValidationFailure<TProcessResult>> failures = new();
+        List<ValidationFailure<TProcessResult>> failures = [];
 
         foreach (ValidationRule<TProcessResult> rule in Rules)
         {
@@ -89,6 +89,6 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
                 failures.Add(new ValidationFailure<TProcessResult>(rule, result));
         }
 
-        return failures.ToArray();
+        return [.. failures];
     }
 }
