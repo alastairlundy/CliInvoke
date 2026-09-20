@@ -114,6 +114,36 @@ public static class ProcessResultHelperExtensions
         }
 
         /// <summary>
+        /// Enumerates the standard output lines lazily, splitting on
+        /// <see cref="Environment.NewLine" />.
+        /// </summary>
+        /// <remarks>
+        /// Produces the same results as <c>string.Split(Environment.NewLine)</c>,
+        /// including a trailing empty element when the input ends with a newline.
+        /// Unlike <c>MemoryExtensions.EnumerateLines</c>, this method treats
+        /// only the full <see cref="Environment.NewLine" /> sequence as a
+        /// separator, preserving the <c>GetOutputLines()</c> contract.
+        /// </remarks>
+        /// <returns>A lazy sequence of output lines.</returns>
+        public IEnumerable<string> EnumerateOutputLines()
+            => EnumerateLines(processResult.StandardOutput);
+
+        /// <summary>
+        /// Enumerates the standard error lines lazily, splitting on
+        /// <see cref="Environment.NewLine" />.
+        /// </summary>
+        /// <remarks>
+        /// Produces the same results as <c>string.Split(Environment.NewLine)</c>,
+        /// including a trailing empty element when the input ends with a newline.
+        /// Unlike <c>MemoryExtensions.EnumerateLines</c>, this method treats
+        /// only the full <see cref="Environment.NewLine" /> sequence as a
+        /// separator, preserving the <c>GetOutputLines()</c> contract.
+        /// </remarks>
+        /// <returns>A lazy sequence of error lines.</returns>
+        public IEnumerable<string> EnumerateErrorLines()
+            => EnumerateLines(processResult.StandardError);
+
+        /// <summary>
         /// Determines if the process result contains any errors.
         /// Checks whether the StandardError output is not null or empty
         /// and verifies its length is greater than zero.
@@ -135,5 +165,35 @@ public static class ProcessResultHelperExtensions
             return line.ToString();
 
         return string.Empty;
+    }
+
+    /// <summary>
+    ///     Lazily yields lines from <paramref name="text" /> by walking consecutive
+    ///     <see cref="Environment.NewLine" /> separators.
+    /// </summary>
+    /// <remarks>
+    ///     This produces the same results as <c>text.Split(Environment.NewLine)</c>,
+    ///     including a trailing empty element when the input ends with a newline.
+    ///     <c>MemoryExtensions.EnumerateLines</c> is deliberately avoided because it
+    ///     treats lone <c>\n</c> as a separator, diverging from the pinned contract.
+    /// </remarks>
+    private static IEnumerable<string> EnumerateLines(string text)
+    {
+        if (text is null)
+        {
+            yield break;
+        }
+
+        string separator = Environment.NewLine;
+        int start = 0;
+        int index;
+
+        while ((index = text.IndexOf(separator, start, StringComparison.Ordinal)) >= 0)
+        {
+            yield return text.Substring(start, index - start);
+            start = index + separator.Length;
+        }
+
+        yield return text.Substring(start);
     }
 }
