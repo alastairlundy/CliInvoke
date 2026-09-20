@@ -61,6 +61,41 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     }
 
     /// <summary>
+    ///     Initialises a new instance of the <see cref="ProcessConfiguration" /> class
+    ///     with the target file path, an argument list, and an output redirection setting;
+    ///     all other properties take the defaults documented on the corresponding properties.
+    /// </summary>
+    /// <remarks>
+    ///     When <paramref name="argumentList"/> is non-empty, the spawned process receives each
+    ///     entry via <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> rather than
+    ///     a single tokenised <see cref="Arguments"/> string, preventing double-parse
+    ///     command-injection when a shell wrapper re-interprets the command line.
+    ///     The list is captured as a snapshot; later mutations made to the caller's
+    ///     original collection are not reflected in the configuration.
+    /// </remarks>
+    /// <param name="targetFilePath">The file path of the executable to be run.</param>
+    /// <param name="argumentList">
+    ///     The arguments to pass to the executable as individual list entries.
+    ///     A snapshot is captured; <see langword="null" /> is rejected with
+    ///     an <see cref="ArgumentNullException"/>.
+    /// </param>
+    /// <param name="outputRedirection">Whether to redirect standard output and error.</param>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="targetFilePath" /> is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="argumentList" /> is null.</exception>
+    [SetsRequiredMembers]
+    public ProcessConfiguration(string targetFilePath, IEnumerable<string> argumentList,
+        bool outputRedirection = true)
+    {
+        ArgumentNullException.ThrowIfNull(argumentList);
+
+        IReadOnlyList<string> snapshot = [.. argumentList];
+
+        TargetFilePath = targetFilePath;
+        ArgumentList = snapshot;
+        OutputRedirection = outputRedirection;
+    }
+
+    /// <summary>
     ///     Whether administrator privileges should be used when executing the Command.
     /// </summary>
     public bool RequiresAdministrator { get; init; }

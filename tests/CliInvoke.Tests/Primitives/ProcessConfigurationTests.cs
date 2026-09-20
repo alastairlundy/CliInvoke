@@ -6,7 +6,7 @@ public class ProcessConfigurationTests
     public async Task Constructor_WithNullArguments_ThrowsArgumentNullException()
     {
         // Arrange & Act & Assert
-        await Assert.That(() => new ProcessConfiguration("foo.exe", null!))
+        await Assert.That(() => new ProcessConfiguration("foo.exe", (string)null!))
             .Throws<ArgumentNullException>();
     }
 
