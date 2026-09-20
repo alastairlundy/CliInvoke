@@ -18,8 +18,9 @@ adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - **`ShellArgumentEscaper` de-publicized.** The escaper type is now
-  `internal`; callers should rely on the shell middleware or
-  `ShellRewriter` composition core instead.
+  `internal`; callers should rely exclusively on the public shell
+  middleware (`UseCmd()` / `UsePowerShell()`), not internal composition
+  types.
 - **Start-failure exception mapping for unknown Win32 error codes.** Previously every
   non-file-not-found start failure surfaced as `UnauthorizedAccessException`. Known codes now
   map to their natural .NET types (`FileNotFoundException` for Win32 codes 2/3,
