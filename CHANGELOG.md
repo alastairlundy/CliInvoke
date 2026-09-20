@@ -8,30 +8,27 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [3.1.0] - unreleased
 
-CliInvoke 3.1.0 ships the shell-wrapping deepening as a single train.
+### Added
 
-Themes:
-
-- Shell wrapping is now delivered via the shell middleware on plain
-  `ProcessConfiguration` — the old `PowershellProcessConfiguration` and
-  `CmdProcessConfiguration` subclasses are deprecated (scheduled for removal
-  in 4.0).
-- `ShellArgumentEscaper` is no longer public; escaping is an internal
-  concern of the `ShellRewriter` composition core.
-- Escaper unit tests live beside the code's new home; FsCheck property
-  tests prove metacharacters never produce a second command for every
-  shell kind and delivery combination.
-
-> **Migration:** replace `PowershellProcessConfiguration` /
-> `CmdProcessConfiguration` with plain `ProcessConfiguration` + the
-> appropriate shell wrapping middleware (`UsePowerShell` / `UseCmd`).
-> The subclasses will be removed in 4.0.
+- Windows command-line length pre-start check: when the assembled command line exceeds the
+  Windows `CreateProcess` limit (~32,767 characters), an `ArgumentException` is thrown before
+  process start, replacing the cryptic Win32 error 206. The check runs against the resolved
+  absolute executable path and is skipped when `UseShellExecute` is enabled.
 
 ### Changed
 
 - **`ShellArgumentEscaper` de-publicized.** The escaper type is now
   `internal`; callers should rely on the shell middleware or
   `ShellRewriter` composition core instead.
+- **Start-failure exception mapping for unknown Win32 error codes.** Previously every
+  non-file-not-found start failure surfaced as `UnauthorizedAccessException`. Known codes now
+  map to their natural .NET types (`FileNotFoundException` for Win32 codes 2/3,
+  `UnauthorizedAccessException` for code 5, `BadImageFormatException` for code 193), and all
+  other codes rethrow the original `Win32Exception` (carrying `NativeErrorCode`). Callers that
+  caught `UnauthorizedAccessException` around invocations to handle arbitrary start failures
+  should catch `Win32Exception` for unknown codes instead.
+
+### Deprecations
 - **`PowershellProcessConfiguration` deprecated.** Marked with
   `[Obsolete]`; will be removed in 4.0. Use plain `ProcessConfiguration`
   + `UsePowerShell()` middleware.
@@ -43,6 +40,7 @@ Themes:
 
 - Escaper fuzz tests now exercise the `ShellRewriter` composition paths
   for all three shell kinds (PowerShell, Cmd, Posix).
+  
 
 ## [3.0.0] - 2026-09-13
 

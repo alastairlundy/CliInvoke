@@ -52,9 +52,11 @@ simple constructors cannot express.
 
 `ProcessConfiguration` is the only required model. `TargetFilePath` is
 a `required` init property — the constructor throws `ArgumentException`
-if it is null or empty. `WorkingDirectoryPath` validates the directory
-exists at init time and throws `DirectoryNotFoundException` if it does
-not.
+if it is null or empty. `WorkingDirectoryPath` defaults to
+`Directory.GetCurrentDirectory()`, so the caller's current directory is
+the configured starting point when the property is not explicitly set.
+When set to a non-empty value, it validates the directory exists at init
+time and throws `DirectoryNotFoundException` if it does not.
 
 **Convenience constructor** — for the common case of target file path
 plus arguments:
@@ -586,6 +588,15 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 | `StandardOutputEncoding` | `Encoding` | `Encoding.Default` | Read-only | 191 |
 | `StandardErrorEncoding` | `Encoding` | `Encoding.Default` | Read-only | 196 |
 
+> **Note on encodings**: `Encoding.Default` is UTF-8 on .NET 10 and
+> later. Each encoding property is applied by the control adapter only
+> when its corresponding stream is redirected: `StandardInputEncoding`
+> only when both `RedirectStandardInput` is `true` and `StandardInput`
+> is non-null, and `StandardOutputEncoding` /
+> `StandardErrorEncoding` when `OutputRedirection` is `true`. Callers
+> can override per-stream via the init properties without affecting the
+> other streams.
+
 > **Note on `OutputRedirection`**: This is the master switch for
 > stdout/stderr redirection. When `false`, neither stream is captured
 > and the invoker's buffered/piped result types cannot be used.
@@ -659,7 +670,13 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExitBehaviour.cs`.
 |-------|---------|---------|
 | `WaitForExit` | `0` | Run until the process exits on its own. |
 | `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, fall back to a `CancellationTokenSource`. |
-| `ForcefulExit` | `2` | Forcefully terminate the process and all child processes. |
+| `ForcefulExit` | `2` | Forcefully terminate the process and attempt to terminate all child processes. |
+
+> **Note on `ForcefulExit`**: The tree-kill is best-effort, matching
+> .NET's own `Kill(entireProcessTree: true)` semantics. Descendants
+> spawned while the tree is being killed may survive. CliInvoke does
+> not add a post-kill delay or a second kill pass — this mirrors the
+> documented behavior of `Process.Kill(entireProcessTree: true)`.
 
 #### `ProcessExceptionBehaviour`
 

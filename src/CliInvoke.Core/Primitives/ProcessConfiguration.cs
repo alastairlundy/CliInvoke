@@ -221,16 +221,35 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <summary>
     ///     The encoding to use for the Standard Input.
     /// </summary>
+    /// <remarks>
+    ///     Defaults to <see cref="Encoding.Default"/>, which is UTF-8 on .NET 10
+    ///     and later. Callers can override this per-stream via the init property.
+    ///     The control adapter applies this encoding only when standard input is
+    ///     redirected (<see cref="RedirectStandardInput"/> is <c>true</c> and
+    ///     <see cref="StandardInput"/> is not <c>null</c>).
+    /// </remarks>
     public Encoding StandardInputEncoding { get; init; } = Encoding.Default;
 
     /// <summary>
     ///     The encoding to use for the Standard Output.
     /// </summary>
+    /// <remarks>
+    ///     Defaults to <see cref="Encoding.Default"/>, which is UTF-8 on .NET 10
+    ///     and later. Callers can override this per-stream via the init property.
+    ///     The control adapter applies this encoding only when standard output is
+    ///     redirected (<see cref="OutputRedirection"/> is <c>true</c>).
+    /// </remarks>
     public Encoding StandardOutputEncoding { get; init; } = Encoding.Default;
 
     /// <summary>
     ///     The encoding to use for the Standard Error.
     /// </summary>
+    /// <remarks>
+    ///     Defaults to <see cref="Encoding.Default"/>, which is UTF-8 on .NET 10
+    ///     and later. Callers can override this per-stream via the init property.
+    ///     The control adapter applies this encoding only when standard error is
+    ///     redirected (<see cref="OutputRedirection"/> is <c>true</c>).
+    /// </remarks>
     public Encoding StandardErrorEncoding { get; init; } = Encoding.Default;
 
     /// <summary>

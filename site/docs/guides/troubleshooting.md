@@ -118,8 +118,12 @@ specific platform behavior.
    hardcode signal numbers in caller code.
 4. **Process-group vs. process-only termination.** On Unix, killing the
    parent PID does not signal its children. Use
-   `ProcessExitBehaviour.ForcefulExit` to ensure child processes are
-   terminated together.
+   `ProcessExitBehaviour.ForcefulExit` to attempt to terminate child
+   processes together with the parent — it does not guarantee that every
+   descendant is killed. The tree-kill is best-effort: descendants
+   spawned while the tree is being killed may survive. CliInvoke does
+   not add a post-kill delay or a second kill pass, matching
+   .NET's own `Kill(entireProcessTree: true)` semantics.
 5. **Domain credential passed on Linux.** `UserCredential.Domain` and
    `LoadUserProfile` are Windows-only concepts; the
    `WindowsProcessControlAdapter` ignores them on Unix and the value is
