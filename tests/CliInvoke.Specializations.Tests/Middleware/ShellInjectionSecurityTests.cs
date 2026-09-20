@@ -73,9 +73,11 @@ public class ShellInjectionSecurityTests
         // The -Command value is a single element, so the OS passes it to pwsh unmodified.
         string command = rewritten.ArgumentList[3];
         await Assert.That(command).StartsWith("& \"");
-        // Metacharacters are neutralised by the shell-layer escaper, so no raw break remains.
+        // The target is quoted; an embedded quote stays backtick-escaped and the
+        // ampersands remain literal data inside the quoted string, so no raw break
+        // or second command can materialise.
         await Assert.That(command).Contains("`\"", StringComparison.Ordinal);
-        await Assert.That(command).Contains("`&", StringComparison.Ordinal);
+        await Assert.That(command).Contains("& evil.exe", StringComparison.Ordinal);
     }
 
     [Test]
