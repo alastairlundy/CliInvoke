@@ -278,6 +278,10 @@ Themes:
 - Fixed null-unsafe equality operators on primitives.
 - Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`.
 
+## [2.11.3.1] - 2026-09-20
+### Fixed
+* Fixed packaging issues with 2.11.3
+
 ## [2.11.3] - 2026-09-20
 
 ### Changed
