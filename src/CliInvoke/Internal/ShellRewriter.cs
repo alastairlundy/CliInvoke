@@ -351,7 +351,7 @@ internal static class ShellRewriter
                 string safePath = QuotePathForPowerShell(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0
-                    ? string.Join(" ", source.ArgumentList.Select(EscapeForPowerShell))
+                    ? string.Join(" ", source.ArgumentList.Select(QuotePathForPowerShell))
                     : EscapeForPowerShell(source.Arguments);
                 string script = string.IsNullOrWhiteSpace(safeArgs)
                     ? $"& {safePath}"
@@ -392,7 +392,7 @@ internal static class ShellRewriter
                 string safePath = QuotePathForCmd(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0
-                    ? string.Join(" ", source.ArgumentList.Select(EscapeForCmd))
+                    ? string.Join(" ", source.ArgumentList.Select(QuotePathForCmd))
                     : EscapeForCmd(source.Arguments);
                 string innerCommand = string.IsNullOrWhiteSpace(safeArgs)
                     ? safePath
@@ -400,7 +400,7 @@ internal static class ShellRewriter
 
                 string arguments = string.IsNullOrWhiteSpace(runnerArgs)
                     ? innerCommand
-                    : $"{runnerArgs} {innerCommand}";
+                    : $"{runnerArgs} \"{innerCommand}\"";
 
                 return new ProcessConfiguration
                 {
@@ -427,7 +427,7 @@ internal static class ShellRewriter
                 string safePath = QuotePathForPosixShell(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0
-                    ? string.Join(" ", source.ArgumentList.Select(EscapeForPosixShell))
+                    ? string.Join(" ", source.ArgumentList.Select(QuotePathForPosixShell))
                     : EscapeForPosixShell(source.Arguments);
                 string script = string.IsNullOrWhiteSpace(safeArgs)
                     ? safePath

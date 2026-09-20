@@ -279,8 +279,9 @@ public class ShellRewriterMetacharacterPropertyTests
 
                 // Without the leading /c, cmd.exe starts interactively and never runs
                 // the wrapped command; assert the switch is present and first, and that
-                // the target path is emitted as the expected quoted, caret-escaped token.
-                string expectedArguments = $"/c {QuoteCmdPath(metaPath)} arg1";
+                // the target path is emitted as the expected quoted, caret-escaped token
+                // wrapped in double quotes after the /c switch.
+                string expectedArguments = $"/c \"{QuoteCmdPath(metaPath)} arg1\"";
                 return rewritten.Arguments == expectedArguments &&
                        rewritten.ArgumentList.Count == 0;
             })
@@ -306,7 +307,11 @@ public class ShellRewriterMetacharacterPropertyTests
                     useShellExecution: false);
 
                 string expectedCommand = $"{QuoteCmdPath("prog.exe")} {EscapeCmdArg(metaArguments)}";
-                string command = rewritten.Arguments.Substring("/c ".Length);
+                // The rewritten arguments are in the format /c "innerCommand".
+                // Strip the /c prefix and the wrapping double quotes to extract the inner command.
+                string innerPrefix = "/c \"";
+                string args = rewritten.Arguments;
+                string command = args.Substring(innerPrefix.Length, args.Length - innerPrefix.Length - 1);
                 return command == expectedCommand &&
                        !command.Contains("&&") &&
                        rewritten.ArgumentList.Count == 0;
