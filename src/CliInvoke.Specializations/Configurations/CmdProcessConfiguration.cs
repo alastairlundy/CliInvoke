@@ -18,6 +18,7 @@ namespace CliInvoke.Specializations.Configurations;
 /// <summary>
 ///     A Command configuration to make running commands through Windows CMD easier.
 /// </summary>
+[Obsolete("Use ProcessConfiguration with shell wrapping middleware instead: call AddCliInvoke() and AddCliInvokeSpecializations() to register the required services, then run invocations through UseCmd() middleware. CmdProcessConfiguration will be removed in 4.0.")]
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]
 [UnsupportedOSPlatform("linux")]

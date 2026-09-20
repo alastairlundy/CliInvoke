@@ -87,11 +87,113 @@ builder.Services.AddCliInvokeSpecializations(); // registers the platform middle
   });
   ```
 
+  Shell wrapping is delivered via the shell middleware on plain `ProcessConfiguration`.
+  The `ShellArgumentEscaper` type is no longer public — escaping is an internal concern
+  of the `ShellRewriter` composition core. Callers should rely on the middleware or the
+  `ShellRewriter` directly for shell-escaped command composition.
+
+### Deprecated subclasses
+
+`PowershellProcessConfiguration` and `CmdProcessConfiguration` are deprecated as of
+3.1.0 and will be removed in 4.0. Use plain `ProcessConfiguration` with the
+appropriate shell wrapping middleware instead:
+
+```csharp
+// Before (deprecated):
+var config = new PowershellProcessConfiguration(arguments: "Get-Process");
+
+// After:
+var config = new ProcessConfiguration("Get-Process");
+// Register UsePowerShell() in the middleware pipeline
+```
+
 * `UseDefaultShell` — detects the user's default shell (pwsh, Windows PowerShell, or cmd) via `IShellDetector` and wraps the command in it automatically. Use this instead of `UsePowerShell`/`UseCmd` when you want cross-platform shell detection without committing to a specific shell. Requires `IShellDetector` (registered by `AddCliInvoke`).
 
   `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
 
   The `PowerShellMiddleware`/`CmdMiddleware`/`DefaultShellMiddleware` types behind `UsePowerShell()`/`UseCmd()`/`UseDefaultShell()` are registered in the DI container by `AddCliInvokeSpecializations()` (shipped in the `CliInvoke.Specializations` package). Call it alongside `AddCliInvoke` with the same `ServiceLifetime`; without it, resolving the invoker throws `InvalidOperationException` because the middleware types are not registered.
+
+## Wrapping only some invocations in a shell
+
+Shell middleware such as `UsePowerShell()` rewrites every invocation that reaches it. Often you want most commands to run directly and only a few to go through a shell. There are two ways to do this, and they fit different situations. The examples below use PowerShell, but the same techniques apply to `UseCmd()` and `UseDefaultShell()` as well.
+
+### Conditional middleware with `UseWhen`
+
+`IProcessMiddlewareBuilder.UseWhen` takes a predicate over the `InvocationContext` and runs a sub-pipeline only when the predicate returns `true`. When it returns `false`, the invocation skips the sub-pipeline and continues down the chain untouched:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Extensions;
+using CliInvoke.Specializations;             // AddCliInvokeSpecializations
+using CliInvoke.Specializations.Middleware;  // UsePowerShell
+
+builder.Services.AddCliInvoke(b =>
+{
+    b.UseLogging();
+    b.UseWhen(
+        ctx => ctx.Configuration.TargetFilePath.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase),
+        shell => shell.UsePowerShell());
+});
+builder.Services.AddCliInvokeSpecializations();
+```
+
+With this registration, a configuration targeting a `.ps1` file runs inside `pwsh`. A configuration targeting `dotnet` or `git` runs directly. The predicate is evaluated once per invocation, at the point the chain reaches it, so place `UseWhen` in the order you want the wrapping to happen relative to your other middleware.
+
+An async overload (`Func<InvocationContext, Task<bool>>`) exists for decisions that need I/O, such as reading a feature flag or a policy file. The synchronous overload is cheaper; prefer it when the decision comes from the configuration alone.
+
+This approach works well when the rule can be derived from what you are invoking: the target file path, the arguments, the environment variables. If the decision belongs to the calling code instead, register two invokers.
+
+### Two invoker registrations
+
+`AddCliInvoke` registers one `IProcessInvoker`. Keep that one plain and add a second, keyed registration that carries the shell middleware. Callers then pick the invoker at the injection site:
+
+```csharp
+using CliInvoke;
+using CliInvoke.Core;
+using CliInvoke.Core.Factories;
+using CliInvoke.Core.Middleware;
+using CliInvoke.Extensions;
+using CliInvoke.Specializations;             // AddCliInvokeSpecializations
+using CliInvoke.Specializations.Middleware;  // UsePowerShell
+
+// The plain invoker, registered non-keyed as usual.
+builder.Services.AddCliInvoke(b => b.UseLogging());
+builder.Services.AddCliInvokeSpecializations();
+
+// A second invoker with shell wrapping, registered under a key.
+builder.Services.AddKeyedScoped<IProcessInvoker>("shell", (sp, _) =>
+{
+    IExternalProcessFactory factory = sp.GetRequiredService<IExternalProcessFactory>();
+    ProcessMiddlewareBuilder mwBuilder = new(sp);
+    mwBuilder.UsePowerShell();
+    return new ProcessInvoker(factory, mwBuilder.Build(), null);
+});
+```
+
+Keyed and non-keyed registrations are independent in `Microsoft.Extensions.DependencyInjection`, so this does not conflict with the registration `AddCliInvoke` made. Consumers choose per dependency:
+
+```csharp
+public class ScriptRunner(
+    [FromKeyedServices("shell")] IProcessInvoker shellInvoker)
+{
+    public async Task<BufferedProcessResult> RunScriptAsync(string command, CancellationToken ct = default)
+    {
+        ProcessConfiguration config = new("pwsh", command);
+        return await shellInvoker.ExecuteBufferedAsync(
+            config, ProcessExitConfiguration.CreateGraceful(), ct);
+    }
+}
+```
+
+Anything injecting a plain `IProcessInvoker` still gets the un-wrapped one. Both invokers share the same `IExternalProcessFactory` and the same service lifetimes, so behaviour differs only in the middleware chain.
+
+Match the keyed registration's lifetime (`AddKeyedScoped`, `AddKeyedSingleton`, `AddKeyedTransient`) to the lifetime you passed to `AddCliInvoke`. Mismatched lifetimes risk capturing scoped services into a singleton, the same hazard the `AddCliInvokeSpecializations` docs warn about.
+
+If you would rather have *both* invokers keyed, register the plain one yourself under a second key (for example `"plain"`) the same way, and skip the non-keyed registration by registering `AddCliInvoke`'s dependencies manually. Most apps are fine with one plain and one keyed.
+
+### Which one to use
+
+Use `UseWhen` when the rule is a property of the command being run and you can express it as a predicate over the configuration. Use two invoker registrations when the choice is a decision the calling code makes, or when different parts of your app have different shell policies and you want the compiler, not a predicate, to enforce the split. The two compose: a keyed shell invoker can itself use `UseWhen` internally if only a subset of its invocations should wrap.
 
 ## Configuring middleware through DI
 

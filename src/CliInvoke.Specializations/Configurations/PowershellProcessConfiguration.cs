@@ -15,6 +15,7 @@ namespace CliInvoke.Specializations.Configurations;
 /// <summary>
 ///     A Command configuration to make running commands through cross-platform PowerShell easier.
 /// </summary>
+[Obsolete("Use ProcessConfiguration with shell wrapping middleware instead: call AddCliInvoke() and AddCliInvokeSpecializations() to register the required services, then run invocations through UsePowerShell() middleware. PowershellProcessConfiguration will be removed in 4.0.")]
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("macos")]
 [SupportedOSPlatform("maccatalyst")]

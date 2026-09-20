@@ -10,7 +10,7 @@
 #pragma warning disable CA1416
 
 using CliInvoke.Builders;
-using CliInvoke.Core.Internal;
+using CliInvoke.Internal;
 
 namespace CliInvoke.Extensibility;
 
@@ -73,44 +73,33 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         if (runnerIsPowerShell)
         {
             // pwsh -Command delivery via single ArgumentList entry containing the
-            // shell-escaped script. .NET's ArgumentList quoting wraps the entry per
-            // CommandLineToArgvW rules; pwsh's argv parser unquotes the same way, so
-            // the script arrives at pwsh verbatim and is parsed once.
-            IReadOnlyList<string> runnerArgs = !string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments)
-                ? ArgumentTokenizer.Tokenize(runnerProcessConfig.Arguments)
-                : Array.Empty<string>();
+            // shell-escaped script. ShellRewriter handles escaping and composition;
+            // the delivery decision (ArgumentList) stays at the call site.
+            ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+                processConfigToBeRun,
+                runnerProcessConfig.TargetFilePath,
+                runnerProcessConfig.Arguments,
+                ShellKind.PowerShell,
+                windowCreation: processConfigToBeRun.WindowCreation,
+                useShellExecution: processConfigToBeRun.UseShellExecution);
 
-            string safePath = ShellArgumentEscaper.EscapeForPowerShell(processConfigToBeRun.TargetFilePath);
-            string safeArgs = ShellArgumentEscaper.EscapeForPowerShell(processConfigToBeRun.Arguments);
-            string script = string.IsNullOrWhiteSpace(safeArgs)
-                ? $"& \"{safePath}\""
-                : $"& \"{safePath}\" {safeArgs}";
-
-            List<string> argumentList = new(runnerArgs.Count + 1);
-            argumentList.AddRange(runnerArgs);
-            argumentList.Add(script);
-
-            commandBuilder.SetArgumentList(argumentList);
+            commandBuilder.SetArgumentList(rewritten.ArgumentList);
             commandBuilder.SetArguments(string.Empty);
         }
         else if (runnerIsCmd)
         {
             // cmd /c delivery via single Arguments string composed with the cmd escaper.
-            // .NET passes Arguments verbatim to the raw command line; cmd's parser applies
-            // its own quote-stripping rules, which match the unquoted / cmd-escaped form
-            // produced here.
-            string safePath = ShellArgumentEscaper.EscapeForCmd(processConfigToBeRun.TargetFilePath);
-            string safeArgs = ShellArgumentEscaper.EscapeForCmd(processConfigToBeRun.Arguments);
-            string innerCommand = string.IsNullOrWhiteSpace(safeArgs)
-                ? $"\"{safePath}\""
-                : $"\"{safePath}\" {safeArgs}";
+            // ShellRewriter handles escaping and composition; the delivery decision
+            // (Arguments string) stays at the call site.
+            ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+                processConfigToBeRun,
+                runnerProcessConfig.TargetFilePath,
+                runnerProcessConfig.Arguments,
+                ShellKind.Cmd,
+                windowCreation: processConfigToBeRun.WindowCreation,
+                useShellExecution: processConfigToBeRun.UseShellExecution);
 
-            string runnerArgs = runnerProcessConfig.Arguments;
-            string arguments = string.IsNullOrWhiteSpace(runnerArgs)
-                ? innerCommand
-                : $"{runnerArgs} {innerCommand}";
-
-            commandBuilder.SetArguments(arguments);
+            commandBuilder.SetArguments(rewritten.Arguments);
         }
         else
         {

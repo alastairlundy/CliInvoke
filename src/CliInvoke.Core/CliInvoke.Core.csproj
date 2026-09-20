@@ -22,8 +22,8 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0</Version>
-        <PackageVersion>3.0.0</PackageVersion>
+        <Version>3.1.0</Version>
+        <PackageVersion>3.1.0</PackageVersion>
         <PackageReleaseNotes>ProcessConfiguration init-only construction, required TargetFilePath, ArgumentList replacing ArgumentsList
 ProcessConfigurationFactory removed
 Working-directory validation moved to construction
@@ -40,10 +40,11 @@ MiddlewareChain, InvocationContext (renamed from ProcessInvocationContext), Midd
 IRetryClassifier
 UserCredential.GetHashCode excludes Password
 IDisposable dropped from ProcessConfiguration
-.NET Standard 2.0, .NET 8, .NET 9 support dropped; net10.0 only, C# 14</PackageReleaseNotes>
+.NET Standard 2.0, .NET 8, .NET 9 support dropped; net10.0 only, C# 14
+Escaper unit tests relocated alongside moved code; FsCheck property tests for all shell kinds</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>3.0.0.0</AssemblyVersion>
-        <FileVersion>3.0.0.0</FileVersion>
+        <AssemblyVersion>3.1.0.0</AssemblyVersion>
+        <FileVersion>3.1.0.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>

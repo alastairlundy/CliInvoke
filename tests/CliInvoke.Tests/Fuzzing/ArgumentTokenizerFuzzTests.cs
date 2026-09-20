@@ -9,7 +9,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CliInvoke.Core.Internal;
+using CliInvoke.Internal;
 using FsCheck;
 using FsCheck.Fluent;
 

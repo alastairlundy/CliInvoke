@@ -27,12 +27,14 @@ maxBufferedOutputBytes on CliRun buffered path
 CliInvoke.Extensions folded in; dead IVT grants stripped
 Localization resources
 ConfigureAwait(false) enforced on every await in src
-Per-call allocation reductions in result parsing and argument building</PackageReleaseNotes>
+Per-call allocation reductions in result parsing and argument building
+ShellArgumentEscaper de-publicized: escaping is an internal concern of ShellRewriter
+FsCheck property tests prove metacharacters never produce a second command for every shell kind x delivery combination</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0</PackageVersion>
-        <AssemblyVersion>3.0.0.0</AssemblyVersion>
+        <PackageVersion>3.1.0</PackageVersion>
+        <AssemblyVersion>3.1.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -40,7 +42,7 @@ Per-call allocation reductions in result parsing and argument building</PackageR
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
-        <FileVersion>3.0.0.0</FileVersion>
+        <FileVersion>3.1.0.0</FileVersion>
 <!--
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
 -->
@@ -56,6 +58,13 @@ Per-call allocation reductions in result parsing and argument building</PackageR
             <_Parameter1>CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
         <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
+        <!--
+            Cross-package middleware consumption: CliInvoke.Specializations shell
+            middleware must access internal rewriting helpers (ShellRewriter, enums,
+            ArgumentTokenizer). Promotion to public rejected — no extensibility goal;
+            a Specializations home impossible — no reference direction from Core.
+        -->
+        <InternalsVisibleTo Include="CliInvoke.Specializations"/>
     </ItemGroup>
 
 <!--    <ItemGroup>

@@ -20,7 +20,8 @@ namespace CliInvoke.Core.Internal;
 ///     neutralise shell metacharacters (<c>&amp;</c>, <c>|</c>, <c>&lt;</c>, <c>&gt;</c>,
 ///     <c>%</c>, <c>^</c>); that is the shell layer's concern and is handled by the
 ///     cmd/PowerShell specializations. As a result the character set this escaper
-///     transforms is a strict subset of <c>ShellArgumentEscaper.EscapeForCmd</c>'s set.
+///     transforms is a strict subset of the shell-layer escaping set (e.g.
+///     <c>ShellRewriter.EscapeForCmd</c>).
 ///     <para>
 ///         On Windows the C-runtime argument parser treats a doubled quote
 ///         (<c>""</c>) inside a quoted token as a literal quote and gives backslashes

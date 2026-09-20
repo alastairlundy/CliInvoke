@@ -6,7 +6,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
-## [Unreleased]
+## [3.1.0] - unreleased
 
 ### Added
 
@@ -17,6 +17,10 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`ShellArgumentEscaper` de-publicized.** The escaper type is now
+  `internal`; callers should rely exclusively on the public shell
+  middleware (`UseCmd()` / `UsePowerShell()`), not internal composition
+  types.
 - **Start-failure exception mapping for unknown Win32 error codes.** Previously every
   non-file-not-found start failure surfaced as `UnauthorizedAccessException`. Known codes now
   map to their natural .NET types (`FileNotFoundException` for Win32 codes 2/3,
@@ -24,6 +28,20 @@ adheres to [Semantic Versioning](https://semver.org/).
   other codes rethrow the original `Win32Exception` (carrying `NativeErrorCode`). Callers that
   caught `UnauthorizedAccessException` around invocations to handle arbitrary start failures
   should catch `Win32Exception` for unknown codes instead.
+
+### Deprecations
+- **`PowershellProcessConfiguration` deprecated.** Marked with
+  `[Obsolete]`; will be removed in 4.0. Use plain `ProcessConfiguration`
+  + `UsePowerShell()` middleware.
+- **`CmdProcessConfiguration` deprecated.** Marked with
+  `[Obsolete]`; will be removed in 4.0. Use plain `ProcessConfiguration`
+  + `UseCmd()` middleware.
+
+### Fixed
+
+- Escaper fuzz tests now exercise the `ShellRewriter` composition paths
+  for all three shell kinds (PowerShell, Cmd, Posix).
+  
 
 ## [3.0.0] - 2026-09-13
 

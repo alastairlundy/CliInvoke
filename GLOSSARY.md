@@ -18,6 +18,10 @@ The state-bearing object passed through the Process Invocation Pipeline. It enca
 A parameter of the invocation contract that the caller states for the invocation to mean what they intend (e.g., validation rules, truncation cap). Distinct from a middleware concern: cross-cutting behavior composed around the invocation that the caller could omit without changing the invocation's meaning (e.g., logging, retry).
 
 
+### Shell Wrapping
+
+The act of running a command inside a shell interpreter (PowerShell, CMD, or a POSIX shell). A shell-wrapping flow resolves the shell, escapes the command's target and arguments so they are treated as literal data rather than shell syntax, composes the inner command, and rewrites the process configuration so the shell executes the original command. Shell wrapping is a middleware concern, not an Invocation Capability: the caller could omit it without changing what the invocation means.
+
 ## Versioning Terms
 
 ### v2-style code

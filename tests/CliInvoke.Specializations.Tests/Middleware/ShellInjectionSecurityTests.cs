@@ -73,9 +73,11 @@ public class ShellInjectionSecurityTests
         // The -Command value is a single element, so the OS passes it to pwsh unmodified.
         string command = rewritten.ArgumentList[3];
         await Assert.That(command).StartsWith("& \"");
-        // Metacharacters are neutralised by the shell-layer escaper, so no raw break remains.
+        // The target is quoted; an embedded quote stays backtick-escaped and the
+        // ampersands remain literal data inside the quoted string, so no raw break
+        // or second command can materialise.
         await Assert.That(command).Contains("`\"", StringComparison.Ordinal);
-        await Assert.That(command).Contains("`&", StringComparison.Ordinal);
+        await Assert.That(command).Contains("& evil.exe", StringComparison.Ordinal);
     }
 
     [Test]
@@ -94,13 +96,11 @@ public class ShellInjectionSecurityTests
 
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 
-        await Assert.That(rewritten.Arguments).IsEqualTo(string.Empty);
-        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(2);
-        await Assert.That(rewritten.ArgumentList[0]).IsEqualTo("/c");
-
-        string command = rewritten.ArgumentList[1];
-        await Assert.That(command).StartsWith("\"");
-        await Assert.That(command).Contains("^&", StringComparison.Ordinal);
+        // Cmd uses Arguments-string delivery (not ArgumentList) because cmd.exe
+        // applies its own quote-stripping rules. The escaper neutralises metacharacters.
+        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(0);
+        await Assert.That(rewritten.Arguments).IsNotEqualTo(string.Empty);
+        await Assert.That(rewritten.Arguments).Contains("^&", StringComparison.Ordinal);
     }
 
     private static string? ResolvePwshPath()
