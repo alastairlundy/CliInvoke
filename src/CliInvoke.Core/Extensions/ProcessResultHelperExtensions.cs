@@ -21,6 +21,45 @@ public static class ProcessResultHelperExtensions
         where TProcessResult : ProcessResult
     {
         /// <summary>
+        /// Returns <c>true</c> when <see cref="ProcessResult.ExitCode" /> equals zero.
+        /// </summary>
+        /// <remarks>
+        /// This is a literal exit-code check with no <c>Canceled</c> clause.
+        /// For a richer caller-stated success policy, use
+        /// <see cref="ThrowIfUnsuccessful" />
+        /// with an <see cref="IProcessResultValidator{TProcessResult}" /> or the
+        /// <c>UsePostExitValidation</c> middleware.
+        /// </remarks>
+        /// <returns>
+        /// <c>true</c> if <see cref="ProcessResult.ExitCode" /> is zero; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsExitCodeZero()
+            => processResult.ExitCode == 0;
+
+        /// <summary>
+        /// Throws <see cref="ProcessNotSuccessfulException{TProcessResult}" /> when
+        /// <see cref="IsExitCodeZero" /> returns <c>false</c>.
+        /// </summary>
+        /// <remarks>
+        /// This is a default exit-code heuristic for non-DI callers.
+        /// For caller-stated success validation, prefer
+        /// <see cref="ThrowIfUnsuccessful" />
+        /// or the <c>UsePostExitValidation</c> middleware, which honour an
+        /// <see cref="IProcessResultValidator{TProcessResult}" /> supplied by the caller.
+        /// </remarks>
+        /// <exception cref="ProcessNotSuccessfulException{TProcessResult}">
+        /// Thrown when <see cref="ProcessResult.ExitCode" /> is not zero.
+        /// </exception>
+        public void EnsureExitCodeZero()
+        {
+            if (processResult.ExitCode != 0)
+            {
+                throw new ProcessNotSuccessfulException<TProcessResult>(
+                    new ProcessExceptionInfo<TProcessResult>(processResult));
+            }
+        }
+
+        /// <summary>
         /// Throws an exception if the process result is determined to be unsuccessful based on the given validator.
         /// </summary>
         /// <param name="validator">
