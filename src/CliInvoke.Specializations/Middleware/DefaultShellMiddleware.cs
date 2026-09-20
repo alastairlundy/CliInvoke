@@ -20,22 +20,22 @@ namespace CliInvoke.Specializations.Middleware;
 [UnsupportedOSPlatform("watchos")]
 internal sealed class DefaultShellMiddleware : IProcessMiddleware
 {
-    private readonly IShellDetector _shellDetector;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ShellMiddlewareOptions _options;
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    /// <param name="shellDetector"></param>
+    /// <param name="serviceProvider"></param>
     /// <param name="options"></param>
-    public DefaultShellMiddleware(IShellDetector shellDetector, ShellMiddlewareOptions? options = null)
+    public DefaultShellMiddleware(IServiceProvider serviceProvider, ShellMiddlewareOptions? options = null)
     {
-        _shellDetector = shellDetector;
+        _serviceProvider = serviceProvider;
         _options = options ?? ShellMiddlewareOptions.Default;
     }
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="context"></param>
     /// <param name="next"></param>
@@ -46,8 +46,9 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
         ArgumentNullException.ThrowIfNull(next);
 
         ThrowIfUnsupported();
-        
-        ShellInformation shell = await _shellDetector.ResolveDefaultShellAsync(context.CancellationToken).ConfigureAwait(false);
+
+        IShellDetector shellDetector = _serviceProvider.GetRequiredService<IShellDetector>();
+        ShellInformation shell = await shellDetector.ResolveDefaultShellAsync(context.CancellationToken).ConfigureAwait(false);
         
         string shellName = Path.GetFileNameWithoutExtension(shell.TargetFilePath.Name);
 
