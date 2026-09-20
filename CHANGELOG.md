@@ -260,6 +260,15 @@ Themes:
 - Fixed null-unsafe equality operators on primitives.
 - Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`.
 
+## [2.11.3] - 2026-09-20
+
+### Changed
+* Pinned CliInvoke.Core dependency version to version range between 2.11.3 and less than 3.0.0
+* Pinned DotExtensions dependency version to version range between 10.5.2 and less than 11.0.0
+* Pinned CliInvoke dependency version to version range between 2.11.3 and less than 3.0.0
+* Updated internal Polyfill version from 11.3.0 to 11.4.0
+* Updated DotExtensions version from 10.5.1 to 10.5.2
+
 ## [2.11.2] - 2026-09-13
 
 ### Deprecated
