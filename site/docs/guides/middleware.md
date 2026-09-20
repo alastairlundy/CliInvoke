@@ -115,7 +115,7 @@ var config = new ProcessConfiguration("Get-Process");
 
 ## Wrapping only some invocations in a shell
 
-`UsePowerShell()` rewrites every invocation that reaches it. Often you want most commands to run directly and only a few to go through PowerShell. There are two ways to do this, and they fit different situations.
+Shell middleware such as `UsePowerShell()` rewrites every invocation that reaches it. Often you want most commands to run directly and only a few to go through a shell. There are two ways to do this, and they fit different situations. The examples below use PowerShell, but the same techniques apply to `UseCmd()` and `UseDefaultShell()` as well.
 
 ### Conditional middleware with `UseWhen`
 
