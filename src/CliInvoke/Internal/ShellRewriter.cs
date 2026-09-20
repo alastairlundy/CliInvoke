@@ -9,6 +9,7 @@
 
 #pragma warning disable CA1416
 
+using System.Linq;
 using System.Text;
 
 namespace CliInvoke.Internal;
@@ -179,6 +180,132 @@ internal static class ShellRewriter
     }
 
     /// <summary>
+    ///     Composes a target file path for embedding in a PowerShell <c>-Command</c>
+    ///     script, as a double-quoted PowerShell string. Unlike
+    ///     <see cref="EscapeForPowerShell"/> (which targets unquoted command context),
+    ///     only the characters that are significant <em>inside</em> a double-quoted
+    ///     PowerShell string are backtick-escaped — the backtick, the double quote,
+    ///     and <c>$</c> (variable/subexpression expansion). All other characters,
+    ///     including <c>;</c>, <c>|</c>, <c>&amp;</c>, and parentheses, are literal
+    ///     inside a quoted string and are passed through unmodified.
+    /// </summary>
+    /// <param name="path">The raw target file path.</param>
+    /// <returns>The path wrapped in double quotes, safe inside a PowerShell script.</returns>
+    internal static string QuotePathForPowerShell(string path)
+    {
+        StringBuilder builder = new(path.Length + 2 + 8);
+
+        builder.Append('"');
+
+        foreach (char c in path)
+        {
+            switch (c)
+            {
+                case '`':
+                case '"':
+                case '$':
+                    builder.Append('`').Append(c);
+                    break;
+                case '\n':
+                case '\r':
+                    // A bare newline would terminate the script line; drop it.
+                    break;
+                default:
+                    builder.Append(c);
+                    break;
+            }
+        }
+
+        builder.Append('"');
+
+        return builder.ToString();
+    }
+
+    /// <summary>
+    ///     Composes a target file path for embedding in a POSIX shell <c>-c</c>
+    ///     script, using single quotes. Single quotes preserve every character
+    ///     literally in POSIX shells, so no backslash escaping is required except
+    ///     for embedded single quotes, which are written using the standard
+    ///     <c>'\''</c> close-escape-reopen sequence.
+    /// </summary>
+    /// <param name="path">The raw target file path.</param>
+    /// <returns>The path wrapped in single quotes, safe inside a POSIX shell script.</returns>
+    internal static string QuotePathForPosixShell(string path)
+    {
+        return "'" + path.Replace("'", "'\\''") + "'";
+    }
+
+    /// <summary>
+    ///     Composes a target file path for a <c>cmd.exe /c</c> command line, as a
+    ///     double-quoted token. cmd's quote handling is unusual: when its
+    ///     preserved-quote conditions are not met (they cannot be met once special
+    ///     characters are present), <c>cmd /c</c> strips the first and last quote
+    ///     characters of the command line and re-parses the remainder unquoted — so
+    ///     the content must be safe both inside and outside quotes. The path is
+    ///     therefore caret-escaped using outside-quote semantics:
+    ///     <list type="bullet">
+    ///         <item>Command separators and redirection (<c>&amp;</c>, <c>|</c>,
+    ///         <c>&lt;</c>, <c>&gt;</c>), grouping parentheses, and the caret itself
+    ///         are caret-escaped.</item>
+    ///         <item><c>%</c> — environment-variable expansion is caret-escaped so a
+    ///         lone percent survives the unquoted re-parse; note a percent pair
+    ///         matching an existing variable name (e.g. <c>%TEMP%</c>) may still be
+    ///         expanded by cmd's first parse phase, which runs before caret
+    ///         processing and cannot be suppressed by quoting.</item>
+    ///         <item><c>!</c> — delayed expansion (<c>cmd /V:on</c>) is caret-escaped
+    ///         the same way; when delayed expansion is off (the default) the escape
+    ///         resolves to the literal exclamation mark.</item>
+    ///     </list>
+    ///     Embedded double quotes are doubled (<c>""</c>), the cmd convention for a
+    ///     literal quote inside a quoted token.
+    /// </summary>
+    /// <param name="path">The raw target file path.</param>
+    /// <returns>The path as a quoted cmd token, safe on a <c>cmd /c</c> command line.</returns>
+    internal static string QuotePathForCmd(string path)
+    {
+        StringBuilder builder = new(path.Length + 2 + 16);
+
+        builder.Append('"');
+
+        foreach (char c in path)
+        {
+            switch (c)
+            {
+                case '"':
+                    // A literal quote inside a quoted cmd token is written as "".
+                    builder.Append('"').Append('"');
+                    break;
+                case '^':
+                case '&':
+                case '|':
+                case '<':
+                case '>':
+                case '(':
+                case ')':
+                // cmd processes carets after percent expansion, so a caret-escaped
+                // percent/exclamation mark survives the unquoted re-parse as a
+                // literal character (a "%VAR%" pair may still be expanded; see the
+                // remarks above).
+                case '%':
+                case '!':
+                    builder.Append('^').Append(c);
+                    break;
+                case '\n':
+                case '\r':
+                    // A bare newline would terminate the cmd command; drop it.
+                    break;
+                default:
+                    builder.Append(c);
+                    break;
+            }
+        }
+
+        builder.Append('"');
+
+        return builder.ToString();
+    }
+
+    /// <summary>
     ///     Rewrites a <see cref="ProcessConfiguration"/> by escaping and composing the
     ///     inner command for the specified shell kind and delivery method.
     /// </summary>
@@ -213,17 +340,22 @@ internal static class ShellRewriter
         bool windowCreation,
         bool useShellExecution)
     {
+        // When ArgumentList is non-empty it takes precedence over Arguments (matching
+        // ProcessConfiguration's delivery contract); each verbatim entry is escaped
+        // individually for the target shell and joined into the composed command.
+        // Otherwise the legacy single Arguments string is escaped as a whole.
         switch (kind)
         {
             case ShellKind.PowerShell:
             {
-                string safePath = EscapeForPowerShell(
+                string safePath = QuotePathForPowerShell(
                     source.TargetFilePath);
-                string safeArgs = EscapeForPowerShell(
-                    source.Arguments);
+                string safeArgs = source.ArgumentList.Count > 0
+                    ? string.Join(" ", source.ArgumentList.Select(EscapeForPowerShell))
+                    : EscapeForPowerShell(source.Arguments);
                 string script = string.IsNullOrWhiteSpace(safeArgs)
-                    ? $"& \"{safePath}\""
-                    : $"& \"{safePath}\" {safeArgs}";
+                    ? $"& {safePath}"
+                    : $"& {safePath} {safeArgs}";
 
                 IReadOnlyList<string> runnerArgList =
                     !string.IsNullOrWhiteSpace(runnerArgs)
@@ -257,13 +389,14 @@ internal static class ShellRewriter
 
             case ShellKind.Cmd:
             {
-                string safePath = EscapeForCmd(
+                string safePath = QuotePathForCmd(
                     source.TargetFilePath);
-                string safeArgs = EscapeForCmd(
-                    source.Arguments);
+                string safeArgs = source.ArgumentList.Count > 0
+                    ? string.Join(" ", source.ArgumentList.Select(EscapeForCmd))
+                    : EscapeForCmd(source.Arguments);
                 string innerCommand = string.IsNullOrWhiteSpace(safeArgs)
-                    ? $"\"{safePath}\""
-                    : $"\"{safePath}\" {safeArgs}";
+                    ? safePath
+                    : $"{safePath} {safeArgs}";
 
                 string arguments = string.IsNullOrWhiteSpace(runnerArgs)
                     ? innerCommand
@@ -291,13 +424,14 @@ internal static class ShellRewriter
 
             case ShellKind.Posix:
             {
-                string safePath = EscapeForPosixShell(
+                string safePath = QuotePathForPosixShell(
                     source.TargetFilePath);
-                string safeArgs = EscapeForPosixShell(
-                    source.Arguments);
+                string safeArgs = source.ArgumentList.Count > 0
+                    ? string.Join(" ", source.ArgumentList.Select(EscapeForPosixShell))
+                    : EscapeForPosixShell(source.Arguments);
                 string script = string.IsNullOrWhiteSpace(safeArgs)
-                    ? $"\"{safePath}\""
-                    : $"\"{safePath}\" {safeArgs}";
+                    ? safePath
+                    : $"{safePath} {safeArgs}";
 
                 IReadOnlyList<string> runnerArgList =
                     !string.IsNullOrWhiteSpace(runnerArgs)
