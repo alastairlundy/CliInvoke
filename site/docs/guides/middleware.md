@@ -103,7 +103,7 @@ appropriate shell wrapping middleware instead:
 var config = new PowershellProcessConfiguration(arguments: "Get-Process");
 
 // After:
-var config = new ProcessConfiguration("pwsh", "Get-Process");
+var config = new ProcessConfiguration("Get-Process");
 // Register UsePowerShell() in the middleware pipeline
 ```
 
