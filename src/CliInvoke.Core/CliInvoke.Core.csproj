@@ -30,8 +30,6 @@
              errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <Version>2.11.3.1</Version>
-        <AssemblyVersion>2.10.4.0</AssemblyVersion>
-        <FileVersion>2.10.4.0</FileVersion>
         <PackageReleaseNotes>*Fixed packaging issues with 2.11.3</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>2.11.3.1</AssemblyVersion>
