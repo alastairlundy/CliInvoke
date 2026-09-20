@@ -122,10 +122,10 @@ public class ProcessResultValidatorTests
         ValidationRule<ProcessResult> rule =
             new(r => r.ExitCode == 0, "exit zero");
         ProcessResultValidator<ProcessResult> validator =
-            new(new ValidationRule<ProcessResult>[] { rule });
+            new([rule]);
 
         // Assert
-        await Assert.That(validator.Rules.Length).IsEqualTo(1);
+        await Assert.That(validator.ValidationRules.Length).IsEqualTo(1);
         await Assert.That(validator.ValidationRules[0]).IsSameReferenceAs(rule);
     }
 }

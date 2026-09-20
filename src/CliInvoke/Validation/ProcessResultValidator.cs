@@ -36,7 +36,8 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
         for (int i = 0; i < rules.Length; i++)
             mapped[i] = new ValidationRule<TProcessResult>(rules[i]);
 
-        Rules = mapped;
+        ValidationRules = mapped;
+        Rules = ValidationRules;
     }
 
     /// <summary>
@@ -48,26 +49,31 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
     public ProcessResultValidator(ValidationRule<TProcessResult>[] rules)
     {
         ArgumentNullException.ThrowIfNull(rules);
-
-        Rules = rules;
+        
+        ValidationRules = rules;
+        Rules = ValidationRules;
     }
 
     /// <summary>
     ///     Gets the self-describing validation rules applied by this validator.
     /// </summary>
-    public ValidationRule<TProcessResult>[] Rules { get; }
+    [Obsolete(DeprecationMessages.DeprecationV4)]
+    public ValidationRule<TProcessResult>[] Rules { get; private init; }
 
     /// <inheritdoc />
-    public ValidationRule<TProcessResult>[] ValidationRules => Rules;
+    public ValidationRule<TProcessResult>[] ValidationRules {
+        get => Rules;
+        private init => Rules = value;
+    }
 
     /// <summary>
-    ///     Validates a <see cref="TProcessResult" /> against the configured <see cref="Rules" />.
+    ///     Validates a <see cref="TProcessResult" /> against the configured <see cref="ValidationRules" />.
     /// </summary>
     /// <param name="result">The <see cref="TProcessResult" /> to validate against the validation rules.</param>
     /// <returns>True if the <paramref name="result" /> passes all validation rules, false otherwise.</returns>
     public bool Validate(TProcessResult result)
     {
-        foreach (ValidationRule<TProcessResult> rule in Rules)
+        foreach (ValidationRule<TProcessResult> rule in ValidationRules)
         {
             bool ruleResult = rule.Predicate(result);
 
@@ -83,7 +89,7 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
     {
         List<ValidationFailure<TProcessResult>> failures = [];
 
-        foreach (ValidationRule<TProcessResult> rule in Rules)
+        foreach (ValidationRule<TProcessResult> rule in ValidationRules)
         {
             if (!rule.Predicate(result))
                 failures.Add(new ValidationFailure<TProcessResult>(rule, result));
