@@ -83,6 +83,36 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public bool WasTruncated { get; }
 
     /// <summary>
+    ///     Returns a compact single-line diagnostic representation of the buffered result,
+    ///     including output length indicators but never embedding output content.
+    /// </summary>
+    /// <returns>
+    ///     A bracketed string containing the exit code, executed file path, runtime duration,
+    ///     stdout and stderr lengths, and a truncation indicator when <see cref="WasTruncated"/> is true.
+    /// </returns>
+    public override string ToString()
+    {
+        string baseString = $"[ExitCode={ExitCode}, Path={ExecutedFilePath}, Runtime={RuntimeDuration}";
+
+        string truncatedClause = WasTruncated ? ", Truncated=true" : string.Empty;
+
+        return $"{baseString}, StdOutLen={StandardOutput.Length}, StdErrLen={StandardError.Length}{truncatedClause}]";
+    }
+
+    /// <summary>
+    ///     Deconstructs the BufferedProcessResult into its exit code and output strings.
+    /// </summary>
+    /// <param name="exitCode">The process exit code.</param>
+    /// <param name="stdout">The process standard output.</param>
+    /// <param name="stderr">The process standard error.</param>
+    public void Deconstruct(out int exitCode, out string stdout, out string stderr)
+    {
+        exitCode = ExitCode;
+        stdout = StandardOutput;
+        stderr = StandardError;
+    }
+
+    /// <summary>
     ///     Determines whether this BufferedProcessResult object is equal to another BufferedProcessResult
     ///     object.
     /// </summary>
