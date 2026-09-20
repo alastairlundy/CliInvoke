@@ -73,19 +73,45 @@ internal sealed class CmdMiddleware : IProcessMiddleware
         // target and the /c switch; this middleware just supplies the wrapped command and
         // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
+        ProcessConfiguration source = new(src.TargetFilePath, src.Arguments, outputRedirection: context.Mode != InvocationMode.Raw)
+        {
+            ArgumentList = src.ArgumentList,
+            RedirectStandardInput = src.RedirectStandardInput,
+            RequiresAdministrator = src.RequiresAdministrator,
+            WorkingDirectoryPath = src.WorkingDirectoryPath,
+            EnvironmentVariables = new Dictionary<string, string>(src.EnvironmentVariables),
+            Credential = src.Credential,
+            StandardInput = src.StandardInput,
+            StandardInputEncoding = src.StandardInputEncoding,
+            StandardOutputEncoding = src.StandardOutputEncoding,
+            StandardErrorEncoding = src.StandardErrorEncoding,
+            ResourcePolicy = src.ResourcePolicy,
+        };
+
+        ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+            source,
+            shellTargetPath: "cmd.exe",
+            runnerArgs: "/c",
+            kind: ShellKind.Cmd,
+            shellOptions: _options);
+
         ProcessConfiguration newConfig = new CmdProcessConfiguration(
             string.Empty,
-            src.RedirectStandardInput,
+            rewritten.RedirectStandardInput,
             context.Mode != InvocationMode.Raw,
-            workingDirectoryPath: src.WorkingDirectoryPath,
-            requiresAdministrator: src.RequiresAdministrator,
-            new Dictionary<string, string>(src.EnvironmentVariables),
-            credentials: src.Credential,
-            standardInput: src.StandardInput,
-            standardInputEncoding: src.StandardInputEncoding,
-            standardOutputEncoding: src.StandardOutputEncoding,
-            standardErrorEncoding: src.StandardErrorEncoding,
-            processResourcePolicy: src.ResourcePolicy,
+            workingDirectoryPath: rewritten.WorkingDirectoryPath,
+            requiresAdministrator: rewritten.RequiresAdministrator,
+            new Dictionary<string, string>(rewritten.EnvironmentVariables),
+            credentials: rewritten.Credential,
+            standardInput: rewritten.StandardInput,
+            standardInputEncoding: rewritten.StandardInputEncoding,
+            standardOutputEncoding: rewritten.StandardOutputEncoding,
+            standardErrorEncoding: rewritten.StandardErrorEncoding,
+            processResourcePolicy: rewritten.ResourcePolicy,
+            useShellExecution: src.UseShellExecution,
+            windowCreation: src.WindowCreation,
+            argumentList: argumentList);
+        InvocationContext newContext = context.WithConfiguration(newConfig);
             windowCreation: src.WindowCreation,
             argumentList: argumentList);
         InvocationContext newContext = context.WithConfiguration(newConfig);

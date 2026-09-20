@@ -96,19 +96,45 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
         // pwsh target path and shell flags; this middleware just supplies the wrapped command and
         // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
+        ProcessConfiguration source = new(src.TargetFilePath, src.Arguments, outputRedirection: context.Mode != InvocationMode.Raw)
+        {
+            ArgumentList = src.ArgumentList,
+            RedirectStandardInput = src.RedirectStandardInput,
+            RequiresAdministrator = src.RequiresAdministrator,
+            WorkingDirectoryPath = src.WorkingDirectoryPath,
+            EnvironmentVariables = new Dictionary<string, string>(src.EnvironmentVariables),
+            Credential = src.Credential,
+            StandardInput = src.StandardInput,
+            StandardInputEncoding = src.StandardInputEncoding,
+            StandardOutputEncoding = src.StandardOutputEncoding,
+            StandardErrorEncoding = src.StandardErrorEncoding,
+            ResourcePolicy = src.ResourcePolicy,
+        };
+
+        ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+            source,
+            shellTargetPath: OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
+            runnerArgs: "-NoProfile -NonInteractive -Command",
+            kind: ShellKind.PowerShell,
+            shellOptions: _options);
+
         ProcessConfiguration newConfig = new PowershellProcessConfiguration(
             string.Empty,
-            src.RedirectStandardInput,
+            rewritten.RedirectStandardInput,
             context.Mode != InvocationMode.Raw,
-            workingDirectoryPath: src.WorkingDirectoryPath,
-            requiresAdministrator: src.RequiresAdministrator,
-            new Dictionary<string, string>(src.EnvironmentVariables),
-            credentials: src.Credential,
-            standardInput: src.StandardInput,
-            standardInputEncoding: src.StandardInputEncoding,
-            standardOutputEncoding: src.StandardOutputEncoding,
-            standardErrorEncoding: src.StandardErrorEncoding,
-            processResourcePolicy: src.ResourcePolicy,
+            workingDirectoryPath: rewritten.WorkingDirectoryPath,
+            requiresAdministrator: rewritten.RequiresAdministrator,
+            new Dictionary<string, string>(rewritten.EnvironmentVariables),
+            credentials: rewritten.Credential,
+            standardInput: rewritten.StandardInput,
+            standardInputEncoding: rewritten.StandardInputEncoding,
+            standardOutputEncoding: rewritten.StandardOutputEncoding,
+            standardErrorEncoding: rewritten.StandardErrorEncoding,
+            processResourcePolicy: rewritten.ResourcePolicy,
+            useShellExecution: _options.UseShellExecution,
+            windowCreation: _options.WindowCreation,
+            argumentList: argumentList);
+        InvocationContext newContext = context.WithConfiguration(newConfig);
             windowCreation: _options.WindowCreation,
             useShellExecution: _options.UseShellExecution,
             argumentList: argumentList);
