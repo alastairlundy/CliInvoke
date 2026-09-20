@@ -165,6 +165,13 @@ public class ProcessResult : IEquatable<ProcessResult>
     }
 
     /// <summary>
+    ///     Returns a compact single-line diagnostic representation of the result.
+    /// </summary>
+    /// <returns>A bracketed string containing the exit code, executed file path, and runtime duration.</returns>
+    public override string ToString() =>
+        $"[ExitCode={ExitCode}, Path={ExecutedFilePath}, Runtime={RuntimeDuration}]";
+
+    /// <summary>
     ///     Determines whether two specified <see cref="ProcessResult" /> instances are equal.
     /// </summary>
     /// <param name="left">The first <see cref="ProcessResult" /> instance to compare.</param>
