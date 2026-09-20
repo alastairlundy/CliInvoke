@@ -15,18 +15,15 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### Deprecations
-* Marked ``ProcessPipeHandler.Shared`` as deprecated for removal in v3
-* Marked ``ProcessConfigurationFactory`` methods as deprecated for removal in v3
-
-#### 🐛 Bug Fixes
-* Fixed an EOF read race condition that could occur when the same process was run concurrently leading to an ``OperationCanceledException`` being thrown
-* Updated internal Polyfill version from 11.2.0 to 11.3.0</PackageReleaseNotes>
+        <PackageReleaseNotes>* Pinned CliInvoke.Core dependency version to version range between 2.11.3 and less than 3.0.0
+* Updated internal Polyfill version from 11.3.0 to 11.4.0
+* Updated DotExtensions version from 10.5.1 to 10.5.2
+* Pinned DotExtensions dependency version to version range between 10.5.2 and less than 11.0.0</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.11.2</PackageVersion>
-        <AssemblyVersion>2.11.2.0</AssemblyVersion>
+        <PackageVersion>2.11.3</PackageVersion>
+        <AssemblyVersion>2.11.3.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -39,7 +36,7 @@
              they do not leak into, or clash with, CliInvoke.Core's copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <NoWarn>$(NoWarn);CS0618</NoWarn>
-        <FileVersion>2.11.2.0</FileVersion>
+        <FileVersion>2.11.3.0</FileVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="$(TargetFramework) != 'netstandard2.0'">

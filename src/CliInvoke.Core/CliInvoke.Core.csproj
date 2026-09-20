@@ -29,16 +29,13 @@
              CliInvoke/CliInvoke.Specializations and cause duplicate-definition (CS0433/CS0121)
              errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
-        <Version>2.11.2</Version>
+        <Version>2.11.3</Version>
         <AssemblyVersion>2.10.4.0</AssemblyVersion>
         <FileVersion>2.10.4.0</FileVersion>
-        <PackageReleaseNotes>#### Deprecations
-* Marked ``IProcessConfigurationFactory`` methods as deprecated for removal in v3
-* Updated internal Polyfill version from 11.2.0 to 11.3.0
-</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated internal Polyfill version from 11.3.0 to 11.4.0</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.11.2.0</AssemblyVersion>
-        <FileVersion>2.11.2.0</FileVersion>
+        <AssemblyVersion>2.11.3.0</AssemblyVersion>
+        <FileVersion>2.11.3.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>

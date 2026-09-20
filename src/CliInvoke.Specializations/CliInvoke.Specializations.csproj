@@ -15,24 +15,22 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.11.2</PackageVersion>
+        <PackageVersion>2.11.3</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.11.2
-
-#### Deprecations
-* Deprecated ``PowershellProcessInvoker`` methods
-* Deprecated ``CmdProcessInvoker`` methods</PackageReleaseNotes>
+        <PackageReleaseNotes>* Pinned CliInvoke.Core dependency version to version range between 2.11.3 and less than 3.0.0
+* Updated internal Polyfill version from 11.3.0 to 11.4.0
+* Updated to use CliInvoke.Core 2.11.3</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>2.11.2.0</AssemblyVersion>
-        <FileVersion>2.11.2.0</FileVersion>
+        <AssemblyVersion>2.11.3.0</AssemblyVersion>
+        <FileVersion>2.11.3.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>

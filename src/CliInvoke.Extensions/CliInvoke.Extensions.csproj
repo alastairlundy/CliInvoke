@@ -9,15 +9,17 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.11.2</Version>
+        <Version>2.11.3</Version>
         <Title>CliInvoke.Extensions</Title>
         <Authors>AlastairLundy</Authors>
         <Description>Adds a ``AddCliInvoke`` Dependency Injection extension method to enable easy CliInvoke setup when using the Microsoft.Extensions.DependencyInjection package.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.11.2 and CliInvoke 2.11.2
-* Marked some extension methods as deprecated for removal in v3</PackageReleaseNotes>
+        <PackageReleaseNotes>* Pinned CliInvoke.Core dependency version to version range between 2.11.3 and less than 3.0.0
+* Updated internal Polyfill version from 11.3.0 to 11.4.0
+* Pinned CliInvoke dependency version to version range between 2.11.3 and less than 3.0.0
+* Updated to use CliInvoke.Core 2.11.3 and CliInvoke 2.11.3</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -26,8 +28,8 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageId>CliInvoke.Extensions</PackageId>
         <Product>CliInvoke.Extensions</Product>
-        <AssemblyVersion>2.11.2.0</AssemblyVersion>
-        <FileVersion>2.11.2.0</FileVersion>
+        <AssemblyVersion>2.11.3.0</AssemblyVersion>
+        <FileVersion>2.11.3.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
