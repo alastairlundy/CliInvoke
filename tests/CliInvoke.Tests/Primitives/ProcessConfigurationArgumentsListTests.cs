@@ -53,6 +53,32 @@ public class ProcessConfigurationArgumentsListTests
     }
 
     [Test]
+    public async Task ArgumentList_NullEntry_ThrowsArgumentNullException()
+    {
+        // Arrange & Act & Assert
+        await Assert.That(() => _ = new ProcessConfiguration()
+        {
+            TargetFilePath = "foo.exe",
+            ArgumentList = ["--verbose", null!, "--debug"]
+        }).Throws<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task ArgumentList_EmptyStringEntriesPreserved()
+    {
+        // Arrange & Act
+        ProcessConfiguration config = new()
+        {
+            TargetFilePath = "foo.exe",
+            ArgumentList = ["--verbose", "", "--debug"]
+        };
+
+        // Assert
+        await Assert.That(config.ArgumentList).Count().IsEqualTo(3);
+        await Assert.That(config.ArgumentList[1]).IsEmpty();
+    }
+
+    [Test]
     public async Task ArgumentList_EmptyListStaysEmpty()
     {
         // Arrange & Act
