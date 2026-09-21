@@ -162,8 +162,9 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// </summary>
     /// <remarks>
     ///     Any supplied list is captured as a snapshot; later mutations made to the caller's
-    ///     original collection are not reflected in the configuration. A null list is
-    ///     rejected with an <see cref="ArgumentNullException"/>.
+    ///     original collection are not reflected in the configuration. A null list, or a
+    ///     null entry within the list, is rejected with an <see cref="ArgumentNullException"/>.
+    ///     Empty-string entries are preserved.
     /// </remarks>
     public IReadOnlyList<string> ArgumentList
     {
@@ -174,7 +175,10 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 
             if (value.Count == 1) 
                 ArgumentException.ThrowIfNullOrEmpty(value[0]);
-            
+
+            foreach (string argument in value)
+                ArgumentNullException.ThrowIfNull(argument, nameof(value));
+
             field = [.. value];
         }
     } = [];
