@@ -153,7 +153,7 @@ For the full disposal reference — ownership rules, disposal patterns, and a ch
 
 ## Documentation
 
-Full documentation is available in the [CliInvoke Developer Portal](site/docs/readme.md). Pick the path that fits you:
+Full documentation is available in the [CliInvoke Developer Portal](https://). Pick the path that fits you:
 
 | Who you are                                                        | Start here                                                                                                                                                                                               |
 |--------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
