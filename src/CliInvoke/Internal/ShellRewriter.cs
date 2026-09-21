@@ -184,7 +184,7 @@ internal static class ShellRewriter
     ///     script, as a double-quoted PowerShell string. Unlike
     ///     <see cref="EscapeForPowerShell"/> (which targets unquoted command context),
     ///     only the characters that are significant <em>inside</em> a double-quoted
-    ///     PowerShell string are backtick-escaped — the backtick, the double quote,
+    ///     PowerShell string are backtick-escaped: the backtick, the double quote,
     ///     and <c>$</c> (variable/subexpression expansion). All other characters,
     ///     including <c>;</c>, <c>|</c>, <c>&amp;</c>, and parentheses, are literal
     ///     inside a quoted string and are passed through unmodified.
@@ -240,19 +240,19 @@ internal static class ShellRewriter
     ///     double-quoted token. cmd's quote handling is unusual: when its
     ///     preserved-quote conditions are not met (they cannot be met once special
     ///     characters are present), <c>cmd /c</c> strips the first and last quote
-    ///     characters of the command line and re-parses the remainder unquoted — so
+    ///     characters of the command line and re-parses the remainder unquoted, so
     ///     the content must be safe both inside and outside quotes. The path is
     ///     therefore caret-escaped using outside-quote semantics:
     ///     <list type="bullet">
     ///         <item>Command separators and redirection (<c>&amp;</c>, <c>|</c>,
     ///         <c>&lt;</c>, <c>&gt;</c>), grouping parentheses, and the caret itself
     ///         are caret-escaped.</item>
-    ///         <item><c>%</c> — environment-variable expansion is caret-escaped so a
+    ///         <item><c>%</c>: environment-variable expansion is caret-escaped so a
     ///         lone percent survives the unquoted re-parse; note a percent pair
     ///         matching an existing variable name (e.g. <c>%TEMP%</c>) may still be
     ///         expanded by cmd's first parse phase, which runs before caret
     ///         processing and cannot be suppressed by quoting.</item>
-    ///         <item><c>!</c> — delayed expansion (<c>cmd /V:on</c>) is caret-escaped
+    ///         <item><c>!</c>: delayed expansion (<c>cmd /V:on</c>) is caret-escaped
     ///         the same way; when delayed expansion is off (the default) the escape
     ///         resolves to the literal exclamation mark.</item>
     ///     </list>

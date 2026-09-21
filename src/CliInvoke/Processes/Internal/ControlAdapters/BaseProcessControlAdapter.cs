@@ -93,7 +93,7 @@ internal abstract class BaseProcessControlAdapter
     /// </summary>
     /// <remarks>
     ///     Must be called after <see cref="ProcessStartInfo.FileName"/> has been set to the
-    ///     <em>resolved</em> executable path — a short <c>TargetFilePath</c> such as
+    ///     <em>resolved</em> executable path. A short <c>TargetFilePath</c> such as
     ///     <c>"dotnet.exe"</c> can resolve via PATH lookup to a much longer absolute path,
     ///     so validating the unresolved name would under-measure the real command line.
     ///     <para>

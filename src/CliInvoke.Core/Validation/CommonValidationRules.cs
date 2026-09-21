@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 namespace CliInvoke.Core.Validation;
 
 /// <summary>
-///     Provides a set of predefined common validation rules for processing Process results.
+///     Common validation rules for processing Process results.
 ///     These rules validate instances of <typeparamref name="TProcessResult" />,
 ///     which must inherit from <see cref="ProcessResult" />.
 /// </summary>

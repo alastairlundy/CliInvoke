@@ -176,7 +176,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     ///     <see cref="LoadUserProfile"/> only. <see cref="Password"/> participates in
     ///     <see cref="Equals(UserCredential?)"/> content comparison but is intentionally
     ///     excluded from the hash code to avoid unwrapping or hashing secret material.
-    ///     Note: distinct passwords with the same user and domain may share the same hash code.
+    ///     Distinct passwords with the same user and domain may share the same hash code.
     /// </remarks>
     /// <returns>The hash code for the current user credential.</returns>
     public override int GetHashCode()

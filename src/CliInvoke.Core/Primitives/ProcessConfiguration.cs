@@ -123,7 +123,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     <see cref="ArgumentList"/> are set, <see cref="ArgumentList"/> takes precedence and
     ///     <see cref="Arguments"/> is ignored.</b> This is the safe path for shell wrappers
     ///     (PowerShell/cmd), whose own parser would otherwise re-interpret a single re-tokenized
-    ///     <see cref="Arguments"/> string — a command-injection vector.
+    ///     <see cref="Arguments"/> string, a command-injection vector.
     /// </summary>
     /// <remarks>
     ///     Any supplied list is captured as a snapshot; later mutations made to the caller's
