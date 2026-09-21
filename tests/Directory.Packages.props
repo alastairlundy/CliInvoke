@@ -7,7 +7,7 @@
     <PackageVersion Include="Bogus" Version="35.6.5" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
-    <PackageVersion Include="TUnit" Version="1.55.2" />
+    <PackageVersion Include="TUnit" Version="1.68.17" />
     <PackageVersion Include="FsCheck" Version="3.4.0" />
   </ItemGroup>
 </Project>
