@@ -86,13 +86,18 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     ///     Returns a compact single-line diagnostic representation of the buffered result,
     ///     including output length indicators but never embedding output content.
     /// </summary>
+    /// <remarks>
+    ///     Extends the base <see cref="ProcessResult.ToString" /> bracketed format by
+    ///     removing the closing bracket and appending stdout/stderr lengths and a
+    ///     truncation indicator.
+    /// </remarks>
     /// <returns>
     ///     A bracketed string containing the exit code, executed file path, runtime duration,
     ///     stdout and stderr lengths, and a truncation indicator when <see cref="WasTruncated"/> is true.
     /// </returns>
     public override string ToString()
     {
-        string baseString = $"[ExitCode={ExitCode}, Path={ExecutedFilePath}, Runtime={RuntimeDuration}";
+        string baseString = base.ToString();
 
         string truncatedClause = WasTruncated ? ", Truncated=true" : string.Empty;
 

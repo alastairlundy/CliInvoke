@@ -94,6 +94,8 @@ public class ResultErgonomicsTests
     {
         ProcessResult result = MakeProcessResult(0);
 
+        // The success criterion is that EnsureExitCodeZero() completes without throwing;
+        // reaching the assertion below means the call above did not throw.
         result.EnsureExitCodeZero();
 
         await Assert.That(true).IsTrue();
@@ -104,6 +106,8 @@ public class ResultErgonomicsTests
     {
         ProcessResult result = MakeProcessResult(0, canceled: true);
 
+        // The success criterion is that EnsureExitCodeZero() completes without throwing;
+        // reaching the assertion below means the call above did not throw.
         result.EnsureExitCodeZero();
 
         await Assert.That(true).IsTrue();
@@ -308,12 +312,11 @@ public class ResultErgonomicsTests
     }
 
     [Test]
-    public async Task EnumerateOutputLines_NullOutput_YieldsNothing()
+    public async Task EnumerateOutputLines_MatchesGetOutputLines_WithBothStreamsPopulated()
     {
-        // BufferedProcessResult does not allow null, so test via the private
-        // EnumerateLines path: pass null through a BufferedProcessResult with empty strings
-        // and verify the empty case is covered above. This test verifies the
-        // GetOutputLines round-trip contract with both streams populated.
+        // BufferedProcessResult validates non-null streams in its constructor, so the
+        // null path in EnumerateLines is defensive-only and unreachable via this API;
+        // this test instead verifies consistency with GetOutputLines().
         string nl = Environment.NewLine;
         BufferedProcessResult result = MakeBuffered($"out1{nl}out2", $"err1{nl}err2");
 
