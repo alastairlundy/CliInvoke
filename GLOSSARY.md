@@ -22,6 +22,11 @@ A parameter of the invocation contract that the caller states for the invocation
 
 The act of running a command inside a shell interpreter (PowerShell, CMD, or a POSIX shell). A shell-wrapping flow resolves the shell, escapes the command's target and arguments so they are treated as literal data rather than shell syntax, composes the inner command, and rewrites the process configuration so the shell executes the original command. Shell wrapping is a middleware concern, not an Invocation Capability: the caller could omit it without changing what the invocation means.
 
+### Configuration Derivation
+
+The act of producing a new configuration from an existing one, preserving all member values except a stated delta. Derived configurations share resource-owning members by reference; disposal remains the caller's responsibility.
+
+
 ## Versioning Terms
 
 ### v2-style code
