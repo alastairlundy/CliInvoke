@@ -84,7 +84,7 @@ decision tree and a [Configuration Patterns](DESIGN_PATTERNS.md#configuration-pa
 * **`IProcessInvoker`** — DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
 * **`IExternalProcess` & `IExternalProcessFactory`** — Process-like API with DI support. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
 
-> **New to CliInvoke? Start with `CliRun`** — it is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control. See [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md) for the design rationale.
+> **New to CliInvoke? Start with `CliRun`** — it is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control.
 
 ## Examples
 
@@ -211,7 +211,7 @@ unless you have written permission from the maintainer. To request permission, o
 Thanks to these projects:
 
 * [CliWrap](https://github.com/Tyrrrz/CliWrap/) for inspiring this project
-* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying older TFM support
+* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying TFM support
 
 For more information, please see
 the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).
