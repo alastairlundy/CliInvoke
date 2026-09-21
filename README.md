@@ -146,26 +146,26 @@ For the full guide — constructor details, the `IProcessMiddleware` contract, D
 >
 > `ProcessConfiguration` is a plain immutable value object and does **not** implement `IDisposable`. The `StandardInput` (`StreamWriter`) and `UserCredential` you place inside it remain **your** responsibility to dispose — CliInvoke never disposes them on your behalf.
 
-For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](site/docs/guides/resource-disposal.md)**.
+For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/resource-disposal/)**.
 
 > [!NOTE]
 > Middleware does not change these rules. A middleware chain returns the process result **un-disposed** to the caller, so the disposal contract described above applies exactly as it does without middleware. See **[Middleware](#middleware)** for the result-ownership note.
 
 ## Documentation
 
-Full documentation is available in the [CliInvoke Developer Portal](site/docs/readme.md). Pick the path that fits you:
+Full documentation is available in the [CliInvoke Developer Portal](https://alastairlundy.github.io/CliInvoke/). Pick the path that fits you:
 
 | Who you are                                                        | Start here                                                                                                                                                                                               |
 |--------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Beginner** — "I just need to run a command"                      | [Quickstart](site/docs/getting-started-quickstart.md) → [Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)                                                              |
-| **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](site/docs/getting-started.md) → [Configuration](site/docs/guides/configuration.md)                                                                                                     |
-| **Power User** — "I need full lifecycle control"                   | [Choosing your Invocation Pattern → IExternalProcess](site/docs/guides/choosing-invocation-pattern.md#iexternalprocess--power-user-lifecycle-control) → [Architecture](site/docs/guides/architecture.md) |
+| **Beginner** — "I just need to run a command"                      | [Quickstart](https://alastairlundy.github.io/CliInvoke/docs/getting-started-quickstart) → [Choosing your Invocation Pattern](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern)                                                              |
+| **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](https://alastairlundy.github.io/CliInvoke/docs/getting-started/) → [Configuration](https://alastairlundy.github.io/CliInvoke/docs/guides/configuration)                                                                                                     |
+| **Power User** — "I need full lifecycle control"                   | [Choosing your Invocation Pattern → IExternalProcess](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern#iexternalprocess--power-user-lifecycle-control) → [Architecture](https://alastairlundy.github.io/CliInvoke/docs/guides/architecture) |
 
-Other guides: [Troubleshooting](site/docs/guides/troubleshooting.md), [Migration Guides](site/docs/migration-guides/readme.md), [Building from Source](site/docs/building-cliinvoke.md)
+Other guides: [Troubleshooting](https://alastairlundy.github.io/CliInvoke/docs/guides/troubleshooting), [Migration Guides](https://alastairlundy.github.io/CliInvoke/docs/migration-guides/), [Building from Source](https://alastairlundy.github.io/CliInvoke/docs/building-cliinvoke/)
 
 ## How to Build CliInvoke's code
 
-Please see [building-cliinvoke.md](site/docs/building-cliinvoke.md) for how to build CliInvoke from source.
+Please see [building-cliinvoke.md](https://alastairlundy.github.io/CliInvoke/docs/building-cliinvoke/) for how to build CliInvoke from source.
 
 ## How to Contribute to CliInvoke
 
