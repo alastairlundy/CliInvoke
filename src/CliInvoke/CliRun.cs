@@ -59,46 +59,6 @@ public static class CliRun
     }
 
     /// <summary>
-    /// Executes a specified process with the provided argument list asynchronously and returns the resulting process data.
-    /// </summary>
-    /// <remarks>
-    /// Each entry in <paramref name="arguments"/> is passed as an individual element of
-    /// <see cref="ProcessConfiguration.ArgumentList"/>, so the operating-system command-line
-    /// parser delivers each entry to the child process unmodified. This is the safe path for
-    /// shell wrappers whose own parser would otherwise re-interpret a single tokenised string.
-    /// </remarks>
-    /// <param name="targetFilePath">
-    /// The path of the executable file to be run.
-    /// </param>
-    /// <param name="arguments">
-    /// An enumerable of individual arguments to pass to the executable.
-    /// </param>
-    /// <param name="workingDirectory">
-    /// The directory in which the process will be executed. If null, the current directory is used.
-    /// </param>
-    /// <param name="timeoutTimeSpan">
-    /// The maximum duration that the process is allowed to run before it times out. If null, a default value is applied.
-    /// </param>
-    /// <param name="cancellationToken">
-    /// A token that can signal the cancellation of the operation before its completion.
-    /// </param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The task result is a <see cref="ProcessResult"/> object
-    /// containing details of the executed process, including exit status and runtime information.
-    /// </returns>
-    public static async Task<ProcessResult> RunAsync(string targetFilePath,
-        IEnumerable<string> arguments, string? workingDirectory = null,
-        TimeSpan? timeoutTimeSpan = null, CancellationToken cancellationToken = default)
-    {
-        (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
-            BuildArgumentListConfig(targetFilePath, arguments, workingDirectory,
-                timeoutTimeSpan, outputRedirection: false);
-
-        return await RunAsync(configuration, exitConfiguration, cancellationToken)
-            .ConfigureAwait(false);
-    }
-
-    /// <summary>
     /// Executes a process asynchronously with the specified configuration.
     /// </summary>
     /// <param name="configuration">
@@ -161,53 +121,6 @@ public static class CliRun
 
         return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken).ConfigureAwait(false);
     }
-
-    /// <summary>
-    /// Executes a specified process with the provided argument list asynchronously and returns the buffered process result.
-    /// </summary>
-    /// <remarks>
-    /// Each entry in <paramref name="arguments"/> is passed as an individual element of
-    /// <see cref="ProcessConfiguration.ArgumentList"/>, so the operating-system command-line
-    /// parser delivers each entry to the child process unmodified. This is the safe path for
-    /// shell wrappers whose own parser would otherwise re-interpret a single tokenised string.
-    /// </remarks>
-    /// <param name="targetFilePath">
-    /// The path of the executable file to run.
-    /// </param>
-    /// <param name="arguments">
-    /// An enumerable of individual arguments to pass to the executable.
-    /// </param>
-    /// <param name="workingDirectory">
-    /// The working directory for the process. If null, the current directory is used.
-    /// </param>
-    /// <param name="timeoutTimeSpan">
-    /// The maximum duration that the process can run before timing out. If null, a default timeout is applied.
-    /// </param>
-    /// <param name="maxBufferedOutputBytes">
-    /// The maximum number of bytes of combined standard output and standard error to buffer before truncation
-    /// is applied. If null, the default cap is used. Applies only to buffered capture.
-    /// </param>
-    /// <param name="cancellationToken">
-    /// A token to monitor for cancellation requests, allowing the operation to be cancelled before it completes.
-    /// </param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The result is a <see cref="BufferedProcessResult"/>
-    /// object containing the full output of the process and execution details.
-    /// </returns>
-    public static async Task<BufferedProcessResult> RunBufferedAsync(
-        string targetFilePath, IEnumerable<string> arguments,
-        string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
-        long? maxBufferedOutputBytes = null,
-        CancellationToken cancellationToken = default)
-    {
-        (ProcessConfiguration configuration, ProcessExitConfiguration exitConfiguration) =
-            BuildArgumentListConfig(targetFilePath, arguments, workingDirectory,
-                timeoutTimeSpan, outputRedirection: true, maxBufferedOutputBytes);
-
-        return await RunBufferedAsync(configuration, exitConfiguration, cancellationToken)
-            .ConfigureAwait(false);
-    }
-
 
     /// <summary>
     /// Executes a process asynchronously with the specified configuration and returns buffered results.
@@ -286,33 +199,6 @@ public static class CliRun
             ProcessExitConfiguration.CreateGraceful(
                 ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan ?? ProcessTimeoutPolicy.Default.TimeoutThreshold)),
             maxBufferedOutputBytes);
-
-        return (configuration, exitConfiguration);
-    }
-
-    /// <summary>
-    ///     Builds the <see cref="ProcessConfiguration" /> and <see cref="ProcessExitConfiguration" />
-    ///     shared by the argument-list overloads, applying the default working directory and timeout policy.
-    /// </summary>
-    private static (ProcessConfiguration Configuration, ProcessExitConfiguration ExitConfiguration)
-        BuildArgumentListConfig(
-            string targetFilePath, IEnumerable<string> arguments,
-            string? workingDirectory, TimeSpan? timeoutTimeSpan,
-            bool outputRedirection, long? maxBufferedOutputBytes = null)
-    {
-        workingDirectory ??= Environment.CurrentDirectory;
-
-        ProcessConfiguration configuration = new ProcessConfiguration(
-            targetFilePath, arguments, outputRedirection)
-            { WorkingDirectoryPath = workingDirectory };
-
-        ProcessExitConfiguration exitConfiguration =
-            ProcessExitConfiguration.WithMaxBufferedOutputBytes(
-                ProcessExitConfiguration.CreateGraceful(
-                    ProcessTimeoutPolicy.FromTimeSpan(
-                        timeoutTimeSpan ??
-                        ProcessTimeoutPolicy.Default.TimeoutThreshold)),
-                maxBufferedOutputBytes);
 
         return (configuration, exitConfiguration);
     }
