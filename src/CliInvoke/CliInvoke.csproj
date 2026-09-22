@@ -61,8 +61,11 @@ FsCheck property tests prove metacharacters never produce a second command for e
         <!--
             Cross-package middleware consumption: CliInvoke.Specializations shell
             middleware must access internal rewriting helpers (ShellRewriter, enums,
-            ArgumentTokenizer). Promotion to public rejected — no extensibility goal;
-            a Specializations home impossible — no reference direction from Core.
+            ArgumentTokenizer) and the derivation hook (ProcessConfigurationDerivation).
+            Promotion to public rejected — no extensibility goal; a Specializations
+            home impossible — no reference direction from Core. Justification per
+            ADR-0001 (docs/adr/0001-ivt-minimization.md, Grant inventory:
+            CliInvoke → CliInvoke.Specializations).
         -->
         <InternalsVisibleTo Include="CliInvoke.Specializations"/>
     </ItemGroup>
