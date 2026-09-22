@@ -88,8 +88,8 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// </summary>
     /// <remarks>
     ///     Extends the base <see cref="ProcessResult.ToString" /> bracketed format by
-    ///     removing the closing bracket and appending stdout/stderr lengths and a
-    ///     truncation indicator.
+    ///     removing the base closing bracket and appending stdout/stderr lengths and a
+    ///     truncation indicator before adding a single final closing bracket.
     /// </remarks>
     /// <returns>
     ///     A bracketed string containing the exit code, executed file path, runtime duration,
@@ -97,7 +97,10 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// </returns>
     public override string ToString()
     {
-        string baseString = base.ToString();
+        // Remove the closing bracket already included by the base format so that
+        // StdOutLen, StdErrLen, and the truncation clause stay inside a single
+        // bracketed group, then append the single final closing bracket.
+        string baseString = base.ToString().TrimEnd(']');
 
         string truncatedClause = WasTruncated ? ", Truncated=true" : string.Empty;
 

@@ -399,6 +399,27 @@ public class ResultErgonomicsTests
         await Assert.That(text).Contains("StdErrLen=0");
     }
 
+    [Test]
+    public async Task ProcessResult_ToString_NewlinePath_IsEscapedToSingleLine()
+    {
+        ProcessResult result = new("bad\rpath\ntool.exe", 0, 42, FixedTime, FixedTime,
+            canceled: false, signal: null);
+
+        string text = result.ToString();
+
+        // Both separators must be escaped to their literal sequences, never embedded raw.
+        await Assert.That(text).Contains(@"Path=bad\rpath\ntool.exe");
+        await Assert.That(text.Contains('\r')).IsFalse();
+        await Assert.That(text.Contains('\n')).IsFalse();
+
+        // The diagnostic representation must remain a single line.
+        int lineCount = 0;
+        using StringReader reader = new(text);
+        while (await reader.ReadLineAsync() is not null)
+            lineCount++;
+        await Assert.That(lineCount).IsEqualTo(1);
+    }
+
     // -------------------------------------------------------------------
     //  Deconstruct assignment correctness
     // -------------------------------------------------------------------
