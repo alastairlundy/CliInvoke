@@ -46,6 +46,8 @@ public class ProcessResult : IEquatable<ProcessResult>
         bool canceled,
         PosixSignal? signal)
     {
+        ArgumentNullException.ThrowIfNull(executableFilePath);
+
         ExitCode = exitCode;
         ExecutedFilePath = executableFilePath;
         StartTime = startTime;
