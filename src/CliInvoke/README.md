@@ -58,14 +58,6 @@ dotnet add package CliInvoke.Core
 dotnet add package CliInvoke
 ```
 
-### Extensions Package
-
-[CliInvoke.Extensions Nuget](https://nuget.org/packages/CliInvoke.Extensions)
-
-```bash
-dotnet add package CliInvoke.Extensions
-```
-
 ### Specializations Package
 
 [CliInvoke.Specializations Nuget](https://nuget.org/packages/CliInvoke.Specializations)
