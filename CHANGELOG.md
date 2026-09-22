@@ -14,6 +14,23 @@ adheres to [Semantic Versioning](https://semver.org/).
   Windows `CreateProcess` limit (~32,767 characters), an `ArgumentException` is thrown before
   process start, replacing the cryptic Win32 error 206. The check runs against the resolved
   absolute executable path and is skipped when `UseShellExecute` is enabled.
+- `ProcessResult.ToString()` bracketed diagnostic format:
+  `[ExitCode=N, Path=..., Runtime=...]`.
+- `BufferedProcessResult.ToString()` bracketed diagnostic format with
+  stdout/stderr length indicators and optional `Truncated=true`.
+- `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`
+  for tuple deconstruction.
+- `IsExitCodeZero()` extension on `ProcessResult` — returns `true` when
+  `ExitCode` equals zero; a default heuristic for non-DI callers.
+- `EnsureExitCodeZero()` extension on `ProcessResult` — throws
+  `ProcessNotSuccessfulException<TProcessResult>` when `ExitCode` is
+  non-zero.
+- `EnumerateOutputLines()` and `EnumerateErrorLines()` lazy extensions
+  on `BufferedProcessResult` — split output on `Environment.NewLine`
+  without allocating an intermediate array.
+- Result-ergonomics documentation guide (`site/docs/guides/results.md`)
+  covering the new members, `ToString` formats, `Deconstruct`, and the
+  heuristic-vs-validator framing.
 
 ### Changed
 
