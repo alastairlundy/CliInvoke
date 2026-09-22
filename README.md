@@ -42,7 +42,7 @@ Launch processes, redirect standard input and output streams, and await process 
 
 CliInvoke is compared against [CliWrap](https://github.com/Tyrrrz/CliWrap/), [ProcessX](https://github.com/Cysharp/ProcessX), and the built-in .NET `Process` class across features like configuration separation, DI support, middleware, cross-platform support, and licensing.
 
-See the [full comparison table](site/docs/comparison.md) for a detailed feature-by-feature breakdown.
+See the [full comparison table](https://alastairlundy.github.io/CliInvoke/docs/comparison) for a detailed feature-by-feature breakdown.
 
 ## Installing CliInvoke
 
@@ -71,7 +71,7 @@ The package(s) to install depends on your use case:
 
 CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android.
 
-For more details see the [list of supported platforms](site/docs/Supported-OperatingSystems.md)
+For more details see the [list of supported platforms](https://alastairlundy.github.io/CliInvoke/docs/Supported-OperatingSystems)
 
 ## Design Patterns & When to Use Them
 
@@ -119,9 +119,9 @@ For detailed documentation on all available patterns and when to use them, see [
 
 ### Advanced Configuration
 
-For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](site/docs/guides/configuration.md)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
+For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/configuration)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
 
-> Most configurations are built with direct init construction (see [Configuration Patterns](DESIGN_PATTERNS.md#configuration-patterns)). The builder path is for argument escaping, user credentials, and resource policy features.
+> Most configurations are built with direct init construction (see [Configuration Patterns](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern)). The builder path is for argument escaping, user credentials, and resource policy features.
 
 ## Middleware
 
@@ -129,7 +129,7 @@ CliInvoke's `ProcessInvoker` supports an optional **middleware** system that let
 
 Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`. `UsePowerShell`/`UseCmd` additionally require registering the Specializations middleware types via `AddCliInvokeSpecializations()` from the `CliInvoke.Specializations` package — see that package's README.
 
-For the full guide — constructor details, the `IProcessMiddleware` contract, DI configuration, result ownership, and the result-swap rule — see the **[Middleware Guide](site/docs/guides/middleware.md)**.
+For the full guide — constructor details, the `IProcessMiddleware` contract, DI configuration, result ownership, and the result-swap rule — see the **[Middleware Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/middleware/)**.
 
 ## Resource Disposal
 
@@ -153,7 +153,7 @@ For the full disposal reference — ownership rules, disposal patterns, and a ch
 
 ## Documentation
 
-Full documentation is available in the [CliInvoke Developer Portal](https://alastairlundy.github.io/CliInvoke/). Pick the path that fits you:
+Full documentation is available in the [CliInvoke Developer Site](https://alastairlundy.github.io/CliInvoke/). Pick the path that fits you:
 
 | Who you are                                                        | Start here                                                                                                                                                                                               |
 |--------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
