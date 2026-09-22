@@ -17,7 +17,7 @@ namespace CliInvoke;
 /// <summary>
 /// The default implementation of <see cref="IFilePathResolver"/>, providing
 /// the standard PATH-lookup and directory-recursion strategies (PATH first, then
-/// directory recursion — see GLOSSARY.md Design Decision 1).
+/// directory recursion (see GLOSSARY.md Design Decision 1).
 /// </summary>
 public class FilePathResolver : IFilePathResolver
 {

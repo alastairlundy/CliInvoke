@@ -30,8 +30,8 @@ namespace CliInvoke.Core.Internal;
 ///         before the closing quote, and bare newlines are dropped (they would
 ///         otherwise terminate the line). .NET's Unix argument parser applies the same
 ///         rule for the double-quoted context the caller supplies, so the POSIX branch
-///         uses identical escaping — doubled backslashes before an embedded quote and
-///         before the closing quote, embedded quotes written as <c>""</c> — and drops
+///         uses identical escaping (doubled backslashes before an embedded quote and
+///         before the closing quote, embedded quotes written as <c>""</c>) and drops
 ///         bare newlines.
 ///     </para>
 /// </remarks>

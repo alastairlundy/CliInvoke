@@ -118,7 +118,7 @@ internal static class VersionParseExtensions
     /// <para>
     /// Code review concern: the 4-component cap is enforced by the size of
     /// the stack-allocated <c>Range</c> buffer. If the cap grows above 4, the
-    /// stack buffer must be resized accordingly — otherwise the function
+    /// stack buffer must be resized accordingly, otherwise the function
     /// silently truncates components beyond the cap.
     /// </para>
     /// </remarks>

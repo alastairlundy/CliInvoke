@@ -28,7 +28,7 @@ internal class ProcessWrapper : Process
     /// </summary>
     /// <param name="timeoutSeconds">The user-supplied timeout threshold, in whole seconds.</param>
     /// <returns>
-    /// <c>min(10 + floor(timeoutSeconds * 0.05), 20)</c> — i.e. a fixed 10s base plus 5% of the
+    /// <c>min(10 + floor(timeoutSeconds * 0.05), 20)</c>, i.e. a fixed 10s base plus 5% of the
     /// requested timeout (rounded down to an integer), capped at 20s.
     /// </returns>
     internal static int CalculatePostInterruptGracePeriodSeconds(int timeoutSeconds)
@@ -269,7 +269,7 @@ internal class ProcessWrapper : Process
     /// Thrown when an attempt is made to suspend a process that has already exited.
     /// </exception>
     /// <remarks>
-    /// This method leverages platform-specific mechanisms to suspend a process and is supported
+    /// This method uses platform-specific mechanisms to suspend a process and is supported
     /// on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
     /// </remarks>
     [SupportedOSPlatform("windows")]
@@ -291,7 +291,7 @@ internal class ProcessWrapper : Process
     /// Thrown when an attempt is made to resume a process that has already exited.
     /// </exception>
     /// <remarks>
-    /// This method utilises platform-specific mechanisms to resume a suspended process
+    /// This method uses platform-specific mechanisms to resume a suspended process
     /// and is supported on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
     /// </remarks>
     [SupportedOSPlatform("windows")]
@@ -381,10 +381,10 @@ internal class ProcessWrapper : Process
     ///     This is a distinct overload of the base buffered-capture method on <see cref="Process"/>;
     ///     the inherited method is NOT overridden. The cap parameter supports three spellings:
     ///     <list type="bullet">
-    ///         <item><c>null</c> — no cap is applied; the stream is read in full.</item>
-    ///         <item>Negative value — no cap is applied; equivalent to <c>null</c>.</item>
-    ///         <item><c>0</c> — a valid zero-byte cap producing empty text with the truncated flag set.</item>
-    ///         <item>Positive value — the stream is read up to that many bytes, then truncated.</item>
+    ///         <item><c>null</c>: no cap is applied; the stream is read in full.</item>
+    ///         <item>Negative value: no cap is applied; equivalent to <c>null</c>.</item>
+    ///         <item><c>0</c>: a valid zero-byte cap producing empty text with the truncated flag set.</item>
+    ///         <item>Positive value: the stream is read up to that many bytes, then truncated.</item>
     ///     </list>
     /// </remarks>
     /// <param name="cancellationToken">A cancellation token for the read operations.</param>
@@ -425,10 +425,10 @@ internal class ProcessWrapper : Process
     /// <remarks>
     ///     The <paramref name="maxBytes"/> parameter supports three spellings:
     ///     <list type="bullet">
-    ///         <item><c>null</c> — no cap; the stream is read in full.</item>
-    ///         <item>Negative value — no cap; equivalent to <c>null</c>.</item>
-    ///         <item><c>0</c> — a valid zero-byte cap producing empty text with the truncated flag set.</item>
-    ///         <item>Positive value — the stream is read up to that many bytes, then truncated.</item>
+    ///         <item><c>null</c>: no cap; the stream is read in full.</item>
+    ///         <item>Negative value: no cap; equivalent to <c>null</c>.</item>
+    ///         <item><c>0</c>: a valid zero-byte cap producing empty text with the truncated flag set.</item>
+    ///         <item>Positive value: the stream is read up to that many bytes, then truncated.</item>
     ///     </list>
     ///     Multibyte sequences that straddle the cap boundary are decoded incrementally so that
     ///     split trailing bytes are held back and dropped cleanly (no U+FFFD replacement characters).
