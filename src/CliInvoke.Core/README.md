@@ -10,19 +10,19 @@ For an implementing package, check out [CliInvoke](https://www.nuget.org/package
 [![Downloads](https://img.shields.io/nuget/dt/CliInvoke.Core.svg)](https://www.nuget.org/packages/CliInvoke.Core/)
 ![License](https://img.shields.io/github/license/alastairlundy/CliInvoke)
 
-Key Abstractions:
+Key abstractions:
 
-* ``IProcessInvoker``
-* ``IExternalProcessFactory``
+* ``IProcessInvoker`` - Runs a ``ProcessConfiguration`` and returns the result.
+* ``IExternalProcessFactory`` - Creates ``IExternalProcess`` instances from a ``ProcessConfiguration`` for lifecycle control.
 
 * Output redirection:
     * Output redirection is handled via ``IProcessInvoker.ExecuteBufferedAsync`` (or
       ``IExternalProcess.CaptureBufferedResultAsync``).
 
-* Fluent Builders:
-    * ``ArgumentsSpec`` - A spec for Argument Building and argument escaping.
-    * ``EnvironmentVariablesSpec`` - A spec for setting Environment variables.
-    * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects.
+* Fluent specs and builders:
+    * ``ArgumentsSpec`` - A spec for argument building and argument escaping.
+    * ``EnvironmentVariablesSpec`` - A spec for setting environment variables.
+    * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects. Prefer direct init construction. Reach for the builder only for argument escaping, user credentials, or resource-policy flows.
     * ``ProcessResourcePolicySpec`` - A spec for fluently configuring and building ``ProcessResourcePolicy``
       objects.
     * ``UserCredentialSpec``
@@ -31,24 +31,18 @@ Key Abstractions:
 
 * Clear separation of concerns between Process Configuration Builders, Process Configuration Models, and Invokers.
 * Supports .NET 10 and has few dependencies.
-* Dependency Injection extensions register `IProcessInvoker`, `IExternalProcessFactory`, and middleware from a single `AddCliInvoke()` call.
+* Dependency Injection extensions in the main `CliInvoke` package register `IProcessInvoker`, `IExternalProcessFactory`, and middleware from a single `AddCliInvoke()` call.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
   Windows <sup>1</sup>
 * [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
 
 <sup>1</sup> Specializations library distributed separately.
 
-## Comparison vs Alternatives
+## Comparison vs alternatives
 
-| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   | [ProcessX](https://github.com/Cysharp/ProcessX) |
-|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------:|
-| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                        ❌                        |
-| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                         |                        ❌                        |
-| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                       ❌*                        |
-| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |
+CliInvoke is compared against [CliWrap](https://github.com/Tyrrrz/CliWrap/), [ProcessX](https://github.com/Cysharp/ProcessX), and the built-in .NET `Process` class across features like configuration separation, DI support, middleware, cross-platform support, and licensing.
+
+See the [full comparison table](../../site/docs/comparison.md) for a detailed feature-by-feature breakdown.
 
 ## Installing CliInvoke.Core
 
@@ -64,7 +58,7 @@ via the Nuget website.
 CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android.
 
 For more details see
-the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/docs/docs/Supported-OperatingSystems.md)
+the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blob/main/site/docs/Supported-OperatingSystems.md)
 
 ## Design Patterns & When to Use Them
 
@@ -72,136 +66,121 @@ CliInvoke.Core provides abstractions and types used by different design patterns
 
 * **`CliRun`** – Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. (Requires `CliInvoke` package)
 * **`IProcessInvoker`** – DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
-* **`ExternalProcess` & `ExternalProcessFactory`** – Process-like API with greater flexibility. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
+* **`IExternalProcess` & `IExternalProcessFactory`** – Process-like API with greater flexibility. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
 
 ## Examples
 
-### Simple ``ProcessConfiguration`` creation with Factory Pattern
+### Simple ``ProcessConfiguration`` with init construction
 
-This approach uses the ``IExternalProcessFactory`` interface factory to create a ``ProcessConfiguration``. It
-requires fewer parameters and sets up more defaults for you.
+Build the configuration directly. ``TargetFilePath`` is required and all other properties take documented defaults.
 
-It can be provided with a ``Action<IProcessConfigurationBuilder> configure`` optional parameter where greater control is
-desired.
+#### Non-buffered execution example
 
-#### Non-Buffered Execution Example
-
-This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
+This example gets a non-buffered ``ProcessResult`` that contains the exit code, process id, and other information.
 
 ```csharp
-using CliInvoke.Core.Factories;
 using CliInvoke.Core;
 
 using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code omitted for clarity
 
-// Get IExternalProcessFactory 
-IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
-
 // Get IProcessInvoker
-IProcessInvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
+IProcessInvoker invoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-// Simply create the process configuration.
-ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
+// Build the process configuration directly.
+ProcessConfiguration configuration = new ProcessConfiguration
+{
+    TargetFilePath = "path/to/exe",
+    Arguments = "arguments"
+};
 
-// Run the process configuration and get the results.
-ProcessResult result = await _invoker.ExecuteAsync(configuration, CancellationToken.None);
+// Run the process configuration and get the result.
+ProcessResult result = await invoker.ExecuteAsync(configuration);
 ```
 
-#### Buffered Execution Example
+#### Buffered execution example
 
 This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
 
 ```csharp
-using CliInvoke.Core.Factories;
 using CliInvoke.Core;
 
 using Microsoft.Extensions.DependencyInjection;
 
 // Dependency Injection setup code omitted for clarity
 
-// Get IExternalProcessFactory 
-IExternalProcessFactory processConfigFactory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
-
 // Get IProcessInvoker
-IProcessnvoker _invoker_ = serviceProvider.GetRequiredService<IProcessInvoker>();
+IProcessInvoker invoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-// Simply create the process configuration.
-ProcessConfiguration configuration = processConfigFactory.Create("path/to/exe", "arguments");
+// Build the process configuration directly.
+ProcessConfiguration configuration = new ProcessConfiguration
+{
+    TargetFilePath = "path/to/exe",
+    Arguments = "arguments"
+};
 
-// Run the process configuration and get the results.
-BufferedProcessResult result = await _invoker.ExecuteBufferedAsync(configuration, CancellationToken.None);
+// Run the process configuration and get the result.
+BufferedProcessResult result = await invoker.ExecuteBufferedAsync(configuration);
 ```
 
-### Advanced Configuration with Builders
+### Advanced configuration with builders
 
-The following examples shows how to configure and build a ``ProcessConfiguration`` depending on whether Buffering the
-output is desired.
+Reach for ``IProcessConfigurationBuilder`` only when you need argument escaping, user credentials, or resource-policy callback flows. For everything else, prefer direct init construction as shown above. The builder implementation ships in the main ``CliInvoke`` package.
 
-#### Non-Buffered Execution Example
-
-This example gets a non buffered ``ProcessResult`` that contains basic process exit code, id, and other information.
+#### Non-buffered execution example
 
 ```csharp
-using CliInvoke;
-using CliInvoke.Core;
-
 using CliInvoke.Builders;
-using CliInvoke.Core.Builders;
-
-using Microsoft.Extensions.DependencyInjection;
-
-  //Namespace and class code ommitted for clarity 
-
-  // ServiceProvider and Dependency Injection setup code ommitted for clarity
-  
-  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
-
-  // Fluently configure your Command.
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
-                            .SetArguments(["arg1", "arg2"])
-                            .SetWorkingDirectory("/Path/To/Directory");
-  
-  // Build it as a ProcessConfiguration object when you're ready to use it.
-  ProcessConfiguration config = builder.Build();
-  
-  // Execute the process through ProcessInvoker and get the results.
-ProcessResult result = await _processConfigInvoker.ExecuteAsync(config);
-```
-
-#### Buffered Execution Example
-
-This example gets a ``BufferedProcessResult`` which contains redirected StandardOutput and StandardError as strings.
-
-```csharp
-using CliInvoke;
-using CliInvoke.Builders;
-
 using CliInvoke.Core;
 using CliInvoke.Core.Builders;
 
 using Microsoft.Extensions.DependencyInjection;
 
+// Namespace and class code omitted for clarity
 
-  //Namespace and class code ommitted for clarity 
+// ServiceProvider and Dependency Injection setup code omitted for clarity
 
-  // ServiceProvider and Dependency Injection setup code ommitted for clarity
-  
-  IProcessInvoker _processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-  // Fluently configure your Command.
-  IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable")
-                            .SetArguments(["arg1", "arg2"])
-                            .SetWorkingDirectory("/Path/To/Directory")
-                            .SetOutputRedirection(true)
-                           .SetOutputRedirection(true);
-  
-  // Build it as a ProcessConfiguration object when you're ready to use it.
-  ProcessConfiguration config = builder.Build();
-  
-  // Execute the process through ProcessInvoker and get the results.
-BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(config);
+// Fluently configure the command. The builder is disposable.
+using IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable");
+builder.SetArguments(["arg1", "arg2"]);
+builder.SetWorkingDirectory("/Path/To/Directory");
+
+// Build it as a ProcessConfiguration object when ready to use it.
+ProcessConfiguration config = builder.Build();
+
+// Execute the process through the invoker and get the result.
+ProcessResult result = await processInvoker.ExecuteAsync(config);
+```
+
+#### Buffered execution example
+
+```csharp
+using CliInvoke.Builders;
+using CliInvoke.Core;
+using CliInvoke.Core.Builders;
+
+using Microsoft.Extensions.DependencyInjection;
+
+// Namespace and class code omitted for clarity
+
+// ServiceProvider and Dependency Injection setup code omitted for clarity
+
+IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+
+// Fluently configure the command. The builder is disposable.
+using IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable");
+builder.SetArguments(["arg1", "arg2"]);
+builder.SetWorkingDirectory("/Path/To/Directory");
+builder.SetOutputRedirection(true);
+
+// Build it as a ProcessConfiguration object when ready to use it.
+ProcessConfiguration config = builder.Build();
+
+// Execute the process through the invoker and get the result.
+BufferedProcessResult result = await processInvoker.ExecuteBufferedAsync(config);
 ```
 
 #### Cancellation and Timeout
@@ -273,8 +252,8 @@ using CliInvoke.Core;
 
 // Configure forceful exit on timeout (immediate termination)
 ProcessTimeoutPolicy forcefulTimeout = new ProcessTimeoutPolicy(
-    timeoutThreshold: TimeSpan.FromSeconds(30), 
-    enabled: true, 
+    timeoutThreshold: TimeSpan.FromSeconds(30),
+    enabled: true,
     exitBehaviour: ProcessExitBehaviour.ForcefulExit);
 
 ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(forcefulTimeout);
@@ -318,7 +297,7 @@ ProcessExitConfiguration noTimeout = new ProcessExitConfiguration(ProcessTimeout
 
 Thanks to these projects:
 
-* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying older TFM support
+* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying TFM support
 
 For more information, please see
 the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).
