@@ -13,38 +13,35 @@ Looking for the [CliInvoke Readme](https://github.com/alastairlundy/CliInvoke/bl
 
 ## Usage
 
-CliInvoke.Specializations ships two specializations:
+CliInvoke.Specializations ships three shell middleware types: `PowerShellMiddleware` (`UsePowerShell()`), `CmdMiddleware` (`UseCmd()`), and `DefaultShellMiddleware` (`UseDefaultShell()`). They wrap the command in the relevant shell at invocation time.
 
-- [CmdProcessConfiguration](#cmdprocessconfiguration) — An easier way to execute processes and commands through
-  Windows' `cmd.exe`.
-- [PowershellProcessConfiguration](#powershellprocessconfiguration) — An easier way to execute processes and commands
-  through the modern Cross-Platform open source PowerShell (PowerShell is not installed by CliInvoke and is expected to
-  be installed if you plan to use it.)
+The legacy `CmdProcessConfiguration` and `PowershellProcessConfiguration` subclasses are deprecated, marked `[Obsolete]`, and will be removed in 4.0. New code should use `ProcessConfiguration` with the matching middleware instead. The old subclasses are still documented below for existing users:
 
-All Command specialization classes come with an already configured `TargetFilePath` that points to the relevant
-executable.
+- [CmdProcessConfiguration](#cmdprocessconfiguration-deprecated) — only for existing users, runs through Windows' `cmd.exe`.
+- [PowershellProcessConfiguration](#powershellprocessconfiguration-deprecated) — only for existing users, runs through cross-platform PowerShell (PowerShell is not installed by CliInvoke and must already be installed).
 
 ### Quick start with CliRun
 
-The fastest path is the static `CliRun` helper. Build a configuration and await the result.
+The fastest path is the static `CliRun` helper. `CliRun` runs each call through a fresh pipeline with no middleware, so target the shell executable directly.
 
 ```csharp
 using CliInvoke;
 using CliInvoke.Core;
-using CliInvoke.Specializations.Configurations;
 
 // Run a PowerShell command using the cross-platform pwsh executable.
-using PowershellProcessConfiguration config = new PowershellProcessConfiguration("-Command Get-Process");
+ProcessConfiguration config = new ProcessConfiguration
+{
+    TargetFilePath = "pwsh",
+    Arguments = "-Command Get-Process"
+};
 
 BufferedProcessResult result = await CliRun.RunBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
-
-
 ```
 
 `CliRun` also exposes `RunAsync` (returns a `ProcessResult`) and
-`FireAndForget` for fire-and-forget execution.
+`FireAndForget` for fire-and-forget execution. To wrap commands through middleware instead, use the dependency injection path below.
 
-### Dependency Injection
+### Dependency injection
 
 If you prefer to resolve an invoker from a dependency injection container, call `AddCliInvoke()` (namespace
 `CliInvoke.Extensions`, shipped in the main `CliInvoke` package). This registers the core services, the
@@ -53,8 +50,8 @@ If you prefer to resolve an invoker from a dependency injection container, call 
 #### AddCliInvokeSpecializations
 
 `AddCliInvokeSpecializations()` (namespace `CliInvoke.Extensions`, shipped in this package) registers the
-Specializations middleware types — `PowerShellMiddleware`, `CmdMiddleware`, `DefaultShellMiddleware`, and
-`ShellMiddlewareOptions` — so that the convenience builder extensions `UsePowerShell()`, `UseCmd()`, and
+Specializations middleware types (`PowerShellMiddleware`, `CmdMiddleware`, `DefaultShellMiddleware`, and
+`ShellMiddlewareOptions`), so the convenience builder extensions `UsePowerShell()`, `UseCmd()`, and
 `UseDefaultShell()` can resolve them from the DI container.
 
 `DefaultShellMiddleware` detects the user's default shell (pwsh, Windows PowerShell, or cmd) and wraps the
@@ -66,7 +63,7 @@ specific shell.
 > process factory, and other core services will not be available.
 
 Both registrations accept an optional `ServiceLifetime` parameter (default `Scoped`). The two calls are
-independent and can be chained in either order, but both must use the **same lifetime** — middleware lifetimes
+independent and can be chained in either order, but both must use the **same lifetime**. Middleware lifetimes
 are matched to the invoker lifetime to avoid capturing scoped services into a singleton:
 
 ```csharp
@@ -80,16 +77,43 @@ ServiceCollection services = new ServiceCollection();
 services.AddCliInvoke(builder => builder.UsePowerShell().UseCmd())
     .AddCliInvokeSpecializations();
 
-using IServiceProvider serviceProvider = services.BuildServiceProvider();
+using ServiceProvider serviceProvider = services.BuildServiceProvider();
 ```
 
 > Calling `AddCliInvoke(builder => builder.UsePowerShell())` without `AddCliInvokeSpecializations()` compiles but
 > throws `InvalidOperationException` when the invoker is first resolved, because the `PowerShellMiddleware` type
 > is not registered in the container.
 
-### CmdProcessConfiguration
+### CmdProcessConfiguration (deprecated)
 
-The `CmdProcessConfiguration` `TargetFilePath` points to Windows' copy of `cmd.exe`. This is only supported on Windows.
+> [!WARNING]
+> `CmdProcessConfiguration` is marked `[Obsolete]` and will be removed in 4.0. New code should use `ProcessConfiguration` with `UseCmd()` middleware. The example below remains for existing users.
+
+```csharp
+using CliInvoke.Core;
+using CliInvoke.Extensions;
+using CliInvoke.Specializations.Middleware;
+using Microsoft.Extensions.DependencyInjection;
+
+ServiceCollection services = new ServiceCollection();
+
+services.AddCliInvoke(builder => builder.UseCmd())
+    .AddCliInvokeSpecializations();
+
+using ServiceProvider serviceProvider = services.BuildServiceProvider();
+
+IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+
+ProcessConfiguration config = new ProcessConfiguration
+{
+    TargetFilePath = "Path/To/Exe",
+    Arguments = "With/Arguments"
+};
+
+BufferedProcessResult result = await processInvoker.ExecuteBufferedAsync(config);
+```
+
+The legacy subclass equivalent, for existing users only: `CmdProcessConfiguration` `TargetFilePath` points to Windows' copy of `cmd.exe`. This is only supported on Windows.
 
 ```csharp
 using CliInvoke;
@@ -118,9 +142,36 @@ To discard the output, call `ExecuteAsync()` instead:
 ProcessResult result = await _processInvoker.ExecuteAsync(processToRun);
 ```
 
-### PowershellProcessConfiguration
+### PowershellProcessConfiguration (deprecated)
 
-`PowershellProcessConfiguration.TargetFilePath` points to the installed copy of cross-platform PowerShell. Supported on the platforms that `pwsh` supports.
+> [!WARNING]
+> `PowershellProcessConfiguration` is marked `[Obsolete]` and will be removed in 4.0. New code should use `ProcessConfiguration` with `UsePowerShell()` middleware. The example below remains for existing users.
+
+```csharp
+using CliInvoke.Core;
+using CliInvoke.Extensions;
+using CliInvoke.Specializations.Middleware;
+using Microsoft.Extensions.DependencyInjection;
+
+ServiceCollection services = new ServiceCollection();
+
+services.AddCliInvoke(builder => builder.UsePowerShell())
+    .AddCliInvokeSpecializations();
+
+using ServiceProvider serviceProvider = services.BuildServiceProvider();
+
+IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
+
+ProcessConfiguration config = new ProcessConfiguration
+{
+    TargetFilePath = "Path/To/Exe",
+    Arguments = "With/Arguments"
+};
+
+BufferedProcessResult result = await processInvoker.ExecuteBufferedAsync(config);
+```
+
+The legacy subclass equivalent, for existing users only: `PowershellProcessConfiguration.TargetFilePath` points to the installed copy of cross-platform PowerShell. Supported on the platforms that `pwsh` supports.
 
 ```csharp
 using CliInvoke;
@@ -142,33 +193,9 @@ ProcessConfiguration processToRun = _runnerConfigurationFactory.CreateRunnerConf
 BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(processToRun);
 ```
 
-### Dedicated invokers
+### Dedicated invokers (removed)
 
-CliInvoke.Specializations also ships two convenience invoker wrappers — `CmdProcessInvoker` and
-`PowershellProcessInvoker` (namespace `CliInvoke.Specializations`) — that implement `IProcessInvoker`
-with the relevant middleware (`CmdMiddleware` / `PowerShellMiddleware`) applied. They run commands
-through `cmd.exe` / `pwsh` directly without manually building a runner configuration.
-
-Both are constructed from an `IExternalProcessFactory`, which `AddCliInvoke()` (main `CliInvoke` package) registers in the container:
-
-```csharp
-using CliInvoke.Core;
-using CliInvoke.Core.Factories;
-using CliInvoke.Specializations;
-using CliInvoke.Specializations.Configurations;
-
-// Resolve the external process factory registered by AddCliInvoke().
-IExternalProcessFactory factory = serviceProvider.GetRequiredService<IExternalProcessFactory>();
-
-// CmdProcessInvoker applies CmdMiddleware and runs through cmd.exe (Windows only).
-using CmdProcessInvoker cmdInvoker = new CmdProcessInvoker(factory);
-
-using CmdProcessConfiguration cmdConfig = new CmdProcessConfiguration("echo hello", false, true);
-ProcessResult result = await cmdInvoker.ExecuteAsync(cmdConfig);
-```
-
-`PowershellProcessInvoker` works the same way and is supported on the platforms that cross-platform PowerShell
-supports.
+`CmdProcessInvoker` and `PowershellProcessInvoker` were removed. Use `IProcessInvoker` with `UseCmd()` or `UsePowerShell()` middleware instead, as shown above.
 
 ## Licensing
 
