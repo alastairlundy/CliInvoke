@@ -423,7 +423,5 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             _disposed = true;
             _processWrapper.Dispose();
         }
-
-        GC.SuppressFinalize(this);
     }
 }
