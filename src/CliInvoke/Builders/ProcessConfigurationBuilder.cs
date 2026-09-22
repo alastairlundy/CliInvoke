@@ -87,6 +87,73 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
         
         _workingDirectoryPath = Directory.GetCurrentDirectory();
     }
+
+    /// <summary>
+    ///     Initialises a new instance of the <see cref="ProcessConfigurationBuilder" /> class
+    ///     pre-populated with every member value from the supplied
+    ///     <paramref name="source" /> configuration. The resulting builder is the
+    ///     delta surface for configuration derivation: callers apply overrides via
+    ///     the public Set*/Configure methods and call <see cref="Build" /> to
+    ///     produce a derived <see cref="ProcessConfiguration" />.
+    /// </summary>
+    /// <param name="source">The source configuration whose members seed the builder.</param>
+    internal ProcessConfigurationBuilder(ProcessConfiguration source)
+        : this(source.TargetFilePath)
+    {
+        _argumentsSpec.Clear();
+        if (!string.IsNullOrEmpty(source.Arguments))
+            _argumentsSpec.Add(source.Arguments, escape: false);
+
+        _argumentList = source.ArgumentList;
+        _workingDirectoryPath = source.WorkingDirectoryPath;
+        _requiresAdministratorPrivileges = source.RequiresAdministrator;
+        _enableWindowCreation = source.WindowCreation;
+        _useShellExecution = source.UseShellExecution;
+        _redirectStandardInput = source.RedirectStandardInput;
+        _outputRedirection = source.OutputRedirection;
+        _standardInput = source.StandardInput ?? StreamWriter.Null;
+        _standardInputEncoding = source.StandardInputEncoding;
+        _standardOutputEncoding = source.StandardOutputEncoding;
+        _standardErrorEncoding = source.StandardErrorEncoding;
+
+        _environmentVariablesSpec.SetReadOnlyDictionary(
+            source.EnvironmentVariables);
+
+#pragma warning disable CA1416
+        ConfigureProcessResourcePolicy(spec =>
+        {
+            spec.SetPriorityClass(
+                    source.ResourcePolicy.PriorityClass)
+                .ConfigurePriorityBoost(
+                    source.ResourcePolicy.EnablePriorityBoost);
+
+            spec.SetMinWorkingSet(
+                source.ResourcePolicy.MinWorkingSet);
+            spec.SetMaxWorkingSet(
+                source.ResourcePolicy.MaxWorkingSet);
+
+            spec.SetProcessorAffinity(
+                source.ResourcePolicy.ProcessorAffinity ??
+                (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+        });
+
+        ConfigureUserCredential(spec =>
+        {
+            if (source.Credential.LoadUserProfile is not null)
+                spec.SetUserProfileLoading(
+                    (bool)source.Credential.LoadUserProfile);
+
+            if (source.Credential.Domain is not null)
+                spec.SetDomain(source.Credential.Domain);
+
+            if (source.Credential.UserName is not null)
+                spec.SetUsername(source.Credential.UserName);
+
+            if (source.Credential.Password is not null)
+                spec.SetPassword(source.Credential.Password);
+        });
+#pragma warning restore CA1416
+    }
     
     /// <summary>
     ///     Sets the process arguments to the Process Configuration builder.
