@@ -134,10 +134,8 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
             useShellExecution: _options.UseShellExecution,
             windowCreation: _options.WindowCreation,
             argumentList: argumentList);
+
         InvocationContext newContext = context.WithConfiguration(newConfig);
-            windowCreation: _options.WindowCreation,
-            useShellExecution: _options.UseShellExecution,
-            argumentList: argumentList);
 
         InvocationContext newContext = context.WithConfiguration(newConfig);
 

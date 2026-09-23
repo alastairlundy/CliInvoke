@@ -111,9 +111,7 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             useShellExecution: src.UseShellExecution,
             windowCreation: src.WindowCreation,
             argumentList: argumentList);
-        InvocationContext newContext = context.WithConfiguration(newConfig);
-            windowCreation: src.WindowCreation,
-            argumentList: argumentList);
+
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
         await next(newContext).ConfigureAwait(false);
