@@ -50,16 +50,14 @@ Per-call allocation reductions in result parsing and argument building</PackageR
         <IsAotCompatible>true</IsAotCompatible>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-
+    
     <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>CliInvoke.Tests</_Parameter1>
-        </AssemblyAttribute>
+        <InternalsVisibleTo Include="CliInvoke.Tests"/>
+        <InternalsVisibleTo Include="CliInvoke.Specializations"/>
         <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
     </ItemGroup>
 
 <!--    <ItemGroup>
-        <PackageReference Include="DotExtensions"/>
        <PackageReference Include="Polyfill" PrivateAssets="all">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

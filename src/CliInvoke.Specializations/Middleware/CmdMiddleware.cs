@@ -8,6 +8,7 @@
    */
 
 using CliInvoke.Core.Internal;
+using CliInvoke.Internal;
 using CliInvoke.Specializations.Configurations;
 
 namespace CliInvoke.Specializations.Middleware;
