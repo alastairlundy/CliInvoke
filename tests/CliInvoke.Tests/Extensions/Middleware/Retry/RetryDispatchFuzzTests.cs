@@ -7,11 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using CliInvoke.Core.Middleware;
 using CliInvoke.Extensions.Middleware.Retry;
-using FsCheck;
-using FsCheck.Fluent;
 
-namespace CliInvoke.Extensions.Tests.Middleware.Retry;
+namespace CliInvoke.Tests.Extensions.Middleware.Retry;
 
 /// <summary>
 ///     Property-based fuzz tests for <see cref="RetryMiddleware"/> dispatch: how many times the inner

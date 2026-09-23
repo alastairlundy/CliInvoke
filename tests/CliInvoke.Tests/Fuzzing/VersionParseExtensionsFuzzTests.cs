@@ -9,8 +9,6 @@
 
 using System.Linq;
 using CliInvoke.Internal.Versions;
-using FsCheck;
-using FsCheck.Fluent;
 
 namespace CliInvoke.Tests.Fuzzing;
 

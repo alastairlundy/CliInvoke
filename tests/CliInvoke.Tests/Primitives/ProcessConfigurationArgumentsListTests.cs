@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace CliInvoke.Tests.Primitives;
 
 public class ProcessConfigurationArgumentsListTests

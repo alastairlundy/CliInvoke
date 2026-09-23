@@ -7,11 +7,13 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Extensions;
 using CliInvoke.Extensions.Caching;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace CliInvoke.Extensions.Tests.Caching;
+namespace CliInvoke.Tests.Extensions.Caching;
 
 /// <summary>
 ///     Tests for <see cref="CachingFilePathResolverExtensions.UseCachingFilePathResolver"/>: the

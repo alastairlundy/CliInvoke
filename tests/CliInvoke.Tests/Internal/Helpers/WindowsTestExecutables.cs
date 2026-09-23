@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace CliInvoke.Tests.Internal.Helpers;
+﻿namespace CliInvoke.Tests.Internal.Helpers;
 
 public static class WindowsTestExecutables
 {

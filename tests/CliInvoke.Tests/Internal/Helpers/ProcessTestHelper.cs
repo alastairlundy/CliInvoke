@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 using CliInvoke.Processes.Internal;
 
 namespace CliInvoke.Tests.Internal.Helpers;
