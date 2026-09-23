@@ -3,7 +3,7 @@ using TUnit.Assertions.Enums;
 
 namespace CliInvoke.Tests.Middleware;
 
-public class UseWhenTests
+public class MiddlewareUseWhenTests
 {
     [Test]
     public async Task UseWhen_SyncPredicate_True_RunsSubPipeline()

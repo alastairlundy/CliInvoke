@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-namespace CliInvoke.Tests;
+namespace CliInvoke.Tests.Invokers;
 
 /// <summary>
 /// Exercises the public surface of <see cref="CliRun"/> by running real processes.

@@ -10,7 +10,7 @@
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 
-namespace CliInvoke.Tests;
+namespace CliInvoke.Tests.Helpers;
 
 /// <summary>
 /// Records how many times <see cref="CreateExternalProcess(ProcessConfiguration, ProcessExitConfiguration)"/>
