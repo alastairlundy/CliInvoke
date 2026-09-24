@@ -22,8 +22,7 @@ This skill provides the operational commands for packaging and publishing the Cl
 
 | Input | Required | Description |
 |-------|----------|-------------|
-| Core Version | Yes | The version string for CliInvoke.Core (e.g., 3.0.0) |
-| Main Version | Yes | The version string for CliInvoke (e.g., 3.0.0) |
+| Release versions | Yes | Set the `PackageVersion` property in each csproj (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) before packing. These are the single source of truth — no workflow inputs or version properties are passed. |
 
 ## Workflow
 
@@ -39,10 +38,12 @@ dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json
 ```
 
 ### Step 2: Production Publishing Sequence
-Follow the sequence defined in `.github/workflows/publish.yml`:
+Follow the sequence defined in `.github/workflows/publish.yml` — plain `dotnet pack` per project, in dependency order:
 1. Pack `src/CliInvoke.Core`.
-2. Restore and build dependent projects while passing version properties:
-   `/p:CliInvokeCoreVersion=<<core-version>>` and `/p:CliInvokeVersion=<<main-version>>`.
+2. Pack `src/CliInvoke`.
+3. Pack `src/CliInvoke.Specializations`.
+
+The three projects reference each other via ProjectReference (versioned by each csproj's `PackageVersion`), so no feed or version properties are needed.
 
 ### Step 3: Release Build Verification
 Verify that the projects build in Release mode with SourceLink enabled. Release builds in CI expect SourceLink and symbol generation; use the CI build flag to replicate that behavior:
@@ -54,6 +55,6 @@ dotnet build src/CliInvoke.sln -c Release /p:ContinuousIntegrationBuild=true
 
 - [ ] `src/CliInvoke.Core` nupkg is generated in the output directory.
 - [ ] `src/CliInvoke` restores successfully using the local feed.
-- [ ] Version properties are correctly applied during the build.
+- [ ] All three csprojs' `PackageVersion` properties match the intended release version.
 - [ ] No prerelease suffix on stable release versions (e.g., `3.0.0`, not `3.0.0-beta.3`).
 - [ ] Release build with `/p:ContinuousIntegrationBuild=true` completes without errors (SourceLink and symbol generation are enabled in the csproj).
