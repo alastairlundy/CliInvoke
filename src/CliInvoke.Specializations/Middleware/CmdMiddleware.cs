@@ -94,7 +94,8 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             shellTargetPath: "cmd.exe",
             runnerArgs: "/c",
             kind: ShellKind.Cmd,
-            shellOptions: _options);
+            windowCreation: src.WindowCreation,
+            useShellExecution: src.UseShellExecution);
 
         ProcessConfiguration newConfig = new CmdProcessConfiguration(
             string.Empty,

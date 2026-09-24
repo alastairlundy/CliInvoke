@@ -114,10 +114,12 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
 
         ProcessConfiguration rewritten = ShellRewriter.Rewrite(
             source,
-            shellTargetPath: OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
+            OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
             runnerArgs: "-NoProfile -NonInteractive -Command",
             kind: ShellKind.PowerShell,
-            shellOptions: _options);
+            windowCreation:  _options.WindowCreation,
+            useShellExecution: _options.UseShellExecution
+        );
 
         ProcessConfiguration newConfig = new PowershellProcessConfiguration(
             string.Empty,
@@ -135,9 +137,7 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
             useShellExecution: _options.UseShellExecution,
             windowCreation: _options.WindowCreation,
             argumentList: argumentList);
-
-        InvocationContext newContext = context.WithConfiguration(newConfig);
-
+        
         InvocationContext newContext = context.WithConfiguration(newConfig);
 
         await next(newContext).ConfigureAwait(false);
