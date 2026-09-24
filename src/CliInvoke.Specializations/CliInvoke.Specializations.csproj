@@ -12,27 +12,22 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.0</PackageVersion>
+        <PackageVersion>3.0.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>AddCliInvokeSpecializations is the registration entry point (must chain with AddCliInvoke, same ServiceLifetime)
-PowerShellMiddleware, CmdMiddleware, DefaultShellMiddleware and their UsePowerShell/UseCmd/UseDefaultShell extensions
-ShellMiddlewareOptions (renamed from PowerShellMiddlewareOptions)
-ShellArgumentEscaper.EscapeForPosixShell for POSIX shell escaping
-ShellArgumentEscaper relocated here with hardened escaping
-IFilePathResolver removed from PowershellProcessConfiguration, PowershellProcessInvoker, and PowerShellMiddleware constructors
-CmdProcessInvoker and PowershellProcessInvoker wrapper types deleted. Use middleware instead.
-Specialized invokers refactored into thin wrappers over ProcessInvoker + middleware</PackageReleaseNotes>
+        <PackageReleaseNotes>#### Fixed
+* Fixed an issue where ``ArgumentList`` was never copied from a user supplied ``ProcessConfiguration`` to the intermediate ``ProcessConfiguration`` that was run.
+* Updated to use CliInvoke 3.0.1</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>3.0.0</AssemblyVersion>
-        <FileVersion>3.0.0</FileVersion>
+        <AssemblyVersion>3.0.1</AssemblyVersion>
+        <FileVersion>3.0.1</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
