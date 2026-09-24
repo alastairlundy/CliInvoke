@@ -12,6 +12,8 @@
 using System.Linq;
 using System.Text;
 
+using CliInvoke.Core.Internal;
+
 namespace CliInvoke.Internal;
 
 /// <summary>
