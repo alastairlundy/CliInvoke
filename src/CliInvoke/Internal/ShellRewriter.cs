@@ -345,7 +345,7 @@ internal static class ShellRewriter
         // When ArgumentList is non-empty it takes precedence over Arguments (matching
         // ProcessConfiguration's delivery contract); each verbatim entry is escaped
         // individually for the target shell and joined into the composed command.
-        // Otherwise the legacy single Arguments string is escaped as a whole.
+        // Otherwise, the legacy single Arguments string is escaped as a whole.
         switch (kind)
         {
             case ShellKind.PowerShell:
