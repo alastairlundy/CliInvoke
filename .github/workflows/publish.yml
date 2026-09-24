@@ -43,25 +43,30 @@ jobs:
       - name: Pack Core to local feed
         run: dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs
 
-      # Use local feed for Specializations
-      - name: Restore Specializations from local feed + NuGet.org
-        run: dotnet restore src/CliInvoke.Specializations -s ./nupkgs -s https://api.nuget.org/v3/index.json
-
-      - name: Build Specializations (resolves CliInvoke.Core from local feed)
-        run: dotnet build src/CliInvoke.Specializations -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }}
-
-      # Use local feed for main
+      # Main: resolve CliInvoke.Core from the local feed so the packed
+      # dependency is pinned exactly to core-version and can never float.
+      # Main is packed before Specializations so the CliInvoke package is
+      # already in the local feed when Specializations restores.
       - name: Restore Main from local feed + NuGet.org
-        run: dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json
+        run: dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
 
       - name: Build Main (resolves CliInvoke.Core from local feed)
-        run: dotnet build src/CliInvoke -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }}
+        run: dotnet build src/CliInvoke -c Release --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
 
-      # Pack the builds to ./nupkgs as well (so all resulting nupkgs end up in ./nupkgs)
-      - name: Pack Specializations and Main into local feed
-        run: |
-          dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
-          dotnet pack src/CliInvoke -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+      # Pack Main so its nupkg lands in ./nupkgs (all resulting nupkgs end up in ./nupkgs)
+      - name: Pack Main into local feed
+        run: dotnet pack src/CliInvoke -c Release -o ./nupkgs --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+
+      # Specializations: packed after Main so both CliInvoke.Core and CliInvoke
+      # are already in the local feed (Specializations depends on both packages).
+      - name: Restore Specializations from local feed + NuGet.org
+        run: dotnet restore src/CliInvoke.Specializations -s ./nupkgs -s https://api.nuget.org/v3/index.json /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }} /p:CliInvokeVersion=${{ inputs.main-version }}
+
+      - name: Build Specializations (resolves CliInvoke.Core/CliInvoke from local feed)
+        run: dotnet build src/CliInvoke.Specializations -c Release --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }} /p:CliInvokeVersion=${{ inputs.main-version }}
+
+      - name: Pack Specializations into local feed
+        run: dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs --no-restore /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }} /p:CliInvokeVersion=${{ inputs.main-version }}
 
       # Authenticate to NuGet (OIDC)
       - name: NuGet login (OIDC → temp API key)
