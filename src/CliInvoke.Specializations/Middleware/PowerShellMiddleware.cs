@@ -7,9 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core.Internal;
 using CliInvoke.Internal;
-using CliInvoke.Specializations.Configurations;
 
 namespace CliInvoke.Specializations.Middleware;
 
@@ -67,35 +65,6 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
 
         ThrowIfUnsupported();
 
-        string originalPath = context.Configuration.TargetFilePath;
-        string originalArgs = context.Configuration.Arguments;
-
-        // Escape both the target and the arguments so they are passed to the
-        // wrapped command as literal data. Without this, shell metacharacters in
-        // the arguments (e.g. ';', '|', '&', '$(...)') would be re-interpreted by
-        // PowerShell as additional commands — a command-injection risk.
-        string safePath = ShellArgumentEscaper.EscapeForPowerShell(originalPath);
-        string safeArgs = ShellArgumentEscaper.EscapeForPowerShell(originalArgs);
-
-        string wrappedCommand = string.IsNullOrWhiteSpace(safeArgs)
-            ? $"& \"{safePath}\""
-            : $"& \"{safePath}\" {safeArgs}";
-
-        // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
-        // re-tokenise it before PowerShell parses it. A single re-tokenised Arguments string
-        // would let a '"' in the value break the OS-level quoting and let PowerShell reassemble
-        // a second command (command-injection). ArgumentList is passed through unchanged.
-        IReadOnlyList<string> argumentList =
-        [
-            "-NoProfile",
-            "-NonInteractive",
-            "-Command",
-            wrappedCommand,
-        ];
-
-        // The specialisation configuration class is the single source of truth for the
-        // pwsh target path and shell flags; this middleware just supplies the wrapped command and
-        // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration source = new(src.TargetFilePath, src.Arguments, outputRedirection: context.Mode != InvocationMode.Raw)
         {
@@ -117,28 +86,10 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
             OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
             runnerArgs: "-NoProfile -NonInteractive -Command",
             kind: ShellKind.PowerShell,
-            windowCreation:  _options.WindowCreation,
-            useShellExecution: _options.UseShellExecution
-        );
-
-        ProcessConfiguration newConfig = new PowershellProcessConfiguration(
-            string.Empty,
-            rewritten.RedirectStandardInput,
-            context.Mode != InvocationMode.Raw,
-            workingDirectoryPath: rewritten.WorkingDirectoryPath,
-            requiresAdministrator: rewritten.RequiresAdministrator,
-            new Dictionary<string, string>(rewritten.EnvironmentVariables),
-            credentials: rewritten.Credential,
-            standardInput: rewritten.StandardInput,
-            standardInputEncoding: rewritten.StandardInputEncoding,
-            standardOutputEncoding: rewritten.StandardOutputEncoding,
-            standardErrorEncoding: rewritten.StandardErrorEncoding,
-            processResourcePolicy: rewritten.ResourcePolicy,
-            useShellExecution: _options.UseShellExecution,
             windowCreation: _options.WindowCreation,
-            argumentList: argumentList);
-        
-        InvocationContext newContext = context.WithConfiguration(newConfig);
+            useShellExecution: _options.UseShellExecution);
+
+        InvocationContext newContext = context.WithConfiguration(rewritten);
 
         await next(newContext).ConfigureAwait(false);
 

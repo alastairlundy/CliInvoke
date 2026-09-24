@@ -7,9 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core.Internal;
 using CliInvoke.Internal;
-using CliInvoke.Specializations.Configurations;
 
 namespace CliInvoke.Specializations.Middleware;
 
@@ -50,29 +48,6 @@ internal sealed class CmdMiddleware : IProcessMiddleware
 
         ThrowIfUnsupported();
 
-        string originalPath = context.Configuration.TargetFilePath;
-        string originalArgs = context.Configuration.Arguments;
-
-        // Escape both the target and the arguments so they are passed to the
-        // wrapped command as literal data. Without this, shell metacharacters in
-        // the arguments (e.g. '&', '|', '<', '>', '%VAR%') would be re-interpreted
-        // by cmd.exe as additional commands or redirection — a command-injection risk.
-        string safePath = ShellArgumentEscaper.EscapeForCmd(originalPath);
-        string safeArgs = ShellArgumentEscaper.EscapeForCmd(originalArgs);
-
-        string wrappedCommand = string.IsNullOrWhiteSpace(safeArgs)
-            ? $"\"{safePath}\""
-            : $"\"{safePath}\" {safeArgs}";
-
-        // Emit the wrapper as a verbatim ArgumentList so the OS command-line parser does NOT
-        // re-tokenise it before cmd.exe parses it. A single re-tokenised Arguments string
-        // (the historical implementation) let a '"' in the value break the OS-level quoting and
-        // inject additional cmd commands (command-injection). ArgumentList is passed through unchanged.
-        IReadOnlyList<string> argumentList = ["/c", wrappedCommand];
-
-        // The specialisation configuration class is the single source of truth for the cmd.exe
-        // target and the /c switch; this middleware just supplies the wrapped command and
-        // forwards the full original configuration.
         ProcessConfiguration src = context.Configuration;
         ProcessConfiguration source = new(src.TargetFilePath, src.Arguments, outputRedirection: context.Mode != InvocationMode.Raw)
         {
@@ -97,24 +72,7 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             windowCreation: src.WindowCreation,
             useShellExecution: src.UseShellExecution);
 
-        ProcessConfiguration newConfig = new CmdProcessConfiguration(
-            string.Empty,
-            rewritten.RedirectStandardInput,
-            context.Mode != InvocationMode.Raw,
-            workingDirectoryPath: rewritten.WorkingDirectoryPath,
-            requiresAdministrator: rewritten.RequiresAdministrator,
-            new Dictionary<string, string>(rewritten.EnvironmentVariables),
-            credentials: rewritten.Credential,
-            standardInput: rewritten.StandardInput,
-            standardInputEncoding: rewritten.StandardInputEncoding,
-            standardOutputEncoding: rewritten.StandardOutputEncoding,
-            standardErrorEncoding: rewritten.StandardErrorEncoding,
-            processResourcePolicy: rewritten.ResourcePolicy,
-            useShellExecution: src.UseShellExecution,
-            windowCreation: src.WindowCreation,
-            argumentList: argumentList);
-
-        InvocationContext newContext = context.WithConfiguration(newConfig);
+        InvocationContext newContext = context.WithConfiguration(rewritten);
 
         await next(newContext).ConfigureAwait(false);
 

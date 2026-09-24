@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
+## [3.0.1] - 2026-09-24
+
+### Changed
+
+- Backported shell command composition and escaping from v3.1 into an internal `ShellRewriter`, with property-based tests covering PowerShell, `cmd.exe`, and POSIX shell metacharacters.
+- Updated the root, Core, and Specializations READMEs to use v3 construction and middleware patterns, remove stale API references, and link to the published documentation.
+- Updated example projects to use the stable `CliInvoke` 3.0.0 and `CliInvoke.Core` 3.0.0 packages instead of `3.0.0-beta.3`.
+
+### Fixed
+
+- `UsePowerShell()` and `UseCmd()` now use the backported `ShellRewriter` output for the final invocation. Non-empty `ProcessConfiguration.ArgumentList` values are preserved and take precedence over `Arguments`; PowerShell uses discrete arguments, while `cmd.exe` uses its parser-compatible escaped command string.
+- Corrected target-path quoting for PowerShell and `cmd.exe` so embedded quotes, expansions, and shell metacharacters remain literal.
+- `UseCmd()` now preserves the source configuration's `UseShellExecution` setting.
+- `ProcessConfiguration.ArgumentList` now throws `ArgumentNullException` when assigned a list containing `null`. Empty-string entries remain valid.
+- `ProcessResult` now throws `ArgumentNullException` when constructed with a null `ExecutedFilePath`.
+
 ## [3.0.0] - 2026-09-13
 
 CliInvoke 3.0.0 is the first stable release of the v3 line.

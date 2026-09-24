@@ -16,13 +16,9 @@ using CliInvoke.Specializations.Middleware;
 namespace CliInvoke.Specializations.Tests.Middleware;
 
 /// <summary>
-///     Regression tests for the command-injection (RCE) vulnerability in the PowerShell/cmd
-///     wrappers. Historically the shell command was emitted as a single re-tokenized
-///     <see cref="System.Diagnostics.ProcessStartInfo.Arguments"/> string, so a <c>"</c> in a
-///     user-supplied target/argument broke the OS-level quoting and let the wrapped shell
-///     reassemble a second command. The wrappers now deliver the command via
-///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/>, so metacharacters must be
-///     treated as literal data.
+///     Regression tests for shell command composition. The middleware must use the
+///     shell-aware <c>ShellRewriter</c> output, preserve caller-supplied argument lists,
+///     and prevent shell metacharacters from becoming additional commands.
 /// </summary>
 public class ShellInjectionSecurityTests
 {
@@ -47,7 +43,7 @@ public class ShellInjectionSecurityTests
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
-    public async Task PowerShell_Wrapper_EmitsVerbatimArgumentList_NotSingleArgumentsString()
+    public async Task PowerShell_Wrapper_PreventsCommandInjectionFromTargetAndArguments()
     {
         // A target containing a double-quote and ampersand: under the old re-tokenized-Arguments
         // bug this would break OS-level quoting and inject a second command.
@@ -78,16 +74,23 @@ public class ShellInjectionSecurityTests
         // or second command can materialise.
         await Assert.That(command).Contains("`\"", StringComparison.Ordinal);
         await Assert.That(command).Contains("& evil.exe", StringComparison.Ordinal);
+        await Assert.That(command.Contains("`& evil.exe", StringComparison.Ordinal)).IsFalse();
+        await Assert.That(command).Contains("a `& b `| c", StringComparison.Ordinal);
     }
 
     [Test]
     [SupportedOSPlatform("windows")]
-    public async Task Cmd_Wrapper_EmitsVerbatimArgumentList_NotSingleArgumentsString()
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
+    public async Task PowerShell_Wrapper_PreservesArgumentListAndIgnoresArguments()
     {
-        ProcessConfiguration original = MakeConfig("prog\" & evil.exe & \"", "a & b | c");
+        ProcessConfiguration original = new("prog.exe", "ignored")
+        {
+            ArgumentList = ["first", "second;evil.exe"]
+        };
 
         CapturingNext next = new();
-        var middleware = new CmdMiddleware();
+        PowerShellMiddleware middleware = new();
 
         await middleware.InvokeAsync(
             new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
@@ -97,12 +100,57 @@ public class ShellInjectionSecurityTests
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 
         await Assert.That(rewritten.Arguments).IsEqualTo(string.Empty);
-        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(2);
-        await Assert.That(rewritten.ArgumentList[0]).IsEqualTo("/c");
+        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(4);
+        await Assert.That(rewritten.ArgumentList[3])
+            .IsEqualTo("& \"prog.exe\" first second`;evil.exe");
+    }
 
-        string command = rewritten.ArgumentList[1];
-        await Assert.That(command).StartsWith("\"");
-        await Assert.That(command).Contains("^&", StringComparison.Ordinal);
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task Cmd_Wrapper_PreventsCommandInjectionFromTargetAndArguments()
+    {
+        ProcessConfiguration original = MakeConfig("prog\" & evil.exe & \"", "a & b | c");
+
+        CapturingNext next = new();
+        CmdMiddleware middleware = new();
+
+        await middleware.InvokeAsync(
+            new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
+                InvocationMode.Buffered),
+            next.Invoke);
+
+        ProcessConfiguration rewritten = next.Captured!.Configuration;
+
+        // cmd.exe applies its own quote-stripping rules, so it receives a single
+        // escaped Arguments string rather than a ProcessStartInfo.ArgumentList.
+        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(0);
+        await Assert.That(rewritten.Arguments).StartsWith("/c \"");
+        await Assert.That(rewritten.Arguments).Contains("^&", StringComparison.Ordinal);
+        await Assert.That(rewritten.Arguments).Contains("^|", StringComparison.Ordinal);
+    }
+
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task Cmd_Wrapper_PreservesArgumentListAndIgnoresArguments()
+    {
+        ProcessConfiguration original = new("prog.exe", "ignored")
+        {
+            ArgumentList = ["first", "second&evil.exe"]
+        };
+
+        CapturingNext next = new();
+        CmdMiddleware middleware = new();
+
+        await middleware.InvokeAsync(
+            new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
+                InvocationMode.Buffered),
+            next.Invoke);
+
+        ProcessConfiguration rewritten = next.Captured!.Configuration;
+
+        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(0);
+        await Assert.That(rewritten.Arguments)
+            .IsEqualTo("/c \"prog.exe\" first second^&evil.exe");
     }
 
     private static string? ResolvePwshPath()
