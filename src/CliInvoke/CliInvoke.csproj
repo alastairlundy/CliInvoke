@@ -68,12 +68,7 @@
         </PackageReference>
     </ItemGroup>-->
 
-    <PropertyGroup>
-        <!-- default false, CI can set to true -->
-        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
-    </PropertyGroup>
-
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
+    <ItemGroup>
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
     </ItemGroup>
 
@@ -81,11 +76,6 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
-        <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="CliInvoke.Core"/>
     </ItemGroup>
 
     <ItemGroup>

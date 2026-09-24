@@ -41,21 +41,9 @@
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- default false, CI can set to true -->
-        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
-    </PropertyGroup>
-
-
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
+    <ItemGroup>
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
         <ProjectReference Include="..\CliInvoke\CliInvoke.csproj"/>
-    </ItemGroup>
-    
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
-        <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="CliInvoke.Core"/>
-        <PackageReference Include="CliInvoke"/>
     </ItemGroup>
 
     <ItemGroup>
