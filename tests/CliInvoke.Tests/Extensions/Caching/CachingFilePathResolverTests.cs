@@ -7,11 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Runtime.InteropServices;
 using CliInvoke.Extensions.Caching;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace CliInvoke.Extensions.Tests.Caching;
+namespace CliInvoke.Tests.Extensions.Caching;
 
 /// <summary>
 ///     Tests for <see cref="CachingFilePathResolver"/>: cache-by-raw-target behaviour, PATH-first

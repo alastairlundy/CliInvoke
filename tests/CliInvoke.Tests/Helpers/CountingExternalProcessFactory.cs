@@ -7,11 +7,10 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Runtime.InteropServices;
 using CliInvoke.Core.Factories;
 using CliInvoke.Core.Processes;
 
-namespace CliInvoke.Tests;
+namespace CliInvoke.Tests.Helpers;
 
 /// <summary>
 /// Records how many times <see cref="CreateExternalProcess(ProcessConfiguration, ProcessExitConfiguration)"/>

@@ -8,10 +8,13 @@
 */
 
 using CliInvoke.Core.Factories;
+using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Processes;
+using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware.Retry;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace CliInvoke.Extensions.Tests.Middleware.Retry;
+namespace CliInvoke.Tests.Extensions.Middleware.Retry;
 
 /// <summary>
 ///     Tests for <see cref="RetryMiddleware"/> and the <c>UseRetryPolicy</c> registration extension.
@@ -179,7 +182,7 @@ public class RetryMiddlewareTests
         IServiceCollection services = new ServiceCollection();
         // Register UseRetryPolicy() first, then replace the retry classifier and process factory with stubs.
         // Registering after AddCliInvoke ensures our singleton registrations win over the ones it adds.
-        services.AddCliInvoke(builder => builder.UseRetryPolicy());
+        services.AddCliInvoke(builder => RetryMiddlewareExtensions.UseRetryPolicy(builder));
 
         // A retry classifier that always classifies the result as retryable, plus a stub process factory that
         // avoids spawning real processes. Executing through the resolved IProcessInvoker (not a

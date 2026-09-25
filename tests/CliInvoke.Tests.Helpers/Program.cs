@@ -26,7 +26,7 @@ string markerPath = args.Length >= 1 ? args[0] : throw new ArgumentException(
     "Expected at least 2 arguments: <markerFilePath> <sleepSeconds>");
 
 if (!int.TryParse(args.Length >= 2 ? args[1] : null, NumberStyles.None,
-    CultureInfo.InvariantCulture, out int sleepSeconds))
+        CultureInfo.InvariantCulture, out int sleepSeconds))
 {
     throw new ArgumentException(
         $"Second argument must be an integer (sleep duration in seconds), got: '{args.ElementAtOrDefault(1)}'.");

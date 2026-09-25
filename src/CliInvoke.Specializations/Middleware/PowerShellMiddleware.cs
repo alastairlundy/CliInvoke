@@ -71,7 +71,7 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
 
         ProcessConfiguration rewritten = ShellRewriter.Rewrite(
             source,
-            shellTargetPath: OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
+            OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
             runnerArgs: "-NoProfile -NonInteractive -Command",
             kind: ShellKind.PowerShell,
             windowCreation: _options.WindowCreation,

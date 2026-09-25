@@ -14,9 +14,23 @@ adheres to [Semantic Versioning](https://semver.org/).
   Windows `CreateProcess` limit (~32,767 characters), an `ArgumentException` is thrown before
   process start, replacing the cryptic Win32 error 206. The check runs against the resolved
   absolute executable path and is skipped when `UseShellExecute` is enabled.
-- FsCheck property tests proving that `ProcessConfigurationDerivation` with an empty delta
-  reproduces every init-only property of the source configuration exactly (resource-owning
-  members matched by reference).
+- `ProcessResult.ToString()` bracketed diagnostic format:
+  `[ExitCode=N, Path=..., Runtime=...]`.
+- `BufferedProcessResult.ToString()` bracketed diagnostic format with
+  stdout/stderr length indicators and optional `Truncated=true`.
+- `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`
+  for tuple deconstruction.
+- `IsExitCodeZero()` extension on `ProcessResult` — returns `true` when
+  `ExitCode` equals zero; a default heuristic for non-DI callers.
+- `EnsureExitCodeZero()` extension on `ProcessResult` — throws
+  `ProcessNotSuccessfulException<TProcessResult>` when `ExitCode` is
+  non-zero.
+- `EnumerateOutputLines()` and `EnumerateErrorLines()` lazy extensions
+  on `BufferedProcessResult` — split output on `Environment.NewLine`
+  without allocating an intermediate array.
+- Result-ergonomics documentation guide (`site/docs/guides/results.md`)
+  covering the new members, `ToString` formats, `Deconstruct`, and the
+  heuristic-vs-validator framing.
 
 ### Changed
 
@@ -65,6 +79,21 @@ adheres to [Semantic Versioning](https://semver.org/).
 - Escaper fuzz tests now exercise the `ShellRewriter` composition paths
   for all three shell kinds (PowerShell, Cmd, Posix).
   
+## [3.0.1] - 2026-09-24
+
+### Changed
+
+- Backported shell command composition and escaping from v3.1 into an internal `ShellRewriter`, with property-based tests covering PowerShell, `cmd.exe`, and POSIX shell metacharacters.
+- Updated the root, Core, and Specializations READMEs to use v3 construction and middleware patterns, remove stale API references, and link to the published documentation.
+- Updated example projects to use the stable `CliInvoke` 3.0.0 and `CliInvoke.Core` 3.0.0 packages instead of `3.0.0-beta.3`.
+
+### Fixed
+
+- `UsePowerShell()` and `UseCmd()` now use the backported `ShellRewriter` output for the final invocation. Non-empty `ProcessConfiguration.ArgumentList` values are preserved and take precedence over `Arguments`; PowerShell uses discrete arguments, while `cmd.exe` uses its parser-compatible escaped command string.
+- Corrected target-path quoting for PowerShell and `cmd.exe` so embedded quotes, expansions, and shell metacharacters remain literal.
+- `UseCmd()` now preserves the source configuration's `UseShellExecution` setting.
+- `ProcessConfiguration.ArgumentList` now throws `ArgumentNullException` when assigned a list containing `null`. Empty-string entries remain valid.
+- `ProcessResult` now throws `ArgumentNullException` when constructed with a null `ExecutedFilePath`.
 
 ## [3.0.0] - 2026-09-13
 

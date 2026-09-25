@@ -8,8 +8,6 @@
  */
 
 using CliInvoke.Core.Configuration;
-using FsCheck;
-using FsCheck.Fluent;
 
 namespace CliInvoke.Tests.Fuzzing;
 

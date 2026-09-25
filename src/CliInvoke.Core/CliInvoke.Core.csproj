@@ -23,25 +23,23 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.1.0</PackageVersion>
-        <PackageReleaseNotes>ProcessConfiguration init-only construction, required TargetFilePath, ArgumentList replacing ArgumentsList
-ProcessConfigurationFactory removed
-Working-directory validation moved to construction
-New Spec types: ArgumentsSpec, EnvironmentVariablesSpec, UserCredentialSpec, ProcessResourcePolicySpec
-IProcessConfigurationBuilder ConfigureXxx signatures changed to Action&lt;XxxSpec&gt;
-IExternalProcess and ExternalProcess constructors reduced, Configuration init-only
-ProcessInvoker constructors reduced to two
-ProcessResult: new Canceled, Signal, ExecutedFilePath properties; symmetric equality; null-safe equality operators
-BufferedProcessResult: WasTruncated immutable, included in equality, ProcessId in equality
-ProcessExitConfiguration for exit-code and signal validation
-IProcessResultValidator, CommonValidationRules, ValidationRule
-ProcessValidationException type
-MiddlewareChain, InvocationContext (renamed from ProcessInvocationContext), MiddlewareItems
-IRetryClassifier
-UserCredential.GetHashCode excludes Password
-IDisposable dropped from ProcessConfiguration
-.NET Standard 2.0, .NET 8, .NET 9 support dropped; net10.0 only, C# 14
-Escaper unit tests relocated alongside moved code; FsCheck property tests for all shell kinds</PackageReleaseNotes>
+        <PackageVersion>3.1.0-alpha.1</PackageVersion>
+        <PackageReleaseNotes>#### Added
+- `IsExitCodeZero()` extension on `ProcessResult` — returns `true` when
+  `ExitCode` equals zero.
+- `EnsureExitCodeZero()` extension on `ProcessResult` — throws
+  `ProcessNotSuccessfulException&lt;TProcessResult&gt;` when `ExitCode` is
+  non-zero.
+- `EnumerateOutputLines()` and `EnumerateErrorLines()` lazy extensions
+  on `BufferedProcessResult` — split output on `Environment.NewLine`
+  without allocating an intermediate array.
+- `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`
+  for tuple deconstruction.
+
+#### Changed
+-  Overwrote base ToString method in `ProcessResult` - `ProcessResult.ToString` now returns bracketed diagnostic format text:
+  `[ExitCode=N, Path=..., Runtime=...]`.
+- Overwrote base ToString method in `BufferedProcessResult` - `BufferedProcessResult.ToString()`now returns bracketed diagnostic format with stdout/stderr length indicators and optional `Truncated=true`.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>3.1.0.0</AssemblyVersion>
         <FileVersion>3.1.0.0</FileVersion>

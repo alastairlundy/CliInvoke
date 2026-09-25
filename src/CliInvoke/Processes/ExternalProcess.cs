@@ -13,7 +13,7 @@ using CliInvoke.Processes.Internal;
 namespace CliInvoke.Processes;
 
 /// <summary>
-///     Wraps a <see cref="System.Diagnostics.Process"/> for managed lifecycle control.
+///     Wraps a <see cref="Process"/> for managed lifecycle control.
 /// </summary>
 // ReSharper disable once RedundantExtendsListEntry
 public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
@@ -423,7 +423,5 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             _disposed = true;
             _processWrapper.Dispose();
         }
-
-        GC.SuppressFinalize(this);
     }
 }

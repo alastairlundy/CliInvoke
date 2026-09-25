@@ -46,6 +46,8 @@ public class ProcessResult : IEquatable<ProcessResult>
         bool canceled,
         PosixSignal? signal)
     {
+        ArgumentNullException.ThrowIfNull(executableFilePath);
+
         ExitCode = exitCode;
         ExecutedFilePath = executableFilePath;
         StartTime = startTime;
@@ -162,6 +164,25 @@ public class ProcessResult : IEquatable<ProcessResult>
 #pragma warning disable CA1416
         return HashCode.Combine(ExitCode, ExecutedFilePath, ProcessId, StartTime, ExitTime, Canceled, Signal);
 #pragma warning restore CA1416
+    }
+
+    /// <summary>
+    ///     Returns a compact single-line diagnostic representation of the result.
+    /// </summary>
+    /// <remarks>
+    ///     Carriage return and line feed characters in <see cref="ExecutedFilePath" /> are
+    ///     escaped as <c>\r</c> and <c>\n</c> so the representation never spans multiple lines.
+    /// </remarks>
+    /// <returns>A bracketed string containing the exit code, executed file path, and runtime duration.</returns>
+    public override string ToString()
+    {
+        // Escape carriage returns and line feeds so the diagnostic representation
+        // always stays on a single line, even for paths containing newline characters.
+        string escapedPath = ExecutedFilePath
+            .Replace("\r", "\\r")
+            .Replace("\n", "\\n");
+
+        return $"[ExitCode={ExitCode}, Path={escapedPath}, Runtime={RuntimeDuration}]";
     }
 
     /// <summary>

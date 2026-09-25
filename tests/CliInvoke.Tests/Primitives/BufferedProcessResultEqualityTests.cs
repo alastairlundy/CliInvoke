@@ -7,9 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Collections.Generic;
-
-namespace CliInvoke.Tests;
+namespace CliInvoke.Tests.Primitives;
 
 /// <summary>
 ///     Tests that <see cref="BufferedProcessResult.WasTruncated"/> is immutable and participates in

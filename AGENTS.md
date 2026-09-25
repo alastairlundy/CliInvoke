@@ -51,8 +51,8 @@ Exactly **three** `IDisposable` types: `IExternalProcess`, `UserCredential`, `Us
 ## Packaging & releases
 - Use the `cliinvoke-publish-and-package` skill for releases and cross-project testing (it requires running `cliinvoke-inner-loop` first).
 - Release-style build: `dotnet build src/CliInvoke.sln -c Release /p:ContinuousIntegrationBuild=true` (SourceLink + snupkg expected in CI).
-- Cross-project testing: pack Core to a local feed and restore dependents with `-s ./nupkgs`; `UsePublishedPackages=true` with `-p:CliInvokeCoreVersion=...` / `-p:CliInvokeVersion=...` switches project refs to package refs.
-- `publish.yml` is manual (`workflow_dispatch` with `core-version` and `main-version` inputs).
+- Cross-project testing: pack Core to a local feed (`dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs`) and restore dependents with `-s ./nupkgs`. Packs use plain project references — nuspec dependency versions are taken from the referenced projects' `PackageVersion` properties.
+- `publish.yml` is manual (`workflow_dispatch`); package versions come from the csprojs' `PackageVersion` properties — keep them in sync before dispatching.
 - Update the csproj `PackageVersion`/`PackageReleaseNotes` **and** `CHANGELOG.md` for releases.
 
 ## Testing notes

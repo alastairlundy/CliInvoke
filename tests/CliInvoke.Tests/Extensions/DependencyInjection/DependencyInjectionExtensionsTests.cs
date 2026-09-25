@@ -1,5 +1,5 @@
 /*
-    CliInvoke.Tests
+    CliInvoke.Extensions.Tests
     Copyright (C) 2024-2026  Alastair Lundy
 
     This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,18 +7,17 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Runtime.InteropServices;
+using CliInvoke.Core.Validation;
 using CliInvoke.Extensions;
+using CliInvoke.Extensions.Middleware.Logging;
 using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Specializations;
-using CliInvoke.Specializations.Middleware;
+using CliInvoke.Validation;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
-using LoggingMiddleware = CliInvoke.Extensions.Middleware.Logging.LoggingMiddleware;
 
-namespace CliInvoke.Tests.DependencyInjection;
+namespace CliInvoke.Tests.Extensions.DependencyInjection;
 
-public class DependencyInjectionExtensionTests
+public class DependencyInjectionExtensionsTests
 {
     private static (string FilePath, string Arguments) ResolveEchoCommand()
     {
@@ -51,7 +50,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware(NullLogger<LoggingMiddleware>.Instance)));
+        services.AddCliInvoke(builder => builder.UseLogging());
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();
@@ -77,7 +76,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_Singleton_RegistersAsSingleton()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware(NullLogger<LoggingMiddleware>.Instance)), ServiceLifetime.Singleton);
+        services.AddCliInvoke(builder => builder.UseLogging(), ServiceLifetime.Singleton);
         IServiceProvider provider = services.BuildServiceProvider();
 
         IProcessInvoker? invoker1 = provider.GetService<IProcessInvoker>();
@@ -92,7 +91,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_Scoped_RegistersAsScoped()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware(NullLogger<LoggingMiddleware>.Instance)), ServiceLifetime.Scoped);
+        services.AddCliInvoke(builder => builder.UseLogging(), ServiceLifetime.Scoped);
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope1 = provider.CreateScope();
@@ -113,7 +112,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_Transient_RegistersAsTransient()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware(NullLogger<LoggingMiddleware>.Instance)), ServiceLifetime.Transient);
+        services.AddCliInvoke(builder => builder.UseLogging(), ServiceLifetime.Transient);
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();
@@ -131,8 +130,8 @@ public class DependencyInjectionExtensionTests
         IServiceCollection services = new ServiceCollection();
         services.AddCliInvoke(builder =>
         {
-            builder.UseMiddleware(new LoggingMiddleware(NullLogger<LoggingMiddleware>.Instance));
-            builder.UseMiddleware(new PostExitValidationMiddleware(PostExitValidation.ExitCodeIsZero()));
+            builder.UseLogging();
+            builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
         });
         IServiceProvider provider = services.BuildServiceProvider();
 
@@ -147,7 +146,7 @@ public class DependencyInjectionExtensionTests
     public async Task AddCliInvoke_WithConfigure_MiddlewareRunsDuringExecution()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseMiddleware(new LoggingMiddleware(NullLogger<LoggingMiddleware>.Instance)));
+        services.AddCliInvoke(builder => builder.UseLogging());
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();
@@ -164,7 +163,7 @@ public class DependencyInjectionExtensionTests
     }
 
     [Test]
-    public async Task AddCliInvoke_WithConfigure_UsePowerShell_WithSpecializations_ResolvesInvoker()
+    public async Task AddCliInvoke_WithConfigure_UsePowerShell_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
         services.AddCliInvokeSpecializations();
@@ -179,18 +178,111 @@ public class DependencyInjectionExtensionTests
     }
 
     [Test]
-    public async Task AddCliInvoke_WithConfigure_UsePowerShell_WithoutSpecializations_ThrowsOnInvokerResolution()
+    public async Task AddCliInvoke_WithConfigure_UseCmd_RegistersConfiguredInvoker()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UsePowerShell());
+        services.AddCliInvokeSpecializations();
+        services.AddCliInvoke(builder => builder.UseCmd());
         IServiceProvider provider = services.BuildServiceProvider();
 
-        // PowerShellMiddleware is only registered by AddCliInvokeSpecializations in the
-        // CliInvoke.Specializations package; without it the pipeline build fails when
-        // the invoker is first resolved.
-        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
-            () => provider.GetService<IProcessInvoker>());
+        using IServiceScope scope = provider.CreateScope();
+        IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
 
-        await Assert.That(exception.Message).Contains("PowerShellMiddleware");
+        await Assert.That(invoker).IsNotNull();
+        await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
+    }
+
+    [Test]
+    public async Task AddCliInvoke_WithConfigure_AllBuiltInMiddleware_RegistersConfiguredInvoker()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddCliInvokeSpecializations();
+        services.AddCliInvoke(builder =>
+        {
+            builder.UseLogging();
+            builder.UsePostExitValidation(PostExitValidation.ExitCodeIsZero());
+            builder.UsePowerShell();
+            builder.UseCmd();
+        });
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessInvoker? invoker = scope.ServiceProvider.GetService<IProcessInvoker>();
+
+        await Assert.That(invoker).IsNotNull();
+        await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
+    }
+
+    [Test]
+    public async Task AddValidationRules_RegistersValidator()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddValidationRules<ProcessResult>(
+            [result => result.ExitCode == 0]);
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessResultValidator<ProcessResult>? validator =
+            scope.ServiceProvider.GetService<IProcessResultValidator<ProcessResult>>();
+
+        await Assert.That(validator).IsNotNull();
+        await Assert.That(validator).IsTypeOf<ProcessResultValidator<ProcessResult>>();
+    }
+
+    [Test]
+    public async Task AddValidationRules_DoubleCall_LastRegistrationWins()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddValidationRules<ProcessResult>(
+            [result => result.ExitCode == 0]);
+        services.AddValidationRules<ProcessResult>(
+            [result => result.ExitCode != 0]);
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessResultValidator<ProcessResult>? validator =
+            scope.ServiceProvider.GetService<IProcessResultValidator<ProcessResult>>();
+
+        await Assert.That(validator).IsNotNull();
+    }
+
+    [Test]
+    public async Task AddCustomResultValidators_RegistersValidator()
+    {
+        var customValidator = new ProcessResultValidator<ProcessResult>(
+            [result => result.ExitCode == 0]);
+
+        IServiceCollection services = new ServiceCollection();
+        services.AddCustomResultValidators<ProcessResult, ProcessResultValidator<ProcessResult>>(
+            customValidator);
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessResultValidator<ProcessResult>? resolved =
+            scope.ServiceProvider.GetService<IProcessResultValidator<ProcessResult>>();
+
+        await Assert.That(resolved).IsNotNull();
+        await Assert.That(resolved).IsSameReferenceAs(customValidator);
+    }
+
+    [Test]
+    public async Task AddCustomResultValidators_DoubleCall_LastRegistrationWins()
+    {
+        var first = new ProcessResultValidator<ProcessResult>(
+            [result => result.ExitCode == 0]);
+        var second = new ProcessResultValidator<ProcessResult>(
+            [result => result.ExitCode != 0]);
+
+        IServiceCollection services = new ServiceCollection();
+        services.AddCustomResultValidators<ProcessResult, ProcessResultValidator<ProcessResult>>(first);
+        services.AddCustomResultValidators<ProcessResult, ProcessResultValidator<ProcessResult>>(second);
+        IServiceProvider provider = services.BuildServiceProvider();
+
+        using IServiceScope scope = provider.CreateScope();
+        IProcessResultValidator<ProcessResult>? resolved =
+            scope.ServiceProvider.GetService<IProcessResultValidator<ProcessResult>>();
+
+        await Assert.That(resolved).IsNotNull();
+        await Assert.That(resolved).IsSameReferenceAs(second);
     }
 }

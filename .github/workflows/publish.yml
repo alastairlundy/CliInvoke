@@ -2,13 +2,6 @@ name: Publish Packages to Nuget
 
 on:
   workflow_dispatch:
-     inputs:
-      core-version:
-         type: string
-         required: true
-      main-version:
-        type: string
-        required: true
 
 permissions:
   contents: read
@@ -35,33 +28,17 @@ jobs:
       - name: Create local nupkg output dir
         run: mkdir -p ./nupkgs
 
-      # Build Core
-      - name: Build Core
-        run: dotnet build src/CliInvoke.Core -c Release
-
-      # Pack Core into ./nupkgs
-      - name: Pack Core to local feed
+      # Pack in dependency order (Core -> Main -> Specializations).
+      # Nuspec dependency versions come from the referenced projects'
+      # PackageVersion properties; the local feed is only for the push step.
+      - name: Pack Core
         run: dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs
 
-      # Use local feed for Specializations
-      - name: Restore Specializations from local feed + NuGet.org
-        run: dotnet restore src/CliInvoke.Specializations -s ./nupkgs -s https://api.nuget.org/v3/index.json
+      - name: Pack Main
+        run: dotnet pack src/CliInvoke -c Release -o ./nupkgs
 
-      - name: Build Specializations (resolves CliInvoke.Core from local feed)
-        run: dotnet build src/CliInvoke.Specializations -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }}
-
-      # Use local feed for main
-      - name: Restore Main from local feed + NuGet.org
-        run: dotnet restore src/CliInvoke -s ./nupkgs -s https://api.nuget.org/v3/index.json
-
-      - name: Build Main (resolves CliInvoke.Core from local feed)
-        run: dotnet build src/CliInvoke -c Release -p:CliInvokeCoreVersion=${{ inputs.core-version }}
-
-      # Pack the builds to ./nupkgs as well (so all resulting nupkgs end up in ./nupkgs)
-      - name: Pack Specializations and Main into local feed
-        run: |
-          dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
-          dotnet pack src/CliInvoke -c Release -o ./nupkgs /p:UsePublishedPackages=true /p:CliInvokeCoreVersion=${{ inputs.core-version }}
+      - name: Pack Specializations
+        run: dotnet pack src/CliInvoke.Specializations -c Release -o ./nupkgs
 
       # Authenticate to NuGet (OIDC)
       - name: NuGet login (OIDC → temp API key)

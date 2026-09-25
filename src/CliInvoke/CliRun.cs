@@ -117,7 +117,7 @@ public static class CliRun
         ProcessExitConfiguration? exitConfiguration = null,
         CancellationToken cancellationToken = default)
     {
-        InvocationContext ctx = new InvocationContext(
+        InvocationContext ctx = new(
             configuration,
             exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Raw,
@@ -228,7 +228,7 @@ public static class CliRun
         ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)
     {
-        InvocationContext ctx = new InvocationContext(
+        InvocationContext ctx = new(
             configuration,
             exitConfiguration ?? ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Buffered,
@@ -263,7 +263,7 @@ public static class CliRun
         // ExitConfiguration is unused by FireAndForget
         workingDirectory ??= Environment.CurrentDirectory;
 
-        ProcessConfiguration configuration = new ProcessConfiguration(targetFilePath, arguments)
+        ProcessConfiguration configuration = new(targetFilePath, arguments)
             { OutputRedirection = false, WorkingDirectoryPath = workingDirectory };
 
         return FireAndForget(configuration);
@@ -279,7 +279,7 @@ public static class CliRun
     {
         workingDirectory ??= Environment.CurrentDirectory;
 
-        ProcessConfiguration configuration = new ProcessConfiguration(
+        ProcessConfiguration configuration = new(
             targetFilePath, arguments, outputRedirection) { WorkingDirectoryPath = workingDirectory };
 
         ProcessExitConfiguration exitConfiguration = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
@@ -302,7 +302,7 @@ public static class CliRun
     {
         workingDirectory ??= Environment.CurrentDirectory;
 
-        ProcessConfiguration configuration = new ProcessConfiguration(
+        ProcessConfiguration configuration = new(
             targetFilePath, arguments, outputRedirection)
             { WorkingDirectoryPath = workingDirectory };
 

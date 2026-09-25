@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using FsCheck;
-using FsCheck.Fluent;
-
 namespace CliInvoke.Tests.Primitives;
 
 /// <summary>

@@ -7,9 +7,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Core.Middleware;
+using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware.Truncation;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace CliInvoke.Extensions.Tests.Middleware.Truncation;
+namespace CliInvoke.Tests.Extensions.Middleware.Truncation;
 
 /// <summary>
 ///     Tests for <see cref="OutputTruncationMiddleware"/> and the
@@ -83,7 +86,7 @@ public class OutputTruncationMiddlewareTests
     public async Task UseOutputTruncation_RegistersMiddlewareInPipeline()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseOutputTruncation());
+        services.AddCliInvoke(builder => OutputTruncationMiddlewareExtensions.UseOutputTruncation(builder));
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();

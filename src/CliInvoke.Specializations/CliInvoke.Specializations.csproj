@@ -12,21 +12,18 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.1.0</PackageVersion>
+        <PackageVersion>3.1.0-alpha.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>AddCliInvokeSpecializations is the registration entry point (must chain with AddCliInvoke, same ServiceLifetime)
-PowerShellMiddleware, CmdMiddleware, DefaultShellMiddleware and their UsePowerShell/UseCmd/UseDefaultShell extensions
-ShellMiddlewareOptions (renamed from PowerShellMiddlewareOptions)
-IFilePathResolver removed from PowershellProcessConfiguration, PowershellProcessInvoker, and PowerShellMiddleware constructors
-CmdProcessInvoker and PowershellProcessInvoker wrapper types deleted. Use middleware instead.
-Specialized invokers refactored into thin wrappers over ProcessInvoker + middleware
-PowershellProcessConfiguration deprecated: use ProcessConfiguration + UsePowerShell() middleware
-CmdProcessConfiguration deprecated: use ProcessConfiguration + UseCmd() middleware
-Subclasses will be removed in 4.0</PackageReleaseNotes>
+        <PackageReleaseNotes>#### Changes
+* Updated to use new internal Shell escaping and composition code
+
+#### Deprecations
+- Deprecated `PowershellProcessConfiguration`. This will be removed in 4.0. Use plain `ProcessConfiguration` + `UsePowerShell()` middleware instead.
+- Deprecated `CmdProcessConfiguration` This; will be removed in 4.0. Use plain `ProcessConfiguration` + `UseCmd()` middleware instead.</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
@@ -44,21 +41,9 @@ Subclasses will be removed in 4.0</PackageReleaseNotes>
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- default false, CI can set to true -->
-        <UsePublishedPackages Condition="'$(UsePublishedPackages)'==''">false</UsePublishedPackages>
-    </PropertyGroup>
-
-
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='false'">
+    <ItemGroup>
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
         <ProjectReference Include="..\CliInvoke\CliInvoke.csproj"/>
-    </ItemGroup>
-    
-    <ItemGroup Condition="'$(UsePublishedPackages)'=='true'">
-        <!-- set CliInvokeCoreVersion in the workflow -->
-        <PackageReference Include="CliInvoke.Core"/>
-        <PackageReference Include="CliInvoke"/>
     </ItemGroup>
 
     <ItemGroup>

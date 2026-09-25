@@ -24,6 +24,7 @@
     <ProjectReference Include="..\CliInvoke.Tests.Helpers\CliInvoke.Tests.Helpers.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Extensions\" />
     <Folder Include="Invokers\Cancellation\" />
   </ItemGroup>
 </Project>
