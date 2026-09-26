@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using CliInvoke.Core.Validation;
+
 namespace CliInvoke.Tests.Core.Extensions;
 
 public class ProcessExitConfigurationCreationExtensionsTests
@@ -120,5 +122,74 @@ public class ProcessExitConfigurationCreationExtensionsTests
         await Assert.That(config.TimeoutPolicy.TimeoutThreshold)
             .IsEqualTo(sourcePolicy.TimeoutThreshold);
         await Assert.That(config.TimeoutPolicy.Enabled).IsEqualTo(sourcePolicy.Enabled);
+    }
+
+    [Test]
+    public async Task WithValidationRules_ReplacesRules_OtherMembersCopied()
+    {
+        // Arrange
+        ProcessTimeoutPolicy policy = new(TimeSpan.FromSeconds(15), true);
+        ValidationRule<ProcessResult> existingRule = new(_ => true, "Existing");
+        ValidationRule<ProcessResult> newRule = new(_ => true, "New");
+
+        ProcessExitConfiguration source = new ProcessExitConfiguration(
+            policy,
+            ProcessExitBehaviour.ForcefulExit,
+            ProcessExceptionBehaviour.SuppressExceptions,
+            false)
+        {
+            ValidationRules = [existingRule],
+            MaxBufferedOutputBytes = 1024
+        };
+
+        // Act
+        ProcessExitConfiguration result =
+            ProcessExitConfigurationCreationExtensions
+                .WithValidationRules(source, newRule);
+
+        // Assert
+        await Assert.That(result.ValidationRules).HasCount(1);
+        await Assert.That(result.ValidationRules[0].Name).IsEqualTo("New");
+        await Assert.That(result.TimeoutPolicy).IsEqualTo(policy);
+        await Assert.That(result.RequestedCancellationExitBehaviour)
+            .IsEqualTo(ProcessExitBehaviour.ForcefulExit);
+        await Assert.That(result.ExceptionBehaviour)
+            .IsEqualTo(ProcessExceptionBehaviour.SuppressExceptions);
+        await Assert.That(result.CancellationThrowsException).IsFalse();
+        await Assert.That(result.MaxBufferedOutputBytes).IsEqualTo(1024);
+    }
+
+    [Test]
+    public async Task WithMaxBufferedOutputBytes_SetsCap_OtherMembersCopied()
+    {
+        // Arrange
+        ProcessTimeoutPolicy policy = new(TimeSpan.FromSeconds(20), true);
+        ValidationRule<ProcessResult> rule = new(_ => true, "Rule");
+
+        ProcessExitConfiguration source = new ProcessExitConfiguration(
+            policy,
+            ProcessExitBehaviour.GracefulExit,
+            ProcessExceptionBehaviour.AllowExceptionsIfUnexpected,
+            true)
+        {
+            ValidationRules = [rule],
+            MaxBufferedOutputBytes = 512
+        };
+
+        // Act
+        ProcessExitConfiguration result =
+            ProcessExitConfigurationCreationExtensions
+                .WithMaxBufferedOutputBytes(source, 4096);
+
+        // Assert
+        await Assert.That(result.MaxBufferedOutputBytes).IsEqualTo(4096);
+        await Assert.That(result.ValidationRules).HasCount(1);
+        await Assert.That(result.ValidationRules[0].Name).IsEqualTo("Rule");
+        await Assert.That(result.TimeoutPolicy).IsEqualTo(policy);
+        await Assert.That(result.RequestedCancellationExitBehaviour)
+            .IsEqualTo(ProcessExitBehaviour.GracefulExit);
+        await Assert.That(result.ExceptionBehaviour)
+            .IsEqualTo(ProcessExceptionBehaviour.AllowExceptionsIfUnexpected);
+        await Assert.That(result.CancellationThrowsException).IsTrue();
     }
 }

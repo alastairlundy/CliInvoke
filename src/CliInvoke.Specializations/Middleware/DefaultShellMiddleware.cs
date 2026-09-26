@@ -59,21 +59,9 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
                 ? ShellKind.PowerShell
                 : ShellKind.Posix;
 
-        ProcessConfiguration src = context.Configuration;
-        ProcessConfiguration source = new(src.TargetFilePath, src.Arguments, outputRedirection: context.Mode != InvocationMode.Raw)
-        {
-            ArgumentList = src.ArgumentList,
-            RedirectStandardInput = src.RedirectStandardInput,
-            RequiresAdministrator = src.RequiresAdministrator,
-            WorkingDirectoryPath = src.WorkingDirectoryPath,
-            EnvironmentVariables = new Dictionary<string, string>(src.EnvironmentVariables),
-            Credential = src.Credential,
-            StandardInput = src.StandardInput,
-            StandardInputEncoding = src.StandardInputEncoding,
-            StandardOutputEncoding = src.StandardOutputEncoding,
-            StandardErrorEncoding = src.StandardErrorEncoding,
-            ResourcePolicy = src.ResourcePolicy,
-        };
+        ProcessConfiguration source = ProcessConfigurationDerivation.Derive(
+            context.Configuration,
+            b => b.SetOutputRedirection(context.Mode != InvocationMode.Raw));
 
         // Shell switches are caller-owned: each kind needs its own execution switch to
         // make the composed inner command run rather than being ignored.

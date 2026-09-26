@@ -45,6 +45,26 @@ adheres to [Semantic Versioning](https://semver.org/).
   other codes rethrow the original `Win32Exception` (carrying `NativeErrorCode`). Callers that
   caught `UnauthorizedAccessException` around invocations to handle arbitrary start failures
   should catch `Win32Exception` for unknown codes instead.
+- **Internal derivation hook for `ProcessConfiguration`.** All six hand-copied
+  `ProcessConfiguration` derivation sites — the three Specializations shell middleware
+  (`PowerShellMiddleware`, `CmdMiddleware`, `DefaultShellMiddleware`) and the three
+  `ShellRewriter` switch branches — now derive through a shared internal hook
+  (`ProcessConfigurationDerivation.Derive`) that seeds a `ProcessConfigurationBuilder`
+  from the source configuration, applies a caller-supplied delta, and builds. This
+  eliminates the copy-churn bug class where a new member could be missed at one or
+  more sites. Resource-owning members (`StandardInput`) are reference-copied, matching
+  prior hand-copy behavior. No public API change.
+- **`ProcessExitConfiguration` copy logic converged.** The `WithValidationRules` and
+  `WithMaxBufferedOutputBytes` extension methods now delegate to a shared private
+  `CopyWithDelta` function, eliminating duplicated property-copy blocks.
+- **ADR-0001 updated** to document the derivation-hook IVT usage under the
+  CliInvoke → CliInvoke.Specializations grant. The existing grant's justification
+  now covers `ProcessConfigurationDerivation` alongside the shell-rewriting helpers.
+  No new IVT grant was added.
+- **`CliInvoke` / `CliInvoke.Specializations` lockstep coupling.** The derivation
+  hook lives in the `CliInvoke` implementation package and is accessed by
+  `CliInvoke.Specializations` through the existing IVT grant. The two packages
+  must be released together in lockstep for this train.
 
 ### Deprecations
 - **`PowershellProcessConfiguration` deprecated.** Marked with

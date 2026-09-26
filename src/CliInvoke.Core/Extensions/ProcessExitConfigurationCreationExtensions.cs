@@ -86,15 +86,7 @@ public static class ProcessExitConfigurationCreationExtensions
         /// <returns>A new configuration instance with the updated validation rules.</returns>
         public static ProcessExitConfiguration WithValidationRules(ProcessExitConfiguration config, params ValidationRule<ProcessResult>[] rules)
         {
-            return new ProcessExitConfiguration(
-                config.TimeoutPolicy,
-                config.RequestedCancellationExitBehaviour,
-                config.ExceptionBehaviour,
-                config.CancellationThrowsException)
-            {
-                ValidationRules = rules,
-                MaxBufferedOutputBytes = config.MaxBufferedOutputBytes
-            };
+            return CopyWithDelta(config, validationRules: rules);
         }
 
         /// <summary>
@@ -106,14 +98,23 @@ public static class ProcessExitConfigurationCreationExtensions
         /// <returns>A new configuration instance with the updated buffer cap.</returns>
         public static ProcessExitConfiguration WithMaxBufferedOutputBytes(ProcessExitConfiguration config, long? cap)
         {
+            return CopyWithDelta(config, maxBufferedOutputBytes: cap);
+        }
+
+        private static ProcessExitConfiguration CopyWithDelta(
+            ProcessExitConfiguration source,
+            ValidationRule<ProcessResult>[]? validationRules = null,
+            long? maxBufferedOutputBytes = null)
+        {
             return new ProcessExitConfiguration(
-                config.TimeoutPolicy,
-                config.RequestedCancellationExitBehaviour,
-                config.ExceptionBehaviour,
-                config.CancellationThrowsException)
+                source.TimeoutPolicy,
+                source.RequestedCancellationExitBehaviour,
+                source.ExceptionBehaviour,
+                source.CancellationThrowsException)
             {
-                ValidationRules = config.ValidationRules,
-                MaxBufferedOutputBytes = cap
+                ValidationRules = validationRules ?? source.ValidationRules,
+                MaxBufferedOutputBytes =
+                    maxBufferedOutputBytes ?? source.MaxBufferedOutputBytes
             };
         }
     }
