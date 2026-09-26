@@ -76,6 +76,10 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `WithMaxBufferedOutputBytes(config, null)` now clears the source
+  configuration's buffer cap instead of silently inheriting it, so an explicit
+  `null` really means unbounded output. Omitting the argument still inherits
+  the source cap.
 - Escaper fuzz tests now exercise the `ShellRewriter` composition paths
   for all three shell kinds (PowerShell, Cmd, Posix).
   

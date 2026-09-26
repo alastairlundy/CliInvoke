@@ -192,4 +192,42 @@ public class ProcessExitConfigurationCreationExtensionsTests
             .IsEqualTo(ProcessExceptionBehaviour.AllowExceptionsIfUnexpected);
         await Assert.That(result.CancellationThrowsException).IsTrue();
     }
+
+    [Test]
+    public async Task WithMaxBufferedOutputBytes_ExplicitNull_ClearsSourceCap()
+    {
+        // Arrange
+        ProcessExitConfiguration source = new()
+        {
+            MaxBufferedOutputBytes = 512
+        };
+
+        // Act
+        ProcessExitConfiguration result =
+            ProcessExitConfigurationCreationExtensions
+                .WithMaxBufferedOutputBytes(source, null);
+
+        // Assert - an explicit null means unbounded, not "keep the source cap".
+        await Assert.That(result.MaxBufferedOutputBytes).IsNull();
+        await Assert.That(result.TimeoutPolicy).IsEqualTo(source.TimeoutPolicy);
+    }
+
+    [Test]
+    public async Task WithValidationRules_OmittedCap_InheritsSourceCap()
+    {
+        // Arrange
+        ValidationRule<ProcessResult> newRule = new(_ => true, "New");
+        ProcessExitConfiguration source = new()
+        {
+            MaxBufferedOutputBytes = 512
+        };
+
+        // Act
+        ProcessExitConfiguration result =
+            ProcessExitConfigurationCreationExtensions
+                .WithValidationRules(source, newRule);
+
+        // Assert - the helper argument was omitted, so the source cap carries over.
+        await Assert.That(result.MaxBufferedOutputBytes).IsEqualTo(512);
+    }
 }

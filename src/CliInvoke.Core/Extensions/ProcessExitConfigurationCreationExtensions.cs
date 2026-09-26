@@ -95,16 +95,18 @@ public static class ProcessExitConfigurationCreationExtensions
         /// </summary>
         /// <param name="config">The source configuration to copy from.</param>
         /// <param name="cap">The maximum number of bytes of standard output to buffer, or <c>null</c> for unbounded.</param>
-        /// <returns>A new configuration instance with the updated buffer cap.</returns>
+        /// <returns>A new configuration instance with the updated buffer cap. An explicit <c>null</c>
+        /// <paramref name="cap"/> clears any cap inherited from <paramref name="config"/>.</returns>
         public static ProcessExitConfiguration WithMaxBufferedOutputBytes(ProcessExitConfiguration config, long? cap)
         {
-            return CopyWithDelta(config, maxBufferedOutputBytes: cap);
+            return CopyWithDelta(config, maxBufferedOutputBytes: cap, replaceMaxBufferedOutputBytes: true);
         }
 
         private static ProcessExitConfiguration CopyWithDelta(
             ProcessExitConfiguration source,
             ValidationRule<ProcessResult>[]? validationRules = null,
-            long? maxBufferedOutputBytes = null)
+            long? maxBufferedOutputBytes = null,
+            bool replaceMaxBufferedOutputBytes = false)
         {
             return new ProcessExitConfiguration(
                 source.TimeoutPolicy,
@@ -114,7 +116,9 @@ public static class ProcessExitConfigurationCreationExtensions
             {
                 ValidationRules = validationRules ?? source.ValidationRules,
                 MaxBufferedOutputBytes =
-                    maxBufferedOutputBytes ?? source.MaxBufferedOutputBytes
+                    replaceMaxBufferedOutputBytes
+                        ? maxBufferedOutputBytes
+                        : source.MaxBufferedOutputBytes
             };
         }
     }
