@@ -368,25 +368,16 @@ internal static class ShellRewriter
                 argumentList.AddRange(runnerArgList);
                 argumentList.Add(script);
 
-                return new ProcessConfiguration
-                {
-                    TargetFilePath = shellTargetPath,
-                    Arguments = string.Empty,
-                    ArgumentList = argumentList,
-                    RequiresAdministrator = source.RequiresAdministrator,
-                    WorkingDirectoryPath = source.WorkingDirectoryPath,
-                    WindowCreation = windowCreation,
-                    EnvironmentVariables = source.EnvironmentVariables,
-                    Credential = source.Credential,
-                    UseShellExecution = useShellExecution,
-                    StandardInput = source.StandardInput,
-                    RedirectStandardInput = source.RedirectStandardInput,
-                    OutputRedirection = source.OutputRedirection,
-                    ResourcePolicy = source.ResourcePolicy,
-                    StandardInputEncoding = source.StandardInputEncoding,
-                    StandardOutputEncoding = source.StandardOutputEncoding,
-                    StandardErrorEncoding = source.StandardErrorEncoding
-                };
+                return ProcessConfigurationDerivation.Derive(
+                    source,
+                    b =>
+                    {
+                        b.SetTargetFilePath(shellTargetPath);
+                        b.SetArguments(string.Empty);
+                        b.SetArgumentList(argumentList);
+                        b.EnableWindowCreation(windowCreation);
+                        b.UseShellExecution(useShellExecution);
+                    });
             }
 
             case ShellKind.Cmd:
@@ -404,24 +395,16 @@ internal static class ShellRewriter
                     ? innerCommand
                     : $"{runnerArgs} \"{innerCommand}\"";
 
-                return new ProcessConfiguration
-                {
-                    TargetFilePath = shellTargetPath,
-                    Arguments = arguments,
-                    RequiresAdministrator = source.RequiresAdministrator,
-                    WorkingDirectoryPath = source.WorkingDirectoryPath,
-                    WindowCreation = windowCreation,
-                    EnvironmentVariables = source.EnvironmentVariables,
-                    Credential = source.Credential,
-                    UseShellExecution = useShellExecution,
-                    StandardInput = source.StandardInput,
-                    RedirectStandardInput = source.RedirectStandardInput,
-                    OutputRedirection = source.OutputRedirection,
-                    ResourcePolicy = source.ResourcePolicy,
-                    StandardInputEncoding = source.StandardInputEncoding,
-                    StandardOutputEncoding = source.StandardOutputEncoding,
-                    StandardErrorEncoding = source.StandardErrorEncoding
-                };
+                return ProcessConfigurationDerivation.Derive(
+                    source,
+                    b =>
+                    {
+                        b.SetTargetFilePath(shellTargetPath);
+                        b.SetArguments(arguments);
+                        b.SetArgumentList([]);
+                        b.EnableWindowCreation(windowCreation);
+                        b.UseShellExecution(useShellExecution);
+                    });
             }
 
             case ShellKind.Posix:
@@ -444,25 +427,16 @@ internal static class ShellRewriter
                 argumentList.AddRange(runnerArgList);
                 argumentList.Add(script);
 
-                return new ProcessConfiguration
-                {
-                    TargetFilePath = shellTargetPath,
-                    Arguments = string.Empty,
-                    ArgumentList = argumentList,
-                    RequiresAdministrator = source.RequiresAdministrator,
-                    WorkingDirectoryPath = source.WorkingDirectoryPath,
-                    WindowCreation = windowCreation,
-                    EnvironmentVariables = source.EnvironmentVariables,
-                    Credential = source.Credential,
-                    UseShellExecution = useShellExecution,
-                    StandardInput = source.StandardInput,
-                    RedirectStandardInput = source.RedirectStandardInput,
-                    OutputRedirection = source.OutputRedirection,
-                    ResourcePolicy = source.ResourcePolicy,
-                    StandardInputEncoding = source.StandardInputEncoding,
-                    StandardOutputEncoding = source.StandardOutputEncoding,
-                    StandardErrorEncoding = source.StandardErrorEncoding
-                };
+                return ProcessConfigurationDerivation.Derive(
+                    source,
+                    b =>
+                    {
+                        b.SetTargetFilePath(shellTargetPath);
+                        b.SetArguments(string.Empty);
+                        b.SetArgumentList(argumentList);
+                        b.EnableWindowCreation(windowCreation);
+                        b.UseShellExecution(useShellExecution);
+                    });
             }
 
             default:

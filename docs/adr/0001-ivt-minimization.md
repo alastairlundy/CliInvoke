@@ -57,9 +57,47 @@ The version window is applied per type: any type **promoted to public API** requ
 
 The IVT-minimization principle is recorded in this ADR and in `CONTRIBUTING.md`. **No CI guard** is added to enforce it (Option B).
 
+### Grant inventory: CliInvoke → CliInvoke.Specializations
+
+The existing `InternalsVisibleTo` grant from CliInvoke to CliInvoke.Specializations
+(`src/CliInvoke/CliInvoke.csproj`) covers two internal type groups. This section
+justifies each and records the promote-or-relocate commitment for grant removal.
+
+#### Shell-rewriting helpers
+
+`ShellRewriter`, `ShellKind`, `ArgumentTokenizer`, and related enums are consumed
+by the Specializations shell middleware. Public promotion was rejected because
+these types have no extensibility goal; relocating them to a Specializations home
+was rejected because no reference direction from Core supports that layout.
+
+#### Derivation hook
+
+`ProcessConfigurationDerivation` (internal, in `CliInvoke.Internal`) is consumed
+by the Specializations shell middleware, which must derive configurations from
+a caller-supplied source. Public promotion was rejected per T010 — the hook is
+an internal plumbing seam, not an extensibility point. Relocation was rejected
+per T011 — the hook depends on `ProcessConfigurationBuilder` internals that live
+in the CliInvoke implementation package, so no self-contained relocation exists.
+
+Because .NET IVT is assembly-wide, this grant exposes the *entire* internal surface
+of CliInvoke to CliInvoke.Specializations, not only the derivation hook. The
+documented-usage constraint ("Specializations accesses only `ProcessConfigurationDerivation`
+and the shell-rewriting helpers") is a reviewer-enforced convention, not a technical
+boundary. The Consequences section records this risk.
+
+#### Promote-or-relocate commitment
+
+If the `CliInvoke → CliInvoke.Specializations` IVT grant is ever removed, the
+types it covers (`ProcessConfigurationDerivation` and the shell-rewriting helpers)
+shall be **promoted to public API or relocated to a shared package** — never
+narrowed to a subset of the current grant. This commitment preserves the ADR's
+legitimacy principle: the grant exists because the types are consumed, and removal
+requires making the types accessible without IVT.
+
 ## Consequences
 
 - New IVT grants require explicit justification; reviewers should challenge any grant that could be replaced by promotion/relocation.
 - Unused grants are removed aggressively; used test-assembly grants stay while unused ones are removed.
 - Required grants are reduced deliberately per type, respecting the v3 breaking-change window for public promotions.
 - Contributors have clear guidance (this ADR + `CONTRIBUTING.md`) but no automated enforcement, keeping the rule a reviewed convention rather than a build gate.
+- The CliInvoke → CliInvoke.Specializations grant is assembly-wide; the documented-usage constraint (shell-rewriting helpers + derivation hook only) is enforced by review convention, not by a technical boundary.

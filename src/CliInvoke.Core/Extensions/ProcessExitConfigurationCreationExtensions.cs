@@ -86,15 +86,7 @@ public static class ProcessExitConfigurationCreationExtensions
         /// <returns>A new configuration instance with the updated validation rules.</returns>
         public static ProcessExitConfiguration WithValidationRules(ProcessExitConfiguration config, params ValidationRule<ProcessResult>[] rules)
         {
-            return new ProcessExitConfiguration(
-                config.TimeoutPolicy,
-                config.RequestedCancellationExitBehaviour,
-                config.ExceptionBehaviour,
-                config.CancellationThrowsException)
-            {
-                ValidationRules = rules,
-                MaxBufferedOutputBytes = config.MaxBufferedOutputBytes
-            };
+            return CopyWithDelta(config, validationRules: rules);
         }
 
         /// <summary>
@@ -103,17 +95,30 @@ public static class ProcessExitConfigurationCreationExtensions
         /// </summary>
         /// <param name="config">The source configuration to copy from.</param>
         /// <param name="cap">The maximum number of bytes of standard output to buffer, or <c>null</c> for unbounded.</param>
-        /// <returns>A new configuration instance with the updated buffer cap.</returns>
+        /// <returns>A new configuration instance with the updated buffer cap. An explicit <c>null</c>
+        /// <paramref name="cap"/> clears any cap inherited from <paramref name="config"/>.</returns>
         public static ProcessExitConfiguration WithMaxBufferedOutputBytes(ProcessExitConfiguration config, long? cap)
         {
+            return CopyWithDelta(config, maxBufferedOutputBytes: cap, replaceMaxBufferedOutputBytes: true);
+        }
+
+        private static ProcessExitConfiguration CopyWithDelta(
+            ProcessExitConfiguration source,
+            ValidationRule<ProcessResult>[]? validationRules = null,
+            long? maxBufferedOutputBytes = null,
+            bool replaceMaxBufferedOutputBytes = false)
+        {
             return new ProcessExitConfiguration(
-                config.TimeoutPolicy,
-                config.RequestedCancellationExitBehaviour,
-                config.ExceptionBehaviour,
-                config.CancellationThrowsException)
+                source.TimeoutPolicy,
+                source.RequestedCancellationExitBehaviour,
+                source.ExceptionBehaviour,
+                source.CancellationThrowsException)
             {
-                ValidationRules = config.ValidationRules,
-                MaxBufferedOutputBytes = cap
+                ValidationRules = validationRules ?? source.ValidationRules,
+                MaxBufferedOutputBytes =
+                    replaceMaxBufferedOutputBytes
+                        ? maxBufferedOutputBytes
+                        : source.MaxBufferedOutputBytes
             };
         }
     }
