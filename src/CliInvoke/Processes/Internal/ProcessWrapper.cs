@@ -93,6 +93,12 @@ internal class ProcessWrapper : Process
     internal bool Canceled =>
         _cancellationReason is CancellationReason.Timeout or CancellationReason.RequestedCancellation;
 
+    // The child's stdin writer, cached during Start() for the same reason as the
+    // StandardOutput/StandardError readers below: property access throws post-exit on
+    // .NET 10 for fast-exiting processes. Closed by PipeStandardInputAsync to deliver
+    // EOF to stdin-reading children.
+    private StreamWriter? _cachedStdInWriter;
+
     /// <summary>
     ///     The POSIX signal that terminated the process (Unix only), obtained via the control adapter.
     /// </summary>
@@ -178,16 +184,18 @@ internal class ProcessWrapper : Process
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
         }
 
-        // Cache StandardOutput/StandardError StreamReaders while the process is still
-        // guaranteed alive. These properties internally call EnsureState, which in
-        // .NET 10 throws InvalidOperationException("process has exited") on
-        // fast-exiting processes (e.g. `which dotnet`) that exit before the next
-        // line of code runs. Touching them here means downstream code that reads
-        // from the cached readers works even if the process has already exited.
+        // Cache StandardOutput/StandardError StreamReaders and the child's stdin writer
+        // while the process is still guaranteed alive. These properties internally call
+        // EnsureState, which in .NET 10 throws InvalidOperationException("process has
+        // exited") on fast-exiting processes (e.g. `which dotnet`) that exit before the
+        // next line of code runs. Touching them here means downstream code that reads
+        // from the cached readers — or closes the cached stdin writer — works even if
+        // the process has already exited.
         try
         {
             _ = base.StandardOutput;
             _ = base.StandardError;
+            _cachedStdInWriter = base.StandardInput;
         }
         catch (InvalidOperationException)
         {
@@ -263,26 +271,38 @@ internal class ProcessWrapper : Process
 
     #region Piping Standard Inputs and Outputs
     /// <summary>
-    ///     Asynchronously pipes the standard input from a source stream to a specified process.
+    ///     Asynchronously pipes the standard input from a source stream to a specified process,
+    ///     then closes the child's stdin write end so the child receives an end-of-file signal —
+    ///     on every exit path of the piping (successful copy, cancellation, or source-stream error).
     /// </summary>
+    /// <remarks>
+    ///     The close targets only the child's pipe write end; the caller-owned source stream is
+    ///     never closed or disposed by this method. All exceptions propagate to the caller.
+    /// </remarks>
     /// <param name="source">The stream from which to read the standard input data.</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>A task that represents the asynchronous operation containing the destination process.</returns>
+    /// <returns>A task that represents the asynchronous piping operation.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("browser")]
-    internal async Task<bool> PipeStandardInputAsync(Stream source,
+    internal async Task PipeStandardInputAsync(Stream source,
         CancellationToken cancellationToken)
     {
         if (StartInfo.RedirectStandardInput)
         {
-            await StandardInput.FlushAsync(cancellationToken).ConfigureAwait(false);
-            await source.CopyToAsync(StandardInput.BaseStream, cancellationToken).ConfigureAwait(false);
-
-            return source.Equals(StandardInput.BaseStream);
+            try
+            {
+                await source.CopyToAsync(StandardInput.BaseStream, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                // Close the child's pipe write end so stdin-reading processes receive
+                // the end-of-file signal on every exit path, including cancellation
+                // and source-stream errors. The cached writer survives fast-exiting
+                // processes; the caller's source stream is never touched here.
+                _cachedStdInWriter?.Close();
+            }
         }
-
-        return false;
     }
     
     /// <summary>
