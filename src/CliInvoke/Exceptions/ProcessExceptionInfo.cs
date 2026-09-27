@@ -155,11 +155,17 @@ public class ProcessExceptionInfo : IEquatable<ProcessExceptionInfo>, IDisposabl
     }
 
     /// <summary>
-    /// Releases all resources used by the current instance of the <see cref="ProcessExceptionInfo"/> class.
+    /// Releases resources used by the current instance of the <see cref="ProcessExceptionInfo"/> class.
     /// </summary>
+    /// <remarks>
+    /// The <see cref="Credential"/> (and the <see cref="Configuration"/> that owns it) is
+    /// caller-owned: the same <see cref="UserCredential"/> instance may still be in use by the
+    /// configuration it came from, so disposing it here would break credential reuse and
+    /// double-dispose a credential the caller is responsible for. Only the caller disposes
+    /// the <see cref="Credential"/>.
+    /// </remarks>
     public void Dispose()
     {
-        Credential?.Dispose();
         GC.SuppressFinalize(this);
     }
 }

@@ -34,6 +34,25 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     }
 
     /// <summary>
+    /// Computes the maximum valid processor-affinity bitmask for the current system,
+    /// handling processor counts that equal or exceed the native integer bit width.
+    /// Mirrors the validation formula used by <see cref="ProcessResourcePolicy"/>.
+    /// </summary>
+    /// <returns>The maximum processor-affinity mask.</returns>
+    private static nint GetMaxProcessorAffinity()
+    {
+        int processorCount = Environment.ProcessorCount;
+        int nativeWidth = IntPtr.Size * 8;
+
+        if (processorCount >= nativeWidth)
+        {
+            return (nint)(((long)1 << (nativeWidth - 1)) - 1);
+        }
+
+        return ((nint)1 << processorCount) - 1;
+    }
+
+    /// <summary>
     /// Configures the ProcessResourcePolicyBuilder with the specified ProcessorAffinity.
     /// </summary>
     /// <param name="processorAffinity">The processor affinity to be used.</param>
@@ -47,7 +66,7 @@ public class ProcessResourcePolicyBuilder : IProcessResourcePolicyBuilder
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(processorAffinity, 0x0001);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(processorAffinity,
-            ProcessResourcePolicy.ComputeMaxProcessorAffinity());
+            GetMaxProcessorAffinity());
         
         return new ProcessResourcePolicyBuilder(
             new ProcessResourcePolicy(

@@ -117,8 +117,11 @@ public partial class ShellDetector : IShellDetector
         {
             string powershell5Plus = _filePathResolver.ResolveFilePath("pwsh.exe");
             
+            // Invoke with an argument that makes pwsh print its version and exit; an
+            // empty argument list would launch an interactive session that never
+            // terminates until the exit configuration times out.
             using ProcessConfiguration powershellConfig = _processConfigurationFactory
-                .Create(powershell5Plus, "");
+                .Create(powershell5Plus, "--version");
             
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(powershellConfig, 
                 ProcessExitConfiguration.Default, false,  cancellationToken);
@@ -139,13 +142,19 @@ public partial class ShellDetector : IShellDetector
 
             string cmdExe = _filePathResolver.ResolveFilePath("cmd.exe");
 
+            // Invoke with an argument that makes cmd.exe print its version and exit; an
+            // empty argument list would launch an interactive session that never
+            // terminates until the exit configuration times out.
             using ProcessConfiguration cmdConfig = _processConfigurationFactory
-                .Create(cmdExe, "");
+                .Create(cmdExe, "/c ver");
             
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
                 ProcessExitConfiguration.Default, false,  cancellationToken);
             
-            string line = result.StandardOutput.Split(Environment.NewLine).First();
+            // `ver` prints a leading blank line before the version banner, so skip
+            // empty lines before parsing.
+            string line = result.StandardOutput.Split(Environment.NewLine)
+                .First(candidateLine => !string.IsNullOrWhiteSpace(candidateLine));
 
             string versionString = line.Replace("Microsoft", string.Empty).Replace("Windows", string.Empty).Replace("]", string.Empty);
             Version cmdVersion = Version.GracefulParse(versionString.Split('[')[1]

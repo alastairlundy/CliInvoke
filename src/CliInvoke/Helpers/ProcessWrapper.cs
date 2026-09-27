@@ -51,6 +51,27 @@ internal
 
     internal new DateTime ExitTime { get; private set; }
 
+    /// <summary>
+    /// Reads the OS-provided exit time directly, bypassing the <c>Exited</c> event handler.
+    /// </summary>
+    /// <remarks>
+    /// Safe to call once <see cref="Process.HasExited"/> is <see langword="true"/>. Unlike the
+    /// handler-assigned <see cref="ExitTime"/>, this never returns a stale <c>default</c> value,
+    /// so callers cannot observe an unset exit time after the process has exited.
+    /// </remarks>
+    internal DateTime SafeExitTime
+    {
+        get
+        {
+            DateTime exitTime = base.ExitTime;
+
+            if (exitTime == default)
+                return DateTime.UtcNow;
+
+            return exitTime.ToUniversalTime();
+        }
+    }
+
     internal new int Id { get; private set; }
 
     internal new string ProcessName { get; private set; }
@@ -87,7 +108,12 @@ internal
 
     private void OnExited(object? sender, EventArgs e)
     {
-        ExitTime = base.ExitTime.ToUniversalTime();
+        // Idempotent: assign on first invocation and never move the value backwards,
+        // so a later re-raise cannot regress the captured exit time.
+        DateTime exitTime = SafeExitTime;
+
+        if (ExitTime == default || exitTime < ExitTime)
+            ExitTime = exitTime;
     }
 
     internal event EventHandler Started;
@@ -392,8 +418,12 @@ internal
 
     private static void SuspendProcessUnix(int pid)
     {
-        int SIGSTOP = OperatingSystem.IsMacOS() ? 17 : 19; // macOS fallback vs Linux
-        if (kill(pid, SIGSTOP) != 0)
+        // Signal numbers use the BSD layout (SIGSTOP = 17) on macOS/macCatalyst/FreeBSD and
+        // the Linux layout (SIGSTOP = 19) elsewhere; raising the wrong number on the BSD
+        // family is either a no-op (Linux's 19 is SIGCONT there) or stops the wrong thing.
+        int sigStop = OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
+                      OperatingSystem.IsFreeBSD() ? 17 : 19;
+        if (kill(pid, sigStop) != 0)
         {
             int errno = Marshal.GetLastWin32Error();
             // No such process - indicates the process already exited; treat as no-op.
@@ -404,8 +434,12 @@ internal
 
     private static void ResumeProcessUnix(int pid)
     {
-        const int SIGCONT = 18; // common value for SIGCONT
-        if (kill(pid, SIGCONT) != 0)
+        // Signal numbers use the BSD layout (SIGCONT = 19) on macOS/macCatalyst/FreeBSD and
+        // the Linux layout (SIGCONT = 18) elsewhere; Linux's 18 is SIGTSTP on the BSD
+        // family, which would re-stop the process instead of resuming it.
+        int sigCont = OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() ||
+                      OperatingSystem.IsFreeBSD() ? 19 : 18;
+        if (kill(pid, sigCont) != 0)
         {
             int errno = Marshal.GetLastWin32Error();
             // No such process - indicates the process already exited; treat as no-op.

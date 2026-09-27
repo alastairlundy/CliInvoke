@@ -169,15 +169,16 @@ public class ExternalProcess : IExternalProcess
         _processWrapper.Started += (sender, args) => Started?.Invoke(sender, args);
         _processWrapper.Exited += (sender, args) => Exited?.Invoke(sender, args);
         
-        if (configuration.StandardInput is not null
-            && configuration.StandardInput != StreamWriter.Null)
-        {
+        var shouldRedirectStandardInput = configuration.StandardInput is not null
+            && configuration.StandardInput != StreamWriter.Null
+            && configuration.RedirectStandardInput;
+        
+        if (shouldRedirectStandardInput)
             _processWrapper.StartInfo.RedirectStandardInput = true;
-        }
         
         _processWrapper.Start();
         
-        if(configuration.StandardInput is not null)
+        if(shouldRedirectStandardInput && configuration.StandardInput is not null)
             await _processPipeHandler.PipeStandardInputAsync(configuration.StandardInput.BaseStream, _processWrapper, cancellationToken);
     }
 
@@ -225,7 +226,7 @@ public class ExternalProcess : IExternalProcess
                 _processWrapper.ExitCode,
                 _processWrapper.Id,
                 _processWrapper.StartTime,
-                _processWrapper.ExitTime
+                ExternalProcess.GetExitTimeOrNow(_processWrapper)
             );
 
             ThrowIfProcessNotSuccessful(result);
@@ -279,7 +280,7 @@ public class ExternalProcess : IExternalProcess
             
             BufferedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
                 _processWrapper.Id, await standardOutputString, await standardErrorString, _processWrapper.StartTime,
-                _processWrapper.ExitTime);
+                ExternalProcess.GetExitTimeOrNow(_processWrapper));
 
             ThrowIfProcessNotSuccessful(result);
 
@@ -329,7 +330,7 @@ public class ExternalProcess : IExternalProcess
             Stream standardError = await standardErrorStream;
             
             PipedProcessResult result = new(_processWrapper.StartInfo.FileName, _processWrapper.ExitCode,
-                _processWrapper.Id, _processWrapper.StartTime, _processWrapper.ExitTime,
+                _processWrapper.Id, _processWrapper.StartTime, ExternalProcess.GetExitTimeOrNow(_processWrapper),
                 standardOutput, standardError);
 
             ThrowIfProcessNotSuccessful(result);
@@ -380,6 +381,35 @@ public class ExternalProcess : IExternalProcess
         _processWrapper.Dispose();
         
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Reads the process exit time for result construction.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="Process.Exited"/> event can fire after <see cref="Process.HasExited"/>
+    /// becomes observable (ProcessWrapper polls HasExited rather than relying on the event),
+    /// so the handler-assigned <see cref="ProcessWrapper.ExitTime"/> may still be <c>default</c>
+    /// when a result is built, which would yield a bogus negative
+    /// <see cref="CliInvoke.Core.ProcessResult.RuntimeDuration"/>. Reading the OS-provided exit
+    /// time directly is race-free once the process has exited, and a UTC "now" fallback covers
+    /// the not-yet-started window.
+    /// </remarks>
+    private static DateTime GetExitTimeOrNow(ProcessWrapper processWrapper)
+    {
+        if (!processWrapper.HasExited)
+            return DateTime.UtcNow;
+
+        try
+        {
+            return processWrapper.SafeExitTime;
+        }
+        catch (Exception exception) when (exception is InvalidOperationException
+            or System.ComponentModel.Win32Exception)
+        {
+            // Exit info is unavailable (e.g. the handle was closed); fall back to now.
+            return DateTime.UtcNow;
+        }
     }
 
     private void ThrowIfProcessNotSuccessful(ProcessResult result)

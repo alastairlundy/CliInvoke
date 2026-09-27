@@ -460,7 +460,7 @@ using (credential)
 * Never dispose a `StandardInput`, `StandardOutput`, `StandardError`, or `SecureString` twice — the library handles it when owning the resources.
 * If you reuse a `ProcessConfiguration` multiple times, call `Dispose()` manually after the final use.
 * Wrap builders and built credentials in `using` statements to ensure `SecureString` cleanup.
-* Only these five types require explicit disposal: `ProcessConfiguration`, `IExternalProcess`, `UserCredential`, `UserCredentialBuilder`, and `PipedProcessResult`. Other CliInvoke types do not implement `IDisposable`.
+* Only these four types require explicit disposal: `ProcessConfiguration`, `IExternalProcess`, `UserCredential`, and `PipedProcessResult`. Other CliInvoke types do not implement `IDisposable`.
 
 ## How to Build CliInvoke's code
 
