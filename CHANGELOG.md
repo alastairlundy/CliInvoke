@@ -324,6 +324,14 @@ Themes:
 - Fixed null-unsafe equality operators on primitives.
 - Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`.
 
+## [2.11.4] - 2026-09-28
+### Fixed
+- **Stdin redirection override** – `StartAsync` was forcing `RedirectStandardInput = true` even when the configuration didn't ask for it; it now honours the `RedirectStandardInput` flag.
+- **Negative `RuntimeDuration`** – `ExternalProcess` was reading a not-yet-set `ExitTime` when the `Exited` event raced the `HasExited` poll, producing bogus negative durations; it now reads the OS exit time directly with a `UtcNow` fallback.
+- **Credential disposal** – `ProcessExceptionInfo.Dispose()` was disposing a caller-owned `Credential` shared with the originating configuration, leaving it unusable afterward.
+- **Unix suspend/resume** – `SIGCONT` was hardcoded to Linux's signal 18, so macOS never resumed; FreeBSD's suspend/resume were inverted. Now uses BSD layout (17/19) on macOS/Catalyst/FreeBSD and Linux layout (18/19) elsewhere.
+- **Shell detection hangs** – Windows probes (`pwsh --version`, `cmd /c ver`) launched interactive sessions that blocked until timeout; they now exit immediately.
+
 ## [2.11.3.1] - 2026-09-20
 ### Fixed
 * Fixed packaging issues with 2.11.3
