@@ -80,6 +80,24 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Environment variables, user credentials, and the administrator verb are applied to the
+  process that actually starts. `BaseProcessControlAdapter.ApplyConfiguration` assigned a
+  freshly built `ProcessStartInfo` over `process.StartInfo` *after* the control adapter had
+  written the admin verb, credential fields, and environment variables onto the original
+  instance, so all three were silently discarded in every invocation pattern (`CliRun`,
+  `IProcessInvoker`, and `IExternalProcess`). The assembled `ProcessStartInfo` is now
+  assigned before those mutations, and a buffered run test asserts that a configured
+  environment variable reaches the child process.
+- Unix suspend/resume signals corrected on macOS and FreeBSD. `SIGCONT` is 19 there, not
+  the Linux value 18, and `SIGSTOP` is 17, not 19. Because the suspend→resume cycle runs
+  on every process start, macOS children were stopped and never resumed, and on FreeBSD
+  suspend and resume were fully inverted. The exit-code-to-`PosixSignal` mapping
+  (`ProcessResult.Signal`) is now platform-aware as well.
+- The default `ProcessResourcePolicy` affinity mask now selects every logical processor.
+  The old default, `2 * Environment.ProcessorCount - 1`, is a valid all-cores mask only
+  for one or two processors; on an 8-core machine it pinned spawned processes to cores
+  0 through 3. The default is now `(1 << Environment.ProcessorCount) - 1`, matching the
+  constructor's own validation formula.
 - `WithMaxBufferedOutputBytes(config, null)` now clears the source
   configuration's buffer cap instead of silently inheriting it, so an explicit
   `null` really means unbounded output. Omitting the argument still inherits

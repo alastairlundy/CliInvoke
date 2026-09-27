@@ -646,7 +646,7 @@ Defined in `src/CliInvoke.Core/Primitives/Policies/ProcessResourcePolicy.cs`.
 
 | Property | Type | Default | Platform | Source line |
 |----------|------|---------|----------|-------------|
-| `ProcessorAffinity` | `IntPtr?` | `2 * Environment.ProcessorCount - 1` *(all logical processors)* | Windows, Linux | 87 |
+| `ProcessorAffinity` | `IntPtr?` | `(1 << Environment.ProcessorCount) - 1` *(all logical processors)* | Windows, Linux | 87 |
 | `PriorityClass` | `ProcessPriorityClass` | `ProcessPriorityClass.Normal` | All | 92 |
 | `EnablePriorityBoost` | `bool` | `false` | All | 97 |
 | `MinWorkingSet` | `nint?` | `null` | Windows, macOS | 105 |

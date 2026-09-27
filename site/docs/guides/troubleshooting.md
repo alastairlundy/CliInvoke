@@ -113,9 +113,10 @@ specific platform behavior.
    guarantees beyond `pwsh` being installed and runnable on the
    target host. For other Unix shells, supply the shell executable
    explicitly.
-3. **macOS signal differences.** `SIGSTOP` is signal 17 on macOS and 19 on
-   Linux. `UnixProcessControlAdapter` already accounts for this; do not
-   hardcode signal numbers in caller code.
+3. **macOS and BSD-family signal differences.** `SIGSTOP` is signal 17 on macOS and
+   FreeBSD but 19 on Linux, and `SIGCONT` is 19 on macOS and FreeBSD but 18 on Linux.
+   `UnixProcessControlAdapter` accounts for both; do not hardcode signal numbers in
+   caller code.
 4. **Process-group vs. process-only termination.** On Unix, killing the
    parent PID does not signal its children. Use
    `ProcessExitBehaviour.ForcefulExit` to attempt to terminate child
