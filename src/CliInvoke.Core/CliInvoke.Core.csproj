@@ -13,7 +13,6 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageTags>shell, pipe, command-line, executable, processconfiguration, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, iprocessconfigurationfactory</PackageTags>
         <Description>External Process and Cli program running related abstractions implemented by CliInvoke</Description>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageReadmeFile>README.md</PackageReadmeFile> 
