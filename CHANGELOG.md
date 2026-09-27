@@ -31,6 +31,10 @@ adheres to [Semantic Versioning](https://semver.org/).
 - Result-ergonomics documentation guide (`site/docs/guides/results.md`)
   covering the new members, `ToString` formats, `Deconstruct`, and the
   heuristic-vs-validator framing.
+- Stdin piping guide (`site/docs/guides/stdin-piping.md`) documenting
+  which invocation paths pipe `ProcessConfiguration.StandardInput`, worked
+  Raw and Buffered examples, the end-of-file contract, why `Start()` stays
+  no-pipe, and caller ownership of the source stream.
 
 ### Changed
 
@@ -82,6 +86,35 @@ adheres to [Semantic Versioning](https://semver.org/).
   the source cap.
 - Escaper fuzz tests now exercise the `ShellRewriter` composition paths
   for all three shell kinds (PowerShell, Cmd, Posix).
+- The invocation pipeline now honors `ProcessConfiguration.StandardInput`
+  in both modes. Raw (`CliRun.RunAsync`, `IProcessInvoker.ExecuteAsync`)
+  and Buffered (`CliRun.RunBufferedAsync`,
+  `IProcessInvoker.ExecuteBufferedAsync`) previously started the child
+  without ever copying the configured stdin, so a stdin-reading child
+  received no input. Raw pipes stdin during `StartAsync(CancellationToken)`;
+  Buffered pipes it concurrently with output capture inside
+  `CaptureBufferedResultAsync`.
+- The one-call bypass path now delivers end-of-file.
+  `ExternalProcess.StartAsync(configuration, cancellationToken)` copied
+  stdin into the child but never closed the child's stdin write end, so
+  the child never received end-of-file and a stdin-reading child hung.
+  The write end now closes on every piping exit path (success,
+  cancellation, or source error). The caller's source stream is never
+  closed or disposed by the library.
+- **`StartAsync(CancellationToken)` returns at launch again.** The method
+  had regressed into waiting for process exit, which also kept Raw-mode
+  timeouts from ever firing mid-run because the timeout machinery only ran
+  after the process had already exited. It now resolves the file path,
+  starts the process, pipes any configured stdin, and returns without
+  waiting for exit; Raw-mode timeouts fire mid-run again. Callers that
+  relied on the accidental wait must now call
+  `WaitForExitOrTimeoutAsync` or `CaptureBufferedResultAsync` explicitly
+  after `StartAsync` returns.
+- `IExternalProcess.Start()` and `CliRun.FireAndForget` remain no-pipe by
+  design: a synchronous stdin copy would block the caller on the child's
+  consumption speed and deadlock the Buffered composition. Feed stdin via
+  `StartAsync` or `CaptureBufferedResultAsync` instead; see the
+  [stdin piping guide](site/docs/guides/stdin-piping.md).
   
 ## [3.0.1] - 2026-09-24
 

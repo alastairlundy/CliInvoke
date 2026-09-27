@@ -467,17 +467,28 @@ and joins in a single call, `IExternalProcess` exposes the process's
 lifecycle as a sequence of steps you orchestrate yourself:
 
 1. **Start** — call `StartAsync(...)`. This returns once the OS
-   process has been launched and the redirected pipes are attached.
-   `StartAsync` returns a plain `Task`; it does **not** return the
-   process result. The result is obtained separately, by calling
-   one of the capture methods below.
+   process has been launched, the redirected pipes are attached, and
+   any configured `StandardInput` has been piped to the child. When
+   stdin was piped, the child's stdin write end has closed by then, so
+   a stdin-reading child receives end-of-file. `StartAsync` returns a
+   plain `Task`; it does **not** return the process result and does
+   **not** wait for the process to exit. The result is obtained
+   separately, by calling one of the capture methods below.
 2. **Observe** — subscribe to `Started` and `Exited` events, or
    poll `HasStarted` / `HasExited`.
 3. **Capture** — call `WaitForExitOrTimeoutAsync` for a plain
     `ProcessResult`, or `CaptureBufferedResultAsync` to read the buffered
-    stdout/stderr into memory. These methods can be called at any point
-    during execution, not only at exit.
+    stdout/stderr into memory. `CaptureBufferedResultAsync` also feeds
+    the configured `StandardInput` to the child, concurrently with
+    capturing output, when redirection is enabled. These methods can be
+    called at any point during execution, not only at exit.
 4. **Terminate** — call `Kill()` to forcibly stop a runaway process.
+
+The synchronous `Start()` is start-only and pipes no stdin; use
+`StartAsync` or `CaptureBufferedResultAsync` when the configuration
+carries a `StandardInput`. The [Stdin Piping](./stdin-piping.md) guide
+documents which paths pipe, the end-of-file contract, and why `Start()`
+deliberately does not pipe.
 
 > **Fire-and-forget launching** is *not* a member of `IExternalProcess`.
 > If you only need the OS process id and do not care about the result,
