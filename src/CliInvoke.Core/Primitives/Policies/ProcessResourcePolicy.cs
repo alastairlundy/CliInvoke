@@ -21,7 +21,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// handling processor counts that equal or exceed the native integer bit width.
     /// </summary>
     /// <returns>The maximum processor-affinity mask.</returns>
-    public static nint ComputeMaxProcessorAffinity()
+    private static nint ComputeMaxProcessorAffinity()
     {
         int processorCount = Environment.ProcessorCount;
         int nativeWidth = IntPtr.Size * 8;
