@@ -81,7 +81,7 @@ the pipeline to the end.
 A **Resource-Owning Type** is any CliInvoke type that holds, directly or
 transitively, an unmanaged resource (pipes, file handles, process
 threads) or a sensitive managed resource (`SecureString`). The library
-exposes exactly three; see the
+exposes exactly four; see the
 [Resource Disposal guide](resource-disposal.md) for the full list.
 
 ## The data-flow: Construction → Model → Invoker → Result
@@ -449,6 +449,20 @@ a result with `ThrowIfUnsuccessful`, which raises
 `ProcessNotSuccessfulException<TProcessResult>` when `Validate`
 returns false.
 
+`IProcessResultValidator<TProcessResult>` answers the question
+*“is this result acceptable, or should we raise a failure?”*. The
+default implementation (`ProcessResultValidator<TProcessResult>`)
+evaluates a set of self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
+rules. `Validate` returns a `bool` (all rules pass), while
+`GetValidationFailures` returns the per-rule <xref:CliInvoke.Core.Validation.ValidationFailure`1>
+instances so callers can surface detailed, rule-by-rule messages. The
+invocation pipeline raises a `ProcessValidationException` when a
+configured validation rule rejects the result (see
+`ProcessExitConfiguration.ValidationRules`). The post-exit
+validation middleware (`UsePostExitValidation`) consumes the same
+validator stack and throws `ProcessValidationException` with the
+joined per-rule failure messages.
+
 Custom validators are the supported way to add domain-specific
 post-execution checks — for example, asserting that captured output
 matches a regex, or that a specific environment variable was
@@ -528,7 +542,7 @@ scenario.
   `ProcessConfiguration`, the builder lifecycle, and the
   default-value appendix.
 - [Resource Disposal](resource-disposal.md) — the disposal contract
-  for the three Resource-Owning Types, including the configuration,
+  for the four Resource-Owning Types, including the configuration,
   the `IExternalProcess`, and the result.
 - [Troubleshooting](troubleshooting.md) — symptom-based diagnosis for
   leaks, hangs, exit-code mismatches, and file-not-found errors.

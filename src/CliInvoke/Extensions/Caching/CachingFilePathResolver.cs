@@ -58,8 +58,11 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     }
 
     /// <inheritdoc />
+    /// <exception cref="ArgumentException">Thrown when <paramref name="filePathToResolve"/> is null or whitespace.</exception>
     public FileInfo ResolveFilePath(string filePathToResolve)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
+
         string key = NormalizeKey(filePathToResolve);
 
         if (TryGetVerified(key, out FileInfo? cached) && cached is not null)
@@ -73,25 +76,43 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    ///     Per the Try* convention this method never throws: invalid (null or whitespace)
+    ///     input, cache failures, and inner-resolver faults all resolve to
+    ///     <c>false</c> with <paramref name="resolvedFilePath"/> set to <c>null</c>.
+    /// </remarks>
     public bool TryResolveFilePath(string filePathToResolve, out FileInfo? resolvedFilePath)
     {
-        string key = NormalizeKey(filePathToResolve);
-
-        if (TryGetVerified(key, out FileInfo? cached) && cached is not null)
-        {
-            resolvedFilePath = cached;
-            return true;
-        }
-
-        if (_inner.TryResolveFilePath(filePathToResolve, out FileInfo? innerResolved) && innerResolved is not null)
-        {
-            Cache(key, innerResolved.FullName);
-            resolvedFilePath = innerResolved;
-            return true;
-        }
-
         resolvedFilePath = null;
-        return false;
+
+        if (string.IsNullOrWhiteSpace(filePathToResolve))
+            return false;
+
+        try
+        {
+            string key = NormalizeKey(filePathToResolve);
+
+            if (TryGetVerified(key, out FileInfo? cached) && cached is not null)
+            {
+                resolvedFilePath = cached;
+                return true;
+            }
+
+            if (_inner.TryResolveFilePath(filePathToResolve, out FileInfo? innerResolved)
+                && innerResolved is not null)
+            {
+                Cache(key, innerResolved.FullName);
+                resolvedFilePath = innerResolved;
+                return true;
+            }
+
+            return false;
+        }
+        catch (Exception)
+        {
+            resolvedFilePath = null;
+            return false;
+        }
     }
 
     /// <summary>

@@ -58,6 +58,8 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
     public IProcessMiddlewareBuilder UseMiddleware<T>() where T : IProcessMiddleware
     {
         _typedEntries.Add(typeof(T));
+        // Placeholder keeps type-based entries positioned in registration order.
+        _middleware.Add(null!);
         return this;
     }
 
@@ -87,11 +89,19 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
     /// <inheritdoc />
     public IReadOnlyList<IProcessMiddleware> Build()
     {
-        List<IProcessMiddleware> result = new List<IProcessMiddleware>(_middleware.Count + _typedEntries.Count);
-        result.AddRange(_middleware);
+        List<IProcessMiddleware> result = new List<IProcessMiddleware>(_middleware.Count);
+        int nextTypedEntry = 0;
 
-        foreach (Type type in _typedEntries)
+        foreach (IProcessMiddleware? entry in _middleware)
         {
+            if (entry is not null)
+            {
+                result.Add(entry);
+                continue;
+            }
+
+            Type type = _typedEntries[nextTypedEntry++];
+
             if (!_resolvedCache.TryGetValue(type, out IProcessMiddleware? resolved))
             {
                 resolved = _resolver(type) ?? throw new InvalidOperationException(

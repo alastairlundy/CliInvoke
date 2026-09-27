@@ -73,6 +73,15 @@ internal static class CancellationHelper
         CancellationReason cancellationReason, ProcessExitConfiguration exitConfiguration,
         Exception exception)
     {
+        // The caller-configured cancellation knob overrides the default
+        // ExceptionBehaviour heuristics: when CancellationThrowsException is set, any
+        // OperationCanceledException raised by the cancellation machinery propagates to
+        // the caller, regardless of whether the cancellation was user-requested or
+        // timer-driven (see troubleshooting docs). Genuine (non-cancellation) failures
+        // remain governed by ExceptionBehaviour below.
+        if (exitConfiguration.CancellationThrowsException && exception is OperationCanceledException)
+            throw exception;
+
         DateTime actualExitTime = DateTime.UtcNow;
         TimeSpan difference = TimeSpan.FromTicks(Math.Abs(expectedExitTime.Ticks - actualExitTime.Ticks));
 

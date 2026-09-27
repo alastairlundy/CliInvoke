@@ -38,7 +38,7 @@ minimise backtracking.
    defaults are.
 3. **[Resource Disposal](resource-disposal.md)** — every unmanaged handle
    and `SecureString` buffer in the library is owned by exactly one of the
-   three Resource-Owning Types; this guide documents the disposal contract
+   four Resource-Owning Types; this guide documents the disposal contract
    for each.
 4. **[Architecture](architecture.md)** — once you have written a few
    invocations, read this to understand the four-stage data-flow, the
@@ -83,7 +83,7 @@ does, what its default is, and which builder method to use.
 ### [Resource Disposal](resource-disposal.md)
 
 Documents every public type in the library that implements `IDisposable`
-(and, where applicable, `IAsyncDisposable`) — there are exactly three — the
+(and, where applicable, `IAsyncDisposable`) — there are exactly four — the
 unmanaged resources they own, and the disposal patterns callers must
 follow. Read this before shipping code that creates processes in a loop,
 exposes processes to a long-running service, or handles `SecureString`

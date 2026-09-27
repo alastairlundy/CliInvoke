@@ -381,9 +381,8 @@ process: processor affinity, priority class, priority boost, and
 working-set sizes. The default value (`ProcessResourcePolicy.Default`)
 assigns affinity to every logical processor on the machine — a mask of
 `(1 << Environment.ProcessorCount) - 1`, saturating to
-`nint.MaxValue` on machines with 63 or more logical processors
-(exposed as `ProcessResourcePolicy.AllProcessorsAffinityMask`);
-everything else is left at the OS default.
+`nint.MaxValue` on machines with 63 or more logical processors —
+and leaves everything else at the OS default.
 
 **Platform notes**:
 
@@ -649,15 +648,15 @@ Defined in `src/CliInvoke.Core/Primitives/Policies/ProcessResourcePolicy.cs`.
 
 | Property | Type | Default | Platform | Source line |
 |----------|------|---------|----------|-------------|
-| `ProcessorAffinity` | `IntPtr?` | `(1 << Environment.ProcessorCount) - 1` *(all logical processors)* | Windows, Linux | 87 |
+| `ProcessorAffinity` | `IntPtr?` | `(1 << Environment.ProcessorCount) - 1` *(a mask covering every logical processor, saturating to `nint.MaxValue` at 63+ processors)* | Windows, Linux | 87 |
 | `PriorityClass` | `ProcessPriorityClass` | `ProcessPriorityClass.Normal` | All | 92 |
 | `EnablePriorityBoost` | `bool` | `false` | All | 97 |
 | `MinWorkingSet` | `nint?` | `null` | Windows, macOS | 105 |
 | `MaxWorkingSet` | `nint?` | `null` | Windows, macOS | 113 |
 
 `ProcessResourcePolicy.Default` is a static instance that
-initializes `ProcessorAffinity` to
-`ProcessResourcePolicy.AllProcessorsAffinityMask` and leaves
+initializes `ProcessorAffinity` to a `(1 << ProcessorCount) - 1`
+mask covering every logical processor on the machine and leaves
 the other properties at their constructor defaults.
 
 ### `UserCredential`
