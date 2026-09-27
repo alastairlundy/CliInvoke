@@ -6,6 +6,74 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
+## [3.0.2] - unreleased
+
+Patch release backporting fixes from the 3.1.0 train for defects present in
+3.0.0 and 3.0.1. No public API changes except where noted under Changed.
+
+### Changed
+
+- `IExternalProcess.StartAsync(CancellationToken)` now returns at launch instead of waiting
+  for exit, so Raw-mode timeouts fire mid-run again. Callers that relied on the accidental
+  wait must call `WaitForExitOrTimeoutAsync` or `CaptureBufferedResultAsync` explicitly
+  after `StartAsync` returns.
+- `EnvironmentVariablesSpec` accepts empty-string values (for example, to clear a variable).
+  Values must still not be null.
+- `AddCliInvoke` registers `IProcessConfigurationBuilder` as a blank-builder factory. The
+  previous type-mapped registration could never resolve; set the target via
+  `SetTargetFilePath` before building.
+- `UseDefaultShell()` wraps PowerShell with the same `-NoProfile -NonInteractive -Command`
+  switches as `UsePowerShell()`.
+
+### Fixed
+
+- Environment variables, user credentials, and the administrator verb are applied to the
+  process that actually starts. `ApplyConfiguration` overwrote `process.StartInfo` after
+  writing them, silently discarding all three in every invocation pattern.
+- Unix suspend/resume signals corrected on macOS and FreeBSD (`SIGCONT` is 19 there, not
+  18; `SIGSTOP` is 17, not 19). macOS children were stopped and never resumed, and FreeBSD
+  suspend/resume were fully inverted. The `ProcessResult.Signal` mapping is platform-aware.
+- The default `ProcessResourcePolicy` affinity mask now selects every logical processor
+  (`(1 << Environment.ProcessorCount) - 1`); the old default pinned 8-core processes to
+  cores 0-3.
+- The invocation pipeline honors `ProcessConfiguration.StandardInput` in Raw and Buffered
+  modes; previously the configured stdin was never copied to the child.
+- The one-call bypass path now delivers end-of-file: the child's stdin write end closes on
+  every piping exit path, so stdin-reading children no longer hang.
+- Kill-induced stdin copy faults are absorbed at the join instead of failing the
+  invocation; genuine source-stream read errors still propagate.
+- `ProcessExitConfiguration.CancellationThrowsException` is honoured. The knob was
+  previously dead: only assigned, never read.
+- `MiddlewareItems.TryGet<T>` returns `false` instead of throwing on a failed lookup,
+  per the Try* convention.
+- `CachingFilePathResolver.TryResolveFilePath` never throws on invalid input, and
+  `ResolveFilePath` throws a documented `ArgumentException` instead of an NRE for null.
+- `ProcessExceptionInfo<TProcessResult>.Dispose()` no longer disposes the caller-owned
+  `UserCredential` it exposes.
+- `ProcessMiddlewareBuilder.Build()` preserves registration order across registration
+  styles instead of running all direct instances before all type-based entries.
+- `ShellDetector`: the Unix `ps` probe runs through `sh -c` so `$$` expands; Unix version
+  parsing keeps the dots (`5.9` parsed as `59.0`); Windows `pwsh` is invoked
+  non-interactively instead of starting a REPL; the `cmd` fallback is reachable.
+- `DefaultShellMiddleware` no longer recurses infinitely when its own chain re-enters
+  during shell detection.
+- `ExitTime` is published under a lock before any wait returns, so `ProcessResult` no
+  longer shows a zero timestamp with a negative `RuntimeDuration`.
+- The linked `CancellationTokenSource` in the forceful-timeout wait no longer leaks when
+  the caller's token is already canceled.
+- `FromProcessStartInfo` maps the `RedirectStandardInput` flag, treats a non-empty
+  `ArgumentList` as canonical over `Arguments`, and no longer reads the Windows-only
+  `Domain`/`LoadUserProfile` properties on Unix.
+- The post-exit validation middleware adapter delegates non-buffered results to the inner
+  rule's null semantics, so `StderrIsEmpty` passes and `StdoutMatches` fails as documented.
+- `GetFirstOutputLine()` splits on `Environment.NewLine` like its sibling line helpers.
+- The static `BufferedProcessResult.Equals(null, null)` overload returns `true` instead
+  of throwing.
+- `FilePathResolver` throws `FileNotFoundException` for rooted paths that do not exist
+  instead of silently returning a non-existent `FileInfo`.
+- Missing internal helper types restored so the branch compiles from source. Internal
+  only; no public API change.
+
 ## [3.1.0] - unreleased
 
 ### Added
