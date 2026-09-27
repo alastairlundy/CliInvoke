@@ -60,12 +60,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         if (processorAffinity is not null)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan((nint)processorAffinity, 0x0001);
-
-            nint maxAffinityMask = Environment.ProcessorCount >= (nint.Size * 8) - 1
-                ? nint.MaxValue
-                : ((nint)1 << Environment.ProcessorCount) - 1;
-
-            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, maxAffinityMask);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, AllProcessorsAffinityMask);
         }
 
         if (maxWorkingSet is not null)
@@ -74,7 +69,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         ProcessorAffinity = processorAffinity ??
 #pragma warning restore CA1416
-                            2 * Environment.ProcessorCount - 1;
+                            AllProcessorsAffinityMask;
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -118,8 +113,21 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     ///     Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
     public static ProcessResourcePolicy Default { get; } = new(
-        2 * Environment.ProcessorCount - 1
+        AllProcessorsAffinityMask
     );
+
+    /// <summary>
+    ///     An affinity mask that covers every logical processor on the current machine.
+    /// </summary>
+    /// <remarks>
+    ///     For N logical processors this is <c>(1 << N) - 1</c>; for machines with
+    ///     <see cref="nint.Size" />*8 or more logical processors it saturates to
+    ///     <see cref="nint.MaxValue" />.
+    /// </remarks>
+    public static nint AllProcessorsAffinityMask =>
+        Environment.ProcessorCount >= (nint.Size * 8) - 1
+            ? nint.MaxValue
+            : ((nint)1 << Environment.ProcessorCount) - 1;
 
     /// <summary>
     ///     Determines whether this ProcessResourcePolicy is equal to another ProcessResourcePolicy.

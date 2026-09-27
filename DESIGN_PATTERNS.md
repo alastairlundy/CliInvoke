@@ -61,8 +61,8 @@ Straightforward API for running a process and retrieving its result.
 
 ### Example
 ```csharp
-// Run a simple command and wait for completion.
-BufferedProcessResult result = await CliRun.RunAsync("dotnet", "--version");
+// Run a simple command, capture its output, and wait for completion.
+BufferedProcessResult result = await CliRun.RunBufferedAsync("dotnet", "--version");
 
 Console.WriteLine(result.StandardOutput);
 ```
