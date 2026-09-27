@@ -82,9 +82,12 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(
 Console.WriteLine(result.StandardOutput);
 ```
 
-`CliRun` is a static façade. It builds a `ProcessConfiguration` internally,
-applies sensible defaults, and delegates to the default `IProcessInvoker`.
-You get results with a single line of code — no DI container, no factories.
+`CliRun` is a static façade. It builds a `ProcessConfiguration` and a
+`ProcessExitConfiguration` internally, applies sensible defaults, and runs
+them through a fresh process pipeline allocated per call — no DI container,
+no invoker resolution, no shared static state (see
+[ADR-0003](https://github.com/alastairlundy/CliInvoke/blob/main/docs/adr/0003-cli-run-defaults-facade.md)).
+You get results with a single line of code.
 
 ### What you give up
 

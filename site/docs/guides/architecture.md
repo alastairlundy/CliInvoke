@@ -253,12 +253,14 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(
     "dotnet", "--version");
 ```
 
-Internally, `CliRun` constructs a `ProcessConfiguration` via init
-construction from the method arguments (Stage 1 → Stage 2), constructs
-a fresh `ExternalProcessFactory` with a default `FilePathResolver`
-(there is no longer any shared, configurable static state — a new factory is
-allocated per call), delegates to a `ProcessInvoker` (Stage 3), and returns the result
-(Stage 4).
+Internally, `CliRun` constructs a `ProcessConfiguration` and a
+`ProcessExitConfiguration` from the method arguments (Stage 1 → Stage 2),
+then allocates a fresh process pipeline — and, underneath it, a fresh
+`ExternalProcessFactory` with a default `FilePathResolver` — per call
+(Stage 3; there is no shared, configurable static state) and returns the
+result (Stage 4). It does not resolve or delegate to a registered
+`IProcessInvoker` (see
+[ADR-0003](https://github.com/alastairlundy/CliInvoke/blob/main/docs/adr/0003-cli-run-defaults-facade.md)).
 
 The caller never sees the builder, the model, or the invoker. This is
 the trade-off documented in
@@ -329,7 +331,7 @@ contract for both the configuration and the `IExternalProcess`.
 
 | Pattern | Stage 1 (Construction) | Stage 2 (Model) | Stage 3 (Invoker / Process) | Stage 4 (Result) |
 |---|---|---|---|---|
-| `CliRun` | Library (implicit) | Library (implicit) | Library (default invoker) | Library returns |
+| `CliRun` | Library (implicit) | Library (implicit) | Library (fresh pipeline per call) | Library returns |
 | `IProcessInvoker` | Caller | Caller | Library (resolved from DI) | Library returns |
 | `IExternalProcess` | Caller | Caller | Library + caller share | Library returns |
 
@@ -397,34 +399,55 @@ toolchain directory. See
 [`GLOSSARY.md` § 1 — Resolution order rationale](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md#1-resolution-order-rationale)
 for the performance contract that custom resolvers must respect.
 
-#### 2. Runner wrapping — `IRunnerConfigurationFactory`
+#### 2. Runner wrapping — `IRunnerConfigurationFactory` and shell middleware
 
 `IRunnerConfigurationFactory` answers the question *“if the process
 needs to be run through another process (e.g. PowerShell, CMD, or a
-custom shell), how do we build a new configuration that does that?”*.
-`CliInvoke.Specializations` provides implementations that wrap
-configurations for Windows PowerShell and CMD; custom implementations
-can wrap configurations for any other runner.
+custom runner such as sudo), how do we build a new configuration that
+does that?”*. The default implementation, `RunnerConfigurationFactory`,
+ships in the `CliInvoke` package and is registered by default by
+`AddCliInvoke`; custom implementations can be registered in DI for any
+other runner.
 
-The runner factory is consulted by the invoker when the configuration
-specifies that it must be executed through a runner. It rewrites the
-`ProcessConfiguration` accordingly; the rest of the pipeline then
-runs the rewritten configuration as if it were the original.
+The invoker does **not** consult the runner factory on its own. There
+are two supported rewrite paths:
 
-#### 3. Result validation — `IProcessResultValidator`
+- **Shell middleware** — `UsePowerShell()` / `UseCmd()` from the
+  `CliInvoke.Specializations` package rewrite the configuration via the
+  internal `ShellRewriter` before the pipeline runs, escaping and
+  composing the inner command for the target shell.
+- **Direct use** — callers invoke `IRunnerConfigurationFactory` (or
+  their own implementation) to produce a rewritten
+  `ProcessConfiguration` and pass that rewritten configuration to the
+  invoker.
 
-`IProcessResultValidator<TProcessResult>` answers the question
-*“is this result acceptable, or should we raise a failure?”*. The
-default implementation (`ProcessResultValidator<TProcessResult>`)
-evaluates a set of self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
-rules. `Validate` returns a `bool` (all rules pass), while
-`GetValidationFailures` returns the per-rule <xref:CliInvoke.Core.Validation.ValidationFailure`1>
-instances so callers can surface detailed, rule-by-rule messages. The
-invoker raises a `ProcessNotSuccessfulException` when a validator
-configured for "must succeed" mode returns invalid. The post-exit
-validation middleware (`UsePostExitValidation`) consumes the same
-validator stack and throws `ProcessValidationException` with the
-joined per-rule failure messages.
+#### 3. Result validation — `IProcessResultValidator` and exit-configuration rules
+
+Result validation has one execution path and one caller-facing helper
+surface.
+
+The **execution path** is `ProcessExitConfiguration.ValidationRules` —
+an array of self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
+rules that the pipeline evaluates once, after the process exits and the
+result is produced. Each failing rule contributes its name and failure
+message; any failure causes the pipeline to throw
+`ProcessValidationException` with the joined per-rule messages. The
+`UsePostExitValidation` middleware works through this same path: it
+folds an `IProcessResultValidator`'s rules into the invocation's exit
+configuration before execution, so validator rules and inline rules are
+evaluated together.
+
+The **helper surface** is `IProcessResultValidator<TProcessResult>` and
+its default implementation (`ProcessResultValidator<TProcessResult>`).
+`Validate` returns a `bool` (all rules pass), while
+`GetValidationFailures` returns the per-rule
+<xref:CliInvoke.Core.Validation.ValidationFailure`1> instances so callers can
+surface detailed, rule-by-rule messages. The invoker itself never
+consults a validator; validator rules reach the pipeline only via
+`UsePostExitValidation`. Callers can also apply a validator directly to
+a result with `ThrowIfUnsuccessful`, which raises
+`ProcessNotSuccessfulException<TProcessResult>` when `Validate`
+returns false.
 
 Custom validators are the supported way to add domain-specific
 post-execution checks — for example, asserting that captured output
@@ -435,31 +458,32 @@ forwarded.
 
 The pipeline wraps the `IExternalProcess` stage. The path resolver
 runs **before** the process is created (it resolves the executable
-path that `ExternalProcess` will use); the runner factory runs
-**before** the process is created (it rewrites the configuration
-when a runner is in play); the result validator runs **after** the
-process exits (it inspects the result before it is returned).
+path that `ExternalProcess` will use); shell middleware rewrites the
+configuration **before** the pipeline runs (when `UsePowerShell()` or
+`UseCmd()` is registered); the exit-configuration validation rules run
+**after** the process exits (they inspect the result before it is
+returned).
 
 ```mermaid
 sequenceDiagram
     participant Caller
     participant Invoker as ProcessInvoker
-    participant Pipeline as Pipeline (path → runner → core)
+    participant Middleware as Middleware (e.g. shell rewriting)
+    participant Pipeline as ProcessInvocationPipeline
     participant Process as IExternalProcess
-    participant Validator as IProcessResultValidator
 
-    Caller->>Invoker: ExecuteAsync(config)
-    Invoker->>Pipeline: Create IExternalProcess(config)
-    Pipeline->>Pipeline: IFilePathResolver.Resolve(config)
-    Pipeline->>Pipeline: IRunnerConfigurationFactory.MaybeRewrite(config)
-    Pipeline->>Process: new IExternalProcess(rewritten config)
-    Pipeline-->>Invoker: IExternalProcess
-    Invoker->>Process: StartAsync()
-    Process-->>Invoker: started
-    Invoker->>Process: WaitForExit / Capture
-    Process-->>Invoker: result
-    Invoker->>Validator: Validate(result)
-    Validator-->>Invoker: ok | throw
+    Caller->>Invoker: ExecuteAsync(config, exitConfiguration)
+    Invoker->>Middleware: RunAsync(context)
+    Middleware->>Middleware: ShellRewriter.Rewrite(config)
+    Note over Middleware: only when shell middleware is registered
+    Middleware->>Pipeline: next(context)
+    Pipeline->>Process: CreateExternalProcess(config, exitConfiguration)
+    Pipeline->>Process: StartAsync()
+    Process-->>Pipeline: started
+    Pipeline->>Process: WaitForExit / Capture
+    Process-->>Pipeline: result
+    Pipeline->>Pipeline: Evaluate exitConfiguration.ValidationRules
+    Pipeline-->>Invoker: result | throw ProcessValidationException
     Invoker-->>Caller: result
 ```
 
@@ -485,7 +509,7 @@ API reference is the canonical place to look up method signatures.
 | Concern | Public interface | Default implementation | Replace via |
 |---|---|---|---|
 | Path resolution | `IFilePathResolver` | `FilePathResolver` | `UseCustomFilePathResolver<T>(ServiceLifetime)` |
-| Runner wrapping | `IRunnerConfigurationFactory` | (none — opt-in) | `RunnerConfigurationFactory` (CliInvoke.Specializations) |
+| Runner wrapping | `IRunnerConfigurationFactory` | `RunnerConfigurationFactory` (CliInvoke package; registered by default by `AddCliInvoke`) | register a custom `IRunnerConfigurationFactory` in DI (replacing the default registration) |
 | Result validation | `IProcessResultValidator<TProcessResult>` | `ProcessResultValidator<TProcessResult>` | `AddCustomResultValidators(...)` |
 
 The **core execution** layer — `IExternalProcess`, `ProcessInvoker`,
