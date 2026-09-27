@@ -5,7 +5,7 @@ description: Validates that code changes adhere to the three primary CliInvoke i
 
 # CliInvoke Pattern Validator
 
-Ensures that the implementation of process invocation adheres to the architectural boundaries defined in PATTERNS.md, preventing the mixing of high-level convenience APIs with low-level lifecycle management.
+Ensures that process invocation code stays inside the architectural boundaries set out in `DESIGN_PATTERNS.md`, so high-level convenience APIs do not drift into low-level lifecycle management.
 
 ## When to Use
 
@@ -33,19 +33,19 @@ Identify which pattern the change belongs to. If the change affects multiple pat
 
 ### Step 2: Boundary Validation
 Depending on the pattern, verify the following constraints:
-- **CliRun**: Must remain a thin wrapper. No complex state management or low-level process manipulation should be added directly to `CliRun`.
+- **CliRun**: Must remain a thin wrapper, and it must remain stateless. It builds a fresh `ProcessInvocationPipeline` over a fresh `ExternalProcessFactory` on every call, so do not let it read or hold process-wide configuration, and do not add low-level process manipulation to it.
 - **IProcessInvoker**: Must remain abstract and DI-friendly. No static dependencies or global state should be introduced into implementations. Ensure `ProcessConfiguration` is the primary input.
 - **IExternalProcess**: Must maintain granular lifecycle control (Start -> optional Input -> Capture/Kill). Ensure the `IExternalProcessFactory` is used for instantiation rather than direct constructor calls where DI is expected.
 
 ### Step 3: Dependency Check
-Verify that high-level patterns do not depend on low-level implementation details of other patterns (e.g., `CliRun` should not bypass `IProcessInvoker` to interact directly with `IExternalProcess`).
+Verify that a high-level pattern is not reimplementing a lower-level pattern's lifecycle logic. Sharing plumbing is expected. `CliRun` legitimately constructs `ExternalProcessFactory` and `ProcessInvocationPipeline` itself rather than resolving an `IProcessInvoker`, because it has no container to resolve one from. What you are looking for is hand-rolled start, capture, or kill behavior that a lower-level type already owns.
 
 ## Validation
 
 - [ ] The change does not introduce "pattern bleed" (mixing responsibilities).
 - [ ] No static dependencies were added to `IProcessInvoker` implementations.
-- [ ] `CliRun` remains a zero-boilerplate entry point.
-- [ ] The separation between Builders, Models, and Invokers is preserved.
+- [ ] `CliRun` remains a zero-boilerplate entry point, and holds no state between calls.
+- [ ] Construction matches the v3 default, with `ProcessConfigurationBuilder` reserved for its documented use cases.
 - [ ] The change does not introduce **v2-style code** (see `GLOSSARY.md`). Code is v2-style if (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles — reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default. **Carve-out**: deliberate advanced-builder usage (argument escaping, `UserCredentialSpec`/resource-policy callback flows) is legitimate and must not be flagged.
 
 ## Common Pitfalls
@@ -53,6 +53,7 @@ Verify that high-level patterns do not depend on low-level implementation detail
 | Pitfall | Solution |
 |---------|----------|
 | Adding complex logic to `CliRun` for convenience | Move logic into a new `IProcessInvoker` implementation or `ProcessConfiguration` extension. |
+| Treating `CliRun`'s direct construction of `ExternalProcessFactory` and `ProcessInvocationPipeline` as pattern bleed | That is the intended design. `CliRun` is stateless and allocates a fresh pipeline per call (`DESIGN_PATTERNS.md`). Flag shared state and hand-rolled lifecycle logic, not fresh allocations. |
 | Creating `IExternalProcess` via `new` in DI contexts | Use `IExternalProcessFactory` to maintain testability and abstraction. |
-| Bypassing `IProcessInvoker` in `CliRun` | Ensure `CliRun` always delegates execution to the configured invoker. |
+| Reading process-wide configuration inside `CliRun` | `CliRun` takes no configuration. Thread the value through the call, or move the caller to `IProcessInvoker`. |
 | Emitting v2-style code (per `GLOSSARY.md` `v2-style code`) | Use init construction with `required` `TargetFilePath` as the default. Reach for `ProcessConfigurationBuilder` only when the use case requires argument escaping, `UserCredentialSpec`, or resource-policy callback flows. |
