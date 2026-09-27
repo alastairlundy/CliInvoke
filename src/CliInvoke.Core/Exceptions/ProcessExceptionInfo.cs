@@ -98,15 +98,21 @@ public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionI
     ///     This is primarily used for scenarios where processes require specific
     ///     user authentication.
     /// </summary>
+    /// <remarks>
+    ///     The credential is the shared, caller-owned reference from the originating
+    ///     <see cref="ProcessConfiguration"/>; this type never disposes it. Disposal of
+    ///     the credential remains the caller's responsibility.
+    /// </remarks>
     public UserCredential? Credential { get; }
 
     /// <summary>
-    ///     Releases all resources used by the current instance of the <see cref="ProcessExceptionInfo{TProcessResult}" />
-    ///     class.
+    ///     Releases resources held by this instance. This instance does not own the
+    ///     <see cref="Credential"/> it exposes (it is the shared reference from the
+    ///     still-live <see cref="ProcessConfiguration"/>), so disposal never disposes
+    ///     the credential.
     /// </summary>
     public void Dispose()
     {
-        Credential?.Dispose();
         GC.SuppressFinalize(this);
     }
 

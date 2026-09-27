@@ -1,7 +1,5 @@
 namespace CliInvoke.Tests.Primitives;
 
-using System.Runtime.InteropServices;
-
 public class ProcessResultEqualityTests
 {
     private static ProcessResult MakeBase()

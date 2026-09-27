@@ -70,7 +70,7 @@ You can also configure the middleware pipeline when registering:
 services.AddCliInvoke(builder => builder.UseMiddleware<LoggingMiddleware>());
 ```
 
-> If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations) package's `UsePowerShell()`/`UseCmd()` middleware, also call `AddCliInvokeSpecializations()` (same namespace) with the same `ServiceLifetime` so those middleware types resolve from the container.
+> If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations) package's `UsePowerShell()`/`UseCmd()` middleware, also call `AddCliInvokeSpecializations()` (namespace `CliInvoke.Specializations` — add `using CliInvoke.Specializations;`) with the same `ServiceLifetime` so those middleware types resolve from the container.
 
 #### Manual Setup
 This example manually registers ``IProcessInvoker`` and the other core CliInvoke services as Singletons.
@@ -85,7 +85,9 @@ using CliInvoke.Builders;
 using CliInvoke.Core;
 using CliInvoke.Core.Builders;
 using CliInvoke.Core.Extensibility;
+using CliInvoke.Core.Factories;
 using CliInvoke.Extensibility;
+using CliInvoke.Factories;
 
 namespace MyApp;
 
@@ -200,8 +202,8 @@ using CliInvoke;
 using CliInvoke.Core;
 using CliInvoke.Specializations.Configurations;
 
-using PowershellProcessConfiguration config = new PowershellProcessConfiguration("-Command Get-Process");
+PowershellProcessConfiguration config = new("-Command Get-Process", redirectStandardInput: false);
 BufferedProcessResult result = await CliRun.RunBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
 ```
 
-You can also route invocations through PowerShell or Cmd using the ``UsePowerShell()`` / ``UseCmd()`` middleware extensions.
+You can also route invocations through PowerShell or Cmd using the ``UsePowerShell()`` / ``UseCmd()`` middleware extensions. To wrap only some invocations (for example, only `.ps1` files) while others run directly, see [Wrapping only some invocations in a shell](guides/middleware.md#wrapping-only-some-invocations-in-a-shell) in the middleware guide.

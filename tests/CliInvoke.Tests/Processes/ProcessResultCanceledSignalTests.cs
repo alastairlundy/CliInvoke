@@ -8,7 +8,6 @@
 */
 
 using CliInvoke.Processes.Internal;
-using System.Runtime.InteropServices;
 
 namespace CliInvoke.Tests.Processes;
 

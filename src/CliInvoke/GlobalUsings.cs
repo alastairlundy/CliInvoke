@@ -19,6 +19,7 @@ global using System.Diagnostics.CodeAnalysis;
 global using CliInvoke.Core.Extensibility;
 global using CliInvoke.Core.Factories;
 global using CliInvoke.Core.Middleware;
+global using CliInvoke.Internal;
 
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;

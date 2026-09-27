@@ -61,6 +61,41 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     }
 
     /// <summary>
+    ///     Initialises a new instance of the <see cref="ProcessConfiguration" /> class
+    ///     with the target file path, an argument list, and an output redirection setting;
+    ///     all other properties take the defaults documented on the corresponding properties.
+    /// </summary>
+    /// <remarks>
+    ///     When <paramref name="argumentList"/> is non-empty, the spawned process receives each
+    ///     entry via <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> rather than
+    ///     a single tokenised <see cref="Arguments"/> string, preventing double-parse
+    ///     command-injection when a shell wrapper re-interprets the command line.
+    ///     The list is captured as a snapshot; later mutations made to the caller's
+    ///     original collection are not reflected in the configuration.
+    /// </remarks>
+    /// <param name="targetFilePath">The file path of the executable to be run.</param>
+    /// <param name="argumentList">
+    ///     The arguments to pass to the executable as individual list entries.
+    ///     A snapshot is captured; <see langword="null" /> is rejected with
+    ///     an <see cref="ArgumentNullException"/>.
+    /// </param>
+    /// <param name="outputRedirection">Whether to redirect standard output and error.</param>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="targetFilePath" /> is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="argumentList" /> is null.</exception>
+    [SetsRequiredMembers]
+    public ProcessConfiguration(string targetFilePath, IEnumerable<string> argumentList,
+        bool outputRedirection = true)
+    {
+        ArgumentNullException.ThrowIfNull(argumentList);
+
+        IReadOnlyList<string> snapshot = [.. argumentList];
+
+        TargetFilePath = targetFilePath;
+        ArgumentList = snapshot;
+        OutputRedirection = outputRedirection;
+    }
+
+    /// <summary>
     ///     Whether administrator privileges should be used when executing the Command.
     /// </summary>
     public bool RequiresAdministrator { get; init; }
@@ -123,7 +158,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     <see cref="ArgumentList"/> are set, <see cref="ArgumentList"/> takes precedence and
     ///     <see cref="Arguments"/> is ignored.</b> This is the safe path for shell wrappers
     ///     (PowerShell/cmd), whose own parser would otherwise re-interpret a single re-tokenized
-    ///     <see cref="Arguments"/> string — a command-injection vector.
+    ///     <see cref="Arguments"/> string, a command-injection vector.
     /// </summary>
     /// <remarks>
     ///     Any supplied list is captured as a snapshot; later mutations made to the caller's
@@ -225,16 +260,35 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <summary>
     ///     The encoding to use for the Standard Input.
     /// </summary>
+    /// <remarks>
+    ///     Defaults to <see cref="Encoding.Default"/>, which is UTF-8 on .NET 10
+    ///     and later. Callers can override this per-stream via the init property.
+    ///     The control adapter applies this encoding only when standard input is
+    ///     redirected (<see cref="RedirectStandardInput"/> is <c>true</c> and
+    ///     <see cref="StandardInput"/> is not <c>null</c>).
+    /// </remarks>
     public Encoding StandardInputEncoding { get; init; } = Encoding.Default;
 
     /// <summary>
     ///     The encoding to use for the Standard Output.
     /// </summary>
+    /// <remarks>
+    ///     Defaults to <see cref="Encoding.Default"/>, which is UTF-8 on .NET 10
+    ///     and later. Callers can override this per-stream via the init property.
+    ///     The control adapter applies this encoding only when standard output is
+    ///     redirected (<see cref="OutputRedirection"/> is <c>true</c>).
+    /// </remarks>
     public Encoding StandardOutputEncoding { get; init; } = Encoding.Default;
 
     /// <summary>
     ///     The encoding to use for the Standard Error.
     /// </summary>
+    /// <remarks>
+    ///     Defaults to <see cref="Encoding.Default"/>, which is UTF-8 on .NET 10
+    ///     and later. Callers can override this per-stream via the init property.
+    ///     The control adapter applies this encoding only when standard error is
+    ///     redirected (<see cref="OutputRedirection"/> is <c>true</c>).
+    /// </remarks>
     public Encoding StandardErrorEncoding { get; init; } = Encoding.Default;
 
     /// <summary>

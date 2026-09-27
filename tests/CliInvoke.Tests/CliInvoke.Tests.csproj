@@ -15,7 +15,6 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="TUnit" />
     <PackageReference Include="Bogus" />
-    <PackageReference Include="DotExtensions" />
     <PackageReference Include="FsCheck" />
   </ItemGroup>
   <ItemGroup>
@@ -25,6 +24,7 @@
     <ProjectReference Include="..\CliInvoke.Tests.Helpers\CliInvoke.Tests.Helpers.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Extensions\" />
     <Folder Include="Invokers\Cancellation\" />
   </ItemGroup>
 </Project>

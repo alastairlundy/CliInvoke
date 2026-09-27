@@ -186,7 +186,7 @@ internal static class ShellRewriter
     ///     script, as a double-quoted PowerShell string. Unlike
     ///     <see cref="EscapeForPowerShell"/> (which targets unquoted command context),
     ///     only the characters that are significant <em>inside</em> a double-quoted
-    ///     PowerShell string are backtick-escaped — the backtick, the double quote,
+    ///     PowerShell string are backtick-escaped: the backtick, the double quote,
     ///     and <c>$</c> (variable/subexpression expansion). All other characters,
     ///     including <c>;</c>, <c>|</c>, <c>&amp;</c>, and parentheses, are literal
     ///     inside a quoted string and are passed through unmodified.
@@ -242,19 +242,19 @@ internal static class ShellRewriter
     ///     double-quoted token. cmd's quote handling is unusual: when its
     ///     preserved-quote conditions are not met (they cannot be met once special
     ///     characters are present), <c>cmd /c</c> strips the first and last quote
-    ///     characters of the command line and re-parses the remainder unquoted — so
+    ///     characters of the command line and re-parses the remainder unquoted, so
     ///     the content must be safe both inside and outside quotes. The path is
     ///     therefore caret-escaped using outside-quote semantics:
     ///     <list type="bullet">
     ///         <item>Command separators and redirection (<c>&amp;</c>, <c>|</c>,
     ///         <c>&lt;</c>, <c>&gt;</c>), grouping parentheses, and the caret itself
     ///         are caret-escaped.</item>
-    ///         <item><c>%</c> — environment-variable expansion is caret-escaped so a
+    ///         <item><c>%</c>: environment-variable expansion is caret-escaped so a
     ///         lone percent survives the unquoted re-parse; note a percent pair
     ///         matching an existing variable name (e.g. <c>%TEMP%</c>) may still be
     ///         expanded by cmd's first parse phase, which runs before caret
     ///         processing and cannot be suppressed by quoting.</item>
-    ///         <item><c>!</c> — delayed expansion (<c>cmd /V:on</c>) is caret-escaped
+    ///         <item><c>!</c>: delayed expansion (<c>cmd /V:on</c>) is caret-escaped
     ///         the same way; when delayed expansion is off (the default) the escape
     ///         resolves to the literal exclamation mark.</item>
     ///     </list>
@@ -353,7 +353,7 @@ internal static class ShellRewriter
                 string safePath = QuotePathForPowerShell(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0
-                    ? string.Join(" ", source.ArgumentList.Select(EscapeForPowerShell))
+                    ? string.Join(" ", source.ArgumentList.Select(QuotePathForPowerShell))
                     : EscapeForPowerShell(source.Arguments);
                 string script = string.IsNullOrWhiteSpace(safeArgs)
                     ? $"& {safePath}"
@@ -368,25 +368,16 @@ internal static class ShellRewriter
                 argumentList.AddRange(runnerArgList);
                 argumentList.Add(script);
 
-                return new ProcessConfiguration
-                {
-                    TargetFilePath = shellTargetPath,
-                    Arguments = string.Empty,
-                    ArgumentList = argumentList,
-                    RequiresAdministrator = source.RequiresAdministrator,
-                    WorkingDirectoryPath = source.WorkingDirectoryPath,
-                    WindowCreation = windowCreation,
-                    EnvironmentVariables = source.EnvironmentVariables,
-                    Credential = source.Credential,
-                    UseShellExecution = useShellExecution,
-                    StandardInput = source.StandardInput,
-                    RedirectStandardInput = source.RedirectStandardInput,
-                    OutputRedirection = source.OutputRedirection,
-                    ResourcePolicy = source.ResourcePolicy,
-                    StandardInputEncoding = source.StandardInputEncoding,
-                    StandardOutputEncoding = source.StandardOutputEncoding,
-                    StandardErrorEncoding = source.StandardErrorEncoding
-                };
+                return ProcessConfigurationDerivation.Derive(
+                    source,
+                    b =>
+                    {
+                        b.SetTargetFilePath(shellTargetPath);
+                        b.SetArguments(string.Empty);
+                        b.SetArgumentList(argumentList);
+                        b.EnableWindowCreation(windowCreation);
+                        b.UseShellExecution(useShellExecution);
+                    });
             }
 
             case ShellKind.Cmd:
@@ -394,7 +385,7 @@ internal static class ShellRewriter
                 string safePath = QuotePathForCmd(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0
-                    ? string.Join(" ", source.ArgumentList.Select(EscapeForCmd))
+                    ? string.Join(" ", source.ArgumentList.Select(QuotePathForCmd))
                     : EscapeForCmd(source.Arguments);
                 string innerCommand = string.IsNullOrWhiteSpace(safeArgs)
                     ? safePath
@@ -402,26 +393,18 @@ internal static class ShellRewriter
 
                 string arguments = string.IsNullOrWhiteSpace(runnerArgs)
                     ? innerCommand
-                    : $"{runnerArgs} {innerCommand}";
+                    : $"{runnerArgs} \"{innerCommand}\"";
 
-                return new ProcessConfiguration
-                {
-                    TargetFilePath = shellTargetPath,
-                    Arguments = arguments,
-                    RequiresAdministrator = source.RequiresAdministrator,
-                    WorkingDirectoryPath = source.WorkingDirectoryPath,
-                    WindowCreation = windowCreation,
-                    EnvironmentVariables = source.EnvironmentVariables,
-                    Credential = source.Credential,
-                    UseShellExecution = useShellExecution,
-                    StandardInput = source.StandardInput,
-                    RedirectStandardInput = source.RedirectStandardInput,
-                    OutputRedirection = source.OutputRedirection,
-                    ResourcePolicy = source.ResourcePolicy,
-                    StandardInputEncoding = source.StandardInputEncoding,
-                    StandardOutputEncoding = source.StandardOutputEncoding,
-                    StandardErrorEncoding = source.StandardErrorEncoding
-                };
+                return ProcessConfigurationDerivation.Derive(
+                    source,
+                    b =>
+                    {
+                        b.SetTargetFilePath(shellTargetPath);
+                        b.SetArguments(arguments);
+                        b.SetArgumentList([]);
+                        b.EnableWindowCreation(windowCreation);
+                        b.UseShellExecution(useShellExecution);
+                    });
             }
 
             case ShellKind.Posix:
@@ -429,7 +412,7 @@ internal static class ShellRewriter
                 string safePath = QuotePathForPosixShell(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0
-                    ? string.Join(" ", source.ArgumentList.Select(EscapeForPosixShell))
+                    ? string.Join(" ", source.ArgumentList.Select(QuotePathForPosixShell))
                     : EscapeForPosixShell(source.Arguments);
                 string script = string.IsNullOrWhiteSpace(safeArgs)
                     ? safePath
@@ -444,25 +427,16 @@ internal static class ShellRewriter
                 argumentList.AddRange(runnerArgList);
                 argumentList.Add(script);
 
-                return new ProcessConfiguration
-                {
-                    TargetFilePath = shellTargetPath,
-                    Arguments = string.Empty,
-                    ArgumentList = argumentList,
-                    RequiresAdministrator = source.RequiresAdministrator,
-                    WorkingDirectoryPath = source.WorkingDirectoryPath,
-                    WindowCreation = windowCreation,
-                    EnvironmentVariables = source.EnvironmentVariables,
-                    Credential = source.Credential,
-                    UseShellExecution = useShellExecution,
-                    StandardInput = source.StandardInput,
-                    RedirectStandardInput = source.RedirectStandardInput,
-                    OutputRedirection = source.OutputRedirection,
-                    ResourcePolicy = source.ResourcePolicy,
-                    StandardInputEncoding = source.StandardInputEncoding,
-                    StandardOutputEncoding = source.StandardOutputEncoding,
-                    StandardErrorEncoding = source.StandardErrorEncoding
-                };
+                return ProcessConfigurationDerivation.Derive(
+                    source,
+                    b =>
+                    {
+                        b.SetTargetFilePath(shellTargetPath);
+                        b.SetArguments(string.Empty);
+                        b.SetArgumentList(argumentList);
+                        b.EnableWindowCreation(windowCreation);
+                        b.UseShellExecution(useShellExecution);
+                    });
             }
 
             default:

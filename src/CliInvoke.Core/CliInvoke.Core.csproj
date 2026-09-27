@@ -22,16 +22,27 @@
         <IsTrimmable>true</IsTrimmable>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Version>3.0.0</Version>
-        <PackageVersion>3.0.1</PackageVersion>
-        <PackageReleaseNotes>### Changes
-* Added a null guard in ``ProcessResult`` ctor for ``ExecutedFilePath``
+        <Version>3.1.0</Version>
+        <PackageVersion>3.1.0-alpha.1</PackageVersion>
+        <PackageReleaseNotes>#### Added
+- `IsExitCodeZero()` extension on `ProcessResult` — returns `true` when
+  `ExitCode` equals zero.
+- `EnsureExitCodeZero()` extension on `ProcessResult` — throws
+  `ProcessNotSuccessfulException&lt;TProcessResult&gt;` when `ExitCode` is
+  non-zero.
+- `EnumerateOutputLines()` and `EnumerateErrorLines()` lazy extensions
+  on `BufferedProcessResult` — split output on `Environment.NewLine`
+  without allocating an intermediate array.
+- `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`
+  for tuple deconstruction.
 
-#### Fixed
-* Fixed an issue where ``ProcessConfiguration`` could accept null arguments in a multi-entry list - Each argument in a multi-entry list is now validated at initialization</PackageReleaseNotes>
+#### Changed
+-  Overwrote base ToString method in `ProcessResult` - `ProcessResult.ToString` now returns bracketed diagnostic format text:
+  `[ExitCode=N, Path=..., Runtime=...]`.
+- Overwrote base ToString method in `BufferedProcessResult` - `BufferedProcessResult.ToString()`now returns bracketed diagnostic format with stdout/stderr length indicators and optional `Truncated=true`.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>3.0.1.0</AssemblyVersion>
-        <FileVersion>3.0.1.0</FileVersion>
+        <AssemblyVersion>3.1.0.0</AssemblyVersion>
+        <FileVersion>3.1.0.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>

@@ -49,7 +49,7 @@ Straightforward API for running a process and retrieving its result.
 * Basic scripting, CI/CD tasks, or quick prototyping.
 
 ### Core idea
-`CliRun` exposes `Run*Async` methods that internally create a `ProcessConfiguration`, apply a default `ProcessExitConfiguration`, and delegate execution to the configured `IProcessInvoker`.
+`CliRun` exposes `Run*Async` methods that internally create a `ProcessConfiguration`, apply a default `ProcessExitConfiguration`, and execute it through a fresh `ProcessInvocationPipeline` constructed over a fresh `ExternalProcessFactory` on every call — no DI container or configured `IProcessInvoker` is involved.
 
 ### Advantage
 * Zero boilerplate – no DI container, no factories required.
@@ -61,8 +61,8 @@ Straightforward API for running a process and retrieving its result.
 
 ### Example
 ```csharp
-// Run a simple command and wait for completion.
-BufferedProcessResult result = await CliRun.RunAsync("dotnet", "--version");
+// Run a simple command, capture its output, and wait for completion.
+BufferedProcessResult result = await CliRun.RunBufferedAsync("dotnet", "--version");
 
 Console.WriteLine(result.StandardOutput);
 ```
@@ -173,7 +173,7 @@ Start from your situation — follow the first branch that matches:
 
 ### Simple constructors (default)
 
-`ProcessConfiguration` exposes two public constructors that cover most scenarios.
+`ProcessConfiguration` exposes three public constructors that cover most scenarios: a parameterless one (for object-initialiser construction), a target-file-path plus string-arguments overload, and a target-file-path plus `IEnumerable<string>` argument-list overload.
 
 **Convenience constructor** — for the common case of target file path plus arguments:
 
@@ -181,7 +181,7 @@ Start from your situation — follow the first branch that matches:
 ProcessConfiguration config = new("dotnet", "--version");
 ```
 
-This sets `TargetFilePath`, `Arguments`, and `OutputRedirection` (which defaults to `true`); all other properties take their documented defaults.
+This sets `TargetFilePath`, `Arguments`, and `OutputRedirection`; the constructor's `outputRedirection` parameter defaults to `true`, so the convenience constructor enables redirection unless you pass `false`. Note that the `OutputRedirection` init property itself defaults to `false` when you construct via the parameterless constructor and object initializer (as in the next example), so set it explicitly there. All other properties take their documented defaults.
 
 **Parameterless constructor with an object initializer** — when you need to set additional init-only properties:
 

@@ -13,7 +13,7 @@ using CliInvoke.Processes.Internal;
 namespace CliInvoke.Processes;
 
 /// <summary>
-///     Wraps a <see cref="System.Diagnostics.Process"/> for managed lifecycle control.
+///     Wraps a <see cref="Process"/> for managed lifecycle control.
 /// </summary>
 // ReSharper disable once RedundantExtendsListEntry
 public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
@@ -261,8 +261,11 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     ///     to receive notice of cancellation.
     /// </param>
     /// <returns>
-    ///     A task that represents the asynchronous operation. The result contains the buffered
-    ///     process result when the method completes.
+    ///     A task that represents the asynchronous operation. The result contains the
+    ///     plain <see cref="ProcessResult"/> when the method completes; redirected output
+    ///     is not captured by this method — use
+    ///     <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)"/>
+    ///     for buffered output.
     /// </returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -472,7 +475,5 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             _disposed = true;
             _processWrapper.Dispose();
         }
-
-        GC.SuppressFinalize(this);
     }
 }

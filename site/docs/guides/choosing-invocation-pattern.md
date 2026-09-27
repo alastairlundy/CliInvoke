@@ -180,7 +180,7 @@ IExternalProcessFactory factory = new ExternalProcessFactory();
 ProcessConfiguration config = new("dotnet", "--version");
 using IExternalProcess process = factory.CreateExternalProcess(config);
 
-await process.StartAsync();
+await process.StartAsync(CancellationToken.None);
 
 // You can interact with the process here — pipe input,
 // check status, etc.
@@ -202,7 +202,7 @@ IExternalProcessFactory factory =
 ProcessConfiguration config = new("dotnet", "--version");
 using IExternalProcess process = factory.CreateExternalProcess(config);
 
-await process.StartAsync();
+await process.StartAsync(CancellationToken.None);
 BufferedProcessResult result = await process.CaptureBufferedResultAsync(
     CancellationToken.None);
 ```
@@ -263,7 +263,7 @@ IExternalProcessFactory factory =
     provider.GetRequiredService<IExternalProcessFactory>();
 
 using IExternalProcess process = factory.CreateExternalProcess(config);
-await process.StartAsync();
+await process.StartAsync(CancellationToken.None);
 
 // Now you can interact with the process before capturing results.
 
@@ -273,7 +273,7 @@ BufferedProcessResult result = await process.CaptureBufferedResultAsync(
 
 **What changes:**
 - Resolve `IExternalProcessFactory` instead of `IProcessInvoker`.
-- Call `StartAsync()` and `CaptureBufferedResultAsync()` separately.
+- Call `StartAsync(CancellationToken)` and `CaptureBufferedResultAsync()` separately.
 - Add explicit disposal of the `IExternalProcess`.
 
 ---

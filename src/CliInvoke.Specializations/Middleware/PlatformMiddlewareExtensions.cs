@@ -75,13 +75,17 @@ public static class PlatformMiddlewareExtensions
 
         /// <summary>
         ///     Adds <see cref="DefaultShellMiddleware"/> to the process invocation pipeline, wrapping
-        ///     the original command in the detected default shell (pwsh, Windows PowerShell, or cmd).
+        ///     the original command in the shell detected as the system default (for example pwsh,
+        ///     Windows PowerShell, cmd, or sh).
         /// </summary>
         /// <remarks>
         ///     Requires <see cref="IShellDetector"/> to be registered (via <c>AddCliInvoke</c>) and
         ///     <see cref="ShellMiddlewareOptions"/> (registered by <c>AddCliInvokeSpecializations</c>).
-        ///     Detected shells other than pwsh, powershell, and cmd throw
-        ///     <see cref="PlatformNotSupportedException"/> at invocation time.
+        ///     The detected shell determines how the original command is wrapped: cmd runs it via
+        ///     <c>/c</c>, pwsh and Windows PowerShell via <c>-Command</c>, and any other detected
+        ///     shell (for example sh or bash) is wrapped as a POSIX shell invoked with <c>-c</c>.
+        ///     <see cref="PlatformNotSupportedException"/> is thrown at invocation time only on
+        ///     platforms where this middleware is unsupported (iOS, tvOS, browser, and watchOS).
         /// </remarks>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">

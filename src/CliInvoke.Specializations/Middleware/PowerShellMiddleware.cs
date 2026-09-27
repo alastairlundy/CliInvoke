@@ -65,21 +65,9 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
 
         ThrowIfUnsupported();
 
-        ProcessConfiguration src = context.Configuration;
-        ProcessConfiguration source = new(src.TargetFilePath, src.Arguments, outputRedirection: context.Mode != InvocationMode.Raw)
-        {
-            ArgumentList = src.ArgumentList,
-            RedirectStandardInput = src.RedirectStandardInput,
-            RequiresAdministrator = src.RequiresAdministrator,
-            WorkingDirectoryPath = src.WorkingDirectoryPath,
-            EnvironmentVariables = new Dictionary<string, string>(src.EnvironmentVariables),
-            Credential = src.Credential,
-            StandardInput = src.StandardInput,
-            StandardInputEncoding = src.StandardInputEncoding,
-            StandardOutputEncoding = src.StandardOutputEncoding,
-            StandardErrorEncoding = src.StandardErrorEncoding,
-            ResourcePolicy = src.ResourcePolicy,
-        };
+        ProcessConfiguration source = ProcessConfigurationDerivation.Derive(
+            context.Configuration,
+            b => b.SetOutputRedirection(context.Mode != InvocationMode.Raw));
 
         ProcessConfiguration rewritten = ShellRewriter.Rewrite(
             source,
@@ -93,8 +81,6 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
 
         await next(newContext).ConfigureAwait(false);
 
-        // The terminal ran against the rewritten context, so propagate its result back to the
-        // original chain context that the caller reads from.
         context.Result = newContext.Result;
     }
 

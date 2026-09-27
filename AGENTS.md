@@ -11,8 +11,8 @@ CliInvoke — a .NET/C# library for launching and interacting with command-line 
 - **Packages** (each carries its own `Version`/`PackageVersion` and `PackageReleaseNotes` in its csproj):
   - `src/CliInvoke.Core/` — abstractions & models (`ProcessConfiguration`, results, middleware interfaces)
   - `src/CliInvoke/` — implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers, including the `AddCliInvoke` DI entry point in `Extensions/DependencyInjection/AddCliInvokeExtensions.cs`, namespace `CliInvoke.Extensions`)
-  - `src/CliInvoke.Specializations/` — PowerShell/CMD middleware; also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Extensions`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
-- `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. `tests/CliInvoke.Extensions.Tests/` still exists and tests the folded-in extensions.
+  - `src/CliInvoke.Specializations/` — PowerShell/CMD middleware; also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Specializations`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
+- `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. (`tests/CliInvoke.Extensions.Tests/` was removed; extension tests now live in `tests/CliInvoke.Tests/`.)
 - **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs only `tests/CliInvoke.Tests/`.
 - **Benchmarks**: `benchmarks/`.
 - **SDK**: `global.json` pins .NET 10 SDK (`rollForward: latestFeature`). Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
@@ -40,10 +40,10 @@ Three patterns, documented in `DESIGN_PATTERNS.md` (includes a decision tree):
 - Load the `cliinvoke-pattern-validator` skill when adding or changing invocation code.
 
 ## Resource disposal
-Exactly **three** `IDisposable` types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec` (see README "Resource Disposal"). `ProcessConfiguration` is not disposable; `StandardInput`/`UserCredential` placed inside it remain the caller's responsibility.
+Exactly **four** `IDisposable` types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, `ProcessConfigurationBuilder` (see README "Resource Disposal"). `ProcessConfiguration` is not disposable; `StandardInput`/`UserCredential` placed inside it remain the caller's responsibility.
 
 ## Domain conventions (details in GLOSSARY.md — do not "fix" these)
-- `FilePathResolverBase.ResolveFilePath`: PATH lookup first, then directory recursion — a performance contract; reordering requires a new ADR.
+- `FilePathResolver.ResolveFilePath` (formerly `FilePathResolverBase`): PATH lookup first, then directory recursion — a performance contract; reordering requires a new ADR.
 - `Get*` returns materialized arrays; `Enumerate*` returns lazy `IEnumerable` — intentional naming asymmetry.
 - Custom `GetPathFileExtensions` overrides must return **lowercased** extensions or matching silently fails.
 - `Try*` methods must never propagate exceptions (catch `Exception` by convention).

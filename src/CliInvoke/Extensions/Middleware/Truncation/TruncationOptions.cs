@@ -14,7 +14,7 @@ namespace CliInvoke.Extensions.Middleware.Truncation;
 /// </summary>
 /// <remarks>
 ///     Unlike the built-in middleware options, this type is not registered in the dependency
-///     injection container by default — <see cref="OutputTruncationMiddleware"/> is opt-in, so the
+///     injection container by default. <see cref="OutputTruncationMiddleware"/> is opt-in, so the
 ///     options instance is supplied directly when configuring the pipeline via the
 ///     <c>UseOutputTruncation</c> extension method on <see cref="OutputTruncationMiddlewareExtensions"/>.
 /// </remarks>

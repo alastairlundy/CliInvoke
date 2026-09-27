@@ -64,7 +64,10 @@ public class ShellDetector : IShellDetector
     private async Task<ShellInformation> ResolveDefaultShellOnUnixAsync(
         CancellationToken cancellationToken = default)
     {
-        ProcessConfiguration execConfiguration = new ProcessConfiguration("ps", "-p $$ -o comm=");
+        // Run the ps probe through a POSIX shell so "$$" expands; with UseShellExecute
+        // disabled a literal "$$" is passed to ps unexpanded and resolution fails.
+        ProcessConfiguration execConfiguration = new ProcessConfiguration("sh",
+            "-c \"ps -p $$ -o comm=\"");
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -105,7 +108,7 @@ public class ShellDetector : IShellDetector
 
         string shellPrettyName = commaSplit.First();
 
-        string versionString = commaSplit.Last().Replace(".", string.Empty);
+        string versionString = commaSplit.Last().Trim();
 
         Version shellVersion = Version.GracefulParse(versionString);
 
@@ -121,8 +124,11 @@ public class ShellDetector : IShellDetector
         {
             FileInfo powershell5PlusFileInfo = _filePathResolver.ResolveFilePath("pwsh.exe");
 
+            // Invoke pwsh non-interactively so it prints its version and exits instead
+            // of starting a REPL that blocks on an interactive terminal until timeout.
             ProcessConfiguration powershellConfig = new ProcessConfiguration(
-                powershell5PlusFileInfo.FullName);
+                powershell5PlusFileInfo.FullName,
+                "-NoProfile -NonInteractive -Command $PSVersionTable.PSVersion.ToString()");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(
                 powershellConfig,
@@ -136,28 +142,39 @@ public class ShellDetector : IShellDetector
 
             Version version = Version.GracefulParse(versionString);
 
-            return new ShellInformation(powershellResults.First(), powershell5PlusFileInfo,
+            return new ShellInformation("pwsh", powershell5PlusFileInfo,
                 version);
         }
-        catch (Exception ex) when (ex is FileNotFoundException or InvalidOperationException)
+        catch (Exception ex) when (ex is FileNotFoundException or InvalidOperationException
+                                   or ArgumentException)
         {
-            // Expected failures: pwsh.exe not found (FileNotFoundException) or shell output
-            // doesn't contain a parseable version line (InvalidOperationException).
+            // Expected failures: pwsh.exe not found (FileNotFoundException), pwsh output
+            // doesn't contain a parseable version line (InvalidOperationException), or the
+            // version text could not be parsed (ArgumentException from GracefulParse).
             // OperationCanceledException propagates naturally without falling through to cmd.
             FileInfo cmdExeInfo = _filePathResolver.ResolveFilePath("cmd.exe");
 
+            // /c ver prints the banner version line and exits; invoking cmd without
+            // arguments would start an interactive session that blocks until timeout.
             ProcessConfiguration cmdConfig = new ProcessConfiguration(
-                cmdExeInfo.FullName);
+                cmdExeInfo.FullName, "/c ver");
 
             BufferedProcessResult result = await _processInvoker.ExecuteBufferedAsync(cmdConfig,
                 ProcessExitConfiguration.CreateGraceful(), cancellationToken).ConfigureAwait(false);
 
-            string line = GetFirstLine(result.StandardOutput);
+            // Parse the banner defensively (e.g. "Microsoft Windows [Version 10.0.19045.3803]")
+            // without indexing assumptions that can throw IndexOutOfRangeException.
+            int openBracket = result.StandardOutput.IndexOf('[');
+            int closeBracket = result.StandardOutput.IndexOf(']');
 
-            string versionString = line.Replace("Microsoft", string.Empty)
-                .Replace("Windows", string.Empty).Replace("]", string.Empty);
-            Version cmdVersion = Version.GracefulParse(versionString.Split('[')[1]
-                .Replace("Version", "")
+            if (openBracket < 0 || closeBracket <= openBracket)
+                throw new InvalidOperationException(
+                    "cmd version banner output was not in the expected format.");
+
+            string versionString = result.StandardOutput[(openBracket + 1)..closeBracket];
+
+            Version cmdVersion = Version.GracefulParse(versionString
+                .Replace("Version", string.Empty)
                 .Replace(" ", string.Empty));
 
             return new ShellInformation("cmd", cmdExeInfo, cmdVersion);

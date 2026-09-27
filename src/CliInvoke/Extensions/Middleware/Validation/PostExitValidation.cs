@@ -68,7 +68,7 @@ public static class PostExitValidation
     /// </summary>
     /// <param name="regex">
     ///     The regular expression pattern to evaluate against
-    ///     <see cref="CliInvoke.Core.BufferedProcessResult.StandardOutput"/>.
+    ///     <see cref="BufferedProcessResult.StandardOutput"/>.
     /// </param>
     /// <returns>A validator enforcing a standard output match.</returns>
     public static IProcessResultValidator<ProcessResult> StdoutMatches(string regex)

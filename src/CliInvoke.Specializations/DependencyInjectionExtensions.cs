@@ -101,7 +101,7 @@ public static class DependencyInjectionExtensions
             services.TryAdd(ServiceDescriptor.Describe(
                 typeof(DefaultShellMiddleware),
                 sp => new DefaultShellMiddleware(
-                    sp.GetRequiredService<IShellDetector>(),
+                    sp,
                     sp.GetService<ShellMiddlewareOptions>()),
                 lifetime));
             

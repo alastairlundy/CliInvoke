@@ -16,13 +16,19 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReleaseNotes>#### Changes
-* Backported improved shell quote escaping code from upcoming 3.1
-* Updated to use CliInvoke.Core 3.0.1</PackageReleaseNotes>
+* Added a Windows command-line pre-start check to check against the Windows command-line's limit of 32767 characters
+* Added Start-failure exception mapping for unknown Win32 error codes -  Previously every
+  non-file-not-found start failure surfaced as `UnauthorizedAccessException`. Known codes now
+  map to their natural .NET types (`FileNotFoundException` for Win32 codes 2/3,
+  `UnauthorizedAccessException` for code 5, `BadImageFormatException` for code 193), and all
+  other codes rethrow the original `Win32Exception` (carrying `NativeErrorCode`). 
+* Made `ShellArgumentEscaper` internal - Callers should rely exclusively on the public shell
+  middleware (`UseCmd()` / `UsePowerShell()`), not internal composition types.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.1</PackageVersion>
-        <AssemblyVersion>3.0.1.0</AssemblyVersion>
+        <PackageVersion>3.1.0-alpha.1</PackageVersion>
+        <AssemblyVersion>3.1.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -30,7 +36,7 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
-        <FileVersion>3.0.1.0</FileVersion>
+        <FileVersion>3.1.0.0</FileVersion>
 <!--
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
 -->
@@ -40,14 +46,25 @@
         <IsAotCompatible>true</IsAotCompatible>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <InternalsVisibleTo Include="CliInvoke.Tests"/>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>CliInvoke.Tests</_Parameter1>
+        </AssemblyAttribute>
+        <!--
+            Cross-package middleware consumption: CliInvoke.Specializations shell
+            middleware must access internal rewriting helpers (ShellRewriter, enums,
+            ArgumentTokenizer) and the derivation hook (ProcessConfigurationDerivation).
+            Promotion to public rejected — no extensibility goal; a Specializations
+            home impossible — no reference direction from Core. Justification per
+            ADR-0001 (docs/adr/0001-ivt-minimization.md, Grant inventory:
+            CliInvoke → CliInvoke.Specializations).
+        -->
         <InternalsVisibleTo Include="CliInvoke.Specializations"/>
-        <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
     </ItemGroup>
 
 <!--    <ItemGroup>
+        <PackageReference Include="DotExtensions"/>
        <PackageReference Include="Polyfill" PrivateAssets="all">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

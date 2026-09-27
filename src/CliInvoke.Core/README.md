@@ -128,6 +128,8 @@ BufferedProcessResult result = await invoker.ExecuteBufferedAsync(configuration)
 
 Reach for ``IProcessConfigurationBuilder`` only when you need argument escaping, user credentials, or resource-policy callback flows. For everything else, prefer direct init construction as shown above. The builder implementation ships in the main ``CliInvoke`` package.
 
+The four resource-owning types are `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, and `ProcessConfigurationBuilder`. For `ProcessConfigurationBuilder` the user remains responsible for disposing any `Credential` and `StandardInput` they supply to it — the builder does not dispose caller-provided credential/stdin resources.
+
 #### Non-buffered execution example
 
 ```csharp
@@ -143,8 +145,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-// Fluently configure the command. The builder is disposable.
-using IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable");
+// Fluently configure the command. The builder is disposable: disposing it releases the
+// UserCredentialSpec it created — not any Credential or StandardInput you supply to it.
+using ProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable");
 builder.SetArguments(["arg1", "arg2"]);
 builder.SetWorkingDirectory("/Path/To/Directory");
 
@@ -170,8 +173,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 IProcessInvoker processInvoker = serviceProvider.GetRequiredService<IProcessInvoker>();
 
-// Fluently configure the command. The builder is disposable.
-using IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable");
+// Fluently configure the command. The builder is disposable: disposing it releases the
+// UserCredentialSpec it created — not any Credential or StandardInput you supply to it.
+using ProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("Path/To/Executable");
 builder.SetArguments(["arg1", "arg2"]);
 builder.SetWorkingDirectory("/Path/To/Directory");
 builder.SetOutputRedirection(true);

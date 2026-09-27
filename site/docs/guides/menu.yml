@@ -2,6 +2,8 @@ doc:
   - {path: readme.md, title: "Overview"}
   - {path: choosing-invocation-pattern.md, title: "Choosing your Invocation Pattern"}
   - {path: configuration.md, title: "Configuration"}
+  - {path: stdin-piping.md, title: "Stdin Piping"}
+  - {path: results.md, title: "Results"}
   - {path: resource-disposal.md, title: "Resource Disposal"}
   - {path: architecture.md, title: "Architecture"}
   - {path: troubleshooting.md, title: "Troubleshooting"}

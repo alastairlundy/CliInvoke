@@ -7,15 +7,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.Collections.Generic;
-
 namespace CliInvoke.Tests;
 
 internal class PipelineDispatchTests : IDisposable
 {
     private readonly CountingExternalProcessFactory _factory;
     private readonly string _targetFilePath;
-    private readonly List<ProcessConfiguration> _configurations = new();
 
     public PipelineDispatchTests()
     {
@@ -33,7 +30,6 @@ internal class PipelineDispatchTests : IDisposable
     {
         ProcessConfiguration config = new ProcessConfiguration(_targetFilePath, "");
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
-        _configurations.Add(config);
         return new InvocationContext(config, exitConfig, mode, cancellationToken);
     }
 

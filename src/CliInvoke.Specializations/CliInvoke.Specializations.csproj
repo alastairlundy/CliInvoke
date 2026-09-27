@@ -12,22 +12,25 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.1</PackageVersion>
+        <PackageVersion>3.1.0-alpha.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>#### Fixed
-* Fixed an issue where ``ArgumentList`` was never copied from a user supplied ``ProcessConfiguration`` to the intermediate ``ProcessConfiguration`` that was run.
-* Updated to use CliInvoke 3.0.1</PackageReleaseNotes>
+        <PackageReleaseNotes>#### Changes
+* Updated to use new internal Shell escaping and composition code
+
+#### Deprecations
+- Deprecated `PowershellProcessConfiguration`. This will be removed in 4.0. Use plain `ProcessConfiguration` + `UsePowerShell()` middleware instead.
+- Deprecated `CmdProcessConfiguration` This; will be removed in 4.0. Use plain `ProcessConfiguration` + `UseCmd()` middleware instead.</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>3.0.1</AssemblyVersion>
-        <FileVersion>3.0.1</FileVersion>
+        <AssemblyVersion>3.1.0</AssemblyVersion>
+        <FileVersion>3.1.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

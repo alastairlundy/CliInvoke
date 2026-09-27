@@ -18,6 +18,15 @@ The state-bearing object passed through the Process Invocation Pipeline. It enca
 A parameter of the invocation contract that the caller states for the invocation to mean what they intend (e.g., validation rules, truncation cap). Distinct from a middleware concern: cross-cutting behavior composed around the invocation that the caller could omit without changing the invocation's meaning (e.g., logging, retry).
 
 
+### Shell Wrapping
+
+The act of running a command inside a shell interpreter (PowerShell, CMD, or a POSIX shell). A shell-wrapping flow resolves the shell, escapes the command's target and arguments so they are treated as literal data rather than shell syntax, composes the inner command, and rewrites the process configuration so the shell executes the original command. Shell wrapping is a middleware concern, not an Invocation Capability: the caller could omit it without changing what the invocation means.
+
+### Configuration Derivation
+
+The act of producing a new configuration from an existing one, preserving all member values except a stated delta. Derived configurations share resource-owning members by reference; disposal remains the caller's responsibility.
+
+
 ## Versioning Terms
 
 ### v2-style code
@@ -32,7 +41,7 @@ For detailed definitions, target audiences, and usage examples of the architectu
 
 ### 1. Resolution order rationale
 
-`FilePathResolverBase.ResolveFilePath` tries PATH first, then directory recursion. This order is a performance contract: PATH lookup is a fast environment-variable read and covers the common case; directory recursion is slow and rare. Reordering the two strategies requires a new decision record.
+`FilePathResolver.ResolveFilePath` tries PATH first, then directory recursion. This order is a performance contract: PATH lookup is a fast environment-variable read and covers the common case; directory recursion is slow and rare. Reordering the two strategies requires a new decision record.
 
 ### 2. Get-prefix vs Enumerate-prefix convention
 
@@ -44,7 +53,7 @@ Custom resolvers overriding `GetPathFileExtensions` must return lowercased exten
 
 ### 4. Catch discipline for `Try*` methods
 
-`FilePathResolverBase.TryResolveFilePath` catches `Exception`, not `FileNotFoundException`. This follows the .NET `Try*` convention: the method must never propagate an exception. The broader catch is required by convention, not by the current algorithm (which only throws `FileNotFoundException` from `LocateFileFromDirectory`). Direct implementers of `IFilePathResolver` must follow the same discipline.
+`FilePathResolver.TryResolveFilePath` catches `Exception`, not `FileNotFoundException`. This follows the .NET `Try*` convention: the method must never propagate an exception. The broader catch is required by convention, not by the current algorithm (which only throws `FileNotFoundException` from `LocateFileFromDirectory`). Direct implementers of `IFilePathResolver` must follow the same discipline.
 
 ### 5. `IFilePathResolver` lifetime convention in `AddCliInvoke`
 
@@ -78,5 +87,5 @@ The failure mode where a granting package's internal helper types (e.g., Guard/E
 
 ### Entrypoint package
 
-One of the CliInvoke packages (Core, CliInvoke, Extensions, Specializations) that provides a distinct consumer entrypoint into the ecosystem; by design it may require limited internal access to other packages.
+One of the CliInvoke packages (Core, CliInvoke, Specializations) that provides a distinct consumer entrypoint into the ecosystem; by design it may require limited internal access to other packages.
 

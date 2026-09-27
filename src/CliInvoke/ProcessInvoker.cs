@@ -104,9 +104,10 @@ public class ProcessInvoker : IProcessInvoker
     ///     Thrown if the file, with the file name of the process to be
     ///     executed, is not found.
     /// </exception>
-    /// <exception cref="ProcessNotSuccessfulException{TProcessResult}">
-    ///     Thrown if the result validation requires the
-    ///     process to exit with exit code zero and the process exits with a different exit code.
+    /// <exception cref="CliInvoke.Core.Exceptions.ProcessValidationException">
+    ///     Thrown when a validation rule in
+    ///     <see cref="ProcessExitConfiguration.ValidationRules" /> rejects the process
+    ///     result.
     /// </exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -136,9 +137,9 @@ public class ProcessInvoker : IProcessInvoker
     /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>
-    /// <exception cref="ProcessNotSuccessfulException{TProcessResult}">
-    ///     Thrown if the result validation requires the
-    ///     process to exit with exit code zero and the process exits with a different exit code.
+    /// <exception cref="ProcessValidationException">
+    ///     Thrown when a validation rule in
+    ///     <see cref="ProcessExitConfiguration.ValidationRules" /> rejects the process result.
     /// </exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -156,18 +157,4 @@ public class ProcessInvoker : IProcessInvoker
 
         return await InvokeThroughChainAsync<BufferedProcessResult>(ctx).ConfigureAwait(false);
     }
-
-    /// <summary>
-    ///     Runs the process asynchronously with Standard Output and Standard Error Redirection,
-    ///     gets Standard Output and Standard Error as Streams, waits for exit, and safely disposes of the
-    ///     Process before returning.
-    /// </summary>
-    /// <param name="processConfiguration">The configuration to use for the process.</param>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken">A token to cancel the operation if required.</param>
-    /// <returns>The Buffered Process Results from running the process.</returns>
-    /// <exception cref="ProcessNotSuccessfulException{TProcessResult}">
-    ///     Thrown if the result validation requires the
-    ///     process to exit with exit code zero and the process exits with a different exit code.
-    /// </exception>
 }

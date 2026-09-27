@@ -69,7 +69,7 @@ The package(s) to install depends on your use case:
 
 ## Supported Platforms
 
-CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android.
+CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android (untested). Note: the PowerShell middleware does not support Android — shell specializations via `UsePowerShell` are unavailable there.
 
 For more details see the [list of supported platforms](https://alastairlundy.github.io/CliInvoke/docs/Supported-OperatingSystems)
 
@@ -84,7 +84,7 @@ decision tree and a [Configuration Patterns](DESIGN_PATTERNS.md#configuration-pa
 * **`IProcessInvoker`** — DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
 * **`IExternalProcess` & `IExternalProcessFactory`** — Process-like API with DI support. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
 
-> **New to CliInvoke? Start with `CliRun`** — it is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control. See [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md) for the design rationale.
+> **New to CliInvoke? Start with `CliRun`** — it is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control.
 
 ## Examples
 
@@ -134,15 +134,18 @@ For the full guide — constructor details, the `IProcessMiddleware` contract, D
 ## Resource Disposal
 
 > [!IMPORTANT]
-> CliInvoke has exactly **three Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
+> CliInvoke has four **Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
 >
 > | # | Type                    | What it owns                                                      |
 > |---|-------------------------|-------------------------------------------------------------------|
 > | 1 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
 > | 2 | `UserCredential`        | `SecureString` password buffer                                    |
 > | 3 | `UserCredentialSpec`  | `SecureString` password buffer staged for `Build()`               |
+> | 4 | `ProcessConfigurationBuilder` | The `UserCredentialSpec` it created — `Dispose()` disposes only that spec (and its staged `SecureString`), never caller-supplied `Credential`/`StandardInput` |
 >
-> No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
+> Always wrap these four types in `using` or `await using` statements.
+>
+> For `ProcessConfigurationBuilder`, the user remains responsible for disposing any `Credential` and `StandardInput` they supply to it — the builder does not dispose caller-provided credential/stdin resources.
 >
 > `ProcessConfiguration` is a plain immutable value object and does **not** implement `IDisposable`. The `StandardInput` (`StreamWriter`) and `UserCredential` you place inside it remain **your** responsibility to dispose — CliInvoke never disposes them on your behalf.
 
@@ -211,7 +214,7 @@ unless you have written permission from the maintainer. To request permission, o
 Thanks to these projects:
 
 * [CliWrap](https://github.com/Tyrrrz/CliWrap/) for inspiring this project
-* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying older TFM support
+* [Polyfill](https://github.com/SimonCropp/Polyfill) for simplifying TFM support
 
 For more information, please see
 the [THIRD_PARTY_NOTICES file](https://github.com/alastairlundy/CliInvoke/blob/main/THIRD_PARTY_NOTICES.txt).

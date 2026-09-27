@@ -52,9 +52,11 @@ simple constructors cannot express.
 
 `ProcessConfiguration` is the only required model. `TargetFilePath` is
 a `required` init property — the constructor throws `ArgumentException`
-if it is null or empty. `WorkingDirectoryPath` validates the directory
-exists at init time and throws `DirectoryNotFoundException` if it does
-not.
+if it is null or empty. `WorkingDirectoryPath` defaults to
+`Directory.GetCurrentDirectory()`, so the caller's current directory is
+the configured starting point when the property is not explicitly set.
+When set to a non-empty value, it validates the directory exists at init
+time and throws `DirectoryNotFoundException` if it does not.
 
 **Convenience constructor** — for the common case of target file path
 plus arguments:
@@ -92,11 +94,13 @@ ProcessConfiguration config = new ProcessConfiguration("dotnet")
 };
 ```
 
-The model is mostly immutable: most properties have only a getter.
-`TargetFilePath`, `Arguments`, and `OutputRedirection` are mutable on
-the public surface for back-compat reasons — see the
-[Reference Appendix](#reference-appendix) for the exact mutability of
-each property.
+The model is immutable after construction: every property is
+`{ get; init; }`, so `TargetFilePath`, `Arguments`,
+`OutputRedirection`, and the rest can be set only during construction
+(via the constructor or an object initializer) and cannot be
+reassigned afterwards — see the
+[Reference Appendix](#reference-appendix) for the default of each
+property.
 
 ### `ProcessExitConfiguration` — direct construction
 
@@ -114,12 +118,11 @@ ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
 ### `UserCredential` — direct construction
 
 ```csharp
-UserCredential credential = new UserCredential
-{
-    Domain = "CONTOSO",
-    UserName = "admin",
-    Password = securePassword
-};
+UserCredential credential = new UserCredential(
+    domain: "CONTOSO",
+    username: "admin",
+    password: securePassword,
+    loadUserProfile: null);
 ```
 
 `UserCredential` implements `IDisposable` — see the
@@ -134,10 +137,8 @@ ProcessResourcePolicy policy = ProcessResourcePolicy.Default;
 Or construct a custom policy:
 
 ```csharp
-ProcessResourcePolicy policy = new ProcessResourcePolicy
-{
-    PriorityClass = ProcessPriorityClass.High
-};
+ProcessResourcePolicy policy = new ProcessResourcePolicy(
+    priorityClass: ProcessPriorityClass.High);
 ```
 
 ## Builders — advanced
@@ -154,9 +155,9 @@ simple constructors cannot express:
   credential injection with `SecureString` password staging.
 - **Resource policy configuration** —
   `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)`
-  for processor affinity and resource settings with internal pairing
-  logic (e.g., `SetMinWorkingSet` without a prior `SetMaxWorkingSet`
-  fabricates `Max = Min + 1`).
+  for processor affinity and resource settings with cross-validation
+  (e.g., `SetMinWorkingSet` throws `ArgumentOutOfRangeException` when
+  it exceeds an already-set maximum working set).
 
 ```csharp
 using CliInvoke.Builders;
@@ -189,10 +190,12 @@ same model** for the same input. Concretely:
 - **Argument escaping is applied by the builder.** `Add` and
   `AddRange` on `ArgumentsSpec` apply character escaping before
   joining. The model's `Arguments` string is stored verbatim.
-- **Working-set pairing in `ProcessResourcePolicySpec`.** Calling
-  `SetMinWorkingSet` without a prior `SetMaxWorkingSet` fabricates
-  `Max = Min + 1` so the resulting policy is internally consistent.
-  The model allows `Min` and `Max` to be set independently.
+- **Working-set cross-validation in `ProcessResourcePolicySpec`.**
+  `SetMinWorkingSet` and `SetMaxWorkingSet` validate against each
+  other: once one of them is set, setting the other to an
+  inconsistent value throws `ArgumentOutOfRangeException`. Neither
+  call fabricates a value for the other, and the model allows `Min`
+  and `Max` to be set independently.
 
 ### Builder-methods-to-init-properties table
 
@@ -204,11 +207,11 @@ same model** for the same input. Concretely:
 | `ConfigureArguments(Action<ArgumentsSpec>)` | *(no direct init)* | Escaping, validation |
 | `SetOutputRedirection(bool)` | `OutputRedirection` | Default differs: `true` (init) vs `false` (builder) |
 | `SetWorkingDirectory(string)` | `WorkingDirectoryPath` | Builder validates existence |
-| `SetWindowCreation(bool)` | `WindowCreation` | |
-| `ConfigureShellExecution()` | `UseShellExecution` | |
+| `EnableWindowCreation(bool)` | `WindowCreation` | |
+| `UseShellExecution(bool)` | `UseShellExecution` | |
 | `ConfigureEnvironmentVariables(Action<EnvironmentVariablesSpec>)` | `EnvironmentVariables` | |
 | `ConfigureUserCredential(Action<UserCredentialSpec>)` | `Credential` | Advanced: `SecureString` staging |
-| `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` | `ResourcePolicy` | Advanced: pairing logic |
+| `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` | `ResourcePolicy` | Advanced: working-set cross-validation |
 
 ### When to keep the builder
 
@@ -219,7 +222,7 @@ The builder is the right choice when:
 - You need `UserCredentialSpec` for Windows-domain credential staging
   with `SecureString`.
 - You need `ProcessResourcePolicySpec` for resource-policy callback
-  flows with internal pairing logic.
+  flows with working-set cross-validation.
 - The configuration needs to be assembled conditionally, in stages,
   or from multiple sources.
 
@@ -236,12 +239,15 @@ services.AddCliInvoke();
 You can configure the middleware pipeline when registering:
 
 ```csharp
-services.AddCliInvoke(builder => builder.UseMiddleware<LoggingMiddleware>());
+using CliInvoke.Extensions.Middleware.Logging;
+
+services.AddCliInvoke(builder => builder.UseLogging());
 ```
 
 > If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations)
 > package's `UsePowerShell()`/`UseCmd()` middleware, also call
-> `AddCliInvokeSpecializations()` (same namespace) with the same
+> `AddCliInvokeSpecializations()` (namespace `CliInvoke.Specializations`
+> — add `using CliInvoke.Specializations;`) with the same
 > `ServiceLifetime` so those middleware types resolve from the container.
 
 ## The Lifecycle: Construction → Model → Invoker
@@ -352,9 +358,11 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
 ```
 
 Represents the Windows-domain credentials under which the child
-process should run. On non-Windows platforms the credential is
-constructed but not applied; the property is `[SupportedOSPlatform("windows")]`
-on `Domain`, `Password`, and `LoadUserProfile`.
+process should run. On non-Windows platforms, a credential with any
+values set throws `PlatformNotSupportedException` when the process is
+started — only an empty (all-null) credential such as
+`UserCredential.Null` is accepted. `Domain`, `Password`, and
+`LoadUserProfile` are marked `[SupportedOSPlatform("windows")]`.
 
 `UserCredential.Null` is a static singleton representing "no
 credential". This is the default assigned by
@@ -377,8 +385,10 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 Describes OS-level resource constraints applied to the spawned
 process: processor affinity, priority class, priority boost, and
 working-set sizes. The default value (`ProcessResourcePolicy.Default`)
-assigns affinity to all available logical processors; everything else
-is left at the OS default.
+assigns affinity to every logical processor on the machine — a mask of
+`(1 << Environment.ProcessorCount) - 1`, saturating to
+`nint.MaxValue` on machines with 63 or more logical processors —
+and leaves everything else at the OS default.
 
 **Platform notes**:
 
@@ -480,7 +490,14 @@ lifecycle as a sequence of steps you orchestrate yourself:
     the configured `StandardInput` to the child, concurrently with
     capturing output, when redirection is enabled. These methods can be
     called at any point during execution, not only at exit.
-4. **Terminate** — call `Kill()` to forcibly stop a runaway process.
+4. **Terminate** — call `Kill()` to stop a runaway process. It does
+    not always force-stop: it honours
+    `ExitConfiguration.RequestedCancellationExitBehaviour`. With
+    `WaitForExit` it waits for the process to exit on its own and
+    returns without terminating it; with `GracefulExit` (the default)
+    it requests a graceful exit and force-terminates only as a
+    fallback if the process does not exit; with `ForcefulExit` it
+    force-terminates the process and its tree.
 
 The synchronous `Start()` is start-only and pipes no stdin; use
 `StartAsync` or `CaptureBufferedResultAsync` when the configuration
@@ -543,7 +560,7 @@ calls one of the capture methods (`WaitForExitOrTimeoutAsync` for
 obtain the result,
 and disposes the `IExternalProcess`. The configuration is built for
 you from the positional parameters; the timeout defaults to
-`ProcessTimeoutPolicy.Default.TimeoutThreshold` (3 minutes); and
+`ProcessTimeoutPolicy.Default.TimeoutThreshold` (2 minutes); and
 the exit configuration defaults to a graceful one. The factory and
 file-path resolver are fixed defaults — `CliRun` keeps no process-wide
 mutable state — so callers that need a custom factory or resolver
@@ -581,21 +598,30 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 
 | Property | Type | Default | Mutability | Source line |
 |----------|------|---------|------------|-------------|
-| `TargetFilePath` | `string` | *(required, no default)* | Read-only | 111 |
-| `Arguments` | `string` | `""` | Read-only | 121 |
-| `RequiresAdministrator` | `bool` | `false` | Read-only | 106 |
-| `WorkingDirectoryPath` | `string` | `Directory.GetCurrentDirectory()` | Read-only | 116 |
-| `WindowCreation` | `bool` | `false` | Read-only | 126 |
-| `UseShellExecution` | `bool` | `false` | Read-only | 147 |
-| `EnvironmentVariables` | `IReadOnlyDictionary<string, string>` | `new Dictionary<string, string>()` | Read-only | 131 |
-| `Credential` | `UserCredential` | `UserCredential.Null` | Read-only | 136 |
-| `OutputRedirection` | `bool` | `true` | Read-only | 168 |
-| `RedirectStandardInput` | `bool` | `false` | Read-only | 163 |
-| `StandardInput` | `StreamWriter?` | `StreamWriter.Null` | Read-only | 158 |
-| `ResourcePolicy` | `ProcessResourcePolicy` | `ProcessResourcePolicy.Default` | Read-only | 181 |
-| `StandardInputEncoding` | `Encoding` | `Encoding.Default` | Read-only | 186 |
-| `StandardOutputEncoding` | `Encoding` | `Encoding.Default` | Read-only | 191 |
-| `StandardErrorEncoding` | `Encoding` | `Encoding.Default` | Read-only | 196 |
+| `TargetFilePath` | `string` | *(required, no default)* | Init-only | 111 |
+| `Arguments` | `string` | `""` | Init-only | 151 |
+| `RequiresAdministrator` | `bool` | `false` | Init-only | 101 |
+| `WorkingDirectoryPath` | `string` | `Directory.GetCurrentDirectory()` | Init-only | 128 |
+| `WindowCreation` | `bool` | `false` | Init-only | 189 |
+| `UseShellExecution` | `bool` | `false` | Init-only | 224 |
+| `EnvironmentVariables` | `IReadOnlyDictionary<string, string>` | `ImmutableSortedDictionary<string, string>.Empty` | Init-only | 204 |
+| `Credential` | `UserCredential` | `UserCredential.Null` | Init-only | 213 |
+| `OutputRedirection` | `bool` | `false` *(the convenience constructor defaults to `true`)* | Init-only | 245 |
+| `RedirectStandardInput` | `bool` | `false` | Init-only | 240 |
+| `StandardInput` | `StreamWriter?` | `StreamWriter.Null` | Init-only | 235 |
+| `ResourcePolicy` | `ProcessResourcePolicy` | `ProcessResourcePolicy.Default` | Init-only | 258 |
+| `StandardInputEncoding` | `Encoding` | `Encoding.Default` | Init-only | 270 |
+| `StandardOutputEncoding` | `Encoding` | `Encoding.Default` | Init-only | 281 |
+| `StandardErrorEncoding` | `Encoding` | `Encoding.Default` | Init-only | 292 |
+
+> **Note on encodings**: `Encoding.Default` is UTF-8 on .NET 10 and
+> later. Each encoding property is applied by the control adapter only
+> when its corresponding stream is redirected: `StandardInputEncoding`
+> only when both `RedirectStandardInput` is `true` and `StandardInput`
+> is non-null, and `StandardOutputEncoding` /
+> `StandardErrorEncoding` when `OutputRedirection` is `true`. Callers
+> can override per-stream via the init properties without affecting the
+> other streams.
 
 > **Note on `OutputRedirection`**: This is the master switch for
 > stdout/stderr redirection. When `false`, neither stream is captured
@@ -607,26 +633,26 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExitConfiguration.cs`.
 
 | Property | Type | Default | Source line |
 |----------|------|---------|-------------|
-| `TimeoutPolicy` | `ProcessTimeoutPolicy` | `ProcessTimeoutPolicy.Default` | 64 |
-| `RequestedCancellationExitBehaviour` | `ProcessExitBehaviour` | `ProcessExitBehaviour.GracefulExit` | 74 |
-| `ExceptionBehaviour` | `ProcessExceptionBehaviour` | `ProcessExceptionBehaviour.AllowExceptionsIfUnexpected` | 82 |
-| `CancellationThrowsException` | `bool` | `false` | 88 |
+| `TimeoutPolicy` | `ProcessTimeoutPolicy` | `ProcessTimeoutPolicy.Default` | 70 |
+| `RequestedCancellationExitBehaviour` | `ProcessExitBehaviour` | `ProcessExitBehaviour.GracefulExit` | 80 |
+| `ExceptionBehaviour` | `ProcessExceptionBehaviour` | `ProcessExceptionBehaviour.AllowExceptionsIfUnexpected` | 88 |
+| `CancellationThrowsException` | `bool` | `false` | 103 |
 
 ### `ProcessTimeoutPolicy`
 
 Defined in `src/CliInvoke.Core/Primitives/Policies/ProcessTimeoutPolicy.cs`.
 
 The parameterless constructor sets `TimeoutThreshold` to **2 minutes**;
-the static `Default` instance used by `ProcessExitConfiguration` sets
-it to **3 minutes**. Code that constructs its own
-`ProcessTimeoutPolicy()` gets the 2-minute value; code that relies on
-`ProcessExitConfiguration()`'s default gets the 3-minute value via
-`Default`.
+the static `Default` instance used by `ProcessExitConfiguration` is
+built from that same parameterless constructor, so it carries the
+same **2-minute** value. Code that constructs its own
+`ProcessTimeoutPolicy()` and code that relies on
+`ProcessExitConfiguration()`'s default both get the 2-minute policy.
 
 | Property | Type | `new ProcessTimeoutPolicy()` | `ProcessTimeoutPolicy.Default` | `ProcessTimeoutPolicy.None` | Source line |
 |----------|------|------------------------------|-------------------------------|----------------------------|-------------|
 | `Enabled` | `bool` | `true` | `true` | `false` | 74 |
-| `TimeoutThreshold` | `TimeSpan` | `TimeSpan.FromMinutes(2)` | `TimeSpan.FromMinutes(3)` | `TimeSpan.FromSeconds(0)` | 69 |
+| `TimeoutThreshold` | `TimeSpan` | `TimeSpan.FromMinutes(2)` | `TimeSpan.FromMinutes(2)` | `TimeSpan.FromSeconds(0)` | 69 |
 | `TimeoutExitBehaviour` | `ProcessExitBehaviour` | `GracefulExit` | `GracefulExit` | `WaitForExit` | 64 |
 
 ### `ProcessResourcePolicy`
@@ -635,14 +661,15 @@ Defined in `src/CliInvoke.Core/Primitives/Policies/ProcessResourcePolicy.cs`.
 
 | Property | Type | Default | Platform | Source line |
 |----------|------|---------|----------|-------------|
-| `ProcessorAffinity` | `IntPtr?` | `(1 << Environment.ProcessorCount) - 1` *(all logical processors)* | Windows, Linux | 87 |
-| `PriorityClass` | `ProcessPriorityClass` | `ProcessPriorityClass.Normal` | All | 92 |
-| `EnablePriorityBoost` | `bool` | `false` | All | 97 |
-| `MinWorkingSet` | `nint?` | `null` | Windows, macOS | 105 |
-| `MaxWorkingSet` | `nint?` | `null` | Windows, macOS | 113 |
+| `ProcessorAffinity` | `IntPtr?` | `(1 << Environment.ProcessorCount) - 1` *(a mask covering every logical processor, saturating to `nint.MaxValue` at 63+ processors)* | Windows, Linux | 84 |
+| `PriorityClass` | `ProcessPriorityClass` | `ProcessPriorityClass.Normal` | All | 89 |
+| `EnablePriorityBoost` | `bool` | `false` | All | 94 |
+| `MinWorkingSet` | `nint?` | `null` | Windows, macOS | 102 |
+| `MaxWorkingSet` | `nint?` | `null` | Windows, macOS | 110 |
 
 `ProcessResourcePolicy.Default` is a static instance that
-initializes `ProcessorAffinity` to all logical processors and leaves
+initializes `ProcessorAffinity` to a `(1 << ProcessorCount) - 1`
+mask covering every logical processor on the machine and leaves
 the other properties at their constructor defaults.
 
 ### `UserCredential`
@@ -669,8 +696,14 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExitBehaviour.cs`.
 | Value | Numeric | Meaning |
 |-------|---------|---------|
 | `WaitForExit` | `0` | Run until the process exits on its own. |
-| `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, fall back to a `CancellationTokenSource`. |
-| `ForcefulExit` | `2` | Forcefully terminate the process and all child processes. |
+| `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, falling back to forceful termination if the process does not exit. |
+| `ForcefulExit` | `2` | Forcefully terminate the process and attempt to terminate all child processes. |
+
+> **Note on `ForcefulExit`**: The tree-kill is best-effort, matching
+> .NET's own `Kill(entireProcessTree: true)` semantics. Descendants
+> spawned while the tree is being killed may survive. CliInvoke does
+> not add a post-kill delay or a second kill pass — this mirrors the
+> documented behavior of `Process.Kill(entireProcessTree: true)`.
 
 #### `ProcessExceptionBehaviour`
 
@@ -679,8 +712,8 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExceptionBehaviour.cs`.
 | Value | Numeric | Meaning |
 |-------|---------|---------|
 | `SuppressExceptions` | `0` | Suppress all exceptions thrown during execution. |
-| `AllowExceptions` | `1` | Allow .NET to throw the exception if expected. |
-| `AllowExceptionsIfUnexpected` | `2` | *(default)* Allow the exception only if it was unexpected. |
+| `AllowExceptions` | `1` | Throw the exception for a cancellation under all circumstances. |
+| `AllowExceptionsIfUnexpected` | `2` | *(default)* Throw only when the cancellation outcome was unexpected — i.e., the cancellation resolved more than 1 second from the expected exit time. |
 
 ## Cross-References
 

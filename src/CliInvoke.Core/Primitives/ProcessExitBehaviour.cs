@@ -26,8 +26,9 @@ public enum ProcessExitBehaviour
     /// </remarks>
     WaitForExit = 0,
     /// <summary>
-    ///     Gracefully cancels the Process upon request using SIGTERM/SIGINT Signals, or a
-    ///     <see cref="CancellationTokenSource" /> if that fails.
+    ///     Gracefully cancels the Process upon request by sending it the platform's
+    ///     interrupt signal (SIGTERM/SIGINT on Unix-like systems, a console control event
+    ///     on Windows), falling back to forceful termination if the process does not exit.
     /// </summary>
     GracefulExit = 1,
     /// <summary>

@@ -51,12 +51,20 @@ public sealed class MiddlewareItems
     }
 
     /// <summary>
-    /// 
+    ///     Attempts to get a value by key, cast to the specified type, without throwing.
     /// </summary>
     /// <typeparam name="T">The expected type of the value.</typeparam>
     /// <param name="key">The key to look up.</param>
-    /// <param name="value"></param>
-    /// <returns></returns>
+    /// <param name="value">
+    ///     When this method returns, contains the value cast to <typeparamref name="T"/>,
+    ///     or <c>default</c> when the key does not exist, the stored value is
+    ///     <c>null</c>, or the value cannot be cast to <typeparamref name="T"/>.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> when the key exists and the value is of (or assignable to)
+    ///     <typeparamref name="T"/>; otherwise, <c>false</c>. This method never throws,
+    ///     per the Try* convention.
+    /// </returns>
     public bool TryGet<T>(string key, out T? value)
     {
         try
@@ -65,7 +73,7 @@ public sealed class MiddlewareItems
 
             return true;
         }
-        catch(KeyNotFoundException)
+        catch (Exception)
         {
             value = default;
             return false;

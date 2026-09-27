@@ -28,7 +28,7 @@ internal class ProcessWrapper : Process
     /// </summary>
     /// <param name="timeoutSeconds">The user-supplied timeout threshold, in whole seconds.</param>
     /// <returns>
-    /// <c>min(10 + floor(timeoutSeconds * 0.05), 20)</c> — i.e. a fixed 10s base plus 5% of the
+    /// <c>min(10 + floor(timeoutSeconds * 0.05), 20)</c>, i.e. a fixed 10s base plus 5% of the
     /// requested timeout (rounded down to an integer), capped at 20s.
     /// </returns>
     internal static int CalculatePostInterruptGracePeriodSeconds(int timeoutSeconds)
@@ -64,6 +64,13 @@ internal class ProcessWrapper : Process
         ResourcePolicy = configuration.ResourcePolicy;
         ProcessControlAdapter.ApplyConfiguration(this, configuration);
         StartInfo.FileName = resolvedFilePath.FullName;
+
+        // Validated here rather than in ApplyConfiguration: the resolved absolute path can be
+        // substantially longer than the unresolved TargetFilePath (PATH lookup / recursion),
+        // so measuring before this overwrite would under-count the real command line.
+        if (OperatingSystem.IsWindows())
+            BaseProcessControlAdapter.ValidateCommandLineLength(StartInfo);
+
         ProcessName = StartInfo.FileName;
         EnableRaisingEvents = true;
         Exited += OnExited;
@@ -161,7 +168,49 @@ internal class ProcessWrapper : Process
     }
 
     internal event EventHandler Started;
-    
+
+    /// <summary>
+    ///     Maps a <see cref="Win32Exception"/> thrown during process start to the
+    ///     natural .NET exception type for the given <see cref="Win32Exception.NativeErrorCode"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Known codes: 2/3 → <see cref="FileNotFoundException"/>,
+    ///     5 → <see cref="UnauthorizedAccessException"/>,
+    ///     193 → <see cref="BadImageFormatException"/>.
+    ///     All other codes rethrow the original <see cref="Win32Exception"/>, preserving its
+    ///     <see cref="Win32Exception.NativeErrorCode"/> so callers can catch it specifically.
+    /// </remarks>
+    internal static Exception MapWin32ExceptionToStartFailureException(
+        Win32Exception exception,
+        string targetFilePath)
+    {
+        return exception.NativeErrorCode switch
+        {
+            // ERROR_FILE_NOT_FOUND (2) or ERROR_PATH_NOT_FOUND (3)
+            2 or 3 =>
+                new FileNotFoundException(
+                    $"The file '{targetFilePath}' was not found.",
+                    targetFilePath,
+                    exception),
+
+            // ERROR_ACCESS_DENIED (5)
+            5 =>
+                new UnauthorizedAccessException(
+                    $"The current user does not have permission to execute the file '{targetFilePath}'.",
+                    exception),
+
+            // ERROR_BAD_EXE_FORMAT (193)
+            193 =>
+                new BadImageFormatException(
+                    $"The file '{targetFilePath}' is not a valid executable image.",
+                    exception),
+
+            // Unknown codes — rethrow the original so callers can catch Win32Exception
+            // and inspect NativeErrorCode rather than being forced into catch (Exception).
+            _ => exception,
+        };
+    }
+
     public new bool Start()
     {
         try
@@ -172,11 +221,7 @@ internal class ProcessWrapper : Process
         {
             HasStarted = false;
 
-            // ERROR_FILE_NOT_FOUND (2) or ERROR_PATH_NOT_FOUND (3)
-            if (exception.NativeErrorCode is 2 or 3)
-                throw new FileNotFoundException($"The file '{StartInfo.FileName}' was not found.", StartInfo.FileName, exception);
-
-            throw new UnauthorizedAccessException($"The current user does not have permission to execute the file '{StartInfo.FileName}'.", exception);
+            throw MapWin32ExceptionToStartFailureException(exception, StartInfo.FileName);
         }
 
         if (!HasStarted)
@@ -232,7 +277,7 @@ internal class ProcessWrapper : Process
     /// Thrown when an attempt is made to suspend a process that has already exited.
     /// </exception>
     /// <remarks>
-    /// This method leverages platform-specific mechanisms to suspend a process and is supported
+    /// This method uses platform-specific mechanisms to suspend a process and is supported
     /// on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
     /// </remarks>
     [SupportedOSPlatform("windows")]
@@ -254,7 +299,7 @@ internal class ProcessWrapper : Process
     /// Thrown when an attempt is made to resume a process that has already exited.
     /// </exception>
     /// <remarks>
-    /// This method utilises platform-specific mechanisms to resume a suspended process
+    /// This method uses platform-specific mechanisms to resume a suspended process
     /// and is supported on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
     /// </remarks>
     [SupportedOSPlatform("windows")]
@@ -356,10 +401,10 @@ internal class ProcessWrapper : Process
     ///     This is a distinct overload of the base buffered-capture method on <see cref="Process"/>;
     ///     the inherited method is NOT overridden. The cap parameter supports three spellings:
     ///     <list type="bullet">
-    ///         <item><c>null</c> — no cap is applied; the stream is read in full.</item>
-    ///         <item>Negative value — no cap is applied; equivalent to <c>null</c>.</item>
-    ///         <item><c>0</c> — a valid zero-byte cap producing empty text with the truncated flag set.</item>
-    ///         <item>Positive value — the stream is read up to that many bytes, then truncated.</item>
+    ///         <item><c>null</c>: no cap is applied; the stream is read in full.</item>
+    ///         <item>Negative value: no cap is applied; equivalent to <c>null</c>.</item>
+    ///         <item><c>0</c>: a valid zero-byte cap producing empty text with the truncated flag set.</item>
+    ///         <item>Positive value: the stream is read up to that many bytes, then truncated.</item>
     ///     </list>
     /// </remarks>
     /// <param name="cancellationToken">A cancellation token for the read operations.</param>
@@ -400,10 +445,10 @@ internal class ProcessWrapper : Process
     /// <remarks>
     ///     The <paramref name="maxBytes"/> parameter supports three spellings:
     ///     <list type="bullet">
-    ///         <item><c>null</c> — no cap; the stream is read in full.</item>
-    ///         <item>Negative value — no cap; equivalent to <c>null</c>.</item>
-    ///         <item><c>0</c> — a valid zero-byte cap producing empty text with the truncated flag set.</item>
-    ///         <item>Positive value — the stream is read up to that many bytes, then truncated.</item>
+    ///         <item><c>null</c>: no cap; the stream is read in full.</item>
+    ///         <item>Negative value: no cap; equivalent to <c>null</c>.</item>
+    ///         <item><c>0</c>: a valid zero-byte cap producing empty text with the truncated flag set.</item>
+    ///         <item>Positive value: the stream is read up to that many bytes, then truncated.</item>
     ///     </list>
     ///     Multibyte sequences that straddle the cap boundary are decoded incrementally so that
     ///     split trailing bytes are held back and dropped cleanly (no U+FFFD replacement characters).

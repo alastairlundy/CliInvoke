@@ -244,6 +244,8 @@ On Windows, `CreateProcess` has a ~32,767 character limit for the full command l
 **`WorkingDirectory` semantics depend on `UseShellExecute`.**
 When `UseShellExecute = true`, an empty `WorkingDirectory` means "current directory contains the executable." When `false`, it means "use the hosting process's current directory." The same property has different semantics depending on another property's value.
 
+**CliInvoke**: `WorkingDirectoryPath` defaults to `Directory.GetCurrentDirectory()`, giving the caller's current directory as the configured starting point. When you set a non-empty `WorkingDirectoryPath`, CliInvoke validates the directory exists at construction time. The adapter passes the value to `ProcessStartInfo.WorkingDirectory` with no normalization.
+
 **Redirects require `UseShellExecute = false`.**
 You cannot redirect stdin, stdout, or stderr when `UseShellExecute` is `true`. This is a hard constraint that surprises developers coming from `cmd.exe` workflows.
 
@@ -255,3 +257,5 @@ You cannot redirect stdin, stdout, or stderr when `UseShellExecute` is `true`. T
 ```csharp
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 ```
+
+**CliInvoke**: The three encoding properties (`StandardInputEncoding`, `StandardOutputEncoding`, `StandardErrorEncoding`) default to `Encoding.Default`, which is UTF-8 on .NET 10 and later. Each encoding is applied only when its corresponding stream is redirected, so callers can override per-stream without affecting others.

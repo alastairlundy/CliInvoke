@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using CliInvoke.Core.Middleware;
 using TUnit.Assertions.Enums;
 
