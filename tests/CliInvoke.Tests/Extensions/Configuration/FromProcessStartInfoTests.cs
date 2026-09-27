@@ -7,8 +7,12 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using System.Security;
+
 using CliInvoke.Extensions.Configuration;
+
 using TUnit.Assertions.Enums;
+using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Tests.Extensions.Configuration;
 
@@ -71,5 +75,42 @@ public class FromProcessStartInfoTests
 
         await Assert.That(config.Arguments).IsEqualTo("--raw value");
         await Assert.That(config.ArgumentList).IsEmpty();
+    }
+
+    /// <summary>
+    ///     Regression test for the Linux CI failure where reading
+    ///     <see cref="ProcessStartInfo.Domain"/> threw
+    ///     <see cref="PlatformNotSupportedException"/>: the credential mapping must stay
+    ///     guarded to Windows while still mapping the values on Windows.
+    /// </summary>
+    [Test]
+    public async Task FromProcessStartInfo_CredentialProperties_MappedOnWindows()
+    {
+        if (!OperatingSystem.IsWindows())
+            throw new SkipTestException("ProcessStartInfo user-credential properties are Windows-only.");
+
+        SecureString password = new SecureString();
+        foreach (char character in "s3cret")
+        {
+            password.AppendChar(character);
+        }
+
+        password.MakeReadOnly();
+
+        ProcessStartInfo startInfo = new ProcessStartInfo("test.exe")
+        {
+            UseShellExecute = false
+        };
+        startInfo.Domain = "WORKGROUP";
+        startInfo.UserName = "service-account";
+        startInfo.Password = password;
+        startInfo.LoadUserProfile = true;
+
+        ProcessConfiguration config = ProcessConfiguration.FromProcessStartInfo(startInfo);
+
+        await Assert.That(config.Credential.Domain).IsEqualTo("WORKGROUP");
+        await Assert.That(config.Credential.UserName).IsEqualTo("service-account");
+        await Assert.That(config.Credential.Password).IsNotNull();
+        await Assert.That(config.Credential.LoadUserProfile).IsTrue();
     }
 }
