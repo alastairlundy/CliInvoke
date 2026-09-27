@@ -26,8 +26,10 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     [UnsupportedOSPlatform("windows")]
     internal override void ResumeProcess(Process process)
     {
-        const int SIGCONT = 18; // common value for SIGCONT
-        if (kill(process.Id, SIGCONT) != 0)
+        // SIGCONT is 18 on Linux but 19 on macOS/FreeBSD (BSD numbering); using the Linux
+        // value there raises SIGTSTP instead, stopping the process it was meant to resume.
+        int sigcont = GetContinueSignalNumber();
+        if (kill(process.Id, sigcont) != 0)
         {
             int errno = Marshal.GetLastWin32Error();
             // No such process - indicates the process already exited; treat as no-op.
@@ -42,8 +44,10 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     [UnsupportedOSPlatform("windows")]
     internal override void SuspendProcess(Process process)
     {
-        int SIGSTOP = OperatingSystem.IsMacOS() ? 17 : 19; // macOS fallback vs Linux
-        if (kill(process.Id, SIGSTOP) != 0)
+        // SIGSTOP is 19 on Linux but 17 on macOS/FreeBSD (BSD numbering); using the Linux
+        // value there raises SIGCONT instead, a no-op for a process meant to be stopped.
+        int sigstop = GetStopSignalNumber();
+        if (kill(process.Id, sigstop) != 0)
         {
             int errno = Marshal.GetLastWin32Error();
             // No such process - indicates the process already exited; treat as no-op.
@@ -51,6 +55,24 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
             throw new InvalidOperationException($"kill(SIGSTOP) failed for pid {process} with errno {errno}.");
         }
     }
+
+    /// <summary>
+    ///     Whether the current platform numbers its POSIX signals using the BSD layout
+    ///     (SIGSTOP 17, SIGTSTP 18, SIGCONT 19, SIGCHLD 20) rather than the Linux layout
+    ///     (SIGCHLD 17, SIGSTOP 19, SIGCONT 18, SIGTSTP 20).
+    /// </summary>
+    internal static bool UsesBsdSignalNumbers() =>
+        OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() || OperatingSystem.IsFreeBSD();
+
+    /// <summary>
+    ///     The platform-correct signal number for raising SIGSTOP.
+    /// </summary>
+    internal static int GetStopSignalNumber() => UsesBsdSignalNumbers() ? 17 : 19;
+
+    /// <summary>
+    ///     The platform-correct signal number for raising SIGCONT.
+    /// </summary>
+    internal static int GetContinueSignalNumber() => UsesBsdSignalNumbers() ? 19 : 18;
 
     internal override void SetResourcePolicy(ProcessWrapper process, ProcessResourcePolicy? resourcePolicy)
     {
@@ -129,21 +151,43 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         return _signalByNumber.TryGetValue(signalNumber, out PosixSignal signal) ? signal : null;
     }
 
-    private static readonly Dictionary<int, PosixSignal> _signalByNumber = new()
+    private static readonly Dictionary<int, PosixSignal> _signalByNumber = CreateSignalByNumberTable();
+
+    private static Dictionary<int, PosixSignal> CreateSignalByNumberTable()
     {
-        [1] = PosixSignal.SIGHUP,
-        [2] = PosixSignal.SIGINT,
-        [3] = PosixSignal.SIGQUIT,
-        [15] = PosixSignal.SIGTERM,
-        [17] = PosixSignal.SIGCHLD,
-        [18] = PosixSignal.SIGCONT,
-        [20] = PosixSignal.SIGTSTP,
-        [21] = PosixSignal.SIGTTIN,
-        [22] = PosixSignal.SIGTTOU,
-        [28] = PosixSignal.SIGWINCH,
-        // SIGKILL (9) is intentionally omitted: the PosixSignal enum has no SIGKILL member
-        // (it cannot be caught/trapped), so a SIGKILL death maps to null rather than a wrong value.
-    };
+        Dictionary<int, PosixSignal> table = new()
+        {
+            // Signals with the same numbers on both Linux and the BSD family.
+            [1] = PosixSignal.SIGHUP,
+            [2] = PosixSignal.SIGINT,
+            [3] = PosixSignal.SIGQUIT,
+            [15] = PosixSignal.SIGTERM,
+            [21] = PosixSignal.SIGTTIN,
+            [22] = PosixSignal.SIGTTOU,
+            [28] = PosixSignal.SIGWINCH,
+        };
+
+        if (UsesBsdSignalNumbers())
+        {
+            // BSD numbering (macOS, FreeBSD): SIGSTOP 17 (no PosixSignal member, omitted),
+            // SIGTSTP 18, SIGCONT 19, SIGCHLD 20.
+            table[18] = PosixSignal.SIGTSTP;
+            table[19] = PosixSignal.SIGCONT;
+            table[20] = PosixSignal.SIGCHLD;
+        }
+        else
+        {
+            // Linux numbering: SIGCHLD 17, SIGCONT 18, SIGTSTP 20.
+            table[17] = PosixSignal.SIGCHLD;
+            table[18] = PosixSignal.SIGCONT;
+            table[20] = PosixSignal.SIGTSTP;
+        }
+
+        // SIGKILL (9) maps to null: a process cannot catch or trap SIGKILL, and callers
+        // distinguish library-initiated forceful kills via ProcessResult.Canceled
+        // rather than Signal.
+        return table;
+    }
 
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]

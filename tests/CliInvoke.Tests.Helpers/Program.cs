@@ -22,6 +22,19 @@ if (args.Length >= 1 && args[0] == "echo-args")
     return 0;
 }
 
+// Echo-env mode for environment-variable delivery tests: print the value of the named
+// environment variable to stdout, then exit. Exit code 1 signals that the variable was
+// absent, letting a test distinguish "variable missing" from "variable delivered empty".
+if (args.Length == 2 && args[0] == "echo-env")
+{
+    string? value = Environment.GetEnvironmentVariable(args[1]);
+    Stream stdout = Console.OpenStandardOutput();
+    byte[] valueBytes = Encoding.UTF8.GetBytes(value ?? string.Empty);
+    stdout.Write(valueBytes, 0, valueBytes.Length);
+    stdout.Flush();
+    return value is null ? 1 : 0;
+}
+
 string markerPath = args.Length >= 1 ? args[0] : throw new ArgumentException(
     "Expected at least 2 arguments: <markerFilePath> <sleepSeconds>");
 

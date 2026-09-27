@@ -74,7 +74,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         ProcessorAffinity = processorAffinity ??
 #pragma warning restore CA1416
-                            2 * Environment.ProcessorCount - 1;
+                            GetAllProcessorAffinityMask();
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -118,8 +118,23 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     ///     Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
     public static ProcessResourcePolicy Default { get; } = new(
-        2 * Environment.ProcessorCount - 1
+        GetAllProcessorAffinityMask()
     );
+
+    /// <summary>
+    ///     Computes the processor affinity mask selecting every logical processor
+    ///     reported by <see cref="Environment.ProcessorCount" />:
+    ///     <c>(1 &lt;&lt; ProcessorCount) - 1</c>, i.e. one bit per logical processor.
+    /// </summary>
+    /// <remarks>
+    ///     Uses the same formula as the constructor's affinity-mask validation, and
+    ///     saturates to <see cref="nint.MaxValue" /> on machines with a processor count
+    ///     at or above the native integer width, where the shift would overflow.
+    /// </remarks>
+    private static nint GetAllProcessorAffinityMask() =>
+        Environment.ProcessorCount >= (nint.Size * 8) - 1
+            ? nint.MaxValue
+            : ((nint)1 << Environment.ProcessorCount) - 1;
 
     /// <summary>
     ///     Determines whether this ProcessResourcePolicy is equal to another ProcessResourcePolicy.

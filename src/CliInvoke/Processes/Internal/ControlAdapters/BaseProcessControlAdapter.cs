@@ -64,16 +64,6 @@ internal abstract class BaseProcessControlAdapter
                 processStartInfo.ArgumentList.Add(arg);
         }
 
-        if (processConfiguration.RequiresAdministrator)
-            RequireRunningAsAdmin(process);
-
-#pragma warning disable CA1416
-        SetUserCredential(process, processConfiguration.Credential);
-#pragma warning restore CA1416
-
-        if (processConfiguration.EnvironmentVariables.Count > 0)
-            SetEnvironmentVariables(process, processConfiguration.EnvironmentVariables);
-
         if (processStartInfo.RedirectStandardInput)
             processStartInfo.StandardInputEncoding = processConfiguration.StandardInputEncoding;
 
@@ -84,7 +74,22 @@ internal abstract class BaseProcessControlAdapter
         if (processStartInfo.RedirectStandardError)
             processStartInfo.StandardErrorEncoding = processConfiguration.StandardErrorEncoding;
 
+        // Assign the assembled ProcessStartInfo BEFORE applying platform-specific mutations
+        // below. RequireRunningAsAdmin, SetUserCredential, and SetEnvironmentVariables mutate
+        // process.StartInfo in place, so they must run after this assignment to land on the
+        // instance that will actually be used to start the process. Mutating before the
+        // assignment silently drops environment variables, credentials, and the admin verb.
         process.StartInfo = processStartInfo;
+
+        if (processConfiguration.RequiresAdministrator)
+            RequireRunningAsAdmin(process);
+
+#pragma warning disable CA1416
+        SetUserCredential(process, processConfiguration.Credential);
+#pragma warning restore CA1416
+
+        if (processConfiguration.EnvironmentVariables.Count > 0)
+            SetEnvironmentVariables(process, processConfiguration.EnvironmentVariables);
     }
     
     private void SetEnvironmentVariables(
