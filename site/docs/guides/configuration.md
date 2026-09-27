@@ -379,8 +379,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 Describes OS-level resource constraints applied to the spawned
 process: processor affinity, priority class, priority boost, and
 working-set sizes. The default value (`ProcessResourcePolicy.Default`)
-assigns affinity to all available logical processors; everything else
-is left at the OS default.
+assigns affinity to every logical processor on the machine — a mask of
+`(1 << Environment.ProcessorCount) - 1`, saturating to
+`nint.MaxValue` on machines with 63 or more logical processors
+(exposed as `ProcessResourcePolicy.AllProcessorsAffinityMask`);
+everything else is left at the OS default.
 
 **Platform notes**:
 
@@ -545,7 +548,7 @@ calls one of the capture methods (`WaitForExitOrTimeoutAsync` for
 obtain the result,
 and disposes the `IExternalProcess`. The configuration is built for
 you from the positional parameters; the timeout defaults to
-`ProcessTimeoutPolicy.Default.TimeoutThreshold` (3 minutes); and
+`ProcessTimeoutPolicy.Default.TimeoutThreshold` (2 minutes); and
 the exit configuration defaults to a graceful one. The factory and
 file-path resolver are fixed defaults — `CliRun` keeps no process-wide
 mutable state — so callers that need a custom factory or resolver
@@ -628,16 +631,16 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExitConfiguration.cs`.
 Defined in `src/CliInvoke.Core/Primitives/Policies/ProcessTimeoutPolicy.cs`.
 
 The parameterless constructor sets `TimeoutThreshold` to **2 minutes**;
-the static `Default` instance used by `ProcessExitConfiguration` sets
-it to **3 minutes**. Code that constructs its own
-`ProcessTimeoutPolicy()` gets the 2-minute value; code that relies on
-`ProcessExitConfiguration()`'s default gets the 3-minute value via
-`Default`.
+the static `Default` instance used by `ProcessExitConfiguration` is
+built from that same parameterless constructor, so it carries the
+same **2-minute** value. Code that constructs its own
+`ProcessTimeoutPolicy()` and code that relies on
+`ProcessExitConfiguration()`'s default both get the 2-minute policy.
 
 | Property | Type | `new ProcessTimeoutPolicy()` | `ProcessTimeoutPolicy.Default` | `ProcessTimeoutPolicy.None` | Source line |
 |----------|------|------------------------------|-------------------------------|----------------------------|-------------|
 | `Enabled` | `bool` | `true` | `true` | `false` | 74 |
-| `TimeoutThreshold` | `TimeSpan` | `TimeSpan.FromMinutes(2)` | `TimeSpan.FromMinutes(3)` | `TimeSpan.FromSeconds(0)` | 69 |
+| `TimeoutThreshold` | `TimeSpan` | `TimeSpan.FromMinutes(2)` | `TimeSpan.FromMinutes(2)` | `TimeSpan.FromSeconds(0)` | 69 |
 | `TimeoutExitBehaviour` | `ProcessExitBehaviour` | `GracefulExit` | `GracefulExit` | `WaitForExit` | 64 |
 
 ### `ProcessResourcePolicy`
@@ -653,7 +656,8 @@ Defined in `src/CliInvoke.Core/Primitives/Policies/ProcessResourcePolicy.cs`.
 | `MaxWorkingSet` | `nint?` | `null` | Windows, macOS | 113 |
 
 `ProcessResourcePolicy.Default` is a static instance that
-initializes `ProcessorAffinity` to all logical processors and leaves
+initializes `ProcessorAffinity` to
+`ProcessResourcePolicy.AllProcessorsAffinityMask` and leaves
 the other properties at their constructor defaults.
 
 ### `UserCredential`

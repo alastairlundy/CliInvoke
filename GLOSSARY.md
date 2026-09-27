@@ -41,7 +41,7 @@ For detailed definitions, target audiences, and usage examples of the architectu
 
 ### 1. Resolution order rationale
 
-`FilePathResolverBase.ResolveFilePath` tries PATH first, then directory recursion. This order is a performance contract: PATH lookup is a fast environment-variable read and covers the common case; directory recursion is slow and rare. Reordering the two strategies requires a new decision record.
+`FilePathResolver.ResolveFilePath` tries PATH first, then directory recursion. This order is a performance contract: PATH lookup is a fast environment-variable read and covers the common case; directory recursion is slow and rare. Reordering the two strategies requires a new decision record.
 
 ### 2. Get-prefix vs Enumerate-prefix convention
 
@@ -53,7 +53,7 @@ Custom resolvers overriding `GetPathFileExtensions` must return lowercased exten
 
 ### 4. Catch discipline for `Try*` methods
 
-`FilePathResolverBase.TryResolveFilePath` catches `Exception`, not `FileNotFoundException`. This follows the .NET `Try*` convention: the method must never propagate an exception. The broader catch is required by convention, not by the current algorithm (which only throws `FileNotFoundException` from `LocateFileFromDirectory`). Direct implementers of `IFilePathResolver` must follow the same discipline.
+`FilePathResolver.TryResolveFilePath` catches `Exception`, not `FileNotFoundException`. This follows the .NET `Try*` convention: the method must never propagate an exception. The broader catch is required by convention, not by the current algorithm (which only throws `FileNotFoundException` from `LocateFileFromDirectory`). Direct implementers of `IFilePathResolver` must follow the same discipline.
 
 ### 5. `IFilePathResolver` lifetime convention in `AddCliInvoke`
 

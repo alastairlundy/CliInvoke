@@ -233,8 +233,8 @@ and `ProcessExitBehaviour` that produce surprising exit behavior.
 1. **`ProcessTimeoutPolicy.None` used by accident.** `None` is a
    zero-second, disabled policy. Use
    `ProcessTimeoutPolicy.FromTimeSpan(...)` or
-   `ProcessTimeoutPolicy.Default` (3 minutes; the parameterless
-   `ProcessTimeoutPolicy()` constructor returns a 2-minute policy with
+   `ProcessTimeoutPolicy.Default` (2 minutes, the same value the
+   parameterless `ProcessTimeoutPolicy()` constructor returns, with
    cancellation enabled).
 2. **`ProcessExitBehaviour.WaitForExit` with cancellation.** When the
    behaviour is `WaitForExit`, the process is not signalled on
