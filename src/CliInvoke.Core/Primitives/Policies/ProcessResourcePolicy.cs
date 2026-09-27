@@ -60,7 +60,7 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
         if (processorAffinity is not null)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan((nint)processorAffinity, 0x0001);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, AllProcessorsAffinityMask);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, GetAllProcessorsAffinityMask);
         }
 
         if (maxWorkingSet is not null)
