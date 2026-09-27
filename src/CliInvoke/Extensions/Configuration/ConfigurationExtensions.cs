@@ -9,6 +9,7 @@
  */
 
 using System.Linq;
+using System.Security;
 
 using CliInvoke.Builders;
 
@@ -49,6 +50,29 @@ public static class ConfigurationExtensions
         ///     resulting configuration redirects output when either (or both) of the original flags
         ///     was set. This is a lossy conversion; the individual per-stream information is not
         ///     preserved.
+        ///     <para>
+        ///         <see cref="ProcessStartInfo.RedirectStandardInput"/> maps to
+        ///         <see cref="ProcessConfiguration.RedirectStandardInput"/>. Only the flag is mapped:
+        ///         <see cref="ProcessConfiguration.StandardInput"/> keeps its builder default, because
+        ///         the input-pipe <see cref="StreamWriter"/> must be supplied by the caller of
+        ///         <see cref="IProcessConfigurationBuilder.SetStandardInputPipe"/>.
+        ///     </para>
+        ///     <para>
+        ///         When <see cref="ProcessStartInfo.ArgumentList"/> is non-empty it is mapped to
+        ///         <see cref="ProcessConfiguration.ArgumentList"/> and
+        ///         <see cref="ProcessStartInfo.Arguments"/> is ignored, mirroring how the control
+        ///         adapter treats a non-empty <see cref="ProcessConfiguration.ArgumentList"/> as the
+        ///         canonical source and emits it via
+        ///         <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the raw
+        ///         command-line string. The raw <see cref="ProcessStartInfo.Arguments"/> string is
+        ///         only mapped when the list API was not used.
+        ///     </para>
+        ///     <para>
+        ///         User credential properties are mapped only on Windows: <c>ProcessStartInfo.Domain</c>
+        ///         and <c>ProcessStartInfo.LoadUserProfile</c> throw <c>PlatformNotSupportedException</c>
+        ///         on other platforms, mirroring the Windows-only support of
+        ///         <see cref="IProcessConfigurationBuilder.ConfigureUserCredential"/>.
+        ///     </para>
         /// </remarks>
         [Pure]
         public static ProcessConfiguration FromProcessStartInfo(ProcessStartInfo processStartInfo)
@@ -75,13 +99,21 @@ public static class ConfigurationExtensions
                 })
                 .UseShellExecution(processStartInfo.UseShellExecute)
                 .EnableWindowCreation(!processStartInfo.CreateNoWindow)
-                .SetArguments(processStartInfo.Arguments)
                 .SetOutputRedirection( processStartInfo.RedirectStandardOutput ||  processStartInfo.RedirectStandardError)
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
                 .SetStandardInputPipe(StreamWriter.Null)
+                .RedirectStandardInput(processStartInfo.RedirectStandardInput)
                 .SetEncoding(
                     processStartInfo.StandardInputEncoding,
                     processStartInfo.StandardOutputEncoding, processStartInfo.StandardErrorEncoding);
+
+            // A non-empty ArgumentList is canonical (mirrors BaseProcessControlAdapter, which
+            // clears Arguments and emits the list via ProcessStartInfo.ArgumentList); the raw
+            // Arguments string is only used when the caller never populated the list API.
+            if (processStartInfo.ArgumentList.Count > 0)
+                processConfigurationBuilder.SetArgumentList(processStartInfo.ArgumentList);
+            else
+                processConfigurationBuilder.SetArguments(processStartInfo.Arguments);
 
             if (!string.IsNullOrEmpty(processStartInfo.WorkingDirectory))
                 processConfigurationBuilder.SetWorkingDirectory(processStartInfo.WorkingDirectory);
@@ -89,22 +121,34 @@ public static class ConfigurationExtensions
             if (requiresAdministrator)
                 processConfigurationBuilder.RequireAdministratorPrivileges();
 
-#pragma warning disable CA1416
-            processConfigurationBuilder =
-                processConfigurationBuilder.ConfigureUserCredential(credentialSpec =>
-                {
-                    if (processStartInfo.Domain != string.Empty)
-                        credentialSpec.SetDomain(processStartInfo.Domain);
+            // User credentials are a Windows-only concept (see the ConfigureUserCredential
+            // remarks): reading Domain, Password, and LoadUserProfile throws
+            // PlatformNotSupportedException on Unix, so the mapping is guarded at runtime
+            // rather than relying on a CA1416 suppression. Values are read into locals so
+            // the platform analyzer tracks the guard (it does not flow into lambda bodies).
+            if (OperatingSystem.IsWindows())
+            {
+                string domain = processStartInfo.Domain;
+                SecureString? password = processStartInfo.Password;
+                string userName = processStartInfo.UserName;
+                bool loadUserProfile = processStartInfo.LoadUserProfile;
 
-                    if (processStartInfo.Password is not null)
-                        credentialSpec.SetPassword(processStartInfo.Password);
+                processConfigurationBuilder =
+                    processConfigurationBuilder.ConfigureUserCredential(credentialSpec =>
+                    {
+                        if (domain != string.Empty)
+                            credentialSpec.SetDomain(domain);
 
-                    if (processStartInfo.UserName != string.Empty)
-                        credentialSpec.SetUsername(processStartInfo.UserName);
+                        if (password is not null)
+                            credentialSpec.SetPassword(password);
 
-                    credentialSpec.SetUserProfileLoading(processStartInfo.LoadUserProfile);
-                });
-#pragma warning restore CA1416
+                        if (userName != string.Empty)
+                            credentialSpec.SetUsername(userName);
+
+                        credentialSpec.SetUserProfileLoading(loadUserProfile);
+                    });
+            }
+
             return processConfigurationBuilder.Build();
         }
     }

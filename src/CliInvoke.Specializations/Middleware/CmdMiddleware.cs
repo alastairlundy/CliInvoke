@@ -19,6 +19,20 @@ namespace CliInvoke.Specializations.Middleware;
 /// <remarks>
 ///     Windows-only. Calls on any non-Windows platform throw
 ///     <see cref="PlatformNotSupportedException"/> at runtime.
+///     <para>
+///         Unlike <see cref="PowerShellMiddleware"/> and <see cref="DefaultShellMiddleware"/>,
+///         this middleware takes <see cref="ProcessConfiguration.WindowCreation"/> and
+///         <see cref="ProcessConfiguration.UseShellExecution"/> from the source
+///         <see cref="ProcessConfiguration"/> per invocation; it does not read
+///         <see cref="ShellMiddlewareOptions"/>, so registering that type does not affect it.
+///     </para>
+///     <para>
+///         The source configuration's <see cref="ProcessConfiguration.OutputRedirection"/> flag is
+///         overwritten on every invocation to match the invocation mode: forced off in
+///         <see cref="InvocationMode.Raw"/>, forced on otherwise. This protective overwrite prevents
+///         a raw-mode pipe deadlock. Raw mode waits for process exit without draining redirected
+///         output, so a redirected pipe nobody reads would fill up and block the child process.
+///     </para>
 /// </remarks>
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]

@@ -20,6 +20,13 @@ namespace CliInvoke.Specializations.Middleware;
 /// <remarks>
 ///     Supports Windows, macOS, macCatalyst, Linux, and FreeBSD. Calls on Android, iOS, tvOS, watchOS,
 ///     or browser throw <see cref="PlatformNotSupportedException"/> at runtime.
+///     <para>
+///         The source configuration's <see cref="ProcessConfiguration.OutputRedirection"/> flag is
+///         overwritten on every invocation to match the invocation mode: forced off in
+///         <see cref="InvocationMode.Raw"/>, forced on otherwise. This protective overwrite prevents
+///         a raw-mode pipe deadlock. Raw mode waits for process exit without draining redirected
+///         output, so a redirected pipe nobody reads would fill up and block the child process.
+///     </para>
 /// </remarks>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("macos")]
@@ -33,6 +40,15 @@ namespace CliInvoke.Specializations.Middleware;
 [UnsupportedOSPlatform("watchos")]
 internal sealed class PowerShellMiddleware : IProcessMiddleware
 {
+    /// <summary>
+    ///     The PowerShell runner switch set shared by <see cref="PowerShellMiddleware"/> and
+    ///     <see cref="DefaultShellMiddleware"/> so both wrap PowerShell identically.
+    ///     <c>-NoProfile</c> keeps profile scripts (which can prompt for input or block) out of the
+    ///     invocation, and <c>-NonInteractive</c> keeps PowerShell from waiting for input it will
+    ///     never receive.
+    /// </summary>
+    internal const string PowerShellRunnerArgs = "-NoProfile -NonInteractive -Command";
+
     private readonly ShellMiddlewareOptions _options;
 
     /// <summary>
@@ -72,7 +88,7 @@ internal sealed class PowerShellMiddleware : IProcessMiddleware
         ProcessConfiguration rewritten = ShellRewriter.Rewrite(
             source,
             OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh",
-            runnerArgs: "-NoProfile -NonInteractive -Command",
+            runnerArgs: PowerShellRunnerArgs,
             kind: ShellKind.PowerShell,
             windowCreation: _options.WindowCreation,
             useShellExecution: _options.UseShellExecution);

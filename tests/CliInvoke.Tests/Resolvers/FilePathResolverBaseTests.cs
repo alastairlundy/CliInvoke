@@ -192,7 +192,8 @@ public class FilePathResolverBaseTests
     [Test]
     public async Task ResolveFilePath_ReturnsFileInfoDirectly_WhenPathIsRooted()
     {
-        string rootedPath = Path.Combine(Path.GetTempPath(), "somefile.exe");
+        // Use an existing rooted file: rooted paths are validated for existence.
+        string rootedPath = typeof(FilePathResolverBaseTests).Assembly.Location;
 
         TestableFilePathResolver resolver = new();
 
@@ -200,5 +201,36 @@ public class FilePathResolverBaseTests
 
         await Assert.That(result.FullName).IsEqualTo(new FileInfo(rootedPath).FullName);
         await Assert.That(resolver.InvocationOrder).IsEmpty();
+    }
+
+    [Test]
+    public async Task ResolveFilePath_RootedPathDoesNotExist_ThrowsFileNotFoundException()
+    {
+        string missingPath = Path.Combine(
+            Path.GetTempPath(),
+            $"cliinvoke-missing-{Guid.NewGuid():N}.exe");
+
+        TestableFilePathResolver resolver = new();
+
+        await Assert.That(() => resolver.ResolveFilePath(missingPath))
+            .Throws<FileNotFoundException>();
+
+        // The rooted path is rejected before any strategy runs.
+        await Assert.That(resolver.InvocationOrder).IsEmpty();
+    }
+
+    [Test]
+    public async Task TryResolveFilePath_RootedPathDoesNotExist_ReturnsFalseWithoutThrowing()
+    {
+        string missingPath = Path.Combine(
+            Path.GetTempPath(),
+            $"cliinvoke-missing-{Guid.NewGuid():N}.exe");
+
+        TestableFilePathResolver resolver = new();
+
+        bool result = resolver.TryResolveFilePath(missingPath, out FileInfo? resolved);
+
+        await Assert.That(result).IsFalse();
+        await Assert.That(resolved).IsNull();
     }
 }

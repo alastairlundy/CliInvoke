@@ -28,6 +28,11 @@ public class FilePathResolver : IFilePathResolver
     /// <returns>The resolved file path if successful, otherwise throws a FileNotFoundException.</returns>
     /// <exception cref="FileNotFoundException">Thrown if the file path does not exist or cannot be located.</exception>
     /// <exception cref="PlatformNotSupportedException">Thrown if run on an unsupported platform.</exception>
+    /// <remarks>
+    /// Rooted (absolute) paths are not searched in PATH or the directory-recursion fallback;
+    /// they are returned only when the file exists, and otherwise raise the same
+    /// <see cref="FileNotFoundException" /> that the fallback strategies use.
+    /// </remarks>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     public FileInfo ResolveFilePath(string filePathToResolve)
@@ -36,7 +41,15 @@ public class FilePathResolver : IFilePathResolver
 
         if (Path.IsPathRooted(filePathToResolve))
         {
-            return new FileInfo(filePathToResolve);
+            FileInfo rootedFile = new(filePathToResolve);
+
+            if (rootedFile.Exists)
+                return rootedFile;
+
+            throw new FileNotFoundException(
+                Resources.Exceptions_FileNotFound.Replace(
+                    "{file}",
+                    filePathToResolve));
         }
 
         bool resolveFromPath = ResolveFromPathEnvironmentVariable(filePathToResolve, out FileInfo? filePath);

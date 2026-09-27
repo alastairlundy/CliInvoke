@@ -54,6 +54,11 @@ internal class ProcessWrapper : Process
     // Synchronisation primitive to prevent simultaneous cancellation attempts
     private readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
 
+    // Guards ExitTime: written once by the Exited event callback (OnExited) or, when that
+    // callback has not run yet, by the wait paths' fallback (EnsureExitTime). Single-assignment
+    // under this lock keeps readers from ever observing default(DateTime) or a torn value.
+    private readonly object _exitTimeSync = new();
+
     // Resolved cancellation reason, persisted across the wait so Canceled can be computed afterward.
     private CancellationReason _cancellationReason = CancellationReason.NotKnown;
 
@@ -164,7 +169,70 @@ internal class ProcessWrapper : Process
 
     private void OnExited(object? sender, EventArgs e)
     {
-        ExitTime = base.ExitTime.ToUniversalTime();
+        // base.ExitTime is local time; store UTC to match StartTime (DateTime.UtcNow).
+        DateTime exitTime = base.ExitTime.ToUniversalTime();
+
+        lock (_exitTimeSync)
+        {
+            // Single assignment: when a wait path already published the fallback value
+            // first, keep it rather than racing a second write.
+            if (ExitTime == default)
+                ExitTime = exitTime;
+        }
+    }
+
+    /// <summary>
+    ///     Guarantees <see cref="ExitTime"/> holds a real timestamp once the process is known
+    ///     to have exited. The Exited event callback that normally assigns it can run after
+    ///     <see cref="Process.HasExited"/> flips true, so wait paths call this before returning;
+    ///     otherwise readers (e.g. the <c>ProcessResult</c> built by ExternalProcess) race the
+    ///     callback and can observe <c>default</c>, producing a bogus negative RuntimeDuration.
+    ///     No-ops while the process is still running, so it is safe to call from cleanup paths.
+    /// </summary>
+    private void EnsureExitTime()
+    {
+        if (ExitTime != default)
+            return;
+
+        bool exited;
+        try
+        {
+            exited = HasExited;
+        }
+        catch (ObjectDisposedException)
+        {
+            // Wait paths treat a disposed process as exited.
+            exited = true;
+        }
+        catch (InvalidOperationException)
+        {
+            // No process associated; nothing to publish yet.
+            exited = false;
+        }
+
+        if (!exited)
+            return;
+
+        lock (_exitTimeSync)
+        {
+            if (ExitTime != default)
+                return;
+
+            try
+            {
+                ExitTime = base.ExitTime.ToUniversalTime();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Process handle already released (disposed externally); the wait paths treat
+                // that as exited, so the best available timestamp is now.
+                ExitTime = DateTime.UtcNow;
+            }
+            catch (InvalidOperationException)
+            {
+                ExitTime = DateTime.UtcNow;
+            }
+        }
     }
 
     internal event EventHandler Started;
@@ -361,13 +429,25 @@ internal class ProcessWrapper : Process
     internal async Task<Stream> PipeStandardOutputAsync(CancellationToken cancellationToken)
     {
         Stream destination = new MemoryStream();
+        bool completed = false;
 
-        if (StartInfo.RedirectStandardOutput)
-            if (StandardOutput != StreamReader.Null)
-                await StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (StartInfo.RedirectStandardOutput)
+                if (StandardOutput != StreamReader.Null)
+                    await StandardOutput.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
 
-        destination.Position = 0;
-        return destination;
+            destination.Position = 0;
+            completed = true;
+            return destination;
+        }
+        finally
+        {
+            // Dispose the buffer only when the copy faults (or the position reset throws);
+            // on success the caller owns the returned stream.
+            if (!completed)
+                destination.Dispose();
+        }
     }
 
     /// <summary>
@@ -381,13 +461,25 @@ internal class ProcessWrapper : Process
     internal async Task<Stream> PipeStandardErrorAsync(CancellationToken cancellationToken)
     {
         Stream destination = new MemoryStream();
+        bool completed = false;
 
-        if (StartInfo.RedirectStandardError)
-            if (StandardError != StreamReader.Null)
-                await StandardError.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (StartInfo.RedirectStandardError)
+                if (StandardError != StreamReader.Null)
+                    await StandardError.BaseStream.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
 
-        destination.Position = 0;
-        return destination;
+            destination.Position = 0;
+            completed = true;
+            return destination;
+        }
+        finally
+        {
+            // Dispose the buffer only when the copy faults (or the position reset throws);
+            // on success the caller owns the returned stream.
+            if (!completed)
+                destination.Dispose();
+        }
     }
     #endregion
 
@@ -558,7 +650,10 @@ internal class ProcessWrapper : Process
         ProcessExitConfiguration processExitConfiguration,
         CancellationToken cancellationToken = default)
     {
-        if (processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero)
+        // A disabled timeout policy (Enabled == false) skips timeout enforcement entirely,
+        // as does a zero-or-negative threshold: wait for exit or caller cancellation only.
+        if (!processExitConfiguration.TimeoutPolicy.Enabled
+            || processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero)
         {
             await WaitForExitOrCancellationAsync(processExitConfiguration,
                 cancellationToken).ConfigureAwait(false);
@@ -614,6 +709,16 @@ internal class ProcessWrapper : Process
         ArgumentOutOfRangeException.ThrowIfLessThan(
             exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
 
+        // A disabled timeout policy skips timeout enforcement entirely: there is no
+        // threshold after which to send the interrupt or fall back, so wait for exit or
+        // caller cancellation only.
+        if (!exitConfiguration.TimeoutPolicy.Enabled)
+        {
+            await WaitForExitOrCancellationAsync(exitConfiguration, cancellationToken)
+                .ConfigureAwait(false);
+            return;
+        }
+
         await WaitForExitCoreAsync(exitConfiguration, cancellationToken, isGraceful: true, fallbackToForceful).ConfigureAwait(false);
     }
 
@@ -636,11 +741,17 @@ internal class ProcessWrapper : Process
             try
             {
                 if (HasExited)
+                {
+                    // The Exited event callback may not have run yet; publish ExitTime before
+                    // returning so result readers never see default.
+                    EnsureExitTime();
                     return;
+                }
             }
             catch (ObjectDisposedException)
             {
                 // Process was disposed externally; treat as exited.
+                EnsureExitTime();
                 return;
             }
 
@@ -648,6 +759,22 @@ internal class ProcessWrapper : Process
         }
 
         cancellationToken.ThrowIfCancellationRequested();
+    }
+
+    /// <summary>
+    ///     Marks <paramref name="task"/>'s eventual fault as observed without propagating it to
+    ///     this call stack, so it can never surface later as an unobserved
+    ///     <see cref="TaskScheduler.UnobservedTaskException"/>. Safe to call on tasks that have
+    ///     not completed yet: the continuation observes the fault whenever it arrives.
+    /// </summary>
+    /// <param name="task">The task whose fault must be observed.</param>
+    private static void ObserveFault(Task task)
+    {
+        _ = task.ContinueWith(
+            static faulted => _ = faulted.Exception,
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
     }
 
     /// <summary>
@@ -683,26 +810,38 @@ internal class ProcessWrapper : Process
                     processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
                     processExitConfiguration, cancellationToken);
 
-                await Task.WhenAny([
-                    WaitForExitSafeAsync(cancellationToken),
-                    cancelWithInterruptTask
-                ]).ConfigureAwait(false);
+                Task firstExitWatch = WaitForExitSafeAsync(cancellationToken);
+                await Task.WhenAny([firstExitWatch, cancelWithInterruptTask]).ConfigureAwait(false);
 
-                await Task.WhenAny([
-                    Task.Delay(
-                        TimeSpan.FromSeconds(
-                            CalculatePostInterruptGracePeriodSeconds((int)processExitConfiguration.TimeoutPolicy.TimeoutThreshold.TotalSeconds)),
-                        cancellationToken),
-                    WaitForExitSafeAsync(cancellationToken)
-                ]).ConfigureAwait(false);
+                Task interruptGraceDelay = Task.Delay(
+                    TimeSpan.FromSeconds(
+                        CalculatePostInterruptGracePeriodSeconds((int)processExitConfiguration.TimeoutPolicy.TimeoutThreshold.TotalSeconds)),
+                    cancellationToken);
+                Task secondExitWatch = WaitForExitSafeAsync(cancellationToken);
+                await Task.WhenAny([interruptGraceDelay, secondExitWatch]).ConfigureAwait(false);
 
-                // Ensure the interrupt/timeout resolution has fully completed and persisted
-                // _cancellationReason before the caller reads Canceled. Otherwise the returned
-                // ProcessResult could observe Canceled as false even though the process was
-                // terminated by the cancellation machinery. Only wait when the process did not
-                // exit on its own, so fast-exiting processes are not held for the full timeout.
-                if (!HasExited && !cancelWithInterruptTask.IsCompleted)
+                // Task.WhenAny never surfaces the faults of its candidates, and these three
+                // all fault with OperationCanceledException when the caller's token is
+                // cancelled. Observe them without propagating: policy-approved propagation
+                // is the interrupt task's job (below), so the default
+                // CancellationThrowsException=false configuration still does not throw OCE.
+                ObserveFault(firstExitWatch);
+                ObserveFault(interruptGraceDelay);
+                ObserveFault(secondExitWatch);
+
+                // Await the interrupt/timeout resolution so _cancellationReason is persisted
+                // before the caller reads Canceled; otherwise ProcessResult could report
+                // Canceled as false for a process the cancellation machinery terminated.
+                // Awaiting a completed task always observes its fault, so an exception that
+                // CancellationHelper approved for propagation surfaces every time instead of
+                // depending on timing. An incomplete task is awaited only while the process
+                // still runs, so fast-exiting processes are not held for the full timeout; a
+                // late fault there is observed, not propagated, because the wait already
+                // succeeded.
+                if (cancelWithInterruptTask.IsCompleted || !HasExited)
                     await cancelWithInterruptTask.ConfigureAwait(false);
+                else
+                    ObserveFault(cancelWithInterruptTask);
 
                 if (!HasExited && fallbackToForceful)
                     ForcefulExit();
@@ -729,6 +868,10 @@ internal class ProcessWrapper : Process
             if (!HasExited && !isGraceful)
                 ForcefulExit();
 
+            // Belt-and-braces for returns that skipped the exit watches (e.g. a swallowed
+            // exception): once the process is known exited, publish ExitTime.
+            EnsureExitTime();
+
             _cancellationSemaphore.Release();
         }
     }
@@ -754,48 +897,60 @@ internal class ProcessWrapper : Process
         CancellationTokenSource cts =
             CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        if (exitConfiguration.TimeoutPolicy.TimeoutThreshold > TimeSpan.Zero)
-            cts.CancelAfter(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
-
-        CancellationToken actualCancellationToken = cts.Token;
-
-        bool acquired = false;
-        // Use semaphore to prevent simultaneous cancellation attempts
-        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
-        {
-            await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
-            cts.Dispose();
-            return;
-        }
-
-        acquired = true;
-
         try
         {
-            await WaitForExitSafeAsync(actualCancellationToken).ConfigureAwait(false);
-        }
-        catch (Exception exception)
-        {
-            CancellationReason cancellationReason =
-                CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
-            CancellationHelper.HandleCancellationExceptions(expectedExitTime,
-                cancellationReason, exitConfiguration, exception);
-            _cancellationReason = cancellationReason;
+            // A disabled timeout policy never arms the timer, so the wait below is bounded
+            // only by the caller's token and the process's own exit, the same behaviour
+            // ProcessTimeoutPolicy.None already exhibited for a zero threshold.
+            if (exitConfiguration.TimeoutPolicy.Enabled
+                && exitConfiguration.TimeoutPolicy.TimeoutThreshold > TimeSpan.Zero)
+                cts.CancelAfter(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
+
+            CancellationToken actualCancellationToken = cts.Token;
+
+            // Use semaphore to prevent simultaneous cancellation attempts
+            if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
+            {
+                // Another cancellation is already in progress, wait for it to complete
+                await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
+            try
+            {
+                await WaitForExitSafeAsync(actualCancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                CancellationReason cancellationReason =
+                    CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+                CancellationHelper.HandleCancellationExceptions(expectedExitTime,
+                    cancellationReason, exitConfiguration, exception);
+                _cancellationReason = cancellationReason;
+            }
+            finally
+            {
+                try
+                {
+                    ForcefulExit();
+                }
+                catch (Exception)
+                {
+                    // Best-effort kill; swallow any exception to avoid masking the original.
+                }
+
+                // The wait can end via the timeout/cancel exception path rather than a
+                // confirmed exit; publish ExitTime once the kill has landed.
+                EnsureExitTime();
+
+                _cancellationSemaphore.Release();
+            }
         }
         finally
         {
-            try
-            {
-                ForcefulExit();
-            }
-            catch (Exception)
-            {
-                // Best-effort kill; swallow any exception to avoid masking the original.
-            }
-
+            // Disposed on every exit path, including a throw from the semaphore wait with an
+            // already-canceled token, so the linked token registration never leaks.
             cts.Dispose();
-            if (acquired)
-                _cancellationSemaphore.Release();
         }
     }
     

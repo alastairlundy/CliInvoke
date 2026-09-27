@@ -37,9 +37,31 @@ internal sealed class ConditionalMiddleware : IProcessMiddleware
     {
         if (await _predicate(context).ConfigureAwait(false))
         {
-            MiddlewareItems? currentItems = context.Middleware?.Items;
-            MiddlewareChain subChain = new MiddlewareChain(_subPipeline, next, currentItems);
-            await subChain.RunAsync(context, context.CancellationToken).ConfigureAwait(false);
+            // The sub-chain RunAsync overwrites context.Middleware with its own run-scoped
+            // context. Save the outer one so upstream middleware (and anything else holding the
+            // outer chain's state) observe the outer MiddlewareContext again once we return.
+            MiddlewareContext? outerMiddlewareContext = context.Middleware;
+
+            try
+            {
+                // The sub-chain's terminal is the rest of the outer chain, which runs inside
+                // subChain.RunAsync. Restore the outer context before handing control back so
+                // the remaining outer middleware see the outer MiddlewareContext, not the
+                // sub-chain's.
+                Func<InvocationContext, Task> restoreThenContinue = ctx =>
+                {
+                    ctx.Middleware = outerMiddlewareContext;
+                    return next(ctx);
+                };
+
+                MiddlewareChain subChain =
+                    new MiddlewareChain(_subPipeline, restoreThenContinue, outerMiddlewareContext?.Items);
+                await subChain.RunAsync(context, context.CancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                context.Middleware = outerMiddlewareContext;
+            }
         }
         else
         {
