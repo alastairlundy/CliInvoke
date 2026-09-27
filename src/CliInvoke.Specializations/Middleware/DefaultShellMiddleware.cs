@@ -23,6 +23,11 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
     private readonly IServiceProvider _serviceProvider;
     private readonly ShellMiddlewareOptions _options;
 
+    // Async-flow re-entrancy guard: shell detection runs its own probe invocations
+    // through the same DI invoker, whose chain contains this middleware. Without the
+    // guard each probe re-enters detection and recurses infinitely.
+    private static readonly AsyncLocal<bool> DetectionInProgress = new();
+
     /// <summary>
     ///
     /// </summary>
@@ -47,44 +52,61 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
 
         ThrowIfUnsupported();
 
-        IShellDetector shellDetector = _serviceProvider.GetRequiredService<IShellDetector>();
-        ShellInformation shell = await shellDetector.ResolveDefaultShellAsync(context.CancellationToken).ConfigureAwait(false);
-        
-        string shellName = Path.GetFileNameWithoutExtension(shell.TargetFilePath.Name);
-
-        ShellKind kind = shellName.Equals("cmd", StringComparison.OrdinalIgnoreCase)
-            ? ShellKind.Cmd
-            : shellName.Equals("pwsh", StringComparison.OrdinalIgnoreCase) ||
-              shellName.Equals("powershell", StringComparison.OrdinalIgnoreCase)
-                ? ShellKind.PowerShell
-                : ShellKind.Posix;
-
-        ProcessConfiguration source = ProcessConfigurationDerivation.Derive(
-            context.Configuration,
-            b => b.SetOutputRedirection(context.Mode != InvocationMode.Raw));
-
-        // Shell switches are caller-owned: each kind needs its own execution switch to
-        // make the composed inner command run rather than being ignored.
-        string runnerArgs = kind switch
+        if (DetectionInProgress.Value)
         {
-            ShellKind.Cmd => "/c",
-            ShellKind.PowerShell => "-Command",
-            _ => "-c"
-        };
+            // Re-entrant call: an outer shell-detection probe is running through this
+            // chain again. Pass through without re-detecting (a probe must not be
+            // shell-wrapped anyway) to break the recursion cycle.
+            await next(context).ConfigureAwait(false);
+            return;
+        }
 
-        ProcessConfiguration rewritten = ShellRewriter.Rewrite(
-            source,
-            shellTargetPath: shell.TargetFilePath.FullName,
-            runnerArgs: runnerArgs,
-            kind: kind,
-            windowCreation: _options.WindowCreation,
-            useShellExecution: _options.UseShellExecution);
+        DetectionInProgress.Value = true;
+        try
+        {
+            IShellDetector shellDetector = _serviceProvider.GetRequiredService<IShellDetector>();
+            ShellInformation shell = await shellDetector.ResolveDefaultShellAsync(context.CancellationToken).ConfigureAwait(false);
 
-        InvocationContext newContext = context.WithConfiguration(rewritten);
+            string shellName = Path.GetFileNameWithoutExtension(shell.TargetFilePath.Name);
 
-        await next(newContext).ConfigureAwait(false);
+            ShellKind kind = shellName.Equals("cmd", StringComparison.OrdinalIgnoreCase)
+                ? ShellKind.Cmd
+                : shellName.Equals("pwsh", StringComparison.OrdinalIgnoreCase) ||
+                  shellName.Equals("powershell", StringComparison.OrdinalIgnoreCase)
+                    ? ShellKind.PowerShell
+                    : ShellKind.Posix;
 
-        context.Result = newContext.Result;   
+            ProcessConfiguration source = ProcessConfigurationDerivation.Derive(
+                context.Configuration,
+                b => b.SetOutputRedirection(context.Mode != InvocationMode.Raw));
+
+            // Shell switches are caller-owned: each kind needs its own execution switch to
+            // make the composed inner command run rather than being ignored.
+            string runnerArgs = kind switch
+            {
+                ShellKind.Cmd => "/c",
+                ShellKind.PowerShell => "-Command",
+                _ => "-c"
+            };
+
+            ProcessConfiguration rewritten = ShellRewriter.Rewrite(
+                source,
+                shellTargetPath: shell.TargetFilePath.FullName,
+                runnerArgs: runnerArgs,
+                kind: kind,
+                windowCreation: _options.WindowCreation,
+                useShellExecution: _options.UseShellExecution);
+
+            InvocationContext newContext = context.WithConfiguration(rewritten);
+
+            await next(newContext).ConfigureAwait(false);
+
+            context.Result = newContext.Result;
+        }
+        finally
+        {
+            DetectionInProgress.Value = false;
+        }
     }
     
     private static void ThrowIfUnsupported()

@@ -134,13 +134,14 @@ For the full guide — constructor details, the `IProcessMiddleware` contract, D
 ## Resource Disposal
 
 > [!IMPORTANT]
-> CliInvoke has exactly **three Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
+> CliInvoke has exactly **four Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
 >
 > | # | Type                    | What it owns                                                      |
 > |---|-------------------------|-------------------------------------------------------------------|
 > | 1 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
 > | 2 | `UserCredential`        | `SecureString` password buffer                                    |
 > | 3 | `UserCredentialSpec`  | `SecureString` password buffer staged for `Build()`               |
+> | 4 | `ProcessConfigurationBuilder` | The `UserCredentialSpec` (and its staged `SecureString`) it creates |
 >
 > No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
 >

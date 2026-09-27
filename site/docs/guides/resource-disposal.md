@@ -19,7 +19,7 @@ The goal of this page is to prevent two failure modes:
    process accumulates open handles faster than it releases them.
 
 If you only read one section, read
-[The Three Disposable Types](#the-three-disposable-types) and the
+[The Disposable Types](#the-disposable-types) and the
 [Disposal Patterns](#disposal-patterns) summary.
 
 ## Terminology
@@ -27,7 +27,7 @@ If you only read one section, read
 A **Resource-Owning Type** is any CliInvoke type that holds, directly
 or transitively, an unmanaged resource or a sensitive managed resource
 that must be deterministically released. The library exposes exactly
-three of them. Every other public type in the library is a
+four of them. Every other public type in the library is a
 value-bearing immutable, an enum, or an interface contract and
 requires no disposal.
 
@@ -39,13 +39,14 @@ requires no disposal.
 > owned and disposed by **you**, the caller (see
 > [Caller-owned resources](#processconfiguration--caller-owned-resources)).
 
-## The Three Disposable Types
+## The Disposable Types
 
 | # | Type | Disposal contract | Resources owned |
 |---|------|-------------------|-----------------|
 | 1 | [`IExternalProcess`](#1-iexternalprocess) | `IDisposable` | The underlying `System.Diagnostics.Process` (pipes, handles, threads) |
 | 2 | [`UserCredential`](#2-usercredential) | `IDisposable` | `SecureString` password buffer |
 | 3 | [`UserCredentialSpec`](#3-usercredentialspec) | `IDisposable` | `SecureString` password buffer staged for `Build()` |
+| 4 | [`ProcessConfigurationBuilder`](#4-processconfigurationbuilder) | `IDisposable` | The `UserCredentialSpec` it creates |
 
 No other public CliInvoke type implements `IDisposable`. If a type is
 not in the table above, it does not need to be disposed.
@@ -192,6 +193,35 @@ must be disposed when the builder is no longer needed. Disposing the
 builder does **not** dispose the produced `UserCredential` — the two
 lifetimes are independent.
 
+### 4. `ProcessConfigurationBuilder`
+
+Defined in `src/CliInvoke/Builders/ProcessConfigurationBuilder.cs`.
+
+```csharp
+public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, IDisposable
+```
+
+**What it owns**
+
+- The `UserCredentialSpec` it creates internally. The spec (and the
+  staged `SecureString` it holds) exists for the builder's lifetime and
+  is not exposed for caller disposal.
+
+**`Dispose()` behaviour** (line 532):
+
+```csharp
+public void Dispose()
+{
+    _userCredentialSpec.Dispose();
+}
+```
+
+**Ownership rule**: The caller owns the builder; disposing it disposes
+the builder-owned `UserCredentialSpec`. Disposing the builder does
+**not** dispose the produced `ProcessConfiguration`, any `UserCredential`
+inside it, or any `StandardInput` stream the caller supplied — those
+follow the [caller-owned rules](#processconfiguration--caller-owned-resources).
+
 ## Handle Exhaustion: Why Explicit Disposal Is Required
 
 Managed memory in .NET is reclaimed by the garbage collector. The
@@ -321,8 +351,9 @@ using (credential)
 
 These rules are normative for every consumer of the library.
 
-1. **Always dispose** the three resource-owning types listed above
-   (`IExternalProcess`, `UserCredential`, `UserCredentialSpec`).
+1. **Always dispose** the four resource-owning types listed above
+   (`IExternalProcess`, `UserCredential`, `UserCredentialSpec`,
+   `ProcessConfigurationBuilder`).
    `ProcessConfiguration` is not among them.
 2. **Dispose caller-supplied `StandardInput` and `UserCredential`
    yourself.** `ProcessConfiguration` does not dispose them, and

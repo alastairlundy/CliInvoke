@@ -81,7 +81,7 @@ the pipeline to the end.
 A **Resource-Owning Type** is any CliInvoke type that holds, directly or
 transitively, an unmanaged resource (pipes, file handles, process
 threads) or a sensitive managed resource (`SecureString`). The library
-exposes exactly three; see the
+exposes exactly four; see the
 [Resource Disposal guide](resource-disposal.md) for the full list.
 
 ## The data-flow: Construction → Model → Invoker → Result
@@ -420,8 +420,9 @@ evaluates a set of self-describing <xref:CliInvoke.Core.Validation.ValidationRul
 rules. `Validate` returns a `bool` (all rules pass), while
 `GetValidationFailures` returns the per-rule <xref:CliInvoke.Core.Validation.ValidationFailure`1>
 instances so callers can surface detailed, rule-by-rule messages. The
-invoker raises a `ProcessNotSuccessfulException` when a validator
-configured for "must succeed" mode returns invalid. The post-exit
+invocation pipeline raises a `ProcessValidationException` when a
+configured validation rule rejects the result (see
+`ProcessExitConfiguration.ValidationRules`). The post-exit
 validation middleware (`UsePostExitValidation`) consumes the same
 validator stack and throws `ProcessValidationException` with the
 joined per-rule failure messages.
@@ -504,7 +505,7 @@ scenario.
   `ProcessConfiguration`, the builder lifecycle, and the
   default-value appendix.
 - [Resource Disposal](resource-disposal.md) — the disposal contract
-  for the three Resource-Owning Types, including the configuration,
+  for the four Resource-Owning Types, including the configuration,
   the `IExternalProcess`, and the result.
 - [Troubleshooting](troubleshooting.md) — symptom-based diagnosis for
   leaks, hangs, exit-code mismatches, and file-not-found errors.

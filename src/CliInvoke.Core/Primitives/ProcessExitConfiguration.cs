@@ -46,9 +46,13 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     ///     specified timeout policy and result validation.
     /// </summary>
     /// <param name="timeoutPolicy">The timeout policy to apply to the process.</param>
-    /// <param name="requestedCancellationExitBehaviour"></param>
-    /// <param name="exceptionBehaviour"></param>
-    /// <param name="cancellationThrowsException"></param>
+    /// <param name="requestedCancellationExitBehaviour">The exit behaviour to apply when the process is cancelled.</param>
+    /// <param name="exceptionBehaviour">Determines how exceptions raised during process execution are handled.</param>
+    /// <param name="cancellationThrowsException">
+    ///     When <c>true</c>, a cancellation request during process execution throws the
+    ///     underlying <see cref="OperationCanceledException" /> instead of returning a result
+    ///     with <c>Canceled</c> set to <see langword="true" />.
+    /// </param>
     public ProcessExitConfiguration(ProcessTimeoutPolicy timeoutPolicy, 
         ProcessExitBehaviour requestedCancellationExitBehaviour = ProcessExitBehaviour.GracefulExit,
         ProcessExceptionBehaviour exceptionBehaviour = ProcessExceptionBehaviour.AllowExceptionsIfUnexpected,
@@ -87,6 +91,15 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// Gets a value indicating whether a cancellation request during process execution
     /// will throw an exception.
     /// </summary>
+    /// <remarks>
+    /// When <c>true</c>, any <see cref="OperationCanceledException" /> raised by the
+    /// cancellation machinery (whether the cancellation was user-requested or
+    /// timer-driven) propagates to the caller, overriding
+    /// <see cref="ExceptionBehaviour" /> for cancellation-driven exceptions. When
+    /// <c>false</c> (the default), cancellation-driven exceptions are governed by
+    /// <see cref="ExceptionBehaviour" /> and the process simply exits with a result whose
+    /// <c>Canceled</c> flag is set.
+    /// </remarks>
     public bool CancellationThrowsException { get; }
 
     /// <summary>
@@ -97,7 +110,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     ///     These rules are evaluated by the invocation pipeline once the process result is produced. A
     ///     failing rule causes the pipeline to throw a
     ///     <see cref="CliInvoke.Core.Exceptions.ProcessValidationException" />. This property is
-    ///     intentionally excluded from <see cref="ProcessExitConfiguration"/>'s Equals method. /> and
+    ///     intentionally excluded from <see cref="ProcessExitConfiguration"/>'s Equals method and
     ///     <see cref="GetHashCode" /> because validation rules are delegate-based and are not
     ///     value-compared.
     /// </remarks>

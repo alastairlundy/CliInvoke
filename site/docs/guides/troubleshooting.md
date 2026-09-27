@@ -23,10 +23,11 @@ detection method.
 
 ## Resource Management
 
-CliInvoke exposes exactly three [Resource-Owning Types](guides-resource-disposal.md#terminology)
+CliInvoke exposes exactly four [Resource-Owning Types](guides-resource-disposal.md#terminology)
 that hold unmanaged handles or sensitive memory: `IExternalProcess`,
-`UserCredential`, and `UserCredentialSpec`. Every reported leak in this
-library traces back to one of these three.
+`UserCredential`, `UserCredentialSpec`, and `ProcessConfigurationBuilder`
+(owning its `UserCredentialSpec`). Every reported leak in this
+library traces back to one of these four.
 
 ### Symptoms
 

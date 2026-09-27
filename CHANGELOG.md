@@ -80,6 +80,50 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`ProcessExitConfiguration.CancellationThrowsException` is honoured.** The knob was
+  previously a dead setting — only assigned and compared, never read by any execution
+  path, with real cancellation exception behaviour governed solely by
+  `ExceptionBehaviour`. When set to `true`, an `OperationCanceledException` raised by
+  the cancellation machinery (user-requested or timer-driven) now propagates to the
+  caller; when `false` (the default), behaviour is unchanged.
+- `MiddlewareItems.TryGet<T>` no longer lets exceptions escape. It previously caught only
+  `KeyNotFoundException`, so a type mismatch (`InvalidOperationException` from `Get<T>`)
+  propagated to callers, violating the Try* convention; it now returns `false` for any
+  failed lookup and never throws.
+- `CachingFilePathResolver.TryResolveFilePath` no longer throws on invalid input: null or
+  whitespace input and inner-resolver faults resolve to `false` instead of an NRE, and
+  `ResolveFilePath` throws a documented `ArgumentException` instead of an NRE for null input.
+- `ProcessExceptionInfo<TProcessResult>.Dispose()` no longer disposes the `UserCredential`
+  it exposes. The credential is the caller-owned, shared reference from the still-live
+  `ProcessConfiguration`; disposing it here destroyed a credential the instance does not
+  own. The public `IDisposable` surface is unchanged.
+- `ProcessMiddlewareBuilder.Build()` now preserves registration order across registration
+  styles: middleware registered as direct instances and via `UseMiddleware<T>()` appear in
+  the pipeline in the exact order they were registered, instead of all direct instances
+  being executed before all type-based entries.
+- `ShellDetector` Unix detection passes the `ps` probe through a POSIX shell (`sh -c`) so
+  `$$` expands; previously the literal `$$` was passed to `ps` unexpanded and resolution
+  failed with an undocumented throw instead of returning `ShellInformation`.
+- `ShellDetector` Unix version parsing no longer strips the dots from the version text
+  (`5.9` parsed as `59.0`); versions parse with their real components.
+- `ShellDetector` Windows detection invokes `pwsh` non-interactively with
+  `-NoProfile -NonInteractive -Command $PSVersionTable.PSVersion.ToString()` instead of
+  with no arguments (which started a REPL that blocked on interactive terminals until
+  timeout), falls back to `cmd` on `ArgumentException` as well, and runs `cmd /c ver`
+  with defensive banner parsing so the documented cmd fallback is reachable instead of
+  failing with `IndexOutOfRangeException` on its own output.
+- `DefaultShellMiddleware` no longer recurses infinitely when the DI `IProcessInvoker`'s
+  chain contains the default-shell middleware: shell-detection probe invocations
+  re-entering the chain are passed through un-wrapped by a re-entrancy guard.
+- Invoker XML docs no longer promise a `ProcessNotSuccessfulException` from the invoke
+  path (`ProcessInvoker.ExecuteAsync`/`ExecuteBufferedAsync`); the pipeline throws
+  `ProcessValidationException` when configured validation rules reject the result.
+  `ExternalProcess.WaitForExitOrTimeoutAsync` XML docs no longer claim to return a
+  "buffered" result.
+- Disposal docs corrected from "exactly three IDisposable types" to four
+  (`ProcessConfigurationBuilder` included) across the root README, resource-disposal,
+  troubleshooting, architecture, and guides-index docs.
+
 - `WithMaxBufferedOutputBytes(config, null)` now clears the source
   configuration's buffer cap instead of silently inheriting it, so an explicit
   `null` really means unbounded output. Omitting the argument still inherits

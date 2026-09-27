@@ -40,7 +40,7 @@ Three patterns, documented in `DESIGN_PATTERNS.md` (includes a decision tree):
 - Load the `cliinvoke-pattern-validator` skill when adding or changing invocation code.
 
 ## Resource disposal
-Exactly **three** `IDisposable` types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec` (see README "Resource Disposal"). `ProcessConfiguration` is not disposable; `StandardInput`/`UserCredential` placed inside it remain the caller's responsibility.
+Exactly **four** `IDisposable` types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, `ProcessConfigurationBuilder` (see README "Resource Disposal"). `ProcessConfiguration` is not disposable; `StandardInput`/`UserCredential` placed inside it remain the caller's responsibility.
 
 ## Domain conventions (details in GLOSSARY.md — do not "fix" these)
 - `FilePathResolverBase.ResolveFilePath`: PATH lookup first, then directory recursion — a performance contract; reordering requires a new ADR.
