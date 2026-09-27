@@ -191,7 +191,38 @@ adheres to [Semantic Versioning](https://semver.org/).
   consumption speed and deadlock the Buffered composition. Feed stdin via
   `StartAsync` or `CaptureBufferedResultAsync` instead; see the
   [stdin piping guide](site/docs/guides/stdin-piping.md).
-  
+
+## [3.0.2] - unreleased
+
+Patch release backporting fixes from the 3.1.0 train for defects present in 3.0.0 and 3.0.1.
+
+### Changed
+
+- `IExternalProcess.StartAsync(CancellationToken)` now returns at launch instead of waiting for exit. Callers that relied on the wait must call `WaitForExitOrTimeoutAsync` or `CaptureBufferedResultAsync` explicitly after `StartAsync` returns.
+- `EnvironmentVariablesSpec` accepts empty-string values; values must still not be null.
+- `AddCliInvoke` registers `IProcessConfigurationBuilder` as a blank-builder factory; the previous type-mapped registration could never resolve.
+- `UseDefaultShell()` wraps PowerShell with the same `-NoProfile -NonInteractive -Command` switches as `UsePowerShell()`.
+
+### Fixed
+
+- Environment variables, user credentials, and the administrator verb are now applied to the process that actually starts (previously silently discarded in every invocation pattern).
+- Fixed macOS and FreeBSD suspend/resume signals: macOS children were stopped and never resumed, and FreeBSD suspend/resume were inverted.
+- The default `ProcessResourcePolicy` affinity mask now selects every logical processor instead of pinning multi-core machines to half the cores.
+- The invocation pipeline now pipes `ProcessConfiguration.StandardInput` in Raw and Buffered modes, and the one-call bypass path delivers end-of-file so stdin-reading children no longer hang.
+- Kill-induced stdin copy faults are absorbed instead of failing the invocation; genuine source-stream errors still propagate.
+- `ProcessExitConfiguration.CancellationThrowsException` is now honoured (it was previously a dead setting).
+- `MiddlewareItems.TryGet<T>`, `CachingFilePathResolver.TryResolveFilePath`, and static `BufferedProcessResult.Equals(null, null)` no longer throw on invalid input.
+- `ProcessExceptionInfo<TProcessResult>.Dispose()` no longer disposes the caller-owned `UserCredential`.
+- `ProcessMiddlewareBuilder.Build()` preserves middleware registration order across registration styles.
+- `ShellDetector` fixes: the Unix `ps` probe runs through `sh -c` so `$$` expands, Unix version parsing keeps the dots, and Windows `pwsh` detection is invoked non-interactively instead of starting a REPL.
+- `DefaultShellMiddleware` no longer recurses infinitely during shell detection.
+- `ProcessResult` no longer reports a zero `ExitTime` with a negative duration after a wait.
+- Fixed a linked `CancellationTokenSource` leak in the forceful-timeout wait.
+- `FromProcessStartInfo` maps `RedirectStandardInput`, treats non-empty `ArgumentList` as canonical over `Arguments`, and no longer reads Windows-only credential properties on Unix.
+- The post-exit validation middleware adapter now honors inner-rule null semantics for non-buffered results.
+- `GetFirstOutputLine()` splits on `Environment.NewLine` like its siblings.
+- `FilePathResolver` now throws `FileNotFoundException` for rooted paths that do not exist.
+
 ## [3.0.1] - 2026-09-24
 
 ### Changed
