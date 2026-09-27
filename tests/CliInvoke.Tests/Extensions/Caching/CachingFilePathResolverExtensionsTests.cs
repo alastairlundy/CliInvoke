@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace CliInvoke.Tests.Extensions.Caching;
 
 /// <summary>
-///     Tests for <see cref="CachingFilePathResolverExtensions.UseCachingFilePathResolver"/>: the
+///     Tests for <see cref="CachingFilePathResolverExtensions.UseCachingFilePathResolver(Microsoft.Extensions.DependencyInjection.IServiceCollection)"/>: the
 ///     <see cref="IMemoryCache"/> Singleton registration and the decorator swap of the existing
 ///     <see cref="IFilePathResolver"/> (without a circular dependency).
 /// </summary>
