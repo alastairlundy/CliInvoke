@@ -53,20 +53,25 @@ public interface IExternalProcess : IDisposable
     int Start();
 
     /// <summary>
-    ///     Asynchronously starts the external process using the specified configuration.
+    ///     Asynchronously starts the external process, feeding the configured standard
+    ///     input to the child when redirection is enabled.
     /// </summary>
     /// <param name="cancellationToken">
     ///     A cancellation token that can be used by other objects or threads
     ///     to receive notice of cancellation.
     /// </param>
     /// <returns>
-    ///     A task representing the asynchronous operation.
-    ///     The result contains the buffered process result when the method completes.
+    ///     A task that completes once the process has been launched and any configured
+    ///     standard input has been piped to the child. The method does not wait for the
+    ///     process to exit and produces no process result; obtain the result separately
+    ///     via <see cref="WaitForExitOrTimeoutAsync(CancellationToken)"/> or
+    ///     <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)"/>.
     /// </returns>
     Task StartAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Starts the external process asynchronously using the specified configuration.
+    ///     Starts the external process asynchronously using the specified configuration,
+    ///     feeding that configuration's standard input to the child.
     /// </summary>
     /// <param name="configuration">The configuration settings for starting the external process.</param>
     /// <param name="cancellationToken">
@@ -74,8 +79,11 @@ public interface IExternalProcess : IDisposable
     ///     to receive notice of cancellation.
     /// </param>
     /// <returns>
-    ///     A task representing the asynchronous operation.
-    ///     The result contains the buffered process result when the method completes.
+    ///     A task that completes once the process has been launched and the supplied
+    ///     configuration's standard input has been piped to the child. The method does
+    ///     not wait for the process to exit and produces no process result; obtain the
+    ///     result separately via <see cref="WaitForExitOrTimeoutAsync(CancellationToken)"/>
+    ///     or <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)"/>.
     /// </returns>
     Task StartAsync(ProcessConfiguration configuration, CancellationToken cancellationToken);
 
@@ -93,8 +101,9 @@ public interface IExternalProcess : IDisposable
     Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken);
     
     /// <summary>
-    ///     Asynchronously captures output and waits for the external process to exit or a specified
-    ///     timeout period to elapse.
+    ///     Asynchronously feeds the configured standard input to the child when redirection
+    ///     is enabled, captures output, and waits for the external process to exit or a
+    ///     specified timeout period to elapse.
     /// </summary>
     /// <param name="cancellationToken">
     ///     A cancellation token that can be used by other objects or threads

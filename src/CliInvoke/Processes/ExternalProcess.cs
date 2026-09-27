@@ -134,18 +134,23 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     }
 
     /// <summary>
-    ///     Asynchronously starts the external process using the specified configuration.
+    ///     Asynchronously starts the external process, feeding this instance's configured
+    ///     standard input to the child when redirection is enabled.
     /// </summary>
     /// <param name="cancellationToken">
     ///     A cancellation token that can be used by other objects or threads
     ///     to receive notice of cancellation.
     /// </param>
     /// <returns>
-    ///     A task representing the asynchronous operation. The result contains the buffered process
-    ///     result when the method completes.
+    ///     A task that completes once the process has been launched and any redirected
+    ///     standard input has been piped to the child. The method does not wait for the
+    ///     process to exit and produces no process result; obtain the result separately
+    ///     via <see cref="WaitForExitOrTimeoutAsync(CancellationToken)"/> or
+    ///     <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)"/>.
     /// </returns>
     /// <remarks>
-    /// Configuration is not mutated; the resolved file path is returned via the result.
+    /// Configuration is not mutated; the resolved file path surfaces on the result
+    /// returned later via <see cref="WaitForExitOrTimeoutAsync(CancellationToken)"/> as
     /// <see cref="ProcessResult.ExecutedFilePath"/>.
     /// </remarks>
     [UnsupportedOSPlatform("ios")]
@@ -174,11 +179,26 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             wrapper = _processWrapper;
         }
 
-        await wrapper.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+        if (Configuration.StandardInput is not null
+            && wrapper.StartInfo.RedirectStandardInput)
+        {
+            try
+            {
+                await wrapper.PipeStandardInputAsync(Configuration.StandardInput.BaseStream,
+                    cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception) when (wrapper.Canceled)
+            {
+                // A copy fault that is an artifact of this instance's own kill machinery
+                // (a broken pipe after ForcefulExit) is absorbed here; a genuine
+                // source-stream read error propagates to the caller (ledger T006).
+            }
+        }
     }
 
     /// <summary>
-    ///     Starts the external process asynchronously using the specified configuration.
+    ///     Starts the external process asynchronously using the specified configuration,
+    ///     feeding that configuration's standard input to the child.
     /// </summary>
     /// <param name="configuration">The configuration settings for starting the external process.</param>
     /// <param name="cancellationToken">
@@ -186,11 +206,15 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     ///     to receive notice of cancellation.
     /// </param>
     /// <returns>
-    ///     A task representing the asynchronous operation. The result contains the buffered process
-    ///     result when the method completes.
+    ///     A task that completes once the process has been launched and the supplied
+    ///     configuration's standard input has been piped to the child. The method does
+    ///     not wait for the process to exit and produces no process result; obtain the
+    ///     result separately via <see cref="WaitForExitOrTimeoutAsync(CancellationToken)"/>
+    ///     or <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)"/>.
     /// </returns>
     /// <remarks>
-    /// Configuration is not mutated; the resolved file path is returned via the result.
+    /// Configuration is not mutated; the resolved file path surfaces on the result
+    /// returned later via <see cref="WaitForExitOrTimeoutAsync(CancellationToken)"/> as
     /// <see cref="ProcessResult.ExecutedFilePath"/>.
     /// </remarks>
     [UnsupportedOSPlatform("ios")]
@@ -266,7 +290,9 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     }
 
     /// <summary>
-    ///     Asynchronously waits for the external process to exit or a specified timeout period elapses.
+    ///     Asynchronously feeds <see cref="Configuration"/>'s redirected standard input to
+    ///     the child concurrently with capturing its output, then waits for the external
+    ///     process to exit or a specified timeout period to elapse.
     /// </summary>
     /// <param name="cancellationToken">
     ///     A cancellation token that can be used by other objects or threads
@@ -301,11 +327,34 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             wrapper.ReadAllTextAsync(cancellationToken, maxStandardOutputBytes, maxStandardErrorBytes)
             : Task.FromResult((string.Empty, string.Empty, false));
 
+        // Feed stdin alongside the drain-and-wait so the copy runs at the child's
+        // pace instead of blocking ahead of it (ledger T003).
+        Task standardInputCopy = Configuration.StandardInput is not null
+            && wrapper.StartInfo.RedirectStandardInput
+            ? wrapper.PipeStandardInputAsync(Configuration.StandardInput.BaseStream,
+                cancellationToken)
+            : Task.CompletedTask;
+
+        Task waitTask = wrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
+
         try
         {
-            await Task.WhenAll(
-                wrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken),
-                outputStrings).ConfigureAwait(false);
+            try
+            {
+                await Task.WhenAll(waitTask, outputStrings, standardInputCopy)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception) when (standardInputCopy.IsFaulted
+                                    && !waitTask.IsFaulted
+                                    && !outputStrings.IsFaulted
+                                    && wrapper.Canceled)
+            {
+                // A stdin copy fault that is an artifact of this instance's own
+                // timeout/cancellation kill (a broken pipe after ForcefulExit) is
+                // absorbed at this join; a genuine source-stream read error leaves
+                // the kill machinery un-run and still propagates, as do any wait
+                // or drain faults (ledger T006).
+            }
 
             BufferedProcessResult result = new BufferedProcessResult(wrapper.StartInfo.FileName,
                 wrapper.ExitCode,
