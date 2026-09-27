@@ -74,7 +74,9 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         ProcessorAffinity = processorAffinity ??
 #pragma warning restore CA1416
-                            2 * Environment.ProcessorCount - 1;
+                            (Environment.ProcessorCount >= (nint.Size * 8) - 1
+                                ? nint.MaxValue
+                                : ((nint)1 << Environment.ProcessorCount) - 1);
 
         PriorityClass = priorityClass;
         EnablePriorityBoost = enablePriorityBoost;
@@ -118,7 +120,9 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     ///     Creates a ProcessResourcePolicy with a default configuration.
     /// </summary>
     public static ProcessResourcePolicy Default { get; } = new(
-        2 * Environment.ProcessorCount - 1
+        Environment.ProcessorCount >= (nint.Size * 8) - 1
+            ? nint.MaxValue
+            : ((nint)1 << Environment.ProcessorCount) - 1
     );
 
     /// <summary>
