@@ -10,261 +10,47 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Windows command-line length pre-start check: when the assembled command line exceeds the
-  Windows `CreateProcess` limit (~32,767 characters), an `ArgumentException` is thrown before
-  process start, replacing the cryptic Win32 error 206. The check runs against the resolved
-  absolute executable path and is skipped when `UseShellExecute` is enabled.
-- `ProcessResult.ToString()` bracketed diagnostic format:
-  `[ExitCode=N, Path=..., Runtime=...]`.
-- `BufferedProcessResult.ToString()` bracketed diagnostic format with
-  stdout/stderr length indicators and optional `Truncated=true`.
-- `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`
-  for tuple deconstruction.
-- `IsExitCodeZero()` extension on `ProcessResult` — returns `true` when
-  `ExitCode` equals zero; a default heuristic for non-DI callers.
-- `EnsureExitCodeZero()` extension on `ProcessResult` — throws
-  `ProcessNotSuccessfulException<TProcessResult>` when `ExitCode` is
-  non-zero.
-- `EnumerateOutputLines()` and `EnumerateErrorLines()` lazy extensions
-  on `BufferedProcessResult` — split output on `Environment.NewLine`
-  without allocating an intermediate array.
-- Result-ergonomics documentation guide (`site/docs/guides/results.md`)
-  covering the new members, `ToString` formats, `Deconstruct`, and the
-  heuristic-vs-validator framing.
-- Stdin piping guide (`site/docs/guides/stdin-piping.md`) documenting
-  which invocation paths pipe `ProcessConfiguration.StandardInput`, worked
-  Raw and Buffered examples, the end-of-file contract, why `Start()` stays
-  no-pipe, and caller ownership of the source stream.
+- Windows command-line length pre-start check. When the assembled command line exceeds the Windows `CreateProcess` limit (~32,767 characters), an `ArgumentException` is thrown before start against the resolved absolute executable path, instead of the cryptic Win32 error 206. Skipped when `UseShellExecute` is enabled.
+- Result ergonomics: `ProcessResult.ToString()` in bracketed diagnostic form (`[ExitCode=N, Path=..., Runtime=...]`); `BufferedProcessResult.ToString()` with output-length indicators and `Truncated=true` when truncated; `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`; `IsExitCodeZero()` and `EnsureExitCodeZero()` extensions on `ProcessResult`; and lazy `EnumerateOutputLines()` / `EnumerateErrorLines()` extensions on `BufferedProcessResult`.
+- Result-ergonomics guide (`site/docs/guides/results.md`) and stdin piping guide (`site/docs/guides/stdin-piping.md`).
 
 ### Changed
 
-- **`ShellArgumentEscaper` de-publicized.** The escaper type is now
-  `internal`; callers should rely exclusively on the public shell
-  middleware (`UseCmd()` / `UsePowerShell()`), not internal composition
-  types.
-- **Start-failure exception mapping for unknown Win32 error codes.** Previously every
-  non-file-not-found start failure surfaced as `UnauthorizedAccessException`. Known codes now
-  map to their natural .NET types (`FileNotFoundException` for Win32 codes 2/3,
-  `UnauthorizedAccessException` for code 5, `BadImageFormatException` for code 193), and all
-  other codes rethrow the original `Win32Exception` (carrying `NativeErrorCode`). Callers that
-  caught `UnauthorizedAccessException` around invocations to handle arbitrary start failures
-  should catch `Win32Exception` for unknown codes instead.
-- **Internal derivation hook for `ProcessConfiguration`.** All six hand-copied
-  `ProcessConfiguration` derivation sites — the three Specializations shell middleware
-  (`PowerShellMiddleware`, `CmdMiddleware`, `DefaultShellMiddleware`) and the three
-  `ShellRewriter` switch branches — now derive through a shared internal hook
-  (`ProcessConfigurationDerivation.Derive`) that seeds a `ProcessConfigurationBuilder`
-  from the source configuration, applies a caller-supplied delta, and builds. This
-  eliminates the copy-churn bug class where a new member could be missed at one or
-  more sites. Resource-owning members (`StandardInput`) are reference-copied, matching
-  prior hand-copy behavior. No public API change.
-- **`ProcessExitConfiguration` copy logic converged.** The `WithValidationRules` and
-  `WithMaxBufferedOutputBytes` extension methods now delegate to a shared private
-  `CopyWithDelta` function, eliminating duplicated property-copy blocks.
-- **ADR-0001 updated** to document the derivation-hook IVT usage under the
-  CliInvoke → CliInvoke.Specializations grant. The existing grant's justification
-  now covers `ProcessConfigurationDerivation` alongside the shell-rewriting helpers.
-  No new IVT grant was added.
-- **`CliInvoke` / `CliInvoke.Specializations` lockstep coupling.** The derivation
-  hook lives in the `CliInvoke` implementation package and is accessed by
-  `CliInvoke.Specializations` through the existing IVT grant. The two packages
-  must be released together in lockstep for this train.
-- **`RetryConditions.ExitCodeZero()` renamed to `NonZeroExitCode()`.** The old name
-  described the opposite of the behavior: the classifier retries when the exit code is
-  non-zero. The private classifier type is renamed with it; behavior is unchanged.
-  Update call sites of the pre-release name.
+- **`ShellArgumentEscaper` is now `internal`.** Compose shell commands through the public middleware (`UseCmd()` / `UsePowerShell()`), not internal composition types.
+- **Start-failure exceptions map to their natural .NET types.** Known Win32 codes map to `FileNotFoundException` (2/3), `UnauthorizedAccessException` (5), and `BadImageFormatException` (193). Everything else rethrows the original `Win32Exception` with `NativeErrorCode` intact, replacing the old catch-all `UnauthorizedAccessException`. Callers handling arbitrary start failures should catch `Win32Exception`.
+- **`ProcessConfiguration` derivation goes through one internal hook.** The six hand-copied derivation sites (three Specializations shell middleware, three `ShellRewriter` branches) now call `ProcessConfigurationDerivation.Derive`, which seeds a builder from the source config, applies a delta, and builds. A newly added member can no longer be missed by one copy site. No public API change.
+- **`RetryConditions.ExitCodeZero()` renamed to `NonZeroExitCode()`.** The old name described the opposite of the behavior; the classifier retries on non-zero exit codes. Behavior unchanged; update call sites of the pre-release name.
+- The `WithValidationRules` and `WithMaxBufferedOutputBytes` extension methods share one private copy routine instead of duplicated property-copy blocks.
+- ADR-0001 now justifies the derivation-hook usage under the existing CliInvoke → CliInvoke.Specializations IVT grant; no new grant. The two packages ship in lockstep this train because Specializations reads the internal hook.
 
-### Deprecations
-- **`PowershellProcessConfiguration` deprecated.** Marked with
-  `[Obsolete]`; will be removed in 4.0. Use plain `ProcessConfiguration`
-  + `UsePowerShell()` middleware.
-- **`CmdProcessConfiguration` deprecated.** Marked with
-  `[Obsolete]`; will be removed in 4.0. Use plain `ProcessConfiguration`
-  + `UseCmd()` middleware.
+### Deprecated
+
+- `PowershellProcessConfiguration` and `CmdProcessConfiguration`, marked `[Obsolete]`; both are removed in 4.0. Use plain `ProcessConfiguration` with `UsePowerShell()` / `UseCmd()` middleware.
 
 ### Fixed
 
-- The child's stdin write end is now closed by `ProcessWrapper` itself — the writer is
-  cached at process start (stdin property access throws after exit on .NET 10 for
-  fast-exiting children) and closed in a `finally` after every copy — so the end-of-file
-  guarantee holds for Raw, Buffered, and one-call invocations through one shared path.
-- Kill-induced stdin copy faults are absorbed at the join instead of failing the
-  invocation: `IExternalProcess.StartAsync(CancellationToken)` and
-  `CaptureBufferedResultAsync` swallow broken-pipe faults caused by the library's own
-  cancellation or timeout kill, while genuine source-stream read errors still propagate
-  to the caller.
-- A stub-based contract test matrix now pins the stdin close and fault rules without
-  spawning real processes: the write end closes on every piping exit path (success,
-  cancellation, kill), the copy completes before the close, kill-induced copy faults
-  are absorbed while genuine source-stream errors propagate, and the caller's source
-  stream stays untouched.
-- Environment variables, user credentials, and the administrator verb are applied to the
-  process that actually starts. `BaseProcessControlAdapter.ApplyConfiguration` assigned a
-  freshly built `ProcessStartInfo` over `process.StartInfo` *after* the control adapter had
-  written the admin verb, credential fields, and environment variables onto the original
-  instance, so all three were silently discarded in every invocation pattern (`CliRun`,
-  `IProcessInvoker`, and `IExternalProcess`). The assembled `ProcessStartInfo` is now
-  assigned before those mutations, and a buffered run test asserts that a configured
-  environment variable reaches the child process.
-- Unix suspend/resume signals corrected on macOS and FreeBSD. `SIGCONT` is 19 there, not
-  the Linux value 18, and `SIGSTOP` is 17, not 19. Because the suspend→resume cycle runs
-  on every process start, macOS children were stopped and never resumed, and on FreeBSD
-  suspend and resume were fully inverted. The exit-code-to-`PosixSignal` mapping
-  (`ProcessResult.Signal`) is now platform-aware as well.
-- The default `ProcessResourcePolicy` affinity mask now selects every logical processor.
-  The old default, `2 * Environment.ProcessorCount - 1`, is a valid all-cores mask only
-  for one or two processors; on an 8-core machine it pinned spawned processes to cores
-  0 through 3. The default is now `(1 << Environment.ProcessorCount) - 1`, matching the
-  constructor's own validation formula.
-- **`ProcessExitConfiguration.CancellationThrowsException` is honoured.** The knob was
-  previously a dead setting — only assigned and compared, never read by any execution
-  path, with real cancellation exception behaviour governed solely by
-  `ExceptionBehaviour`. When set to `true`, an `OperationCanceledException` raised by
-  the cancellation machinery (user-requested or timer-driven) now propagates to the
-  caller; when `false` (the default), behaviour is unchanged.
-- `MiddlewareItems.TryGet<T>` no longer lets exceptions escape. It previously caught only
-  `KeyNotFoundException`, so a type mismatch (`InvalidOperationException` from `Get<T>`)
-  propagated to callers, violating the Try* convention; it now returns `false` for any
-  failed lookup and never throws.
-- `CachingFilePathResolver.TryResolveFilePath` no longer throws on invalid input: null or
-  whitespace input and inner-resolver faults resolve to `false` instead of an NRE, and
-  `ResolveFilePath` throws a documented `ArgumentException` instead of an NRE for null input.
-- `ProcessExceptionInfo<TProcessResult>.Dispose()` no longer disposes the `UserCredential`
-  it exposes. The credential is the caller-owned, shared reference from the still-live
-  `ProcessConfiguration`; disposing it here destroyed a credential the instance does not
-  own. The public `IDisposable` surface is unchanged.
-- `ProcessMiddlewareBuilder.Build()` now preserves registration order across registration
-  styles: middleware registered as direct instances and via `UseMiddleware<T>()` appear in
-  the pipeline in the exact order they were registered, instead of all direct instances
-  being executed before all type-based entries.
-- `ShellDetector` Unix detection passes the `ps` probe through a POSIX shell (`sh -c`) so
-  `$$` expands; previously the literal `$$` was passed to `ps` unexpanded and resolution
-  failed with an undocumented throw instead of returning `ShellInformation`.
-- `ShellDetector` Unix version parsing no longer strips the dots from the version text
-  (`5.9` parsed as `59.0`); versions parse with their real components.
-- `ShellDetector` Windows detection invokes `pwsh` non-interactively with
-  `-NoProfile -NonInteractive -Command $PSVersionTable.PSVersion.ToString()` instead of
-  with no arguments (which started a REPL that blocked on interactive terminals until
-  timeout), falls back to `cmd` on `ArgumentException` as well, and runs `cmd /c ver`
-  with defensive banner parsing so the documented cmd fallback is reachable instead of
-  failing with `IndexOutOfRangeException` on its own output.
-- `DefaultShellMiddleware` no longer recurses infinitely when the DI `IProcessInvoker`'s
-  chain contains the default-shell middleware: shell-detection probe invocations
-  re-entering the chain are passed through un-wrapped by a re-entrancy guard.
-- Invoker XML docs no longer promise a `ProcessNotSuccessfulException` from the invoke
-  path (`ProcessInvoker.ExecuteAsync`/`ExecuteBufferedAsync`); the pipeline throws
-  `ProcessValidationException` when configured validation rules reject the result.
-  `ExternalProcess.WaitForExitOrTimeoutAsync` XML docs no longer claim to return a
-  "buffered" result.
-- Disposal docs corrected from "exactly three IDisposable types" to four
-  (`ProcessConfigurationBuilder` included) across the root README, resource-disposal,
-  troubleshooting, architecture, and guides-index docs.
-- `IExternalProcess.StartAsync(configuration, cancellationToken)` now honors
-  `ProcessConfiguration.RedirectStandardInput`. The overload previously force-enabled the
-  child's stdin redirect whenever a `StandardInput` writer was configured, even when the
-  configuration said redirection was off, while the instance overloads honored the flag.
-  A configured stdin writer with redirection disabled is now a documented no-op in every
-  path. The overload also absorbs kill-induced stdin copy faults at the join, matching
-  the instance overload's behavior, so cancellation no longer surfaces a broken pipe in
-  one path and not the other.
-- Graceful cancellation no longer loses or races its exceptions. The interrupt task's
-  faults are always observed (no more unobserved task exceptions) and an
-  `OperationCanceledException` surfaces to the caller deterministically when
-  `CancellationThrowsException` is set, never when it is false. The linked
-  `CancellationTokenSource` in the forceful-timeout wait is disposed even when the
-  semaphore wait throws with an already-cancelled token, so the token registration no
-  longer leaks.
-- `ProcessTimeoutPolicy.Enabled` is now honoured. A policy with `Enabled = false` enforces
-  no timeout in the exit-or-timeout, graceful-timeout, and forceful-timeout waits,
-  instead of being consulted only for equality comparisons while the kill timer armed
-  anyway.
-- Environment variables may have empty-string values. `EnvironmentVariablesSpec.SetPair`
-  and `SetEnumerable` rejected empty values with `ArgumentException`, though an empty
-  value is a valid way to clear a variable, and `FromProcessStartInfo` therefore threw
-  for `ProcessStartInfo` instances carrying one. Values must be non-null; keys must be
-  non-null and non-empty.
-- `ProcessInvokerConfigurationExtensions.FromProcessStartInfo` preserves stdin
-  redirection and argument lists. It previously ignored
-  `ProcessStartInfo.RedirectStandardInput` (always mapping the flag as off) and dropped
-  a non-empty `ArgumentList` entirely, losing arguments when the caller had used the
-  list API. A non-empty `ArgumentList` now takes precedence over the raw `Arguments`
-  string, matching how the invocation pipeline treats the list as canonical.
-- `StdoutMatches()` and `StderrIsEmpty()` validators honor raw results. The middleware
-  adapter that folds `CommonValidationRules` predicates into the pipeline forced a
-  failure for any non-buffered result, so `StderrIsEmpty()` always threw on a Raw
-  invocation even though the inner rule's documented semantics pass results that do not
-  expose standard error text. The adapter now delegates the null/non-buffered decision
-  to the inner rule itself, so each rule's own semantics hold.
-- `AddCliInvoke` registers `IProcessConfigurationBuilder` as a blank-builder factory.
-  The previous registration mapped the interface to `ProcessConfigurationBuilder` by
-  type, so `GetService<IProcessConfigurationBuilder>()` threw on every resolution: the
-  builder's only public constructor requires a target file path the container cannot
-  supply. Each lifetime now registers a factory that constructs a blank builder with an
-  empty target path; callers set the target via `SetTargetFilePath` before building.
-- `ProcessResult.ExitTime` is published by the time a wait returns. Exit time was
-  previously assigned only inside the `Exited` event handler, which can run after
-  `HasExited` already became true, so a reader could observe a default timestamp and a
-  bogus negative `RuntimeDuration`. Exit time is now set under a lock on every
-  confirmed-exit path, including the kill paths.
-- Rooted file paths in `FilePathResolver.ResolveFilePath` are validated for existence.
-  An absolute path previously skipped the existence check and returned a `FileInfo` for
-  a file that does not exist; it now throws `FileNotFoundException` like relative-path
-  resolution does, matching the `IFilePathResolver` contract.
-- Static `BufferedProcessResult.Equals(BufferedProcessResult?, BufferedProcessResult?)`
-  no longer throws a `NullReferenceException` for a null first argument; it is null-safe
-  like the `ProcessResult` equivalent.
-- `GetFirstOutputLine()` splits on `Environment.NewLine` only, matching
-  `GetOutputLines()` and `EnumerateOutputLines()`. It previously used a splitter that
-  also broke on lone `\n`, so the line APIs disagreed on `\n`-only output.
-- `UseDefaultShell()` wraps PowerShell with the same safe switch set as `UsePowerShell()`
-  (`-NoProfile -NonInteractive -Command`), instead of bare `-Command`, so profile
-  scripts can no longer run or block under the default-shell middleware. Its
-  unsupported-platform error message is now the generic shell message rather than the
-  PowerShell one.
-- `MiddlewareContext.Next` invokes only the next middleware and the rest of the chain.
-  It previously pointed at the fully composed chain head, so invoking it re-ran the
-  current middleware and everything upstream (unbounded recursion). The context keeps
-  one instance per run with one run-scoped token, as its documentation now states.
-- A conditional middleware's sub-chain no longer leaks its `MiddlewareContext` into the
-  outer chain: upstream middleware observing the context after `await next` and
-  downstream middleware in the outer chain both see the outer context again.
+- Stdin is delivered correctly end to end: the pipeline pipes `ProcessConfiguration.StandardInput` in both Raw and Buffered modes (previously the child received nothing), and the one-call bypass path closes the child's stdin write end on every exit path so stdin-reading children get end-of-file and no longer hang. `ProcessWrapper` caches the writer at start (stdin property access throws after exit on .NET 10 for fast-exiting children) and closes it in a `finally` after each copy. `StartAsync`/`CaptureBufferedResultAsync` absorb broken-pipe faults caused by the library's own kill, while genuine source-stream read errors propagate. `IExternalProcess.StartAsync(configuration, ct)` now honors `RedirectStandardInput` like the instance overloads; a configured writer with redirection disabled is a no-op in every path.
+- **`StartAsync(CancellationToken)` returns at launch again.** It had regressed into waiting for exit, which also kept Raw-mode timeouts from ever firing mid-run. Callers relying on the accidental wait must now call `WaitForExitOrTimeoutAsync` or `CaptureBufferedResultAsync` explicitly. `Start()` and `CliRun.FireAndForget` remain no-pipe by design; see the stdin piping guide.
+- Environment variables, user credentials, and the administrator verb reach the process that actually starts. `BaseProcessControlAdapter.ApplyConfiguration` overwrote `process.StartInfo` after the adapter had written those three onto the original instance, silently discarding them in every invocation pattern. A buffered run test asserts the environment variable arrives.
+- Unix suspend/resume signals corrected on macOS and FreeBSD: `SIGCONT` is 19 there and `SIGSTOP` is 17, not the Linux values. macOS children were stopped and never resumed on every start; FreeBSD suspend and resume were inverted. The exit-code-to-`PosixSignal` mapping (`ProcessResult.Signal`) is platform-aware too.
+- The default `ProcessResourcePolicy` affinity mask selects every logical processor. The old `2 * Environment.ProcessorCount - 1` formula pinned an 8-core machine to cores 0-3; the new `(1 << Environment.ProcessorCount) - 1` matches the constructor's own validation.
+- Graceful cancellation is deterministic: interrupt-task faults are always observed, `OperationCanceledException` surfaces exactly when `CancellationThrowsException` is set (never when false), the knob itself is honoured instead of dead, and the forceful-timeout wait disposes its linked `CancellationTokenSource` even when the token is already cancelled, so the registration no longer leaks. `ProcessTimeoutPolicy.Enabled = false` now enforces no timeout in all three waits instead of arming the kill timer anyway.
+- `ShellDetector` fixes: the Unix `ps` probe runs through `sh -c` so `$$` expands, Unix version parsing keeps the dots (5.9 no longer parses as 59.0), Windows `pwsh` detection runs non-interactively instead of starting a REPL that blocked until timeout, and the documented `cmd` fallback is reachable via defensive banner parsing.
+- `DefaultShellMiddleware` no longer recurses infinitely when shell-detection probes re-enter a chain containing the default-shell middleware, and `UseDefaultShell()` wraps PowerShell with the same safe switch set as `UsePowerShell()` (`-NoProfile -NonInteractive -Command`), so profile scripts cannot run or block. A conditional middleware's sub-chain no longer leaks its `MiddlewareContext` into the outer chain.
+- `MiddlewareContext.Next` invokes only the next middleware and the rest of the chain (previously the composed chain head, causing unbounded recursion). `ProcessMiddlewareBuilder.Build()` preserves registration order across registration styles instead of running all direct instances before all type-based entries.
+- Try* convention restored: `MiddlewareItems.TryGet<T>` returns `false` for any failed lookup (a type mismatch previously threw `InvalidOperationException`) and `CachingFilePathResolver.TryResolveFilePath` resolves null/whitespace input and inner-resolver faults to `false`, with `ResolveFilePath` throwing the documented `ArgumentException` for null input.
+- `ProcessExceptionInfo<TProcessResult>.Dispose()` no longer disposes the caller-owned `UserCredential` it exposes.
+- `FromProcessStartInfo` preserves stdin redirection and a non-empty `ArgumentList` (taking precedence over the raw `Arguments` string, as the pipeline treats the list), and accepts empty-string environment values, which are a valid way to clear a variable; keys must be non-null and non-empty.
+- `StdoutMatches()` and `StderrIsEmpty()` validators honor inner-rule semantics for non-buffered results instead of force-failing every Raw invocation.
+- `AddCliInvoke` registers `IProcessConfigurationBuilder` as a blank-builder factory; the old by-type mapping threw on every `GetService` because the builder's only constructor requires a target path the container cannot supply.
+- `ProcessResult.ExitTime` is set under a lock on every confirmed-exit path, including kills, so a wait never returns a default timestamp with a bogus negative `RuntimeDuration`.
+- Rooted paths in `FilePathResolver.ResolveFilePath` are validated for existence and throw `FileNotFoundException` like relative paths, matching the `IFilePathResolver` contract.
+- Static `BufferedProcessResult.Equals(null, ...)` no longer throws a `NullReferenceException`; it is null-safe like the `ProcessResult` equivalent.
+- `GetFirstOutputLine()` splits on `Environment.NewLine` only, matching the other line APIs.
+- `WithMaxBufferedOutputBytes(config, null)` clears the source cap so an explicit `null` really means unbounded output; omitting the argument still inherits it.
+- XML docs corrected: invoker invoke paths throw `ProcessValidationException`, not `ProcessNotSuccessfulException`; `WaitForExitOrTimeoutAsync` does not return a "buffered" result; disposal docs say four IDisposable types, not three.
+- Stub-based stdin contract tests pin the close and fault rules without spawning real processes, and escaper fuzz tests cover the `ShellRewriter` composition paths for all three shell kinds.
 
-- `WithMaxBufferedOutputBytes(config, null)` now clears the source
-  configuration's buffer cap instead of silently inheriting it, so an explicit
-  `null` really means unbounded output. Omitting the argument still inherits
-  the source cap.
-- Escaper fuzz tests now exercise the `ShellRewriter` composition paths
-  for all three shell kinds (PowerShell, Cmd, Posix).
-- The invocation pipeline now honors `ProcessConfiguration.StandardInput`
-  in both modes. Raw (`CliRun.RunAsync`, `IProcessInvoker.ExecuteAsync`)
-  and Buffered (`CliRun.RunBufferedAsync`,
-  `IProcessInvoker.ExecuteBufferedAsync`) previously started the child
-  without ever copying the configured stdin, so a stdin-reading child
-  received no input. Raw pipes stdin during `StartAsync(CancellationToken)`;
-  Buffered pipes it concurrently with output capture inside
-  `CaptureBufferedResultAsync`.
-- The one-call bypass path now delivers end-of-file.
-  `ExternalProcess.StartAsync(configuration, cancellationToken)` copied
-  stdin into the child but never closed the child's stdin write end, so
-  the child never received end-of-file and a stdin-reading child hung.
-  The write end now closes on every piping exit path (success,
-  cancellation, or source error). The caller's source stream is never
-  closed or disposed by the library.
-- **`StartAsync(CancellationToken)` returns at launch again.** The method
-  had regressed into waiting for process exit, which also kept Raw-mode
-  timeouts from ever firing mid-run because the timeout machinery only ran
-  after the process had already exited. It now resolves the file path,
-  starts the process, pipes any configured stdin, and returns without
-  waiting for exit; Raw-mode timeouts fire mid-run again. Callers that
-  relied on the accidental wait must now call
-  `WaitForExitOrTimeoutAsync` or `CaptureBufferedResultAsync` explicitly
-  after `StartAsync` returns.
-- `IExternalProcess.Start()` and `CliRun.FireAndForget` remain no-pipe by
-  design: a synchronous stdin copy would block the caller on the child's
-  consumption speed and deadlock the Buffered composition. Feed stdin via
-  `StartAsync` or `CaptureBufferedResultAsync` instead; see the
-  [stdin piping guide](site/docs/guides/stdin-piping.md).
-  
 ## [3.0.2] - 2026-09-27
 
 ### Fixed
