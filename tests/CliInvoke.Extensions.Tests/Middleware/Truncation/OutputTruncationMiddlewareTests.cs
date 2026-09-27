@@ -13,7 +13,7 @@ namespace CliInvoke.Extensions.Tests.Middleware.Truncation;
 
 /// <summary>
 ///     Tests for <see cref="OutputTruncationMiddleware"/> and the
-///     <see cref="OutputTruncationMiddlewareExtensions.UseOutputTruncation"/> registration extension.
+///     <see cref="OutputTruncationMiddlewareExtensions.UseOutputTruncation(CliInvoke.Core.Middleware.IProcessMiddlewareBuilder)"/> registration extension.
 /// </summary>
 public class OutputTruncationMiddlewareTests
 {

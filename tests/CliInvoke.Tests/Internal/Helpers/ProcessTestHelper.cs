@@ -78,7 +78,7 @@ internal class ProcessTestHelper
     ///     Delivers <see cref="PosixSignal.SIGTERM"/> to the process with the given id.
     /// </summary>
     /// <remarks>
-    ///     <see cref="System.Diagnostics.Process.Kill"/> terminates a Unix process with
+    ///     <see cref="System.Diagnostics.Process.Kill()"/> terminates a Unix process with
     ///     <c>SIGKILL</c> (exit code 137), not <c>SIGTERM</c> (exit code 143), so it cannot be
     ///     used to exercise the signal-trapping helper. This sends the expected signal directly.
     /// </remarks>

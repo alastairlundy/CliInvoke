@@ -47,7 +47,7 @@ public class StdinPipingClaimTests
     private static readonly TimeSpan GuardTimeout = TimeSpan.FromSeconds(30);
 
     /// <summary>
-    ///     Claim 1 / D002 (Raw): <see cref="CliRun.RunAsync"/> pipes the configured
+    ///     Claim 1 / D002 (Raw): <see cref="CliRun.RunAsync(CliInvoke.Core.ProcessConfiguration, CliInvoke.Core.ProcessExitConfiguration?, System.Threading.CancellationToken)"/> pipes the configured
     ///     stdin to a real child. The child reads exactly one line and exits 0 only
     ///     when it equals the payload, so a non-piped or corrupted payload fails the
     ///     test. The payload is newline-terminated so the read completes on the
@@ -76,7 +76,7 @@ public class StdinPipingClaimTests
     }
 
     /// <summary>
-    ///     Claim 1 / D002 (Buffered): <see cref="CliRun.RunBufferedAsync"/> completes
+    ///     Claim 1 / D002 (Buffered): <see cref="CliRun.RunBufferedAsync(CliInvoke.Core.ProcessConfiguration, CliInvoke.Core.ProcessExitConfiguration?, System.Threading.CancellationToken)"/> completes
     ///     while the child consumes stdin concurrently with output capture. The echo
     ///     child streams stdin to stdout until end-of-file, and the payload is far
     ///     larger than the OS pipe buffer, so the run can only complete if the stdin
