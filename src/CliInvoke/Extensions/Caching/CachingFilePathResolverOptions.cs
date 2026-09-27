@@ -15,8 +15,11 @@ namespace CliInvoke.Extensions.Caching;
 ///     Configuration options for the cached file-path resolver.
 /// </summary>
 /// <remarks>
-///     Register an instance of this type in the dependency injection container to customise caching
-///     behaviour. When no instance is registered, <see cref="Default"/> is used.
+///     Customise caching behaviour through the <c>configure</c> callback overload of
+///     <c>UseCachingFilePathResolver</c>: the registration creates its own instance,
+///     applies the callback to it, and passes the result to the resolver — an instance
+///     registered in the dependency injection container is never read. When no
+///     customisation is applied, the values of <see cref="Default"/> are used.
 /// </remarks>
 public sealed class CachingFilePathResolverOptions
 {

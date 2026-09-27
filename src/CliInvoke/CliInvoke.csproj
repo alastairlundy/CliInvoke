@@ -51,7 +51,6 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>CliInvoke.Tests</_Parameter1>
         </AssemblyAttribute>
-        <InternalsVisibleTo Include="CliInvoke.Extensions.Tests"/>
         <!--
             Cross-package middleware consumption: CliInvoke.Specializations shell
             middleware must access internal rewriting helpers (ShellRewriter, enums,

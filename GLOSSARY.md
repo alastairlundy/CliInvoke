@@ -87,5 +87,5 @@ The failure mode where a granting package's internal helper types (e.g., Guard/E
 
 ### Entrypoint package
 
-One of the CliInvoke packages (Core, CliInvoke, Extensions, Specializations) that provides a distinct consumer entrypoint into the ecosystem; by design it may require limited internal access to other packages.
+One of the CliInvoke packages (Core, CliInvoke, Specializations) that provides a distinct consumer entrypoint into the ecosystem; by design it may require limited internal access to other packages.
 

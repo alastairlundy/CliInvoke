@@ -101,3 +101,13 @@ requires making the types accessible without IVT.
 - Required grants are reduced deliberately per type, respecting the v3 breaking-change window for public promotions.
 - Contributors have clear guidance (this ADR + `CONTRIBUTING.md`) but no automated enforcement, keeping the rule a reviewed convention rather than a build gate.
 - The CliInvoke → CliInvoke.Specializations grant is assembly-wide; the documented-usage constraint (shell-rewriting helpers + derivation hook only) is enforced by review convention, not by a technical boundary.
+
+## Amendment — 2026-09-27
+
+As part of the 3.1.0 documentation/audit pass, the `CliInvoke → CliInvoke.Extensions.Tests`
+IVT grant in `src/CliInvoke/CliInvoke.csproj` was removed. The grant targeted a test project
+that no longer exists: `tests/CliInvoke.Extensions.Tests` (csproj and sources) was deleted
+earlier in this cycle, so the grant had no consumer and fell under the "unused grants are
+removed" rule above. This keeps the ADR's inventory consistent with the csproj — the remaining
+grants in `CliInvoke.csproj` are `CliInvoke.Tests` (consumed test assembly) and
+`CliInvoke.Specializations` (justified under "Grant inventory" above).

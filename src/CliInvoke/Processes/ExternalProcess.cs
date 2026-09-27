@@ -262,8 +262,8 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     /// </param>
     /// <returns>
     ///     A task that represents the asynchronous operation. The result contains the
-    ///     (unbuffered) process result when the method completes; redirected output is
-    ///     not captured by this method — use
+    ///     plain <see cref="ProcessResult"/> when the method completes; redirected output
+    ///     is not captured by this method — use
     ///     <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)"/>
     ///     for buffered output.
     /// </returns>

@@ -178,9 +178,12 @@ Key types in this stage:
 - Models are immutable after `Build()` returns.
 - The same model can be reused across multiple invocations; it carries
   no per-call state.
-- The caller that constructed the model owns its lifetime and is
-  responsible for disposing it (it is one of the three
-  [Resource-Owning Types](resource-disposal.md#the-three-disposable-types)).
+- The caller owns the model: `ProcessConfiguration` is not disposable
+  and is not one of the four
+  [Resource-Owning Types](resource-disposal.md#the-disposable-types)
+  (`IExternalProcess`, `UserCredential`, `UserCredentialSpec`,
+  `ProcessConfigurationBuilder`). Any `Credential` or `StandardInput`
+  you supplied inside the model remain yours to dispose.
 
 ### Stage 3 — Invoker
 
@@ -188,7 +191,7 @@ The invoker is the abstraction that turns a `ProcessConfiguration` into
 a running process. The default implementation, `ProcessInvoker`, takes
 a configuration, a `ProcessExitConfiguration`, and a cancellation
 token; creates an `IExternalProcess` via the configured
-`IExternalProcessFactory`; runs it; and returns a typed result. Three
+`IExternalProcessFactory`; runs it; and returns a typed result. Two
 methods exist on the interface, one per execution mode:
 
 - `ExecuteAsync` — returns `ProcessResult` (exit code only).
@@ -437,9 +440,12 @@ folds an `IProcessResultValidator`'s rules into the invocation's exit
 configuration before execution, so validator rules and inline rules are
 evaluated together.
 
-The **helper surface** is `IProcessResultValidator<TProcessResult>` and
-its default implementation (`ProcessResultValidator<TProcessResult>`).
-`Validate` returns a `bool` (all rules pass), while
+The **helper surface** is `IProcessResultValidator<TProcessResult>` —
+it answers the question *“is this result acceptable, or should we
+raise a failure?”* — and its default implementation
+(`ProcessResultValidator<TProcessResult>`), which evaluates a set of
+self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
+rules. `Validate` returns a `bool` (all rules pass), while
 `GetValidationFailures` returns the per-rule
 <xref:CliInvoke.Core.Validation.ValidationFailure`1> instances so callers can
 surface detailed, rule-by-rule messages. The invoker itself never
@@ -447,21 +453,10 @@ consults a validator; validator rules reach the pipeline only via
 `UsePostExitValidation`. Callers can also apply a validator directly to
 a result with `ThrowIfUnsuccessful`, which raises
 `ProcessNotSuccessfulException<TProcessResult>` when `Validate`
-returns false.
-
-`IProcessResultValidator<TProcessResult>` answers the question
-*“is this result acceptable, or should we raise a failure?”*. The
-default implementation (`ProcessResultValidator<TProcessResult>`)
-evaluates a set of self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
-rules. `Validate` returns a `bool` (all rules pass), while
-`GetValidationFailures` returns the per-rule <xref:CliInvoke.Core.Validation.ValidationFailure`1>
-instances so callers can surface detailed, rule-by-rule messages. The
-invocation pipeline raises a `ProcessValidationException` when a
-configured validation rule rejects the result (see
-`ProcessExitConfiguration.ValidationRules`). The post-exit
-validation middleware (`UsePostExitValidation`) consumes the same
-validator stack and throws `ProcessValidationException` with the
-joined per-rule failure messages.
+returns false — that exception is produced only by these result
+helper extensions; the invocation path itself never throws it (the
+pipeline throws `ProcessValidationException`, per the execution path
+above).
 
 Custom validators are the supported way to add domain-specific
 post-execution checks — for example, asserting that captured output
@@ -542,8 +537,10 @@ scenario.
   `ProcessConfiguration`, the builder lifecycle, and the
   default-value appendix.
 - [Resource Disposal](resource-disposal.md) — the disposal contract
-  for the four Resource-Owning Types, including the configuration,
-  the `IExternalProcess`, and the result.
+  for the four Resource-Owning Types: the `IExternalProcess`,
+  `UserCredential`, `UserCredentialSpec`, and
+  `ProcessConfigurationBuilder`, plus the caller-owned `Credential`
+  and `StandardInput` inside `ProcessConfiguration`.
 - [Troubleshooting](troubleshooting.md) — symptom-based diagnosis for
   leaks, hangs, exit-code mismatches, and file-not-found errors.
 - [`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md) — full API-level detail for

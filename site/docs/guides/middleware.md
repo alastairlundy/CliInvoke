@@ -24,13 +24,13 @@ public ProcessInvoker(
     MiddlewareItems? sharedItems);
 ```
 
-The full constructor accepts an optional `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with pre-injected services (such as an `ILogger`). This is how middleware like `LoggingMiddleware` receives a logger at runtime:
+The full constructor accepts an optional `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with services your own middleware reads at runtime. Built-in middleware does not pull its dependencies from this bag: `LoggingMiddleware`, for example, receives its `ILogger` through constructor injection from the DI container (`UseLogging()` is the only public entry point — the middleware class itself is internal):
 
 ```csharp
 using CliInvoke.Core.Middleware; // MiddlewareItems
 
 var items = new MiddlewareItems();
-items.Set("Logger", myLogger);
+items.Set("MyService", myService);
 var invoker = new ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items);
 ```
 
@@ -51,7 +51,7 @@ public interface IProcessMiddleware
 
 The `next` delegate takes only the `InvocationContext`; the `CancellationToken` is available as `context.CancellationToken` (not a separate parameter). Calling `next(context)` continues the chain (or the terminal pipeline); omitting the call short-circuits.
 
-Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag). For example, `LoggingMiddleware` resolves an `ILogger` from that bag under the well-known key `"Logger"`.
+Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag) — for example, your own middleware can store a value under a key of its choosing for downstream middleware to read. Built-in middleware does not resolve its logger from this bag: `LoggingMiddleware` constructor-injects an `ILogger` from the DI container, falling back to a no-op `NullLogger` when none is registered.
 
 ## Built-in middleware
 
@@ -60,8 +60,9 @@ The public API is the **builder extension methods** (`UseLogging`, `UsePostExitV
 ```csharp
 using CliInvoke;
 using CliInvoke.Extensions;
-using CliInvoke.Extensions.Middleware;            // UseLogging
+using CliInvoke.Extensions.Middleware.Logging;    // UseLogging
 using CliInvoke.Extensions.Middleware.Validation; // UsePostExitValidation
+using CliInvoke.Specializations;                  // AddCliInvokeSpecializations
 using CliInvoke.Specializations.Middleware;        // UsePowerShell, UseCmd
 
 builder.Services.AddCliInvoke(builder =>
@@ -73,9 +74,9 @@ builder.Services.AddCliInvoke(builder =>
 builder.Services.AddCliInvokeSpecializations(); // registers the platform middleware types
 ```
 
-* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). A built-in heuristic redacts the values following the sensitive flags (`--password`, `--token`, `--api-key`); captured stdout/stderr lines are redacted too. To apply an organisation-wide secret taxonomy instead, construct `LoggingMiddleware` with a `Func<string?, string>?` redactor (for example Microsoft's `Microsoft.Extensions.Compliance.Redaction` `IRedactorProvider`) — the built-in heuristic is used when no redactor is supplied. If no `ILogger` is supplied via the middleware items, a no-op logger is used.
+* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). A built-in heuristic redacts the values following the sensitive flags (`--password`, `--token`, `--api-key`); captured stdout/stderr lines are redacted too. The middleware class is `internal` and `UseLogging()` takes no parameters, so there is no public way to supply a custom redactor — the built-in heuristic is always used. Its `ILogger` is constructor-injected from the DI container at pipeline build time; when no logger is registered, a no-op `NullLogger` is used.
 * `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
-* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowershellProcessInvoker`, `PowerShellMiddleware` and `ProcessConfiguration`. To configure non-default behaviour, register `ShellMiddlewareOptions` (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties) in the DI container — for example:
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowerShellMiddleware` and `ProcessConfiguration`. To configure non-default behaviour, register `ShellMiddlewareOptions` (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties) in the DI container — for example:
 
   ```csharp
   using CliInvoke.Specializations.Middleware; // ShellMiddlewareOptions
@@ -100,7 +101,8 @@ appropriate shell wrapping middleware instead:
 
 ```csharp
 // Before (deprecated):
-var config = new PowershellProcessConfiguration(arguments: "Get-Process");
+var config = new PowershellProcessConfiguration(
+    arguments: "Get-Process", redirectStandardInput: false);
 
 // After:
 var config = new ProcessConfiguration("Get-Process");
@@ -109,7 +111,7 @@ var config = new ProcessConfiguration("Get-Process");
 
 * `UseDefaultShell` — detects the user's default shell (pwsh, Windows PowerShell, or cmd) via `IShellDetector` and wraps the command in it automatically. Use this instead of `UsePowerShell`/`UseCmd` when you want cross-platform shell detection without committing to a specific shell. Requires `IShellDetector` (registered by `AddCliInvoke`).
 
-  `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour mirrors `CmdProcessInvoker`.
+  `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour is enforced by `CmdMiddleware`.
 
   The `PowerShellMiddleware`/`CmdMiddleware`/`DefaultShellMiddleware` types behind `UsePowerShell()`/`UseCmd()`/`UseDefaultShell()` are registered in the DI container by `AddCliInvokeSpecializations()` (shipped in the `CliInvoke.Specializations` package). Call it alongside `AddCliInvoke` with the same `ServiceLifetime`; without it, resolving the invoker throws `InvalidOperationException` because the middleware types are not registered.
 
@@ -201,9 +203,12 @@ Middleware does not need to be wired by hand when you register CliInvoke through
 
 ```csharp
 using CliInvoke;
+using CliInvoke.Core;
+using CliInvoke.Core.Validation;
 using CliInvoke.Extensions;
-using CliInvoke.Extensions.Middleware;
+using CliInvoke.Extensions.Middleware.Logging;
 using CliInvoke.Extensions.Middleware.Validation;
+using CliInvoke.Validation;
 
 builder.Services.AddCliInvoke(configure: builder =>
 {
@@ -214,7 +219,7 @@ builder.Services.AddCliInvoke(configure: builder =>
 });
 ```
 
-The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Transient`). The `IProcessMiddlewareBuilder` creates the middleware chain from the container's services; the middleware itself still resolves its per-invocation dependencies (for example `ILogger` via the `MiddlewareItems` bag) from the active scope, so DI-driven configuration does not bypass the middleware contract described above.
+The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Transient`). The `IProcessMiddlewareBuilder` creates the middleware chain from the container's services; the middleware itself still resolves its dependencies (for example `LoggingMiddleware` constructor-injects its `ILogger`) from the active scope, so DI-driven configuration does not bypass the middleware contract described above.
 
 ## Result-ownership and disposal through the chain
 

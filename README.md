@@ -69,7 +69,7 @@ The package(s) to install depends on your use case:
 
 ## Supported Platforms
 
-CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android.
+CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android (untested). Note: the PowerShell middleware does not support Android — shell specializations via `UsePowerShell` are unavailable there.
 
 For more details see the [list of supported platforms](https://alastairlundy.github.io/CliInvoke/docs/Supported-OperatingSystems)
 
@@ -134,16 +134,18 @@ For the full guide — constructor details, the `IProcessMiddleware` contract, D
 ## Resource Disposal
 
 > [!IMPORTANT]
-> CliInvoke has exactly **four Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
+> CliInvoke has four **Resource-Owning Types** that implement `IDisposable` and **must** be disposed after use to avoid resource leaks (open pipe handles, kernel handles, and pinned `SecureString` buffers):
 >
 > | # | Type                    | What it owns                                                      |
 > |---|-------------------------|-------------------------------------------------------------------|
 > | 1 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
 > | 2 | `UserCredential`        | `SecureString` password buffer                                    |
 > | 3 | `UserCredentialSpec`  | `SecureString` password buffer staged for `Build()`               |
-> | 4 | `ProcessConfigurationBuilder` | The `UserCredentialSpec` (and its staged `SecureString`) it creates |
+> | 4 | `ProcessConfigurationBuilder` | The `UserCredentialSpec` it created — `Dispose()` disposes only that spec (and its staged `SecureString`), never caller-supplied `Credential`/`StandardInput` |
 >
-> No other CliInvoke type implements `IDisposable`. Always wrap these types in `using` or `await using` statements.
+> Always wrap these four types in `using` or `await using` statements.
+>
+> For `ProcessConfigurationBuilder`, the user remains responsible for disposing any `Credential` and `StandardInput` they supply to it — the builder does not dispose caller-provided credential/stdin resources.
 >
 > `ProcessConfiguration` is a plain immutable value object and does **not** implement `IDisposable`. The `StandardInput` (`StreamWriter`) and `UserCredential` you place inside it remain **your** responsibility to dispose — CliInvoke never disposes them on your behalf.
 

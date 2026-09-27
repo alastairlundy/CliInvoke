@@ -23,12 +23,18 @@ public enum ProcessExceptionBehaviour
     SuppressExceptions = 0,
 
     /// <summary>
-    ///     Allow .NET to throw the exception if expected.
+    ///     Rethrows the exception raised by the cancellation machinery whatever the
+    ///     cancellation reason: a requested cancellation, a timeout, or an unknown reason.
     /// </summary>
     AllowExceptions,
 
     /// <summary>
-    ///     Allows the exception to be thrown if it is unexpected.
+    ///     Rethrows the exception raised by the cancellation machinery only when the
+    ///     cancellation outcome was unexpected: a timeout or unknown reason whose
+    ///     cancellation resolved more than one second before or after the exit time
+    ///     predicted by the configured timeout. A requested cancellation, or a timeout
+    ///     that resolves within that window, is swallowed; the process exits with a
+    ///     result whose <c>Canceled</c> flag is set instead.
     /// </summary>
     AllowExceptionsIfUnexpected
 }

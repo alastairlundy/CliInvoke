@@ -80,6 +80,20 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- The child's stdin write end is now closed by `ProcessWrapper` itself — the writer is
+  cached at process start (stdin property access throws after exit on .NET 10 for
+  fast-exiting children) and closed in a `finally` after every copy — so the end-of-file
+  guarantee holds for Raw, Buffered, and one-call invocations through one shared path.
+- Kill-induced stdin copy faults are absorbed at the join instead of failing the
+  invocation: `IExternalProcess.StartAsync(CancellationToken)` and
+  `CaptureBufferedResultAsync` swallow broken-pipe faults caused by the library's own
+  cancellation or timeout kill, while genuine source-stream read errors still propagate
+  to the caller.
+- A stub-based contract test matrix now pins the stdin close and fault rules without
+  spawning real processes: the write end closes on every piping exit path (success,
+  cancellation, kill), the copy completes before the close, kill-induced copy faults
+  are absorbed while genuine source-stream errors propagate, and the caller's source
+  stream stays untouched.
 - Environment variables, user credentials, and the administrator verb are applied to the
   process that actually starts. `BaseProcessControlAdapter.ApplyConfiguration` assigned a
   freshly built `ProcessStartInfo` over `process.StartInfo` *after* the control adapter had

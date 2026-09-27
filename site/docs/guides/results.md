@@ -75,6 +75,7 @@ caller-stated validation path instead.
 using CliInvoke;
 using CliInvoke.Core;
 using CliInvoke.Core.Validation;
+using CliInvoke.Validation;
 
 BufferedProcessResult result = await CliRun.RunBufferedAsync(
     "dotnet", "--list-sdks");

@@ -49,7 +49,7 @@ If you prefer to resolve an invoker from a dependency injection container, call 
 
 #### AddCliInvokeSpecializations
 
-`AddCliInvokeSpecializations()` (namespace `CliInvoke.Extensions`, shipped in this package) registers the
+`AddCliInvokeSpecializations()` (namespace `CliInvoke.Specializations`, shipped in this package) registers the
 Specializations middleware types (`PowerShellMiddleware`, `CmdMiddleware`, `DefaultShellMiddleware`, and
 `ShellMiddlewareOptions`), so the convenience builder extensions `UsePowerShell()`, `UseCmd()`, and
 `UseDefaultShell()` can resolve them from the DI container.
@@ -68,6 +68,8 @@ are matched to the invoker lifetime to avoid capturing scoped services into a si
 
 ```csharp
 using CliInvoke.Extensions;
+using CliInvoke.Specializations;
+using CliInvoke.Specializations.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 
 ServiceCollection services = new ServiceCollection();
@@ -92,6 +94,7 @@ using ServiceProvider serviceProvider = services.BuildServiceProvider();
 ```csharp
 using CliInvoke.Core;
 using CliInvoke.Extensions;
+using CliInvoke.Specializations;
 using CliInvoke.Specializations.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -150,6 +153,7 @@ ProcessResult result = await _processInvoker.ExecuteAsync(processToRun);
 ```csharp
 using CliInvoke.Core;
 using CliInvoke.Extensions;
+using CliInvoke.Specializations;
 using CliInvoke.Specializations.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 
