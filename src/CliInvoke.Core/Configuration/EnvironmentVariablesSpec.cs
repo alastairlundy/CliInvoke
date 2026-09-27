@@ -51,7 +51,10 @@ public sealed class EnvironmentVariablesSpec
     /// <summary>
     ///     Sets multiple environment variables.
     /// </summary>
-    /// <param name="variables">The environment variables to set.</param>
+    /// <param name="variables">
+    ///     The environment variables to set. Keys must be non-null and non-empty; values may be
+    ///     empty strings (e.g. to clear a variable) but must not be null.
+    /// </param>
     /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
     public EnvironmentVariablesSpec SetEnumerable(
         IEnumerable<KeyValuePair<string, string>> variables)
@@ -61,7 +64,7 @@ public sealed class EnvironmentVariablesSpec
         foreach (KeyValuePair<string, string> pair in variables)
         {
             ArgumentException.ThrowIfNullOrEmpty(pair.Key);
-            ArgumentException.ThrowIfNullOrEmpty(pair.Value);
+            ArgumentNullException.ThrowIfNull(pair.Value);
 
             if (_throwExceptionIfDuplicateKeyFound)
             {
@@ -82,13 +85,16 @@ public sealed class EnvironmentVariablesSpec
     /// <summary>
     ///     Sets a single environment variable.
     /// </summary>
-    /// <param name="name">The name of the environment variable to set.</param>
-    /// <param name="value">The value of the environment variable to set.</param>
+    /// <param name="name">The name of the environment variable to set. Must be non-null and non-empty.</param>
+    /// <param name="value">
+    ///     The value of the environment variable to set. An empty string is permitted
+    ///     (e.g. to clear the variable); <see langword="null" /> is rejected.
+    /// </param>
     /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
     public EnvironmentVariablesSpec SetPair(string name, string value)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
-        ArgumentException.ThrowIfNullOrEmpty(value);
+        ArgumentNullException.ThrowIfNull(value);
 
         if (_throwExceptionIfDuplicateKeyFound)
         {

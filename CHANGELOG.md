@@ -69,6 +69,10 @@ adheres to [Semantic Versioning](https://semver.org/).
   hook lives in the `CliInvoke` implementation package and is accessed by
   `CliInvoke.Specializations` through the existing IVT grant. The two packages
   must be released together in lockstep for this train.
+- **`RetryConditions.ExitCodeZero()` renamed to `NonZeroExitCode()`.** The old name
+  described the opposite of the behavior: the classifier retries when the exit code is
+  non-zero. The private classifier type is renamed with it; behavior is unchanged.
+  Update call sites of the pre-release name.
 
 ### Deprecations
 - **`PowershellProcessConfiguration` deprecated.** Marked with
@@ -155,6 +159,75 @@ adheres to [Semantic Versioning](https://semver.org/).
 - Disposal docs corrected from "exactly three IDisposable types" to four
   (`ProcessConfigurationBuilder` included) across the root README, resource-disposal,
   troubleshooting, architecture, and guides-index docs.
+- `IExternalProcess.StartAsync(configuration, cancellationToken)` now honors
+  `ProcessConfiguration.RedirectStandardInput`. The overload previously force-enabled the
+  child's stdin redirect whenever a `StandardInput` writer was configured, even when the
+  configuration said redirection was off, while the instance overloads honored the flag.
+  A configured stdin writer with redirection disabled is now a documented no-op in every
+  path. The overload also absorbs kill-induced stdin copy faults at the join, matching
+  the instance overload's behavior, so cancellation no longer surfaces a broken pipe in
+  one path and not the other.
+- Graceful cancellation no longer loses or races its exceptions. The interrupt task's
+  faults are always observed (no more unobserved task exceptions) and an
+  `OperationCanceledException` surfaces to the caller deterministically when
+  `CancellationThrowsException` is set, never when it is false. The linked
+  `CancellationTokenSource` in the forceful-timeout wait is disposed even when the
+  semaphore wait throws with an already-cancelled token, so the token registration no
+  longer leaks.
+- `ProcessTimeoutPolicy.Enabled` is now honoured. A policy with `Enabled = false` enforces
+  no timeout in the exit-or-timeout, graceful-timeout, and forceful-timeout waits,
+  instead of being consulted only for equality comparisons while the kill timer armed
+  anyway.
+- Environment variables may have empty-string values. `EnvironmentVariablesSpec.SetPair`
+  and `SetEnumerable` rejected empty values with `ArgumentException`, though an empty
+  value is a valid way to clear a variable, and `FromProcessStartInfo` therefore threw
+  for `ProcessStartInfo` instances carrying one. Values must be non-null; keys must be
+  non-null and non-empty.
+- `ProcessInvokerConfigurationExtensions.FromProcessStartInfo` preserves stdin
+  redirection and argument lists. It previously ignored
+  `ProcessStartInfo.RedirectStandardInput` (always mapping the flag as off) and dropped
+  a non-empty `ArgumentList` entirely, losing arguments when the caller had used the
+  list API. A non-empty `ArgumentList` now takes precedence over the raw `Arguments`
+  string, matching how the invocation pipeline treats the list as canonical.
+- `StdoutMatches()` and `StderrIsEmpty()` validators honor raw results. The middleware
+  adapter that folds `CommonValidationRules` predicates into the pipeline forced a
+  failure for any non-buffered result, so `StderrIsEmpty()` always threw on a Raw
+  invocation even though the inner rule's documented semantics pass results that do not
+  expose standard error text. The adapter now delegates the null/non-buffered decision
+  to the inner rule itself, so each rule's own semantics hold.
+- `AddCliInvoke` registers `IProcessConfigurationBuilder` as a blank-builder factory.
+  The previous registration mapped the interface to `ProcessConfigurationBuilder` by
+  type, so `GetService<IProcessConfigurationBuilder>()` threw on every resolution: the
+  builder's only public constructor requires a target file path the container cannot
+  supply. Each lifetime now registers a factory that constructs a blank builder with an
+  empty target path; callers set the target via `SetTargetFilePath` before building.
+- `ProcessResult.ExitTime` is published by the time a wait returns. Exit time was
+  previously assigned only inside the `Exited` event handler, which can run after
+  `HasExited` already became true, so a reader could observe a default timestamp and a
+  bogus negative `RuntimeDuration`. Exit time is now set under a lock on every
+  confirmed-exit path, including the kill paths.
+- Rooted file paths in `FilePathResolver.ResolveFilePath` are validated for existence.
+  An absolute path previously skipped the existence check and returned a `FileInfo` for
+  a file that does not exist; it now throws `FileNotFoundException` like relative-path
+  resolution does, matching the `IFilePathResolver` contract.
+- Static `BufferedProcessResult.Equals(BufferedProcessResult?, BufferedProcessResult?)`
+  no longer throws a `NullReferenceException` for a null first argument; it is null-safe
+  like the `ProcessResult` equivalent.
+- `GetFirstOutputLine()` splits on `Environment.NewLine` only, matching
+  `GetOutputLines()` and `EnumerateOutputLines()`. It previously used a splitter that
+  also broke on lone `\n`, so the line APIs disagreed on `\n`-only output.
+- `UseDefaultShell()` wraps PowerShell with the same safe switch set as `UsePowerShell()`
+  (`-NoProfile -NonInteractive -Command`), instead of bare `-Command`, so profile
+  scripts can no longer run or block under the default-shell middleware. Its
+  unsupported-platform error message is now the generic shell message rather than the
+  PowerShell one.
+- `MiddlewareContext.Next` invokes only the next middleware and the rest of the chain.
+  It previously pointed at the fully composed chain head, so invoking it re-ran the
+  current middleware and everything upstream (unbounded recursion). The context keeps
+  one instance per run with one run-scoped token, as its documentation now states.
+- A conditional middleware's sub-chain no longer leaks its `MiddlewareContext` into the
+  outer chain: upstream middleware observing the context after `await next` and
+  downstream middleware in the outer chain both see the outer context again.
 
 - `WithMaxBufferedOutputBytes(config, null)` now clears the source
   configuration's buffer cap instead of silently inheriting it, so an explicit

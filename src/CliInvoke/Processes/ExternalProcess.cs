@@ -191,7 +191,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             {
                 // A copy fault that is an artifact of this instance's own kill machinery
                 // (a broken pipe after ForcefulExit) is absorbed here; a genuine
-                // source-stream read error propagates to the caller (ledger T006).
+                // source-stream read error propagates to the caller.
             }
         }
     }
@@ -239,7 +239,11 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             _processWrapper.Started += _startedHandler;
             _processWrapper.Exited += _exitedHandler;
 
-            if (configuration.StandardInput is not null
+            // Only force the redirect when the configuration actually enables it:
+            // a real StandardInput writer with RedirectStandardInput=false stays a
+            // no-op, exactly like the Start()/StartAsync(CancellationToken) overloads.
+            if (configuration.RedirectStandardInput
+                && configuration.StandardInput is not null
                 && configuration.StandardInput != StreamWriter.Null)
                 _processWrapper.StartInfo.RedirectStandardInput = true;
 
@@ -248,9 +252,22 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             wrapper = _processWrapper;
         }
 
-        if (configuration.StandardInput is not null)
-            await wrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
-                cancellationToken).ConfigureAwait(false);
+        if (configuration.StandardInput is not null
+            && wrapper.StartInfo.RedirectStandardInput)
+        {
+            try
+            {
+                await wrapper.PipeStandardInputAsync(configuration.StandardInput.BaseStream,
+                    cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception) when (wrapper.Canceled)
+            {
+                // A copy fault that is an artifact of this instance's own kill machinery
+                // (a broken pipe after ForcefulExit) is absorbed here, mirroring the
+                // StartAsync(CancellationToken) overload; a genuine source-stream read
+                // error propagates to the caller.
+            }
+        }
     }
 
     /// <summary>
@@ -331,7 +348,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             : Task.FromResult((string.Empty, string.Empty, false));
 
         // Feed stdin alongside the drain-and-wait so the copy runs at the child's
-        // pace instead of blocking ahead of it (ledger T003).
+        // pace instead of blocking ahead of it.
         Task standardInputCopy = Configuration.StandardInput is not null
             && wrapper.StartInfo.RedirectStandardInput
             ? wrapper.PipeStandardInputAsync(Configuration.StandardInput.BaseStream,
@@ -356,7 +373,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 // timeout/cancellation kill (a broken pipe after ForcefulExit) is
                 // absorbed at this join; a genuine source-stream read error leaves
                 // the kill machinery un-run and still propagates, as do any wait
-                // or drain faults (ledger T006).
+                // or drain faults.
             }
 
             BufferedProcessResult result = new BufferedProcessResult(wrapper.StartInfo.FileName,
@@ -425,11 +442,16 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     
     /// <summary>
     ///     Terminates the associated external process based on the specified exit configuration.
+    ///     <para>
+    ///     The behaviour depends on <see cref="ExitConfiguration"/>.RequestedCancellationExitBehaviour:
+    ///     <see cref="ProcessExitBehaviour.ForcefulExit"/> and
+    ///     <see cref="ProcessExitBehaviour.GracefulExit"/> wait for the process to exit (bounded by
+    ///     the configured timeout policy) and terminate it if it is still running;
+    ///     <see cref="ProcessExitBehaviour.WaitForExit"/> only waits for the process to exit on its
+    ///     own and does not terminate it; any other (out-of-range) value falls back to
+    ///     <see cref="Process.Kill()"/>.
+    ///     </para>
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown when an invalid value is provided for
-    ///     ExitConfiguration.TimeoutPolicy.CancellationMode.
-    /// </exception>
     public async Task Kill()
     {
         ProcessWrapper wrapper;

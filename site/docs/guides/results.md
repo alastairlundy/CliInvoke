@@ -101,7 +101,9 @@ services.AddCliInvoke(builder =>
 });
 ```
 
-`UsePostExitValidation` runs after the process exits and throws
+`UsePostExitValidation` folds the validator's rules into the invocation's
+exit configuration before the process runs; once the process exits, the
+pipeline runs the validator against the `ProcessResult` and throws
 `ProcessValidationException` (with per-rule failure messages) when the
 validator rejects the result. Helpers: `PostExitValidation.ExitCodeIsZero()`,
 `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`,

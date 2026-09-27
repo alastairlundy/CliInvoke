@@ -64,7 +64,8 @@ public static class PostExitValidation
 
     /// <summary>
     ///     Creates a validator that ensures the buffered process result's standard output matches the
-    ///     supplied regular expression.
+    ///     supplied regular expression. Results that do not expose buffered standard output text
+    ///     (non-buffered or <c>null</c> results) fail the rule, as dictated by the inner rule.
     /// </summary>
     /// <param name="regex">
     ///     The regular expression pattern to evaluate against
@@ -84,7 +85,8 @@ public static class PostExitValidation
 
     /// <summary>
     ///     Creates a validator that ensures the buffered process result's standard error is empty or
-    ///     whitespace only.
+    ///     whitespace only. Results that do not expose buffered standard error text (non-buffered or
+    ///     <c>null</c> results) pass the rule, as dictated by the inner rule.
     /// </summary>
     /// <returns>A validator enforcing empty standard error.</returns>
     public static IProcessResultValidator<ProcessResult> StderrIsEmpty()
@@ -98,13 +100,18 @@ public static class PostExitValidation
 
     /// <summary>
     ///     Adapts a <see cref="ValidationRule{BufferedProcessResult}"/> into a
-    ///     <see cref="ValidationRule{ProcessResult}"/> so it can validate any process result, failing
-    ///     non-buffered results as the inner rule dictates.
+    ///     <see cref="ValidationRule{ProcessResult}"/> so it can validate any process result.
+    ///     The inner rule stays the single source of truth for results that do not expose buffered
+    ///     text: when the supplied result is not a <see cref="BufferedProcessResult"/> (including a
+    ///     <c>null</c> result), the inner predicate is evaluated against a <c>null</c> buffered
+    ///     result, exactly what the inner rules treat "a result without buffered text" as. Rules
+    ///     that pass such results (e.g. standard-error-empty) therefore pass here, and rules that
+    ///     require buffered text (e.g. standard-output-match) fail here.
     /// </summary>
     private static ValidationRule<ProcessResult> ToProcessResultRule(ValidationRule<BufferedProcessResult> rule)
     {
         return new ValidationRule<ProcessResult>(
-            result => result is BufferedProcessResult buffered && rule.Predicate(buffered),
+            result => rule.Predicate((result as BufferedProcessResult)!),
             rule.Name,
             rule.FailureMessage,
             failureMessageFactory: null);

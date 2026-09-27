@@ -121,5 +121,14 @@ namespace CliInvoke.Specializations.Internal.Localizations {
                 return ResourceManager.GetString("Exceptions.Powershell.VersionNotFound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shell wrapping only supports Windows, macOS, Linux, and FreeBSD..
+        /// </summary>
+        internal static string Exceptions_Shell_OnlySupportedOnDesktop {
+            get {
+                return ResourceManager.GetString("Exceptions.Shell.OnlySupportedOnDesktop", resourceCulture);
+            }
+        }
     }
 }

@@ -93,12 +93,16 @@ public static class ProcessResultHelperExtensions
         /// <summary>
         /// Retrieves the first line of the standard output from the process result.
         /// </summary>
+        /// <remarks>
+        /// Splits on <see cref="Environment.NewLine" /> only, preserving the same contract
+        /// as <see cref="GetOutputLines" /> and <see cref="EnumerateOutputLines" />.
+        /// </remarks>
         /// <returns>
         /// A string representing the first line of the standard output. If the output is empty,
         /// an empty string will be returned.
         /// </returns>
         public string GetFirstOutputLine()
-            => GetFirstLineFromSpan(processResult.StandardOutput.AsSpan());
+            => GetFirstLine(processResult.StandardOutput);
 
         /// <summary>
         /// Splits the standard output and standard error of the process result into lines.
@@ -157,12 +161,13 @@ public static class ProcessResultHelperExtensions
 
 
     /// <summary>
-    ///     Returns the first line of the supplied text without allocating a full line array.
+    ///     Returns the first line of the supplied text without allocating a full line array,
+    ///     splitting on <see cref="Environment.NewLine" /> exactly like <see cref="EnumerateLines" />.
     /// </summary>
-    private static string GetFirstLineFromSpan(ReadOnlySpan<char> text)
+    private static string GetFirstLine(string text)
     {
-        foreach (ReadOnlySpan<char> line in text.EnumerateLines())
-            return line.ToString();
+        foreach (string line in EnumerateLines(text))
+            return line;
 
         return string.Empty;
     }

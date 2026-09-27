@@ -202,8 +202,13 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     /// <param name="left">The first BufferedProcessResult to compare.</param>
     /// <param name="right">The second BufferedProcessResult to compare.</param>
     /// <returns>True if the two BufferedProcessResult objects are equal; false otherwise.</returns>
-    public static bool Equals(BufferedProcessResult left, BufferedProcessResult? right) 
-        => left.Equals(right);
+    public static bool Equals(BufferedProcessResult? left, BufferedProcessResult? right) 
+    {
+        if (left is null)
+            return right is null;
+
+        return left.Equals(right);
+    }
 
     /// <summary>
     ///     Determines if a BufferedProcessResult is equal to another BufferedProcessResult.

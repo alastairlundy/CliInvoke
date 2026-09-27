@@ -24,8 +24,8 @@ namespace CliInvoke.Tests.Fuzzing;
 ///     Resource-owning members are matched by reference.
 /// </summary>
 /// <remarks>
-///     The member set is explicitly enumerated to track the T005 init-only
-///     property set. When v4 adds PipeSource (D009) or other init-only
+///     The member set is explicitly enumerated to track the init-only
+///     property set. When v4 adds PipeSource or other init-only
 ///     properties, extend <see cref="ExpectedPropertyCount"/> and add the
 ///     corresponding assertion in <see cref="DeriveEmptyDelta_PreservesAllProperties"/>.
 /// </remarks>
@@ -34,7 +34,7 @@ public class ProcessConfigurationDerivationPropertyTests
     /// <summary>
     ///     The number of init-only properties on
     ///     <see cref="ProcessConfiguration"/> that this test asserts.
-    ///     Must be updated when the T005 member set changes.
+    ///     Must be updated when the member set changes.
     /// </summary>
     private const int ExpectedPropertyCount = 16;
 
@@ -103,7 +103,7 @@ public class ProcessConfigurationDerivationPropertyTests
                 // ---------------------------------------------------------------
                 // Explicit member parity assertion.
                 //
-                // Every init-only property on ProcessConfiguration (the T005 set)
+                // Every init-only property on ProcessConfiguration
                 // is checked individually so that a missing member surfaces as a
                 // compile-time error, not a silent runtime gap.
                 //

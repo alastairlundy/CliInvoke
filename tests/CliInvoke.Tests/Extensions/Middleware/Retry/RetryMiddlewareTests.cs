@@ -118,7 +118,7 @@ public class RetryMiddlewareTests
             MaxAttempts = 3,
             BaseDelay = TimeSpan.FromMilliseconds(1)
         };
-        RetryMiddleware middleware = new RetryMiddleware(RetryConditions.ExitCodeZero(), options);
+        RetryMiddleware middleware = new RetryMiddleware(RetryConditions.NonZeroExitCode(), options);
         InvocationContext ctx = CreateContext();
 
         int attempts = 0;

@@ -44,4 +44,7 @@
     <data name="Exceptions.Powershell.OnlySupportedOnDesktop" xml:space="preserve">
         <value>Powershell only supports Windows, macOS, Linux, and FreeBSD.</value>
     </data>
+    <data name="Exceptions.Shell.OnlySupportedOnDesktop" xml:space="preserve">
+        <value>Shell wrapping only supports Windows, macOS, Linux, and FreeBSD.</value>
+    </data>
 </root>

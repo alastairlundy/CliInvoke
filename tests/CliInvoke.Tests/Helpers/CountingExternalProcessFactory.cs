@@ -19,7 +19,7 @@ namespace CliInvoke.Tests.Helpers;
 /// was called and the last <see cref="ProcessConfiguration"/> it received. Returns a stub
 /// <see cref="IExternalProcess"/> so tests can exercise the pipeline without actually starting a process.
 /// The stubs share <see cref="StdinPiping"/>, a piping seam that records the modelled
-/// copy/finally-close stdin contract (ledger T008).
+/// copy/finally-close stdin contract.
 /// </summary>
 internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, IDisposable
 {
@@ -41,7 +41,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
     ///     The stdin-piping event log shared with every stub process this factory creates.
     ///     The stub's modelled piping records copy start, copy completion/fault, and the
     ///     child-side write-end close here, so tests can assert close-on-every-exit-path
-    ///     and copy-before-close ordering deterministically (ledger T008).
+    ///     and copy-before-close ordering deterministically.
     /// </summary>
     public StdinPipingLog StdinPiping { get; } = new();
 
@@ -173,7 +173,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
                 }
                 catch (Exception) when (Canceled)
                 {
-                    // Join (mirror of ExternalProcess.StartAsync, ledger T006): a copy fault
+                    // Join (mirror of ExternalProcess.StartAsync): a copy fault
                     // that is an artifact of this stub's own kill machinery is absorbed here;
                     // source read errors and cancellation (Canceled false) propagate.
                 }
@@ -186,7 +186,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
             BeginStart(cancellationToken);
 
             // The configuration overload pipes whenever a stdin source is supplied and has
-            // no join of its own - every fault propagates, mirroring ExternalProcess (T006).
+            // no join of its own - every fault propagates, mirroring ExternalProcess.
             if (configuration.StandardInput is not null)
                 await PipeStandardInputAsync(configuration.StandardInput.BaseStream,
                     cancellationToken).ConfigureAwait(false);
@@ -207,8 +207,8 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
         }
 
         /// <summary>
-        ///     Models the wrapper's copy + finally-close stdin piping contract (ledger D003,
-        ///     T005): the source is copied into the stub child's stdin write end, and the
+        ///     Models the wrapper's copy + finally-close stdin piping contract: the
+        ///     source is copied into the stub child's stdin write end, and the
         ///     write end is closed in a <c>finally</c> on every exit path - successful copy,
         ///     cancellation, source error, or kill-induced fault. The caller's source stream
         ///     is never closed or disposed here.
@@ -247,7 +247,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
         }
 
         /// <summary>
-        ///     Models the buffered capture join (ledger T003, T006): the stdin copy runs
+        ///     Models the buffered capture join: the stdin copy runs
         ///     alongside the wait and drain, and the join absorbs a copy fault only when it
         ///     is an artifact of this stub's own kill machinery; source read errors and any
         ///     wait/drain fault propagate.
@@ -279,7 +279,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
                                     && !drainTask.IsFaulted
                                     && Canceled)
             {
-                // Kill artifact absorbed at the join (ledger T006); a genuine source-stream
+                // Kill artifact absorbed at the join; a genuine source-stream
                 // read error leaves the kill machinery un-run (Canceled false) and propagates.
             }
 
@@ -316,7 +316,7 @@ internal enum StdinPipingEvent
 /// <summary>
 ///     Deterministic record of a stub child's stdin piping: the ordered events plus the
 ///     child-side write end the copy targets. This is the piping seam <see cref="IExternalProcess"/>
-///     cannot express (ledger T008).
+///     cannot express.
 /// </summary>
 internal sealed class StdinPipingLog
 {
@@ -340,7 +340,7 @@ internal sealed class StdinPipingLog
 
     /// <summary>
     ///     When armed, writes to the write end fail with an <see cref="IOException"/> -
-    ///     the broken pipe a library kill leaves behind mid-copy (ledger T006).
+    ///     the broken pipe a library kill leaves behind mid-copy.
     /// </summary>
     public bool ArmBrokenPipe { get; set; }
 
@@ -445,7 +445,7 @@ internal sealed class RecordingStdinWriteEnd : Stream
 ///     or throws a prescribed fault from the second read onward (<see cref="FaultAfterFirstRead"/>),
 ///     so cancellation and source-error exits are injected deterministically mid-copy.
 ///     Tests assert <see cref="CanRead"/> stays true after every exit path - the library
-///     must never close it (ledger D003).
+///     must never close it.
 /// </summary>
 internal sealed class InjectableStdinSourceStream : Stream
 {

@@ -117,7 +117,7 @@ public class OutputTruncationHandoffTests
     [Test]
     public async Task ExecuteBufferedAsync_WithoutTruncationMiddleware_ExitConfigurationCap_Truncates()
     {
-        // T005 constraint: the configuration path serves callers without middleware. A cap set on the
+        // The configuration path serves callers without middleware. A cap set on the
         // exit configuration is honored even when no truncation middleware is registered.
         IServiceCollection services = new ServiceCollection();
         services.AddCliInvoke();

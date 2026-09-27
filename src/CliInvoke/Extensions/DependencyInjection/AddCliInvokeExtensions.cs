@@ -27,7 +27,11 @@ namespace CliInvoke.Extensions;
 /// <remarks>
 ///     <para>
 ///         These methods register CliInvoke's core services and CliInvoke's core built-in
-///         middleware (<c>LoggingMiddleware</c>, <c>RetryMiddleware</c>).
+///         middleware (<c>LoggingMiddleware</c>, <c>RetryMiddleware</c>). The registered
+///         <c>IProcessConfigurationBuilder</c> resolves to a blank builder with an empty
+///         target path: the only public constructor takes the target file path, which the
+///         container cannot supply, so callers set the target via <c>SetTargetFilePath</c>
+///         before building.
 ///     </para>
 ///     <para>
 ///         Platform middleware shipped in the CliInvoke.Specializations package
@@ -106,9 +110,9 @@ public static class AddCliInvokeExtensions
                         new ProcessResultValidator<BufferedProcessResult>(
                             [CommonValidationRules<BufferedProcessResult>.ExitCodeZeroRule()]));
 
-                    services.AddSingleton<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
-
                     services.AddSingleton<IExternalProcessFactory, ExternalProcessFactory>();
+                    services.AddSingleton<IProcessConfigurationBuilder>(_ =>
+                        new ProcessConfigurationBuilder(string.Empty));
 
                     if (configure is not null)
                     {
@@ -139,9 +143,9 @@ public static class AddCliInvokeExtensions
                         new ProcessResultValidator<BufferedProcessResult>(
                             [CommonValidationRules<BufferedProcessResult>.ExitCodeZeroRule()]));
 
-                    services.AddScoped<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
-
                     services.AddScoped<IExternalProcessFactory, ExternalProcessFactory>();
+                    services.AddScoped<IProcessConfigurationBuilder>(_ =>
+                        new ProcessConfigurationBuilder(string.Empty));
 
                     if (configure is not null)
                     {
@@ -172,9 +176,9 @@ public static class AddCliInvokeExtensions
                         new ProcessResultValidator<BufferedProcessResult>(
                             [CommonValidationRules<BufferedProcessResult>.ExitCodeZeroRule()]));
 
-                    services.AddTransient<IProcessConfigurationBuilder, ProcessConfigurationBuilder>();
-
                     services.AddTransient<IExternalProcessFactory, ExternalProcessFactory>();
+                    services.AddTransient<IProcessConfigurationBuilder>(_ =>
+                        new ProcessConfigurationBuilder(string.Empty));
 
                     if (configure is not null)
                     {
@@ -241,7 +245,7 @@ public static class AddCliInvokeExtensions
             services.TryAdd(ServiceDescriptor.Describe(
                 typeof(RetryMiddleware),
                 sp => new RetryMiddleware(
-                    sp.GetService<IRetryClassifier>() ?? RetryConditions.ExitCodeZero(),
+                    sp.GetService<IRetryClassifier>() ?? RetryConditions.NonZeroExitCode(),
                     sp.GetService<RetryOptions>() ?? RetryOptions.Default),
                 lifetime));
         }

@@ -19,7 +19,8 @@ public static class RetryMiddlewareExtensions
     {
         /// <summary>
         ///     Adds retry middleware to the process pipeline using the default options and the
-        ///     default retry classifier (exit-code-zero, resolved from the dependency injection container).
+        ///     default retry classifier (retries on a non-zero exit code, resolved from the
+        ///     dependency injection container).
         /// </summary>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="builder"/> is <c>null</c>.</exception>
@@ -59,7 +60,7 @@ public static class RetryMiddlewareExtensions
             ArgumentNullException.ThrowIfNull(builder);
             ArgumentNullException.ThrowIfNull(options);
 
-            return builder.UseMiddleware(new RetryMiddleware(RetryConditions.ExitCodeZero(), options));
+            return builder.UseMiddleware(new RetryMiddleware(RetryConditions.NonZeroExitCode(), options));
         }
 
         /// <summary>

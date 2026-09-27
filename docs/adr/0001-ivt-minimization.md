@@ -74,9 +74,9 @@ was rejected because no reference direction from Core supports that layout.
 
 `ProcessConfigurationDerivation` (internal, in `CliInvoke.Internal`) is consumed
 by the Specializations shell middleware, which must derive configurations from
-a caller-supplied source. Public promotion was rejected per T010 — the hook is
-an internal plumbing seam, not an extensibility point. Relocation was rejected
-per T011 — the hook depends on `ProcessConfigurationBuilder` internals that live
+a caller-supplied source. Public promotion was rejected — the hook is
+an internal plumbing seam, not an extensibility point. Relocation was rejected —
+the hook depends on `ProcessConfigurationBuilder` internals that live
 in the CliInvoke implementation package, so no self-contained relocation exists.
 
 Because .NET IVT is assembly-wide, this grant exposes the *entire* internal surface

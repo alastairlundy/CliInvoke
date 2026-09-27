@@ -21,9 +21,9 @@ public static class PlatformMiddlewareExtensions
         ///     Adds <see cref="PowerShellMiddleware"/> to the process invocation pipeline.
         /// </summary>
         /// <remarks>
-        ///     Configure <see cref="ShellMiddlewareOptions"/> via the dependency injection
-        ///     container to customise window-creation and shell-execution behaviour.
-        ///     When no options are registered, <see cref="ShellMiddlewareOptions.Default"/> is used.
+        ///     Register a <see cref="ShellMiddlewareOptions"/> instance in the dependency
+        ///     injection container to customise window-creation and shell-execution behaviour.
+        ///     When no instance is registered, <see cref="ShellMiddlewareOptions.Default"/> is used.
         /// </remarks>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">
@@ -51,6 +51,14 @@ public static class PlatformMiddlewareExtensions
         /// <summary>
         ///     Adds <see cref="CmdMiddleware"/> to the process invocation pipeline.
         /// </summary>
+        /// <remarks>
+        ///     <c>CmdMiddleware</c> honors the source <see cref="ProcessConfiguration"/>'s
+        ///     <see cref="ProcessConfiguration.WindowCreation"/> and
+        ///     <see cref="ProcessConfiguration.UseShellExecution"/> flags rather than
+        ///     <see cref="ShellMiddlewareOptions"/>: registering that options type affects
+        ///     <c>UsePowerShell()</c> and <c>UseDefaultShell()</c> only. Set the flags on the
+        ///     per-invocation configuration to change cmd wrapping behaviour.
+        /// </remarks>
         /// <returns>The builder for fluent chaining.</returns>
         /// <exception cref="ArgumentNullException">
         ///     Thrown when <paramref name="builder"/> is <c>null</c>.
@@ -82,8 +90,11 @@ public static class PlatformMiddlewareExtensions
         ///     Requires <see cref="IShellDetector"/> to be registered (via <c>AddCliInvoke</c>) and
         ///     <see cref="ShellMiddlewareOptions"/> (registered by <c>AddCliInvokeSpecializations</c>).
         ///     The detected shell determines how the original command is wrapped: cmd runs it via
-        ///     <c>/c</c>, pwsh and Windows PowerShell via <c>-Command</c>, and any other detected
-        ///     shell (for example sh or bash) is wrapped as a POSIX shell invoked with <c>-c</c>.
+        ///     <c>/c</c>, pwsh and Windows PowerShell via
+        ///     <see cref="PowerShellMiddleware.PowerShellRunnerArgs"/> (equivalent to
+        ///     <c>-NoProfile -NonInteractive -Command</c>, the same switch set
+        ///     <c>UsePowerShell()</c> uses), and any other detected shell (for example sh or bash)
+        ///     is wrapped as a POSIX shell invoked with <c>-c</c>.
         ///     <see cref="PlatformNotSupportedException"/> is thrown at invocation time only on
         ///     platforms where this middleware is unsupported (iOS, tvOS, browser, and watchOS).
         /// </remarks>

@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Linq;
+
 using CliInvoke.Core.Exceptions;
 using CliInvoke.Validation;
 
@@ -75,14 +77,45 @@ public class ProcessResultHelperExtensionsTests
     [Test]
     public async Task GetFirstOutputLine_ReturnsFirstLine()
     {
-        // Arrange
-        BufferedProcessResult result = MakeBuffered("first line\nsecond line\nthird", "");
+        // Arrange - use the platform's newline so the split is deterministic across OSes.
+        string nl = Environment.NewLine;
+        BufferedProcessResult result = MakeBuffered($"first line{nl}second line{nl}third", "");
 
         // Act
         string first = result.GetFirstOutputLine();
 
         // Assert
         await Assert.That(first).IsEqualTo("first line");
+    }
+
+    [Test]
+    public async Task GetFirstOutputLine_LoneNewline_MatchesGetOutputLinesContract()
+    {
+        // Arrange - a lone \n is not a separator on Windows; GetFirstOutputLine must
+        // agree with GetOutputLines rather than MemoryExtensions.EnumerateLines.
+        BufferedProcessResult result = MakeBuffered("first line\nsecond line", "");
+
+        // Act
+        string first = result.GetFirstOutputLine();
+        (string[] stdout, _) = result.GetOutputLines();
+
+        // Assert
+        await Assert.That(first).IsEqualTo(stdout[0]);
+    }
+
+    [Test]
+    public async Task GetFirstOutputLine_WithPlatformNewline_MatchesEnumerateOutputLines()
+    {
+        // Arrange
+        string nl = Environment.NewLine;
+        BufferedProcessResult result = MakeBuffered($"a{nl}b{nl}", "");
+
+        // Act
+        string first = result.GetFirstOutputLine();
+        string firstEnumerated = result.EnumerateOutputLines().First();
+
+        // Assert
+        await Assert.That(first).IsEqualTo(firstEnumerated);
     }
 
     [Test]

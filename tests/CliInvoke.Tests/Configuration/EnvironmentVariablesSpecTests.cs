@@ -42,7 +42,7 @@ public class EnvironmentVariablesSpecTests
     }
 
     [Test]
-    public async Task SetPair_RejectsNullOrEmptyNameOrValue()
+    public async Task SetPair_RejectsNullOrEmptyNameOrNullValue()
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
@@ -51,7 +51,21 @@ public class EnvironmentVariablesSpecTests
         await Assert.That(() => spec.SetPair(null!, "v")).Throws<ArgumentException>();
         await Assert.That(() => spec.SetPair("", "v")).Throws<ArgumentException>();
         await Assert.That(() => spec.SetPair("k", null!)).Throws<ArgumentException>();
-        await Assert.That(() => spec.SetPair("k", "")).Throws<ArgumentException>();
+    }
+
+    [Test]
+    public async Task SetPair_AllowsEmptyValue()
+    {
+        // Arrange - an empty value is a legitimate way to clear a variable.
+        EnvironmentVariablesSpec spec = new();
+
+        // Act
+        spec.SetPair("KEY", "");
+
+        // Assert
+        IReadOnlyDictionary<string, string> built = spec.Build();
+        await Assert.That(built).ContainsKey("KEY");
+        await Assert.That(built["KEY"]).IsEqualTo("");
     }
 
     [Test]
@@ -109,6 +123,31 @@ public class EnvironmentVariablesSpecTests
 
         // Assert
         await Assert.That(() => spec.SetEnumerable((IEnumerable<KeyValuePair<string, string>>)null!))
+            .Throws<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task SetEnumerable_AllowsEmptyValues_RejectsNullValues()
+    {
+        // Arrange - empty values are legitimate; null values are not.
+        EnvironmentVariablesSpec spec = new();
+        List<KeyValuePair<string, string>> vars = new()
+        {
+            new("EMPTY", ""),
+        };
+
+        // Act
+        spec.SetEnumerable(vars);
+
+        // Assert
+        await Assert.That(spec.Build()["EMPTY"]).IsEqualTo("");
+
+        List<KeyValuePair<string, string>> withNull = new()
+        {
+            new("NULL", null!),
+        };
+
+        await Assert.That(() => spec.SetEnumerable(withNull))
             .Throws<ArgumentNullException>();
     }
 

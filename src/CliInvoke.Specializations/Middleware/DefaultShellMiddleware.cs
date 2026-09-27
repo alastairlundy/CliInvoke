@@ -12,8 +12,30 @@ using CliInvoke.Internal;
 namespace CliInvoke.Specializations.Middleware;
 
 /// <summary>
-/// 
+///     Middleware that resolves the system default shell at invocation time (via
+///     <see cref="IShellDetector"/>) and rewrites the <see cref="InvocationContext.Configuration"/>
+///     to execute the original command inside it. PowerShell targets are wrapped with the shared
+///     <see cref="PowerShellMiddleware.PowerShellRunnerArgs"/> switch set,
+///     cmd with <c>/c</c>, and any other detected shell with <c>-c</c>.
 /// </summary>
+/// <remarks>
+///     <para>
+///         Window creation and shell-execution behaviour come from the
+///         <see cref="ShellMiddlewareOptions"/> instance registered in the dependency injection
+///         container (or <see cref="ShellMiddlewareOptions.Default"/> when none is registered).
+///     </para>
+///     <para>
+///         The source configuration's <see cref="ProcessConfiguration.OutputRedirection"/> flag is
+///         overwritten on every invocation to match the invocation mode: forced off in
+///         <see cref="InvocationMode.Raw"/>, forced on otherwise. This protective overwrite prevents
+///         a raw-mode pipe deadlock. Raw mode waits for process exit without draining redirected
+///         output, so a redirected pipe nobody reads would fill up and block the child process.
+///     </para>
+///     <para>
+///         On iOS, tvOS, browser, and watchOS, invocation throws
+///         <see cref="PlatformNotSupportedException"/> at runtime.
+///     </para>
+/// </remarks>
 [UnsupportedOSPlatform("browser")]
 [UnsupportedOSPlatform("ios")]
 [UnsupportedOSPlatform("tvos")]
@@ -81,11 +103,12 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
                 b => b.SetOutputRedirection(context.Mode != InvocationMode.Raw));
 
             // Shell switches are caller-owned: each kind needs its own execution switch to
-            // make the composed inner command run rather than being ignored.
+            // make the composed inner command run rather than being ignored. PowerShell uses
+            // the shared safe switch set so wrapping here matches PowerShellMiddleware.
             string runnerArgs = kind switch
             {
                 ShellKind.Cmd => "/c",
-                ShellKind.PowerShell => "-Command",
+                ShellKind.PowerShell => PowerShellMiddleware.PowerShellRunnerArgs,
                 _ => "-c"
             };
 
@@ -115,7 +138,7 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
             OperatingSystem.IsBrowser() || OperatingSystem.IsWatchOS())
         {
             throw new PlatformNotSupportedException(Resources
-                .Exceptions_Powershell_OnlySupportedOnDesktop);
+                .Exceptions_Shell_OnlySupportedOnDesktop);
         }
     }
 }

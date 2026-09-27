@@ -76,17 +76,19 @@ builder.Services.AddCliInvokeSpecializations(); // registers the platform middle
 
 * `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). A built-in heuristic redacts the values following the sensitive flags (`--password`, `--token`, `--api-key`); captured stdout/stderr lines are redacted too. The middleware class is `internal` and `UseLogging()` takes no parameters, so there is no public way to supply a custom redactor — the built-in heuristic is always used. Its `ILogger` is constructor-injected from the DI container at pipeline build time; when no logger is registered, a no-op `NullLogger` is used.
 * `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
-* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowerShellMiddleware` and `ProcessConfiguration`. To configure non-default behaviour, register `ShellMiddlewareOptions` (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties) in the DI container — for example:
+* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowerShellMiddleware` and `ProcessConfiguration`. `PowerShellMiddleware` and `DefaultShellMiddleware` read those two flags from a `ShellMiddlewareOptions` instance resolved directly out of the DI container (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties). Register the instance itself:
 
   ```csharp
   using CliInvoke.Specializations.Middleware; // ShellMiddlewareOptions
 
-  services.Configure<ShellMiddlewareOptions>(o =>
+  services.AddSingleton(new ShellMiddlewareOptions
   {
-      o.WindowCreation = true;
-      o.UseShellExecution = true;
+      WindowCreation = true,
+      UseShellExecution = false,
   });
   ```
+
+  The middleware resolves the `ShellMiddlewareOptions` instance, not an `IConfigureOptions<ShellMiddlewareOptions>`, so `services.Configure<ShellMiddlewareOptions>(...)` silently does nothing — it registers configuration objects that nothing consumes. Register your instance before `AddCliInvokeSpecializations()`: its `TryAdd` registration then leaves your instance in place. When no instance is registered, `ShellMiddlewareOptions.Default` (both flags `false`) is used. `UseCmd()` does not read `ShellMiddlewareOptions` at all — see [Shell middleware settings and output redirection](#shell-middleware-settings-and-output-redirection) below.
 
   Shell wrapping is delivered via the shell middleware on plain `ProcessConfiguration`.
   The `ShellArgumentEscaper` type is no longer public — escaping is an internal concern
@@ -114,6 +116,14 @@ var config = new ProcessConfiguration("Get-Process");
   `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour is enforced by `CmdMiddleware`.
 
   The `PowerShellMiddleware`/`CmdMiddleware`/`DefaultShellMiddleware` types behind `UsePowerShell()`/`UseCmd()`/`UseDefaultShell()` are registered in the DI container by `AddCliInvokeSpecializations()` (shipped in the `CliInvoke.Specializations` package). Call it alongside `AddCliInvoke` with the same `ServiceLifetime`; without it, resolving the invoker throws `InvalidOperationException` because the middleware types are not registered.
+
+### Shell middleware settings and output redirection
+
+Two behaviours of the shell middleware are easy to get wrong when configuring them:
+
+* **`UseCmd` reads its flags from the configuration, not from `ShellMiddlewareOptions`.** `CmdMiddleware` takes `WindowCreation` and `UseShellExecution` from the source `ProcessConfiguration` of each invocation; it never reads a `ShellMiddlewareOptions` instance. Registering `ShellMiddlewareOptions` therefore affects `UsePowerShell()` and `UseDefaultShell()` only. To give a cmd-wrapped invocation a window or shell-execution semantics, set `WindowCreation` / `UseShellExecution` on the `ProcessConfiguration` itself.
+
+* **`OutputRedirection` is overwritten on every invocation.** `PowerShellMiddleware`, `CmdMiddleware`, and `DefaultShellMiddleware` all overwrite the source configuration's `OutputRedirection` flag before the next stage runs: it is forced off when the invocation mode is `InvocationMode.Raw`, and forced on otherwise. The overwrite is protective, not cosmetic. `Raw` mode waits for process exit without draining redirected streams, so a redirected pipe that nobody reads would fill up and block the child process; buffered invocations need the redirect on so output can be captured. The `OutputRedirection` value you set on a `ProcessConfiguration` does not survive shell wrapping.
 
 ## Wrapping only some invocations in a shell
 

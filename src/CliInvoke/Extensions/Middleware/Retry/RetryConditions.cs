@@ -18,10 +18,10 @@ public static class RetryConditions
     ///     Returns a classifier that retries whenever the exit code is non-zero.
     /// </summary>
     /// <returns>An <see cref="IRetryClassifier"/> that retries on non-zero exit codes.</returns>
-    public static IRetryClassifier ExitCodeZero()
-        => new ExitCodeZeroClassifier();
+    public static IRetryClassifier NonZeroExitCode()
+        => new NonZeroExitCodeClassifier();
 
-    private sealed class ExitCodeZeroClassifier : IRetryClassifier
+    private sealed class NonZeroExitCodeClassifier : IRetryClassifier
     {
         public bool ShouldRetry(ProcessResult result)
             => result.ExitCode != 0;

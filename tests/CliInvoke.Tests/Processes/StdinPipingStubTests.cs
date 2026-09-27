@@ -12,7 +12,7 @@ using TUnit.Assertions.Enums;
 namespace CliInvoke.Tests.Processes;
 
 /// <summary>
-///     Deterministic stub matrix for the stdin-piping contract (ledger T008): the child
+///     Deterministic stub matrix for the stdin-piping contract: the child
 ///     process, its kill machinery, and all process timing are stubbed, so close-on-every
 ///     -exit-path, copy-before-close ordering, and the join fault rules are asserted with
 ///     no real processes and no wall-clock or kill-timing dependence. Real-executable
@@ -44,7 +44,7 @@ public class StdinPipingStubTests : IDisposable
 
     /// <summary>
     ///     Success exit: the copy completes, the write end then closes, and the caller's
-    ///     source stream is left untouched (close per D003; ordering per T008).
+    ///     source stream is left untouched.
     /// </summary>
     [Test]
     public async Task Raw_SuccessfulCopy_ClosesWriteEndAfterCopy_LeavesSourceUntouched()
@@ -70,7 +70,7 @@ public class StdinPipingStubTests : IDisposable
 
     /// <summary>
     ///     Cancellation exit: the token cancels the copy mid-flight; the write end still
-    ///     closes in the finally and the caller's source stream stays untouched (D003).
+    ///     closes in the finally and the caller's source stream stays untouched.
     /// </summary>
     [Test]
     public async Task Raw_CancellationMidCopy_StillClosesWriteEnd_LeavesSourceUntouched()
@@ -101,7 +101,7 @@ public class StdinPipingStubTests : IDisposable
 
     /// <summary>
     ///     Kill exit on the StartAsync join: the kill-induced copy fault is absorbed rather
-    ///     than thrown, and the write end still closes (absorb per T006; close per D003).
+    ///     than thrown, and the write end still closes.
     /// </summary>
     [Test]
     public async Task Raw_KillInducedCopyFault_IsAbsorbedAtStartAsyncJoin_ClosesWriteEnd()
@@ -131,7 +131,7 @@ public class StdinPipingStubTests : IDisposable
 
     /// <summary>
     ///     Kill exit on the CaptureBufferedResultAsync join: same absorption with the
-    ///     copy, wait and drain joined concurrently (absorb per T006; close per D003).
+    ///     copy, wait and drain joined concurrently.
     /// </summary>
     [Test]
     public async Task Buffered_KillInducedCopyFault_IsAbsorbedAtCaptureJoin_ClosesWriteEnd()
@@ -160,8 +160,7 @@ public class StdinPipingStubTests : IDisposable
 
     /// <summary>
     ///     Genuine source-stream read error: it propagates out of the capture join instead
-    ///     of being swallowed, after the write end has closed (propagate per T006;
-    ///     close per D003).
+    ///     of being swallowed, after the write end has closed.
     /// </summary>
     [Test]
     public async Task Buffered_SourceReadError_PropagatesAtCaptureJoin_AfterClosingWriteEnd()
