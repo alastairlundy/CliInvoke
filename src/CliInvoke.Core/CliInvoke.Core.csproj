@@ -22,23 +22,10 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.1.0-alpha.1</PackageVersion>
-        <PackageReleaseNotes>#### Added
-- `IsExitCodeZero()` extension on `ProcessResult` — returns `true` when
-  `ExitCode` equals zero.
-- `EnsureExitCodeZero()` extension on `ProcessResult` — throws
-  `ProcessNotSuccessfulException&lt;TProcessResult&gt;` when `ExitCode` is
-  non-zero.
-- `EnumerateOutputLines()` and `EnumerateErrorLines()` lazy extensions
-  on `BufferedProcessResult` — split output on `Environment.NewLine`
-  without allocating an intermediate array.
-- `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`
-  for tuple deconstruction.
-
-#### Changed
--  Overwrote base ToString method in `ProcessResult` - `ProcessResult.ToString` now returns bracketed diagnostic format text:
-  `[ExitCode=N, Path=..., Runtime=...]`.
-- Overwrote base ToString method in `BufferedProcessResult` - `BufferedProcessResult.ToString()`now returns bracketed diagnostic format with stdout/stderr length indicators and optional `Truncated=true`.</PackageReleaseNotes>
+        <PackageVersion>3.1.0-beta.1</PackageVersion>
+        <PackageReleaseNotes>#### Fixed
+- `ProcessExitConfiguration.CancellationThrowsException` is now honoured
+- The default `ProcessResourcePolicy` affinity mask now selects every logical processor instead of pinning multi-core machines to half the cores.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>3.1.0.0</AssemblyVersion>
         <FileVersion>3.1.0.0</FileVersion>

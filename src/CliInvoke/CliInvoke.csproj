@@ -14,19 +14,28 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### Changes
-* Added a Windows command-line pre-start check to check against the Windows command-line's limit of 32767 characters
-* Added Start-failure exception mapping for unknown Win32 error codes -  Previously every
-  non-file-not-found start failure surfaced as `UnauthorizedAccessException`. Known codes now
-  map to their natural .NET types (`FileNotFoundException` for Win32 codes 2/3,
-  `UnauthorizedAccessException` for code 5, `BadImageFormatException` for code 193), and all
-  other codes rethrow the original `Win32Exception` (carrying `NativeErrorCode`). 
-* Made `ShellArgumentEscaper` internal - Callers should rely exclusively on the public shell
-  middleware (`UseCmd()` / `UsePowerShell()`), not internal composition types.</PackageReleaseNotes>
+        <PackageReleaseNotes>#### Added
+- Stdin piping guide; stdin contract tests and derivation property tests.
+
+#### Changed
+- All six `ProcessConfiguration` derivation sites (shell middleware, `ShellRewriter` branches) now build through the internal `ProcessConfigurationDerivation.Derive` hook; `WithValidationRules`/`WithMaxBufferedOutputBytes` share one copy routine. No public API change.
+- `RetryConditions.ExitCodeZero()` renamed to `NonZeroExitCode()` (the old name meant the opposite); update pre-release call sites.
+- ADR-0001 updated; no new IVT grant.
+
+## Fixed
+- `StartAsync(CancellationToken)` returns at launch again instead of waiting for exit; call `WaitForExitOrTimeoutAsync`/`CaptureBufferedResultAsync` explicitly. Raw-mode timeouts fire mid-run again.
+- `IExternalProcess.StartAsync(config, ct)` honors `RedirectStandardInput`; a configured stdin writer with redirection disabled is a no-op everywhere.
+- Graceful cancellation is deterministic: `CancellationThrowsException` is honoured when set and never when false; interrupt faults are observed; `ProcessTimeoutPolicy.Enabled = false` really disables timeouts; no more token leakage.
+- `MiddlewareContext.Next` no longer re-runs the current middleware; sub-chains no longer leak the outer context; `ProcessMiddlewareBuilder.Build()` preserves registration order.
+- `UseDefaultShell()` uses the safe PowerShell switch set (`-NoProfile -NonInteractive -Command`).
+- `WithMaxBufferedOutputBytes(config, null)` clears the cap (unbounded) instead of inheriting it.
+- Empty-string environment variable values are allowed (clearing a variable); keys stay non-empty.
+- `AddCliInvoke` resolves `IProcessConfigurationBuilder` as a blank-builder factory instead of throwing.
+- XML doc corrections.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.1.0-alpha.1</PackageVersion>
+        <PackageVersion>3.1.0-beta.1</PackageVersion>
         <AssemblyVersion>3.1.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
