@@ -127,6 +127,13 @@ Session: technical-grilling over adding .NET 11 support to CliInvoke and the acc
 - **Constraints**: Step 7.1 filename confirmation skipped (existing file named by D001); blueprint §2.3 drops the union-migration clause per D005 in the same edit; the Ledger Reference section extends to cite the dotnet11 ledger records.
 - **Cites**: D001, D005
 
+### [I003] - ticket proposal validation
+
+- **Prompt**: "A few things to check: Which tickets, if any, would you combine, split, or rescope? Are there any spec requirements not yet covered by a ticket, or any ticket that doesn't trace back to a requirement? Are there any tickets where the `Blocked by` chain or Independent/Collaborative classification feels off?"
+- **User Response**: "Agree with decomposition" — full pass on ticket boundaries, coverage, and the `Blocked by` chain.
+- **Resolution**: The 7-ticket vertical-slice decomposition (TK001–TK007) is approved as proposed; no combining, splitting, rescoping, or coverage additions. Generation proceeds with the recorded dependencies and the one-prerelease-train grouping.
+- **Notes**: User also resolved the output target (local markdown files under `tickets/`) and PR count (one PR) in the same session.
+
 <!-- next-d: D010 -->
 <!-- next-t: T006 -->
-<!-- next-i: I003 -->
+<!-- next-i: I004 -->
