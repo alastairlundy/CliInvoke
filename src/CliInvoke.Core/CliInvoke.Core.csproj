@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net10.0</TargetFrameworks>
-        <LangVersion>14</LangVersion>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
         <Nullable>enable</Nullable>
         <PackageId>CliInvoke.Core</PackageId>
         <Title>CliInvoke.Core</Title>
@@ -22,7 +21,7 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.1.0-beta.1</PackageVersion>
+        <PackageVersion>3.2.0-alpha.1</PackageVersion>
         <PackageReleaseNotes>#### Fixed
 - `ProcessExitConfiguration.CancellationThrowsException` is now honoured
 - The default `ProcessResourcePolicy` affinity mask now selects every logical processor instead of pinning multi-core machines to half the cores.</PackageReleaseNotes>
