@@ -424,6 +424,10 @@ are two supported rewrite paths:
   `ProcessConfiguration` and pass that rewritten configuration to the
   invoker.
 
+When the runner is not a shell, a target path that starts with `-`
+gets a `--` option terminator inserted before it in the runner's
+argument list.
+
 #### 3. Result validation — `IProcessResultValidator` and exit-configuration rules
 
 Result validation has one execution path and one caller-facing helper

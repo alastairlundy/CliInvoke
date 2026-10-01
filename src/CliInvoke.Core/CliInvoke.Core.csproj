@@ -22,10 +22,8 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.1.0-beta.1</PackageVersion>
-        <PackageReleaseNotes>#### Fixed
-- `ProcessExitConfiguration.CancellationThrowsException` is now honoured
-- The default `ProcessResourcePolicy` affinity mask now selects every logical processor instead of pinning multi-core machines to half the cores.</PackageReleaseNotes>
+        <PackageVersion>3.1.0-beta.2</PackageVersion>
+        <PackageReleaseNotes>Version aligned with the CliInvoke 3.1.0-beta.2 release. This package has no code changes.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>3.1.0.0</AssemblyVersion>
         <FileVersion>3.1.0.0</FileVersion>
