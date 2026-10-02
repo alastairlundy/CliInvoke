@@ -62,6 +62,17 @@ internal class ProcessWrapper : Process
     // Resolved cancellation reason, persisted across the wait so Canceled can be computed afterward.
     private CancellationReason _cancellationReason = CancellationReason.NotKnown;
 
+#if NET11_0
+    // True while a process created suspended via ProcessStartInfo.StartSuspended
+    // (net11.0 leg, Windows/macOS only — set in Start()) is still awaiting its initial
+    // release. This is a one-shot: ResumeProcess consumes it when it delivers the
+    // creation-suspended release through SafeProcessHandle.Resume(); every resume after
+    // that takes the per-OS control-adapter route, which resumes all threads and keeps
+    // the public Suspend/Resume pair symmetric. Also tells OnStarted that no post-start
+    // suspend step is needed.
+    private bool _awaitingInitialResume;
+#endif
+
     internal ProcessWrapper(ProcessConfiguration configuration,
         FileInfo resolvedFilePath)
     {
@@ -128,16 +139,26 @@ internal class ProcessWrapper : Process
             // suspend/resume cycle in that case to avoid races on process handles.
             if (HasExited) return;
 
-            // TODO: Replace with ProcessStartInfo.StartSuspended + SafeProcessHandle.Resume()
-            // on Windows and macOS when .NET 11 is added as a target framework.
-            try
+#if NET11_0
+            // On the net11.0 leg, Windows/macOS processes are created suspended via
+            // ProcessStartInfo.StartSuspended (see Start()), so they cannot have run yet
+            // and no suspend step is needed here — the process is simply resumed below
+            // after the resource policy has been applied. Linux/FreeBSD (StartSuspended
+            // is unsupported there) and shell-executed starts (StartSuspended is
+            // incompatible with UseShellExecute) fall through to the legacy
+            // suspend → apply → resume cycle.
+            if (!_awaitingInitialResume)
+#endif
             {
-                SuspendProcess();
-            }
-            catch (InvalidOperationException)
-            {
-                // Process exited before we could suspend it.
-                return;
+                try
+                {
+                    SuspendProcess();
+                }
+                catch (InvalidOperationException)
+                {
+                    // Process exited before we could suspend it.
+                    return;
+                }
             }
 
             try
@@ -163,6 +184,15 @@ internal class ProcessWrapper : Process
                     // The process may have already exited during SetResourcePolicy.
                     // Swallow the exception — the process is gone, nothing to resume.
                 }
+#if NET11_0
+                catch (Win32Exception)
+                {
+                    // SafeProcessHandle.Resume() (net11.0, Windows/macOS) reports OS
+                    // failures as Win32Exception — same exit-race situation as above:
+                    // the process is gone (or the resume otherwise cannot land), so
+                    // swallow it instead of leaving the failure unhandled here.
+                }
+#endif
             }
         }
     }
@@ -281,6 +311,21 @@ internal class ProcessWrapper : Process
 
     public new bool Start()
     {
+#if NET11_0
+        // net11.0 leg, Windows/macOS ONLY: StartSuspended is annotated for those two
+        // platforms and the runtime throws PlatformNotSupportedException elsewhere —
+        // Linux/FreeBSD have no create-suspended OS primitive — so the property is never
+        // even assigned on those platforms. Shell-executed starts are excluded because
+        // StartSuspended cannot be combined with UseShellExecute (the runtime throws);
+        // those keep the legacy suspend → apply → resume cycle in OnStarted, as do
+        // Linux/FreeBSD on every start.
+        if ((OperatingSystem.IsWindows() || OperatingSystem.IsMacOS())
+            && !StartInfo.UseShellExecute)
+        {
+            StartInfo.StartSuspended = true;
+            _awaitingInitialResume = true;
+        }
+#endif
         try
         {
             HasStarted = base.Start();
@@ -378,6 +423,25 @@ internal class ProcessWrapper : Process
     {
         if (HasExited)
             throw new InvalidOperationException(Resources.Exceptions_Process_CannotResumeExited);
+
+#if NET11_0
+        // net11.0 leg, Windows/macOS: the creation-suspended release resumes through the
+        // process's SafeProcessHandle — ResumeThread on the main thread on Windows (the
+        // only thread that exists at that point), SIGCONT on macOS — instead of the
+        // per-OS control-adapter route. The flag is consumed only once that release has
+        // been delivered, so every later resume (notably the public Suspend/Resume pair,
+        // which the adapter suspends thread-by-thread) takes the adapter route and
+        // resumes all threads. If the handle resume throws, the flag stays set so the
+        // next call retries the correct mechanism for a still-suspended-at-creation
+        // process. Shell-exec starts and Linux/FreeBSD never set the flag and keep the
+        // adapter route throughout.
+        if (_awaitingInitialResume && (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()))
+        {
+            SafeHandle.Resume();
+            _awaitingInitialResume = false;
+            return;
+        }
+#endif
 
         ProcessControlAdapter.ResumeProcess(this);
     }
