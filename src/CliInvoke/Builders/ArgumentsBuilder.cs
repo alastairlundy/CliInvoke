@@ -79,33 +79,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
             return this;
         }
 
-        if (_buffer.Length is > 0 and < int.MaxValue)
-        {
-            // Add a space if it's missing before adding the new string.
-            if (_buffer[^1] != ' ')
-            {
-                _buffer.Append(' ');
-            }
-        }
-
-        if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
-        {
-            _buffer.Append(escapeSpecialCharacters ? EscapeCharacters(value) : value);
-        }
-        else
-        {
-            throw new InvalidOperationException(Resources
-                .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
-                    int.MaxValue.ToString()));
-        }
-
-        if (_argumentValidationLogic is not null)
-        {
-            return new ArgumentsBuilder(_buffer,
-                _argumentValidationLogic);
-        }
-
-        return new ArgumentsBuilder(_buffer);
+        return Append(value, escapeSpecialCharacters);
     }
 
     /// <summary>
@@ -129,7 +103,10 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(values);
 
         // Do not escape individual values here when escaping is requested to avoid double-escaping.
-        // Instead, join the raw values and perform escaping once at the final Add call.
+        // Do not escape individual values here when escaping is requested to avoid double-escaping.
+        // Instead, join the raw values and perform escaping once when appending.
+        // Each value was already accepted by IsValidArgument above, so the joined
+        // string must not be passed through Add's validator again.
         string[] filtered = values.Where(x => IsValidArgument(x)).ToArray();
 
         if (filtered.Length == 0)
@@ -137,7 +114,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
             return this;
         }
 
-        return Add(string.Join(" ", filtered), escapeSpecialChars);
+        return Append(string.Join(" ", filtered), escapeSpecialChars);
     }
 
     /// <summary>
@@ -295,6 +272,40 @@ public class ArgumentsBuilder : IArgumentsBuilder
     /// Clears the provided argument strings.
     /// </summary>
     public void Clear() => _buffer.Clear();
+
+    /// <summary>
+    /// Appends a value to the buffer without validating it.
+    /// </summary>
+    private IArgumentsBuilder Append(string value, bool escapeSpecialCharacters)
+    {
+        if (_buffer.Length is > 0 and < int.MaxValue)
+        {
+            // Add a space if it's missing before adding the new string.
+            if (_buffer[^1] != ' ')
+            {
+                _buffer.Append(' ');
+            }
+        }
+
+        if (_buffer.Length < _buffer.MaxCapacity && _buffer.Length < int.MaxValue)
+        {
+            _buffer.Append(escapeSpecialCharacters ? EscapeCharacters(value) : value);
+        }
+        else
+        {
+            throw new InvalidOperationException(Resources
+                .Exceptions_ArgumentBuilder_Buffer_MaximumSize.Replace("{x}",
+                    int.MaxValue.ToString()));
+        }
+
+        if (_argumentValidationLogic is not null)
+        {
+            return new ArgumentsBuilder(_buffer,
+                _argumentValidationLogic);
+        }
+
+        return new ArgumentsBuilder(_buffer);
+    }
 
     private bool IsValidArgument(string value)
     {
