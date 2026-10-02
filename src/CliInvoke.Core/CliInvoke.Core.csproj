@@ -29,12 +29,11 @@
              CliInvoke/CliInvoke.Specializations and cause duplicate-definition (CS0433/CS0121)
              errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
-        <Version>2.11.4</Version>
-        <PackageReleaseNotes>#### Changed
-* Internal Tweaks</PackageReleaseNotes>
+        <Version>2.11.5</Version>
+        <PackageReleaseNotes>Updated internal Polyfill version to 11.4.5 from 11.4.0</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>2.11.4.0</AssemblyVersion>
-        <FileVersion>2.11.4.0</FileVersion>
+        <AssemblyVersion>2.11.5.0</AssemblyVersion>
+        <FileVersion>2.11.5.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>
