@@ -31,7 +31,7 @@ public sealed class TruncationOptions
     /// </summary>
     /// <remarks>
     ///     A single value bounds both streams. The default of 1 MB bounds memory growth out of the
-    ///     box while remaining overridable (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
+    ///     box while remaining overridable.
     /// </remarks>
     public long MaxBytes { get; set; } = 1_048_576;
 }
