@@ -103,10 +103,7 @@ public class ArgumentsBuilder : IArgumentsBuilder
         ArgumentNullException.ThrowIfNull(values);
 
         // Do not escape individual values here when escaping is requested to avoid double-escaping.
-        // Do not escape individual values here when escaping is requested to avoid double-escaping.
         // Instead, join the raw values and perform escaping once when appending.
-        // Each value was already accepted by IsValidArgument above, so the joined
-        // string must not be passed through Add's validator again.
         string[] filtered = values.Where(x => IsValidArgument(x)).ToArray();
 
         if (filtered.Length == 0)
@@ -114,7 +111,17 @@ public class ArgumentsBuilder : IArgumentsBuilder
             return this;
         }
 
-        return Append(string.Join(" ", filtered), escapeSpecialChars);
+        string joinedValues = string.Join(" ", filtered);
+
+        // The joined value is the argument actually appended, so the validation logic must
+        // accept it too: a policy over exact argument values must not deliver a combined
+        // operand it never authorized.
+        if (!IsValidArgument(joinedValues))
+        {
+            return this;
+        }
+
+        return Append(joinedValues, escapeSpecialChars);
     }
 
     /// <summary>
