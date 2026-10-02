@@ -16,7 +16,7 @@ namespace CliInvoke.Tests.Processes;
 ///     process, its kill machinery, and all process timing are stubbed, so close-on-every
 ///     -exit-path, copy-before-close ordering, and the join fault rules are asserted with
 ///     no real processes and no wall-clock or kill-timing dependence. Real-executable
-///     end-to-end proofs are covered separately (ticket 004).
+///     end-to-end proofs are covered separately.
 /// </summary>
 public class StdinPipingStubTests : IDisposable
 {
