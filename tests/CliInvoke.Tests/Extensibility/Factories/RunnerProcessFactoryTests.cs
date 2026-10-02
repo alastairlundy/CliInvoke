@@ -59,4 +59,69 @@ public class RunnerProcessFactoryTests
         Assert.Contains("app\"evil.exe", result.ArgumentsList);
         Assert.DoesNotContain("& \"app", result.ArgumentsList);
     }
+
+    [Fact]
+    public void CreateRunnerConfiguration_BenignTarget_DoesNotInsertTerminator()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        ProcessConfiguration runner = BuildConfig("sudo", "-u root");
+        ProcessConfiguration target = BuildConfig("app.exe", "--flag value");
+
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
+
+        // Exact sequence: a target that does not start with a dash must gain no "--"
+        // terminator, because some runners (e.g. Windows runas) treat the terminator
+        // positionally and the command would stop meaning what the caller composed.
+        string[] expected = ["-u", "root", "app.exe", "--flag", "value"];
+        Assert.Equal(expected, result.ArgumentsList);
+    }
+
+    [Fact]
+    public void CreateRunnerConfiguration_DashTarget_TerminatesRunnerOptionZone()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        // An option-parsing runner (sudo on POSIX and Windows) would otherwise bind a
+        // dash-prefixed target into its own option zone; the terminator must sit as a
+        // discrete token between the runner's options and the target.
+        ProcessConfiguration runner = BuildConfig("sudo", "-u root");
+        ProcessConfiguration target = BuildConfig("-preserve-env=LD_PRELOAD", "/bin/sh");
+
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
+
+        string[] expected = ["-u", "root", "--", "-preserve-env=LD_PRELOAD", "/bin/sh"];
+        Assert.Equal(expected, result.ArgumentsList);
+    }
+
+    [Fact]
+    public void CreateRunnerConfiguration_DashTarget_NoRunnerArgs_TerminatorIsFirstToken()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        ProcessConfiguration runner = new ProcessConfigurationBuilder("sudo").Build();
+        ProcessConfiguration target = BuildConfig("-preserve-env=LD_PRELOAD", "/bin/sh");
+
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
+
+        string[] expected = ["--", "-preserve-env=LD_PRELOAD", "/bin/sh"];
+        Assert.Equal(expected, result.ArgumentsList);
+    }
+
+    [Fact]
+    public void CreateRunnerConfiguration_PowerShellRunner_DashTarget_NeverAddsTerminator()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        // A PowerShell runner keeps its call operator and never receives a terminator:
+        // the composed command is a PowerShell script, where "--" would be script text.
+        ProcessConfiguration runner = BuildConfig("pwsh.exe", "-NoProfile -Command");
+        ProcessConfiguration target = BuildConfig("-preserve-env=LD_PRELOAD", "/bin/sh");
+
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
+
+        string[] expected = ["-NoProfile", "-Command", "&", "-preserve-env=LD_PRELOAD", "/bin/sh"];
+        Assert.Equal(expected, result.ArgumentsList);
+        Assert.DoesNotContain("--", result.ArgumentsList);
+    }
 }

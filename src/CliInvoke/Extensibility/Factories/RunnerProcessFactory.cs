@@ -54,8 +54,15 @@ public class RunnerProcessFactory : IRunnerProcessFactory
 
         if (runnerIsPowerShell)
             commandTokens.Add("&");
+        else if (processConfigToBeRun.TargetFilePath.StartsWith('-'))
+            commandTokens.Add("--");
 
-        // Pass the target path and its arguments as literal tokens.
+        // Pass the target path and its arguments as literal tokens. For option-parsing
+        // runners (for example sudo on POSIX and Windows) the "--" terminator added above
+        // ends the runner's option zone so a dash-prefixed target is treated as the
+        // command to run; the terminator is a discrete token, never concatenated onto
+        // the target. PowerShell is excluded: its call operator already starts the
+        // command, and a terminator would become part of the -Command script text.
         commandTokens.Add(processConfigToBeRun.TargetFilePath);
 
         if (!string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments))
