@@ -11,7 +11,7 @@ updates:
     schedule:
       interval: daily
 
-      - package-ecosystem: "nuget" # See documentation for possible values
+  - package-ecosystem: "nuget" # See documentation for possible values
     directories:
         - "tests/" # Location of package manifests
     schedule:
