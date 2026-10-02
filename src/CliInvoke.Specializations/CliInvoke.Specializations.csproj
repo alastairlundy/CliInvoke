@@ -11,20 +11,20 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.2</PackageVersion>
+        <PackageVersion>3.0.3</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke 3.0.2</PackageReleaseNotes>
+        <PackageReleaseNotes>Version aligned with the CliInvoke 3.0.3 release. This package has no code changes.</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>3.0.2.0</AssemblyVersion>
-        <FileVersion>3.0.2.0</FileVersion>
+        <AssemblyVersion>3.0.3.0</AssemblyVersion>
+        <FileVersion>3.0.3.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

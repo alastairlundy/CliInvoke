@@ -22,14 +22,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.0.2</PackageVersion>
-        <PackageReleaseNotes>#### Fixed
-- `GetFirstOutputLine()` splits on `Environment.NewLine` like its siblings.
-- `ProcessExitConfiguration.CancellationThrowsException` is now honoured (it was previously a dead setting).
-- The default `ProcessResourcePolicy` affinity mask now selects every logical processor instead of pinning multi-core machines to half the cores.</PackageReleaseNotes>
+        <PackageVersion>3.0.3</PackageVersion>
+        <PackageReleaseNotes>Version aligned with the CliInvoke 3.0.3 release. This package has no code changes.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>3.0.2.0</AssemblyVersion>
-        <FileVersion>3.0.2.0</FileVersion>
+        <AssemblyVersion>3.0.3.0</AssemblyVersion>
+        <FileVersion>3.0.3.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>
