@@ -96,6 +96,27 @@ public class ArgumentsBuilderTests
     }
 
     [Fact]
+    public void AddEnumerable_PolicyRejectsCombinedOperand_AppendsNothing()
+    {
+        // Exact-value allow-list: each value is authorized on its own, but their joined operand is not.
+        IArgumentsBuilder builder = new ArgumentsBuilder(s => s is "install" or "build");
+
+        IArgumentsBuilder result = builder.AddEnumerable(["install", "build"], true);
+
+        Assert.Equal(string.Empty, result.ToString());
+    }
+
+    [Fact]
+    public void AddEnumerable_PolicyAcceptsCombinedOperand_AppendsJoinedValues()
+    {
+        IArgumentsBuilder builder = new ArgumentsBuilder(_ => true);
+
+        IArgumentsBuilder result = builder.AddEnumerable(["install", "build"], true);
+
+        Assert.Equal("\"install build\"", result.ToString());
+    }
+
+    [Fact]
     public void Add_IFormattable_ThrowsWhenFormattableProducesNullString()
     {
         IArgumentsBuilder builder = new ArgumentsBuilder();
