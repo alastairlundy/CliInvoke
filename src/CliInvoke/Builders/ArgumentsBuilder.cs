@@ -130,11 +130,14 @@ public class ArgumentsBuilder : IArgumentsBuilder
 
         // Do not escape individual values here when escaping is requested to avoid double-escaping.
         // Instead, join the raw values and perform escaping once at the final Add call.
-        IEnumerable<string> filtered = values.Where(x => IsValidArgument(x));
+        string[] filtered = values.Where(x => IsValidArgument(x)).ToArray();
 
-        string joinedValues = string.Join(" ", filtered);
+        if (filtered.Length == 0)
+        {
+            return this;
+        }
 
-        return Add(joinedValues, escapeSpecialChars);
+        return Add(string.Join(" ", filtered), escapeSpecialChars);
     }
 
     /// <summary>
