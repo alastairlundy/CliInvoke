@@ -178,11 +178,16 @@ top.
 The builder and the direct constructor **do not always produce the
 same model** for the same input. Concretely:
 
-- **`OutputRedirection` default differs.** The model's public
-  constructor defaults `outputRedirection` to `true`; the builder
-  defaults it to `false`. `new ProcessConfiguration("git")` and
-  `new ProcessConfigurationBuilder("git").Build()` produce
-  configurations with different `OutputRedirection` values.
+- **`OutputRedirection` default differs.** The `OutputRedirection`
+  init property defaults to `false`, and the builder does too. The two
+  constructors that take a `targetFilePath` default their
+  `outputRedirection` parameter to `true` instead. Both pairs disagree:
+  `new ProcessConfiguration("git")` against
+  `new ProcessConfigurationBuilder("git").Build()`, and
+  `new ProcessConfiguration("git")` against
+  `new ProcessConfiguration { TargetFilePath = "git" }`. Set the
+  property explicitly when you construct via the parameterless
+  constructor.
 - **Working-directory existence is validated by the builder, not the
   model.** `SetWorkingDirectory` throws `DirectoryNotFoundException`
   if the directory does not exist. The model's constructor also
@@ -205,7 +210,7 @@ same model** for the same input. Concretely:
 | `SetArguments(string)` | `Arguments` | Verbatim string |
 | `SetArguments(IEnumerable<string>)` | `ArgumentList` | Init-only |
 | `ConfigureArguments(Action<ArgumentsSpec>)` | *(no direct init)* | Escaping, validation |
-| `SetOutputRedirection(bool)` | `OutputRedirection` | Default differs: `true` (init) vs `false` (builder) |
+| `SetOutputRedirection(bool)` | `OutputRedirection` | Property defaults to `false`; the constructors taking a `targetFilePath` default it to `true` |
 | `SetWorkingDirectory(string)` | `WorkingDirectoryPath` | Builder validates existence |
 | `EnableWindowCreation(bool)` | `WindowCreation` | |
 | `UseShellExecution(bool)` | `UseShellExecution` | |
