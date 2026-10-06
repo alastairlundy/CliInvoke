@@ -1,10 +1,6 @@
 # Security and Support Policies
 This information is provided on an informational basis with forward looking statements and information and is not a guarantee of future support.
 
-When only one major version is supported, the latest 2 minor releases may be supported. 
-Where multiple major versions are supported, only the latest minor release may be supported.
-
-
 ### Currently Supported Versions
 Versions that are currently supported with Bug Fixes and/or Security Fixes.
 
