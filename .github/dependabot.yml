@@ -9,7 +9,7 @@ updates:
     directories:
         - "src/" # Location of package manifests
     schedule:
-      interval: daily
+      interval: weekly
 
   - package-ecosystem: "nuget" # See documentation for possible values
     directories:
