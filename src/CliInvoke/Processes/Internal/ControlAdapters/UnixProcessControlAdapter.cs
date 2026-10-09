@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 using CliInvoke.Processes.Internal.Cancellation;
@@ -15,8 +16,13 @@ namespace CliInvoke.Processes.Internal.ControlAdapters;
 
 internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
 {
+#if !NET11_0
+    // Raw signal numbers for the kill() P/Invoke path. On the net11.0 leg these are
+    // replaced by PosixSignal members passed to Process.Signal (except SIGSTOP, which
+    // the enum does not model and which keeps the kill() path on both legs).
     private const int Sigint = 2;
     private const int Sigterm = 15;
+#endif
 
     private const int DelayBeforeSigintMilliseconds = 3000;
     
@@ -26,6 +32,25 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     [UnsupportedOSPlatform("windows")]
     internal override void ResumeProcess(Process process)
     {
+#if NET11_0
+        // net11.0 leg: Process.Signal delivers SIGCONT through the runtime's own kill()
+        // plumbing, which resolves the platform-correct signal number internally —
+        // the Linux-vs-BSD numbering handled manually on the net10.0 path below.
+        try
+        {
+            // false means the process is already gone (exited or ESRCH): the same no-op
+            // the kill() path treated errno==3 as.
+            _ = process.Signal(PosixSignal.SIGCONT);
+        }
+        catch (Win32Exception exception)
+        {
+            // Preserve the kill() path's failure contract: non-ESRCH delivery failures
+            // surface as InvalidOperationException carrying the errno.
+            throw new InvalidOperationException(
+                $"Signal(SIGCONT) failed for pid {process} with errno {exception.NativeErrorCode}.",
+                exception);
+        }
+#else
         // SIGCONT is 18 on Linux but 19 on macOS/FreeBSD (BSD numbering); using the Linux
         // value there raises SIGTSTP instead, stopping the process it was meant to resume.
         int sigcont = GetContinueSignalNumber();
@@ -36,6 +61,7 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
             if (errno == 3) return;
             throw new InvalidOperationException($"kill(SIGCONT) failed for pid {process} with errno {errno}.");
         }
+#endif
     }
 
     [UnsupportedOSPlatform("browser")]
@@ -46,6 +72,9 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     {
         // SIGSTOP is 19 on Linux but 17 on macOS/FreeBSD (BSD numbering); using the Linux
         // value there raises SIGCONT instead, a no-op for a process meant to be stopped.
+        // This site keeps the kill() P/Invoke on BOTH legs: the BCL PosixSignal enum has
+        // no SIGSTOP member (only the catchable SIGTSTP), so Process.Signal cannot
+        // express a stop and a swap here would change semantics.
         int sigstop = GetStopSignalNumber();
         if (kill(process.Id, sigstop) != 0)
         {
@@ -201,14 +230,49 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
             OperatingSystem.IsTvOS())
             throw new PlatformNotSupportedException();
             
+#if NET11_0
+        bool sigTermSuccess = SendUnixSignal(process, PosixSignal.SIGTERM);
+
+        await Task.Delay(DelayBeforeSigintMilliseconds,
+            cancellationToken).ConfigureAwait(false);
+
+        return sigTermSuccess || SendUnixSignal(process, PosixSignal.SIGINT);
+#else
         bool sigTermSuccess = SendUnixSignal(process.Id, Sigterm);
 
         await Task.Delay(DelayBeforeSigintMilliseconds,
             cancellationToken).ConfigureAwait(false);
 
         return sigTermSuccess || SendUnixSignal(process.Id, Sigint);
+#endif
     }
 
+#if NET11_0
+    /// <summary>
+    ///     Delivers <paramref name="signal"/> to <paramref name="process"/> via
+    ///     <see cref="Process.Signal(PosixSignal)"/> (net11.0 leg). Returns <c>false</c> when
+    ///     the signal could not be delivered — including when the process has already exited —
+    ///     matching the net10.0 <c>kill() == 0</c> contract of the shared-source path.
+    /// </summary>
+    [UnsupportedOSPlatform("ios")]
+    [UnsupportedOSPlatform("tvos")]
+    [UnsupportedOSPlatform("windows")]
+    [UnsupportedOSPlatform("browser")]
+    private static bool SendUnixSignal(Process process, PosixSignal signal)
+    {
+        try
+        {
+            return process.Signal(signal);
+        }
+        catch (Win32Exception)
+        {
+            // Process.Signal throws Win32Exception for non-ESRCH delivery failures where the
+            // kill() path returned a non-zero errno; fold those back to false so callers see
+            // the same bool-only behaviour on both legs.
+            return false;
+        }
+    }
+#else
     /// <summary>
     /// </summary>
     /// <param name="processId"></param>
@@ -219,6 +283,7 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     [UnsupportedOSPlatform("browser")]
     private static bool SendUnixSignal(int processId, int signalId) => 
         kill(processId, signalId) == 0;
+#endif
 
     // Unix: use kill(pid, SIGSTOP) and kill(pid, SIGCONT).
     [LibraryImport("libc", EntryPoint = "kill", SetLastError = true)]
