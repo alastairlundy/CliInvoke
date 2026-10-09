@@ -30,7 +30,7 @@ Launch processes, redirect standard input and output streams, and await process 
 ## Features
 
 * Clear separation of concerns between Process Configuration Builders and Process Configuration Models.
-* Supports .NET 10 and has few dependencies.
+* Supports .NET 10 and .NET 11 and has few dependencies.
 * Dependency Injection extensions register `IProcessInvoker`, `IExternalProcessFactory`, and middleware from a single `AddCliInvoke()` call.
 * Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
   Windows <sup>1</sup>
