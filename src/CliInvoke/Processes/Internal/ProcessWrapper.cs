@@ -425,16 +425,11 @@ internal class ProcessWrapper : Process
             throw new InvalidOperationException(Resources.Exceptions_Process_CannotResumeExited);
 
 #if NET11_0
-        // net11.0 leg, Windows/macOS: the creation-suspended release resumes through the
-        // process's SafeProcessHandle — ResumeThread on the main thread on Windows (the
-        // only thread that exists at that point), SIGCONT on macOS — instead of the
-        // per-OS control-adapter route. The flag is consumed only once that release has
-        // been delivered, so every later resume (notably the public Suspend/Resume pair,
-        // which the adapter suspends thread-by-thread) takes the adapter route and
-        // resumes all threads. If the handle resume throws, the flag stays set so the
-        // next call retries the correct mechanism for a still-suspended-at-creation
-        // process. Shell-exec starts and Linux/FreeBSD never set the flag and keep the
-        // adapter route throughout.
+        // One-shot: the creation-suspended release resumes via SafeProcessHandle
+        // (ResumeThread on Windows, SIGCONT on macOS); every later resume takes the
+        // adapter route so all threads resume. The flag stays set if the resume
+        // throws, so the next call retries. Shell-exec starts and Linux/FreeBSD
+        // never set it and keep the adapter route throughout.
         if (_awaitingInitialResume && (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()))
         {
             SafeHandle.Resume();
