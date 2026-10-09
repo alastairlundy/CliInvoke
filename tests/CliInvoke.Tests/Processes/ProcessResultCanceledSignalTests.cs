@@ -177,4 +177,88 @@ public class ProcessResultCanceledSignalTests
                 File.Delete(markerPath);
         }
     }
+
+    [Test]
+    public async Task Unix_SigkillKilledProcess_ReportsNullSignal()
+    {
+        // SIGKILL deliberately maps to Signal=null on BOTH legs: callers distinguish
+        // library-initiated forceful kills via ProcessResult.Canceled rather than Signal.
+        // net10.0: the 128+n heuristic's table omits signal 9; net11.0: the
+        // ProcessExitStatus.SIGKILL value is mapped back to null in ProcessWrapper.Signal.
+        if (OperatingSystem.IsWindows())
+            return;
+
+        ProcessWrapper process = ProcessTestHelper.CreateProcess("sleep", "30");
+        process.Start();
+
+        try
+        {
+            await ProcessTestHelper.WaitForConditionAsync(
+                () => process.HasStarted && !process.HasExited,
+                TimeSpan.FromSeconds(5),
+                failureMessage: "Process did not start within 5s");
+
+            process.Kill();
+
+            await process.WaitForExitAsync(CancellationToken.None);
+
+            await Assert.That(process.HasExited).IsTrue();
+            await Assert.That(process.ExitCode).IsEqualTo(137);
+            await Assert.That(process.Signal).IsNull();
+        }
+        finally
+        {
+            if (!process.HasExited)
+            {
+                try
+                {
+                    process.Kill(true);
+                }
+                catch
+                {
+                    process.Kill();
+                }
+            }
+
+            process.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task Unix_NormallyExitedProcess_ReportsNullSignal()
+    {
+        // A normal (non-signal) exit has no terminating signal on either leg:
+        // net10.0's heuristic only maps exit codes above 128, and net11.0's
+        // exit-status introspection reports a null Signal for clean exits.
+        if (OperatingSystem.IsWindows())
+            return;
+
+        ProcessWrapper process = ProcessTestHelper.CreateProcess("echo", "clean exit");
+        process.Start();
+
+        try
+        {
+            await process.WaitForExitAsync(CancellationToken.None);
+
+            await Assert.That(process.HasExited).IsTrue();
+            await Assert.That(process.ExitCode).IsEqualTo(0);
+            await Assert.That(process.Signal).IsNull();
+        }
+        finally
+        {
+            if (!process.HasExited)
+            {
+                try
+                {
+                    process.Kill(true);
+                }
+                catch
+                {
+                    process.Kill();
+                }
+            }
+
+            process.Dispose();
+        }
+    }
 }

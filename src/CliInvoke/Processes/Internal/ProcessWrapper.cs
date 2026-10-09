@@ -125,7 +125,55 @@ internal class ProcessWrapper : Process
     /// <summary>
     ///     The POSIX signal that terminated the process (Unix only), obtained via the control adapter.
     /// </summary>
-    internal PosixSignal? Signal => ProcessControlAdapter.GetTerminatingSignal(ExitCode);
+    /// <remarks>
+    ///     On the net11.0 leg this reads the runtime's exit-status introspection
+    ///     (<c>TryWaitForExitStatus</c>) instead of the adapter's 128+n exit-code heuristic;
+    ///     the SIGKILL→null and unknown-signal→null contracts are preserved so both legs
+    ///     report identical <see cref="ProcessResult"/> values.
+    /// </remarks>
+    // On net11.0 the base Process type gains a Signal(PosixSignal) method; this
+    // terminating-signal property intentionally keeps its name, so the hide
+    // warning is suppressed (the net10.0 base has no Signal member at all).
+#pragma warning disable CS0108
+    internal PosixSignal? Signal
+#pragma warning restore CS0108
+    {
+        get
+        {
+#if NET11_0
+            // TimeSpan.Zero makes this a non-blocking status check. Not-yet-exited (or
+            // un-started) falls through to the adapter path below, which reads ExitCode
+            // and throws InvalidOperationException exactly like the net10.0 leg.
+            bool hasStatus;
+#pragma warning disable CA1416 // TryWaitForExitStatus is marked ios/tvos-unsupported; this internal property is only reached from ios/tvos-annotated wait paths.
+            hasStatus = TryWaitForExitStatus(TimeSpan.Zero, out ProcessExitStatus? exitStatus);
+#pragma warning restore CA1416
+            if (hasStatus && exitStatus is not null)
+            {
+                PosixSignal? signal = exitStatus.Signal;
+
+                // Parity with the net10.0 heuristic's contracts: SIGKILL maps to null (a
+                // process cannot catch SIGKILL; callers distinguish library-initiated
+                // forceful kills via ProcessResult.Canceled rather than Signal), and
+                // signal numbers outside the PosixSignal set (delivered as raw numbers by
+                // the runtime) map to null just like a table miss below.
+#pragma warning disable CA1416 // PosixSignal members are unix-flavoured; Signal is always null on Windows so this comparison never fires there.
+                if (signal is PosixSignal.SIGKILL)
+                    return null;
+#pragma warning restore CA1416
+
+                if (signal is not null && !Enum.IsDefined(signal.Value))
+                    return null;
+
+                return signal;
+            }
+
+            return ProcessControlAdapter.GetTerminatingSignal(ExitCode);
+#else
+            return ProcessControlAdapter.GetTerminatingSignal(ExitCode);
+#endif
+        }
+    }
 
     
     private void OnStarted(object? sender, EventArgs e)

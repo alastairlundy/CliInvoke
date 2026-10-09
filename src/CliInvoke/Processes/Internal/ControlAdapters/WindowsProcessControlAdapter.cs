@@ -24,6 +24,16 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         uint actualPid = GetProcessId(process.Handle);
 
         Process proc;
+#if NET11_0
+        // net11.0 leg: non-throwing lookup replaces GetProcessById + catch(ArgumentException);
+        // false (no such process) is the same "probably exited already" no-op.
+        if (!Process.TryGetProcessById((int)actualPid, out Process? found) || found is null)
+        {
+            return;
+        }
+
+        proc = found;
+#else
         try
         {
             proc = Process.GetProcessById((int)actualPid);
@@ -33,6 +43,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
             // Process was not found - probably exited already.
             return;
         }
+#endif
 
         ProcessThreadCollection threads;
         try
@@ -77,6 +88,16 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         uint actualPid = GetProcessId(process.Handle);
 
         Process proc;
+#if NET11_0
+        // net11.0 leg: non-throwing lookup replaces GetProcessById + catch(ArgumentException);
+        // false (no such process) is the same "probably exited already" no-op.
+        if (!Process.TryGetProcessById((int)actualPid, out Process? found) || found is null)
+        {
+            return;
+        }
+
+        proc = found;
+#else
         try
         {
             proc = Process.GetProcessById((int)actualPid);
@@ -86,6 +107,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
             // Process was not found - probably exited already.
             return;
         }
+#endif
 
         ProcessThreadCollection threads;
         try
@@ -220,6 +242,13 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
     private static uint GetProcessGroupId(Process process) => (uint)process.Id;
 
     #region P/Invoke code for Graceful Cancellation of Processes on Windows
+    // This region intentionally stays on BOTH legs (no net11.0 swap): the runtime's
+    // handle-based signal API (Process.Signal / SafeProcessHandle.Signal) supports only
+    // SIGKILL on Windows — verified against the 11.0 RC1 runtime, where Signal(SIGINT)
+    // and Signal(SIGTERM) throw PlatformNotSupportedException (SIGKILL maps to
+    // TerminateProcess). GenerateConsoleCtrlEvent remains the only way to deliver a
+    // graceful CTRL_BREAK/CTRL_C to a child console group, so interrupt dispatch here
+    // keeps its P/Invoke to stay behavior-identical on the net11.0 leg.
     [LibraryImport("Kernel32.dll", EntryPoint = "GenerateConsoleCtrlEvent", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SendCtrlCToConsoleWin(uint ctrlEvent, uint processGroupEventId);
