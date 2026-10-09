@@ -16,7 +16,8 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke 3.1.0 Beta 1</PackageReleaseNotes>
+        <PackageReleaseNotes>* Multi-targets `net10.0` and `net11.0`.
+* Updated to use CliInvoke 3.1.0 Beta 1</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>

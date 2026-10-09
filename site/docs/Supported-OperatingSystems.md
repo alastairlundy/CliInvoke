@@ -3,7 +3,7 @@ title: "Supported Operating Systems"
 ---
 
 ## Supported Operating Systems
-CliInvoke can currently be added to .NET 10 or newer supported projects.
+CliInvoke packages ship with .NET 10 and .NET 11 assets and can be added to .NET 10 or newer supported projects.
 
 The following table details which target platforms are supported for executing commands via CliInvoke. 
 

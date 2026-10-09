@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
+## [3.2.0] - unreleased
+
+### Changed
+
+- All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks.
+
 ## [3.1.0] - unreleased
 
 ### Added
