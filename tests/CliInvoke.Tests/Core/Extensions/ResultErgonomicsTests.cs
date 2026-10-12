@@ -92,11 +92,8 @@ public class ResultErgonomicsTests
     {
         ProcessResult result = MakeProcessResult(0);
 
-        // The success criterion is that EnsureExitCodeZero() completes without throwing;
-        // reaching the assertion below means the call above did not throw.
-        result.EnsureExitCodeZero();
-
-        await Assert.That(true).IsTrue();
+        // The success criterion is that EnsureExitCodeZero() completes without throwing.
+        await Assert.That(() => result.EnsureExitCodeZero()).ThrowsNothing();
     }
 
     [Test]
@@ -104,11 +101,8 @@ public class ResultErgonomicsTests
     {
         ProcessResult result = MakeProcessResult(0, canceled: true);
 
-        // The success criterion is that EnsureExitCodeZero() completes without throwing;
-        // reaching the assertion below means the call above did not throw.
-        result.EnsureExitCodeZero();
-
-        await Assert.That(true).IsTrue();
+        // The success criterion is that EnsureExitCodeZero() completes without throwing.
+        await Assert.That(() => result.EnsureExitCodeZero()).ThrowsNothing();
     }
 
     [Test]
