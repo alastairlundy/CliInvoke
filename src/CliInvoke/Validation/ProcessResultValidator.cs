@@ -37,7 +37,9 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
             mapped[i] = new ValidationRule<TProcessResult>(rules[i]);
 
         ValidationRules = mapped;
+#pragma warning disable CS0618 // Type or member is obsolete
         Rules = ValidationRules;
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     /// <summary>
@@ -51,7 +53,9 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
         ArgumentNullException.ThrowIfNull(rules);
         
         ValidationRules = rules;
+#pragma warning disable CS0618 // Type or member is obsolete
         Rules = ValidationRules;
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     /// <summary>
@@ -62,8 +66,10 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
 
     /// <inheritdoc />
     public ValidationRule<TProcessResult>[] ValidationRules {
+#pragma warning disable CS0618 // Type or member is obsolete
         get => Rules;
         private init => Rules = value;
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     /// <summary>
