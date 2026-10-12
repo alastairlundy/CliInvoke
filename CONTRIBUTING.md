@@ -42,7 +42,7 @@ CliInvoke targets .NET 10 (see `global.json`) and uses the [TUnit](https://www.t
 - **Code style:** Match the existing C# conventions in the repository. Keep changes small and focused, and make sure `dotnet test` passes before submitting.
 - **Pull requests:** When you open a PR, fill in every section of [`.github/pull_request_template.md`](.github/pull_request_template.md) — including the Testing and Contribution Policy sections, and the authorship declaration (human-authored or AI-co-authored).
 - **Issues:** Use the provided templates under [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) (bug report or feature request) when filing an issue.
-- **Contribution policy:** There is currently no CLA or DCO required for this project. By contributing, you confirm you have read and followed this `CONTRIBUTING.md` and that your contribution is your own original work (or properly licensed).
+- **Contribution policy:** By contributing, you confirm you have read and followed this `CONTRIBUTING.md` and that your contribution is your own original work (or properly licensed).
 
 ### InternalsVisibleTo (IVT) grant minimization
 
