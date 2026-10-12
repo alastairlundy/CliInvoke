@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma warning disable CA1416
 
 using CliInvoke.Builders;
 
@@ -57,17 +56,15 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         //     through as a discrete token with no escaping required.
         bool runnerIsPowerShell =
             !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
-            && (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0
-                || runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0);
+            && (runnerProcessConfig.TargetFilePath.Contains("pwsh", StringComparison.OrdinalIgnoreCase)
+                || runnerProcessConfig.TargetFilePath.Contains("powershell", StringComparison.OrdinalIgnoreCase));
 
         bool runnerIsCmd =
             !runnerIsPowerShell
             && !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
-            && runnerProcessConfig.TargetFilePath.IndexOf("cmd", StringComparison.OrdinalIgnoreCase) >= 0;
+            && runnerProcessConfig.TargetFilePath.Contains("cmd", StringComparison.OrdinalIgnoreCase);
 
-        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
-                runnerProcessConfig.TargetFilePath
-            );
+        ProcessConfigurationBuilder commandBuilder = new(runnerProcessConfig.TargetFilePath);
 
         if (runnerIsPowerShell)
         {
@@ -127,14 +124,21 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
             {
                 resourceSpec.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
 
-                resourceSpec.SetMinWorkingSet(processConfigToBeRun.ResourcePolicy.MinWorkingSet);
-                resourceSpec.SetMaxWorkingSet(processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ||
+                    OperatingSystem.IsFreeBSD())
+                {
+                    resourceSpec.SetMinWorkingSet(processConfigToBeRun.ResourcePolicy.MinWorkingSet);
+                    resourceSpec.SetMaxWorkingSet(processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                }
+
+                if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+                {
+                    resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity ??
+                                                      ProcessResourcePolicy.DefaultProcessorAffinity);
+                }
 
                 resourceSpec.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
                     .EnablePriorityBoost);
-
-                resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity ??
-                                                  (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
             })
             .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)
