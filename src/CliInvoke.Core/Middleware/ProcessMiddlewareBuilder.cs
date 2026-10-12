@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Diagnostics;
+
 namespace CliInvoke.Core.Middleware;
 
 /// <summary>
@@ -17,8 +19,7 @@ namespace CliInvoke.Core.Middleware;
 public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
 {
     private readonly Func<Type, IProcessMiddleware> _resolver;
-    private readonly List<IProcessMiddleware> _middleware = [];
-    private readonly List<Type> _typedEntries = [];
+    private readonly List<BuilderEntry> _entries = [];
     private readonly Dictionary<Type, IProcessMiddleware> _resolvedCache = [];
 
     /// <summary>
@@ -50,17 +51,14 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
     public IProcessMiddlewareBuilder UseMiddleware(IProcessMiddleware middleware)
     {
         ArgumentNullException.ThrowIfNull(middleware);
-        _middleware.Add(middleware);
+        _entries.Add(new InstanceEntry(middleware));
         return this;
     }
 
     /// <inheritdoc />
     public IProcessMiddlewareBuilder UseMiddleware<T>() where T : IProcessMiddleware
     {
-        _typedEntries.Add(typeof(T));
-        // Placeholder keeps type-based entries positioned in registration order.
-        //TODO: Replace with a different system 
-        _middleware.Add(null!);
+        _entries.Add(new TypedEntry(typeof(T)));
         return this;
     }
 
@@ -90,31 +88,36 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
     /// <inheritdoc />
     public IReadOnlyList<IProcessMiddleware> Build()
     {
-        List<IProcessMiddleware> result = new List<IProcessMiddleware>(_middleware.Count);
-        int nextTypedEntry = 0;
+        List<IProcessMiddleware> result = new List<IProcessMiddleware>(_entries.Count);
 
-        foreach (IProcessMiddleware? entry in _middleware)
+        foreach (BuilderEntry entry in _entries)
         {
-            if (entry is not null)
+            result.Add(entry switch
             {
-                result.Add(entry);
-                continue;
-            }
-
-            Type type = _typedEntries[nextTypedEntry++];
-
-            if (!_resolvedCache.TryGetValue(type, out IProcessMiddleware? resolved))
-            {
-                resolved = _resolver(type) ?? throw new InvalidOperationException(
-                    $"The resolver returned null for type '{type.FullName}'.");
-                _resolvedCache[type] = resolved;
-            }
-
-            result.Add(resolved);
+                InstanceEntry kept => kept.Middleware,
+                TypedEntry typed => Resolve(typed.MiddlewareType),
+                _ => throw new UnreachableException()
+            });
         }
 
         return result.AsReadOnly();
     }
+
+    private IProcessMiddleware Resolve(Type type)
+    {
+        if (!_resolvedCache.TryGetValue(type, out IProcessMiddleware? resolved))
+        {
+            resolved = _resolver(type) ?? throw new InvalidOperationException(
+                $"The resolver returned null for type '{type.FullName}'.");
+            _resolvedCache[type] = resolved;
+        }
+
+        return resolved;
+    }
+
+    private abstract record BuilderEntry;
+    private sealed record InstanceEntry(IProcessMiddleware Middleware) : BuilderEntry;
+    private sealed record TypedEntry(Type MiddlewareType) : BuilderEntry;
 
     private static string FormatMissingServiceMessage(Type serviceType)
     {
