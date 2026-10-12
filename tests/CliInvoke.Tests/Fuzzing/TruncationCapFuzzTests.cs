@@ -32,7 +32,7 @@ public class TruncationCapFuzzTests
                 if (cap is < 0) return true;
 
                 ProcessExitConfiguration original = ProcessExitConfiguration.CreateGraceful();
-                ProcessExitConfiguration updated = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(original, cap);
+                ProcessExitConfiguration updated = ProcessExitConfiguration.WithMaxBufferedOutputBytes(original, cap);
 
                 return updated.MaxBufferedOutputBytes == cap
                        && ReferenceEquals(updated.ValidationRules, original.ValidationRules)
@@ -48,7 +48,7 @@ public class TruncationCapFuzzTests
     public void WithMaxBufferedOutputBytes_NullCap_RoundTripsNull()
     {
         ProcessExitConfiguration original = ProcessExitConfiguration.CreateGraceful();
-        ProcessExitConfiguration updated = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(original, null);
+        ProcessExitConfiguration updated = ProcessExitConfiguration.WithMaxBufferedOutputBytes(original, null);
 
         if (updated.MaxBufferedOutputBytes is not null)
             throw new InvalidOperationException("WithMaxBufferedOutputBytes did not preserve a null cap.");
@@ -65,19 +65,19 @@ public class TruncationCapFuzzTests
 
                 ValidationRule<ProcessResult>[] rules = new ValidationRule<ProcessResult>[ruleCount];
                 for (int i = 0; i < ruleCount; i++)
-                    rules[i] = new ValidationRule<ProcessResult>(r => true, $"cfg-{i}");
+                    rules[i] = new ValidationRule<ProcessResult>(_ => true, $"cfg-{i}");
 
-                ProcessExitConfiguration baseConfig = ProcessExitConfigurationCreationExtensions.WithValidationRules(
-                    ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(ProcessExitConfiguration.CreateGraceful(), cap),
+                ProcessExitConfiguration baseConfig = ProcessExitConfiguration.WithValidationRules(
+                    ProcessExitConfiguration.WithMaxBufferedOutputBytes(ProcessExitConfiguration.CreateGraceful(), cap),
                     rules);
 
                 // WithValidationRules replaces the rules but must preserve the cap.
-                ProcessExitConfiguration afterRules = ProcessExitConfigurationCreationExtensions.WithValidationRules(baseConfig, rules);
+                ProcessExitConfiguration afterRules = ProcessExitConfiguration.WithValidationRules(baseConfig, rules);
                 bool rulesPreserveCap = afterRules.MaxBufferedOutputBytes == cap
                                          && afterRules.ValidationRules.Length == ruleCount;
 
                 // WithMaxBufferedOutputBytes overwrites the cap but must preserve the rules (same array reference).
-                ProcessExitConfiguration afterCap = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(baseConfig, cap);
+                ProcessExitConfiguration afterCap = ProcessExitConfiguration.WithMaxBufferedOutputBytes(baseConfig, cap);
                 bool capPreservesRules = afterCap.ValidationRules.Length == ruleCount
                                          && ReferenceEquals(afterCap.ValidationRules, baseConfig.ValidationRules);
 
@@ -100,7 +100,7 @@ public class TruncationCapFuzzTests
                 IProcessMiddleware middleware = builder.Build()[0];
 
                 // Pre-set a different cap to prove the middleware overwrites rather than merges.
-                ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+                ProcessExitConfiguration exit = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
                     ProcessExitConfiguration.CreateGraceful(), 1);
                 InvocationContext context = new InvocationContext(
                     new ProcessConfiguration("dotnet", "--version"),
@@ -131,9 +131,9 @@ public class TruncationCapFuzzTests
             {
                 if (a < 0 || b < 0) return true;
 
-                ProcessExitConfiguration configA = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+                ProcessExitConfiguration configA = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
                     ProcessExitConfiguration.CreateGraceful(), a);
-                ProcessExitConfiguration configB = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+                ProcessExitConfiguration configB = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
                     ProcessExitConfiguration.CreateGraceful(), b);
 
                 return configA.Equals(configB) == (a == b);
@@ -144,11 +144,11 @@ public class TruncationCapFuzzTests
     [Test]
     public void WithMaxBufferedOutputBytes_NullCap_Equality()
     {
-        ProcessExitConfiguration nullCapA = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration nullCapA = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), null);
-        ProcessExitConfiguration nullCapB = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration nullCapB = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), null);
-        ProcessExitConfiguration capped = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration capped = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), 1000);
 
         if (!nullCapA.Equals(nullCapB))
@@ -164,7 +164,7 @@ public class TruncationCapFuzzTests
         // Negative caps are stored on the configuration and treated as no-cap at runtime
         // (in ReadStreamCappedAsync). The configuration equality compares raw values,
         // so a negative cap is distinct from null.
-        ProcessExitConfiguration negativeCap = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration negativeCap = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), -1);
 
         if (negativeCap.MaxBufferedOutputBytes != -1)
@@ -175,9 +175,9 @@ public class TruncationCapFuzzTests
     public void WithMaxBufferedOutputBytes_ZeroCap_IsDistinctFromNullCap()
     {
         // 0 is a valid zero-byte cap and must be distinct from null (no cap).
-        ProcessExitConfiguration nullCap = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration nullCap = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), null);
-        ProcessExitConfiguration zeroCap = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration zeroCap = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), 0);
 
         if (zeroCap.MaxBufferedOutputBytes != 0)
@@ -196,7 +196,7 @@ public class TruncationCapFuzzTests
         foreach (long cap in boundaryValues)
         {
             ProcessExitConfiguration original = ProcessExitConfiguration.CreateGraceful();
-            ProcessExitConfiguration updated = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(original, cap);
+            ProcessExitConfiguration updated = ProcessExitConfiguration.WithMaxBufferedOutputBytes(original, cap);
 
             if (updated.MaxBufferedOutputBytes != cap)
                 throw new InvalidOperationException($"Cap value {cap} did not round-trip correctly.");

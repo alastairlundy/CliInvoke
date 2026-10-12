@@ -86,7 +86,7 @@ public class OutputTruncationMiddlewareTests
     public async Task UseOutputTruncation_RegistersMiddlewareInPipeline()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => OutputTruncationMiddlewareExtensions.UseOutputTruncation(builder));
+        services.AddCliInvoke(builder => builder.UseOutputTruncation());
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();

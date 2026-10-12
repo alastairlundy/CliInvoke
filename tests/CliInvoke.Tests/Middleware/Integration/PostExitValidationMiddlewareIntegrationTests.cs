@@ -200,7 +200,7 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         IProcessResultValidator<ProcessResult> validator = new ProcessResultValidator<ProcessResult>(validatorRules);
 
-        ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithValidationRules(
+        ProcessExitConfiguration exit = ProcessExitConfiguration.WithValidationRules(
             ProcessExitConfiguration.CreateGraceful(), configRules);
 
         ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));

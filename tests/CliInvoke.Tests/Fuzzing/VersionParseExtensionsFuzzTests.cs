@@ -23,9 +23,9 @@ public class VersionParseExtensionsFuzzTests
         Prop.ForAll<string>(value =>
             {
                 if (string.IsNullOrWhiteSpace(value) ||
-                    !Enumerable.All(value, c => char.IsDigit(c) || c == '.') ||
+                    !value.All(c => char.IsDigit(c) || c == '.') ||
                     value.Split('.', StringSplitOptions.RemoveEmptyEntries).Length < 1 ||
-                    Enumerable.Any(value.Split('.', StringSplitOptions.RemoveEmptyEntries), seg => seg.Length == 0))
+                    value.Split('.', StringSplitOptions.RemoveEmptyEntries).Any(seg => seg.Length == 0))
                     return true;
 
                 Version result = Version.GracefulParse(value);
@@ -39,7 +39,7 @@ public class VersionParseExtensionsFuzzTests
     {
         Prop.ForAll<string>(value =>
             {
-                if (string.IsNullOrWhiteSpace(value) || !Enumerable.Any(value, char.IsDigit))
+                if (string.IsNullOrWhiteSpace(value) || !value.Any(char.IsDigit))
                     return true;
 
                 Version result = Version.GracefulParse(value);
@@ -53,7 +53,7 @@ public class VersionParseExtensionsFuzzTests
     {
         Prop.ForAll<string>(value =>
             {
-                if (string.IsNullOrWhiteSpace(value) || Enumerable.Any(value, char.IsDigit))
+                if (string.IsNullOrWhiteSpace(value) || value.Any(char.IsDigit))
                     return true;
 
                 try
@@ -131,11 +131,11 @@ public class VersionParseExtensionsFuzzTests
         Prop.ForAll<string>(value =>
             {
                 if (string.IsNullOrWhiteSpace(value) || value.Length > 20 ||
-                    !Enumerable.All(value, c => char.IsDigit(c) || c == '.'))
+                    !value.All(c => char.IsDigit(c) || c == '.'))
                     return true;
 
                 string[] segments = value.Split('.', StringSplitOptions.RemoveEmptyEntries);
-                if (segments.Length < 2 || segments.Length > 4 || Enumerable.Any(segments, seg => seg.Length == 0))
+                if (segments.Length < 2 || segments.Length > 4 || segments.Any(seg => seg.Length == 0))
                     return true;
 
                 Version result = Version.GracefulParse(value);

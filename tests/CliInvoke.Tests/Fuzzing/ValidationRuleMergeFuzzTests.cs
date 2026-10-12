@@ -39,7 +39,7 @@ public class ValidationRuleMergeFuzzTests
 
                 IProcessResultValidator<ProcessResult> validator = new ProcessResultValidator<ProcessResult>(validatorRules);
 
-                ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithValidationRules(
+                ProcessExitConfiguration exit = ProcessExitConfiguration.WithValidationRules(
                     ProcessExitConfiguration.CreateGraceful(), configRules);
 
                 ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
@@ -163,7 +163,7 @@ public class ValidationRuleMergeFuzzTests
 
                 // Source starts from a graceful config (its ValidationRules is the default empty array).
                 ProcessExitConfiguration source = ProcessExitConfiguration.CreateGraceful();
-                ProcessExitConfiguration result = ProcessExitConfigurationCreationExtensions.WithValidationRules(source, supplied);
+                ProcessExitConfiguration result = ProcessExitConfiguration.WithValidationRules(source, supplied);
 
                 if (result.ValidationRules.Length != ruleCount) return false;
 
@@ -195,9 +195,9 @@ public class ValidationRuleMergeFuzzTests
                     new ValidationRule<ProcessResult>(r => true, "rule-0")
                 ];
 
-                ProcessExitConfiguration source = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+                ProcessExitConfiguration source = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
                     ProcessExitConfiguration.CreateGraceful(), cap);
-                ProcessExitConfiguration result = ProcessExitConfigurationCreationExtensions.WithValidationRules(source, rules);
+                ProcessExitConfiguration result = ProcessExitConfiguration.WithValidationRules(source, rules);
 
                 return result.MaxBufferedOutputBytes == cap
                        && result.ValidationRules.Length == 1;

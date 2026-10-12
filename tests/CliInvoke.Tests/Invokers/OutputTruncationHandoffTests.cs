@@ -64,7 +64,7 @@ public class OutputTruncationHandoffTests
         (string target, string arguments) = GetLargeOutputCommand();
 
         ProcessConfiguration configuration = new ProcessConfiguration(target, arguments);
-        ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration exit = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), 1000);
 
         BufferedProcessResult result = await CliRun
@@ -124,7 +124,7 @@ public class OutputTruncationHandoffTests
 
         (string target, string arguments) = GetLargeOutputCommand();
         ProcessConfiguration config = new ProcessConfiguration(target, arguments);
-        ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+        ProcessExitConfiguration exit = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), 1000);
 
         BufferedProcessResult result = await invoker
