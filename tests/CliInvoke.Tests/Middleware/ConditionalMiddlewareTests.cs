@@ -14,7 +14,7 @@ public class ConditionalMiddlewareTests
             _ => Task.FromResult(true),
             new List<IProcessMiddleware> { subMiddleware });
 
-        Func<InvocationContext, Task> outerNext = ctx =>
+        Func<InvocationContext, Task> outerNext = _ =>
         {
             callLog.Add("outerNext");
             return Task.CompletedTask;
@@ -35,7 +35,7 @@ public class ConditionalMiddlewareTests
             _ => Task.FromResult(false),
             new List<IProcessMiddleware> { subMiddleware });
 
-        Func<InvocationContext, Task> outerNext = ctx =>
+        Func<InvocationContext, Task> outerNext = _ =>
         {
             callLog.Add("outerNext");
             return Task.CompletedTask;
@@ -51,7 +51,7 @@ public class ConditionalMiddlewareTests
     public async Task InvokeAsync_PredicateTrue_DoesNotCallOuterNext()
     {
         List<string> callLog = [];
-        Func<InvocationContext, Task> outerNext = ctx =>
+        Func<InvocationContext, Task> outerNext = _ =>
         {
             callLog.Add("outerNext");
             return Task.CompletedTask;
@@ -78,7 +78,7 @@ public class ConditionalMiddlewareTests
             _ => Task.FromResult(true),
             new List<IProcessMiddleware> { subA, subB });
 
-        Func<InvocationContext, Task> outerNext = ctx =>
+        Func<InvocationContext, Task> outerNext = _ =>
         {
             callLog.Add("outerNext");
             return Task.CompletedTask;
@@ -96,10 +96,10 @@ public class ConditionalMiddlewareTests
         List<string> callLog = [];
         FakeMiddleware subMiddleware = new FakeMiddleware("SubA", callLog);
         ConditionalMiddleware conditional = new ConditionalMiddleware(
-            ctx => Task.FromResult(true),
+            _ => Task.FromResult(true),
             new List<IProcessMiddleware> { subMiddleware });
 
-        Func<InvocationContext, Task> outerNext = ctx =>
+        Func<InvocationContext, Task> outerNext = _ =>
         {
             callLog.Add("outerNext");
             return Task.CompletedTask;

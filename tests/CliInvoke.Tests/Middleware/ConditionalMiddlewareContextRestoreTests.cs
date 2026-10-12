@@ -33,7 +33,7 @@ public class ConditionalMiddlewareContextRestoreTests
         IReadOnlyList<IProcessMiddleware> middleware,
         List<string> callLog)
     {
-        return new MiddlewareChain(middleware, ctx =>
+        return new MiddlewareChain(middleware, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;

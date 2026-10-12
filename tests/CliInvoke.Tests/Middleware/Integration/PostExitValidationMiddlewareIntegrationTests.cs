@@ -177,7 +177,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         {
             int index = i;
             configRules[i] = new ValidationRule<ProcessResult>(
-                r =>
+                _ =>
                 {
                     configInvocations[index]++;
                     return true;
@@ -190,7 +190,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         {
             int index = i;
             validatorRules[i] = new ValidationRule<ProcessResult>(
-                r =>
+                _ =>
                 {
                     validatorInvocations[index]++;
                     return true;

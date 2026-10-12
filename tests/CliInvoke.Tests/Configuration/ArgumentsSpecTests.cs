@@ -53,7 +53,7 @@ public class ArgumentsSpecTests
     public async Task Add_RejectsInvalidArgument()
     {
         // Arrange
-        ArgumentsSpec spec = new(arg => false);
+        ArgumentsSpec spec = new(_ => false);
 
         // Assert
         await Assert.That(() => spec.Add("nope", false))

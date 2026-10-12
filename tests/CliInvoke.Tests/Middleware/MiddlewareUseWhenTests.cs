@@ -16,7 +16,7 @@ public class MiddlewareUseWhenTests
             sub => sub.UseMiddleware(new FakeMiddleware("SubA", callLog)));
 
         IReadOnlyList<IProcessMiddleware> pipeline = builder.Build();
-        MiddlewareChain chain = new MiddlewareChain(pipeline, ctx =>
+        MiddlewareChain chain = new MiddlewareChain(pipeline, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;
@@ -39,7 +39,7 @@ public class MiddlewareUseWhenTests
             sub => sub.UseMiddleware(new FakeMiddleware("SubA", callLog)));
 
         IReadOnlyList<IProcessMiddleware> pipeline = builder.Build();
-        MiddlewareChain chain = new MiddlewareChain(pipeline, ctx =>
+        MiddlewareChain chain = new MiddlewareChain(pipeline, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;
@@ -62,7 +62,7 @@ public class MiddlewareUseWhenTests
             sub => sub.UseMiddleware(new FakeMiddleware("SubA", callLog)));
 
         IReadOnlyList<IProcessMiddleware> pipeline = builder.Build();
-        MiddlewareChain chain = new MiddlewareChain(pipeline, ctx =>
+        MiddlewareChain chain = new MiddlewareChain(pipeline, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;
@@ -85,7 +85,7 @@ public class MiddlewareUseWhenTests
             sub => sub.UseMiddleware(new FakeMiddleware("SubA", callLog)));
 
         IReadOnlyList<IProcessMiddleware> pipeline = builder.Build();
-        MiddlewareChain chain = new MiddlewareChain(pipeline, ctx =>
+        MiddlewareChain chain = new MiddlewareChain(pipeline, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;
@@ -109,7 +109,7 @@ public class MiddlewareUseWhenTests
             sub => sub.UseMiddleware(new FakeMiddleware("SubA", callLog)));
 
         IReadOnlyList<IProcessMiddleware> pipeline = builder.Build();
-        MiddlewareChain chain = new MiddlewareChain(pipeline, ctx =>
+        MiddlewareChain chain = new MiddlewareChain(pipeline, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;
@@ -133,7 +133,7 @@ public class MiddlewareUseWhenTests
             sub => sub.UseMiddleware(new FakeMiddleware("SubA", callLog)));
 
         IReadOnlyList<IProcessMiddleware> pipeline = builder.Build();
-        MiddlewareChain chain = new MiddlewareChain(pipeline, ctx =>
+        MiddlewareChain chain = new MiddlewareChain(pipeline, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;
@@ -162,7 +162,7 @@ public class MiddlewareUseWhenTests
             });
 
         IReadOnlyList<IProcessMiddleware> pipeline = builder.Build();
-        MiddlewareChain chain = new MiddlewareChain(pipeline, ctx =>
+        MiddlewareChain chain = new MiddlewareChain(pipeline, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;
@@ -191,7 +191,7 @@ public class MiddlewareUseWhenTests
             });
 
         IReadOnlyList<IProcessMiddleware> pipeline = builder.Build();
-        MiddlewareChain chain = new MiddlewareChain(pipeline, ctx =>
+        MiddlewareChain chain = new MiddlewareChain(pipeline, _ =>
         {
             callLog.Add("terminal");
             return Task.CompletedTask;

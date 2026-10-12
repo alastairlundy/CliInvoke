@@ -73,7 +73,7 @@ public class OutputTruncationMiddlewareTests
         OutputTruncationMiddleware middleware = new OutputTruncationMiddleware(TruncationOptions.Default);
         bool nextCalled = false;
 
-        await middleware.InvokeAsync(ctx, c =>
+        await middleware.InvokeAsync(ctx, _ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
