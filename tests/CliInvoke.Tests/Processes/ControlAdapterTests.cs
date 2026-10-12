@@ -1,5 +1,7 @@
 using System.Runtime.Versioning;
+
 using CliInvoke.Processes.Internal.ControlAdapters;
+using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Tests.Processes;
 
@@ -83,6 +85,23 @@ public class ControlAdapterTests
     }
 
     [Test]
+    public async Task WindowsAdapter_SetUserCredential_Null_DoesNotThrow()
+    {
+        if (!OperatingSystem.IsWindows())
+            throw new SkipTestException("WindowsProcessControlAdapter is Windows-only.");
+
+        WindowsProcessControlAdapter adapter = new WindowsProcessControlAdapter();
+
+        using Process dummyProcess = new Process();
+        dummyProcess.StartInfo = new ProcessStartInfo("echo");
+
+#pragma warning disable CA1416
+        await Assert.That(() => adapter.SetUserCredential(dummyProcess, null!))
+            .ThrowsNothing();
+#pragma warning restore CA1416
+    }
+
+    [Test]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
@@ -109,6 +128,11 @@ public class ControlAdapterTests
     [SupportedOSPlatform("freebsd")]
     public async Task UnixAdapter_GetTerminatingSignal_MapsPlatformSpecificSignalNumber()
     {
+        if (OperatingSystem.IsWindows())
+            throw new SkipTestException(
+                "The Unix adapter's signal table is only populated on Unix-like platforms; " +
+                "Windows routes through WindowsProcessControlAdapter instead.");
+
         UnixProcessControlAdapter adapter = new UnixProcessControlAdapter();
 
         // The 128 + signal number exit-code convention must map to the correct

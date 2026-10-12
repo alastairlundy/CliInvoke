@@ -179,6 +179,7 @@ public static class ProcessResultHelperExtensions
     /// <remarks>
     ///     This produces the same results as <c>text.Split(Environment.NewLine)</c>,
     ///     including a trailing empty element when the input ends with a newline.
+    ///     An empty input yields a single empty line, also matching <c>text.Split(Environment.NewLine)</c>.
     ///     <c>MemoryExtensions.EnumerateLines</c> is deliberately avoided because it
     ///     treats lone <c>\n</c> as a separator, diverging from the pinned contract.
     /// </remarks>
@@ -186,6 +187,11 @@ public static class ProcessResultHelperExtensions
     {
         if (string.IsNullOrEmpty(text))
         {
+            // An empty input must yield a single empty line, matching
+            // string.Split(Environment.NewLine), which returns [""] rather than
+            // an empty sequence for empty input.
+            yield return string.Empty;
+
             yield break;
         }
 

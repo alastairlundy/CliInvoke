@@ -150,6 +150,20 @@ public class ResultErgonomicsTests
     }
 
     // -------------------------------------------------------------------
+    //  GetFirstOutputLine
+    // -------------------------------------------------------------------
+
+    [Test]
+    public async Task GetFirstOutputLine_EmptyString_ReturnsEmpty()
+    {
+        BufferedProcessResult result = MakeBuffered(string.Empty, string.Empty);
+
+        // Empty output's first line is an empty string, matching
+        // string.Split(Environment.NewLine)'s [""] for empty input.
+        await Assert.That(result.GetFirstOutputLine()).IsEqualTo(string.Empty);
+    }
+
+    // -------------------------------------------------------------------
     //  EnumerateOutputLines / EnumerateErrorLines parity with GetOutputLines
     // -------------------------------------------------------------------
 

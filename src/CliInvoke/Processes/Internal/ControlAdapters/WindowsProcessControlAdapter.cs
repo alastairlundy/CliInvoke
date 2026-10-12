@@ -165,6 +165,10 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
     [SupportedOSPlatform("windows")]
     internal override void SetUserCredential(Process process, UserCredential credential)
     {
+        // A null credential is a no-op, matching UnixProcessControlAdapter semantics.
+        if (credential is null)
+            return;
+
         if (credential.Domain is not null && OperatingSystem.IsWindows())
             process.StartInfo.Domain = credential.Domain;
 
