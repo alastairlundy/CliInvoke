@@ -29,7 +29,7 @@ public class MiddlewareContextTests
             (ctx) => Task.CompletedTask,
             cts.Token);
 
-        await Assert.That(context.CancellationToken.IsCancellationRequested).IsEqualTo(true);
+        await Assert.That(context.CancellationToken.IsCancellationRequested).IsTrue();
     }
 
     [Test]

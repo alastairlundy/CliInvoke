@@ -1,0 +1,9 @@
+<Project>
+  <!-- MSBuild imports only the nearest Directory.Build.props, so chain to the repo root
+       to keep TestingPlatformDotnetTestSupport, GenerateDocumentationFile and WarningsAsErrors. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <!-- Test assemblies have no public API; XML doc comments are noise here. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+</Project>

@@ -35,8 +35,7 @@ public class ProcessResultHelperExtensionsTests
         ProcessResult result = MakeResult(0);
 
         // Act / Assert - a passing validator must not throw
-        result.ThrowIfUnsuccessful(AlwaysPass());
-        await Assert.That(true).IsTrue();
+        await Assert.That(() => result.ThrowIfUnsuccessful(AlwaysPass())).ThrowsNothing();
     }
 
     [Test]

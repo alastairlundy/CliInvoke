@@ -154,8 +154,10 @@ public class UserCredentialSpecTests
         UserCredentialSpec spec = new UserCredentialSpec().SetPassword(password);
 
         // Act / Assert - should not throw on repeated dispose
-        spec.Dispose();
-        spec.Dispose();
-        await Assert.That(true).IsTrue();
+        await Assert.That(() =>
+        {
+            spec.Dispose();
+            spec.Dispose();
+        }).ThrowsNothing();
     }
 }

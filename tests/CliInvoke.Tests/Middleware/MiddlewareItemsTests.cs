@@ -34,7 +34,7 @@ public class MiddlewareItemsTests
 
         bool result = items.Get<bool>("flag");
 
-        await Assert.That(result).IsEqualTo(true);
+        await Assert.That(result).IsTrue();
     }
 
     [Test]
