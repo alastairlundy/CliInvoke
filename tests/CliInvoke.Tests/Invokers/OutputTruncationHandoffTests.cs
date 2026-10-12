@@ -8,7 +8,6 @@
  */
 
 using CliInvoke.Extensions;
-using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Truncation;
 using Microsoft.Extensions.DependencyInjection;
 

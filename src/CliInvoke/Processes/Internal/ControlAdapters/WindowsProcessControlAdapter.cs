@@ -230,6 +230,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
 
     [LibraryImport("Kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
+    // ReSharper disable once UnusedMethodReturnValue.Local
     private static partial bool FreeConsoleWin();
     
     

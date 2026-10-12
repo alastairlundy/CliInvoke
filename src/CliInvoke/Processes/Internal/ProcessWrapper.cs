@@ -59,7 +59,7 @@ internal class ProcessWrapper : Process
     // under this lock keeps readers from ever observing default(DateTime) or a torn value.
     private readonly object _exitTimeSync = new();
 
-    // Resolved cancellation reason, persisted across the wait so Canceled can be computed afterward.
+    // Resolved cancellation reason, persisted across the wait so Cancelled can be computed afterward.
     private CancellationReason _cancellationReason = CancellationReason.NotKnown;
 
     internal ProcessWrapper(ProcessConfiguration configuration,
@@ -96,6 +96,7 @@ internal class ProcessWrapper : Process
 
     internal new int Id { get; private set; }
 
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     internal new string ProcessName { get; private set; }
 
     /// <summary>
@@ -187,7 +188,7 @@ internal class ProcessWrapper : Process
     ///     <see cref="Process.HasExited"/> flips true, so wait paths call this before returning;
     ///     otherwise readers (e.g. the <c>ProcessResult</c> built by ExternalProcess) race the
     ///     callback and can observe <c>default</c>, producing a bogus negative RuntimeDuration.
-    ///     No-ops while the process is still running, so it is safe to call from cleanup paths.
+    ///     No-ops while the process is still running, so it is safe to call from clean-up paths.
     /// </summary>
     private void EnsureExitTime()
     {
@@ -306,9 +307,9 @@ internal class ProcessWrapper : Process
         // the process has already exited.
         try
         {
-            _ = base.StandardOutput;
-            _ = base.StandardError;
-            _cachedStdInWriter = base.StandardInput;
+            _ = StandardOutput;
+            _ = StandardError;
+            _cachedStdInWriter = StandardInput;
         }
         catch (InvalidOperationException)
         {
@@ -333,6 +334,7 @@ internal class ProcessWrapper : Process
         }
 
         StartTime = DateTime.UtcNow;
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         Started?.Invoke(this, EventArgs.Empty);
 
         return HasStarted;
@@ -385,7 +387,7 @@ internal class ProcessWrapper : Process
     #region Piping Standard Inputs and Outputs
     /// <summary>
     ///     Asynchronously pipes the standard input from a source stream to a specified process,
-    ///     then closes the child's stdin write end so the child receives an end-of-file signal —
+    ///     then closes the child's stdin write end so the child receives an end-of-file signal
     ///     on every exit path of the piping (successful copy, cancellation, or source-stream error).
     /// </summary>
     /// <remarks>
@@ -446,7 +448,7 @@ internal class ProcessWrapper : Process
             // Dispose the buffer only when the copy faults (or the position reset throws);
             // on success the caller owns the returned stream.
             if (!completed)
-                destination.Dispose();
+                await destination.DisposeAsync();
         }
     }
 
@@ -478,7 +480,7 @@ internal class ProcessWrapper : Process
             // Dispose the buffer only when the copy faults (or the position reset throws);
             // on success the caller owns the returned stream.
             if (!completed)
-                destination.Dispose();
+                await destination.DisposeAsync();
         }
     }
     #endregion
@@ -606,7 +608,7 @@ internal class ProcessWrapper : Process
         }
 
         // Drain any remainder so the pipe is fully consumed even when truncated.
-        while (truncated && (bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+        while (truncated && (_ = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
         {
             // Remainder is discarded.
         }
@@ -637,7 +639,7 @@ internal class ProcessWrapper : Process
         {
             // Process exited between the HasExited check and Kill(true); nothing to do.
         }
-        catch (System.ComponentModel.Win32Exception)
+        catch (Win32Exception)
         {
             // Process handle may be invalid or access denied; nothing more we can do.
         }
@@ -830,8 +832,8 @@ internal class ProcessWrapper : Process
                 ObserveFault(secondExitWatch);
 
                 // Await the interrupt/timeout resolution so _cancellationReason is persisted
-                // before the caller reads Canceled; otherwise ProcessResult could report
-                // Canceled as false for a process the cancellation machinery terminated.
+                // before the caller reads Cancelled; otherwise ProcessResult could report
+                // Cancelled as false for a process the cancellation machinery terminated.
                 // Awaiting a completed task always observes its fault, so an exception that
                 // CancellationHelper approved for propagation surfaces every time instead of
                 // depending on timing. An incomplete task is awaited only while the process
@@ -949,7 +951,7 @@ internal class ProcessWrapper : Process
         finally
         {
             // Disposed on every exit path, including a throw from the semaphore wait with an
-            // already-canceled token, so the linked token registration never leaks.
+            // already-cancelled token, so the linked token registration never leaks.
             cts.Dispose();
         }
     }
@@ -982,8 +984,8 @@ internal class ProcessWrapper : Process
                 return true;
 
             // Reaching this point means the delay elapsed without the token being
-            // canceled, i.e. a graceful timeout. Persist the resolved reason before
-            // sending the interrupt so Canceled can be computed from it afterward.
+            // cancelled, i.e. a graceful timeout. Persist the resolved reason before
+            // sending the interrupt so Cancelled can be computed from it afterward.
             _cancellationReason = CancellationReason.Timeout;
 
             return await ProcessControlAdapter.SendInterruptSignalAsync(this,
@@ -991,7 +993,7 @@ internal class ProcessWrapper : Process
         }
         catch (Exception exception)
         {
-            // Compute the cancellation reason at the catch point where the token is known-canceled.
+            // Compute the cancellation reason at the catch point where the token is known-cancelled.
             CancellationReason cancellationReason =
                 CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
 

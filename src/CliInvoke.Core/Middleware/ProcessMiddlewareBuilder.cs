@@ -31,7 +31,7 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
     {
         ArgumentNullException.ThrowIfNull(provider);
         _resolver = type => (IProcessMiddleware)(provider.GetService(type)
-            ?? throw new InvalidOperationException(FormatMissingServiceMessage(type)));
+                                                 ?? throw new InvalidOperationException(FormatMissingServiceMessage(type)));
     }
 
     /// <summary>
@@ -59,6 +59,7 @@ public sealed class ProcessMiddlewareBuilder : IProcessMiddlewareBuilder
     {
         _typedEntries.Add(typeof(T));
         // Placeholder keeps type-based entries positioned in registration order.
+        //TODO: Replace with a different system 
         _middleware.Add(null!);
         return this;
     }

@@ -9,7 +9,6 @@
 
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
-using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Truncation;
 
 namespace CliInvoke.Tests.Fuzzing;

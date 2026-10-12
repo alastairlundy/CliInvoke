@@ -108,7 +108,9 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
             string runnerArgs = kind switch
             {
                 ShellKind.Cmd => "/c",
+#pragma warning disable CA1416
                 ShellKind.PowerShell => PowerShellMiddleware.PowerShellRunnerArgs,
+#pragma warning restore CA1416
                 _ => "-c"
             };
 

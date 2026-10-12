@@ -184,7 +184,7 @@ public static class ProcessResultHelperExtensions
     /// </remarks>
     private static IEnumerable<string> EnumerateLines(string text)
     {
-        if (text is null)
+        if (string.IsNullOrEmpty(text))
         {
             yield break;
         }
@@ -199,6 +199,6 @@ public static class ProcessResultHelperExtensions
             start = index + separator.Length;
         }
 
-        yield return text.Substring(start);
+        yield return text[start..];
     }
 }

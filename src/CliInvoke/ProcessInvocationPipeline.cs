@@ -51,8 +51,8 @@ internal class ProcessInvocationPipeline
                 return;
 
             ValidationRule<ProcessResult>[] rules = exitConfiguration.ValidationRules;
-
-            if (rules is null)
+            
+            if (rules.Length == 0)
                 return;
 
             List<string> failures = [];

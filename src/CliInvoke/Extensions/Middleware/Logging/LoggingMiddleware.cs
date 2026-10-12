@@ -54,7 +54,9 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
     /// </param>
     public LoggingMiddleware(ILogger<LoggingMiddleware> logger, Func<string?, string>? redactor = null)
     {
-        _logger = logger ?? NullLogger<LoggingMiddleware>.Instance;
+        ArgumentNullException.ThrowIfNull(logger);
+        
+        _logger = logger;
         _redactor = redactor;
     }
 

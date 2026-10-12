@@ -102,7 +102,7 @@ public static class CachingFilePathResolverExtensions
 
                 if (innerDescriptor.ImplementationInstance is not null) return (IFilePathResolver)innerDescriptor.ImplementationInstance;
 
-                return (IFilePathResolver)ActivatorUtilities.CreateInstance(sp, innerDescriptor.ImplementationType!);
+                return (IFilePathResolver)ActivatorUtilities.CreateInstance(sp, innerDescriptor.ImplementationType);
             }
 
             ServiceLifetime lifetime = innerDescriptor.Lifetime;

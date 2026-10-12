@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace CliInvoke.Specializations.Tests.Helpers;
 
-public static class ExecutedCommandHelper
+internal static class ExecutedCommandHelper
 {
-    public static string WinCalcExePath
+    internal static string WinCalcExePath
     {
         get
         {

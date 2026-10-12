@@ -83,4 +83,13 @@
     <data name="Exceptions.Middleware.ChainCompletedWithoutResult" xml:space="preserve">
         <value>The middleware chain completed without setting a result. Short-circuiting middleware must assign InvocationContext.Result before returning.</value>
     </data>
+    <data name="Exceptions.ShellRewriter.UnsupportedShellKind" xml:space="preserve">
+        <value>Unsupported shell kind.</value>
+    </data>
+    <data name="Exceptions.RetryMiddleware.RetryOptions.MaxAttempts.GreaterThanOrEqualToOne" xml:space="preserve">
+        <value>RetryOptions.MaxAttempts must be at least 1; zero or negative attempts are not allowed.</value>
+    </data>
+    <data name="Excpetions.RetryMiddleware.RetryOptions.BaseDelay.NotNegative" xml:space="preserve">
+        <value>RetryOptions.BaseDelay must not be negative; a negative delay would cause Task.Delay to throw on the first retry.</value>
+    </data>
 </root>

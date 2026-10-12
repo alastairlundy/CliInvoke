@@ -7,13 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CliInvoke.Core;
 using CliInvoke.Internal;
-using FsCheck;
-using FsCheck.Fluent;
 
 namespace CliInvoke.Tests.Fuzzing;
 

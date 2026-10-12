@@ -9,8 +9,6 @@
  */
 
 using CliInvoke.Builders;
-using CliInvoke.Core;
-using CliInvoke.Core.Builders;
 
 namespace CliInvoke.Internal;
 
