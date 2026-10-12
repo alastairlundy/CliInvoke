@@ -448,7 +448,7 @@ internal class ProcessWrapper : Process
             // Dispose the buffer only when the copy faults (or the position reset throws);
             // on success the caller owns the returned stream.
             if (!completed)
-                await destination.DisposeAsync();
+                await destination.DisposeAsync().ConfigureAwait(false);
         }
     }
 
@@ -480,7 +480,7 @@ internal class ProcessWrapper : Process
             // Dispose the buffer only when the copy faults (or the position reset throws);
             // on success the caller owns the returned stream.
             if (!completed)
-                await destination.DisposeAsync();
+                await destination.DisposeAsync().ConfigureAwait(false);
         }
     }
     #endregion

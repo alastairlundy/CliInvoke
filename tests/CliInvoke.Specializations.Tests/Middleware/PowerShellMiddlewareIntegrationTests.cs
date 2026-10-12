@@ -79,7 +79,7 @@ public class PowerShellMiddlewareIntegrationTests
             config,
             ProcessExitConfiguration.CreateGraceful());
 
-        await provider.DisposeAsync();
+        await provider.DisposeAsync().ConfigureAwait(false));
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput).IsNotNull();
