@@ -1,22 +1,26 @@
-# Security and Support Policies
-This information is provided on an informational basis with forward looking statements and information and is not a guarantee of future support.
+# Security Policies
+
+## Where to report a Vulnerability
+**Please do not report a vulnerability via GitHub Issues, discussions, Pull Requests, or any other public facing text or method of communication.**
+
+To report a vulnerability privately, use the **GitHub Private Vulnerability Reporting** feature. To do this navigate to the **Security** tab on this repository, select **Advisories**, and click on **Report a vulnerability**. This creates a private draft vulnerability where you can collaborate with the maintainers. 
+
+## Disclosure Policy
+The maintainers kindly ask reporters to adhere to responsible disclosure guidelines and keep details private until the advisory details have been published and a public patch is released.
+
+When a valid report is received:
+* Maintainers will confirm the issue and determine affected versions
+* A fix will be developed and verified privately
+* A patched release and a GitHub Security Advisory (with an optional CVE assignment) will be issued in close proximity.
+
+## Patched Versions Policies
+Patches for accepted vulnerabilities will only be created for currently supported versions. In rare cases the maintainers may, at their sole discretion, decide to release patches for no longer supported versions in addition to currently supported versions.
 
 ### Currently Supported Versions
-Versions that are currently supported with Bug Fixes and/or Security Fixes.
+Versions that are currently supported with Bug Fixes and/or Security Fixes are displayed in the table below.
 
 | Version series | Versions Supported with Bug Fixes | Versions Supported with Security Fixes |
 |--| --|--|
-| 3.x | 3.0 | 3.0 |
+| 3.x | 3.0, 3.1 | 3.0, 3.1 |
 | 2.x | 2.10, 2.11 | 2.10, 2.11 |
 | 1.x | :x: | :x: |
-
-## Reporting a Security Vulnerability
-
-To report a security vulnerability please privately report a Security Vulnerability in the [Security tab](https://github.com/alastairlundy/CliInvoke/security) on this project within GitHub.
-Please ensure you provide all the details regarding the vulnerability. I will try to reply to your report within 2-3 Business Days acknowledging receipt of it.
-
-I will then investigate the issue further and decide whether or not to accept the vulnerability. I will then inform you whether I accept the vulnerability or not.
-
-If the vulnerability is accepted please do not publish the details of the vulnerability until at least 1 Business Day after the updates patching the security vulnerability have been released .
-
-If the vulnerability is rejected please do not refer to it as a vulnerability and do not publish private correspondence without prior written permission.
