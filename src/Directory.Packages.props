@@ -7,7 +7,7 @@
     <PackageVersion Include="Polyfill" Version="11.4.5" />
     <PackageVersion Include="DotExtensions" Version="[10.6.1, 11.0.0)" />
     <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13" />
   </ItemGroup>
   <PropertyGroup>
     <!-- default false, CI can set to true -->
