@@ -51,7 +51,7 @@ public class AdapterConfigurationDeliveryTests
         const string variableName = "CLIINVOKE_ENV_E2E_TEST";
         const string variableValue = "delivered-value-17654";
 
-        ProcessConfiguration configuration = new(helperPath, new[] { "echo-env", variableName })
+        ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
         {
             EnvironmentVariables = new Dictionary<string, string>
             {

@@ -36,7 +36,7 @@ public class ProcessResultValidatorTests
     {
         // Arrange
         ProcessResultValidator<ProcessResult> validator = new(
-            new Func<ProcessResult, bool>[] { r => r.ExitCode == 0, r => r.ProcessId > 0 });
+            [r => r.ExitCode == 0, r => r.ProcessId > 0]);
 
         // Act
         bool result = validator.Validate(MakeResult(0));
@@ -50,7 +50,7 @@ public class ProcessResultValidatorTests
     {
         // Arrange
         ProcessResultValidator<ProcessResult> validator = new(
-            new Func<ProcessResult, bool>[] { r => r.ExitCode == 0, r => r.ProcessId > 0 });
+            [r => r.ExitCode == 0, r => r.ProcessId > 0]);
 
         // Act
         bool result = validator.Validate(MakeResult(1));
@@ -91,7 +91,7 @@ public class ProcessResultValidatorTests
         ValidationRule<ProcessResult> pidRule =
             new(r => r.ProcessId > 0, "positive pid");
         ProcessResultValidator<ProcessResult> validator =
-            new(new ValidationRule<ProcessResult>[] { exitRule, pidRule });
+            new([exitRule, pidRule]);
 
         // Act
         ValidationFailure<ProcessResult>[] failures = validator.GetValidationFailures(MakeResult(1));
