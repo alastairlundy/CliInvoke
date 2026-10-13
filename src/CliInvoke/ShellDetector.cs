@@ -101,7 +101,7 @@ public partial class ShellDetector : IShellDetector
             }
         }
         
-        Version shellVersion = versionStr is not null ? Version.GracefulParse(versionStr.Replace(".", string.Empty)) : new Version();
+        Version shellVersion = versionStr is not null ? Version.GracefulParse(versionStr) : new Version();
 
         string shellPrettyName = Path.GetFileNameWithoutExtension(shellExe);
         
