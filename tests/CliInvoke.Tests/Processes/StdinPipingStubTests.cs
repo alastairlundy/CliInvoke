@@ -16,7 +16,7 @@ namespace CliInvoke.Tests.Processes;
 ///     process, its kill machinery, and all process timing are stubbed, so close-on-every
 ///     -exit-path, copy-before-close ordering, and the join fault rules are asserted with
 ///     no real processes and no wall-clock or kill-timing dependence. Real-executable
-///     end-to-end proofs are covered separately (ticket 004).
+///     end-to-end proofs are covered separately.
 /// </summary>
 public class StdinPipingStubTests : IDisposable
 {
@@ -56,12 +56,11 @@ public class StdinPipingStubTests : IDisposable
             CreateContext(CreateStdinConfiguration(source), InvocationMode.Raw));
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
-            new[]
-            {
+            [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyCompleted,
                 StdinPipingEvent.WriteEndClosed
-            },
+            ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
         await Assert.That(source.CanRead).IsTrue();
@@ -88,12 +87,11 @@ public class StdinPipingStubTests : IDisposable
             .Throws<OperationCanceledException>();
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
-            new[]
-            {
+            [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyFaulted,
                 StdinPipingEvent.WriteEndClosed
-            },
+            ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
         await Assert.That(source.CanRead).IsTrue();
@@ -117,12 +115,11 @@ public class StdinPipingStubTests : IDisposable
             CreateContext(CreateStdinConfiguration(source), InvocationMode.Raw));
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
-            new[]
-            {
+            [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyFaulted,
                 StdinPipingEvent.WriteEndClosed
-            },
+            ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
         await Assert.That(source.CanRead).IsTrue();
@@ -146,12 +143,11 @@ public class StdinPipingStubTests : IDisposable
                 CreateContext(CreateStdinConfiguration(source), InvocationMode.Buffered));
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
-            new[]
-            {
+            [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyFaulted,
                 StdinPipingEvent.WriteEndClosed
-            },
+            ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
         await Assert.That(source.CanRead).IsTrue();
@@ -177,12 +173,11 @@ public class StdinPipingStubTests : IDisposable
             .Throws<IOException>();
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
-            new[]
-            {
+            [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyFaulted,
                 StdinPipingEvent.WriteEndClosed
-            },
+            ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
         await Assert.That(source.CanRead).IsTrue();

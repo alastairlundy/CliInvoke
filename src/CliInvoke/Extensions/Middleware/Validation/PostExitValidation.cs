@@ -111,7 +111,7 @@ public static class PostExitValidation
     private static ValidationRule<ProcessResult> ToProcessResultRule(ValidationRule<BufferedProcessResult> rule)
     {
         return new ValidationRule<ProcessResult>(
-            result => rule.Predicate((result as BufferedProcessResult)!),
+            result => rule.Predicate((result as BufferedProcessResult)),
             rule.Name,
             rule.FailureMessage,
             failureMessageFactory: null);

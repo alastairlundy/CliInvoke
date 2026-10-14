@@ -23,10 +23,10 @@ public class ProcessResultHelperExtensionsTests
         new("app.exe", 0, 1, stdout, stderr, DateTime.UtcNow, DateTime.UtcNow, canceled: false, signal: null);
 
     private static ProcessResultValidator<ProcessResult> AlwaysPass() =>
-        new(new Func<ProcessResult, bool>[] { r => true });
+        new([_ => true]);
 
     private static ProcessResultValidator<ProcessResult> AlwaysFail() =>
-        new(new Func<ProcessResult, bool>[] { r => false });
+        new([_ => false]);
 
     [Test]
     public async Task ThrowIfUnsuccessful_ValidatorPasses_DoesNotThrow()
@@ -35,8 +35,7 @@ public class ProcessResultHelperExtensionsTests
         ProcessResult result = MakeResult(0);
 
         // Act / Assert - a passing validator must not throw
-        result.ThrowIfUnsuccessful(AlwaysPass());
-        await Assert.That(true).IsTrue();
+        await Assert.That(() => result.ThrowIfUnsuccessful(AlwaysPass())).ThrowsNothing();
     }
 
     [Test]

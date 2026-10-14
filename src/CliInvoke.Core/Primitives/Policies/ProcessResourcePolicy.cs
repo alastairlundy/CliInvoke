@@ -131,6 +131,9 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
             ? nint.MaxValue
             : ((nint)1 << Environment.ProcessorCount) - 1;
 
+    internal static nint DefaultProcessorAffinity =>
+        GetAllProcessorAffinityMask();
+    
     /// <summary>
     ///     Determines whether this ProcessResourcePolicy is equal to another ProcessResourcePolicy.
     /// </summary>

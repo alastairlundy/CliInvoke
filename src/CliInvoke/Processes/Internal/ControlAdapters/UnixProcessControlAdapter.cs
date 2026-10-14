@@ -147,7 +147,8 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
 
     internal override void SetUserCredential(Process process, UserCredential credential)
     {
-        if (credential is null)
+        // A null credential is treated the same as the Null sentinel: a no-op.
+        if (credential is null || credential.Equals(UserCredential.Null))
             return;
 
         // An "empty" credential (all fields null) is a no-op, matching the
@@ -157,9 +158,9 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         // would reject every default-configuration process start on Unix.
 #pragma warning disable CA1416
         bool hasCredential = credential.UserName is not null
-            || credential.Domain is not null
-            || credential.Password is not null
-            || credential.LoadUserProfile is not null;
+                             || credential.Domain is not null
+                             || credential.Password is not null
+                             || credential.LoadUserProfile is not null;
 #pragma warning restore CA1416
 
         if (hasCredential)
@@ -191,12 +192,16 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
             [2] = PosixSignal.SIGINT,
             [3] = PosixSignal.SIGQUIT,
             [15] = PosixSignal.SIGTERM,
-            [21] = PosixSignal.SIGTTIN,
-            [22] = PosixSignal.SIGTTOU,
-            [28] = PosixSignal.SIGWINCH,
         };
 
-        if (UsesBsdSignalNumbers())
+        if (!OperatingSystem.IsWindows())
+        {
+            table[21] = PosixSignal.SIGTTIN;
+            table[22] = PosixSignal.SIGTTOU;
+            table[28] = PosixSignal.SIGWINCH;
+        }
+
+        if (UsesBsdSignalNumbers() && ( OperatingSystem.IsFreeBSD() || OperatingSystem.IsMacOS()))
         {
             // BSD numbering (macOS, FreeBSD): SIGSTOP 17 (no PosixSignal member, omitted),
             // SIGTSTP 18, SIGCONT 19, SIGCHLD 20.
@@ -204,7 +209,7 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
             table[19] = PosixSignal.SIGCONT;
             table[20] = PosixSignal.SIGCHLD;
         }
-        else
+        else if(OperatingSystem.IsLinux())
         {
             // Linux numbering: SIGCHLD 17, SIGCONT 18, SIGTSTP 20.
             table[17] = PosixSignal.SIGCHLD;

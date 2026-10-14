@@ -9,8 +9,6 @@
 
 using System.Linq;
 using CliInvoke.Internal;
-using FsCheck;
-using FsCheck.Fluent;
 
 namespace CliInvoke.Tests.Fuzzing;
 
@@ -79,7 +77,7 @@ public class ShellRewriterFuzzTests
         Prop.ForAll<string>(value =>
             {
                 if (string.IsNullOrEmpty(value) ||
-                    Enumerable.Any(value, c => char.IsControl(c) || Array.IndexOf(PosixShellMetacharacters, c) >= 0))
+                    value.Any(c => char.IsControl(c) || Array.IndexOf(PosixShellMetacharacters, c) >= 0))
                     return true;
 
                 string escaped = ShellRewriter.EscapeForPosixShell(value);
@@ -137,7 +135,7 @@ public class ShellRewriterFuzzTests
         Prop.ForAll<string>(value =>
             {
                 if (string.IsNullOrEmpty(value) ||
-                    Enumerable.Any(value, c => char.IsControl(c) || Array.IndexOf(PowerShellMetacharacters, c) >= 0))
+                    value.Any(c => char.IsControl(c) || Array.IndexOf(PowerShellMetacharacters, c) >= 0))
                     return true;
 
                 string escaped = ShellRewriter.EscapeForPowerShell(value);
@@ -199,7 +197,7 @@ public class ShellRewriterFuzzTests
         Prop.ForAll<string>(value =>
             {
                 if (string.IsNullOrEmpty(value) ||
-                    Enumerable.Any(value, c => char.IsControl(c) || Array.IndexOf(CmdMetacharacters, c) >= 0 || c == '"'))
+                    value.Any(c => char.IsControl(c) || Array.IndexOf(CmdMetacharacters, c) >= 0 || c == '"'))
                     return true;
 
                 string escaped = ShellRewriter.EscapeForCmd(value);

@@ -182,7 +182,7 @@ public class RetryMiddlewareTests
         IServiceCollection services = new ServiceCollection();
         // Register UseRetryPolicy() first, then replace the retry classifier and process factory with stubs.
         // Registering after AddCliInvoke ensures our singleton registrations win over the ones it adds.
-        services.AddCliInvoke(builder => RetryMiddlewareExtensions.UseRetryPolicy(builder));
+        services.AddCliInvoke(builder => builder.UseRetryPolicy());
 
         // A retry classifier that always classifies the result as retryable, plus a stub process factory that
         // avoids spawning real processes. Executing through the resolved IProcessInvoker (not a

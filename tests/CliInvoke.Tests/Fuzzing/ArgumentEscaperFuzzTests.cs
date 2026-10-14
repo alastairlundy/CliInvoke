@@ -37,7 +37,7 @@ public class ArgumentEscaperFuzzTests
         Prop.ForAll<string>(value =>
             {
                 if (string.IsNullOrEmpty(value) ||
-                    Enumerable.Any(value, c => !(char.IsLetterOrDigit(c) || c == '_' || c == '-' || c == '.')))
+                    value.Any(c => !(char.IsLetterOrDigit(c) || c == '_' || c == '-' || c == '.')))
                     return true;
 
                 string escaped = ArgumentEscaper.EscapeInner(value);
@@ -152,7 +152,7 @@ public class ArgumentEscaperFuzzTests
         Prop.ForAll<string>(value =>
             {
                 if (string.IsNullOrEmpty(value) ||
-                    Enumerable.Any(value, c => !(char.IsLetterOrDigit(c) || c == '_' || c == '-' || c == '.')))
+                    value.Any(c => !(char.IsLetterOrDigit(c) || c == '_' || c == '-' || c == '.')))
                     return true;
 
                 return !ArgumentEscaper.NeedsQuoting(value);
@@ -165,7 +165,7 @@ public class ArgumentEscaperFuzzTests
     {
         Prop.ForAll<string>(value =>
             {
-                if (string.IsNullOrEmpty(value) || !Enumerable.Any(value, char.IsWhiteSpace))
+                if (string.IsNullOrEmpty(value) || !value.Any(char.IsWhiteSpace))
                     return true;
 
                 return ArgumentEscaper.NeedsQuoting(value);
@@ -180,7 +180,7 @@ public class ArgumentEscaperFuzzTests
 
         Prop.ForAll<string>(value =>
             {
-                if (string.IsNullOrEmpty(value) || !Enumerable.Any(value, c => specialChars.Contains(c)))
+                if (string.IsNullOrEmpty(value) || !value.Any(c => specialChars.Contains(c)))
                     return true;
 
                 return ArgumentEscaper.NeedsQuoting(value);

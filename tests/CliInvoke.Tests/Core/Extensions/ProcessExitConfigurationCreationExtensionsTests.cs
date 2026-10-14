@@ -144,7 +144,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
 
         // Act
         ProcessExitConfiguration result =
-            ProcessExitConfigurationCreationExtensions
+            ProcessExitConfiguration
                 .WithValidationRules(source, newRule);
 
         // Assert
@@ -178,7 +178,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
 
         // Act
         ProcessExitConfiguration result =
-            ProcessExitConfigurationCreationExtensions
+            ProcessExitConfiguration
                 .WithMaxBufferedOutputBytes(source, 4096);
 
         // Assert
@@ -204,7 +204,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
 
         // Act
         ProcessExitConfiguration result =
-            ProcessExitConfigurationCreationExtensions
+            ProcessExitConfiguration
                 .WithMaxBufferedOutputBytes(source, null);
 
         // Assert - an explicit null means unbounded, not "keep the source cap".
@@ -224,7 +224,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
 
         // Act
         ProcessExitConfiguration result =
-            ProcessExitConfigurationCreationExtensions
+            ProcessExitConfiguration
                 .WithValidationRules(source, newRule);
 
         // Assert - the helper argument was omitted, so the source cap carries over.

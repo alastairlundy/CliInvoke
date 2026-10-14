@@ -7,16 +7,11 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Collections.Generic;
-
-using FsCheck;
-using FsCheck.Fluent;
-
 namespace CliInvoke.Tests.Fuzzing;
 
 /// <summary>
 ///     Property-based tests verifying enumeration parity and ToString shape stability
-///     for the result-ergonomics members added in tickets 001–004.
+///     for the result-ergonomics members.
 /// </summary>
 public class ResultErgonomicsPropertyTests
 {

@@ -84,9 +84,11 @@ public class ShellInjectionSecurityTests
     [SupportedOSPlatform("linux")]
     public async Task PowerShell_Wrapper_PreservesArgumentListAndIgnoresArguments()
     {
+        // The third entry carries whitespace: a re-tokenized command would split it into
+        // two arguments instead of delivering it as the single argument the caller asked for.
         ProcessConfiguration original = new("prog.exe", "ignored")
         {
-            ArgumentList = ["first", "second;evil.exe"]
+            ArgumentList = ["first", "second;evil.exe", "third arg"]
         };
 
         CapturingNext next = new();
@@ -101,8 +103,13 @@ public class ShellInjectionSecurityTests
 
         await Assert.That(rewritten.Arguments).IsEqualTo(string.Empty);
         await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(4);
+
+        // ArgumentList takes precedence over Arguments and every entry is quoted on its
+        // own. The per-entry quoting is what preserves argument boundaries and keeps the
+        // ';' literal; concatenating the entries as bare words would both re-tokenize
+        // 'third arg' into two arguments and leave the metacharacter to be re-parsed.
         await Assert.That(rewritten.ArgumentList[3])
-            .IsEqualTo("& \"prog.exe\" first second`;evil.exe");
+            .IsEqualTo("& \"prog.exe\" \"first\" \"second;evil.exe\" \"third arg\"");
     }
 
     [Test]
@@ -133,9 +140,11 @@ public class ShellInjectionSecurityTests
     [SupportedOSPlatform("windows")]
     public async Task Cmd_Wrapper_PreservesArgumentListAndIgnoresArguments()
     {
+        // The third entry carries whitespace: a re-tokenized command would split it into
+        // two arguments instead of delivering it as the single argument the caller asked for.
         ProcessConfiguration original = new("prog.exe", "ignored")
         {
-            ArgumentList = ["first", "second&evil.exe"]
+            ArgumentList = ["first", "second&evil.exe", "third arg"]
         };
 
         CapturingNext next = new();
@@ -149,8 +158,13 @@ public class ShellInjectionSecurityTests
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 
         await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(0);
+
+        // The outer quoting pair is mandatory: cmd.exe strips one leading and one trailing
+        // quote before re-parsing the remainder. Quoting each entry inside it is what keeps
+        // argument boundaries intact. An unquoted 'second^&evil.exe' does not merely lose the
+        // argument, it terminates the command and runs 'evil.exe' as a second one.
         await Assert.That(rewritten.Arguments)
-            .IsEqualTo("/c \"prog.exe\" first second^&evil.exe");
+            .IsEqualTo("/c \"\"prog.exe\" \"first\" \"second^&evil.exe\" \"third arg\"\"");
     }
 
     private static string? ResolvePwshPath()

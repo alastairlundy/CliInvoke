@@ -510,6 +510,65 @@ public class RunnerConfigurationFactoryTests
         await Assert.That(wrapped.ArgumentList).Contains("value");
     }
 
+    [Test]
+    public async Task CreateRunnerConfiguration_NonShellRunner_BenignTarget_NoOptionTerminatorInserted()
+    {
+        // A benign target must get exactly the tokens the caller asked for — no
+        // option terminator. Over-inserting "--" would break runners whose program
+        // slot is positional (runas accepts "runas /user:x prog" but nothing more),
+        // so the guard is conditional on a dash-prefixed target only.
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("sudo", "-u root");
+        ProcessConfiguration target = BuildConfig("app.exe", "--flag value");
+
+        ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
+
+        await Assert.That(wrapped.ArgumentList.Count).IsEqualTo(5);
+        await Assert.That(wrapped.ArgumentList[0]).IsEqualTo("-u");
+        await Assert.That(wrapped.ArgumentList[1]).IsEqualTo("root");
+        await Assert.That(wrapped.ArgumentList[2]).IsEqualTo("app.exe");
+        await Assert.That(wrapped.ArgumentList[3]).IsEqualTo("--flag");
+        await Assert.That(wrapped.ArgumentList[4]).IsEqualTo("value");
+    }
+
+    [Test]
+    public async Task CreateRunnerConfiguration_NonShellRunner_DashPrefixedTarget_InsertsOptionTerminator()
+    {
+        // An option-parsing runner (sudo on POSIX and Windows) binds a dash-prefixed
+        // target into its own option zone: "-u root" plus a target of
+        // "--preserve-env=..." is parsed as another sudo option. The option zone must
+        // be terminated with a separate "--" token before the target.
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("sudo", "-u root");
+        ProcessConfiguration target = BuildConfig("--preserve-env=LD_PRELOAD", "/bin/sh");
+
+        ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
+
+        await Assert.That(wrapped.ArgumentList.Count).IsEqualTo(5);
+        await Assert.That(wrapped.ArgumentList[0]).IsEqualTo("-u");
+        await Assert.That(wrapped.ArgumentList[1]).IsEqualTo("root");
+        await Assert.That(wrapped.ArgumentList[2]).IsEqualTo("--");
+        await Assert.That(wrapped.ArgumentList[3]).IsEqualTo("--preserve-env=LD_PRELOAD");
+        await Assert.That(wrapped.ArgumentList[4]).IsEqualTo("/bin/sh");
+    }
+
+    [Test]
+    public async Task CreateRunnerConfiguration_NonShellRunner_DashPrefixedTarget_EmptyRunnerArgs_TerminatorIsFirstToken()
+    {
+        // With no runner arguments the terminator must still be present, and must be
+        // the first token in the runner's argv.
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("sudo", string.Empty);
+        ProcessConfiguration target = BuildConfig("-preserve-env=LD_PRELOAD", "/bin/sh");
+
+        ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
+
+        await Assert.That(wrapped.ArgumentList.Count).IsEqualTo(3);
+        await Assert.That(wrapped.ArgumentList[0]).IsEqualTo("--");
+        await Assert.That(wrapped.ArgumentList[1]).IsEqualTo("-preserve-env=LD_PRELOAD");
+        await Assert.That(wrapped.ArgumentList[2]).IsEqualTo("/bin/sh");
+    }
+
     private static void SkipTestIfNotWindows()
     {
         if (!OperatingSystem.IsWindows())

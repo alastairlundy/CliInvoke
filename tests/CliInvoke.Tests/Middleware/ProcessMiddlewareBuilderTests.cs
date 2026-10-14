@@ -148,7 +148,7 @@ public class ProcessMiddlewareBuilderTests
     public async Task TypedMiddleware_IsReusedAcrossInvocations()
     {
         int constructionCount = 0;
-        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(type =>
+        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(_ =>
         {
             constructionCount++;
             List<string> log = [];

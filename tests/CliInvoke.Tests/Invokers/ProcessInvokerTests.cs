@@ -24,7 +24,7 @@ public class ProcessInvokerTests
         // Middleware that rewrites the configuration via WithConfiguration before calling next.
         IProcessMiddleware configMiddleware = new ConfigRewritingMiddleware();
 
-        ProcessInvoker invoker = new ProcessInvoker(externalProcessFactory, new[] { configMiddleware }, null);
+        ProcessInvoker invoker = new ProcessInvoker(externalProcessFactory, [configMiddleware], null);
 
         ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 

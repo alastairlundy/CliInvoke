@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Collections.Generic;
-
 using CliInvoke.Core.Exceptions;
 
 namespace CliInvoke.Tests.Core.Extensions;
@@ -94,11 +92,8 @@ public class ResultErgonomicsTests
     {
         ProcessResult result = MakeProcessResult(0);
 
-        // The success criterion is that EnsureExitCodeZero() completes without throwing;
-        // reaching the assertion below means the call above did not throw.
-        result.EnsureExitCodeZero();
-
-        await Assert.That(true).IsTrue();
+        // The success criterion is that EnsureExitCodeZero() completes without throwing.
+        await Assert.That(() => result.EnsureExitCodeZero()).ThrowsNothing();
     }
 
     [Test]
@@ -106,11 +101,8 @@ public class ResultErgonomicsTests
     {
         ProcessResult result = MakeProcessResult(0, canceled: true);
 
-        // The success criterion is that EnsureExitCodeZero() completes without throwing;
-        // reaching the assertion below means the call above did not throw.
-        result.EnsureExitCodeZero();
-
-        await Assert.That(true).IsTrue();
+        // The success criterion is that EnsureExitCodeZero() completes without throwing.
+        await Assert.That(() => result.EnsureExitCodeZero()).ThrowsNothing();
     }
 
     [Test]
@@ -149,6 +141,20 @@ public class ResultErgonomicsTests
 
         await Assert.That(() => result.EnsureExitCodeZero())
             .Throws<ProcessNotSuccessfulException<BufferedProcessResult>>();
+    }
+
+    // -------------------------------------------------------------------
+    //  GetFirstOutputLine
+    // -------------------------------------------------------------------
+
+    [Test]
+    public async Task GetFirstOutputLine_EmptyString_ReturnsEmpty()
+    {
+        BufferedProcessResult result = MakeBuffered(string.Empty, string.Empty);
+
+        // Empty output's first line is an empty string, matching
+        // string.Split(Environment.NewLine)'s [""] for empty input.
+        await Assert.That(result.GetFirstOutputLine()).IsEqualTo(string.Empty);
     }
 
     // -------------------------------------------------------------------

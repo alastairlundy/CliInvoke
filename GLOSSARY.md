@@ -22,6 +22,18 @@ A parameter of the invocation contract that the caller states for the invocation
 
 The act of running a command inside a shell interpreter (PowerShell, CMD, or a POSIX shell). A shell-wrapping flow resolves the shell, escapes the command's target and arguments so they are treated as literal data rather than shell syntax, composes the inner command, and rewrites the process configuration so the shell executes the original command. Shell wrapping is a middleware concern, not an Invocation Capability: the caller could omit it without changing what the invocation means.
 
+### Runner process
+
+A process that executes another process on its behalf, supplying its own target and arguments around the inner command, as a shell interpreter (PowerShell, CMD) or an elevation tool (`sudo`, `runas`) does. The term names the role a process plays in an invocation, not the executable: the same program can be a runner process in one invocation and a plain target in another.
+
+### Runner Configuration
+
+The `ProcessConfiguration` used by a Runner process to execute another process. CliInvoke provides `IRunnerConfigurationFactory` and `RunnerConfigurationFactory` to create a Runner Configuration.
+
+### Non-shell runner process
+
+A runner process that executes its target by forwarding arguments verbatim to it rather than re-parsing them as shell syntax (`sudo`, `runas`). Contrasted with a shell runner process (PowerShell, CMD), whose interpreter re-parses composed text.
+
 ### Configuration Derivation
 
 The act of producing a new configuration from an existing one, preserving all member values except a stated delta. Derived configurations share resource-owning members by reference; disposal remains the caller's responsibility.

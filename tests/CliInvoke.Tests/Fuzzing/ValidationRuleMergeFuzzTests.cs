@@ -9,7 +9,6 @@
 
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
-using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Validation;
 
@@ -32,15 +31,15 @@ public class ValidationRuleMergeFuzzTests
 
                 ValidationRule<ProcessResult>[] configRules = new ValidationRule<ProcessResult>[k];
                 for (int i = 0; i < k; i++)
-                    configRules[i] = new ValidationRule<ProcessResult>(r => true, $"cfg-{i}");
+                    configRules[i] = new ValidationRule<ProcessResult>(_ => true, $"cfg-{i}");
 
                 ValidationRule<ProcessResult>[] validatorRules = new ValidationRule<ProcessResult>[j];
                 for (int i = 0; i < j; i++)
-                    validatorRules[i] = new ValidationRule<ProcessResult>(r => true, $"val-{i}");
+                    validatorRules[i] = new ValidationRule<ProcessResult>(_ => true, $"val-{i}");
 
                 IProcessResultValidator<ProcessResult> validator = new ProcessResultValidator<ProcessResult>(validatorRules);
 
-                ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithValidationRules(
+                ProcessExitConfiguration exit = ProcessExitConfiguration.WithValidationRules(
                     ProcessExitConfiguration.CreateGraceful(), configRules);
 
                 ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
@@ -54,13 +53,8 @@ public class ValidationRuleMergeFuzzTests
                     CancellationToken.None);
 
                 ValidationRule<ProcessResult>[]? captured = null;
-                Func<InvocationContext, Task> next = c =>
-                {
-                    captured = c.ExitConfiguration.ValidationRules;
-                    return Task.CompletedTask;
-                };
 
-                middleware.InvokeAsync(context, next).GetAwaiter().GetResult();
+                middleware.InvokeAsync(context, Next).GetAwaiter().GetResult();
 
                 if (captured is null) return false;
                 if (captured.Length != k + j) return false;
@@ -72,6 +66,12 @@ public class ValidationRuleMergeFuzzTests
                     if (captured[k + i].Name != $"val-{i}") return false;
 
                 return true;
+
+                Task Next(InvocationContext c)
+                {
+                    captured = c.ExitConfiguration.ValidationRules;
+                    return Task.CompletedTask;
+                }
             })
             .QuickCheckThrowOnFailure();
     }
@@ -91,19 +91,19 @@ public class ValidationRuleMergeFuzzTests
                 for (int i = 0; i < k; i++)
                 {
                     int index = i;
-                    configRules[i] = new ValidationRule<ProcessResult>(r => index != f, $"cfg-{i}");
+                    configRules[i] = new ValidationRule<ProcessResult>(_ => index != f, $"cfg-{i}");
                 }
 
                 ValidationRule<ProcessResult>[] validatorRules = new ValidationRule<ProcessResult>[j];
                 for (int i = 0; i < j; i++)
                 {
                     int index = i;
-                    validatorRules[i] = new ValidationRule<ProcessResult>(r => (k + index) != f, $"val-{i}");
+                    validatorRules[i] = new ValidationRule<ProcessResult>(_ => (k + index) != f, $"val-{i}");
                 }
 
                 IProcessResultValidator<ProcessResult> validator = new ProcessResultValidator<ProcessResult>(validatorRules);
 
-                ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithValidationRules(
+                ProcessExitConfiguration exit = ProcessExitConfiguration.WithValidationRules(
                     ProcessExitConfiguration.CreateGraceful(), configRules);
 
                 ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
@@ -117,13 +117,8 @@ public class ValidationRuleMergeFuzzTests
                     CancellationToken.None);
 
                 ValidationRule<ProcessResult>[]? captured = null;
-                Func<InvocationContext, Task> next = c =>
-                {
-                    captured = c.ExitConfiguration.ValidationRules;
-                    return Task.CompletedTask;
-                };
 
-                middleware.InvokeAsync(context, next).GetAwaiter().GetResult();
+                middleware.InvokeAsync(context, Next).GetAwaiter().GetResult();
 
                 if (captured is null || captured.Length != k + j) return false;
 
@@ -147,6 +142,12 @@ public class ValidationRuleMergeFuzzTests
 
                 string expectedName = f < k ? $"cfg-{f}" : $"val-{f - k}";
                 return captured[firstFailing].Name == expectedName;
+
+                Task Next(InvocationContext c)
+                {
+                    captured = c.ExitConfiguration.ValidationRules;
+                    return Task.CompletedTask;
+                }
             })
             .QuickCheckThrowOnFailure();
     }
@@ -160,11 +161,11 @@ public class ValidationRuleMergeFuzzTests
 
                 ValidationRule<ProcessResult>[] supplied = new ValidationRule<ProcessResult>[ruleCount];
                 for (int i = 0; i < ruleCount; i++)
-                    supplied[i] = new ValidationRule<ProcessResult>(r => true, $"sup-{i}");
+                    supplied[i] = new ValidationRule<ProcessResult>(_ => true, $"sup-{i}");
 
                 // Source starts from a graceful config (its ValidationRules is the default empty array).
                 ProcessExitConfiguration source = ProcessExitConfiguration.CreateGraceful();
-                ProcessExitConfiguration result = ProcessExitConfigurationCreationExtensions.WithValidationRules(source, supplied);
+                ProcessExitConfiguration result = ProcessExitConfiguration.WithValidationRules(source, supplied);
 
                 if (result.ValidationRules.Length != ruleCount) return false;
 
@@ -193,12 +194,12 @@ public class ValidationRuleMergeFuzzTests
 
                 ValidationRule<ProcessResult>[] rules =
                 [
-                    new ValidationRule<ProcessResult>(r => true, "rule-0")
+                    new(_ => true, "rule-0")
                 ];
 
-                ProcessExitConfiguration source = ProcessExitConfigurationCreationExtensions.WithMaxBufferedOutputBytes(
+                ProcessExitConfiguration source = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
                     ProcessExitConfiguration.CreateGraceful(), cap);
-                ProcessExitConfiguration result = ProcessExitConfigurationCreationExtensions.WithValidationRules(source, rules);
+                ProcessExitConfiguration result = ProcessExitConfiguration.WithValidationRules(source, rules);
 
                 return result.MaxBufferedOutputBytes == cap
                        && result.ValidationRules.Length == 1;

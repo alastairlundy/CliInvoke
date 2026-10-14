@@ -14,12 +14,11 @@ namespace CliInvoke.Extensions.Caching;
 /// <summary>
 ///     A decorator around <see cref="IFilePathResolver"/> that caches resolved absolute
 ///     <see cref="FileInfo"/> paths, keyed on the raw target, delegating to the inner resolver
-///     (PATH-first per GLOSSARY DD1) on a cache miss.
+///     (PATH-first) on a cache miss.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Lives in <c>CliInvoke.Extensions</c>; <c>CliInvoke.Core</c> remains free of caching concerns
-///         (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
+///         Lives in <c>CliInvoke.Extensions</c>; <c>CliInvoke.Core</c> remains free of caching concerns.
 ///     </para>
 ///     <para>
 ///         Cache keys are normalised per OS casing rules: case-insensitive on Windows,

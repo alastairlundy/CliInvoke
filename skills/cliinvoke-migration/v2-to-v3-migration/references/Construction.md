@@ -34,6 +34,16 @@ ProcessConfiguration config = new ProcessConfiguration
 };
 ```
 
+> **Output redirection differs between these two forms.** The
+> constructors taking a target file path default `OutputRedirection` to
+> `true`. The parameterless constructor leaves it at the property
+> default of `false`, so nothing gets captured. What decides the value
+> is which constructor binds, not whether you use an object initialiser.
+> `new ProcessConfiguration("dotnet") { ArgumentList = [...] }` binds the
+> target file path constructor and still gets `true`. Set
+> `OutputRedirection` explicitly when migrating code that relied on
+> capturing output.
+
 ## ArgumentList replaces ArgumentsList
 
 ### Before (v2-style)
@@ -96,7 +106,7 @@ ProcessConfiguration config = builder.Build();
 | `SetArguments(string)` | `Arguments` | Verbatim string |
 | `SetArguments(IEnumerable<string>)` | `ArgumentList` | Init-only |
 | `ConfigureArguments(Action<ArgumentsSpec>)` | *(no direct init)* | Escaping, validation |
-| `SetOutputRedirection(bool)` | `OutputRedirection` | Default differs: `true` (init) vs `false` (builder) |
+| `SetOutputRedirection(bool)` | `OutputRedirection` | Property defaults to `false`; the constructors taking a `targetFilePath` default it to `true` |
 | `SetWorkingDirectory(string)` | `WorkingDirectoryPath` | Builder validates existence |
 | `SetWindowCreation(bool)` | `WindowCreation` | |
 | `ConfigureShellExecution()` | `UseShellExecution` | |
