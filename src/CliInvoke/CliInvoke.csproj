@@ -14,27 +14,16 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### Fixed
-* Fixed a regression where ``ExternalProcessor`` 's ``StartAsync`` method would incorrectly wait for exit instead of performing standard input piping - Known Affected Versions: CliInvoke 3.0.0 Alpha 10 through 3.0.1
-- Environment variables, user credentials, and the administrator verb are now applied to the process that actually starts (previously silently discarded in every invocation pattern).
-- Fixed macOS and FreeBSD suspend/resume signals: macOS children were stopped and never resumed, and FreeBSD suspend/resume were inverted.
-- `FilePathResolver` now throws `FileNotFoundException` for rooted paths that do not exist.
-- The post-exit validation middleware adapter now honors inner-rule null semantics for non-buffered results.
-- `FromProcessStartInfo` maps `RedirectStandardInput`, treats non-empty `ArgumentList` as canonical over `Arguments`, and no longer reads Windows-only credential properties on Unix.
-- Fixed a linked `CancellationTokenSource` leak in the forceful-timeout wait.
-- `ProcessResult` no longer reports a zero `ExitTime` with a negative duration after a wait.
-- `MiddlewareItems.TryGet&lt;T&gt;`, `CachingFilePathResolver.TryResolveFilePath`, and static `BufferedProcessResult.Equals(null, null)` no longer throw on invalid input.
-- `ProcessExceptionInfo&lt;TProcessResult&gt;.Dispose()` no longer disposes the caller-owned `UserCredential`.
-- `ProcessMiddlewareBuilder.Build()` preserves middleware registration order across registration styles.
-- `ShellDetector` fixes: the Unix `ps` probe runs through `sh -c` so `$$` expands, Unix version parsing keeps the dots, and Windows `pwsh` detection is invoked non-interactively instead of starting a REPL.
-- `DefaultShellMiddleware` no longer recurses infinitely during shell detection.
-- The invocation pipeline now pipes `ProcessConfiguration.StandardInput` in Raw and Buffered modes, and the one-call bypass path delivers end-of-file so stdin-reading children no longer hang.
-- Kill-induced stdin copy faults are absorbed instead of failing the invocation; genuine source-stream errors still propagate.</PackageReleaseNotes>
+        <PackageReleaseNotes>This release hardens command composition in `RunnerConfigurationFactory`, which builds the configuration used to run a program through another program.
+
+#### Changed
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.12 to 10.0.13.
+- Updated internal Polyfill version from 11.4.0 to 11.4.5.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.2</PackageVersion>
-        <AssemblyVersion>3.0.2.0</AssemblyVersion>
+        <PackageVersion>3.0.3</PackageVersion>
+        <AssemblyVersion>3.0.3.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -42,7 +31,7 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
-        <FileVersion>3.0.2.0</FileVersion>
+        <FileVersion>3.0.3.0</FileVersion>
 <!--
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
 -->
