@@ -21,7 +21,7 @@ namespace CliInvoke.Extensions.Middleware.Retry;
 ///     </para>
 ///     <para>
 ///         Retries by default for classified (retryable) failures; callers should avoid this middleware
-///         for non-idempotent invocations (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md).
+///         for non-idempotent invocations.
 ///     </para>
 ///     <para>
 ///         This middleware applies to the <c>ProcessInvoker</c> pattern only; <c>IExternalProcess</c>
@@ -45,7 +45,7 @@ internal sealed class RetryMiddleware : IProcessMiddleware
     ///     Thrown when <paramref name="options"/>.<see cref="RetryOptions.MaxAttempts"/> is less than 1, since
     ///     zero or negative attempts would be meaningless and the <c>do</c> loop would still run once, or when
     ///     <paramref name="options"/>.<see cref="RetryOptions.BaseDelay"/> is negative (which would make the
-    ///     first <see cref="Task.Delay"/> throw).
+    ///     first <see cref="Task.Delay(TimeSpan)"/> throw).
     /// </exception>
     public RetryMiddleware(IRetryClassifier retryClassifier, RetryOptions options)
     {
@@ -55,12 +55,12 @@ internal sealed class RetryMiddleware : IProcessMiddleware
         if (options.MaxAttempts < 1)
             throw new ArgumentOutOfRangeException(
                 nameof(options),
-                "RetryOptions.MaxAttempts must be at least 1; zero or negative attempts are not allowed.");
+                Resources.Exceptions_RetryMiddleware_RetryOptions_MaxAttempts_GreaterThanOrEqualToOne);
 
         if (options.BaseDelay < TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(
                 nameof(options),
-                "RetryOptions.BaseDelay must not be negative; a negative delay would cause Task.Delay to throw on the first retry.");
+                Resources.Excpetions_RetryMiddleware_RetryOptions_BaseDelay_NotNegative);
 
         _retryClassifier = retryClassifier;
         _options = options;

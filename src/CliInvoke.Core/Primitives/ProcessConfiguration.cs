@@ -21,10 +21,16 @@ namespace CliInvoke.Core;
 /// </summary>
 /// <remarks>
 ///     The type is directly constructible via an object initialiser, with init-only
-///     properties and a required <see cref="TargetFilePath"/>. Direct
-///     construction carries the same semantics as the convenience constructor: every
-///     property defaults to the value documented on the property, and init-time validation
-///     runs on <see cref="TargetFilePath"/> and <see cref="WorkingDirectoryPath"/>.
+///     properties and a required <see cref="TargetFilePath"/>. Every property defaults to
+///     the value documented on the property, and init-time validation runs on
+///     <see cref="TargetFilePath"/> and <see cref="WorkingDirectoryPath"/>.
+///     <para>
+///         Direct construction does not inherit the defaults of the constructors that take a
+///         <see cref="TargetFilePath"/>. Every property here defaults to its documented value,
+///         so <see cref="OutputRedirection"/> is <see langword="false" /> unless you set it.
+///         Those constructors instead default their <c>outputRedirection</c> parameter to
+///         <see langword="true" />.
+///     </para>
 /// </remarks>
 public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 {
@@ -242,6 +248,12 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <summary>
     /// Whether to redirect process Standard Output and Error.
     /// </summary>
+    /// <remarks>
+    ///     Defaults to <see langword="false" />. The constructors that take a
+    ///     <see cref="TargetFilePath"/> set it to <see langword="true" /> unless their
+    ///     <c>outputRedirection</c> argument says otherwise, so the default depends on which
+    ///     constructor you call.
+    /// </remarks>
     public bool OutputRedirection { get; init; }
 
     /// <summary>

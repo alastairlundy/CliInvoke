@@ -41,7 +41,7 @@ public class MiddlewareChainNextTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { selfAware, downstream },
-            ctx =>
+            _ =>
             {
                 callLog.Add("terminal");
                 return Task.CompletedTask;
@@ -66,7 +66,7 @@ public class MiddlewareChainNextTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { rewinds, downstream },
-            ctx =>
+            _ =>
             {
                 callLog.Add("terminal");
                 return Task.CompletedTask;
@@ -88,7 +88,7 @@ public class MiddlewareChainNextTests
 
         MiddlewareChain chain = new MiddlewareChain(
             new List<IProcessMiddleware> { first, second },
-            ctx =>
+            _ =>
             {
                 callLog.Add("terminal");
                 return Task.CompletedTask;

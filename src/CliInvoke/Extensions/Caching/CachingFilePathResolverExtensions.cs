@@ -96,15 +96,6 @@ public static class CachingFilePathResolverExtensions
             // creating a circular IFilePathResolver dependency.
             services.RemoveAll<IFilePathResolver>();
 
-            IFilePathResolver InnerFactory(IServiceProvider sp)
-            {
-                if (innerDescriptor.ImplementationFactory is not null) return (IFilePathResolver)innerDescriptor.ImplementationFactory(sp);
-
-                if (innerDescriptor.ImplementationInstance is not null) return (IFilePathResolver)innerDescriptor.ImplementationInstance;
-
-                return (IFilePathResolver)ActivatorUtilities.CreateInstance(sp, innerDescriptor.ImplementationType!);
-            }
-
             ServiceLifetime lifetime = innerDescriptor.Lifetime;
 
             services.Add(ServiceDescriptor.Describe(
@@ -116,6 +107,15 @@ public static class CachingFilePathResolverExtensions
                 lifetime));
 
             return services;
+
+            IFilePathResolver InnerFactory(IServiceProvider sp)
+            {
+                if (innerDescriptor.ImplementationFactory is not null) return (IFilePathResolver)innerDescriptor.ImplementationFactory(sp);
+
+                if (innerDescriptor.ImplementationInstance is not null) return (IFilePathResolver)innerDescriptor.ImplementationInstance;
+
+                return (IFilePathResolver)ActivatorUtilities.CreateInstance(sp, innerDescriptor.ImplementationType);
+            }
         }
     }
 }

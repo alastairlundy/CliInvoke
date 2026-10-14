@@ -53,7 +53,7 @@ public class ArgumentsSpecTests
     public async Task Add_RejectsInvalidArgument()
     {
         // Arrange
-        ArgumentsSpec spec = new(arg => false);
+        ArgumentsSpec spec = new(_ => false);
 
         // Assert
         await Assert.That(() => spec.Add("nope", false))
@@ -144,7 +144,7 @@ public class ArgumentsSpecTests
         ArgumentsSpec spec = new();
 
         // Act
-        spec.AddEnumerable(new[] { "one", "two", "three" }, escape: false);
+        spec.AddEnumerable(["one", "two", "three"], escape: false);
 
         // Assert
         await Assert.That(spec.Build()).IsEqualTo("\"one two three\"");
@@ -157,7 +157,7 @@ public class ArgumentsSpecTests
         ArgumentsSpec spec = new(arg => !arg.Contains("x"));
 
         // Assert - a null item in the collection is rejected.
-        await Assert.That(() => spec.AddEnumerable(new[] { "keep", null!, "hasx" }, escape: false))
+        await Assert.That(() => spec.AddEnumerable(["keep", null!, "hasx"], escape: false))
             .Throws<ArgumentNullException>();
     }
 
@@ -168,7 +168,7 @@ public class ArgumentsSpecTests
         ArgumentsSpec spec = new(_ => false);
 
         // Assert
-        await Assert.That(() => spec.AddEnumerable(new[] { "a", "b" }, escape: false))
+        await Assert.That(() => spec.AddEnumerable(["a", "b"], escape: false))
             .Throws<ArgumentException>();
     }
 
@@ -190,7 +190,7 @@ public class ArgumentsSpecTests
         ArgumentsSpec spec = new();
 
         // Act
-        spec.AddEnumerable(new IFormattable[] { 1, 2, 3 }, escape: false);
+        spec.AddEnumerable([1, 2, 3], escape: false);
 
         // Assert
         await Assert.That(spec.Build()).IsEqualTo("\"1 2 3\"");

@@ -10,7 +10,6 @@
 using CliInvoke.Core.Exceptions;
 using CliInvoke.Core.Middleware;
 using CliInvoke.Core.Validation;
-using CliInvoke.Extensions.Middleware;
 using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Factories;
 using CliInvoke.Validation;
@@ -178,7 +177,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         {
             int index = i;
             configRules[i] = new ValidationRule<ProcessResult>(
-                r =>
+                _ =>
                 {
                     configInvocations[index]++;
                     return true;
@@ -191,7 +190,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         {
             int index = i;
             validatorRules[i] = new ValidationRule<ProcessResult>(
-                r =>
+                _ =>
                 {
                     validatorInvocations[index]++;
                     return true;
@@ -201,7 +200,7 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         IProcessResultValidator<ProcessResult> validator = new ProcessResultValidator<ProcessResult>(validatorRules);
 
-        ProcessExitConfiguration exit = ProcessExitConfigurationCreationExtensions.WithValidationRules(
+        ProcessExitConfiguration exit = ProcessExitConfiguration.WithValidationRules(
             ProcessExitConfiguration.CreateGraceful(), configRules);
 
         ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));

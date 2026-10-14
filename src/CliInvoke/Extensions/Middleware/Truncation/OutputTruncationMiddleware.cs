@@ -17,9 +17,8 @@ namespace CliInvoke.Extensions.Middleware.Truncation;
 ///     The cap is written via <see cref="InvocationContext.WithExitConfiguration"/> so that the
 ///     buffered-capture path (which runs downstream of this link) can truncate each stream as it is
 ///     read. This middleware only writes the cap; it does not perform truncation itself. It is ordered
-///     upstream of <c>LoggingMiddleware</c> so logs reflect already-capped output
-///     (see DECISIONS-CliInvoke-middleware-truncation-caching-retry.md). Does not apply to
-///     <c>IExternalProcess</c> (middleware does not flow there).
+///     upstream of <c>LoggingMiddleware</c> so logs reflect already-capped output. Does not
+///     apply to <c>IExternalProcess</c> (middleware does not flow there).
 /// </remarks>
 internal sealed class OutputTruncationMiddleware : IProcessMiddleware
 {

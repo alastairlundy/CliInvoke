@@ -105,15 +105,6 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The middleware chain completed without setting a result. Short-circuiting middleware must assign InvocationContext.Result before returning..
-        /// </summary>
-        internal static string Exceptions_Middleware_ChainCompletedWithoutResult {
-            get {
-                return ResourceManager.GetString("Exceptions.Middleware.ChainCompletedWithoutResult", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The executed command was not successful and returned an exit code of {x}..
         /// </summary>
         internal static string Exceptions_CommandNotSuccessful_Generic {
@@ -155,6 +146,15 @@ namespace CliInvoke.Internal.Localizations {
         internal static string Exceptions_FileNotFound {
             get {
                 return ResourceManager.GetString("Exceptions.FileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The middleware chain completed without setting a result. Short-circuiting middleware must assign InvocationContext.Result before returning..
+        /// </summary>
+        internal static string Exceptions_Middleware_ChainCompletedWithoutResult {
+            get {
+                return ResourceManager.GetString("Exceptions.Middleware.ChainCompletedWithoutResult", resourceCulture);
             }
         }
         
@@ -213,6 +213,24 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RetryOptions.MaxAttempts must be at least 1; zero or negative attempts are not allowed..
+        /// </summary>
+        internal static string Exceptions_RetryMiddleware_RetryOptions_MaxAttempts_GreaterThanOrEqualToOne {
+            get {
+                return ResourceManager.GetString("Exceptions.RetryMiddleware.RetryOptions.MaxAttempts.GreaterThanOrEqualToOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported shell kind..
+        /// </summary>
+        internal static string Exceptions_ShellRewriter_UnsupportedShellKind {
+            get {
+                return ResourceManager.GetString("Exceptions.ShellRewriter.UnsupportedShellKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The resolved file is not an executable file or did not have executable permissions..
         /// </summary>
         internal static string Exceptions_TargetFile_NotExecutable {
@@ -236,6 +254,15 @@ namespace CliInvoke.Internal.Localizations {
         internal static string Exceptions_VersionParsing_InvalidVersionString {
             get {
                 return ResourceManager.GetString("Exceptions.VersionParsing.InvalidVersionString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RetryOptions.BaseDelay must not be negative; a negative delay would cause Task.Delay to throw on the first retry..
+        /// </summary>
+        internal static string Excpetions_RetryMiddleware_RetryOptions_BaseDelay_NotNegative {
+            get {
+                return ResourceManager.GetString("Excpetions.RetryMiddleware.RetryOptions.BaseDelay.NotNegative", resourceCulture);
             }
         }
     }

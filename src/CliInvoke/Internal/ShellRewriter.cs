@@ -12,8 +12,6 @@
 using System.Linq;
 using System.Text;
 
-using CliInvoke.Core.Internal;
-
 namespace CliInvoke.Internal;
 
 /// <summary>
@@ -441,7 +439,7 @@ internal static class ShellRewriter
 
             default:
                 throw new ArgumentOutOfRangeException(
-                    nameof(kind), kind, "Unsupported shell kind.");
+                    nameof(kind), kind, Resources.Exceptions_ShellRewriter_UnsupportedShellKind);
         }
     }
 }

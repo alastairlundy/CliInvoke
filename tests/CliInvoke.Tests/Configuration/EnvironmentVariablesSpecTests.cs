@@ -100,11 +100,11 @@ public class EnvironmentVariablesSpecTests
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
-        List<KeyValuePair<string, string>> vars = new()
-        {
+        List<KeyValuePair<string, string>> vars =
+        [
             new("A", "1"),
-            new("B", "2"),
-        };
+            new("B", "2")
+        ];
 
         // Act
         spec.SetEnumerable(vars);
@@ -131,10 +131,10 @@ public class EnvironmentVariablesSpecTests
     {
         // Arrange - empty values are legitimate; null values are not.
         EnvironmentVariablesSpec spec = new();
-        List<KeyValuePair<string, string>> vars = new()
-        {
-            new("EMPTY", ""),
-        };
+        List<KeyValuePair<string, string>> vars =
+        [
+            new("EMPTY", "")
+        ];
 
         // Act
         spec.SetEnumerable(vars);
@@ -142,10 +142,10 @@ public class EnvironmentVariablesSpecTests
         // Assert
         await Assert.That(spec.Build()["EMPTY"]).IsEqualTo("");
 
-        List<KeyValuePair<string, string>> withNull = new()
-        {
-            new("NULL", null!),
-        };
+        List<KeyValuePair<string, string>> withNull =
+        [
+            new("NULL", null!)
+        ];
 
         await Assert.That(() => spec.SetEnumerable(withNull))
             .Throws<ArgumentNullException>();
@@ -156,11 +156,11 @@ public class EnvironmentVariablesSpecTests
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
-        List<KeyValuePair<string, string>> vars = new()
-        {
+        List<KeyValuePair<string, string>> vars =
+        [
             new("K", "1"),
-            new("K", "2"),
-        };
+            new("K", "2")
+        ];
 
         // Assert
         await Assert.That(() => spec.SetEnumerable(vars)).Throws<ArgumentException>();

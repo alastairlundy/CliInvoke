@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#pragma warning disable CA1416
 
 using CliInvoke.Builders;
 
@@ -33,47 +32,33 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
 
-        // The runner is one of three categories, and each demands a different delivery
-        // shape — the right choice depends on what the runner does with its arguments:
-        //
-        //   - PowerShell runner (-Command): argv to pwsh is
-        //         [pwsh, -NoProfile, ..., -Command, <script>]
-        //     The user-supplied target + args must be composed into ONE shell-escaped
-        //     script token so pwsh sees a single argv entry after -Command. .NET's
-        //     ProcessStartInfo.ArgumentList quoting matches CommandLineToArgvW rules
-        //     that pwsh's argv parser also uses, so a single ArgumentList entry is the
-        //     safe delivery shape.
-        //
-        //   - cmd.exe runner (/c): cmd's own command-line parser does NOT match
-        //     CommandLineToArgvW quoting the way .NET applies to ArgumentList — the
-        //     escaping .NET adds for embedded double quotes (backslash-escape) is
-        //     NOT what cmd /c's quote-stripping rules expect, and benign targets end
-        //     up unrunnable. The reliable delivery for cmd is therefore the legacy
-        //     single-string Arguments, composed with the cmd escaper, which cmd's
-        //     parser handles correctly.
-        //
-        //   - Non-shell runner (sudo, runas, etc.): the runner does not re-parse its
-        //     arguments; it simply exec's the target. Each value is therefore passed
-        //     through as a discrete token with no escaping required.
+        /*
+            Three runner categories, three delivery shapes:
+              - PowerShell (-Command): ShellRewriter composes target + args into one
+                shell-escaped script, delivered as a single ArgumentList entry.
+              - cmd (/c): cmd's quote-stripping doesn't match .NET's ArgumentList
+                escaping, so this delivers the legacy Arguments string (cmd escaper).
+              - Non-shell (sudo, runas): Discrete tokens are handled without escaping,
+                the runner executes the target as-is. Dash-prefixed targets get a "--"
+                terminator first so option-parsing runners (POSIX/Windows sudo) don't
+                bind them as options; the terminator is conditional on a "-" prefix
+                because positional program slots (runas) must not receive one.
+        */
         bool runnerIsPowerShell =
             !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
-            && (runnerProcessConfig.TargetFilePath.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0
-                || runnerProcessConfig.TargetFilePath.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0);
+            && (runnerProcessConfig.TargetFilePath.Contains("pwsh", StringComparison.OrdinalIgnoreCase)
+                || runnerProcessConfig.TargetFilePath.Contains("powershell", StringComparison.OrdinalIgnoreCase));
 
         bool runnerIsCmd =
             !runnerIsPowerShell
             && !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
-            && runnerProcessConfig.TargetFilePath.IndexOf("cmd", StringComparison.OrdinalIgnoreCase) >= 0;
+            && runnerProcessConfig.TargetFilePath.Contains("cmd", StringComparison.OrdinalIgnoreCase);
 
-        IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
-                runnerProcessConfig.TargetFilePath
-            );
+        ProcessConfigurationBuilder commandBuilder = new(runnerProcessConfig.TargetFilePath);
 
         if (runnerIsPowerShell)
         {
-            // pwsh -Command delivery via single ArgumentList entry containing the
-            // shell-escaped script. ShellRewriter handles escaping and composition;
-            // the delivery decision (ArgumentList) stays at the call site.
+            // ShellRewriter composes the script; delivery is a single ArgumentList entry.
             ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                 processConfigToBeRun,
                 runnerProcessConfig.TargetFilePath,
@@ -87,9 +72,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         }
         else if (runnerIsCmd)
         {
-            // cmd /c delivery via single Arguments string composed with the cmd escaper.
-            // ShellRewriter handles escaping and composition; the delivery decision
-            // (Arguments string) stays at the call site.
+            // ShellRewriter composes the command; delivery is the legacy Arguments string.
             ProcessConfiguration rewritten = ShellRewriter.Rewrite(
                 processConfigToBeRun,
                 runnerProcessConfig.TargetFilePath,
@@ -102,13 +85,15 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         }
         else
         {
-            // Non-shell runner: each value delivered as a discrete token. No escape is
-            // needed because the runner does not re-parse the command; it just exec's
-            // the target.
-            List<string> argumentList = new();
+            // Discrete tokens: the runner executes the target without re-parsing.
+            List<string> argumentList = [];
 
             if (!string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments))
                 argumentList.AddRange(ArgumentTokenizer.Tokenize(runnerProcessConfig.Arguments));
+
+            // End the option zone before a dash-prefixed target (POSIX/Windows sudo).
+            if (processConfigToBeRun.TargetFilePath.StartsWith('-'))
+                argumentList.Add("--");
 
             argumentList.Add(processConfigToBeRun.TargetFilePath);
             if (!string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments))
@@ -127,14 +112,21 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
             {
                 resourceSpec.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
 
-                resourceSpec.SetMinWorkingSet(processConfigToBeRun.ResourcePolicy.MinWorkingSet);
-                resourceSpec.SetMaxWorkingSet(processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ||
+                    OperatingSystem.IsFreeBSD())
+                {
+                    resourceSpec.SetMinWorkingSet(processConfigToBeRun.ResourcePolicy.MinWorkingSet);
+                    resourceSpec.SetMaxWorkingSet(processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                }
+
+                if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+                {
+                    resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity ??
+                                                      ProcessResourcePolicy.DefaultProcessorAffinity);
+                }
 
                 resourceSpec.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
                     .EnablePriorityBoost);
-
-                resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity ??
-                                                  (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
             })
             .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
             .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)

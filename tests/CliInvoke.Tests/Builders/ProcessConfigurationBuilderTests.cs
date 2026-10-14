@@ -145,7 +145,7 @@ public class ProcessConfigurationBuilderTests
         ProcessConfiguration command = processConfigBuilder.Build();
         await Assert.That(command.Credential.Domain).IsNull();
         await Assert.That(command.Credential.UserName).IsEqualTo("root");
-        await Assert.That(command.Credential.LoadUserProfile).IsEqualTo(false);
+        await Assert.That(command.Credential.LoadUserProfile).IsFalse();
         await Assert.That(ReadSecureString(command.Credential.Password)).IsEqualTo("9876");
     }
 

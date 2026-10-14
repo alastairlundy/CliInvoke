@@ -9,6 +9,7 @@
 
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CliInvoke.Extensions;
 using CliInvoke.Specializations.Middleware;
@@ -48,6 +49,9 @@ public class PowerShellMiddlewareIntegrationTests
     }
 
     [Test]
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
     public async Task UsePowerShell_RewritesConfigurationToTargetPwsh_ForRealInvocation()
     {
         string? pwshPath = ResolvePwshPath();
@@ -79,7 +83,7 @@ public class PowerShellMiddlewareIntegrationTests
             config,
             ProcessExitConfiguration.CreateGraceful());
 
-        await provider.DisposeAsync();
+        await provider.DisposeAsync().ConfigureAwait(false);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput).IsNotNull();

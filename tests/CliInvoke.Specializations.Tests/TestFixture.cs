@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Specializations.Tests;
 
-public class TestFixture
+internal class TestFixture
 {
-    public TestFixture()
+    internal TestFixture()
     {
         IServiceCollection serviceCollection = new ServiceCollection();
 
@@ -15,5 +15,5 @@ public class TestFixture
         ServiceProvider = serviceCollection.BuildServiceProvider();
     }
 
-    public IServiceProvider ServiceProvider { get; private set; }
+    internal IServiceProvider ServiceProvider { get; private set; }
 }

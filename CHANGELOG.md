@@ -22,6 +22,8 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.12 to 10.0.13.
+- Updated internal Polyfill version from 11.4.0 to 11.4.5.
 - **`ShellArgumentEscaper` is now `internal`.** Compose shell commands through the public middleware (`UseCmd()` / `UsePowerShell()`), not internal composition types.
 - **Start-failure exceptions map to their natural .NET types.** Known Win32 codes map to `FileNotFoundException` (2/3), `UnauthorizedAccessException` (5), and `BadImageFormatException` (193). Everything else rethrows the original `Win32Exception` with `NativeErrorCode` intact, replacing the old catch-all `UnauthorizedAccessException`. Callers handling arbitrary start failures should catch `Win32Exception`.
 - **`ProcessConfiguration` derivation goes through one internal hook.** The six hand-copied derivation sites (three Specializations shell middleware, three `ShellRewriter` branches) now call `ProcessConfigurationDerivation.Derive`, which seeds a builder from the source config, applies a delta, and builds. A newly added member can no longer be missed by one copy site. No public API change.
