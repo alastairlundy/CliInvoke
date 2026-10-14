@@ -75,8 +75,8 @@ public class ArgumentsBuilderTests
         IArgumentsBuilder builder = new ArgumentsBuilder();
         string[] values = ["a\nb", "c\"d"];
 
-        // Each value is individually escaped and quoted, space-separated:
-        const string expected = "\"a\\nb\" \"c\\\"d\"";
+        // The raw values are joined first, then escaped and quoted once:
+        const string expected = "\"a\\nb c\\\"d\"";
         
         IArgumentsBuilder result = builder.AddEnumerable(values, true);
 
