@@ -16,7 +16,9 @@
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.8 and CliInvoke 2.10.8</PackageReleaseNotes>
+        <PackageReleaseNotes>NOTE: This update contains security fixes. Final update for CliInvoke v2.10.x - CliInvoke v2 users should update to v2.11.x series.
+
+* Updated to use CliInvoke.Core 2.10.8 and CliInvoke 2.10.8</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

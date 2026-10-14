@@ -15,7 +15,7 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>This release hardens command composition in `RunnerProcessFactory`, which builds the configuration used to run a program through another program.
+        <PackageReleaseNotes>NOTE: This update contains security fixes. Final update for CliInvoke v2.10.x - CliInvoke v2 users should update to v2.11.x series.
 
 #### Changed
 - Updated DotExtensions to 10.6.1 from 10.5.1.

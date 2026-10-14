@@ -23,7 +23,9 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.10.8
+        <PackageReleaseNotes>NOTE: This update contains security fixes. Final update for CliInvoke v2.10.x - CliInvoke v2 users should update to v2.11.x series.
+
+* Updated to use CliInvoke.Core 2.10.8
 * Version aligned with the CliInvoke 2.10.8 release. If you use the PowerShell or CMD invokers, also update the CliInvoke package to 2.10.8.</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
