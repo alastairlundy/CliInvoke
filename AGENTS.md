@@ -22,6 +22,7 @@ From repo root (see `.github/workflows/test.yml`):
 1. `bash scripts/guard-configureawait.sh src` — **ConfigureAwait guard, hard CI gate run before build.** Every `await` in `src/` must have `.ConfigureAwait(false)`; `await foreach`/`await using` are exempt. Run via Git Bash/WSL on Windows.
 2. `dotnet build src/CliInvoke.sln`
 3. From `tests/CliInvoke.Tests/`: `dotnet test`
+4. From `tests/CliInvoke.Specializations.Tests/`: `dotnet test`
 
 Other gates/quirks:
 - **XML doc comments are build errors**: `Directory.Build.props` escalates CS1574/1580/1581/1584/1658/1734/1762 to errors. Keep `<summary>`/`<paramref>`/`<see>` valid on public API.
