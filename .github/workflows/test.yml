@@ -17,7 +17,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 10
 
     steps:
     - name: Harden the runner (Audit all outbound calls)
@@ -34,6 +34,13 @@ jobs:
       run: bash scripts/guard-configureawait.sh src
     - name: Build
       run: dotnet build src/CliInvoke.sln
-    - name: Test
+    - name: Test (CliInvoke)
       run: dotnet test
       working-directory: tests/CliInvoke.Tests/
+    # PowerShell/Cmd middleware security tests (ShellInjectionSecurityTests) live in
+    # the Specializations project; without this step they never execute in CI.
+    # cmd-runner behavioural tests are Windows-only and skip on ubuntu by design —
+    # replicate on Windows locally for cmd coverage.
+    - name: Test (Specializations)
+      run: dotnet test
+      working-directory: tests/CliInvoke.Specializations.Tests/
