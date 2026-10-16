@@ -67,15 +67,33 @@ public class FilePathResolverTests
     {
         string executableName = ProcessTestHelper.GetTargetFilePath();
 
-        string expectedPath = OperatingSystem.IsWindows()
-            ? TargetFilePaths.CmdFilePath
-            : TargetFilePaths.LinuxEchoFilePath;
-
+        // Deriving the unix expectation from the system's own `which` lookup keeps the
+        // assertion portable: echo lives at /usr/bin/echo, /bin/echo, or another PATH
+        // location depending on the OS and image, and the resolver must agree with the
+        // shell rather than with a hardcoded path.
         IFilePathResolver filePathResolver = CreateFileResolver();
 
         FileInfo actual = filePathResolver.ResolveFilePath(executableName);
 
-        await Assert.That(actual.FullName).IsEqualTo(expectedPath);
+        if (OperatingSystem.IsWindows())
+        {
+            await Assert.That(actual.FullName).IsEqualTo(TargetFilePaths.CmdFilePath);
+        }
+        else
+        {
+            IExternalProcessFactory externalProcessFactory = CreateExternalProcessFactory();
+
+            ProcessConfiguration configuration = new ProcessConfiguration("which", executableName);
+
+            IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
+
+            BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
+                cancellationToken: CancellationToken.None);
+
+            string expectedPath = task.StandardOutput.Trim().Split(Environment.NewLine).First();
+
+            await Assert.That(actual.FullName).IsEqualTo(expectedPath);
+        }
     }
 
     [Test]

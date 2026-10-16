@@ -13,7 +13,7 @@ CliInvoke — a .NET/C# library for launching and interacting with command-line 
   - `src/CliInvoke/` — implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers, including the `AddCliInvoke` DI entry point in `Extensions/DependencyInjection/AddCliInvokeExtensions.cs`, namespace `CliInvoke.Extensions`)
   - `src/CliInvoke.Specializations/` — PowerShell/CMD middleware; also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Specializations`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
 - `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. (`tests/CliInvoke.Extensions.Tests/` was removed; extension tests now live in `tests/CliInvoke.Tests/`.)
-- **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs `tests/CliInvoke.Tests/` **and** `tests/CliInvoke.Specializations.Tests/` (both on ubuntu-latest).
+- **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs `tests/CliInvoke.Tests/` **and** `tests/CliInvoke.Specializations.Tests/` on the ubuntu-latest, windows-latest, and macos-latest matrix legs.
 - **Benchmarks**: `benchmarks/`.
 - **SDK**: `global.json` pins .NET 10 SDK (`rollForward: latestFeature`). Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
 
@@ -59,7 +59,7 @@ Exactly **four** `IDisposable` types: `IExternalProcess`, `UserCredential`, `Use
 ## Testing notes
 - TUnit + FsCheck (property tests) + Bogus.
 - Tests spawn real executables (`dotnet`, `powershell.exe`, `pwsh`); PowerShell middleware tests skip when `pwsh` is not on PATH (e.g., Windows CI). OS-dependent behavior — replicate CI on ubuntu-latest when in doubt.
-- CI is ubuntu-latest only: cmd-runner behavioural tests (marker-file injection tests in `tests/CliInvoke.Tests/Extensibility/Factories/` and `tests/CliInvoke.Specializations.Tests/`) are Windows-only by design and skip on ubuntu. Run them locally on Windows for cmd coverage; a skip on CI is expected, not a pass substitute.
+- CI runs on ubuntu-latest, windows-latest, and macos-latest: cmd-runner behavioural tests (marker-file injection tests in `tests/CliInvoke.Tests/Extensibility/Factories/` and `tests/CliInvoke.Specializations.Tests/`) are Windows-only by design and skip on the other legs; the windows-latest leg runs them.
 
 ## PRs & contributing
 - Follow `CONTRIBUTING.md`; fill in every section of `.github/pull_request_template.md`.
