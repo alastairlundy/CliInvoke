@@ -139,6 +139,12 @@ internal class ProcessWrapper : Process
                 // Process exited before we could suspend it.
                 return;
             }
+            catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
+            {
+                // Adapter suspend signals a just-exited child; errno ESRCH means it is
+                // gone. Same race as the exiting-before-suspend case above.
+                return;
+            }
 
             try
             {
@@ -150,10 +156,17 @@ internal class ProcessWrapper : Process
             {
                 // Process exited before we could set the resource policy.
             }
+            catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
+            {
+                // PriorityClass and working-set setters translate libc ESRCH into
+                // Win32Exception ("No such process") when the fast-exiting child is
+                // already reaped (observed on macOS arm64 runners). Unrelated access
+                // failures keep surfacing.
+            }
             finally
             {
-                // Always resume the process — even if SetResourcePolicy throws —
-                // to prevent leaving it permanently suspended.
+                // Always resume the process — even if SetResourcePolicy or a raced
+                // child exit throws — so it cannot stay suspended.
                 try
                 {
                     ResumeProcess();
@@ -163,9 +176,23 @@ internal class ProcessWrapper : Process
                     // The process may have already exited during SetResourcePolicy.
                     // Swallow the exception — the process is gone, nothing to resume.
                 }
+                catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
+                {
+                    // Same as above: the child exited mid-sequence.
+                }
             }
         }
     }
+
+    /// <summary>
+    ///     Matches Linux, macOS, and FreeBSD <c>Win32Exception</c> translations of
+    ///     errno <c>ESRCH</c> (3), which mean the child process is gone. Windows maps
+    ///     its own error numbers into the same exception type (3 is
+    ///     <c>ERROR_PATH_NOT_FOUND</c>), so Windows never matches here.
+    /// </summary>
+    private static bool IsErrnoNoSuchProcess(Win32Exception exception) =>
+        !OperatingSystem.IsWindows()
+        && exception.NativeErrorCode == 3;
 
     private void OnExited(object? sender, EventArgs e)
     {
