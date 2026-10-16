@@ -836,14 +836,23 @@ internal class ProcessWrapper : Process
                 // Cancelled as false for a process the cancellation machinery terminated.
                 // Awaiting a completed task always observes its fault, so an exception that
                 // CancellationHelper approved for propagation surfaces every time instead of
-                // depending on timing. An incomplete task is awaited only while the process
-                // still runs, so fast-exiting processes are not held for the full timeout; a
-                // late fault there is observed, not propagated, because the wait already
-                // succeeded.
-                if (cancelWithInterruptTask.IsCompleted || !HasExited)
+                // depending on timing. When the caller's token has fired, the task is also
+                // bounded: its delay already faulted and its cleanup no-ops once the child
+                // is dead, so it is awaited even when the child has exited, guaranteeing
+                // propagation of the approved cancellation fault. Skipping a not-yet-
+                // completed task is reserved for the natural-exit race: the wait succeeded
+                // for reasons unrelated to cancellation, so the late fault is only
+                // observed there.
+                if (cancelWithInterruptTask.IsCompleted
+                    || !HasExited
+                    || cancellationToken.IsCancellationRequested)
+                {
                     await cancelWithInterruptTask.ConfigureAwait(false);
+                }
                 else
+                {
                     ObserveFault(cancelWithInterruptTask);
+                }
 
                 if (!HasExited && fallbackToForceful)
                     ForcefulExit();
@@ -926,9 +935,13 @@ internal class ProcessWrapper : Process
             {
                 CancellationReason cancellationReason =
                     CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+
+                // Persist the reason BEFORE the propagation decision; see CancelWithInterrupt
+                // for why the assignment must not sit after HandleCancellationExceptions.
+                _cancellationReason = cancellationReason;
+
                 CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                     cancellationReason, exitConfiguration, exception);
-                _cancellationReason = cancellationReason;
             }
             finally
             {
@@ -997,12 +1010,17 @@ internal class ProcessWrapper : Process
             CancellationReason cancellationReason =
                 CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
 
+            // Persist the reason BEFORE the propagation decision: on approved-throw
+            // configurations HandleCancellationExceptions below throws, and an assignment
+            // placed after it would be unreachable — leaving Cancelled false even though
+            // the cancellation machinery performed the termination.
+            _cancellationReason = cancellationReason;
+
             cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason).ConfigureAwait(false);
 
             CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                 cancellationReason,
                 exitConfiguration, exception);
-            _cancellationReason = cancellationReason;
         }
         finally
         {
