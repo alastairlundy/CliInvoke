@@ -53,6 +53,17 @@ adheres to [Semantic Versioning](https://semver.org/).
 - XML docs corrected: invoker invoke paths throw `ProcessValidationException`, not `ProcessNotSuccessfulException`; `WaitForExitOrTimeoutAsync` does not return a "buffered" result; disposal docs say four IDisposable types, not three.
 - Stub-based stdin contract tests pin the close and fault rules without spawning real processes, and escaper fuzz tests cover the `ShellRewriter` composition paths for all three shell kinds.
 
+## [3.0.3] - 2026-10-02
+
+### Changed
+
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.12 to 10.0.13.
+- Updated internal Polyfill version from 11.4.0 to 11.4.5.
+
+### Fixed
+
+- `RunnerConfigurationFactory` now inserts a `--` terminator before dash-prefixed targets for non-shell runners (e.g. `sudo`), so option-parsing runners treat the target as the command to run rather than as an option. PowerShell and `cmd.exe` runners are unaffected.
+
 ## [3.0.2] - 2026-09-27
 
 ### Fixed
@@ -326,6 +337,19 @@ Themes:
 - Fixed null-unsafe equality operators on primitives.
 - Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`.
 
+## [2.11.5] - 2026-10-14
+
+### Changed
+
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions to 10.0.13.
+- Updated internal Polyfill version to 11.4.5.
+
+### Fixed
+
+- `RunnerProcessFactory` now inserts a `--` terminator before dash-prefixed targets for non-shell runners (e.g. `sudo`), so option-parsing runners treat the target as the command to run rather than as an option. PowerShell runners are unaffected.
+- `ShellDetector` no longer strips version separators before `GracefulParse`, fixing version parsing for shells that report versions like `5.9` (previously parsed as `59.0`).
+- `ArgumentsBuilder.AddEnumerable(string)` restores join-then-escape behavior: raw values are joined first, then escaped once at the final `Add` call, matching the `IFormattable` overload. The joined value is also validated against the argument validation logic before appending.
+
 ## [2.11.4] - 2026-09-28
 ### Fixed
 - **Stdin redirection override** – `StartAsync` was forcing `RedirectStandardInput = true` even when the configuration didn't ask for it; it now honours the `RedirectStandardInput` flag.
@@ -399,6 +423,19 @@ Themes:
 - Deprecated `PipedProcessResult` ahead of removal in v3
 - Deprecated some extensions for removal in v3
 - Deprecated `PowershellProcessInvoker` and `CmdProcessInvoker` ahead of removal in v3
+
+## [2.10.8] - 2026-10-14
+
+### Changed
+
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions to 10.0.13.
+- Updated internal Polyfill version to 11.4.5.
+
+### Fixed
+
+- `RunnerProcessFactory` now inserts a `--` terminator before dash-prefixed targets for non-shell runners (e.g. `sudo`), so option-parsing runners treat the target as the command to run rather than as an option. PowerShell runners are unaffected.
+- `ShellDetector` no longer strips version separators before `GracefulParse`, fixing version parsing for shells that report versions like `5.9` (previously parsed as `59.0`).
+- `ArgumentsBuilder.AddEnumerable(string)` restores join-then-escape behavior: raw values are joined first, then escaped once at the final `Add` call, matching the `IFormattable` overload. The joined value is also validated against the argument validation logic before appending.
 
 ## [2.10.7] - 2026-09-13
 
