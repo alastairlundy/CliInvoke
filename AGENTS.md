@@ -3,15 +3,15 @@
 ## What this repo is
 CliInvoke — a .NET/C# library for launching and interacting with command-line processes (builders, configuration models, invokers, middleware, DI, and platform specializations).
 
-- Single TFM: `net10.0` (see `global.json` and csproj files). Current release line: `3.0.0`.
-- Docs portal lives in `site/` (built with Lunet, published on GitHub release). Root `getting-started.md` is legacy — prefer `site/docs/`.
+- Single TFM: `net10.0` (see `global.json` and csproj files). Current release line: `3.1.0`.
+- Docs portal lives in `site/` (built with Lunet; published to GitHub Pages on release by `.github/workflows/docs-publish.yml`).
 
 ## Codebase Organization
 - **Solution**: `src/CliInvoke.sln`
 - **Packages** (each carries its own `Version`/`PackageVersion` and `PackageReleaseNotes` in its csproj):
   - `src/CliInvoke.Core/` — abstractions & models (`ProcessConfiguration`, results, middleware interfaces)
   - `src/CliInvoke/` — implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers, including the `AddCliInvoke` DI entry point in `Extensions/DependencyInjection/AddCliInvokeExtensions.cs`, namespace `CliInvoke.Extensions`)
-  - `src/CliInvoke.Specializations/` — PowerShell/CMD middleware; also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Specializations`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
+  - `src/CliInvoke.Specializations/` — shell middleware (PowerShell/CMD/default shell); also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Specializations`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
 - `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. (`tests/CliInvoke.Extensions.Tests/` was removed; extension tests now live in `tests/CliInvoke.Tests/`.)
 - **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs `tests/CliInvoke.Tests/` **and** `tests/CliInvoke.Specializations.Tests/` on the ubuntu-latest, windows-latest, and macos-latest matrix legs.
 - **Benchmarks**: `benchmarks/`.
@@ -35,7 +35,7 @@ Three patterns, documented in `DESIGN_PATTERNS.md` (includes a decision tree):
 - **`CliRun`** — static, stateless, batteries-included facade; recommended default (`RunAsync`/`RunBufferedAsync` with string-args overloads). Allocates a fresh pipeline per call; no process-wide configurable state.
 - **`IProcessInvoker`** — DI-centric; the only pattern that flows through the middleware chain.
 - **`IExternalProcess` / `IExternalProcessFactory`** — process-like lifecycle control; does **not** flow through middleware (the bypass pattern).
-- Built-in middleware: `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd` (+ retry/truncation extensions). Middleware returns the process result **un-disposed** to the caller.
+- Built-in middleware: `UseLogging`, `UsePostExitValidation` (main package); `UsePowerShell`, `UseCmd`, `UseDefaultShell` (Specializations). Plus retry/truncation extensions. Middleware returns the process result **un-disposed** to the caller.
 - Middleware state split: **DI** resolves framework services (loggers, validators, lifetimes); **`MiddlewareItems`** is the ad-hoc per-invocation bag shared between middleware (same split as `HttpContext.RequestServices` vs `HttpContext.Items`).
 - Construction default: init construction with `required` `TargetFilePath`. `ProcessConfigurationBuilder` is only for argument escaping, `UserCredentialSpec`, and resource-policy callback flows — reaching for the builder by habit is "v2-style code" (see `GLOSSARY.md`).
 - Load the `cliinvoke-pattern-validator` skill when adding or changing invocation code.
