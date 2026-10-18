@@ -8,8 +8,6 @@ public static class TargetFilePaths
 
     public static readonly string CmdFilePath = Environment.SystemDirectory + Path.DirectorySeparatorChar + "cmd.exe";
 
-    public static readonly string LinuxEchoFilePath = "/usr/bin/echo";
-
     public static string DotnetFilePath =>
         _filePathResolver.ResolveFilePath(
             OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet").FullName;
