@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CliInvoke.Extensions;
 using CliInvoke.Specializations.Middleware;
@@ -16,6 +17,10 @@ namespace CliInvoke.Specializations.Tests.DependencyInjection;
 
 public class DependencyInjectionExtensionsTests
 {
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task AddCliInvokeSpecializations_WithUsePowerShell_ResolvesConfiguredInvoker()
     {
@@ -31,6 +36,10 @@ public class DependencyInjectionExtensionsTests
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task AddCliInvokeSpecializations_SingletonLifetime_ResolvesMiddlewareFromRootProvider()
     {
@@ -81,6 +90,10 @@ public class DependencyInjectionExtensionsTests
         await Assert.That(middleware).IsNotNull();
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task AddCliInvokeSpecializations_ConsumerRegisteredOptions_WinsOverDefault()
     {

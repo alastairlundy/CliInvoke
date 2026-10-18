@@ -20,9 +20,12 @@ public class ConfigurationSubclassDeprecationTests
     [Test]
     public async Task PowershellProcessConfiguration_IsMarkedObsolete()
     {
-        ObsoleteAttribute? obsolete = Attribute.GetCustomAttribute(
+        ObsoleteAttribute? obsolete;
+#pragma warning disable CS0618
+        obsolete = Attribute.GetCustomAttribute(
             typeof(PowershellProcessConfiguration),
             typeof(ObsoleteAttribute)) as ObsoleteAttribute;
+#pragma warning restore CS0618
 
         await Assert.That(obsolete).IsNotNull();
         await Assert.That(obsolete!.Message).Contains("Use ProcessConfiguration with shell wrapping middleware");
@@ -32,9 +35,12 @@ public class ConfigurationSubclassDeprecationTests
     [Test]
     public async Task CmdProcessConfiguration_IsMarkedObsolete()
     {
-        ObsoleteAttribute? obsolete = Attribute.GetCustomAttribute(
+        ObsoleteAttribute? obsolete;
+#pragma warning disable CS0618
+        obsolete = Attribute.GetCustomAttribute(
             typeof(CmdProcessConfiguration),
             typeof(ObsoleteAttribute)) as ObsoleteAttribute;
+#pragma warning restore CS0618
 
         await Assert.That(obsolete).IsNotNull();
         await Assert.That(obsolete!.Message).Contains("Use ProcessConfiguration with shell wrapping middleware");
