@@ -53,7 +53,7 @@ For detailed definitions, target audiences, and usage examples of the architectu
 
 ### 1. Resolution order rationale
 
-`FilePathResolver.ResolveFilePath` tries PATH first, then directory recursion. This order is a performance contract: PATH lookup is a fast environment-variable read and covers the common case; directory recursion is slow and rare. Reordering the two strategies requires a new decision record.
+`FilePathResolver.ResolveFilePath` tries PATH first, then falls back to a single-level, non-recursive search of the inferred base directory (the current working directory when no directory can be inferred). This order is a performance contract: PATH lookup is a fast environment-variable read and covers the common case; the directory fallback is slow and rare. Reordering the two strategies requires a new decision record. Recursion was deliberately removed: walking the whole subtree from the base directory was an over-broad-match/DoS surface when that directory is large or attacker-influenced.
 
 ### 2. Get-prefix vs Enumerate-prefix convention
 

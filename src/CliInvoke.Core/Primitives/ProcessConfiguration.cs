@@ -312,13 +312,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     {
         if (other is null) return false;
         
-        return TargetFilePath.Equals(other.TargetFilePath)
+        return PathsEqual(TargetFilePath, other.TargetFilePath)
                && EnvironmentVariables.Count == other.EnvironmentVariables.Count
                && EnvironmentVariables.SequenceEqual(other.EnvironmentVariables)
                && Arguments.Equals(other.Arguments)
                && ArgumentList.SequenceEqual(other.ArgumentList)
                && ResourcePolicy.Equals(other.ResourcePolicy)
-               && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
+               && PathsEqual(WorkingDirectoryPath, other.WorkingDirectoryPath)
                && UseShellExecution.Equals(other.UseShellExecution)
                && Credential.Equals(other.Credential)
                && RequiresAdministrator == other.RequiresAdministrator
@@ -329,6 +329,23 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
                && StandardInputEncoding.Equals(other.StandardInputEncoding)
                && StandardOutputEncoding.Equals(other.StandardOutputEncoding)
                && StandardErrorEncoding.Equals(other.StandardErrorEncoding);
+    }
+
+    /// <summary>
+    ///     Compares two file paths using <see cref="StringComparison.OrdinalIgnoreCase"/> on
+    ///     Windows (where file-system paths are case-insensitive) and
+    ///     <see cref="StringComparison.Ordinal"/> elsewhere.
+    /// </summary>
+    /// <param name="left">The first path to compare.</param>
+    /// <param name="right">The second path to compare.</param>
+    /// <returns><c>true</c> when both paths are equal under the platform comparison.</returns>
+    private static bool PathsEqual(string left, string right)
+    {
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.Equals(left, right, comparison);
     }
 
     /// <summary>

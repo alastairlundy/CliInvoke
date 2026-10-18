@@ -117,7 +117,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ValidationRule<ProcessResult>[] ValidationRules { get; init; } = [];
 
     /// <summary>
-    ///     Gets the maximum number of bytes of standard output to buffer. When <c>null</c>,
+    ///     Gets the maximum number of bytes to buffer for each of standard output and standard
+    ///     error; the cap is applied independently to each stream. When <c>null</c>,
     ///     the output is unbounded. This property participates in equality comparisons.
     /// </summary>
     public long? MaxBufferedOutputBytes { get; init; }
@@ -198,7 +199,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="right">The second <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right) => Equals(left, right);
+        ProcessExitConfiguration? right) => left is null ? right is null : left.Equals(right);
 
     /// <summary>
     ///     Determines whether two <see cref="ProcessExitConfiguration" /> instances are not equal.
@@ -207,5 +208,5 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="right">The second <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <returns><c>true</c> if both instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right) => !Equals(left, right);
+        ProcessExitConfiguration? right) => !(left == right);
 }

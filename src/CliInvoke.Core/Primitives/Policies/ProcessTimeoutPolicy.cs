@@ -47,8 +47,13 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
-    ///     Instantiates a default ProcessTimeoutPolicy which times out after 2 minutes.
+    ///     Instantiates a default ProcessTimeoutPolicy which is enabled and times out after a
+    ///     2-minute threshold.
     /// </summary>
+    /// <remarks>
+    ///     When the threshold is reached, a graceful interrupt is attempted and, if the process
+    ///     does not exit within a short grace period, it is force-terminated.
+    /// </remarks>
     public static ProcessTimeoutPolicy Default { get; } =
         new();
 
