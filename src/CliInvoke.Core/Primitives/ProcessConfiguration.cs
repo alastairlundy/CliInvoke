@@ -349,6 +349,23 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     }
 
     /// <summary>
+    ///     Computes a hash code for a file path using the same platform-aware comparison as
+    ///     <see cref="PathsEqual"/>, so that equal paths (per platform comparison) produce
+    ///     equal hash codes and the <see cref="Equals(ProcessConfiguration?)"/> /
+    ///     <see cref="GetHashCode"/> contract is preserved.
+    /// </summary>
+    /// <param name="path">The file path to hash.</param>
+    /// <returns>A hash code consistent with <see cref="PathsEqual"/>.</returns>
+    private static int PathHashCode(string path)
+    {
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.GetHashCode(path, comparison);
+    }
+
+    /// <summary>
     ///     Determines if a Process configuration is equal to another object.
     /// </summary>
     /// <param name="obj">The object to compare against.</param>
@@ -370,11 +387,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     {
         HashCode hashCode = new HashCode();
 
-        hashCode.Add(TargetFilePath);
+        hashCode.Add(PathHashCode(TargetFilePath));
         hashCode.Add(Arguments);
         foreach (string arg in ArgumentList)
             hashCode.Add(arg);
-        hashCode.Add(WorkingDirectoryPath);
+        hashCode.Add(PathHashCode(WorkingDirectoryPath));
         foreach (KeyValuePair<string, string> kvp in EnvironmentVariables)
         {
             hashCode.Add(kvp.Key);
