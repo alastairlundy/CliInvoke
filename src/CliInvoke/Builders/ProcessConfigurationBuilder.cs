@@ -420,11 +420,18 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
             spec.SetPriorityClass(processResourcePolicy.PriorityClass)
                 .ConfigurePriorityBoost(processResourcePolicy.EnablePriorityBoost);
 
-            spec.SetMinWorkingSet(processResourcePolicy.MinWorkingSet);
-            spec.SetMaxWorkingSet(processResourcePolicy.MaxWorkingSet);
+            if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ||
+                OperatingSystem.IsFreeBSD())
+            {
+                spec.SetMinWorkingSet(processResourcePolicy.MinWorkingSet);
+                spec.SetMaxWorkingSet(processResourcePolicy.MaxWorkingSet);
+            }
 
-            spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity ??
-                                      (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+            if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+            {
+                spec.SetProcessorAffinity(processResourcePolicy.ProcessorAffinity ??
+                                          (nint)ProcessResourcePolicy.Default.ProcessorAffinity!);   
+            }
         });
     }
 
