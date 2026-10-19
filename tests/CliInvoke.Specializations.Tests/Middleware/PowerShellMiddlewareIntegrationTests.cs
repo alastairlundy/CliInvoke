@@ -59,7 +59,7 @@ public class PowerShellMiddlewareIntegrationTests
     [SupportedOSPlatform("freebsd")]
     private static async Task<BufferedProcessResult> ExecuteDotnetVersionThroughPwshAsync()
     {
-        ServiceProvider provider = new ServiceCollection()
+        await using ServiceProvider provider = new ServiceCollection()
             .AddCliInvokeSpecializations()
             .AddCliInvoke(builder => builder.UsePowerShell())
             .BuildServiceProvider();
@@ -68,13 +68,9 @@ public class PowerShellMiddlewareIntegrationTests
 
         ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
-        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
+        return await invoker.ExecuteBufferedAsync(
             config,
             ProcessExitConfiguration.CreateGraceful());
-
-        await provider.DisposeAsync().ConfigureAwait(false);
-
-        return result;
     }
 
     [Test]
