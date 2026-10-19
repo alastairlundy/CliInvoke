@@ -11,13 +11,16 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.1.0-beta.2</PackageVersion>
+        <PackageVersion>3.1.0</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>Version aligned with the CliInvoke 3.1.0-beta.2 release. This package has no code changes.</PackageReleaseNotes>
+        <PackageReleaseNotes>### Fixed
+* `UseDefaultShell()` wraps PowerShell with `-NoProfile -NonInteractive -Command`, so profile
+  scripts cannot run or block, and a conditional middleware's sub-chain no longer leaks its
+  `MiddlewareContext` into the outer chain.</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
