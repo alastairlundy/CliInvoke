@@ -1,9 +1,9 @@
 # CliInvoke Review Findings — Fix Handoff
 
-Date: 2026-10-18 (updated 2026-10-18 after fix round 1)
+Date: 2026-10-18 (updated 2026-10-19 after fix round 2: M1, M3, M6 code fixes)
 Source: behavioral review of `src/` ("potentially surprising or unexpected behaviour"), severity-ranked, followed by per-finding fix proposals. Findings verified against the tree at 3.1.0.
 
-**TL;DR: Fixed (verified): H1, M2, M4, M7, L3b, plus docs-only fixes M5, L3a, L4. Everything else in this document is proposed/not implemented.** Fixed items verified with `dotnet build src/CliInvoke.sln` (0 errors) and the `tests/CliInvoke.Tests` suite (656 total, 0 failed, 1 pre-existing skip).
+**TL;DR: Fixed (verified): H1, M1, M2, M3, M4, M6, M7, L3b, plus docs-only fixes M5, L3a, L4. Everything else in this document is proposed/not implemented.** Fixed items verified with the ConfigureAwait guard, `dotnet build src/CliInvoke.sln` (0 errors), and the `tests/CliInvoke.Tests` suite (669 total, 0 failed, 1 pre-existing skip) as of fix round 2 (2026-10-19).
 
 ## Status board
 
@@ -11,12 +11,12 @@ Source: behavioral review of `src/` ("potentially surprising or unexpected behav
 |---|---|---|
 | H1 silent 2-min default timeout | High | ✅ **Fixed** — docs (timeout + kill/cancellation semantics) |
 | H2 Raw-mode pipe deadlock | High | ❌ Not fixed — proposed (3.2.0) |
-| M1 Raw vs Buffered cancellation divergence | Medium | ❌ Not fixed — proposed (3.2.0) |
+| M1 Raw vs Buffered cancellation divergence | Medium | ✅ **Fixed** — Buffered honors the documented cancellation contract (knob-gated absorb) |
 | M2 `ProcessExitConfiguration` null-unsafe `==` | Medium | ✅ **Fixed** — null-aware operators |
-| M3 retry middleware replays empty stdin on attempts ≥ 2 | Medium | ❌ Not fixed — proposed (3.2.0) |
+| M3 retry middleware replays empty stdin on attempts ≥ 2 | Medium | ✅ **Fixed** — stdin rewound per retry attempt; non-seekable stdin throws |
 | M4 "directory recursion" docs drift | Medium | ✅ **Fixed** — docs (GLOSSARY, XML, site/docs) |
 | M5 Windows graceful exit degrades to kill | Medium | ✅ **Fixed** — docs (XML + site/docs troubleshooting/configuration) |
-| M6 logging shows empty arguments for shell-wrapped runs | Medium | ❌ Not fixed — proposed (3.2.0) |
+| M6 logging shows empty arguments for shell-wrapped runs | Medium | ✅ **Fixed** — logs joined ArgumentList when the argument string is empty |
 | M7 `MaxBufferedOutputBytes` docs contradiction | Medium | ✅ **Fixed** — docs converge on per-stream |
 | L1 `FireAndForget` disposal + redirection trap | Low | ❌ Not fixed — proposed (3.2.0) |
 | L2 eager filesystem I/O in `ExternalProcess` ctor | Low | ❌ Not fixed — proposed (3.2.0 minimal) |
@@ -32,7 +32,7 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 ## Release batches (consolidated)
 
 - **3.1.x — docs-only, zero behavior change:** H1, M4, M7 (**✅ done**) + L4, L5 docs, L3a doc notes, L7(a) docs + XML hazard notes for H2/L1/M5 (docs halves of those proposals). Theme: *make the contracts say what the code does.*
-- **3.2.0 — behavior fixes, one release note ("Raw/FireAndForget pipe and cancellation contract alignment"):** H2 normalization, M1 Buffered cancellation, L1 fail-fast, M3 stdin replay, M6 logging, L2 minimal cache, L6 null env-var semantics, L7(b) OCE-gated swallow. Theme: *fail fast or normalize, never silently hang.*
+- **3.2.0 — behavior fixes, one release note ("Raw/FireAndForget pipe and cancellation contract alignment"):** H2 normalization, M1 Buffered cancellation (**✅ done**), L1 fail-fast, M3 stdin replay (**✅ done**), M6 logging (**✅ done**), L2 minimal cache, L6 null env-var semantics, L7(b) OCE-gated swallow. Theme: *fail fast or normalize, never silently hang.*
 - **4.0.0 / deferred:** H2 hard-fail (only if normalization draws bug reports), M1 throw-by-default, M5 console-attach knob (recommend never), L3a semantic flip (all eight types in one change), L2 lazy resolution, L5 encoding-default decision, L7(a) `Default` alignment.
 
 ---
@@ -46,6 +46,7 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 **Effort:** ~0.5 day incl. tests (chatty Raw child completes).
 
 ### M1 — Cancellation semantics differ between Raw and Buffered
+**Status:** ✅ Fixed (2026-10-19, fix round 2) — drain-side OCE absorbed in `CaptureBufferedResultAsync` under the proposal's guards **plus one required addition**: the absorb is gated on `!ExitConfiguration.CancellationThrowsException`. Rationale: the wait fault and the drain OCE race to the `Task.WhenAll` join, and `wrapper.Canceled` is already set (reason persisted at `ProcessWrapper.cs:1044`) before `HandleCancellationExceptions` rethrows — so at catch time the proposal's three guards can hold while the wait task has not faulted yet, and the OCE would be swallowed even with the knob on. With the knob gate both contract paths are deterministic: absorb when the knob is false, propagate when true. The guarded `outputStrings.Result` read falls back to empty strings when the drain fault was absorbed (cancelled reads yield no partial strings). XML updated on `IExternalProcess.CaptureBufferedResultAsync`, `ExternalProcess.CaptureBufferedResultAsync`, and all three `CliRun.RunBufferedAsync` overloads. Tests: `tests/CliInvoke.Tests/Invokers/Cancellation/BufferedCancellationContractTests.cs` (buffered default → `Canceled` result, buffered knob=true → OCE, raw regression guard).
 **Fix:** Fix **Buffered**, not Raw — the documented contract on `ProcessExitConfiguration.CancellationThrowsException=false` (`ProcessExitConfiguration.cs:90-103`) is a normal result with `Canceled=true`; Raw honors it, Buffered violates it (stream-read OCE escapes `Task.WhenAll`). Extend the catch filter at `src/CliInvoke/Processes/ExternalProcess.cs:367-377` to also absorb `outputStrings` faults when the fault is OCE **and** `cancellationToken.IsCancellationRequested` **and** `wrapper.Canceled` (same three guards as the existing stdin clause — never absorb genuine read failures). Cancelled reads yield no partial strings, so return the `BufferedProcessResult` with empty output, `Canceled=true`. Update XML on `CaptureBufferedResultAsync` (`IExternalProcess.cs:103-127`, `ExternalProcess.cs:312-338`) and `CliRun.RunBufferedAsync`; note that callers wanting OCE already have the opt-in (`CancellationThrowsException=true`).
 **Compat:** Observable change, but toward the documented contract — bug fix. 3.2.0 with release note.
 **Alternative:** Unify on throw-by-default (cleaner .NET citizenship, contradicts documented default) → 4.0.0.
@@ -58,12 +59,14 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 **Effort:** ~2 h incl. XML + tests.
 
 ### M3 — Retry middleware replays empty stdin on attempts ≥ 2
+**Status:** ✅ Fixed (2026-10-19, fix round 2) — `RetryMiddleware.InvokeAsync` rewinds a seekable `StandardInput.BaseStream` (`Position = 0`) before every attempt after the first and throws `InvalidOperationException` for a non-seekable source (resource key `Exceptions.RetryMiddleware.NonSeekableStandardInput`). Spec deltas: the replay sentence is a class-level `<remarks>` covering all `UseRetryPolicy` overloads (no `UseRetry` method exists) and is also on `RetryOptions`. Tests: `tests/CliInvoke.Tests/Extensions/Middleware/Retry/RetryStdinReplayTests.cs` (MemoryStream + FileStream replay, non-seekable throw, no-throw paths, null-stdin no-op).
 **Fix:** In `RetryMiddleware.InvokeAsync` (`src/CliInvoke/Extensions/Middleware/Retry/RetryMiddleware.cs:77-96`), before invoking `next(context)` on any attempt after the first, reset the stdin source: if `context.Configuration.StandardInput?.BaseStream` is `{ CanSeek: true }`, set `Position = 0`; if stdin is set but not seekable, throw `InvalidOperationException` at the moment a retry would occur ("retrying an invocation with a non-seekable standard input stream cannot replay the input"). `RetryMiddleware` is `internal sealed`, so the fix site is contained. Add one `<remarks>` sentence to `UseRetry`/`RetryOptions` docs: stdin is replayed per attempt and must be seekable (or null).
 **Compat:** No API surface change; silent empty-stdin corruption becomes correct replay or a loud error. 3.2.0.
 **Alternative:** Snapshot stdin into a `MemoryStream` on first attempt — copies unbounded payloads and spreads retry knowledge into the pipeline; rejected.
 **Effort:** ~1-2 h incl. replay tests (FileStream + MemoryStream, non-seekable throw case).
 
 ### M6 — LoggingMiddleware logs empty arguments for ArgumentList/shell-wrapped runs
+**Status:** ✅ Fixed (2026-10-19, fix round 2) — `LoggingMiddleware.InvokeAsync` computes the display string once (`Arguments` when non-whitespace, else `string.Join(" ", ArgumentList)`) and passes it through `Sanitize`; redaction still spans the joined string. Exit line untouched. Tests: `tests/CliInvoke.Tests/Middleware/Integration/LoggingArgumentListTests.cs` (joined list logged, redaction across the join, `Arguments` precedence).
 **Fix:** In `LoggingMiddleware.cs:74`, compute the display string once: use `Configuration.Arguments` when non-whitespace, else `string.Join(" ", Configuration.ArgumentList)`; pass it through the existing `Sanitize` redactor (flag-then-value regex still matches across the join, so `["--password","hunter2"]` redacts correctly). Bonus: shell-wrapped invocations log the derived `ArgumentList` containing the quoted inner command — the truthful picture. Exit line untouched.
 **Compat:** No public API change; log content only (current output is factually wrong). 3.2.0.
 **Alternative:** Log both fields as structured properties — preserves raw fidelity but always logs an empty `Arguments` and doubles redaction calls; not worth it.
