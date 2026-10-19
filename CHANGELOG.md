@@ -59,6 +59,29 @@ adheres to [Semantic Versioning](https://semver.org/).
 - XML docs corrected: invoker invoke paths throw `ProcessValidationException`, not `ProcessNotSuccessfulException`; `WaitForExitOrTimeoutAsync` does not return a "buffered" result; disposal docs say four IDisposable types, not three.
 - Stub-based stdin contract tests pin the close and fault rules without spawning real processes, and escaper fuzz tests cover the `ShellRewriter` composition paths for all three shell kinds.
 
+## [3.0.4] - 2026-10-19
+
+### Fixed
+
+- Fixed an issue where a fast-running process on macOS would throw `Win32Exception` ("No such process") if it exited whilst a `ProcessResourcePolicy` was being applied to it.
+- `ProcessConfigurationBuilder` now applies working-set limits only on Windows, macOS, and FreeBSD, and processor affinity only on Windows and Linux, avoiding unsupported calls on other platforms.
+- Fixed an XML documentation comment issue in `MiddlewareContext`.
+
+### Changed
+
+- Updated Microsoft.Extensions.Logging.Abstractions and Microsoft.Extensions.Caching.Memory from 10.0.12 to 10.0.13.
+
+## [3.0.3] - 2026-10-14
+
+### Changed
+
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.12 to 10.0.13.
+- Updated internal Polyfill version from 11.4.0 to 11.4.5.
+
+### Fixed
+
+- `RunnerConfigurationFactory` now inserts a `--` terminator before dash-prefixed targets for non-shell runners (e.g. `sudo`), so option-parsing runners treat the target as the command to run rather than as an option. PowerShell and `cmd.exe` runners are unaffected.
+
 ## [3.0.2] - 2026-09-27
 
 ### Fixed
