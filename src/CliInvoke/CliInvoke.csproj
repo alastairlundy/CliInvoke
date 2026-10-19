@@ -51,6 +51,7 @@
     <PropertyGroup>
         <IsAotCompatible>true</IsAotCompatible>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Squash_InternalNamespacesToKeep>CliInvoke</Squash_InternalNamespacesToKeep>
     </PropertyGroup>
 
     <ItemGroup>
@@ -84,6 +85,8 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
+        <PackageReference Include="Polyfill" PrivateAssets="all"/>
+        <PackageReference Include="Squash" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
