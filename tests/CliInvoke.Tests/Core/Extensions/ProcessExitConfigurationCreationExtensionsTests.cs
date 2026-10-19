@@ -14,15 +14,33 @@ namespace CliInvoke.Tests.Core.Extensions;
 public class ProcessExitConfigurationCreationExtensionsTests
 {
     [Test]
-    public async Task Default_ReturnsGracefulDefault()
+    public async Task Default_MatchesConstructorDefaults()
     {
         // Act
         ProcessExitConfiguration config = ProcessExitConfiguration.Default;
 
-        // Assert
+        // Assert - Default is re-pointed at the ctor default (L7a): unexpected-exit
+        // exceptions are allowed, unlike the CreateGraceful suppressing flavour.
+        await Assert.That(config).IsEqualTo(new ProcessExitConfiguration());
         await Assert.That(config.RequestedCancellationExitBehaviour).IsEqualTo(ProcessExitBehaviour.GracefulExit);
         await Assert.That(config.TimeoutPolicy).IsEqualTo(ProcessTimeoutPolicy.Default);
         await Assert.That(config.CancellationThrowsException).IsFalse();
+        await Assert.That(config.ExceptionBehaviour)
+            .IsEqualTo(ProcessExceptionBehaviour.AllowExceptionsIfUnexpected);
+    }
+
+    [Test]
+    public async Task Default_DiffersFromCreateGraceful_InExceptionBehaviour()
+    {
+        // Act
+        ProcessExitConfiguration defaultConfig = ProcessExitConfiguration.Default;
+        ProcessExitConfiguration gracefulConfig = ProcessExitConfiguration.CreateGraceful();
+
+        // Assert - the two spellings disagree only on exception behaviour, by design.
+        await Assert.That(defaultConfig).IsNotEqualTo(gracefulConfig);
+        await Assert.That(gracefulConfig.ExceptionBehaviour)
+            .IsEqualTo(ProcessExceptionBehaviour.SuppressExceptions);
+        await Assert.That(gracefulConfig.CancellationThrowsException).IsFalse();
     }
 
     [Test]

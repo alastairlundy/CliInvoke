@@ -25,18 +25,32 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     private bool _disposed;
 
     private readonly IFilePathResolver _filePathResolver;
+    private readonly FileInfo _resolvedFilePath;
 
     /// <summary>
-    /// 
+    ///     Initialises a new instance of the <see cref="ExternalProcess" /> class,
+    ///     resolving <see cref="ProcessConfiguration.TargetFilePath" /> once at construction
+    ///     and reusing the resolved path in <see cref="Start" /> and
+    ///     <see cref="StartAsync(CancellationToken)" />.
     /// </summary>
-    /// <param name="filePathResolver"></param>
-    /// <param name="configuration"></param>
-    /// <param name="exitConfiguration"></param>
+    /// <param name="filePathResolver">The resolver used to locate the target executable.</param>
+    /// <param name="configuration">The configuration settings for the process.</param>
+    /// <param name="exitConfiguration">
+    ///     The exit configuration controlling timeout, cancellation, and exception handling;
+    ///     defaults to <see cref="ProcessExitConfigurationCreationExtensions.CreateGraceful()" /> if
+    ///     <see langword="null" />, which suppresses unexpected-exit exceptions. Pass
+    ///     <c>ProcessExitConfiguration.Default</c> (equivalent to
+    ///     <c>new ProcessExitConfiguration()</c>) to allow unexpected-exit exceptions instead.
+    /// </param>
+    /// <exception cref="FileNotFoundException">
+    ///     Thrown at construction when the target file cannot be resolved.
+    /// </exception>
     public ExternalProcess(IFilePathResolver filePathResolver, ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null)
     {
         _filePathResolver = filePathResolver;
-        _processWrapper = new ProcessWrapper(configuration, _filePathResolver.ResolveFilePath(configuration.TargetFilePath));
+        _resolvedFilePath = filePathResolver.ResolveFilePath(configuration.TargetFilePath);
+        _processWrapper = new ProcessWrapper(configuration, _resolvedFilePath);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
 
@@ -115,12 +129,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             if (_processWrapper.HasStarted)
                 throw new InvalidOperationException("The process has already been started.");
 
-            FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
-
             _processWrapper.Started -= _startedHandler;
             _processWrapper.Exited -= _exitedHandler;
             _processWrapper.Dispose();
-            _processWrapper = new ProcessWrapper(Configuration, filePath);
+            _processWrapper = new ProcessWrapper(Configuration, _resolvedFilePath);
 
             _processWrapper.Started += _startedHandler;
             _processWrapper.Exited += _exitedHandler;
@@ -164,12 +176,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             if (_processWrapper.HasStarted)
                 throw new InvalidOperationException("The process has already been started.");
 
-            FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
-
             _processWrapper.Started -= _startedHandler;
             _processWrapper.Exited -= _exitedHandler;
             _processWrapper.Dispose();
-            _processWrapper = new ProcessWrapper(Configuration, filePath);
+            _processWrapper = new ProcessWrapper(Configuration, _resolvedFilePath);
 
             _processWrapper.Started += _startedHandler;
             _processWrapper.Exited += _exitedHandler;

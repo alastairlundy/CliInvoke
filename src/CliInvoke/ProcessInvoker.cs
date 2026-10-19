@@ -95,8 +95,11 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processExitConfiguration">
-    ///     The exit configuration to use for the process, or the
-    ///     default if null.
+    ///     The exit configuration to use for the process, or
+    ///     <c>ProcessExitConfiguration.Default</c> (equivalent to
+    ///     <c>new ProcessExitConfiguration()</c>, which allows unexpected-exit exceptions)
+    ///     if null. For the suppressing flavour, pass
+    ///     <see cref="ProcessExitConfigurationCreationExtensions.CreateGraceful()" />.
     /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Process Results from running the process.</returns>
@@ -132,8 +135,11 @@ public class ProcessInvoker : IProcessInvoker
     /// </summary>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processExitConfiguration">
-    ///     The exit configuration to use for the process, or the
-    ///     default if null.
+    ///     The exit configuration to use for the process, or
+    ///     <c>ProcessExitConfiguration.Default</c> (equivalent to
+    ///     <c>new ProcessExitConfiguration()</c>, which allows unexpected-exit exceptions)
+    ///     if null. For the suppressing flavour, pass
+    ///     <see cref="ProcessExitConfigurationCreationExtensions.CreateGraceful()" />.
     /// </param>
     /// <param name="cancellationToken">A token to cancel the operation if required.</param>
     /// <returns>The Buffered Process Results from running the process.</returns>

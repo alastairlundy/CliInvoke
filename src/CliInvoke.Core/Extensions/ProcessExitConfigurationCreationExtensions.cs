@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke.Core
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -20,11 +20,22 @@ public static class ProcessExitConfigurationCreationExtensions
     extension(ProcessExitConfiguration)
     {
         /// <summary>
-        /// Provides a default instance of <see cref="ProcessExitConfiguration"/>
-        /// that is configured to perform a graceful exit with a standard timeout policy.
+        /// Provides a default instance of <see cref="ProcessExitConfiguration"/>, equivalent
+        /// to <c>new ProcessExitConfiguration()</c>: the standard timeout policy, a graceful
+        /// cancellation exit, and exception behaviour that allows unexpected-exit exceptions
+        /// to propagate.
         /// </summary>
+        /// <remarks>
+        /// This is the constructor default, not the suppressing flavour. Cancellation-driven
+        /// exceptions are still not thrown, because
+        /// <see cref="ProcessExitConfiguration.CancellationThrowsException" /> is
+        /// <see langword="false" />; unexpected-exit exceptions, however, are governed by
+        /// <see cref="ProcessExitConfiguration.ExceptionBehaviour" /> and are allowed. For the
+        /// suppressing flavour — where unexpected-exit exceptions are swallowed — use
+        /// <see cref="CreateGraceful()" />.
+        /// </remarks>
         public static ProcessExitConfiguration Default
-            => ProcessExitConfiguration.CreateGraceful();
+            => new ProcessExitConfiguration();
 
         /// <summary>
         /// Creates a new instance of <see cref="ProcessExitConfiguration"/> with the specified timeout policy, cancellation exit behaviour, and exception handling settings.
@@ -49,7 +60,11 @@ public static class ProcessExitConfigurationCreationExtensions
         /// </summary>
         /// <remarks>
         /// With this configuration, a timeout or cancellation kill returns a result with
-        /// <c>Canceled</c> set to <see langword="true" /> instead of throwing.
+        /// <c>Canceled</c> set to <see langword="true" /> instead of throwing, and
+        /// unexpected-exit exceptions are suppressed
+        /// (<see cref="ProcessExceptionBehaviour.SuppressExceptions" />). This differs from
+        /// <c>Default</c>, which matches the constructor
+        /// default and allows unexpected-exit exceptions.
         /// </remarks>
         /// <returns>A <see cref="ProcessExitConfiguration"/> object configured to perform a graceful exit with the default timeout policy.</returns>
         public static ProcessExitConfiguration CreateGraceful()
@@ -60,7 +75,11 @@ public static class ProcessExitConfigurationCreationExtensions
         /// </summary>
         /// <remarks>
         /// With this configuration, a timeout or cancellation kill returns a result with
-        /// <c>Canceled</c> set to <see langword="true" /> instead of throwing.
+        /// <c>Canceled</c> set to <see langword="true" /> instead of throwing, and
+        /// unexpected-exit exceptions are suppressed
+        /// (<see cref="ProcessExceptionBehaviour.SuppressExceptions" />). This differs from
+        /// <c>Default</c>, which matches the constructor
+        /// default and allows unexpected-exit exceptions.
         /// </remarks>
         /// <param name="timeoutPolicy">The <see cref="ProcessTimeoutPolicy"/> instance to define the timeout settings for the process exit.</param>
         /// <returns>A <see cref="ProcessExitConfiguration"/> object configured to perform a graceful exit using the specified timeout policy.</returns>
