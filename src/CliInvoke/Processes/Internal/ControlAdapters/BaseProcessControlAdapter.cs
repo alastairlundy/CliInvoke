@@ -30,6 +30,15 @@ internal abstract class BaseProcessControlAdapter
     /// </summary>
     internal abstract PosixSignal? GetTerminatingSignal(int exitCode);
 
+    /// <summary>
+    ///     Converts a raw native POSIX signal number (e.g. <c>WTERMSIG</c>, or the <c>n</c> of a
+    ///     <c>128 + n</c> exit code) to the corresponding <see cref="PosixSignal"/> member, using the
+    ///     current platform's signal numbering. Returns <c>null</c> on platforms without POSIX
+    ///     signal numbering and for numbers no <see cref="PosixSignal"/> member represents (SIGKILL,
+    ///     and signals the BCL enum does not model, resolve to <c>null</c> by contract).
+    /// </summary>
+    internal virtual PosixSignal? MapNativeSignalNumber(int signalNumber) => null;
+
     internal virtual void ApplyConfiguration(ProcessWrapper process, ProcessConfiguration processConfiguration)
     {
         ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath);

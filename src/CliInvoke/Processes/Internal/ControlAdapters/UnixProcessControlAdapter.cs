@@ -177,9 +177,18 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         // e.g. SIGTERM = -4, SIGINT = -2), so a raw cast of (exitCode - 128) would yield a
         // value that does not equal the corresponding enum member. Map the raw signal number
         // to the correct PosixSignal explicitly instead.
-        int signalNumber = exitCode - 128;
-        return _signalByNumber.TryGetValue(signalNumber, out PosixSignal signal) ? signal : null;
+        return MapNativeSignalNumber(exitCode - 128);
     }
+
+    /// <summary>
+    ///     Maps a raw native POSIX signal number (e.g. <c>WTERMSIG</c>) to the corresponding
+    ///     <see cref="PosixSignal"/> member using this platform's signal numbering (Linux vs
+    ///     BSD layout). Returns <c>null</c> when the number has no table entry: SIGKILL has no
+    ///     entry by contract, and numbers the BCL <see cref="PosixSignal"/> enum does not
+    ///     model (SIGUSR1, SIGPIPE, real-time signals, …) cannot be represented.
+    /// </summary>
+    internal override PosixSignal? MapNativeSignalNumber(int signalNumber) =>
+        _signalByNumber.TryGetValue(signalNumber, out PosixSignal signal) ? signal : null;
 
     private static readonly Dictionary<int, PosixSignal> _signalByNumber = CreateSignalByNumberTable();
 

@@ -128,9 +128,12 @@ internal class ProcessWrapper : Process
     /// </summary>
     /// <remarks>
     ///     On the net11.0 leg this reads the runtime's exit-status introspection
-    ///     (<c>TryWaitForExitStatus</c>) instead of the adapter's 128+n exit-code heuristic;
-    ///     the SIGKILL→null and unknown-signal→null contracts are preserved so both legs
-    ///     report identical <see cref="ProcessResult"/> values.
+    ///     (<c>TryWaitForExitStatus</c>) instead of the adapter's 128+n exit-code heuristic.
+    ///     The runtime casts the raw positive native signal number (<c>WTERMSIG</c>) into
+    ///     <see cref="PosixSignal"/>, so before any check, positive raw values are converted
+    ///     through the adapter's platform-specific signal-number mapping; the SIGKILL→null
+    ///     and unknown-signal→null contracts are preserved so both legs report identical
+    ///     <see cref="ProcessResult"/> values.
     /// </remarks>
     // On net11.0 the base Process type gains a Signal(PosixSignal) method; this
     // terminating-signal property intentionally keeps its name, so the hide
@@ -153,11 +156,28 @@ internal class ProcessWrapper : Process
             {
                 PosixSignal? signal = exitStatus.Signal;
 
+                // The runtime's Unix wait reporting casts the RAW positive native signal
+                // number (WTERMSIG) into the PosixSignal type ((PosixSignal)terminatingSignal
+                // in ProcessWaitState.Unix.cs), but the BCL PosixSignal members are negative
+                // sentinels (SIGTERM = -4, SIGKILL = -11), so a positive value can never
+                // compare equal to a member. Convert positive native numbers through the
+                // adapter's platform-specific mapping (Linux vs BSD numbering) BEFORE the
+                // SIGKILL and undefined-value checks below: raw 15 becomes genuine
+                // PosixSignal.SIGTERM, while numbers the platform mapping table cannot
+                // represent — including SIGKILL (9), which has no entry by contract —
+                // collapse to null.
+                // Negative values (if the runtime ever delivers actual members instead of
+                // raw numbers) pass through untouched; null stays null.
+                if (signal is not null && (int)signal.Value > 0)
+                {
+                    signal = ProcessControlAdapter.MapNativeSignalNumber((int)signal.Value);
+                }
+
                 // Parity with the net10.0 heuristic's contracts: SIGKILL maps to null (a
                 // process cannot catch SIGKILL; callers distinguish library-initiated
                 // forceful kills via ProcessResult.Canceled rather than Signal), and
-                // signal numbers outside the PosixSignal set (delivered as raw numbers by
-                // the runtime) map to null just like a table miss below.
+                // undefined values (numbers no PosixSignal member models) map to null
+                // just like a table miss in the mapping above.
 #pragma warning disable CA1416 // PosixSignal members are unix-flavoured; Signal is always null on Windows so this comparison never fires there.
                 if (signal is PosixSignal.SIGKILL)
                     return null;
