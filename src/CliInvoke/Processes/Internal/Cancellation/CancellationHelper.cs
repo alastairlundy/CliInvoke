@@ -62,11 +62,12 @@ internal static class CancellationHelper
     /// <remarks>
     ///     When <see cref="ProcessExitConfiguration.ExceptionBehaviour" /> is
     ///     <see cref="ProcessExceptionBehaviour.AllowExceptionsIfUnexpected" /> and the reason is a
-    ///     timeout or an unknown reason, the exception is re-thrown only if the cancellation
-    ///     resolved more than 1 second before or after <paramref name="expectedExitTime" />.
-    ///     Exceptions raised by an on-time timeout cancellation resolve within milliseconds of the
-    ///     expected exit time and are swallowed; genuine failures (I/O errors, access violations,
-    ///     etc.) resolve outside that window and propagate to the caller.
+    ///     timeout or an unknown reason, only an <see cref="OperationCanceledException" /> raised
+    ///     within 1 second of <paramref name="expectedExitTime" /> — an on-time timeout raised by
+    ///     CliInvoke's own cancellation machinery — is swallowed. A cancellation exception outside
+    ///     that window propagates, and so does every non-cancellation exception (I/O errors, access
+    ///     violations, etc.) regardless of timing: the wall-clock window discriminates on-time
+    ///     timeouts, never genuine failures.
     /// </remarks>
     /// <exception cref="Exception">Rethrown when the exception behaviour configuration permits it.</exception>
     internal static void HandleCancellationExceptions(DateTime expectedExitTime,
@@ -98,10 +99,17 @@ internal static class CancellationHelper
             case CancellationReason.Timeout or CancellationReason.NotKnown:
             {
                 if (exitConfiguration.ExceptionBehaviour
-                    == ProcessExceptionBehaviour.AllowExceptions || (exitConfiguration
-                            .ExceptionBehaviour
-                        == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected &&
-                        difference > TimeSpan.FromSeconds(1)))
+                    == ProcessExceptionBehaviour.AllowExceptions)
+                    throw exception;
+
+                // AllowExceptionsIfUnexpected swallows only cancellation exceptions raised
+                // on time (the expected kill timer or caller token firing at the threshold).
+                // Non-cancellation exceptions are genuine failures and always propagate —
+                // never let a wall-clock coincidence silently eat them (L7b).
+                if (exitConfiguration.ExceptionBehaviour
+                        == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected
+                    && (exception is not OperationCanceledException
+                        || difference > TimeSpan.FromSeconds(1)))
                     throw exception;
 
                 break;
