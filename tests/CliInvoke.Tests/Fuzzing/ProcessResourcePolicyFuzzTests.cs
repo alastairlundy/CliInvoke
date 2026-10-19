@@ -8,6 +8,7 @@
  */
 
 using CliInvoke.Core.Configuration;
+using System.Runtime.Versioning;
 
 namespace CliInvoke.Tests.Fuzzing;
 
@@ -16,6 +17,10 @@ namespace CliInvoke.Tests.Fuzzing;
 /// </summary>
 public class ProcessResourcePolicyFuzzTests
 {
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public void SetMinWorkingSet_GreaterThanMax_ThrowsArgumentOutOfRangeException()
     {
@@ -39,6 +44,10 @@ public class ProcessResourcePolicyFuzzTests
             .QuickCheckThrowOnFailure();
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public void SetMaxWorkingSet_LessThanMin_ThrowsArgumentOutOfRangeException()
     {
@@ -62,6 +71,10 @@ public class ProcessResourcePolicyFuzzTests
             .QuickCheckThrowOnFailure();
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public void SetMinWorkingSet_Negative_ThrowsArgumentOutOfRangeException()
     {
@@ -84,6 +97,10 @@ public class ProcessResourcePolicyFuzzTests
             .QuickCheckThrowOnFailure();
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public void SetMaxWorkingSet_Negative_ThrowsArgumentOutOfRangeException()
     {
@@ -106,6 +123,10 @@ public class ProcessResourcePolicyFuzzTests
             .QuickCheckThrowOnFailure();
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task SetMaxWorkingSet_Zero_ThrowsArgumentOutOfRangeException()
     {
@@ -114,6 +135,10 @@ public class ProcessResourcePolicyFuzzTests
         await Assert.That(() => spec.SetMaxWorkingSet(0)).Throws<ArgumentOutOfRangeException>();
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public void Build_WithValidMinAndMax_ReturnsPolicyWithCorrectValues()
     {
@@ -134,6 +159,10 @@ public class ProcessResourcePolicyFuzzTests
             .QuickCheckThrowOnFailure();
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("maccatalyst")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task Build_DefaultSpec_HasExpectedDefaults()
     {

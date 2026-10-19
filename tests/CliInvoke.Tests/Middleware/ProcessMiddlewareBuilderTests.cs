@@ -14,7 +14,7 @@ public class ProcessMiddlewareBuilderTests
         builder.UseMiddleware(middleware);
 
         IReadOnlyList<IProcessMiddleware> result = builder.Build();
-        await Assert.That(result).HasCount(1);
+        await Assert.That(result).Count().IsEqualTo(1);
         await Assert.That(result[0]).IsEqualTo(middleware);
     }
 
@@ -54,7 +54,7 @@ public class ProcessMiddlewareBuilderTests
         builder.UseMiddleware<FakeMiddleware>();
 
         IReadOnlyList<IProcessMiddleware> result = builder.Build();
-        await Assert.That(result).HasCount(1);
+        await Assert.That(result).Count().IsEqualTo(1);
         await Assert.That(result[0]).IsEqualTo(expected);
     }
 
@@ -95,7 +95,7 @@ public class ProcessMiddlewareBuilderTests
         builder.UseMiddleware<FakeMiddleware>();
 
         IReadOnlyList<IProcessMiddleware> result = builder.Build();
-        await Assert.That(result).HasCount(2);
+        await Assert.That(result).Count().IsEqualTo(2);
         await Assert.That(result[0]).IsEqualTo(instance);
         await Assert.That(result[1]).IsEqualTo(resolved);
     }
@@ -129,7 +129,7 @@ public class ProcessMiddlewareBuilderTests
         builder.UseMiddleware<FakeMiddleware>();
 
         IReadOnlyList<IProcessMiddleware> result = builder.Build();
-        await Assert.That(result).HasCount(1);
+        await Assert.That(result).Count().IsEqualTo(1);
         await Assert.That(result[0]).IsEqualTo(expected);
     }
 
