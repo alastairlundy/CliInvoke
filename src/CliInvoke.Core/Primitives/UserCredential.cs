@@ -144,6 +144,11 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
     /// <param name="left">The first user credential to compare.</param>
     /// <param name="right">The second user credential to compare.</param>
     /// <returns>True if the two user credential objects are equal; false otherwise.</returns>
+    /// <remarks>
+    ///     Returns <see langword="true" /> when both operands are <see langword="null" />,
+    ///     and <see langword="false" /> when exactly one operand is <see langword="null" />,
+    ///     following the standard reference-equality convention.
+    /// </remarks>
     public static bool Equals(UserCredential? left, UserCredential? right)
     {
         if (left is null && right is null)

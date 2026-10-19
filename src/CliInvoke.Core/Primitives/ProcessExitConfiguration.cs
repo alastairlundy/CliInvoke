@@ -76,6 +76,10 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <remarks>
     /// Options include waiting for the process to exit, attempting a graceful exit, or forcing
     /// termination. The default behaviour is <see cref="ProcessExitBehaviour.GracefulExit" />.
+    /// Note that a <see cref="ProcessExitBehaviour.GracefulExit" /> interrupt is best-effort on
+    /// Windows — a console-host caller typically cannot attach to the child's console, so no
+    /// signal is delivered and the child is force-terminated; on Unix, SIGTERM is delivered
+    /// and the exit is genuinely graceful.
     /// </remarks>
     public ProcessExitBehaviour RequestedCancellationExitBehaviour { get; }
 
@@ -183,6 +187,11 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="left">The first <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     Returns <see langword="false" /> when either operand is <see langword="null" />,
+    ///     including when both operands are <see langword="null" />; unlike the
+    ///     <c>==</c> operator, which treats two null references as equal.
+    /// </remarks>
     public static bool Equals(ProcessExitConfiguration? left,
         ProcessExitConfiguration? right)
     {

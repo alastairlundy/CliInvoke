@@ -12,6 +12,21 @@ namespace CliInvoke.Core;
 /// <summary>
 ///     A class that defines a Process' Timeout configuration, if any.
 /// </summary>
+/// <remarks>
+///     <para>
+///         When a timeout expires with
+///         <see cref="ProcessExitBehaviour.GracefulExit" />, the graceful interrupt is
+///         <b>best-effort on Windows</b>: delivering the interrupt requires attaching to
+///         the child process's console, which typically fails when the caller itself is
+///         running in a console window. When the console cannot be attached, no signal
+///         is delivered and the child is force-terminated instead.
+///     </para>
+///     <para>
+///         On Unix, the graceful interrupt sends SIGTERM and is genuinely graceful.
+///         Under all configurations, if the process does not exit after the interrupt
+///         attempt within a short grace period, it is force-terminated.
+///     </para>
+/// </remarks>
 public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
 {
     /// <summary>
@@ -64,8 +79,14 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
         new(TimeSpan.FromSeconds(0), false, ProcessExitBehaviour.WaitForExit);
 
     /// <summary>
-    /// 
+    ///     The method of cancellation applied when the timeout threshold is reached.
     /// </summary>
+    /// <remarks>
+    ///     With <see cref="ProcessExitBehaviour.GracefulExit" />, the interrupt is
+    ///     best-effort on Windows (see the type-level remarks); on Unix, SIGTERM is
+    ///     delivered. If the process does not exit within a short grace period after
+    ///     the interrupt attempt, it is force-terminated regardless of platform.
+    /// </remarks>
     public ProcessExitBehaviour TimeoutExitBehaviour { get; }
     
     /// <summary>
@@ -116,6 +137,13 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     ///     A new instance of <see cref="ProcessTimeoutPolicy" /> configured with the specified
     ///     parameters.
     /// </returns>
+    /// <remarks>
+    ///     If <paramref name="exitBehaviour" /> is
+    ///     <see cref="ProcessExitBehaviour.GracefulExit" />, the graceful interrupt is
+    ///     best-effort on Windows — a console-host caller typically cannot attach to the
+    ///     child's console, no signal is delivered, and the child is force-terminated;
+    ///     on Unix, SIGTERM is delivered and the exit is genuinely graceful.
+    /// </remarks>
     public static ProcessTimeoutPolicy FromTimeSpan(TimeSpan timeoutThreshold,
         ProcessExitBehaviour exitBehaviour = ProcessExitBehaviour.GracefulExit)
     {
@@ -163,6 +191,11 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     ///     <c>true</c> if the two <see cref="ProcessTimeoutPolicy" /> instances are equal; otherwise,
     ///     <c>false</c>.
     /// </returns>
+    /// <remarks>
+    ///     Returns <see langword="true" /> when both operands are <see langword="null" />,
+    ///     and <see langword="false" /> when exactly one operand is <see langword="null" />,
+    ///     following the standard reference-equality convention.
+    /// </remarks>
     public static bool Equals(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         if (left is null) return right is null;

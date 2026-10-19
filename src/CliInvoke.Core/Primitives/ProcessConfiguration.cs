@@ -400,6 +400,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <param name="left">A Process configuration to be compared.</param>
     /// <param name="right">The other Process configuration to be compared.</param>
     /// <returns>True if both Process configurations are equal to each other; false otherwise.</returns>
+    /// <remarks>
+    ///     Returns <see langword="false" /> when either operand is <see langword="null" />,
+    ///     including when both operands are <see langword="null" />; unlike the
+    ///     <c>==</c> operator, which treats two null references as equal.
+    /// </remarks>
     public static bool Equals(ProcessConfiguration? left, ProcessConfiguration? right)
     {
         if (left is null || right is null) return false;
