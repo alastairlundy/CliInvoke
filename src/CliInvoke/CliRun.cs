@@ -164,7 +164,13 @@ public static class CliRun
     /// </param>
     /// <returns>
     /// A task representing the asynchronous operation. The result is a <see cref="BufferedProcessResult"/>
-    /// object containing the full output of the process and execution details.
+    /// object containing the full output of the process and execution details. When the operation is
+    /// cancelled mid-run, a normal result with <c>Canceled</c> set to <see langword="true"/> and empty
+    /// captured output is returned instead of throwing, because the applied graceful exit configuration
+    /// leaves <see cref="ProcessExitConfiguration.CancellationThrowsException"/> false; to receive an
+    /// <see cref="OperationCanceledException"/> instead, use the
+    /// <see cref="RunBufferedAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)"/>
+    /// overload and set <c>CancellationThrowsException</c> to <see langword="true"/>.
     /// </returns>
     public static async Task<BufferedProcessResult> RunBufferedAsync(string targetFilePath,
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
@@ -211,7 +217,13 @@ public static class CliRun
     /// </param>
     /// <returns>
     /// A task representing the asynchronous operation. The result is a <see cref="BufferedProcessResult"/>
-    /// object containing the full output of the process and execution details.
+    /// object containing the full output of the process and execution details. When the operation is
+    /// cancelled mid-run, a normal result with <c>Canceled</c> set to <see langword="true"/> and empty
+    /// captured output is returned instead of throwing, because the applied graceful exit configuration
+    /// leaves <see cref="ProcessExitConfiguration.CancellationThrowsException"/> false; to receive an
+    /// <see cref="OperationCanceledException"/> instead, use the
+    /// <see cref="RunBufferedAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)"/>
+    /// overload and set <c>CancellationThrowsException</c> to <see langword="true"/>.
     /// </returns>
     public static async Task<BufferedProcessResult> RunBufferedAsync(
         string targetFilePath, IEnumerable<string> arguments,
@@ -241,7 +253,13 @@ public static class CliRun
     /// A token that, if cancelled, will be used to cancel the operation.
     /// </param>
     /// <returns>
-    /// The buffered result of the process execution.
+    /// The buffered result of the process execution. When cancellation occurs and
+    /// <see cref="ProcessExitConfiguration.CancellationThrowsException"/> on
+    /// <paramref name="exitConfiguration"/> is <see langword="false"/> (the default when no exit
+    /// configuration is supplied), a normal result with <c>Canceled</c> set to
+    /// <see langword="true"/> and empty captured output is returned instead of throwing; set
+    /// <c>CancellationThrowsException</c> to <see langword="true"/> to receive an
+    /// <see cref="OperationCanceledException"/> instead.
     /// </returns>
     public static Task<BufferedProcessResult> RunBufferedAsync(
         ProcessConfiguration configuration,

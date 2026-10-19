@@ -13,8 +13,15 @@ namespace CliInvoke.Extensions.Middleware.Retry;
 ///     Configuration options for retry middleware applied to process invocation.
 /// </summary>
 /// <remarks>
-///     Register an instance of this type in the dependency injection container to customise retry
-///     behaviour. When no instance is registered, <see cref="Default"/> is used.
+///     <para>
+///         Register an instance of this type in the dependency injection container to customise retry
+///         behaviour. When no instance is registered, <see cref="Default"/> is used.
+///     </para>
+///     <para>
+///         Standard input is replayed from the beginning on each retry attempt; the configured standard
+///         input stream must be seekable (or <c>null</c>), otherwise a retry attempt throws
+///         <see cref="InvalidOperationException"/>.
+///     </para>
 /// </remarks>
 public sealed class RetryOptions
 {

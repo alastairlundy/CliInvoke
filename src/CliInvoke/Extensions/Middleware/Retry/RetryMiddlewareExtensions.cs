@@ -12,6 +12,11 @@ namespace CliInvoke.Extensions.Middleware.Retry;
 /// <summary>
 ///     Provides extension methods for configuring retry middleware on the process pipeline.
 /// </summary>
+/// <remarks>
+///     Standard input is replayed from the beginning on each retry attempt; the configured standard
+///     input stream must be seekable (or <c>null</c>), otherwise a retry attempt throws
+///     <see cref="InvalidOperationException"/>.
+/// </remarks>
 public static class RetryMiddlewareExtensions
 {
     /// <param name="builder">The middleware builder.</param>

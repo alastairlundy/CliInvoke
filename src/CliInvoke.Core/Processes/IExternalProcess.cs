@@ -121,8 +121,15 @@ public interface IExternalProcess : IDisposable
     ///     <c>null</c> means no cap is applied.
     /// </param>
     /// <returns>
-    ///     A task that represents the asynchronous operation.
-    ///     The result contains the buffered process result when the method completes.
+    ///     A task that represents the asynchronous operation. The result contains the buffered
+    ///     process result when the method completes. When cancellation occurs and
+    ///     <see cref="ProcessExitConfiguration.CancellationThrowsException"/> is
+    ///     <see langword="false"/> (the default), the method returns a normal
+    ///     <see cref="BufferedProcessResult"/> with <c>Canceled</c> set to
+    ///     <see langword="true"/> and empty captured standard output and standard error
+    ///     instead of throwing; an <see cref="OperationCanceledException"/> is thrown only
+    ///     when <see cref="ProcessExitConfiguration.CancellationThrowsException"/> is
+    ///     <see langword="true"/> or when a genuine stream failure occurs.
     /// </returns>
     Task<BufferedProcessResult> CaptureBufferedResultAsync(
         CancellationToken cancellationToken,
