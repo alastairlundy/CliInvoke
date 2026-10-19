@@ -48,6 +48,35 @@ public class PowerShellMiddlewareIntegrationTests
         return null;
     }
 
+    /// <summary>
+    ///     Builds a fresh DI provider with <c>UsePowerShell()</c> middleware and runs
+    ///     <c>dotnet --version</c> through the invoker, so the middleware rewrites the
+    ///     target to <c>pwsh -NoProfile -Command</c>.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("freebsd")]
+    private static async Task<BufferedProcessResult> ExecuteDotnetVersionThroughPwshAsync()
+    {
+        ServiceProvider provider = new ServiceCollection()
+            .AddCliInvokeSpecializations()
+            .AddCliInvoke(builder => builder.UsePowerShell())
+            .BuildServiceProvider();
+
+        IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
+
+        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
+
+        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
+            config,
+            ProcessExitConfiguration.CreateGraceful());
+
+        await provider.DisposeAsync().ConfigureAwait(false);
+
+        return result;
+    }
+
     [Test]
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("macos")]
@@ -68,22 +97,26 @@ public class PowerShellMiddlewareIntegrationTests
         // `pwsh -NoProfile -Command "..."`. We wire the middleware onto a normal
         // ProcessInvoker through the supported DI entry points; the dedicated
         // `PowershellProcessInvoker` type was removed in favour of this pipeline.
-        ServiceProvider provider = new ServiceCollection()
-            .AddCliInvokeSpecializations()
-            .AddCliInvoke(builder => builder.UsePowerShell())
-            .BuildServiceProvider();
+        BufferedProcessResult result = await ExecuteDotnetVersionThroughPwshAsync();
 
-        IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
+        // pwsh occasionally dies from a signal on hosted Linux runners (observed
+        // SIGABRT/exit 134 on ubuntu-latest) before producing any output. That is an
+        // environment-level process crash, not a middleware-rewrite failure, so retry
+        // once; a genuine rewrite failure reproduces on the retry. Exit codes above 127
+        // on Unix are reserved for signal deaths (128 + signal number).
+        if (OperatingSystem.IsLinux() && result.ExitCode > 127)
+        {
+            result = await ExecuteDotnetVersionThroughPwshAsync();
+        }
 
-        ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
-
-        // PowerShellMiddleware rewrites the config so the real target becomes `pwsh`.
-        // Verify the rewrite by confirming the process executed through pwsh (exit 0 with output).
-        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
-            config,
-            ProcessExitConfiguration.CreateGraceful());
-
-        await provider.DisposeAsync().ConfigureAwait(false);
+        // Fail with captured output first so a crash like the one above is diagnosable
+        // from the test log instead of showing only the exit code.
+        if (result.ExitCode != 0)
+        {
+            Assert.Fail(
+                $"pwsh invocation exited with {result.ExitCode}. " +
+                $"stdout: '{result.StandardOutput}'; stderr: '{result.StandardError}'");
+        }
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput).IsNotNull();
