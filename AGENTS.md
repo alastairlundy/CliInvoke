@@ -3,17 +3,17 @@
 ## What this repo is
 CliInvoke — a .NET/C# library for launching and interacting with command-line processes (builders, configuration models, invokers, middleware, DI, and platform specializations).
 
-- Single TFM: `net10.0` (see `global.json` and csproj files). Current release line: `3.0.0`.
-- Docs portal lives in `site/` (built with Lunet, published on GitHub release). Root `getting-started.md` is legacy — prefer `site/docs/`.
+- Single TFM: `net10.0` (see `global.json` and csproj files). Current release line: `3.1.0`.
+- Docs portal lives in `site/` (built with Lunet; published to GitHub Pages on release by `.github/workflows/docs-publish.yml`).
 
 ## Codebase Organization
 - **Solution**: `src/CliInvoke.sln`
 - **Packages** (each carries its own `Version`/`PackageVersion` and `PackageReleaseNotes` in its csproj):
   - `src/CliInvoke.Core/` — abstractions & models (`ProcessConfiguration`, results, middleware interfaces)
   - `src/CliInvoke/` — implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers, including the `AddCliInvoke` DI entry point in `Extensions/DependencyInjection/AddCliInvokeExtensions.cs`, namespace `CliInvoke.Extensions`)
-  - `src/CliInvoke.Specializations/` — PowerShell/CMD middleware; also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Specializations`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
+  - `src/CliInvoke.Specializations/` — shell middleware (PowerShell/CMD/default shell); also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Specializations`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
 - `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. (`tests/CliInvoke.Extensions.Tests/` was removed; extension tests now live in `tests/CliInvoke.Tests/`.)
-- **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs only `tests/CliInvoke.Tests/`.
+- **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs `tests/CliInvoke.Tests/` **and** `tests/CliInvoke.Specializations.Tests/` on the ubuntu-latest, windows-latest, and macos-latest matrix legs.
 - **Benchmarks**: `benchmarks/`.
 - **SDK**: `global.json` pins .NET 10 SDK (`rollForward: latestFeature`). Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
 
@@ -22,6 +22,7 @@ From repo root (see `.github/workflows/test.yml`):
 1. `bash scripts/guard-configureawait.sh src` — **ConfigureAwait guard, hard CI gate run before build.** Every `await` in `src/` must have `.ConfigureAwait(false)`; `await foreach`/`await using` are exempt. Run via Git Bash/WSL on Windows.
 2. `dotnet build src/CliInvoke.sln`
 3. From `tests/CliInvoke.Tests/`: `dotnet test`
+4. From `tests/CliInvoke.Specializations.Tests/`: `dotnet test`
 
 Other gates/quirks:
 - **XML doc comments are build errors**: `Directory.Build.props` escalates CS1574/1580/1581/1584/1658/1734/1762 to errors. Keep `<summary>`/`<paramref>`/`<see>` valid on public API.
@@ -34,7 +35,7 @@ Three patterns, documented in `DESIGN_PATTERNS.md` (includes a decision tree):
 - **`CliRun`** — static, stateless, batteries-included facade; recommended default (`RunAsync`/`RunBufferedAsync` with string-args overloads). Allocates a fresh pipeline per call; no process-wide configurable state.
 - **`IProcessInvoker`** — DI-centric; the only pattern that flows through the middleware chain.
 - **`IExternalProcess` / `IExternalProcessFactory`** — process-like lifecycle control; does **not** flow through middleware (the bypass pattern).
-- Built-in middleware: `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd` (+ retry/truncation extensions). Middleware returns the process result **un-disposed** to the caller.
+- Built-in middleware: `UseLogging`, `UsePostExitValidation` (main package); `UsePowerShell`, `UseCmd`, `UseDefaultShell` (Specializations). Plus retry/truncation extensions. Middleware returns the process result **un-disposed** to the caller.
 - Middleware state split: **DI** resolves framework services (loggers, validators, lifetimes); **`MiddlewareItems`** is the ad-hoc per-invocation bag shared between middleware (same split as `HttpContext.RequestServices` vs `HttpContext.Items`).
 - Construction default: init construction with `required` `TargetFilePath`. `ProcessConfigurationBuilder` is only for argument escaping, `UserCredentialSpec`, and resource-policy callback flows — reaching for the builder by habit is "v2-style code" (see `GLOSSARY.md`).
 - Load the `cliinvoke-pattern-validator` skill when adding or changing invocation code.
@@ -43,7 +44,7 @@ Three patterns, documented in `DESIGN_PATTERNS.md` (includes a decision tree):
 Exactly **four** `IDisposable` types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, `ProcessConfigurationBuilder` (see README "Resource Disposal"). `ProcessConfiguration` is not disposable; `StandardInput`/`UserCredential` placed inside it remain the caller's responsibility.
 
 ## Domain conventions (details in GLOSSARY.md — do not "fix" these)
-- `FilePathResolver.ResolveFilePath` (formerly `FilePathResolverBase`): PATH lookup first, then directory recursion — a performance contract; reordering requires a new ADR.
+- `FilePathResolver.ResolveFilePath` (formerly `FilePathResolverBase`): PATH lookup first, then a single-level, non-recursive directory fallback — a performance contract; reordering requires a new ADR.
 - `Get*` returns materialized arrays; `Enumerate*` returns lazy `IEnumerable` — intentional naming asymmetry.
 - Custom `GetPathFileExtensions` overrides must return **lowercased** extensions or matching silently fails.
 - `Try*` methods must never propagate exceptions (catch `Exception` by convention).
@@ -58,6 +59,7 @@ Exactly **four** `IDisposable` types: `IExternalProcess`, `UserCredential`, `Use
 ## Testing notes
 - TUnit + FsCheck (property tests) + Bogus.
 - Tests spawn real executables (`dotnet`, `powershell.exe`, `pwsh`); PowerShell middleware tests skip when `pwsh` is not on PATH (e.g., Windows CI). OS-dependent behavior — replicate CI on ubuntu-latest when in doubt.
+- CI runs on ubuntu-latest, windows-latest, and macos-latest: cmd-runner behavioural tests (marker-file injection tests in `tests/CliInvoke.Tests/Extensibility/Factories/` and `tests/CliInvoke.Specializations.Tests/`) are Windows-only by design and skip on the other legs; the windows-latest leg runs them.
 
 ## PRs & contributing
 - Follow `CONTRIBUTING.md`; fill in every section of `.github/pull_request_template.md`.

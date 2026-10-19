@@ -106,10 +106,12 @@ public class ProcessRuntimeBugfixTests
     }
 
     /// <summary>
-    ///     Cancelling the caller's token during a graceful wait surfaces the
-    ///     cancellation to the caller when <c>CancellationThrowsException</c> is set. The
-    ///     interrupt task's fault is observed on every path, so propagation does not
-    ///     depend on timing.
+    ///     Cancelling the caller's token during a graceful wait with
+    ///     <c>CancellationThrowsException</c> set surfaces the cancellation to the caller
+    ///     deterministically: the wait throws <see cref="OperationCanceledException"/>
+    ///     even when the interrupted process exits before the machinery finishes its own
+    ///     bookkeeping, and <c>Canceled</c> reports the machinery termination once the
+    ///     reason is persisted.
     /// </summary>
     [Test]
     public async Task GracefulWait_CallerCancellation_WithCancellationThrowsException_PropagatesOperationCanceled()
@@ -135,12 +137,29 @@ public class ProcessRuntimeBugfixTests
                 cancellationTokenSource.Token);
             cancellationTokenSource.Cancel();
 
-            await Assert.That(async () => await waitTask).Throws<OperationCanceledException>();
+            // The approved cancellation fault must reach the caller even when the
+            // interrupted child exits before the machinery finishes its bookkeeping:
+            // WaitForExitCoreAsync awaits the interrupt task whenever the caller's token
+            // has fired, so the propagation decision no longer races the child's exit.
+            OperationCanceledException? propagated = null;
+            try
+            {
+                await waitTask;
+            }
+            catch (OperationCanceledException exception)
+            {
+                propagated = exception;
+            }
+
+            await Assert.That(propagated).IsNotNull();
 
             await ProcessTestHelper.WaitForConditionAsync(
                 () => process.HasExited,
                 TimeSpan.FromSeconds(5),
                 failureMessage: "Process was not terminated by the cancellation machinery within 5s.");
+
+            await Assert.That(process.HasExited).IsTrue();
+            await Assert.That(process.Canceled).IsTrue();
         }
         finally
         {

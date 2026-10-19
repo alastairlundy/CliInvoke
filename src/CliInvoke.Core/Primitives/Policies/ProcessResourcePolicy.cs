@@ -195,6 +195,11 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     /// <param name="left">A Process Resource Policy to be compared.</param>
     /// <param name="right">The other  Process Resource Policy to be compared.</param>
     /// <returns>True if both  Process Resource Policies are equal to each other; false otherwise.</returns>
+    /// <remarks>
+    ///     Returns <see langword="true" /> when both operands are <see langword="null" />,
+    ///     and <see langword="false" /> when exactly one operand is <see langword="null" />,
+    ///     following the standard reference-equality convention.
+    /// </remarks>
     public static bool Equals(ProcessResourcePolicy? left, ProcessResourcePolicy? right)
     {
         if (ReferenceEquals(left, right))

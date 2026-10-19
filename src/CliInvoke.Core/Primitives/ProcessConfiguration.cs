@@ -312,13 +312,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     {
         if (other is null) return false;
         
-        return TargetFilePath.Equals(other.TargetFilePath)
+        return PathsEqual(TargetFilePath, other.TargetFilePath)
                && EnvironmentVariables.Count == other.EnvironmentVariables.Count
                && EnvironmentVariables.SequenceEqual(other.EnvironmentVariables)
                && Arguments.Equals(other.Arguments)
                && ArgumentList.SequenceEqual(other.ArgumentList)
                && ResourcePolicy.Equals(other.ResourcePolicy)
-               && WorkingDirectoryPath.Equals(other.WorkingDirectoryPath)
+               && PathsEqual(WorkingDirectoryPath, other.WorkingDirectoryPath)
                && UseShellExecution.Equals(other.UseShellExecution)
                && Credential.Equals(other.Credential)
                && RequiresAdministrator == other.RequiresAdministrator
@@ -329,6 +329,40 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
                && StandardInputEncoding.Equals(other.StandardInputEncoding)
                && StandardOutputEncoding.Equals(other.StandardOutputEncoding)
                && StandardErrorEncoding.Equals(other.StandardErrorEncoding);
+    }
+
+    /// <summary>
+    ///     Compares two file paths using <see cref="StringComparison.OrdinalIgnoreCase"/> on
+    ///     Windows (where file-system paths are case-insensitive) and
+    ///     <see cref="StringComparison.Ordinal"/> elsewhere.
+    /// </summary>
+    /// <param name="left">The first path to compare.</param>
+    /// <param name="right">The second path to compare.</param>
+    /// <returns><c>true</c> when both paths are equal under the platform comparison.</returns>
+    private static bool PathsEqual(string left, string right)
+    {
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.Equals(left, right, comparison);
+    }
+
+    /// <summary>
+    ///     Computes a hash code for a file path using the same platform-aware comparison as
+    ///     <see cref="PathsEqual"/>, so that equal paths (per platform comparison) produce
+    ///     equal hash codes and the <see cref="Equals(ProcessConfiguration?)"/> /
+    ///     <see cref="GetHashCode"/> contract is preserved.
+    /// </summary>
+    /// <param name="path">The file path to hash.</param>
+    /// <returns>A hash code consistent with <see cref="PathsEqual"/>.</returns>
+    private static int PathHashCode(string path)
+    {
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.GetHashCode(path, comparison);
     }
 
     /// <summary>
@@ -353,11 +387,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     {
         HashCode hashCode = new HashCode();
 
-        hashCode.Add(TargetFilePath);
+        hashCode.Add(PathHashCode(TargetFilePath));
         hashCode.Add(Arguments);
         foreach (string arg in ArgumentList)
             hashCode.Add(arg);
-        hashCode.Add(WorkingDirectoryPath);
+        hashCode.Add(PathHashCode(WorkingDirectoryPath));
         foreach (KeyValuePair<string, string> kvp in EnvironmentVariables)
         {
             hashCode.Add(kvp.Key);
@@ -383,6 +417,11 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <param name="left">A Process configuration to be compared.</param>
     /// <param name="right">The other Process configuration to be compared.</param>
     /// <returns>True if both Process configurations are equal to each other; false otherwise.</returns>
+    /// <remarks>
+    ///     Returns <see langword="false" /> when either operand is <see langword="null" />,
+    ///     including when both operands are <see langword="null" />; unlike the
+    ///     <c>==</c> operator, which treats two null references as equal.
+    /// </remarks>
     public static bool Equals(ProcessConfiguration? left, ProcessConfiguration? right)
     {
         if (left is null || right is null) return false;

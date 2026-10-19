@@ -14,13 +14,23 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReleaseNotes>#### Changed
-- Multi-targets `net10.0` and `net11.0`.
+* Multi-targets `net10.0` and `net11.0`.
 #### Added
-- Stdin piping guide; stdin contract tests and derivation property tests.
+* Windows command-line length check. When the assembled command line exceeds the Windows
+  `CreateProcess` limit (~32,767 characters), you get an `ArgumentException` before the process
+  starts instead of Win32 error 206. Skipped when `UseShellExecute` is enabled.
 
-#### Changed
-- Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.12 to 10.0.13.
-- Updated internal Polyfill version from 11.4.0 to 11.4.5.</PackageReleaseNotes>
+#### Fixed
+* `ProcessTimeoutPolicy.Enabled = false` now means no timeout in all three waits instead of
+  arming the kill timer anyway, and interrupt-task faults are always observed.
+* `MiddlewareContext.Next` invokes only the next middleware and the rest of the chain, not the
+  composed chain head, which previously caused unbounded recursion.
+* `AddCliInvoke` registers `IProcessConfigurationBuilder` as a blank-builder factory. The old
+  by-type mapping threw on every `GetService`.
+* `IExternalProcess.StartAsync(configuration, ct)` honors `RedirectStandardInput` like the
+  instance overloads. A configured writer with redirection disabled is a no-op in every path.
+* `FromProcessStartInfo` accepts empty-string environment values as a valid way to clear a
+  variable. Keys must be non-null and non-empty.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>

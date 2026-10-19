@@ -73,9 +73,9 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
     }
 
     /// <summary>
-    ///     Validates a <see cref="TProcessResult" /> against the configured <see cref="ValidationRules" />.
+    ///     Validates a <c>TProcessResult</c> against the configured <see cref="ValidationRules" />.
     /// </summary>
-    /// <param name="result">The <see cref="TProcessResult" /> to validate against the validation rules.</param>
+    /// <param name="result">The <c>TProcessResult</c> to validate against the validation rules.</param>
     /// <returns>True if the <paramref name="result" /> passes all validation rules, false otherwise.</returns>
     public bool Validate(TProcessResult result)
     {

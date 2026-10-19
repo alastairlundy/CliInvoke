@@ -208,6 +208,12 @@ internal class ProcessWrapper : Process
                     // Process exited before we could suspend it.
                     return;
                 }
+                catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
+                {
+                    // Adapter suspend signals a just-exited child; errno ESRCH means it is
+                    // gone. Same race as the exiting-before-suspend case above.
+                    return;
+                }
             }
 
             try
@@ -220,10 +226,17 @@ internal class ProcessWrapper : Process
             {
                 // Process exited before we could set the resource policy.
             }
+            catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
+            {
+                // PriorityClass and working-set setters translate libc ESRCH into
+                // Win32Exception ("No such process") when the fast-exiting child is
+                // already reaped (observed on macOS arm64 runners). Unrelated access
+                // failures keep surfacing.
+            }
             finally
             {
-                // Always resume the process — even if SetResourcePolicy throws —
-                // to prevent leaving it permanently suspended.
+                // Always resume the process — even if SetResourcePolicy or a raced
+                // child exit throws — so it cannot stay suspended.
                 try
                 {
                     ResumeProcess();
@@ -232,6 +245,10 @@ internal class ProcessWrapper : Process
                 {
                     // The process may have already exited during SetResourcePolicy.
                     // Swallow the exception — the process is gone, nothing to resume.
+                }
+                catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
+                {
+                    // Same as above: the child exited mid-sequence.
                 }
 #if NET11_0
                 catch (Win32Exception)
@@ -245,6 +262,16 @@ internal class ProcessWrapper : Process
             }
         }
     }
+
+    /// <summary>
+    ///     Matches Linux, macOS, and FreeBSD <c>Win32Exception</c> translations of
+    ///     errno <c>ESRCH</c> (3), which mean the child process is gone. Windows maps
+    ///     its own error numbers into the same exception type (3 is
+    ///     <c>ERROR_PATH_NOT_FOUND</c>), so Windows never matches here.
+    /// </summary>
+    private static bool IsErrnoNoSuchProcess(Win32Exception exception) =>
+        !OperatingSystem.IsWindows()
+        && exception.NativeErrorCode == 3;
 
     private void OnExited(object? sender, EventArgs e)
     {
@@ -943,14 +970,23 @@ internal class ProcessWrapper : Process
                 // Cancelled as false for a process the cancellation machinery terminated.
                 // Awaiting a completed task always observes its fault, so an exception that
                 // CancellationHelper approved for propagation surfaces every time instead of
-                // depending on timing. An incomplete task is awaited only while the process
-                // still runs, so fast-exiting processes are not held for the full timeout; a
-                // late fault there is observed, not propagated, because the wait already
-                // succeeded.
-                if (cancelWithInterruptTask.IsCompleted || !HasExited)
+                // depending on timing. When the caller's token has fired, the task is also
+                // bounded: its delay already faulted and its cleanup no-ops once the child
+                // is dead, so it is awaited even when the child has exited, guaranteeing
+                // propagation of the approved cancellation fault. Skipping a not-yet-
+                // completed task is reserved for the natural-exit race: the wait succeeded
+                // for reasons unrelated to cancellation, so the late fault is only
+                // observed there.
+                if (cancelWithInterruptTask.IsCompleted
+                    || !HasExited
+                    || cancellationToken.IsCancellationRequested)
+                {
                     await cancelWithInterruptTask.ConfigureAwait(false);
+                }
                 else
+                {
                     ObserveFault(cancelWithInterruptTask);
+                }
 
                 if (!HasExited && fallbackToForceful)
                     ForcefulExit();
@@ -1033,9 +1069,13 @@ internal class ProcessWrapper : Process
             {
                 CancellationReason cancellationReason =
                     CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+
+                // Persist the reason BEFORE the propagation decision; see CancelWithInterrupt
+                // for why the assignment must not sit after HandleCancellationExceptions.
+                _cancellationReason = cancellationReason;
+
                 CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                     cancellationReason, exitConfiguration, exception);
-                _cancellationReason = cancellationReason;
             }
             finally
             {
@@ -1104,12 +1144,17 @@ internal class ProcessWrapper : Process
             CancellationReason cancellationReason =
                 CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
 
+            // Persist the reason BEFORE the propagation decision: on approved-throw
+            // configurations HandleCancellationExceptions below throws, and an assignment
+            // placed after it would be unreachable — leaving Cancelled false even though
+            // the cancellation machinery performed the termination.
+            _cancellationReason = cancellationReason;
+
             cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason).ConfigureAwait(false);
 
             CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                 cancellationReason,
                 exitConfiguration, exception);
-            _cancellationReason = cancellationReason;
         }
         finally
         {

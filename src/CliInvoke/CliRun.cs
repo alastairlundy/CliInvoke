@@ -39,7 +39,12 @@ public static class CliRun
     /// The directory in which the process will be executed. If null, the current directory is used.
     /// </param>
     /// <param name="timeoutTimeSpan">
-    /// The maximum duration that the process is allowed to run before it times out. If null, a default value is applied.
+    /// The maximum duration that the process is allowed to run before it times out. If null,
+    /// the default is <see cref="ProcessTimeoutPolicy.Default"/>: enabled, with a 2-minute
+    /// threshold. Reaching the threshold attempts a graceful interrupt and, if the process does
+    /// not exit within a short grace period, force-terminates it. With the default graceful exit
+    /// configuration no exception is thrown: the invocation completes normally with a result
+    /// whose <c>Canceled</c> is <see langword="true" /> and the kill exit code.
     /// </param>
     /// <param name="cancellationToken">
     /// A token that can signal the cancellation of the operation before its completion.
@@ -77,7 +82,11 @@ public static class CliRun
     /// The directory in which the process will be executed. If null, the current directory is used.
     /// </param>
     /// <param name="timeoutTimeSpan">
-    /// The maximum duration that the process is allowed to run before it times out. If null, a default value is applied.
+    /// The maximum duration that the process is allowed to run before it times out. If null,
+    /// the default is <see cref="ProcessTimeoutPolicy.Default"/> (enabled, 2-minute threshold):
+    /// reaching the threshold attempts a graceful interrupt, then force-terminates the process,
+    /// and the default graceful exit configuration returns a <c>Canceled</c> result with the
+    /// kill exit code instead of throwing.
     /// </param>
     /// <param name="cancellationToken">
     /// A token that can signal the cancellation of the operation before its completion.
@@ -139,11 +148,16 @@ public static class CliRun
     /// The working directory for the process. If null, the current directory is used.
     /// </param>
     /// <param name="timeoutTimeSpan">
-    /// The maximum duration that the process can run before timing out. If null, a default timeout is applied.
+    /// The maximum duration that the process can run before timing out. If null, the default
+    /// is <see cref="ProcessTimeoutPolicy.Default"/> (enabled, 2-minute threshold): reaching
+    /// the threshold attempts a graceful interrupt, then force-terminates the process, and the
+    /// default graceful exit configuration returns a <c>Canceled</c> result with the kill exit
+    /// code instead of throwing.
     /// </param>
     /// <param name="maxBufferedOutputBytes">
-    /// The maximum number of bytes of combined standard output and standard error to buffer before truncation
-    /// is applied. If null, the default cap is used. Applies only to buffered capture.
+    /// The maximum number of bytes to buffer before truncation is applied, applied
+    /// independently to standard output and to standard error. If null, the default cap is
+    /// used. Applies only to buffered capture.
     /// </param>
     /// <param name="cancellationToken">
     /// A token to monitor for cancellation requests, allowing the operation to be cancelled before it completes.
@@ -181,11 +195,16 @@ public static class CliRun
     /// The working directory for the process. If null, the current directory is used.
     /// </param>
     /// <param name="timeoutTimeSpan">
-    /// The maximum duration that the process can run before timing out. If null, a default timeout is applied.
+    /// The maximum duration that the process can run before timing out. If null, the default
+    /// is <see cref="ProcessTimeoutPolicy.Default"/> (enabled, 2-minute threshold): reaching
+    /// the threshold attempts a graceful interrupt, then force-terminates the process, and the
+    /// default graceful exit configuration returns a <c>Canceled</c> result with the kill exit
+    /// code instead of throwing.
     /// </param>
     /// <param name="maxBufferedOutputBytes">
-    /// The maximum number of bytes of combined standard output and standard error to buffer before truncation
-    /// is applied. If null, the default cap is used. Applies only to buffered capture.
+    /// The maximum number of bytes to buffer before truncation is applied, applied
+    /// independently to standard output and to standard error. If null, the default cap is
+    /// used. Applies only to buffered capture.
     /// </param>
     /// <param name="cancellationToken">
     /// A token to monitor for cancellation requests, allowing the operation to be cancelled before it completes.

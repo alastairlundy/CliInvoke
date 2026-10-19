@@ -15,9 +15,19 @@ on:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            timeout: 4
+          - os: windows-latest
+            timeout: 5
+          - os: macos-latest
+            timeout: 5
 
-    runs-on: ubuntu-latest
-    timeout-minutes: 4
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: ${{ matrix.timeout }}
 
     steps:
     - name: Harden the runner (Audit all outbound calls)
@@ -33,9 +43,19 @@ jobs:
           10.0.x
           11.0.x
     - name: ConfigureAwait guard
+      # Lint-style gate with an OS-independent outcome. Linux-only so the plain
+      # 'run:' pwsh default on Windows can't stumble on the bash script.
+      if: runner.os == 'Linux'
       run: bash scripts/guard-configureawait.sh src
     - name: Build
       run: dotnet build src/CliInvoke.sln
-    - name: Test
+    - name: Test (CliInvoke)
       run: dotnet test
       working-directory: tests/CliInvoke.Tests/
+    # PowerShell/Cmd middleware security tests (ShellInjectionSecurityTests) live in
+    # the Specializations project; without this step they never execute in CI.
+    # cmd-runner behavioural tests are Windows-only and skip on ubuntu by design.
+    # They execute on the windows-latest matrix leg instead.
+    - name: Test (Specializations)
+      run: dotnet test
+      working-directory: tests/CliInvoke.Specializations.Tests/

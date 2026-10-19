@@ -78,10 +78,11 @@ internal static class ArgumentEscaper
                 }
                 else if (c is '\n' or '\r')
                 {
-                    // Drop bare newlines so they cannot terminate the command line,
-                    // flushing any preceding backslashes first.
-                    builder.Append('\\', backslashCount);
-                    backslashCount = 0;
+                    // Drop bare newlines so they cannot terminate the command line.
+                    // Do not flush the pending backslash run here: a dropped newline is
+                    // not content, so the run still applies to whatever follows (a
+                    // later char flushes it raw, an embedded quote or the end of the
+                    // content doubles it for the closing quote).
                 }
                 else
                 {
@@ -125,10 +126,9 @@ internal static class ArgumentEscaper
             }
             else if (c is '\n' or '\r')
             {
-                // Drop bare newlines so they cannot terminate the command line,
-                // flushing any preceding backslashes first.
-                posixBuilder.Append('\\', posixBackslashCount);
-                posixBackslashCount = 0;
+                // Drop bare newlines so they cannot terminate the command line; the
+                // pending backslash run carries across the drop, same reasoning as the
+                // Windows branch above.
             }
             else
             {

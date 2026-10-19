@@ -391,7 +391,8 @@ the default implementation.
 
 `IFilePathResolver` answers the question *“where on disk is this
 executable?”*. The default implementation, `FilePathResolver`,
-consults `PATH` first, then falls back to directory recursion. The
+consults `PATH` first, then falls back to a single-level, non-recursive
+search of the inferred base directory. The
 resolver is consulted by `ExternalProcessFactory` when the
 `ProcessConfiguration` references a bare executable name rather than
 an absolute path.

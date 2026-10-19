@@ -14,6 +14,7 @@ using CliInvoke.Extensions.Middleware.Validation;
 using CliInvoke.Specializations;
 using CliInvoke.Validation;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.Versioning;
 
 namespace CliInvoke.Tests.Extensions.DependencyInjection;
 
@@ -162,6 +163,10 @@ public class DependencyInjectionExtensionsTests
         await Assert.That(result.ExitCode).IsEqualTo(0);
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task AddCliInvoke_WithConfigure_UsePowerShell_RegistersConfiguredInvoker()
     {
@@ -177,6 +182,7 @@ public class DependencyInjectionExtensionsTests
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
     }
 
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task AddCliInvoke_WithConfigure_UseCmd_RegistersConfiguredInvoker()
     {
@@ -192,6 +198,7 @@ public class DependencyInjectionExtensionsTests
         await Assert.That(invoker).IsTypeOf<ProcessInvoker>();
     }
 
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task AddCliInvoke_WithConfigure_AllBuiltInMiddleware_RegistersConfiguredInvoker()
     {

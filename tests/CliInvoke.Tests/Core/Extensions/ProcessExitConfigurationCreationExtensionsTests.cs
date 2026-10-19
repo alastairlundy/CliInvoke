@@ -148,7 +148,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
                 .WithValidationRules(source, newRule);
 
         // Assert
-        await Assert.That(result.ValidationRules).HasCount(1);
+        await Assert.That(result.ValidationRules).Count().IsEqualTo(1);
         await Assert.That(result.ValidationRules[0].Name).IsEqualTo("New");
         await Assert.That(result.TimeoutPolicy).IsEqualTo(policy);
         await Assert.That(result.RequestedCancellationExitBehaviour)
@@ -183,7 +183,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
 
         // Assert
         await Assert.That(result.MaxBufferedOutputBytes).IsEqualTo(4096);
-        await Assert.That(result.ValidationRules).HasCount(1);
+        await Assert.That(result.ValidationRules).Count().IsEqualTo(1);
         await Assert.That(result.ValidationRules[0].Name).IsEqualTo("Rule");
         await Assert.That(result.TimeoutPolicy).IsEqualTo(policy);
         await Assert.That(result.RequestedCancellationExitBehaviour)

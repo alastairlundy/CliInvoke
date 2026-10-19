@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CliInvoke.Specializations.Middleware;
+using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Specializations.Tests.Middleware;
 
@@ -116,6 +117,10 @@ public class ShellInjectionSecurityTests
     [SupportedOSPlatform("windows")]
     public async Task Cmd_Wrapper_PreventsCommandInjectionFromTargetAndArguments()
     {
+        if (!OperatingSystem.IsWindows())
+            throw new SkipTestException(
+                "cmd is Windows-only; CmdMiddleware rejects non-Windows by design.");
+
         ProcessConfiguration original = MakeConfig("prog\" & evil.exe & \"", "a & b | c");
 
         CapturingNext next = new();
@@ -140,6 +145,10 @@ public class ShellInjectionSecurityTests
     [SupportedOSPlatform("windows")]
     public async Task Cmd_Wrapper_PreservesArgumentListAndIgnoresArguments()
     {
+        if (!OperatingSystem.IsWindows())
+            throw new SkipTestException(
+                "cmd is Windows-only; CmdMiddleware rejects non-Windows by design.");
+
         // The third entry carries whitespace: a re-tokenized command would split it into
         // two arguments instead of delivering it as the single argument the caller asked for.
         ProcessConfiguration original = new("prog.exe", "ignored")

@@ -96,7 +96,10 @@ public interface IExternalProcess : IDisposable
     /// </param>
     /// <returns>
     ///     A task that represents the asynchronous operation.
-    ///     The result contains the buffered process result when the method completes.
+    ///     The result is a plain <see cref="ProcessResult" /> containing the child process's
+    ///     exit details; it does <b>not</b> include buffered standard output or standard
+    ///     error text. To capture buffered output, use
+    ///     <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)" /> instead.
     /// </returns>
     Task<ProcessResult> WaitForExitOrTimeoutAsync(CancellationToken cancellationToken);
     
