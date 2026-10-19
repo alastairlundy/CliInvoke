@@ -19,7 +19,12 @@ public class ProcessCancellationTests
             $"cliinvoke-process-cancel-timespan-{Guid.NewGuid():N}.marker");
 
         const int timeoutSeconds = 3;
-        const int ceilingSeconds = timeoutSeconds * 2;
+        // The graceful path may legitimately take up to the timeout plus the
+        // post-interrupt grace period before ForcefulExit lands, and CI runners
+        // are slower than dev machines. The ceiling only exists to catch hangs,
+        // so size it from the machinery's own worst case plus slack instead of
+        // twice the timeout (which the normal path sits close to under load).
+        int ceilingSeconds = ProcessWrapper.CalculateGracefulTimeoutWaitSeconds(timeoutSeconds) + 5;
 
         ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 10);
 
@@ -74,7 +79,12 @@ public class ProcessCancellationTests
             $"cliinvoke-process-cancel-normal-{Guid.NewGuid():N}.marker");
 
         const int timeoutSeconds = 3;
-        const int ceilingSeconds = timeoutSeconds * 2;
+        // The graceful path may legitimately take up to the timeout plus the
+        // post-interrupt grace period before ForcefulExit lands, and CI runners
+        // are slower than dev machines. The ceiling only exists to catch hangs,
+        // so size it from the machinery's own worst case plus slack instead of
+        // twice the timeout (which the normal path sits close to under load).
+        int ceilingSeconds = ProcessWrapper.CalculateGracefulTimeoutWaitSeconds(timeoutSeconds) + 5;
 
         ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 10);
 
