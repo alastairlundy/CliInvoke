@@ -22,11 +22,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.0.3</PackageVersion>
-        <PackageReleaseNotes>Version aligned with the CliInvoke 3.0.3 release. This package has no code changes.</PackageReleaseNotes>
+        <PackageVersion>3.0.4</PackageVersion>
+        <PackageReleaseNotes>* Fixed an xml doc comment issue</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>3.0.3.0</AssemblyVersion>
-        <FileVersion>3.0.3.0</FileVersion>
+        <AssemblyVersion>3.0.4.0</AssemblyVersion>
+        <FileVersion>3.0.4.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>
