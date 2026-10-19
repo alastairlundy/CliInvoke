@@ -1,9 +1,9 @@
 # CliInvoke Review Findings — Fix Handoff
 
-Date: 2026-10-18 (updated 2026-10-19 after fix round 3: L1, L2 minimal, L7(a) code fixes; fix round 2 before that: M1, M3, M6)
+Date: 2026-10-18 (updated 2026-10-19 after fix round 4: L7(b); fix round 3: L1, L2 minimal, L7(a); fix round 2: M1, M3, M6)
 Source: behavioral review of `src/` ("potentially surprising or unexpected behaviour"), severity-ranked, followed by per-finding fix proposals. Findings verified against the tree at 3.1.0.
 
-**TL;DR: Fixed (verified): H1, M1, M2, M3, M4, M6, M7, L1, L2 (minimal), L3b, L7(a), plus docs-only fixes M5, L3a, L4. Everything else in this document is proposed/not implemented.** Fixed items verified with the ConfigureAwait guard, `dotnet build src/CliInvoke.sln` (0 errors), and the `tests/CliInvoke.Tests` suite (672 total, 0 failed, 1 pre-existing skip) plus `tests/CliInvoke.Specializations.Tests` (14 total, 0 failed) as of fix round 3 (2026-10-19).
+**TL;DR: Fixed (verified): H1, M1, M2, M3, M4, M6, M7, L1, L2 (minimal), L3b, L7(a), L7(b), plus docs-only fixes M5, L3a, L4. Everything else in this document is proposed/not implemented.** Fixed items verified with the ConfigureAwait guard, `dotnet build src/CliInvoke.sln` (0 errors), and the `tests/CliInvoke.Tests` suite (679 total, 0 failed, 1 pre-existing skip) plus `tests/CliInvoke.Specializations.Tests` (14 total, 0 failed) as of fix round 4 (2026-10-19).
 
 ## Status board
 
@@ -25,14 +25,14 @@ Source: behavioral review of `src/` ("potentially surprising or unexpected behav
 | L4 `WaitForExitOrTimeoutAsync` XML copy-paste bug | Low | ✅ **Fixed** — docs (XML returns) |
 | L5 UTF-8 default vs OEM/ANSI child output | Low | ❌ Not fixed — proposed (3.1.x docs) |
 | L6 null env-var values silently dropped | Low | ❌ Not fixed — proposed (3.2.0) |
-| L7 "Default" divergence + ±1s swallow window | Low | L7(a) ✅ **Fixed** — `Default` re-pointed to ctor defaults; L7(b) ❌ Not fixed — proposed (3.2.0) |
+| L7 "Default" divergence + ±1s swallow window | Low | ✅ **Fixed** — L7(a) `Default` re-pointed to ctor defaults; L7(b) swallow window gated on `OperationCanceledException` |
 
 Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/1581/1584/1658/1734/1762 escalated in `Directory.Build.props`); style per `src/.editorconfig` (no `var` for built-ins, separate using groups, 100-col); GLOSSARY.md entries are contracts (PATH-first ordering is ADR-protected).
 
 ## Release batches (consolidated)
 
 - **3.1.x — docs-only, zero behavior change:** H1, M4, M7 (**✅ done**) + L4, L5 docs, L3a doc notes + XML hazard notes for H2/L1/M5 (docs halves of those proposals). Theme: *make the contracts say what the code does.*
-- **3.2.0 — behavior fixes, one release note ("Raw/FireAndForget pipe and cancellation contract alignment"):** H2 normalization, M1 Buffered cancellation (**✅ done**), L1 fail-fast (**✅ done**), M3 stdin replay (**✅ done**), M6 logging (**✅ done**), L2 minimal cache (**✅ done**), L6 null env-var semantics, L7(b) OCE-gated swallow. Theme: *fail fast or normalize, never silently hang.* Release note must also call out the L7(a) `Default` re-point (pulled forward from 4.0.0) — the DI `ProcessInvoker` null-fallback now allows unexpected-exit exceptions.
+- **3.2.0 — behavior fixes, one release note ("Raw/FireAndForget pipe and cancellation contract alignment"):** H2 normalization, M1 Buffered cancellation (**✅ done**), L1 fail-fast (**✅ done**), M3 stdin replay (**✅ done**), M6 logging (**✅ done**), L2 minimal cache (**✅ done**), L6 null env-var semantics, L7(b) OCE-gated swallow (**✅ done**). Theme: *fail fast or normalize, never silently hang.* Release note must also call out the L7(a) `Default` re-point (pulled forward from 4.0.0) — the DI `ProcessInvoker` null-fallback now allows unexpected-exit exceptions.
 - **4.0.0 / deferred:** H2 hard-fail (only if normalization draws bug reports), M1 throw-by-default, M5 console-attach knob (recommend never), L3a semantic flip (all eight types in one change), L2 lazy resolution, L5 encoding-default decision.
 
 ---
@@ -87,6 +87,7 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 **Effort:** ~30 min incl. one test (null value → variable absent in child env).
 
 ### L7(b) — ±1s skew heuristic can swallow genuine failures
+**Status:** ✅ Fixed (2026-10-19, fix round 4) — under `AllowExceptionsIfUnexpected` in the `Timeout`/`NotKnown` branch of `CancellationHelper.HandleCancellationExceptions`, the throw condition is now `exception is not OperationCanceledException || difference > TimeSpan.FromSeconds(1)`: non-cancellation exceptions always propagate regardless of timing; only OCEs are time-discriminated (swallowed when on-time). `SuppressExceptions` and `AllowExceptions` behaviour unchanged; `RequestedCancellation` branch untouched (outside the finding's scope); the `CancellationThrowsException` knob still overrides first. XML remarks rewritten to match. Tests: `tests/CliInvoke.Tests/Processes/CancellationHelperTests.cs` (7 tests — on-time OCE swallowed, off-window OCE thrown, IOException-near-timeout thrown on Timeout and NotKnown, SuppressExceptions still swallows, AllowExceptions still throws, requested-cancellation branch regression guard).
 **Fix:** In `CancellationHelper.cs:98-108`, under `AllowExceptionsIfUnexpected`, gate the time-window swallow on exception type: only swallow `OperationCanceledException` raised within the window; rethrow all non-OCE exceptions regardless of timing (`if (exception is not OperationCanceledException || difference > TimeSpan.FromSeconds(1)) throw;`). Every OCE in this pipeline originates from CliInvoke's own cancellation machinery (timer or caller token), so on-time-timeout OCEs stay swallowed and intended behavior is preserved — while genuine I/O errors near the timeout can no longer vanish. The wall-clock heuristic alone is unsalvageable as a failure discriminator.
 **Compat:** Internal method, behavior change only. 3.2.0.
 **Alternative:** Narrow window to ±100 ms — still wall-clock gambling; rejected.
@@ -123,6 +124,9 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 **Status:** ✅ Fixed (code, 2026-10-19, fix round 3 — pulled forward from 4.0.0 by maintainer decision) — `ProcessExitConfiguration.Default` re-pointed from `CreateGraceful()` to `new ProcessExitConfiguration()`, so `Default` and the constructor default are now the same concept (`AllowExceptionsIfUnexpected`, `CancellationThrowsException=false`); `CreateGraceful()` keeps its suppressing semantics (`SuppressExceptions`) and is the documented contrast. XML updated on `Default`, both `CreateGraceful` overloads, the `?? CreateGraceful()` call sites (`CliRun.RunAsync`/`RunBufferedAsync(ProcessConfiguration, ...)`, `ExternalProcess` ctor), and the `?? ProcessExitConfiguration.Default` call sites (`ProcessInvoker.ExecuteAsync`/`ExecuteBufferedAsync`). **Observable change:** the DI `ProcessInvoker` null-fallback previously suppressed unexpected-exit exceptions (via the old graceful `Default`) and now allows them — callers wanting the old behavior pass `CreateGraceful()`. `CliRun`/`ExternalProcess` null-fallbacks are unchanged (still `CreateGraceful()`). Note for doc authors: crefs to the extension-block members `Default`/`CreateGraceful` do not resolve (CS1574) from outside — use `<c>` text or the containing-type cref for `CreateGraceful()`. Tests: `Default_MatchesConstructorDefaults`, `Default_DiffersFromCreateGraceful_InExceptionBehaviour` in `tests/CliInvoke.Tests/Core/Extensions/ProcessExitConfigurationCreationExtensionsTests.cs`.
 **Fix (docs now):** XML remarks on `Default`, `CreateGraceful` (`src/CliInvoke.Core/Extensions/ProcessExitConfigurationCreationExtensions.cs:26-61`) and the `exitConfiguration ?? CreateGraceful()` call sites (`CliRun.cs:122/233`, `ExternalProcess.cs:41`) stating plainly: the graceful flavor suppresses unexpected-exit exceptions (`CancellationThrowsException=false`, `SuppressExceptions`); the ctor default allows them (`AllowExceptionsIfUnexpected`).
 **Deferred (4.0.0):** ~~keep `CreateGraceful` semantics (the name signals intent) but obsolete `Default` or re-point it to ctor defaults~~ — the re-point happened in fix round 3 instead; nothing further deferred.
+
+### Fix round 4 (2026-10-19): L7(b)
+- `CancellationHelper.HandleCancellationExceptions`: the `AllowExceptionsIfUnexpected` clause in the `Timeout`/`NotKnown` branch now throws when `exception is not OperationCanceledException || difference > TimeSpan.FromSeconds(1)` — non-OCE failures propagate even inside the ±1s window; only cancellation exceptions remain time-discriminated. XML remarks rewritten; new `CancellationHelperTests` (7 tests).
 
 ### Fix round 3 (2026-10-19): L1, L2 minimal, L7(a)
 - L1: `FireAndForget(ProcessConfiguration)` fail-fast on `OutputRedirection || RedirectStandardInput` + `<exception>` XML warning that the position-arg `ProcessConfiguration` ctors default `outputRedirection: true` (so `outputRedirection: false` must be explicit). Repo tests updated to the non-redirected construction.
