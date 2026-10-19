@@ -566,7 +566,7 @@ public class ProcessConfigurationBuilderTests
 
         // Assert
         ProcessConfiguration config = builder.Build();
-        await Assert.That(config.EnvironmentVariables).HasCount().EqualTo(1);
+        await Assert.That(config.EnvironmentVariables).Count().IsEqualTo(1);
         await Assert.That(config.EnvironmentVariables["KEY2"]).IsEqualTo("VALUE2");
     }
 
