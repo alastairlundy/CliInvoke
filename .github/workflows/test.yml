@@ -41,7 +41,7 @@ jobs:
       with:
         dotnet-version: |
           10.0.x
-          11.0.x
+          11.0.100-rc.2.26504.105
     - name: ConfigureAwait guard
       # Lint-style gate with an OS-independent outcome. Linux-only so the plain
       # 'run:' pwsh default on Windows can't stumble on the bash script.
