@@ -8,6 +8,7 @@
    */
 
 using Microsoft.Extensions.Caching.Memory;
+// ReSharper disable CheckNamespace
 
 namespace CliInvoke.Extensions.Caching;
 
