@@ -254,9 +254,24 @@ internal class ProcessWrapper : Process
                 catch (Win32Exception)
                 {
                     // SafeProcessHandle.Resume() (net11.0, Windows/macOS) reports OS
-                    // failures as Win32Exception — same exit-race situation as above:
-                    // the process is gone (or the resume otherwise cannot land), so
-                    // swallow it instead of leaving the failure unhandled here.
+                    // failures as Win32Exception. Only the exit race is benign: when
+                    // the child is already gone there is nothing to resume. A live
+                    // child whose resume failed would stay creation-suspended forever,
+                    // so terminate it and surface the failure to the caller instead.
+                    if (!HasExited)
+                    {
+                        try
+                        {
+                            ForcefulExit();
+                        }
+                        catch (Exception)
+                        {
+                            // Best-effort kill; swallow any exception to avoid masking
+                            // the resume failure rethrown below.
+                        }
+
+                        throw;
+                    }
                 }
 #endif
             }
