@@ -194,6 +194,11 @@ public class ProcessResult : IEquatable<ProcessResult>
     ///     <c>true</c> if the specified <see cref="ProcessResult" /> instances are equal; otherwise,
     ///     <c>false</c>.
     /// </returns>
+    /// <remarks>
+    ///     Returns <see langword="true" /> when both operands are <see langword="null" />,
+    ///     and <see langword="false" /> when exactly one operand is <see langword="null" />,
+    ///     following the standard reference-equality convention.
+    /// </remarks>
     public static bool Equals(ProcessResult? left, ProcessResult? right)
     {
         if (left is null)

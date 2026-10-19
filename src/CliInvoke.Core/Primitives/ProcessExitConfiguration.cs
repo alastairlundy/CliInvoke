@@ -76,6 +76,10 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <remarks>
     /// Options include waiting for the process to exit, attempting a graceful exit, or forcing
     /// termination. The default behaviour is <see cref="ProcessExitBehaviour.GracefulExit" />.
+    /// Note that a <see cref="ProcessExitBehaviour.GracefulExit" /> interrupt is best-effort on
+    /// Windows — a console-host caller typically cannot attach to the child's console, so no
+    /// signal is delivered and the child is force-terminated; on Unix, SIGTERM is delivered
+    /// and the exit is genuinely graceful.
     /// </remarks>
     public ProcessExitBehaviour RequestedCancellationExitBehaviour { get; }
 
@@ -117,7 +121,8 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     public ValidationRule<ProcessResult>[] ValidationRules { get; init; } = [];
 
     /// <summary>
-    ///     Gets the maximum number of bytes of standard output to buffer. When <c>null</c>,
+    ///     Gets the maximum number of bytes to buffer for each of standard output and standard
+    ///     error; the cap is applied independently to each stream. When <c>null</c>,
     ///     the output is unbounded. This property participates in equality comparisons.
     /// </summary>
     public long? MaxBufferedOutputBytes { get; init; }
@@ -182,6 +187,11 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="left">The first <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <param name="right">The second <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     Returns <see langword="false" /> when either operand is <see langword="null" />,
+    ///     including when both operands are <see langword="null" />; unlike the
+    ///     <c>==</c> operator, which treats two null references as equal.
+    /// </remarks>
     public static bool Equals(ProcessExitConfiguration? left,
         ProcessExitConfiguration? right)
     {
@@ -198,7 +208,7 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="right">The second <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <returns><c>true</c> if both instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right) => Equals(left, right);
+        ProcessExitConfiguration? right) => left is null ? right is null : left.Equals(right);
 
     /// <summary>
     ///     Determines whether two <see cref="ProcessExitConfiguration" /> instances are not equal.
@@ -207,5 +217,5 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     /// <param name="right">The second <see cref="ProcessExitConfiguration" /> to compare.</param>
     /// <returns><c>true</c> if both instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(ProcessExitConfiguration? left,
-        ProcessExitConfiguration? right) => !Equals(left, right);
+        ProcessExitConfiguration? right) => !(left == right);
 }

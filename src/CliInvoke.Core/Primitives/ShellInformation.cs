@@ -85,6 +85,11 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <param name="left">The first <see cref="ShellInformation" /> to compare.</param>
     /// <param name="right">The second <see cref="ShellInformation" /> to compare.</param>
     /// <returns>true if the two <see cref="ShellInformation" /> are equal; otherwise, false.</returns>
+    /// <remarks>
+    ///     Returns <see langword="false" /> when either operand is <see langword="null" />,
+    ///     including when both operands are <see langword="null" /> — the <c>==</c> operator
+    ///     shares this behavior because it delegates to this method.
+    /// </remarks>
     public static bool Equals(ShellInformation? left, ShellInformation? right)
     {
         if (left is null || right is null)

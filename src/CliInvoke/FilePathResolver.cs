@@ -173,8 +173,9 @@ public class FilePathResolver : IFilePathResolver
     }
 
     /// <summary>
-    /// Locates <paramref name="filePathToResolve"/> by recursing into the directory inferred
-    /// from the path (or the current working directory when no directory can be inferred).
+    /// Locates <paramref name="filePathToResolve"/> by searching the inferred base directory
+    /// (single level, non-recursive), or the current working directory when no directory can
+    /// be inferred from the path.
     /// </summary>
     /// <param name="filePathToResolve">The file path to resolve.</param>
     /// <returns>The located <see cref="FileInfo"/>.</returns>

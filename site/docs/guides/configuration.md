@@ -701,7 +701,7 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExitBehaviour.cs`.
 | Value | Numeric | Meaning |
 |-------|---------|---------|
 | `WaitForExit` | `0` | Run until the process exits on its own. |
-| `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, falling back to forceful termination if the process does not exit. |
+| `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, falling back to forceful termination if the process does not exit. **On Windows this is best-effort**: the interrupt requires attaching to the child's console, which typically fails when the caller itself runs in a console window — no signal is delivered and the child is force-terminated. Unix SIGTERM delivery is genuinely graceful. |
 | `ForcefulExit` | `2` | Forcefully terminate the process and attempt to terminate all child processes. |
 
 > **Note on `ForcefulExit`**: The tree-kill is best-effort, matching

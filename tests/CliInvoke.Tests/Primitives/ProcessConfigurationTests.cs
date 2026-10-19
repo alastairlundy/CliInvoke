@@ -63,4 +63,28 @@ public class ProcessConfigurationTests
         await Assert.That(a == b).IsFalse();
         await Assert.That(a != b).IsTrue();
     }
+
+    [Test]
+    public async Task Equals_TargetFilePathDifferingOnlyByCase_MatchesPlatformPathComparison()
+    {
+        ProcessConfiguration upper = new(@"C:\Tools\X.EXE");
+        ProcessConfiguration lower = new(@"C:\tools\x.exe");
+
+        bool expected = OperatingSystem.IsWindows();
+
+        await Assert.That(upper.Equals(lower)).IsEqualTo(expected);
+        await Assert.That(upper == lower).IsEqualTo(expected);
+        await Assert.That(upper != lower).IsEqualTo(!expected);
+    }
+
+    [Test]
+    public async Task StaticEquals_BothNull_IsFalse()
+    {
+        // Kept behaviour, intentionally different from the == operator: the static
+        // Equals(left, right) returns false when either operand is null (both null included).
+        ProcessConfiguration? left = null;
+        ProcessConfiguration? right = null;
+
+        await Assert.That(ProcessConfiguration.Equals(left, right)).IsFalse();
+    }
 }

@@ -44,7 +44,7 @@ Three patterns, documented in `DESIGN_PATTERNS.md` (includes a decision tree):
 Exactly **four** `IDisposable` types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, `ProcessConfigurationBuilder` (see README "Resource Disposal"). `ProcessConfiguration` is not disposable; `StandardInput`/`UserCredential` placed inside it remain the caller's responsibility.
 
 ## Domain conventions (details in GLOSSARY.md — do not "fix" these)
-- `FilePathResolver.ResolveFilePath` (formerly `FilePathResolverBase`): PATH lookup first, then directory recursion — a performance contract; reordering requires a new ADR.
+- `FilePathResolver.ResolveFilePath` (formerly `FilePathResolverBase`): PATH lookup first, then a single-level, non-recursive directory fallback — a performance contract; reordering requires a new ADR.
 - `Get*` returns materialized arrays; `Enumerate*` returns lazy `IEnumerable` — intentional naming asymmetry.
 - Custom `GetPathFileExtensions` overrides must return **lowercased** extensions or matching silently fails.
 - `Try*` methods must never propagate exceptions (catch `Exception` by convention).

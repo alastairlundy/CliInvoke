@@ -47,6 +47,10 @@ public static class ProcessExitConfigurationCreationExtensions
         /// <summary>
         /// Creates a default graceful <see cref="ProcessExitConfiguration"/> instance using a standard timeout policy.
         /// </summary>
+        /// <remarks>
+        /// With this configuration, a timeout or cancellation kill returns a result with
+        /// <c>Canceled</c> set to <see langword="true" /> instead of throwing.
+        /// </remarks>
         /// <returns>A <see cref="ProcessExitConfiguration"/> object configured to perform a graceful exit with the default timeout policy.</returns>
         public static ProcessExitConfiguration CreateGraceful()
             => ProcessExitConfiguration.CreateGraceful(ProcessTimeoutPolicy.Default);
@@ -54,6 +58,10 @@ public static class ProcessExitConfigurationCreationExtensions
         /// <summary>
         /// Creates a default graceful <see cref="ProcessExitConfiguration"/> instance using the specified timeout policy.
         /// </summary>
+        /// <remarks>
+        /// With this configuration, a timeout or cancellation kill returns a result with
+        /// <c>Canceled</c> set to <see langword="true" /> instead of throwing.
+        /// </remarks>
         /// <param name="timeoutPolicy">The <see cref="ProcessTimeoutPolicy"/> instance to define the timeout settings for the process exit.</param>
         /// <returns>A <see cref="ProcessExitConfiguration"/> object configured to perform a graceful exit using the specified timeout policy.</returns>
         public static ProcessExitConfiguration CreateGraceful(ProcessTimeoutPolicy timeoutPolicy)
@@ -94,7 +102,7 @@ public static class ProcessExitConfigurationCreationExtensions
         /// preserving all other properties.
         /// </summary>
         /// <param name="config">The source configuration to copy from.</param>
-        /// <param name="cap">The maximum number of bytes of standard output to buffer, or <c>null</c> for unbounded.</param>
+        /// <param name="cap">The maximum number of bytes to buffer for each of standard output and standard error, or <c>null</c> for unbounded.</param>
         /// <returns>A new configuration instance with the updated buffer cap. An explicit <c>null</c>
         /// <paramref name="cap"/> clears any cap inherited from <paramref name="config"/>.</returns>
         public static ProcessExitConfiguration WithMaxBufferedOutputBytes(ProcessExitConfiguration config, long? cap)

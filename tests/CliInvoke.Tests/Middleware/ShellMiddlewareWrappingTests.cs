@@ -12,6 +12,7 @@ using CliInvoke.Core.Middleware;
 using CliInvoke.Extensions;
 using CliInvoke.Specializations;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.Versioning;
 
 namespace CliInvoke.Tests.Middleware;
 
@@ -82,6 +83,10 @@ public class ShellMiddlewareWrappingTests
         return factory.LastConfiguration!;
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task UsePowerShell_WrapsWithNoProfileNonInteractiveCommandSwitches()
     {
@@ -130,6 +135,10 @@ public class ShellMiddlewareWrappingTests
         await Assert.That(wrapped.ArgumentList[0]).IsEqualTo("-c");
     }
 
+    [SupportedOSPlatform("freebsd")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
+    [SupportedOSPlatform("windows")]
     [Test]
     public async Task RegisteredShellMiddlewareOptionsInstance_IsHonouredByUsePowerShell()
     {

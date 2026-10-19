@@ -142,6 +142,20 @@ specific platform behavior.
 6. **Path-separator assumptions.** Backslash-separated paths fail on
    Unix. Use `Path.Combine` or pass arguments as separate `string[]`
    entries rather than concatenating with `\`.
+7. **Windows "graceful" timeout degrades to forceful termination.** With
+   `ProcessExitBehaviour.GracefulExit`, the interrupt is best-effort on
+   Windows: delivering the interrupt requires attaching to the child
+   process's console (`AttachConsole(child)`), which typically fails when
+   the caller itself is running in a console window. When the attach
+   fails, no signal is sent (no `CTRL_BREAK_EVENT`/`CTRL_C_EVENT`
+   reaches the child), and the child is force-terminated after the
+   grace period. The observable symptom is a timed-out child killed
+   with `ExitCode != 0` and no chance to run cleanup handlers, with no
+   signal-related error surfaced. On Unix the same configuration sends
+   SIGTERM and is genuinely graceful. If clean shutdown on Windows is
+   required, prefer an application-level shutdown mechanism (a flag
+   file, named pipe, or command the child polls/accepts) over relying
+   on console control events.
 
 ### Detection
 
