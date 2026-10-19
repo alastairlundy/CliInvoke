@@ -52,8 +52,10 @@ public sealed class EnvironmentVariablesSpec
     ///     Sets multiple environment variables.
     /// </summary>
     /// <param name="variables">
-    ///     The environment variables to set. Keys must be non-null and non-empty; values may be
-    ///     empty strings (e.g. to clear a variable) but must not be null.
+    ///     The environment variables to set. Keys must be non-null and non-empty. Values must
+    ///     not be null. An empty string value is permitted and sets the variable to an empty
+    ///     value in the child process; it does not remove the variable, and this specification
+    ///     cannot remove variables inherited from the parent environment.
     /// </param>
     /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
     public EnvironmentVariablesSpec SetEnumerable(
@@ -87,8 +89,9 @@ public sealed class EnvironmentVariablesSpec
     /// </summary>
     /// <param name="name">The name of the environment variable to set. Must be non-null and non-empty.</param>
     /// <param name="value">
-    ///     The value of the environment variable to set. An empty string is permitted
-    ///     (e.g. to clear the variable); <see langword="null" /> is rejected.
+    ///     The value of the environment variable to set. An empty string is permitted and sets
+    ///     the variable to an empty value in the child process (it does not remove the
+    ///     variable); <see langword="null" /> is rejected.
     /// </param>
     /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
     public EnvironmentVariablesSpec SetPair(string name, string value)

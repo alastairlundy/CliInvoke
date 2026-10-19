@@ -18,6 +18,8 @@ namespace CliInvoke.Tests.Processes;
 ///     <see cref="ProcessStartInfo"/> must be assigned to the process
 ///     <em>before</em> the adapter applies them, so they reach the instance used to
 ///     start the process instead of being discarded with the wrapper's default instance.
+///     It also pins the null-value contract: a null-valued entry removes the variable
+///     from the child process (BCL semantics), while an empty string sets an empty value.
 /// </summary>
 public class AdapterConfigurationDeliveryTests
 {
@@ -65,6 +67,101 @@ public class AdapterConfigurationDeliveryTests
         // Exit code 1 means the child could not find the variable at all.
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput).IsEqualTo(variableValue);
+    }
+
+    [Test]
+    public async Task ProcessWrapper_NullEnvironmentVariableValue_OverridesInheritedValue()
+    {
+        // L6: a null value must reach StartInfo.Environment as null (BCL removal semantics)
+        // instead of being silently skipped, which would leave the inherited parent value.
+        const string variableName = "CLIINVOKE_L6_NULL_UNIT";
+
+        Environment.SetEnvironmentVariable(variableName, "inherited-parent-value");
+        try
+        {
+            ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(), string.Empty)
+            {
+                EnvironmentVariables = new Dictionary<string, string>
+                {
+                    [variableName] = null!
+                }
+            };
+
+            FilePathResolver resolver = new();
+            ProcessWrapper process = new(configuration, resolver.ResolveFilePath(configuration.TargetFilePath));
+
+            await Assert.That(process.StartInfo.Environment[variableName]).IsNull();
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(variableName, null);
+        }
+    }
+
+    [Test]
+    public async Task RunBufferedAsync_NullEnvironmentVariableValue_RemovesInheritedVariableFromChildProcess()
+    {
+        // L6 end to end: the parent process defines the variable, the configuration nulls it,
+        // and the child must not see it (echo-env exits 1 for "absent"; an inherited leak would
+        // exit 0 and print the parent's value).
+        string helperPath = ProcessTestHelper.GetSignalTrappingHelperPath();
+
+        const string variableName = "CLIINVOKE_L6_NULL_E2E";
+        const string inheritedValue = "inherited-secret-4821";
+
+        Environment.SetEnvironmentVariable(variableName, inheritedValue);
+        try
+        {
+            ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
+            {
+                EnvironmentVariables = new Dictionary<string, string>
+                {
+                    [variableName] = null!
+                }
+            };
+
+            BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
+                ProcessExitConfiguration.CreateGraceful());
+
+            await Assert.That(result.ExitCode).IsEqualTo(1);
+            await Assert.That(result.StandardOutput).IsEqualTo(string.Empty);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(variableName, null);
+        }
+    }
+
+    [Test]
+    public async Task RunBufferedAsync_EmptyEnvironmentVariableValue_SetsEmptyValueInsteadOfRemoving()
+    {
+        // Companion to the null case: an empty string is "set to empty", not "removed" -
+        // echo-env exits 0 (present) with empty output, versus exit 1 for absent.
+        string helperPath = ProcessTestHelper.GetSignalTrappingHelperPath();
+
+        const string variableName = "CLIINVOKE_L6_EMPTY_E2E";
+
+        Environment.SetEnvironmentVariable(variableName, "inherited-value");
+        try
+        {
+            ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
+            {
+                EnvironmentVariables = new Dictionary<string, string>
+                {
+                    [variableName] = string.Empty
+                }
+            };
+
+            BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
+                ProcessExitConfiguration.CreateGraceful());
+
+            await Assert.That(result.ExitCode).IsEqualTo(0);
+            await Assert.That(result.StandardOutput).IsEqualTo(string.Empty);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(variableName, null);
+        }
     }
 
     [Test]

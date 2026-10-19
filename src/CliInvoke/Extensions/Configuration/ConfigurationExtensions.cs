@@ -73,6 +73,14 @@ public static class ConfigurationExtensions
         ///         on other platforms, mirroring the Windows-only support of
         ///         <see cref="IProcessConfigurationBuilder.ConfigureUserCredential"/>.
         ///     </para>
+        ///     <para>
+        ///         Null-valued entries in <see cref="ProcessStartInfo.Environment"/> (which remove
+        ///         the variable from the child process when the source is started directly) are
+        ///         not carried over: <see cref="ProcessConfiguration.EnvironmentVariables"/> is a
+        ///         set-only surface that cannot express removal, so the variable stays inherited
+        ///         by the child after conversion. This is another lossy edge of this conversion,
+        ///         like the redirect-flag collapse above.
+        ///     </para>
         /// </remarks>
         [Pure]
         public static ProcessConfiguration FromProcessStartInfo(ProcessStartInfo processStartInfo)

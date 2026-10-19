@@ -237,9 +237,11 @@ internal abstract class BaseProcessControlAdapter
             return;
 
         foreach (KeyValuePair<string, string> variable in environmentVariables)
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (variable.Value is not null)
-                process.StartInfo.Environment[variable.Key] = variable.Value;
+            // BCL semantics: ProcessStartInfo.Environment treats a null value as removal of
+            // the variable - entries whose value is null are omitted when the child's
+            // environment block is built, so the variable is absent in the child instead of
+            // falling back to the value inherited from the current process.
+            process.StartInfo.Environment[variable.Key] = variable.Value;
     }
    
     internal abstract void RequireRunningAsAdmin(Process process);
