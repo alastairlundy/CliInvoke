@@ -1,9 +1,9 @@
 # CliInvoke Review Findings — Fix Handoff
 
-Date: 2026-10-18 (updated 2026-10-19 after fix round 2: M1, M3, M6 code fixes)
+Date: 2026-10-18 (updated 2026-10-19 after fix round 3: L1, L2 minimal, L7(a) code fixes; fix round 2 before that: M1, M3, M6)
 Source: behavioral review of `src/` ("potentially surprising or unexpected behaviour"), severity-ranked, followed by per-finding fix proposals. Findings verified against the tree at 3.1.0.
 
-**TL;DR: Fixed (verified): H1, M1, M2, M3, M4, M6, M7, L3b, plus docs-only fixes M5, L3a, L4. Everything else in this document is proposed/not implemented.** Fixed items verified with the ConfigureAwait guard, `dotnet build src/CliInvoke.sln` (0 errors), and the `tests/CliInvoke.Tests` suite (669 total, 0 failed, 1 pre-existing skip) as of fix round 2 (2026-10-19).
+**TL;DR: Fixed (verified): H1, M1, M2, M3, M4, M6, M7, L1, L2 (minimal), L3b, L7(a), plus docs-only fixes M5, L3a, L4. Everything else in this document is proposed/not implemented.** Fixed items verified with the ConfigureAwait guard, `dotnet build src/CliInvoke.sln` (0 errors), and the `tests/CliInvoke.Tests` suite (672 total, 0 failed, 1 pre-existing skip) plus `tests/CliInvoke.Specializations.Tests` (14 total, 0 failed) as of fix round 3 (2026-10-19).
 
 ## Status board
 
@@ -18,22 +18,22 @@ Source: behavioral review of `src/` ("potentially surprising or unexpected behav
 | M5 Windows graceful exit degrades to kill | Medium | ✅ **Fixed** — docs (XML + site/docs troubleshooting/configuration) |
 | M6 logging shows empty arguments for shell-wrapped runs | Medium | ✅ **Fixed** — logs joined ArgumentList when the argument string is empty |
 | M7 `MaxBufferedOutputBytes` docs contradiction | Medium | ✅ **Fixed** — docs converge on per-stream |
-| L1 `FireAndForget` disposal + redirection trap | Low | ❌ Not fixed — proposed (3.2.0) |
-| L2 eager filesystem I/O in `ExternalProcess` ctor | Low | ❌ Not fixed — proposed (3.2.0 minimal) |
+| L1 `FireAndForget` disposal + redirection trap | Low | ✅ **Fixed** — fail-fast `ArgumentException` on redirected configs (ctor-default collision: the position-arg `ProcessConfiguration` ctors default `outputRedirection: true`) |
+| L2 eager filesystem I/O in `ExternalProcess` ctor | Low | ✅ **Fixed (minimal)** — ctor-resolved `FileInfo` cached and reused by `Start`/`StartAsync`; lazy resolution still deferred |
 | L3a static `Equals(null, null)` returns false | Low | ✅ **Fixed (docs)** — per-type XML remarks; semantic flip still deferred (4.0.0) |
 | L3b case-sensitive path comparison on Windows | Low | ✅ **Fixed** — OS-aware comparison |
 | L4 `WaitForExitOrTimeoutAsync` XML copy-paste bug | Low | ✅ **Fixed** — docs (XML returns) |
 | L5 UTF-8 default vs OEM/ANSI child output | Low | ❌ Not fixed — proposed (3.1.x docs) |
 | L6 null env-var values silently dropped | Low | ❌ Not fixed — proposed (3.2.0) |
-| L7 "Default" divergence + ±1s swallow window | Low | ❌ Not fixed — proposed (split: 3.1.x / 3.2.0 / 4.0.0) |
+| L7 "Default" divergence + ±1s swallow window | Low | L7(a) ✅ **Fixed** — `Default` re-pointed to ctor defaults; L7(b) ❌ Not fixed — proposed (3.2.0) |
 
 Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/1581/1584/1658/1734/1762 escalated in `Directory.Build.props`); style per `src/.editorconfig` (no `var` for built-ins, separate using groups, 100-col); GLOSSARY.md entries are contracts (PATH-first ordering is ADR-protected).
 
 ## Release batches (consolidated)
 
-- **3.1.x — docs-only, zero behavior change:** H1, M4, M7 (**✅ done**) + L4, L5 docs, L3a doc notes, L7(a) docs + XML hazard notes for H2/L1/M5 (docs halves of those proposals). Theme: *make the contracts say what the code does.*
-- **3.2.0 — behavior fixes, one release note ("Raw/FireAndForget pipe and cancellation contract alignment"):** H2 normalization, M1 Buffered cancellation (**✅ done**), L1 fail-fast, M3 stdin replay (**✅ done**), M6 logging (**✅ done**), L2 minimal cache, L6 null env-var semantics, L7(b) OCE-gated swallow. Theme: *fail fast or normalize, never silently hang.*
-- **4.0.0 / deferred:** H2 hard-fail (only if normalization draws bug reports), M1 throw-by-default, M5 console-attach knob (recommend never), L3a semantic flip (all eight types in one change), L2 lazy resolution, L5 encoding-default decision, L7(a) `Default` alignment.
+- **3.1.x — docs-only, zero behavior change:** H1, M4, M7 (**✅ done**) + L4, L5 docs, L3a doc notes + XML hazard notes for H2/L1/M5 (docs halves of those proposals). Theme: *make the contracts say what the code does.*
+- **3.2.0 — behavior fixes, one release note ("Raw/FireAndForget pipe and cancellation contract alignment"):** H2 normalization, M1 Buffered cancellation (**✅ done**), L1 fail-fast (**✅ done**), M3 stdin replay (**✅ done**), M6 logging (**✅ done**), L2 minimal cache (**✅ done**), L6 null env-var semantics, L7(b) OCE-gated swallow. Theme: *fail fast or normalize, never silently hang.* Release note must also call out the L7(a) `Default` re-point (pulled forward from 4.0.0) — the DI `ProcessInvoker` null-fallback now allows unexpected-exit exceptions.
+- **4.0.0 / deferred:** H2 hard-fail (only if normalization draws bug reports), M1 throw-by-default, M5 console-attach knob (recommend never), L3a semantic flip (all eight types in one change), L2 lazy resolution, L5 encoding-default decision.
 
 ---
 
@@ -53,6 +53,7 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 **Effort:** ~0.5 day incl. cancellation tests on both modes.
 
 ### L1 — `FireAndForget(ProcessConfiguration)` disposal + redirection trap
+**Status:** ✅ Fixed (2026-10-19, fix round 3) — `CliRun.FireAndForget(ProcessConfiguration)` throws `ArgumentException` (param `configuration`) when `OutputRedirection || RedirectStandardInput`, before any process handle is created. XML `<exception>` added and cross-references the string-args overload (which forces redirection off). **Discovered during implementation — important compat note:** the position-argument `ProcessConfiguration` constructors default `outputRedirection` to `true`, so `new ProcessConfiguration(path, args)` is itself a redirected config and now throws; callers must pass `outputRedirection: false` explicitly (the repo's own tests were updated accordingly). The string-args `FireAndForget` overload is unaffected. Tests: `tests/CliInvoke.Tests/Invokers/CliRunTests.cs` (redirected-output throw, redirected-stdin throw, non-redirected still starts, resolution failure still `FileNotFoundException`).
 **Fix:** Fail fast in `CliRun.FireAndForget(ProcessConfiguration)` (`CliRun.cs:247-251`): throw `ArgumentException` when `configuration.OutputRedirection || configuration.RedirectStandardInput`. A redirected fire-and-forget is broken by construction (no one drains pipes; handle disposed immediately after `Start()`). Update the XML and cross-reference the string-args overload that forces redirection off (`CliRun.cs:261-270`).
 **Compat:** Behavior change for callers passing redirected configs — they get silent breakage today. 3.2.0 with release note.
 **Alternative:** Docs-only in 3.1.x, or silently force redirection off like the string overload (rejected — hides caller mistakes). Genuinely supporting redirected fire-and-forget needs background drain tasks outliving the call — complexity that earns nothing.
@@ -73,6 +74,7 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 **Effort:** ~30-45 min incl. test asserting the ArgumentList case appears in logs.
 
 ### L2 — `ExternalProcess` constructor eagerly resolves the target file
+**Status:** ✅ Fixed (minimal, 2026-10-19, fix round 3) — `ExternalProcess` caches the ctor-resolved `FileInfo` in a readonly field (`_resolvedFilePath`) and `Start()`/`StartAsync(CancellationToken)` reuse it instead of re-resolving; the `StartAsync(ProcessConfiguration, ct)` overload still resolves its *parameter's* target path (different config object, not a double resolution). Ctor XML now documents construct-time resolution and the `FileNotFoundException`. Construct-time-throw semantics preserved exactly; zero observable change.
 **Fix (minimal, recommended):** Cache the `FileInfo` resolved in the constructor (`src/CliInvoke/Processes/ExternalProcess.cs:39`) and reuse it in `Start()` (:118) and `StartAsync()` (:167) instead of re-resolving. Three lines; closes the double-resolution/TOCTOU window and halves filesystem I/O; construct-time `FileNotFoundException` semantics preserved exactly.
 **Compat:** Zero observable change. 3.2.0.
 **Full fix (defer):** Lazy resolution — store only the resolver in the ctor, resolve on first `Start`/`StartAsync` so no I/O and no throw at create time. Moves an exception from ctor to Start (observable) → 4.0.0, and needs an "unstarted" `ProcessWrapper` state since `HasExited`/`HasStarted` touch `_processWrapper` pre-start. Do only if someone hits the construct-time-throw pain.
@@ -118,9 +120,14 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 **Effort:** docs ~1 h across eight types; flip ~1 h + tests in 4.0.0.
 
 ### L7(a) — two spellings of "default" `ProcessExitConfiguration` differ in exception behavior
+**Status:** ✅ Fixed (code, 2026-10-19, fix round 3 — pulled forward from 4.0.0 by maintainer decision) — `ProcessExitConfiguration.Default` re-pointed from `CreateGraceful()` to `new ProcessExitConfiguration()`, so `Default` and the constructor default are now the same concept (`AllowExceptionsIfUnexpected`, `CancellationThrowsException=false`); `CreateGraceful()` keeps its suppressing semantics (`SuppressExceptions`) and is the documented contrast. XML updated on `Default`, both `CreateGraceful` overloads, the `?? CreateGraceful()` call sites (`CliRun.RunAsync`/`RunBufferedAsync(ProcessConfiguration, ...)`, `ExternalProcess` ctor), and the `?? ProcessExitConfiguration.Default` call sites (`ProcessInvoker.ExecuteAsync`/`ExecuteBufferedAsync`). **Observable change:** the DI `ProcessInvoker` null-fallback previously suppressed unexpected-exit exceptions (via the old graceful `Default`) and now allows them — callers wanting the old behavior pass `CreateGraceful()`. `CliRun`/`ExternalProcess` null-fallbacks are unchanged (still `CreateGraceful()`). Note for doc authors: crefs to the extension-block members `Default`/`CreateGraceful` do not resolve (CS1574) from outside — use `<c>` text or the containing-type cref for `CreateGraceful()`. Tests: `Default_MatchesConstructorDefaults`, `Default_DiffersFromCreateGraceful_InExceptionBehaviour` in `tests/CliInvoke.Tests/Core/Extensions/ProcessExitConfigurationCreationExtensionsTests.cs`.
 **Fix (docs now):** XML remarks on `Default`, `CreateGraceful` (`src/CliInvoke.Core/Extensions/ProcessExitConfigurationCreationExtensions.cs:26-61`) and the `exitConfiguration ?? CreateGraceful()` call sites (`CliRun.cs:122/233`, `ExternalProcess.cs:41`) stating plainly: the graceful flavor suppresses unexpected-exit exceptions (`CancellationThrowsException=false`, `SuppressExceptions`); the ctor default allows them (`AllowExceptionsIfUnexpected`).
-**Deferred (4.0.0):** keep `CreateGraceful` semantics (the name signals intent) but obsolete `Default` or re-point it to ctor defaults, so the two "default" concepts stop disagreeing. Obsolete first — re-pointing is breaking.
-**Effort:** docs ~45 min; 4.0.0 alignment ~1 h + obsolete warnings.
+**Deferred (4.0.0):** ~~keep `CreateGraceful` semantics (the name signals intent) but obsolete `Default` or re-point it to ctor defaults~~ — the re-point happened in fix round 3 instead; nothing further deferred.
+
+### Fix round 3 (2026-10-19): L1, L2 minimal, L7(a)
+- L1: `FireAndForget(ProcessConfiguration)` fail-fast on `OutputRedirection || RedirectStandardInput` + `<exception>` XML warning that the position-arg `ProcessConfiguration` ctors default `outputRedirection: true` (so `outputRedirection: false` must be explicit). Repo tests updated to the non-redirected construction.
+- L2: `ExternalProcess` caches the ctor-resolved `FileInfo` (`_resolvedFilePath`) and reuses it in `Start()`/`StartAsync(CancellationToken)`; ctor XML filled in (was empty stubs) documenting construct-time resolution.
+- L7(a): `ProcessExitConfiguration.Default` re-pointed to `new ProcessExitConfiguration()`; XML contrast with `CreateGraceful()` added at the definitions and at every `?? CreateGraceful()` / `?? Default` call site (`CliRun`, `ExternalProcess`, `ProcessInvoker`).
 
 ### Done in this round (docs halves of H2/L1 already applied with the code work, plus H1/M4/M7)
 - H1: name the 2-minute `ProcessTimeoutPolicy.Default` in `CliRun.cs` XML (the "a default value is applied" remark at ~41-43 + `timeoutTimeSpan` params) and document threshold behavior: graceful interrupt attempted → force-kill after a short grace period; with the default graceful config no exception is thrown — result comes back `Canceled=true`. Also `ProcessTimeoutPolicy.Default` property XML and a `CreateGraceful` remark.
@@ -140,9 +147,8 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 | L3a static `Equals` semantic flip | All eight types in one uniform change |
 | L2 lazy resolution (no I/O at create) | Observable exception-move; needs unstarted wrapper state |
 | L5 encoding-default change | Needs ADR-style note on which children break |
-| L7(a) `Default` re-point/obsolete | Breaking; obsolete-first path |
 
-No signature changes anywhere in the 3.1.x/3.2.0 batches; no new IVT grants, no reflection (AOT-safe throughout).
+No signature changes anywhere in the 3.1.x/3.2.0 batches (the L7(a) `Default` re-point and L1 fail-fast are behavior changes only, no signature changes); no new IVT grants, no reflection (AOT-safe throughout).
 
 ## Low label reference
 
