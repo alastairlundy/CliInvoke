@@ -9,20 +9,12 @@ Source: behavioral review of `src/` ("potentially surprising or unexpected behav
 
 | Finding | Severity | Status |
 |---|---|---|
-| H1 silent 2-min default timeout | High | ✅ **Fixed** — docs (timeout + kill/cancellation semantics) |
 | H2 Raw-mode pipe deadlock | High | ❌ Not fixed — proposed (3.2.0) |
 | M1 Raw vs Buffered cancellation divergence | Medium | ❌ Not fixed — proposed (3.2.0) |
-| M2 `ProcessExitConfiguration` null-unsafe `==` | Medium | ✅ **Fixed** — null-aware operators |
 | M3 retry middleware replays empty stdin on attempts ≥ 2 | Medium | ❌ Not fixed — proposed (3.2.0) |
-| M4 "directory recursion" docs drift | Medium | ✅ **Fixed** — docs (GLOSSARY, XML, site/docs) |
-| M5 Windows graceful exit degrades to kill | Medium | ✅ **Fixed** — docs (XML + site/docs troubleshooting/configuration) |
 | M6 logging shows empty arguments for shell-wrapped runs | Medium | ❌ Not fixed — proposed (3.2.0) |
-| M7 `MaxBufferedOutputBytes` docs contradiction | Medium | ✅ **Fixed** — docs converge on per-stream |
 | L1 `FireAndForget` disposal + redirection trap | Low | ❌ Not fixed — proposed (3.2.0) |
 | L2 eager filesystem I/O in `ExternalProcess` ctor | Low | ❌ Not fixed — proposed (3.2.0 minimal) |
-| L3a static `Equals(null, null)` returns false | Low | ✅ **Fixed (docs)** — per-type XML remarks; semantic flip still deferred (4.0.0) |
-| L3b case-sensitive path comparison on Windows | Low | ✅ **Fixed** — OS-aware comparison |
-| L4 `WaitForExitOrTimeoutAsync` XML copy-paste bug | Low | ✅ **Fixed** — docs (XML returns) |
 | L5 UTF-8 default vs OEM/ANSI child output | Low | ❌ Not fixed — proposed (3.1.x docs) |
 | L6 null env-var values silently dropped | Low | ❌ Not fixed — proposed (3.2.0) |
 | L7 "Default" divergence + ±1s swallow window | Low | ❌ Not fixed — proposed (split: 3.1.x / 3.2.0 / 4.0.0) |
@@ -91,39 +83,17 @@ Repo gates for implementers: XML doc comments are **build errors** (CS1574/1580/
 
 ## 3.1.x proposals (docs-only)
 
-### M5 — Windows "GracefulExit" timeout frequently degrades to forceful termination
-**Status:** ✅ Fixed (docs) — type-level, `TimeoutExitBehaviour`, and `FromTimeSpan` XML on `ProcessTimeoutPolicy`; `RequestedCancellationExitBehaviour` XML on `ProcessExitConfiguration`; `GracefulExit` table row in `site/docs/guides/configuration.md`; new common cause #7 in `site/docs/guides/troubleshooting.md` (OS-Specifics).
-**Fix:** Document precisely; do **not** attempt the console dance. XML on `ProcessTimeoutPolicy.FromTimeSpan`/`ProcessTimeoutPolicy` (`src/CliInvoke.Core/Primitives/Policies/ProcessTimeoutPolicy.cs:37-47, 114-118`) and `ProcessExitConfiguration`: `GracefulExit` is best-effort on Windows — a console-host caller typically cannot `AttachConsole(child)` (`src/CliInvoke/Processes/Internal/ControlAdapters/WindowsProcessControlAdapter.cs:187-216`), no signal is delivered, and the child is force-terminated (`ProcessWrapper.cs:1052-1056`). Unix sends SIGTERM and is genuinely graceful. Plus a troubleshooting entry in `site/docs`.
-**Never build:** the `FreeConsole()` → `AttachConsole(child)` → signal → restore sequence — a failed restore leaves the *host* without a console. Not honestly achievable with `GenerateConsoleCtrlEvent` from an arbitrary host.
-**Effort:** docs ~30 min; the opt-in attach knob ~1-2 days if ever pursued (recommend never).
-
-### L4 — `WaitForExitOrTimeoutAsync` XML promises a buffered result
-**Status:** ✅ Fixed (docs) — `<returns>` on `IExternalProcess.WaitForExitOrTimeoutAsync` now states the result is a plain `ProcessResult` without buffered output and cross-references `CaptureBufferedResultAsync`.
-**Fix:** At `IExternalProcess.cs:97-100`, change the `<returns>` to state the result is a plain `ProcessResult` without buffered output; cross-reference `CaptureBufferedResultAsync` for buffered capture.
-**Effort:** 10 min.
 
 ### L5 — UTF-8 default decoding mojibakes OEM/ANSI child output
 **Fix:** Docs-only now. XML remarks (`ProcessConfiguration.cs:276-303`) already state UTF-8; add a troubleshooting entry to `site/docs` (and a README note): children emitting Windows OEM/ANSI code-page text need explicit encodings — the builder API exists (see `RunnerConfigurationFactory.cs:131` for the pattern). Rationale for not flipping the default: UTF-8 is the correct modern default (pwsh 7, git, node emit it) and the BCL's own fallback (`Console.OutputEncoding`) breaks a different class of children — any default breaks someone; the fix is discoverability.
 **Deferred (4.0.0):** default change (e.g., stdout/stderr UTF-8 + stdin `Console.InputEncoding`, or a `ProcessEncodings.Oem()`/`Ansi()` helper) — needs its own ADR-style note; `Console.OutputEncoding` can throw on non-console hosts and must not be captured in a static initializer.
 **Effort:** docs ~1 h.
 
-### L3a — static `Equals(left, right)` returns false for `(null, null)`
-**Status:** ✅ Fixed (docs) — `<remarks>` added to all eight static `Equals` methods, each stating the method's **actual** current behavior.
-**Drift note (2026-10-19):** the tree no longer matches the original proposal's premise. Five of the eight static methods already follow BCL convention and return `true` for `(null, null)` (`ProcessResult`, `BufferedProcessResult`, `UserCredential`, `ProcessResourcePolicy` via `ReferenceEquals`, `ProcessTimeoutPolicy`); only `ProcessExitConfiguration`, `ProcessConfiguration`, and `ShellInformation` are still strict. Of the strict three, `ProcessExitConfiguration` and `ProcessConfiguration` have `==` operators that treat `(null, null)` as equal (independent implementations), while `ShellInformation`'s `==` still **delegates** to the strict static method, so `null == null` is `false` there — include `ShellInformation` (and audit `ProcessResourcePolicy`'s delegating `==`) in the 4.0.0 uniform flip.
-**Fix (docs now):** Add a `<remarks>` to all **eight** static `Equals` methods — `ProcessConfiguration.cs:386`, `ProcessExitConfiguration.cs:185`, `UserCredential.cs:147`, `ShellInformation.cs:88`, `BufferedProcessResult.cs:205`, `ProcessResult.cs:197`, `ProcessResourcePolicy.cs:198`, `ProcessTimeoutPolicy.cs:161` — stating: "Returns false when either operand is null, including when both are null; unlike `==`." **Resolved flag:** the in-progress operator fix has landed — `ProcessExitConfiguration`'s `==`/`!=` operators are now implemented independently (`left is null ? right is null : left.Equals(right)`; verified at `ProcessExitConfiguration.cs:201-202`) and no longer delegate to the static method, so the eight doc notes apply as written.
-**Deferred (4.0.0):** semantic flip to `left is null ? right is null : left.Equals(right)` — observable change on public API; apply uniformly across all eight types in one change, never piecemeal. Alternatively keep the "strict" semantics permanently and close L3a as docs-only — defensible now that operators follow BCL convention.
-**Effort:** docs ~1 h across eight types; flip ~1 h + tests in 4.0.0.
 
 ### L7(a) — two spellings of "default" `ProcessExitConfiguration` differ in exception behavior
 **Fix (docs now):** XML remarks on `Default`, `CreateGraceful` (`src/CliInvoke.Core/Extensions/ProcessExitConfigurationCreationExtensions.cs:26-61`) and the `exitConfiguration ?? CreateGraceful()` call sites (`CliRun.cs:122/233`, `ExternalProcess.cs:41`) stating plainly: the graceful flavor suppresses unexpected-exit exceptions (`CancellationThrowsException=false`, `SuppressExceptions`); the ctor default allows them (`AllowExceptionsIfUnexpected`).
 **Deferred (4.0.0):** keep `CreateGraceful` semantics (the name signals intent) but obsolete `Default` or re-point it to ctor defaults, so the two "default" concepts stop disagreeing. Obsolete first — re-pointing is breaking.
 **Effort:** docs ~45 min; 4.0.0 alignment ~1 h + obsolete warnings.
-
-### Done in this round (docs halves of H2/L1 already applied with the code work, plus H1/M4/M7)
-- H1: name the 2-minute `ProcessTimeoutPolicy.Default` in `CliRun.cs` XML (the "a default value is applied" remark at ~41-43 + `timeoutTimeSpan` params) and document threshold behavior: graceful interrupt attempted → force-kill after a short grace period; with the default graceful config no exception is thrown — result comes back `Canceled=true`. Also `ProcessTimeoutPolicy.Default` property XML and a `CreateGraceful` remark.
-- M4: GLOSSARY.md Decision 1 + `LocateFileFromDirectory` XML (`FilePathResolver.cs:176-178`): single-level directory fallback, recursion deliberately removed (over-broad-match/DoS surface); PATH-first ordering contract unchanged (no new ADR). Grep README + site/docs for stragglers.
-- M7: converge docs on per-stream caps ("applied independently to standard output and to standard error"): `CliRun.cs:144-147` + twin ~186-189, `ProcessExitConfiguration.cs:119-123`, `WithMaxBufferedOutputBytes` (`ProcessExitConfigurationCreationExtensions.cs:92-99`).
-- XML hazard warnings for H2 (Raw+redirection), L1 (FireAndForget redirection), M5 (Windows graceful best-effort) — document current reality, patch-safe.
 
 ---
 
