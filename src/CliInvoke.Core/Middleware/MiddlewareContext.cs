@@ -11,7 +11,7 @@ namespace CliInvoke.Core.Middleware;
 
 /// <summary>
 ///     The per-run state exposed to middleware via the chain walker. One instance is constructed
-///     per <see cref="MiddlewareChain.RunAsync(InvocationContext, CancellationToken)"/> call and
+///     per <see cref="MiddlewareChain.RunAsync(InvocationContext,System.Threading.CancellationToken)"/> call and
 ///     shared by every middleware in the chain; it carries the run's single cancellation token.
 /// </summary>
 public sealed class MiddlewareContext
