@@ -48,5 +48,5 @@ Versions that are currently supported with Bug Fixes and/or Security Fixes are d
 | Version series | Versions Supported with Bug Fixes | Versions Supported with Security Fixes |
 |--| --|--|
 | 3.x | 3.0, 3.1 | 3.0, 3.1 |
-| 2.x | 2.10, 2.11 | 2.10, 2.11 |
+| 2.x | 2.11 | 2.11 |
 | 1.x | :x: | :x: |
