@@ -36,7 +36,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>3.2.0-alpha.1</PackageVersion>
         <AssemblyVersion>3.1.0.0</AssemblyVersion>
-        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
+        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, invocation, execution</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>

@@ -28,6 +28,7 @@
         <Product>CliInvoke.Specializations</Product>
         <AssemblyVersion>3.1.0</AssemblyVersion>
         <FileVersion>3.1.0</FileVersion>
+        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, invocation, execution</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
