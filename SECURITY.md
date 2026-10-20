@@ -50,3 +50,9 @@ Versions that are currently supported with Bug Fixes and/or Security Fixes are d
 | 3.x | 3.0, 3.1 | 3.0, 3.1 |
 | 2.x | 2.11 | 2.11 |
 | 1.x | :x: | :x: |
+
+### Version Support EOL dates
+| Version line | End of Security Fixes |
+|-|-|
+| 3.0 | December 1st 2026 |
+| 2.11 | December 1st 2026 |
