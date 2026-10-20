@@ -14,7 +14,11 @@ public class GracefulCancellationTests
 
         int gracefulTimeoutSeconds = 2;
 
-        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 5);
+        // The child must comfortably outlive the graceful timeout. On loaded CI runners the
+        // timeout continuation can be delayed by several seconds; if the child reaches its
+        // natural exit first, no cancellation is ever performed and the machinery correctly
+        // reports not-canceled — so a short sleep races the timeout and fails intermittently.
+        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 30);
 
         process.Start();
 
@@ -60,7 +64,10 @@ public class GracefulCancellationTests
 
         const int gracefulTimeoutSeconds = 2;
 
-        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 5);
+        // Sleep well past the 2s graceful timeout (rationale in
+        // GracefulCancel_InterruptSignals_Success): a child that exits naturally before the
+        // timeout fires is correctly reported as not canceled, which fails the assertion below.
+        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 30);
 
         process.Start();
 
@@ -121,7 +128,11 @@ public class GracefulCancellationTests
         const int gracefulTimeoutSeconds = 2;
 
         string helperPath = ProcessTestHelper.GetSignalTrappingHelperPath();
-        ProcessConfiguration configuration = new(helperPath, $"\"{markerPath}\" 5");
+        // 30s sleep instead of 5s: the helper must outlive the 2s graceful timeout by a wide
+        // margin so a delayed timeout continuation on loaded CI runners cannot let the child
+        // exit naturally first — that path correctly reports Canceled as false (regression
+        // intent: verify the timeout machinery's result, not a natural exit).
+        ProcessConfiguration configuration = new(helperPath, $"\"{markerPath}\" 30");
 
         ProcessExitConfiguration exitConfiguration = new(
             ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(gracefulTimeoutSeconds)),
