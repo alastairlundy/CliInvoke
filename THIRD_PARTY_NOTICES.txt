@@ -56,7 +56,7 @@ SOFTWARE.
 -----------------------------------------------------------------------------
 
  CliInvoke.Internal.Versions.VersionParseExtensions.cs and
- CliInvoke.Core.Internal.IO.PathEnvironmentVariable.cs are derived from DotExtensions.
+ CliInvoke.Internal.IO.PathEnvironmentVariable.cs are derived from DotExtensions.
  
  DotExtensions is licensed under the MIT license.
 -----------------------------------------------------

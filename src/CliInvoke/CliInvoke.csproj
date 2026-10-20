@@ -71,13 +71,6 @@
         <InternalsVisibleTo Include="CliInvoke.Specializations"/>
     </ItemGroup>
 
-<!--    <ItemGroup>
-        <PackageReference Include="DotExtensions"/>
-       <PackageReference Include="Polyfill" PrivateAssets="all">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>-->
-
     <ItemGroup>
         <ProjectReference Include="..\CliInvoke.Core\CliInvoke.Core.csproj"/>
     </ItemGroup>
