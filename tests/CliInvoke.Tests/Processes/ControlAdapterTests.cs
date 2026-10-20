@@ -142,4 +142,28 @@ public class ControlAdapterTests
 
         await Assert.That(terminatingSignal).IsEqualTo(PosixSignal.SIGCONT);
     }
+
+    [Test]
+    public async Task UnixAdapter_MapNativeSignalNumber_ConvertsRawNumbersToMembers()
+    {
+        // This is the mapping the net11.0 ProcessWrapper.Signal path applies to the raw
+        // positive native terminating-signal number the runtime delivers (WTERMSIG cast
+        // into PosixSignal) before the SIGKILL and undefined-value filters. Signals
+        // 1/2/3/15 share the same numbers across the Linux and BSD layouts, so these
+        // assertions hold on every platform the table's first entries are populated on.
+        UnixProcessControlAdapter adapter = new UnixProcessControlAdapter();
+
+        // SIGTERM (15) raw -> genuine member; this is what the SIGTERM integration test
+        // (Unix_SignalTrappingHelper_KilledBySigterm_ReportsSignal) asserts end to end.
+        await Assert.That(adapter.MapNativeSignalNumber(15)).IsEqualTo(PosixSignal.SIGTERM);
+        await Assert.That(adapter.MapNativeSignalNumber(2)).IsEqualTo(PosixSignal.SIGINT);
+
+        // SIGKILL (9) deliberately has no table entry: Signal must stay null and callers
+        // distinguish library-initiated forceful kills via ProcessResult.Canceled.
+        await Assert.That(adapter.MapNativeSignalNumber(9)).IsNull();
+
+        // Signals the BCL PosixSignal enum does not model (e.g. SIGUSR1) are unknown
+        // signals and resolve to null, matching the undefined-value filter.
+        await Assert.That(adapter.MapNativeSignalNumber(10)).IsNull();
+    }
 }

@@ -22,12 +22,15 @@ public class ProcessSuspendResumeTests
             process = ProcessTestHelper.CreateProcess("sleep", $"{sleepTimeSeconds}");
         else if (OperatingSystem.IsWindows())
         {
-            // Windows 'timeout' exits immediately when any standard stream is redirected.
-            // Disable output redirection so stdout/stderr stay connected to the console.
+            // Windows 'timeout' exits immediately whenever stdin is redirected (which
+            // the test runner does in CI), so the test would race a process that dies
+            // on startup and lose. ping ignores stdin entirely and keeps running for
+            // the full sleep window no matter how the runner wires its streams; cmd's
+            // own >nul keeps its output out of the CI log.
             FilePathResolver resolver = new();
             FileInfo resolvedCmd = resolver.ResolveFilePath("cmd.exe");
             ProcessConfiguration configuration = new ProcessConfiguration(resolvedCmd.FullName,
-                $"/c timeout /t {sleepTimeSeconds} /nobreak", outputRedirection: false);
+                $"/c ping -n {sleepTimeSeconds + 1} 127.0.0.1 >nul", outputRedirection: false);
             process = new ProcessWrapper(configuration, resolvedCmd);
         }
         else

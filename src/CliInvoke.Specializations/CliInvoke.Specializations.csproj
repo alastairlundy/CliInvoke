@@ -2,8 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net10.0</TargetFrameworks>
-        <LangVersion>14</LangVersion>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
         <Nullable>enable</Nullable>
         <Title>CliInvoke.Specializations</Title>
         <Authors>AlastairLundy</Authors>
@@ -11,13 +10,14 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.1.0</PackageVersion>
+        <PackageVersion>3.2.0-alpha.1</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>### Fixed
+        <PackageReleaseNotes>* Multi-targets `net10.0` and `net11.0`.
+### Fixed
 * `UseDefaultShell()` wraps PowerShell with `-NoProfile -NonInteractive -Command`, so profile
   scripts cannot run or block, and a conditional middleware's sub-chain no longer leaks its
   `MiddlewareContext` into the outer chain.</PackageReleaseNotes>

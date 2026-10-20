@@ -2,8 +2,7 @@
 
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net10.0</TargetFrameworks>
-        <LangVersion>14</LangVersion>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <Title>CliInvoke</Title>
@@ -14,7 +13,9 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### Added
+        <PackageReleaseNotes>#### Changed
+* Multi-targets `net10.0` and `net11.0`.
+#### Added
 * Windows command-line length check. When the assembled command line exceeds the Windows
   `CreateProcess` limit (~32,767 characters), you get an `ArgumentException` before the process
   starts instead of Win32 error 206. Skipped when `UseShellExecute` is enabled.
@@ -33,7 +34,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.1.0</PackageVersion>
+        <PackageVersion>3.2.0-alpha.1</PackageVersion>
         <AssemblyVersion>3.1.0.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

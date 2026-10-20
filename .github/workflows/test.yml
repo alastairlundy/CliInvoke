@@ -39,7 +39,9 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
-        dotnet-version: 10.0.x
+        dotnet-version: |
+          10.0.x
+          11.0.100-rc.2.26504.105
     - name: ConfigureAwait guard
       # Lint-style gate with an OS-independent outcome. Linux-only so the plain
       # 'run:' pwsh default on Windows can't stumble on the bash script.
@@ -48,7 +50,12 @@ jobs:
     - name: Build
       run: dotnet build src/CliInvoke.sln
     - name: Test (CliInvoke)
-      run: dotnet test
+      # net10.0 and net11.0 test apps otherwise run as concurrent test modules:
+      # two hosts spawn processes side by side on the runner, which destabilises
+      # the timing-sensitive process-control tests (suspend/resume, graceful
+      # cancellation). Run them one at a time, matching the single-host cadence
+      # the suite has on main.
+      run: dotnet test --max-parallel-test-modules 1
       working-directory: tests/CliInvoke.Tests/
     # PowerShell/Cmd middleware security tests (ShellInjectionSecurityTests) live in
     # the Specializations project; without this step they never execute in CI.

@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net10.0</TargetFrameworks>
-        <LangVersion>14</LangVersion>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
         <Nullable>enable</Nullable>
         <PackageId>CliInvoke.Core</PackageId>
         <Title>CliInvoke.Core</Title>
@@ -22,15 +21,12 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.1.0</PackageVersion>
-        <PackageReleaseNotes>#### Added
-* Result ergonomics:
-  * `ProcessResult.ToString()` in bracketed diagnostic form (`[ExitCode=N, Path=..., Runtime=...]`)
-  * `BufferedProcessResult.ToString()` with output-length indicators and `Truncated=true` when truncated
-  * `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`
-  * `IsExitCodeZero()` and `EnsureExitCodeZero()` extensions on `ProcessResult`
-  * Lazy `EnumerateOutputLines()` / `EnumerateErrorLines()` extensions on `BufferedProcessResult`
-* Two new guides: [results](https://alastairlundy.github.io/CliInvoke/docs/guides/results) and [stdin piping](https://alastairlundy.github.io/CliInvoke/docs/guides/stdin-piping).</PackageReleaseNotes>
+        <PackageVersion>3.2.0-alpha.1</PackageVersion>
+        <PackageReleaseNotes>#### Changed
+- Multi-targets `net10.0` and `net11.0`.
+#### Fixed
+- `ProcessExitConfiguration.CancellationThrowsException` is now honoured
+- The default `ProcessResourcePolicy` affinity mask now selects every logical processor instead of pinning multi-core machines to half the cores.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>3.1.0.0</AssemblyVersion>
         <FileVersion>3.1.0.0</FileVersion>

@@ -62,6 +62,17 @@ internal class ProcessWrapper : Process
     // Resolved cancellation reason, persisted across the wait so Cancelled can be computed afterward.
     private CancellationReason _cancellationReason = CancellationReason.NotKnown;
 
+#if NET11_0
+    // True while a process created suspended via ProcessStartInfo.StartSuspended
+    // (net11.0 leg, Windows/macOS only — set in Start()) is still awaiting its initial
+    // release. This is a one-shot: ResumeProcess consumes it when it delivers the
+    // creation-suspended release through SafeProcessHandle.Resume(); every resume after
+    // that takes the per-OS control-adapter route, which resumes all threads and keeps
+    // the public Suspend/Resume pair symmetric. Also tells OnStarted that no post-start
+    // suspend step is needed.
+    private bool _awaitingInitialResume;
+#endif
+
     internal ProcessWrapper(ProcessConfiguration configuration,
         FileInfo resolvedFilePath)
     {
@@ -115,7 +126,75 @@ internal class ProcessWrapper : Process
     /// <summary>
     ///     The POSIX signal that terminated the process (Unix only), obtained via the control adapter.
     /// </summary>
-    internal PosixSignal? Signal => ProcessControlAdapter.GetTerminatingSignal(ExitCode);
+    /// <remarks>
+    ///     On the net11.0 leg this reads the runtime's exit-status introspection
+    ///     (<c>TryWaitForExitStatus</c>) instead of the adapter's 128+n exit-code heuristic.
+    ///     The runtime casts the raw positive native signal number (<c>WTERMSIG</c>) into
+    ///     <see cref="PosixSignal"/>, so before any check, positive raw values are converted
+    ///     through the adapter's platform-specific signal-number mapping; the SIGKILL→null
+    ///     and unknown-signal→null contracts are preserved so both legs report identical
+    ///     <see cref="ProcessResult"/> values.
+    /// </remarks>
+    // On net11.0 the base Process type gains a Signal(PosixSignal) method; this
+    // terminating-signal property intentionally keeps its name, so the hide
+    // warning is suppressed (the net10.0 base has no Signal member at all).
+#pragma warning disable CS0108
+    internal PosixSignal? Signal
+#pragma warning restore CS0108
+    {
+        get
+        {
+#if NET11_0
+            // TimeSpan.Zero makes this a non-blocking status check. Not-yet-exited (or
+            // un-started) falls through to the adapter path below, which reads ExitCode
+            // and throws InvalidOperationException exactly like the net10.0 leg.
+            bool hasStatus;
+#pragma warning disable CA1416 // TryWaitForExitStatus is marked ios/tvos-unsupported; this internal property is only reached from ios/tvos-annotated wait paths.
+            hasStatus = TryWaitForExitStatus(TimeSpan.Zero, out ProcessExitStatus? exitStatus);
+#pragma warning restore CA1416
+            if (hasStatus && exitStatus is not null)
+            {
+                PosixSignal? signal = exitStatus.Signal;
+
+                // The runtime's Unix wait reporting casts the RAW positive native signal
+                // number (WTERMSIG) into the PosixSignal type ((PosixSignal)terminatingSignal
+                // in ProcessWaitState.Unix.cs), but the BCL PosixSignal members are negative
+                // sentinels (SIGTERM = -4, SIGKILL = -11), so a positive value can never
+                // compare equal to a member. Convert positive native numbers through the
+                // adapter's platform-specific mapping (Linux vs BSD numbering) BEFORE the
+                // SIGKILL and undefined-value checks below: raw 15 becomes genuine
+                // PosixSignal.SIGTERM, while numbers the platform mapping table cannot
+                // represent — including SIGKILL (9), which has no entry by contract —
+                // collapse to null.
+                // Negative values (if the runtime ever delivers actual members instead of
+                // raw numbers) pass through untouched; null stays null.
+                if (signal is not null && (int)signal.Value > 0)
+                {
+                    signal = ProcessControlAdapter.MapNativeSignalNumber((int)signal.Value);
+                }
+
+                // Parity with the net10.0 heuristic's contracts: SIGKILL maps to null (a
+                // process cannot catch SIGKILL; callers distinguish library-initiated
+                // forceful kills via ProcessResult.Canceled rather than Signal), and
+                // undefined values (numbers no PosixSignal member models) map to null
+                // just like a table miss in the mapping above.
+#pragma warning disable CA1416 // PosixSignal members are unix-flavoured; Signal is always null on Windows so this comparison never fires there.
+                if (signal is PosixSignal.SIGKILL)
+                    return null;
+#pragma warning restore CA1416
+
+                if (signal is not null && !Enum.IsDefined(signal.Value))
+                    return null;
+
+                return signal;
+            }
+
+            return ProcessControlAdapter.GetTerminatingSignal(ExitCode);
+#else
+            return ProcessControlAdapter.GetTerminatingSignal(ExitCode);
+#endif
+        }
+    }
 
     
     private void OnStarted(object? sender, EventArgs e)
@@ -129,22 +208,32 @@ internal class ProcessWrapper : Process
             // suspend/resume cycle in that case to avoid races on process handles.
             if (HasExited) return;
 
-            // TODO: Replace with ProcessStartInfo.StartSuspended + SafeProcessHandle.Resume()
-            // on Windows and macOS when .NET 11 is added as a target framework.
-            try
+#if NET11_0
+            // On the net11.0 leg, Windows/macOS processes are created suspended via
+            // ProcessStartInfo.StartSuspended (see Start()), so they cannot have run yet
+            // and no suspend step is needed here — the process is simply resumed below
+            // after the resource policy has been applied. Linux/FreeBSD (StartSuspended
+            // is unsupported there) and shell-executed starts (StartSuspended is
+            // incompatible with UseShellExecute) fall through to the legacy
+            // suspend → apply → resume cycle.
+            if (!_awaitingInitialResume)
+#endif
             {
-                SuspendProcess();
-            }
-            catch (InvalidOperationException)
-            {
-                // Process exited before we could suspend it.
-                return;
-            }
-            catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
-            {
-                // Adapter suspend signals a just-exited child; errno ESRCH means it is
-                // gone. Same race as the exiting-before-suspend case above.
-                return;
+                try
+                {
+                    SuspendProcess();
+                }
+                catch (InvalidOperationException)
+                {
+                    // Process exited before we could suspend it.
+                    return;
+                }
+                catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
+                {
+                    // Adapter suspend signals a just-exited child; errno ESRCH means it is
+                    // gone. Same race as the exiting-before-suspend case above.
+                    return;
+                }
             }
 
             try
@@ -181,6 +270,30 @@ internal class ProcessWrapper : Process
                 {
                     // Same as above: the child exited mid-sequence.
                 }
+#if NET11_0
+                catch (Win32Exception)
+                {
+                    // SafeProcessHandle.Resume() (net11.0, Windows/macOS) reports OS
+                    // failures as Win32Exception. Only the exit race is benign: when
+                    // the child is already gone there is nothing to resume. A live
+                    // child whose resume failed would stay creation-suspended forever,
+                    // so terminate it and surface the failure to the caller instead.
+                    if (!HasExited)
+                    {
+                        try
+                        {
+                            ForcefulExit();
+                        }
+                        catch (Exception)
+                        {
+                            // Best-effort kill; swallow any exception to avoid masking
+                            // the resume failure rethrown below.
+                        }
+
+                        throw;
+                    }
+                }
+#endif
             }
         }
     }
@@ -309,6 +422,21 @@ internal class ProcessWrapper : Process
 
     public new bool Start()
     {
+#if NET11_0
+        // net11.0 leg, Windows/macOS ONLY: StartSuspended is annotated for those two
+        // platforms and the runtime throws PlatformNotSupportedException elsewhere —
+        // Linux/FreeBSD have no create-suspended OS primitive — so the property is never
+        // even assigned on those platforms. Shell-executed starts are excluded because
+        // StartSuspended cannot be combined with UseShellExecute (the runtime throws);
+        // those keep the legacy suspend → apply → resume cycle in OnStarted, as do
+        // Linux/FreeBSD on every start.
+        if ((OperatingSystem.IsWindows() || OperatingSystem.IsMacOS())
+            && !StartInfo.UseShellExecute)
+        {
+            StartInfo.StartSuspended = true;
+            _awaitingInitialResume = true;
+        }
+#endif
         try
         {
             HasStarted = base.Start();
@@ -407,6 +535,20 @@ internal class ProcessWrapper : Process
     {
         if (HasExited)
             throw new InvalidOperationException(Resources.Exceptions_Process_CannotResumeExited);
+
+#if NET11_0
+        // One-shot: the creation-suspended release resumes via SafeProcessHandle
+        // (ResumeThread on Windows, SIGCONT on macOS); every later resume takes the
+        // adapter route so all threads resume. The flag stays set if the resume
+        // throws, so the next call retries. Shell-exec starts and Linux/FreeBSD
+        // never set it and keep the adapter route throughout.
+        if (_awaitingInitialResume && (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()))
+        {
+            SafeHandle.Resume();
+            _awaitingInitialResume = false;
+            return;
+        }
+#endif
 
         ProcessControlAdapter.ResumeProcess(this);
     }
