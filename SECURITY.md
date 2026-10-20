@@ -45,14 +45,9 @@ Patches for accepted vulnerabilities will only be created for currently supporte
 ### Currently Supported Versions
 Versions that are currently supported with Bug Fixes and/or Security Fixes are displayed in the table below.
 
-| Version series | Versions Supported with Bug Fixes | Versions Supported with Security Fixes |
-|--| --|--|
-| 3.x | 3.0, 3.1 | 3.0, 3.1 |
-| 2.x | 2.11 | 2.11 |
-| 1.x | :x: | :x: |
-
-### Version Support EOL dates
-| Version line | End of Security Fixes |
-|-|-|
-| 3.0 | December 1st 2026 |
-| 2.11 | December 1st 2026 |
+| Version series | Support Status | End of Security Fixes |
+|-|-|-|
+| 3.1 | Features, Bug Fixes, and Security Fixes | None Scheduled |
+| 3.0 | Security Fixes only | December 1st 2026 |
+| 2.11 | Security Fixes only | December 1st 2026 |
+| 2.10 and older | End Of Life | Ended October 14th 2026 |
