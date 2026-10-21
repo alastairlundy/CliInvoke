@@ -10,8 +10,8 @@
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageTags>shell, pipe, command-line, executable, processconfiguration, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, invocation, execution</PackageTags>
-        <Description>External Process and Cli program running related abstractions implemented by CliInvoke</Description>
+        <PackageTags>shell, pipe, command-line, executable, processconfiguration, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, invocation, execution, abstractions, testing, mock, dependency-injection</PackageTags>
+        <Description>Abstractions and models for running external processes from .NET. Reference CliInvoke.Core in library projects and mock IProcessInvoker in unit tests; install the CliInvoke package for the implementation.</Description>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageReadmeFile>README.md</PackageReadmeFile> 

@@ -10,9 +10,11 @@
 
 <img src="https://github.com/alastairlundy/CliInvoke/blob/main/.assets/icon.png" width="192" height="192" alt="CliInvoke Logo">
 
-CliInvoke is a .NET library for interacting with Command Line Interfaces and wrapping around executables.
+CliInvoke runs external processes from C# without the `System.Diagnostics.Process` footguns.
 
-Launch processes, redirect standard input and output streams, and await process completion.
+* Capture standard output and error in buffered mode without the classic stream deadlocks.
+* Enforce timeouts and cancellation, with the process killed when a timeout fires.
+* Unit-test your process-calling code by mocking `IProcessInvoker` from `CliInvoke.Core` instead of spawning real processes.
 
 ## Table of Contents
 
@@ -30,12 +32,11 @@ Launch processes, redirect standard input and output streams, and await process 
 
 ## Features
 
-* Clear separation of concerns between Process Configuration Builders and Process Configuration Models.
-* Supports .NET 10 and .NET 11 and has few dependencies.
+* Launch guardrails: the Windows command-line length check catches the ~32,767 character `CreateProcess` limit before the process starts, instead of failing later with Win32 error 206.
+* Mockable design: reference `CliInvoke.Core` abstractions in your libraries and mock `IProcessInvoker` in unit tests.
+* A middleware pipeline for logging, retries, output truncation, and post-exit validation; PowerShell and CMD specializations via `UsePowerShell` and `UseCmd` <sup>1</sup>
 * Dependency Injection extensions register `IProcessInvoker`, `IExternalProcessFactory`, and middleware from a single `AddCliInvoke()` call.
-* Support for specific specializations such as running executables or commands via Windows PowerShell or CMD on
-  Windows <sup>1</sup>
-* [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support
+* AOT compatible, trimmable, few dependencies, and [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support. Supports .NET 10 and .NET 11.
 
 <sup>1</sup> Specializations library distributed separately.
 
@@ -44,6 +45,8 @@ Launch processes, redirect standard input and output streams, and await process 
 CliInvoke is compared against [CliWrap](https://github.com/Tyrrrz/CliWrap/), [ProcessX](https://github.com/Cysharp/ProcessX), and the built-in .NET `Process` class across features like configuration separation, DI support, middleware, cross-platform support, and licensing.
 
 See the [full comparison table](https://alastairlundy.github.io/CliInvoke/docs/comparison) for a detailed feature-by-feature breakdown.
+
+Choose CliInvoke when DI integration, middleware, and mockable abstractions matter. If CliWrap's streaming API fits your project and you don't need those, it remains a solid choice.
 
 ## Installing CliInvoke
 
@@ -71,6 +74,8 @@ The package(s) to install depends on your use case:
 ## Supported Platforms
 
 CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android (untested). Note: the PowerShell middleware does not support Android — shell specializations via `UsePowerShell` are unavailable there.
+
+CliInvoke targets .NET 10 and .NET 11 only, by design. .NET 8 and .NET 9 leave Microsoft support in November 2026, and supporting netstandard2.0 in v2 added real maintenance cost. The 2.x release line, which supports older runtimes, is itself unsupported after December 1, 2026.
 
 For more details see the [list of supported platforms](https://alastairlundy.github.io/CliInvoke/docs/Supported-OperatingSystems)
 

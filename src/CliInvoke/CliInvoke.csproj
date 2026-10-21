@@ -7,7 +7,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <Title>CliInvoke</Title>
         <Authors>AlastairLundy</Authors>
-        <Description>CliInvoke is a .NET Library for interacting with Command Line Interfaces, CliInvoke is a library for interacting with Command Line Interfaces and wrapping around executables.</Description>
+        <Description>Run external processes in C# without System.Diagnostics.Process footguns. Mockable abstractions, DI, and middleware included.</Description>
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -36,7 +36,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>3.2.0-alpha.1</PackageVersion>
         <AssemblyVersion>3.1.0.0</AssemblyVersion>
-        <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, invocation, execution</PackageTags>
+        <PackageTags>shell,command-line,cli,automation,execute,executable,wrapper,powershell,cmd,timeout,cancellation,standard-input,standard-output,standard-error,invoke,process,invocation,execution</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
