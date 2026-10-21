@@ -43,7 +43,10 @@ minimise backtracking.
 4. **[Architecture](architecture.md)** — once you have written a few
    invocations, read this to understand the four-stage data-flow, the
    Process Invocation Pipeline, and where cross-cutting concerns plug in.
-5. **[Troubleshooting](troubleshooting.md)** — keep this as a reference for
+5. **[Guarded execution for automation and agents](guarded-execution.md)** —
+   read this if your code shells out from a harness, CI, or a service; it maps
+   the four failure modes of automation onto CliInvoke's guards and contracts.
+6. **[Troubleshooting](troubleshooting.md)** — keep this as a reference for
    when something goes wrong; it is symptom-organised, not narrative.
 
 After the first pass, you will probably treat this section as a reference
@@ -96,6 +99,21 @@ modes: process hangs, `ObjectDisposedException`, exit-code mismatches,
 file-not-found errors, and resource leaks. Each section lists the likely
 causes in priority order with a concrete detection method. Keep this as
 a reference for when an invocation misbehaves.
+
+### [Guarded execution for automation and agents](guarded-execution.md)
+
+Failure-mode-organised guide for code that shells out from agent harnesses,
+CI runners, and services: the default guards, timeout and cancellation
+contracts, output caps, exit validation, safe retries, secret redaction, and
+raw-mode caveats. Each section pairs one automation failure mode with the
+guard that answers it.
+
+### [OpenTelemetry tracing middleware](opentelemetry-middleware.md)
+
+A copy-paste middleware recipe that emits one span per invocation (exit
+code, duration, canceled flag) through `System.Diagnostics.ActivitySource`,
+wired into OpenTelemetry with no new package. Start here when you want
+subprocess visibility in your traces.
 
 ## Where to go next
 
