@@ -114,7 +114,12 @@ public static class CliRun
     /// The process configuration defining how to run the process, including settings such as working directory, timeout, and other parameters.
     /// </param>
     /// <param name="exitConfiguration">
-    /// The configuration that determines how the process is terminated; defaults to a graceful configuration if not provided.
+    /// The configuration that determines how the process is terminated; defaults to
+    /// <see cref="ProcessExitConfigurationCreationExtensions.CreateGraceful()"/> if not provided, which
+    /// suppresses unexpected-exit exceptions and returns a <c>Canceled</c> result on
+    /// timeout or cancellation. Pass <c>ProcessExitConfiguration.Default</c>
+    /// (equivalent to <c>new ProcessExitConfiguration()</c>) to allow unexpected-exit
+    /// exceptions instead.
     /// </param>
     /// <param name="cancellationToken">
     /// A token that, if cancelled, will be used to cancel the operation.
@@ -164,7 +169,13 @@ public static class CliRun
     /// </param>
     /// <returns>
     /// A task representing the asynchronous operation. The result is a <see cref="BufferedProcessResult"/>
-    /// object containing the full output of the process and execution details.
+    /// object containing the full output of the process and execution details. When the operation is
+    /// cancelled mid-run, a normal result with <c>Canceled</c> set to <see langword="true"/> and empty
+    /// captured output is returned instead of throwing, because the applied graceful exit configuration
+    /// leaves <see cref="ProcessExitConfiguration.CancellationThrowsException"/> false; to receive an
+    /// <see cref="OperationCanceledException"/> instead, use the
+    /// <see cref="RunBufferedAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)"/>
+    /// overload and set <c>CancellationThrowsException</c> to <see langword="true"/>.
     /// </returns>
     public static async Task<BufferedProcessResult> RunBufferedAsync(string targetFilePath,
         string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null,
@@ -211,7 +222,13 @@ public static class CliRun
     /// </param>
     /// <returns>
     /// A task representing the asynchronous operation. The result is a <see cref="BufferedProcessResult"/>
-    /// object containing the full output of the process and execution details.
+    /// object containing the full output of the process and execution details. When the operation is
+    /// cancelled mid-run, a normal result with <c>Canceled</c> set to <see langword="true"/> and empty
+    /// captured output is returned instead of throwing, because the applied graceful exit configuration
+    /// leaves <see cref="ProcessExitConfiguration.CancellationThrowsException"/> false; to receive an
+    /// <see cref="OperationCanceledException"/> instead, use the
+    /// <see cref="RunBufferedAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)"/>
+    /// overload and set <c>CancellationThrowsException</c> to <see langword="true"/>.
     /// </returns>
     public static async Task<BufferedProcessResult> RunBufferedAsync(
         string targetFilePath, IEnumerable<string> arguments,
@@ -235,13 +252,24 @@ public static class CliRun
     /// The process configuration defining how to run the process.
     /// </param>
     /// <param name="exitConfiguration">
-    /// The configuration that determines how the process is terminated; defaults to a graceful configuration if not provided.
+    /// The configuration that determines how the process is terminated; defaults to
+    /// <see cref="ProcessExitConfigurationCreationExtensions.CreateGraceful()"/> if not provided, which
+    /// suppresses unexpected-exit exceptions and returns a <c>Canceled</c> result on
+    /// timeout or cancellation. Pass <c>ProcessExitConfiguration.Default</c>
+    /// (equivalent to <c>new ProcessExitConfiguration()</c>) to allow unexpected-exit
+    /// exceptions instead.
     /// </param>
     /// <param name="cancellationToken">
     /// A token that, if cancelled, will be used to cancel the operation.
     /// </param>
     /// <returns>
-    /// The buffered result of the process execution.
+    /// The buffered result of the process execution. When cancellation occurs and
+    /// <see cref="ProcessExitConfiguration.CancellationThrowsException"/> on
+    /// <paramref name="exitConfiguration"/> is <see langword="false"/> (the default when no exit
+    /// configuration is supplied), a normal result with <c>Canceled</c> set to
+    /// <see langword="true"/> and empty captured output is returned instead of throwing; set
+    /// <c>CancellationThrowsException</c> to <see langword="true"/> to receive an
+    /// <see cref="OperationCanceledException"/> instead.
     /// </returns>
     public static Task<BufferedProcessResult> RunBufferedAsync(
         ProcessConfiguration configuration,
@@ -263,8 +291,30 @@ public static class CliRun
     /// </summary>
     /// <param name="configuration">The configuration settings for starting the process.</param>
     /// <returns>The process ID of the started process.</returns>
+    /// <exception cref="ArgumentException">
+    ///     Thrown when <paramref name="configuration" /> enables
+    ///     <see cref="ProcessConfiguration.OutputRedirection" /> or
+    ///     <see cref="ProcessConfiguration.RedirectStandardInput" />. The process handle is
+    ///     disposed immediately after start, so no one drains the redirected pipes and the
+    ///     child would hang or fail silently; use
+    ///     <see cref="RunAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)" />
+    ///     or
+    ///     <see cref="RunBufferedAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)" />
+    ///     instead. The string-arguments overload forces output redirection off and is safe.
+    ///     Note that the position-argument <see cref="ProcessConfiguration" /> constructors
+    ///     default <c>outputRedirection</c> to <see langword="true" />, so pass
+    ///     <see langword="false" /> explicitly when building a configuration for this method.
+    /// </exception>
     public static int FireAndForget(ProcessConfiguration configuration)
     {
+        if (configuration.OutputRedirection || configuration.RedirectStandardInput)
+            throw new ArgumentException(
+                "FireAndForget does not support redirected output or standard input: the "
+                + "process handle is disposed immediately after start, so no one drains the "
+                + "pipes. Use RunAsync or RunBufferedAsync instead, or the string-arguments "
+                + "FireAndForget overload, which forces output redirection off.",
+                nameof(configuration));
+
         using IExternalProcess p = new ExternalProcessFactory().CreateExternalProcess(configuration);
         return p.Start();
     }

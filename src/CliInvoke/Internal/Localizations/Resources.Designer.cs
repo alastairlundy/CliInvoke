@@ -265,5 +265,14 @@ namespace CliInvoke.Internal.Localizations {
                 return ResourceManager.GetString("Excpetions.RetryMiddleware.RetryOptions.BaseDelay.NotNegative", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to retrying an invocation with a non-seekable standard input stream cannot replay the input.
+        /// </summary>
+        internal static string Exceptions_RetryMiddleware_NonSeekableStandardInput {
+            get {
+                return ResourceManager.GetString("Exceptions.RetryMiddleware.NonSeekableStandardInput", resourceCulture);
+            }
+        }
     }
 }

@@ -206,6 +206,14 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     to the spawned process, this has no effect on process execution. The snapshot also
     ///     isolates the configuration from later mutations made to the caller's original
     ///     dictionary.
+    ///     <para>
+    ///         A null value for a variable removes that variable from the child process's
+    ///         environment: the value inherited from the current process is not passed on. An
+    ///         empty string instead sets an empty value and does not remove the variable. Null
+    ///         values are only honourable through direct initialisation of this property; the
+    ///         <c>EnvironmentVariablesSpec</c> builder API rejects them with an
+    ///         <see cref="ArgumentNullException"/>.
+    ///     </para>
     /// </remarks>
     public IReadOnlyDictionary<string, string> EnvironmentVariables
     {

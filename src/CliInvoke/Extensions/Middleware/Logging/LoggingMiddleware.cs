@@ -71,7 +71,13 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        string sanitizedArgs = Sanitize(context.Configuration.Arguments);
+        // Prefer the single-string Arguments; when the caller (or a shell middleware)
+        // populated ArgumentList instead, log the joined list so the entry line is truthful.
+        string argumentsForLogging = !string.IsNullOrWhiteSpace(context.Configuration.Arguments)
+            ? context.Configuration.Arguments
+            : string.Join(" ", context.Configuration.ArgumentList);
+
+        string sanitizedArgs = Sanitize(argumentsForLogging);
 
         _logger.LogInformation("Invoking process {TargetFilePath} with arguments {Arguments}",
             context.Configuration.TargetFilePath,

@@ -82,8 +82,11 @@ public class CliRunTests
     [Test]
     public async Task FireAndForget_WithConfig_StartsProcessAndReturnsProcessId()
     {
+        // Redirecting output is rejected by FireAndForget (the process handle is
+        // disposed immediately after start, so nobody drains the pipes); pass
+        // outputRedirection: false explicitly, because the ctor defaults it to true.
         ProcessConfiguration configuration =
-            new ProcessConfiguration(TargetFilePath, TargetArguments);
+            new ProcessConfiguration(TargetFilePath, TargetArguments, outputRedirection: false);
 
         int processId = CliRun.FireAndForget(configuration);
 
@@ -102,9 +105,31 @@ public class CliRunTests
     public async Task FireAndForget_WithInvalidConfig_Throws()
     {
         ProcessConfiguration configuration =
-            new ProcessConfiguration("NONEXISTENT_COMMAND_ABC123.exe", "");
+            new ProcessConfiguration("NONEXISTENT_COMMAND_ABC123.exe", "", outputRedirection: false);
 
         await Assert.That(() => CliRun.FireAndForget(configuration))
             .Throws<FileNotFoundException>();
+    }
+
+    [Test]
+    public async Task FireAndForget_WithRedirectedOutput_Throws()
+    {
+        ProcessConfiguration configuration =
+            new ProcessConfiguration(TargetFilePath, TargetArguments)
+                { OutputRedirection = true };
+
+        await Assert.That(() => CliRun.FireAndForget(configuration))
+            .Throws<ArgumentException>();
+    }
+
+    [Test]
+    public async Task FireAndForget_WithRedirectedStandardInput_Throws()
+    {
+        ProcessConfiguration configuration =
+            new ProcessConfiguration(TargetFilePath, TargetArguments)
+                { RedirectStandardInput = true };
+
+        await Assert.That(() => CliRun.FireAndForget(configuration))
+            .Throws<ArgumentException>();
     }
 }

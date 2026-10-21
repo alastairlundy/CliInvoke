@@ -76,6 +76,9 @@ internal sealed class RetryMiddleware : IProcessMiddleware
 
         do
         {
+            if (attempts > 0)
+                ResetStandardInputForRetry(context);
+
             await next(context).ConfigureAwait(false);
 
             attempts++;
@@ -94,6 +97,25 @@ internal sealed class RetryMiddleware : IProcessMiddleware
             await Task.Delay(delay, context.CancellationToken).ConfigureAwait(false);
         }
         while (attempts < _options.MaxAttempts);
+    }
+
+    // A previous attempt's stdin copy consumed the source stream to its end; replaying without
+    // rewinding would send empty input to the child. Non-seekable sources cannot be rewound, so
+    // they fail loudly here - at the moment a retry would occur - instead of silently corrupting.
+    private static void ResetStandardInputForRetry(InvocationContext context)
+    {
+        Stream? source = context.Configuration.StandardInput?.BaseStream;
+
+        if (source is null)
+            return;
+
+        if (source.CanSeek)
+        {
+            source.Position = 0;
+            return;
+        }
+
+        throw new InvalidOperationException(Resources.Exceptions_RetryMiddleware_NonSeekableStandardInput);
     }
 
     // The maximum delay Task.Delay accepts; larger values throw ArgumentOutOfRangeException.

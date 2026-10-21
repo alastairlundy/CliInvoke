@@ -92,4 +92,7 @@
     <data name="Excpetions.RetryMiddleware.RetryOptions.BaseDelay.NotNegative" xml:space="preserve">
         <value>RetryOptions.BaseDelay must not be negative; a negative delay would cause Task.Delay to throw on the first retry.</value>
     </data>
+    <data name="Exceptions.RetryMiddleware.NonSeekableStandardInput" xml:space="preserve">
+        <value>retrying an invocation with a non-seekable standard input stream cannot replay the input</value>
+    </data>
 </root>

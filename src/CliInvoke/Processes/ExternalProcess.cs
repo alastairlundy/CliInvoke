@@ -25,18 +25,32 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     private bool _disposed;
 
     private readonly IFilePathResolver _filePathResolver;
+    private readonly FileInfo _resolvedFilePath;
 
     /// <summary>
-    /// 
+    ///     Initialises a new instance of the <see cref="ExternalProcess" /> class,
+    ///     resolving <see cref="ProcessConfiguration.TargetFilePath" /> once at construction
+    ///     and reusing the resolved path in <see cref="Start" /> and
+    ///     <see cref="StartAsync(CancellationToken)" />.
     /// </summary>
-    /// <param name="filePathResolver"></param>
-    /// <param name="configuration"></param>
-    /// <param name="exitConfiguration"></param>
+    /// <param name="filePathResolver">The resolver used to locate the target executable.</param>
+    /// <param name="configuration">The configuration settings for the process.</param>
+    /// <param name="exitConfiguration">
+    ///     The exit configuration controlling timeout, cancellation, and exception handling;
+    ///     defaults to <see cref="ProcessExitConfigurationCreationExtensions.CreateGraceful()" /> if
+    ///     <see langword="null" />, which suppresses unexpected-exit exceptions. Pass
+    ///     <c>ProcessExitConfiguration.Default</c> (equivalent to
+    ///     <c>new ProcessExitConfiguration()</c>) to allow unexpected-exit exceptions instead.
+    /// </param>
+    /// <exception cref="FileNotFoundException">
+    ///     Thrown at construction when the target file cannot be resolved.
+    /// </exception>
     public ExternalProcess(IFilePathResolver filePathResolver, ProcessConfiguration configuration,
         ProcessExitConfiguration? exitConfiguration = null)
     {
         _filePathResolver = filePathResolver;
-        _processWrapper = new ProcessWrapper(configuration, _filePathResolver.ResolveFilePath(configuration.TargetFilePath));
+        _resolvedFilePath = filePathResolver.ResolveFilePath(configuration.TargetFilePath);
+        _processWrapper = new ProcessWrapper(configuration, _resolvedFilePath);
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
 
@@ -115,12 +129,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             if (_processWrapper.HasStarted)
                 throw new InvalidOperationException("The process has already been started.");
 
-            FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
-
             _processWrapper.Started -= _startedHandler;
             _processWrapper.Exited -= _exitedHandler;
             _processWrapper.Dispose();
-            _processWrapper = new ProcessWrapper(Configuration, filePath);
+            _processWrapper = new ProcessWrapper(Configuration, _resolvedFilePath);
 
             _processWrapper.Started += _startedHandler;
             _processWrapper.Exited += _exitedHandler;
@@ -164,12 +176,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             if (_processWrapper.HasStarted)
                 throw new InvalidOperationException("The process has already been started.");
 
-            FileInfo filePath = _filePathResolver.ResolveFilePath(Configuration.TargetFilePath);
-
             _processWrapper.Started -= _startedHandler;
             _processWrapper.Exited -= _exitedHandler;
             _processWrapper.Dispose();
-            _processWrapper = new ProcessWrapper(Configuration, filePath);
+            _processWrapper = new ProcessWrapper(Configuration, _resolvedFilePath);
 
             _processWrapper.Started += _startedHandler;
             _processWrapper.Exited += _exitedHandler;
@@ -328,7 +338,14 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     /// </param>
     /// <returns>
     ///     A task that represents the asynchronous operation. The result contains the buffered
-    ///     process result when the method completes.
+    ///     process result when the method completes. When cancellation occurs and
+    ///     <see cref="ProcessExitConfiguration.CancellationThrowsException"/> is
+    ///     <see langword="false"/> (the default), the method returns a normal
+    ///     <see cref="BufferedProcessResult"/> with <c>Canceled</c> set to
+    ///     <see langword="true"/> and empty captured standard output and standard error
+    ///     instead of throwing; an <see cref="OperationCanceledException"/> is thrown only
+    ///     when <see cref="ProcessExitConfiguration.CancellationThrowsException"/> is
+    ///     <see langword="true"/> or when a genuine stream failure occurs.
     /// </returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -375,15 +392,42 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 // the kill machinery un-run and still propagates, as do any wait
                 // or drain faults.
             }
+            catch (Exception ex) when (ex is OperationCanceledException
+                                       && !ExitConfiguration.CancellationThrowsException
+                                       && cancellationToken.IsCancellationRequested
+                                       && !waitTask.IsFaulted
+                                       && !standardInputCopy.IsFaulted
+                                       && wrapper.Canceled)
+            {
+                // A stream-read OperationCanceledException raised by this instance's
+                // own cancellation machinery (the drains observe the caller's token)
+                // is absorbed so the documented CancellationThrowsException=false
+                // contract holds: the caller receives a normal BufferedProcessResult
+                // with Canceled set and empty captured output instead of an escaping
+                // exception. When CancellationThrowsException is true nothing from
+                // the cancellation machinery is absorbed — the OCE propagates whether
+                // it surfaces from the wait or from the drain (the two faults race,
+                // so the knob is checked here rather than relying on which task
+                // faults first). Genuine (non-OCE) read failures and wait faults
+                // always propagate.
+            }
+
+            // An absorbed output-drain cancellation leaves outputStrings without a
+            // result, so read it only on successful completion; cancelled reads
+            // yield no partial strings.
+            (string StandardOutput, string StandardError, bool WasTruncated) capturedOutput =
+                outputStrings.Status == TaskStatus.RanToCompletion
+                    ? outputStrings.Result
+                    : (string.Empty, string.Empty, false);
 
             BufferedProcessResult result = new BufferedProcessResult(wrapper.StartInfo.FileName,
                 wrapper.ExitCode,
-                wrapper.Id, outputStrings.Result.StandardOutput, outputStrings.Result.StandardError,
+                wrapper.Id, capturedOutput.StandardOutput, capturedOutput.StandardError,
                 wrapper.StartTime,
                 wrapper.ExitTime,
                 canceled: wrapper.Canceled,
                 signal: wrapper.Signal,
-                wasTruncated: outputStrings.Result.WasTruncated);
+                wasTruncated: capturedOutput.WasTruncated);
 
             return result;
         }
