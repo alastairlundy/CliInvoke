@@ -1048,6 +1048,34 @@ internal class ProcessWrapper : Process
             if (!HasExited && !isGraceful)
                 ForcefulExit();
 
+            // ForcefulExit (Kill) returns before the OS has reaped the child, so a
+            // caller reading ExitCode immediately after this method returns could
+            // otherwise observe "process must exit before requested information can
+            // be determined". Poll for actual termination (bounded) before returning;
+            // re-issue the forceful kill if the first attempt did not take.
+            bool exited;
+            try { exited = HasExited; }
+            catch (ObjectDisposedException) { exited = true; }
+            catch (InvalidOperationException) { exited = false; }
+
+            if (!exited)
+            {
+                try { ForcefulExit(); }
+                catch (InvalidOperationException) { /* already exited */ }
+                catch (Win32Exception) { /* access denied / no such process */ }
+                DateTime deadline = DateTime.UtcNow.AddSeconds(5);
+                while (true)
+                {
+                    try { exited = HasExited; }
+                    catch (ObjectDisposedException) { exited = true; }
+                    catch (InvalidOperationException) { exited = false; }
+                    if (exited || DateTime.UtcNow >= deadline)
+                        break;
+                    try { await Task.Delay(25, CancellationToken.None).ConfigureAwait(false); }
+                    catch { break; }
+                }
+            }
+
             // Belt-and-braces for returns that skipped the exit watches (e.g. a swallowed
             // exception): once the process is known exited, publish ExitTime.
             EnsureExitTime();
