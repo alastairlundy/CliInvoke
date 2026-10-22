@@ -245,9 +245,11 @@ catching these to keep running with a configuration that cannot work.
 
 CliInvoke decodes child output as UTF-8 by default, which is correct for
 modern tools. Older Windows tools emit OEM or ANSI code-page text, and
-decoding that as UTF-8 produces mojibake. When you know a tool emits legacy
+decoding that as UTF-8 produces
+[mojibake](https://en.wikipedia.org/wiki/Mojibake). When you know a tool emits legacy
 code-page output, set its encodings explicitly in the configuration. See the
-[troubleshooting guide](troubleshooting.md) for the detection steps.
+[troubleshooting guide](troubleshooting.md#child-output-encoding-mojibake)
+for the detection steps and code samples.
 
 ## Anti-patterns
 

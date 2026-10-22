@@ -13,7 +13,7 @@ detection method.
 ## How to use this page
 
 1. Identify which category matches the symptom (process hangs, exception on
-   shutdown, exit code mismatch, file not found, etc.).
+   shutdown, exit code mismatch, file not found, garbled output, etc.).
 2. Walk the **Common causes** list top-to-bottom; each cause is a single,
    specific mistake with a fix.
 3. Use the **Detection** subsection to confirm the cause with a tool
@@ -286,6 +286,90 @@ the result is constructed.
   policy.TimeoutThreshold, policy.TimeoutExitBehaviour)`.
 - Reproduce locally with a longer timeout and `ProcessExitBehaviour.ForcefulExit`
   to distinguish "process is slow" from "process is hung".
+
+---
+
+## Child Output Encoding (Mojibake)
+
+CliInvoke decodes redirected child output as UTF-8
+(`Encoding.Default` on .NET 10). Modern tools emit UTF-8, so this default
+is right most of the time. Older Windows tools emit text in the console's
+OEM code page (CP437, CP850) or an ANSI code page (CP1252). Decoding those
+bytes as UTF-8 produces [mojibake](https://en.wikipedia.org/wiki/Mojibake),
+the same bytes read with the wrong character table.
+
+### Symptoms
+
+- Replacement characters (`U+FFFD`, �) in captured output.
+- Accented or non-English text that renders correctly in a console window
+  but arrives doubled or scrambled in `BufferedProcessResult`
+  (`Ã©` where the child printed `é`).
+- stdout decoded correctly while stderr is garbled, or the reverse.
+- `ArgumentException` from `Encoding.GetEncoding(<code page>)` before any
+  process starts.
+
+### Common causes
+
+1. **A legacy Windows child emitting OEM or ANSI code-page text.**
+   cmd.exe built-ins, .NET Framework-era tools, and anything writing to
+   the console with the active code page. The captured bytes are correct;
+   UTF-8 is the wrong decoding table for them.
+2. **Assuming `Encoding.Default` is the ANSI code page.** It was on .NET
+   Framework. On .NET 10 it is UTF-8.
+3. **Skipping `CodePagesEncodingProvider` registration.** Code-page
+   encodings such as CP850 and CP1252 are not built into the runtime.
+   Without
+   `Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)`,
+   `Encoding.GetEncoding(850)` throws `ArgumentException` instead of
+   returning the encoding.
+4. **Fixing only one stream.** stdout, stderr, and stdin each carry their
+   own encoding. Setting `StandardOutputEncoding` alone leaves stderr
+   decoding as UTF-8.
+5. **Writing stdin in a different encoding than the child reads.** The
+   `StreamWriter` you assign to `StandardInput` carries its own
+   `Encoding`, and that is what puts bytes on the pipe. Keep it aligned
+   with `StandardInputEncoding` and with what the child expects.
+
+### Fix
+
+Set the encodings explicitly to the child's actual code page. Both API
+surfaces do the same thing:
+
+```csharp
+using System.Text;
+
+// Register once at startup; without it, GetEncoding(850) throws.
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+Encoding oem = Encoding.GetEncoding(850); // confirm the number with `chcp`, below
+
+// Init-property construction (the convenience constructor already redirects output)
+ProcessConfiguration config = new ProcessConfiguration(targetFilePath: "legacy-tool.exe")
+{
+    StandardOutputEncoding = oem,
+    StandardErrorEncoding = oem,
+};
+
+// Builder construction (all three streams in one call)
+ProcessConfigurationBuilder builder = new("legacy-tool.exe");
+builder.SetEncoding(standardOutputEncoding: oem, standardErrorEncoding: oem);
+```
+
+For redirected stdin, wrap the payload in a `StreamWriter` built with the
+same encoding so the bytes you write match what the child decodes.
+
+### Detection
+
+| Platform | Command | What to look for |
+|----------|---------|------------------|
+| Windows | `chcp` in cmd, or `[Console]::OutputEncoding` in pwsh | The active console code page (437, 850, 1252, 936, ...). Match it in `SetEncoding`. |
+| Any | Inspect captured output for `U+FFFD` (�) | The decoder hit bytes invalid in the current encoding. That is the mojibake signature. |
+| Any | `Format-Hex` (pwsh) or `xxd` on a redirected sample | Compare the raw bytes against the code page's table to confirm what the child emits. |
+
+The UTF-8 default is deliberate. Any default breaks some class of
+children, and UTF-8 is what pwsh 7, git, and node emit, so the fix is an
+explicit override rather than a different default. For the history of the
+.NET encoding default, see
+[Everything wrong with Process in C#](everything-wrong-with-process-in-csharp.md).
 
 ---
 

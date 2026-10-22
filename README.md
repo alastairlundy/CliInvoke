@@ -129,6 +129,9 @@ For fine-grained control over process execution — custom timeouts, cancellatio
 
 > Most configurations are built with direct init construction (see [Configuration Patterns](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern)). The builder path is for argument escaping, user credentials, and resource policy features.
 
+> [!NOTE]
+> Child output is decoded as UTF-8 by default. Legacy Windows tools that emit OEM or ANSI code-page text need their encodings set explicitly, through the `StandardOutputEncoding`/`StandardErrorEncoding` init properties or the builder's `SetEncoding` method, or captured output comes back as mojibake. See the [troubleshooting guide](https://alastairlundy.github.io/CliInvoke/docs/guides/troubleshooting).
+
 ## Middleware
 
 CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns — logging, validation, platform selection, retries — around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`) remain identical.

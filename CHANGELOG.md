@@ -12,6 +12,10 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 - All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks.
 
+### Docs
+
+- Troubleshooting guide: new "Child Output Encoding (Mojibake)" section covering the UTF-8 output-decoding default, with detection steps and code samples for overriding encodings on legacy Windows OEM/ANSI children. Documentation only; no behavior change.
+
 ## [3.1.0] - 2026-10-19
 
 ### Added

@@ -473,8 +473,14 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     ///     The encoding scheme to use for standard input.
     ///     Uses the Default Encoding if null.
     /// </param>
-    /// <param name="standardOutputEncoding">The encoding scheme to use for standard output.</param>
-    /// <param name="standardErrorEncoding">The encoding scheme to use for standard error.</param>
+    /// <param name="standardOutputEncoding">
+    ///     The encoding scheme to use for standard output.
+    ///     Uses the Default Encoding if null.
+    /// </param>
+    /// <param name="standardErrorEncoding">
+    ///     The encoding scheme to use for standard error.
+    ///     Uses the Default Encoding if null.
+    /// </param>
     /// <returns>The same builder instance, with stream encodings set.</returns>
     public IProcessConfigurationBuilder SetEncoding(Encoding? standardInputEncoding = null,
         Encoding? standardOutputEncoding = null, Encoding? standardErrorEncoding = null)

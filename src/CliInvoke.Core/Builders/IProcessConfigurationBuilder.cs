@@ -149,12 +149,21 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder EnableWindowCreation(bool enableWindowCreation);
 
     /// <summary>
-    ///     Sets the Encoding types to be used for Standard Input.
+    ///     Sets the encodings used for the standard input, output, and error streams.
     /// </summary>
-    /// <param name="standardInputEncoding">The encoding type to be used for the Standard Input.</param>
-    /// <param name="standardOutputEncoding"></param>
-    /// <param name="standardErrorEncoding"></param>
-    /// <returns>The new IProcessConfigurationBuilder with the specified Pipe Encoding types.</returns>
+    /// <param name="standardInputEncoding">
+    ///     The encoding for standard input. Kept unchanged when null; the initial
+    ///     encoding is <see cref="Encoding.Default"/>.
+    /// </param>
+    /// <param name="standardOutputEncoding">
+    ///     The encoding for standard output. Kept unchanged when null; the initial
+    ///     encoding is <see cref="Encoding.Default"/>.
+    /// </param>
+    /// <param name="standardErrorEncoding">
+    ///     The encoding for standard error. Kept unchanged when null; the initial
+    ///     encoding is <see cref="Encoding.Default"/>.
+    /// </param>
+    /// <returns>The same builder instance, with the specified stream encodings set.</returns>
     IProcessConfigurationBuilder SetEncoding(Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null);
 
