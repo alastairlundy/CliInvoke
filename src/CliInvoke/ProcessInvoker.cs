@@ -93,6 +93,17 @@ public class ProcessInvoker : IProcessInvoker
     ///     Runs the process asynchronously, waits for exit, and safely disposes of the Process before
     ///     returning.
     /// </summary>
+    /// <remarks>
+    ///     Raw mode does not capture output. When <paramref name="processConfiguration"/> has
+    ///     <see cref="ProcessConfiguration.OutputRedirection"/> enabled, the pipeline
+    ///     forces it off for the invocation so the child inherits the parent's handles
+    ///     instead of writing to a pipe that Raw mode never drains (the raw-mode pipe
+    ///     deadlock). Nothing readable is lost: no public Raw-mode surface exposes
+    ///     output. To capture output, use
+    ///     <see cref="ExecuteBufferedAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)"/>.
+    ///     Direct <see cref="CliInvoke.Core.Processes.IExternalProcess.WaitForExitOrTimeoutAsync(CancellationToken)"/>
+    ///     users bypass this normalization — see that member's remarks.
+    /// </remarks>
     /// <param name="processConfiguration">The configuration to use for the process.</param>
     /// <param name="processExitConfiguration">
     ///     The exit configuration to use for the process, or

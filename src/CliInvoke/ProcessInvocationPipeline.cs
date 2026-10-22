@@ -41,8 +41,22 @@ internal class ProcessInvocationPipeline
     {
         long? truncationCap = ctx.ExitConfiguration.MaxBufferedOutputBytes;
 
+        // H2: Raw mode waits for exit without draining redirected output, so a redirected
+        // pipe nobody reads fills up and blocks the child (the raw-mode pipe deadlock).
+        // Force redirection off for the invocation — the same protective normalization the
+        // Specializations shell middleware applies — so the child inherits the parent's
+        // handles instead. Buffered mode is untouched: it drains concurrently via the
+        // capture methods. A member-wise copy (not a builder round-trip) preserves the
+        // source configuration exactly, including null env-var removal values (L6).
+        ProcessConfiguration configuration = ctx.Configuration;
+        if (ctx.Mode == InvocationMode.Raw && configuration.OutputRedirection)
+        {
+            configuration = ProcessConfigurationDerivation
+                .WithOutputRedirectionDisabled(configuration);
+        }
+
         IExternalProcess externalProcess = _externalProcessFactory.CreateExternalProcess(
-            ctx.Configuration, ctx.ExitConfiguration);
+            configuration, ctx.ExitConfiguration);
 
         static void ValidateResult<TProcessResult>(TProcessResult result, ProcessExitConfiguration? exitConfiguration)
             where TProcessResult : ProcessResult

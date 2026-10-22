@@ -90,6 +90,18 @@ public interface IExternalProcess : IDisposable
     /// <summary>
     ///     Asynchronously waits for the process to exit or a specified timeout period to elapse.
     /// </summary>
+    /// <remarks>
+    ///     This method does not drain redirected output. When
+    ///     <see cref="Configuration"/> has <see cref="ProcessConfiguration.OutputRedirection"/>
+    ///     enabled and the child writes more than the operating-system pipe buffer, the
+    ///     child blocks on the full pipe and the wait never completes (the raw-mode pipe
+    ///     deadlock). The invocation pipelines (<c>CliRun</c>, <c>IProcessInvoker</c>)
+    ///     normalize Raw-mode invocations by forcing redirection off before the process
+    ///     starts; direct <see cref="IExternalProcess"/> users bypass that pipeline, so
+    ///     either disable output redirection or use
+    ///     <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)"/> to
+    ///     capture (and thereby drain) the redirected streams.
+    /// </remarks>
     /// <param name="cancellationToken">
     ///     A cancellation token that can be used by other objects or threads
     ///     to receive notice of cancellation.

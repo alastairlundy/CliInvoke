@@ -30,8 +30,13 @@ public class ProcessInvokerIntegrationTests
         IProcessInvoker processInvoker =
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
+        // /c keeps the child non-interactive: since the H2 Raw-mode normalization removed
+        // output redirection, a bare `cmd` inherits the host's interactive console stdin
+        // and waits at its REPL for keyboard input instead of exiting. The test's intent
+        // is a trivially successful process, not cmd's REPL behaviour.
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath, "");
+            new ProcessConfiguration(_targetFilePath,
+                OperatingSystem.IsWindows() ? "/c exit 0" : string.Empty);
 
         ProcessResult result =
             await processInvoker.ExecuteAsync(config,

@@ -12,6 +12,10 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 - All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks.
 
+### Fixed
+
+- Raw-mode invocations no longer deadlock on chatty children when the configuration enables `OutputRedirection`. `ProcessInvocationPipeline` now forces redirection off for `InvocationMode.Raw` before the process starts (a faithful member-wise copy — the caller's configuration is untouched), so the child inherits the parent's handles instead of writing to a pipe nobody drains. This is the same protective normalization the shell middleware already applied, now applied pipeline-wide. Observable: in Raw mode children see console handles instead of pipes; nothing readable is lost because no public Raw surface exposes output. Use `RunBufferedAsync`/`ExecuteBufferedAsync` to capture output. Direct `IExternalProcess` users still bypass the pipeline — see the new hazard remarks on `WaitForExitOrTimeoutAsync`.
+
 ### Docs
 
 - Troubleshooting guide: new "Child Output Encoding (Mojibake)" section covering the UTF-8 output-decoding default, with detection steps and code samples for overriding encodings on legacy Windows OEM/ANSI children. Documentation only; no behavior change.

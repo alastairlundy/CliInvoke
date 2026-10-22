@@ -110,6 +110,17 @@ public static class CliRun
     /// <summary>
     /// Executes a process asynchronously with the specified configuration.
     /// </summary>
+    /// <remarks>
+    ///     Raw mode does not capture output. When <paramref name="configuration"/> has
+    ///     <see cref="ProcessConfiguration.OutputRedirection"/> enabled, the pipeline
+    ///     forces it off for the invocation so the child inherits the parent's handles
+    ///     instead of writing to a pipe that Raw mode never drains (the raw-mode pipe
+    ///     deadlock). Nothing readable is lost: no public Raw-mode surface exposes
+    ///     output. To capture output, use
+    ///     <see cref="RunBufferedAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)"/>.
+    ///     Direct <see cref="IExternalProcess"/> users bypass this normalization — see
+    ///     <see cref="IExternalProcess.WaitForExitOrTimeoutAsync(CancellationToken)"/>.
+    /// </remarks>
     /// <param name="configuration">
     /// The process configuration defining how to run the process, including settings such as working directory, timeout, and other parameters.
     /// </param>

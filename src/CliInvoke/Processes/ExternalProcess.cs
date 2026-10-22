@@ -283,6 +283,16 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     /// <summary>
     ///     Asynchronously waits for the process to exit or a specified timeout period elapses.
     /// </summary>
+    /// <remarks>
+    ///     This method does not drain redirected output: a configuration with
+    ///     <see cref="ProcessConfiguration.OutputRedirection"/> enabled whose child writes
+    ///     more than the operating-system pipe buffer blocks the child and the wait never
+    ///     completes. The invocation pipelines force redirection off in Raw mode before the
+    ///     process starts; direct users of this type bypass that normalization — disable
+    ///     output redirection or use
+    ///     <see cref="CaptureBufferedResultAsync(CancellationToken, long?, long?)"/> to
+    ///     capture (and thereby drain) the redirected streams.
+    /// </remarks>
     /// <param name="cancellationToken">
     ///     A cancellation token that can be used by other objects or threads
     ///     to receive notice of cancellation.
