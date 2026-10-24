@@ -8,13 +8,32 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [3.2.0] - unreleased
 
+### Added
+
+- All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks. The test suite runs both legs.
+- On the `net11.0` leg, Windows and macOS children start suspended (`ProcessStartInfo.StartSuspended`) so a configured `ProcessResourcePolicy` is applied before the child first runs; Linux and FreeBSD keep the previous behaviour (the runtime rejects suspended start there). If resuming a creation-suspended child fails for a reason other than the child already having exited, the child is forceful-exited and the failure propagates from `Start`/`StartAsync` instead of leaving it suspended forever.
+- Guarded-execution guide (`site/docs/guides/guarded-execution.md`): failure-mode-organised reference mapping hangs, runaway output, ignored exit codes, and secret leaks onto CliInvoke's timeout, cancellation, and exit-configuration guards, for automation and agent harnesses.
+- OpenTelemetry middleware recipe (`site/docs/guides/opentelemetry-middleware.md`): a ~30-line `IProcessMiddleware` sample emitting one `ActivitySource` span per invocation (exit code, duration, canceled, mode), with registration and OTLP listener snippets. Spans deliberately carry no output content or raw arguments.
+
 ### Changed
 
-- All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks.
+- **`CliRun.FireAndForget(ProcessConfiguration)` fails fast on redirected configurations.** Enabling `OutputRedirection` or `RedirectStandardInput` now throws `ArgumentException` before start: the process handle is disposed immediately after launch, so nobody drains the pipes and the child would hang or fail silently. Use `RunAsync`/`RunBufferedAsync` for output. The string-arguments overload forces output redirection off and is safe.
+- **`ProcessExitConfigurationCreationExtensions.Default` now matches the constructor default.** `Default` is `new ProcessExitConfiguration()` (allows unexpected-exit exceptions) instead of aliasing `CreateGraceful()` (suppresses them). Use `CreateGraceful()` when you want timeouts and cancellations to return a `Canceled` result instead of throwing.
+- **`ExternalProcess` resolves `TargetFilePath` once, at construction.** An unresolvable path now throws `FileNotFoundException` at construction rather than at `Start`/`StartAsync`, and repeated starts reuse the resolved path instead of re-resolving.
+- **Retry middleware replays standard input correctly.** `RetryMiddleware` rewinds a seekable standard-input stream (`Position = 0`) before every retry attempt after the first, instead of silently replaying an empty, already-consumed stream. A non-seekable stdin source throws `InvalidOperationException` at the moment a retry would occur. The replay contract is documented on `UseRetryPolicy`/`RetryOptions`.
+- **`LoggingMiddleware` logs `ArgumentList` when the argument string is empty.** Shell-wrapped and `ArgumentList`-based invocations no longer log blank arguments; the display string still passes through the `Sanitize` redactor.
+- **`Polyfill` moved from `CliInvoke.Core` to `CliInvoke`**, and the `CliInvoke` package adopts `Squash` build-time trimming.
+- The `net11.0` leg uses the new .NET 11 `Process` APIs (`Process.Signal`, `TryWaitForExitStatus`, `TryGetProcessById`) at the platform control-adapter sites; the `net10.0` leg is unchanged.
+- README now leads with outcome-oriented framing, and the NuGet package descriptions and tags for all three packages were rewritten so search results carry the searched words.
 
 ### Fixed
 
 - Raw-mode invocations no longer deadlock on chatty children when the configuration enables `OutputRedirection`. `ProcessInvocationPipeline` now forces redirection off for `InvocationMode.Raw` before the process starts (a faithful member-wise copy — the caller's configuration is untouched), so the child inherits the parent's handles instead of writing to a pipe nobody drains. This is the same protective normalization the shell middleware already applied, now applied pipeline-wide. Observable: in Raw mode children see console handles instead of pipes; nothing readable is lost because no public Raw surface exposes output. Use `RunBufferedAsync`/`ExecuteBufferedAsync` to capture output. Direct `IExternalProcess` users still bypass the pipeline — see the new hazard remarks on `WaitForExitOrTimeoutAsync`.
+- Buffered cancellation is deterministic under `CancellationThrowsException=false`. A drain-side `OperationCanceledException` in `CaptureBufferedResultAsync` no longer escapes: it is absorbed under the same guard as the stdin clause, returning a normal `BufferedProcessResult` with `Canceled=true` and empty captured output. When the knob is `true`, nothing from the cancellation machinery is absorbed and the `OperationCanceledException` propagates deterministically whether it surfaces from the wait or the drain.
+- Wait paths wait for actual process exit after a forceful kill. `ForcefulExit` returns before the OS has reaped the child, so reading `ExitCode` immediately after a kill-timed-out wait could throw "process must exit before requested information can be determined". The wait paths now poll (bounded at 5 seconds, re-issuing the kill if needed) before returning.
+- `AllowExceptionsIfUnexpected` no longer swallows genuine failures that happen to resolve near a timeout. Only an `OperationCanceledException` raised within 1 second of the expected exit time (an on-time timeout from CliInvoke's own cancellation machinery) is swallowed; non-cancellation exceptions (I/O errors, access violations, and the like) always propagate regardless of timing.
+- Null environment-variable values are honoured as BCL variable removal instead of being silently dropped; empty-string values remain a valid way to clear a variable, and the `ProcessConfiguration.EnvironmentVariables` docs state both contracts.
+- `ProcessResult.Signal` is correct on the `net11.0` Unix leg. The runtime's `TryWaitForExitStatus` delivers the terminating signal as a raw positive native number (WTERMSIG), which never equals the negative BCL `PosixSignal` members; raw numbers are now converted through the platform signal-number mapping before the SIGKILL and undefined-value filters, preserving SIGKILL-to-null and unknown-signal-to-null.
 
 ### Docs
 
