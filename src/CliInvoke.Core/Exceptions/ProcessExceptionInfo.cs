@@ -16,9 +16,9 @@ public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionI
     where TProcessResult : ProcessResult
 {
     /// <summary>
-    /// 
+    ///     Initialises an instance from the result of a failed process execution.
     /// </summary>
-    /// <param name="result"></param>
+    /// <param name="result">The result of the process execution that raised the exception.</param>
     public ProcessExceptionInfo(TProcessResult result)
     {
         Result = result;
@@ -31,9 +31,10 @@ public class ProcessExceptionInfo<TProcessResult> : IEquatable<ProcessExceptionI
     }
     
     /// <summary>
+    ///     Initialises an instance from the result and configuration of a failed process execution.
     /// </summary>
-    /// <param name="result"></param>
-    /// <param name="configuration"></param>
+    /// <param name="result">The result of the process execution that raised the exception.</param>
+    /// <param name="configuration">The configuration the process was invoked with.</param>
     public ProcessExceptionInfo(TProcessResult result, ProcessConfiguration configuration)
     {
         Result = result;

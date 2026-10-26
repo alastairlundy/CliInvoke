@@ -55,10 +55,10 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetArgumentList(IReadOnlyList<string>? argumentList);
 
     /// <summary>
-    /// 
+    ///     Configures the argument spec used to build the Process' argument list.
     /// </summary>
-    /// <param name="configureArguments"></param>
-    /// <returns></returns>
+    /// <param name="configureArguments">The action that populates the <see cref="ArgumentsSpec" />.</param>
+    /// <returns>The builder with the updated argument spec.</returns>
     IProcessConfigurationBuilder ConfigureArguments(Action<ArgumentsSpec> configureArguments);
     
     /// <summary>
@@ -69,10 +69,10 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetTargetFilePath(string targetFilePath);
     
     /// <summary>
-    /// 
+    ///     Configures the environment variables the Process inherits from.
     /// </summary>
-    /// <param name="configure"></param>
-    /// <returns></returns>
+    /// <param name="configure">The action that populates the <see cref="EnvironmentVariablesSpec" />.</param>
+    /// <returns>The builder with the updated environment variables.</returns>
     IProcessConfigurationBuilder ConfigureEnvironmentVariables(Action<EnvironmentVariablesSpec> configure);
 
     /// <summary>
@@ -89,10 +89,10 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetWorkingDirectory(string workingDirectoryPath);
 
     /// <summary>
-    /// 
+    ///     Configures the credentials the Process is executed under.
     /// </summary>
-    /// <param name="configure"></param>
-    /// <returns></returns>
+    /// <param name="configure">The action that populates the <see cref="UserCredentialSpec" />.</param>
+    /// <returns>The builder with the updated user credential.</returns>
     IProcessConfigurationBuilder ConfigureUserCredential(Action<UserCredentialSpec> configure);
 
     /// <summary>
@@ -110,18 +110,18 @@ public interface IProcessConfigurationBuilder
     IProcessConfigurationBuilder SetStandardInputPipe(StreamWriter source);
 
     /// <summary>
-    /// 
+    ///     Sets whether the Process' standard output and error streams are redirected.
     /// </summary>
-    /// <param name="outputRedirection"></param>
-    /// <returns></returns>
+    /// <param name="outputRedirection">Whether the Process' output streams should be redirected.</param>
+    /// <returns>The builder with the updated output redirection setting.</returns>
     IProcessConfigurationBuilder SetOutputRedirection(
         bool outputRedirection);
 
     /// <summary>
-    /// 
+    ///     Configures the resource policy applied to the Process after it starts.
     /// </summary>
-    /// <param name="processResourcePolicy"></param>
-    /// <returns></returns>
+    /// <param name="processResourcePolicy">The action that populates the <see cref="ProcessResourcePolicySpec" />.</param>
+    /// <returns>The builder with the updated resource policy.</returns>
     IProcessConfigurationBuilder ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec> processResourcePolicy);
 
     /// <summary>

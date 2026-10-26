@@ -16,9 +16,6 @@ using CliInvoke.Processes.Internal.ControlAdapters;
 
 namespace CliInvoke.Processes.Internal;
 
-/// <summary>
-///
-/// </summary>
 internal class ProcessWrapper : Process
 {
     /// <summary>
@@ -564,7 +561,6 @@ internal class ProcessWrapper : Process
     ///     never closed or disposed by this method. All exceptions propagate to the caller.
     /// </remarks>
     /// <param name="source">The stream from which to read the standard input data.</param>
-    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous piping operation.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -592,7 +588,6 @@ internal class ProcessWrapper : Process
     /// <summary>
     ///     Asynchronously retrieves the standard output stream from a specified process.
     /// </summary>
-    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard output stream.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -624,7 +619,6 @@ internal class ProcessWrapper : Process
     /// <summary>
     ///     Asynchronously retrieves the standard error stream from a specified process.
     /// </summary>
-    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation, containing the standard error stream.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -866,9 +860,6 @@ internal class ProcessWrapper : Process
     ///     Asynchronously waits for the process to exit or for the exit configuration's timeout policy
     ///     threshold to be exceeded, whichever is sooner.
     /// </summary>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
-    /// <param name="fallbackToForceful"></param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if the timeout threshold is less than 0.</exception>
     /// <exception cref="NotSupportedException">Thrown if run on a remote computer or device.</exception>
     [UnsupportedOSPlatform("ios")]
@@ -1087,8 +1078,6 @@ internal class ProcessWrapper : Process
     
     /// <summary>
     /// </summary>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -1170,9 +1159,6 @@ internal class ProcessWrapper : Process
     ///     Sends an interrupt signal to the child process.
     ///     <remarks>Caller must already hold <c>_cancellationSemaphore</c>.</remarks>
     /// </summary>
-    /// <param name="timeoutThreshold"></param>
-    /// <param name="exitConfiguration"></param>
-    /// <param name="cancellationToken"></param>
     /// <exception cref="PlatformNotSupportedException"></exception>
     [UnsupportedOSPlatform("browser")]
     [UnsupportedOSPlatform("ios")]

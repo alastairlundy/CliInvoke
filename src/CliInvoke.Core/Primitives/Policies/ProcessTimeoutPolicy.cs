@@ -47,8 +47,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     ///     The timespan to wait for the Process timeout before cancelling the
     ///     Process.
     /// </param>
-    /// <param name="enabled"></param>
-    /// <param name="exitBehaviour"></param>
+    /// <param name="enabled">Whether the timeout policy is enforced.</param>
+    /// <param name="exitBehaviour">How the process is terminated once the threshold is exceeded.</param>
     public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, bool enabled, 
         ProcessExitBehaviour exitBehaviour = ProcessExitBehaviour.GracefulExit)
     {
@@ -218,10 +218,11 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     }
 
     /// <summary>
+    ///     Determines whether two <see cref="ProcessTimeoutPolicy" /> instances are not equal.
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
+    /// <param name="left">The first policy to compare.</param>
+    /// <param name="right">The second policy to compare.</param>
+    /// <returns><see langword="true"/> when the policies differ; otherwise, <see langword="false"/>.</returns>
     public static bool operator !=(ProcessTimeoutPolicy? left, ProcessTimeoutPolicy? right)
     {
         return !Equals(left, right);

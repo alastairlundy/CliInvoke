@@ -287,10 +287,6 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         }
     }
 #else
-    /// <summary>
-    /// </summary>
-    /// <param name="processId"></param>
-    /// <param name="signalId"></param>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     [UnsupportedOSPlatform("windows")]

@@ -30,9 +30,9 @@ public class ProcessExitConfiguration : IEquatable<ProcessExitConfiguration>
     }
 
     /// <summary>
-    /// 
+    ///     Initialises an exit configuration with the specified timeout threshold and default behaviours.
     /// </summary>
-    /// <param name="timeoutTimeSpan"></param>
+    /// <param name="timeoutTimeSpan">The threshold after which the process is cancelled.</param>
     public ProcessExitConfiguration(TimeSpan timeoutTimeSpan)
     {
         TimeoutPolicy = ProcessTimeoutPolicy.FromTimeSpan(timeoutTimeSpan);

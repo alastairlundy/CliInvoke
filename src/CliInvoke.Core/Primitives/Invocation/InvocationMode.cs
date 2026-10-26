@@ -10,20 +10,20 @@
 namespace CliInvoke.Core;
 
 /// <summary>
-/// 
+///     The shape of invocation used to run a process.
 /// </summary>
 public enum InvocationMode
 {
     /// <summary>
-    /// 
+    ///     Runs the process and returns its result directly from the middleware pipeline.
     /// </summary>
     Raw,
     /// <summary>
-    /// 
+    ///     Runs the process and buffers its output into a <c>BufferedProcessResult</c>.
     /// </summary>
     Buffered,
     /// <summary>
-    /// 
+    ///     Starts the process without waiting for it to exit or capturing a result.
     /// </summary>
     FireAndForget
 }

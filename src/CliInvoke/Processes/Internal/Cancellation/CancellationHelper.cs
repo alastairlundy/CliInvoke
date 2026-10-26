@@ -9,9 +9,6 @@
 
 namespace CliInvoke.Processes.Internal.Cancellation;
 
-/// <summary>
-/// 
-/// </summary>
 internal static class CancellationHelper
 {
     /// <summary>

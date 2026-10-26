@@ -371,10 +371,10 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     }
 
     /// <summary>
-    /// 
+    ///     Sets whether the Process' standard output and error streams are redirected.
     /// </summary>
-    /// <param name="outputRedirection"></param>
-    /// <returns></returns>
+    /// <param name="outputRedirection">Whether the Process' output streams should be redirected.</param>
+    /// <returns>The builder with the updated output redirection setting.</returns>
     public IProcessConfigurationBuilder SetOutputRedirection(bool outputRedirection)
     {
         _outputRedirection = outputRedirection;

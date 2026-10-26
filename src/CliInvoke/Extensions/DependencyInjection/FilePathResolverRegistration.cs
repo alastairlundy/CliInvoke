@@ -10,7 +10,7 @@
 namespace CliInvoke.Extensions;
 
 /// <summary>
-/// 
+///     Registers <see cref="IFilePathResolver" /> implementations in a service collection.
 /// </summary>
 public static class FilePathResolverRegistration
 {

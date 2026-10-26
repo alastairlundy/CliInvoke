@@ -32,9 +32,10 @@ public class ExternalProcessFactory : IExternalProcessFactory
     }
 
     /// <summary>
-    /// 
+    ///     Initialises a new instance of the <see cref="ExternalProcessFactory" /> class
+    ///     that resolves target file paths with the specified resolver.
     /// </summary>
-    /// <param name="filePathResolver"></param>
+    /// <param name="filePathResolver">The resolver used to locate target file paths.</param>
     public ExternalProcessFactory(IFilePathResolver filePathResolver)
     {
         _filePathResolver = filePathResolver;

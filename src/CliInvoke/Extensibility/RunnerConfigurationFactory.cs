@@ -22,8 +22,8 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
     ///     Create the command to be run from the Command runner configuration and an input command.
     /// </summary>
     /// <param name="processConfigToBeRun">The command to be run by the Command Runner command.</param>
-    /// <param name="runnerProcessConfig"></param>
-    /// <returns></returns>
+    /// <param name="runnerProcessConfig">The configuration of the runner that will execute the target command.</param>
+    /// <returns>The configuration the runner should be invoked with.</returns>
     [Pure]
     public ProcessConfiguration CreateRunnerConfiguration(
         ProcessConfiguration processConfigToBeRun,

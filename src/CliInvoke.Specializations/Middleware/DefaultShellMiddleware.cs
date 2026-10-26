@@ -51,10 +51,10 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
     private static readonly AsyncLocal<bool> DetectionInProgress = new();
 
     /// <summary>
-    ///
+    ///     Initialises a new instance of the <see cref="DefaultShellMiddleware" /> class.
     /// </summary>
-    /// <param name="serviceProvider"></param>
-    /// <param name="options"></param>
+    /// <param name="serviceProvider">The service provider used to resolve the shell detector.</param>
+    /// <param name="options">Optional shell detection options; defaults to <see cref="ShellMiddlewareOptions.Default" />.</param>
     public DefaultShellMiddleware(IServiceProvider serviceProvider, ShellMiddlewareOptions? options = null)
     {
         _serviceProvider = serviceProvider;
@@ -62,10 +62,10 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
     }
 
     /// <summary>
-    ///
+    ///     Detects the default shell for the current platform, then invokes the next middleware.
     /// </summary>
-    /// <param name="context"></param>
-    /// <param name="next"></param>
+    /// <param name="context">The invocation context.</param>
+    /// <param name="next">The next middleware in the pipeline.</param>
     /// <exception cref="ArgumentNullException"></exception>
     public async Task InvokeAsync(InvocationContext context, Func<InvocationContext, Task> next)
     {

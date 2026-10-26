@@ -27,7 +27,7 @@ public class ProcessResult : IEquatable<ProcessResult>
     /// </summary>
     /// <param name="executableFilePath">The file path of the file that was executed.</param>
     /// <param name="exitCode">The process' exit code.</param>
-    /// <param name="processId"></param>
+    /// <param name="processId">The id of the process that was executed.</param>
     /// <param name="startTime">The start time of the process.</param>
     /// <param name="exitTime">The exit time of the process.</param>
     /// <param name="canceled">
