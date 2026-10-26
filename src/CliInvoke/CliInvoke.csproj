@@ -81,6 +81,7 @@
         <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
         <PackageReference Include="Polyfill" PrivateAssets="all"/>
         <PackageReference Include="Squash" PrivateAssets="all"/>
+        <PackageReference Include="Meziantou.Analyzer" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>

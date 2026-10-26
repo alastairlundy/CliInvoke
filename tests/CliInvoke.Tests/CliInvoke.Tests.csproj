@@ -16,6 +16,7 @@
     <PackageReference Include="TUnit" />
     <PackageReference Include="Bogus" />
     <PackageReference Include="FsCheck" />
+    <PackageReference Include="Meziantou.Analyzer" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\CliInvoke.Core\CliInvoke.Core.csproj" />

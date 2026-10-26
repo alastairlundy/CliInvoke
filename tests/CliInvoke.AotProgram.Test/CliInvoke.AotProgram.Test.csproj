@@ -23,5 +23,6 @@
     <!-- Add host package so IHost/Host APIs are available -->
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting"/>
+        <PackageReference Include="Meziantou.Analyzer" PrivateAssets="all" />
     </ItemGroup>
 </Project>

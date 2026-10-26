@@ -67,6 +67,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Meziantou.Analyzer" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Include="..\..\.assets\icon.png">
             <Pack>True</Pack>
             <PackagePath></PackagePath>
