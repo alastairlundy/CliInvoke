@@ -25,8 +25,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
 
         Process proc;
 #if NET11_0
-        // net11.0 leg: non-throwing lookup replaces GetProcessById + catch(ArgumentException);
-        // false (no such process) is the same "probably exited already" no-op.
+        // net11.0: TryGetProcessById replaces GetProcessById+catch; false means already exited.
         if (!Process.TryGetProcessById((int)actualPid, out Process? found) || found is null)
         {
             return;
@@ -40,7 +39,6 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         }
         catch (ArgumentException)
         {
-            // Process was not found - probably exited already.
             return;
         }
 #endif
@@ -67,12 +65,11 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
             {
                 int err = Marshal.GetLastWin32Error();
                 CloseHandle(threadHandle);
-                // ERROR_ACCESS_DENIED (5) can occur when resuming protected threads; ignore it.
                 const int ERROR_ACCESS_DENIED = 5;
                 if (err == ERROR_ACCESS_DENIED)
                     continue;
 
-                // If the process has exited since we started enumerating threads, treat that as benign and continue.
+                // Benign exit race during thread enumeration; continue with other threads.
                 if (proc.HasExited)
                     continue;
 
@@ -89,8 +86,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
 
         Process proc;
 #if NET11_0
-        // net11.0 leg: non-throwing lookup replaces GetProcessById + catch(ArgumentException);
-        // false (no such process) is the same "probably exited already" no-op.
+        // net11.0: TryGetProcessById replaces GetProcessById+catch; false means already exited.
         if (!Process.TryGetProcessById((int)actualPid, out Process? found) || found is null)
         {
             return;
@@ -104,7 +100,6 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         }
         catch (ArgumentException)
         {
-            // Process was not found - probably exited already.
             return;
         }
 #endif
@@ -130,13 +125,11 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
             {
                 int err = Marshal.GetLastWin32Error();
                 CloseHandle(threadHandle);
-                // ERROR_ACCESS_DENIED (5) can occur for certain systems or protected threads.
-                // Treat access denied as non-fatal and continue with other threads.
                 const int ERROR_ACCESS_DENIED = 5;
                 if (err == ERROR_ACCESS_DENIED)
                     continue;
 
-                // If the process has exited since we started enumerating threads, treat that as benign and continue.
+                // Benign exit race during thread enumeration; continue with other threads.
                 if (proc.HasExited)
                     continue;
 

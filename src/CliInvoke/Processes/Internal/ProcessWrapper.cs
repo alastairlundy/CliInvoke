@@ -561,6 +561,7 @@ internal class ProcessWrapper : Process
     ///     never closed or disposed by this method. All exceptions propagate to the caller.
     /// </remarks>
     /// <param name="source">The stream from which to read the standard input data.</param>
+    /// <param name="cancellationToken">A cancellation token that aborts the copy.</param>
     /// <returns>A task that represents the asynchronous piping operation.</returns>
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -609,8 +610,7 @@ internal class ProcessWrapper : Process
         }
         finally
         {
-            // Dispose the buffer only when the copy faults (or the position reset throws);
-            // on success the caller owns the returned stream.
+            // On the fault path only: on success the caller owns the returned stream.
             if (!completed)
                 await destination.DisposeAsync().ConfigureAwait(false);
         }
@@ -640,8 +640,7 @@ internal class ProcessWrapper : Process
         }
         finally
         {
-            // Dispose the buffer only when the copy faults (or the position reset throws);
-            // on success the caller owns the returned stream.
+            // On the fault path only: on success the caller owns the returned stream.
             if (!completed)
                 await destination.DisposeAsync().ConfigureAwait(false);
         }
@@ -656,7 +655,7 @@ internal class ProcessWrapper : Process
     /// </summary>
     /// <remarks>
     ///     This is a distinct overload of the base buffered-capture method on <see cref="Process"/>;
-    ///     the inherited method is NOT overridden. The cap parameter supports three spellings:
+    ///     the inherited method is NOT overridden. The cap parameter accepts these values:
     ///     <list type="bullet">
     ///         <item><c>null</c>: no cap is applied; the stream is read in full.</item>
     ///         <item>Negative value: no cap is applied; equivalent to <c>null</c>.</item>
@@ -665,16 +664,8 @@ internal class ProcessWrapper : Process
     ///     </list>
     /// </remarks>
     /// <param name="cancellationToken">A cancellation token for the read operations.</param>
-    /// <param name="maxStandardOutputBytes">
-    ///     An optional maximum number of bytes to capture from standard output before truncating.
-    ///     <c>null</c> or a negative value means no cap is applied.
-    ///     <c>0</c> is a valid zero-byte cap producing empty text with the truncated flag set.
-    /// </param>
-    /// <param name="maxStandardErrorBytes">
-    ///     An optional maximum number of bytes to capture from standard error before truncating.
-    ///     <c>null</c> or a negative value means no cap is applied.
-    ///     <c>0</c> is a valid zero-byte cap producing empty text with the truncated flag set.
-    /// </param>
+    /// <param name="maxStandardOutputBytes">Optional byte cap for standard output; value spellings are described above.</param>
+    /// <param name="maxStandardErrorBytes">Optional byte cap for standard error; same semantics as <paramref name="maxStandardOutputBytes"/>.</param>
     /// <returns>
     ///     A tuple containing the captured standard output, standard error, and a flag indicating
     ///     whether either stream was truncated.
@@ -700,15 +691,10 @@ internal class ProcessWrapper : Process
     ///     discarding any remainder (lossy truncation).
     /// </summary>
     /// <remarks>
-    ///     The <paramref name="maxBytes"/> parameter supports three spellings:
-    ///     <list type="bullet">
-    ///         <item><c>null</c>: no cap; the stream is read in full.</item>
-    ///         <item>Negative value: no cap; equivalent to <c>null</c>.</item>
-    ///         <item><c>0</c>: a valid zero-byte cap producing empty text with the truncated flag set.</item>
-    ///         <item>Positive value: the stream is read up to that many bytes, then truncated.</item>
-    ///     </list>
-    ///     Multibyte sequences that straddle the cap boundary are decoded incrementally so that
-    ///     split trailing bytes are held back and dropped cleanly (no U+FFFD replacement characters).
+    ///     <paramref name="maxBytes"/> accepts the same value spellings as
+    ///     <c>ReadAllTextAsync</c> above. Multibyte sequences that straddle the cap boundary
+    ///     are decoded incrementally so that split trailing bytes are held back and dropped
+    ///     cleanly (no U+FFFD replacement characters).
     /// </remarks>
     private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
         StreamReader reader,
@@ -815,8 +801,7 @@ internal class ProcessWrapper : Process
         ProcessExitConfiguration processExitConfiguration,
         CancellationToken cancellationToken = default)
     {
-        // A disabled timeout policy (Enabled == false) skips timeout enforcement entirely,
-        // as does a zero-or-negative threshold: wait for exit or caller cancellation only.
+        // Disabled policy or a non-positive threshold: no timeout to enforce.
         if (!processExitConfiguration.TimeoutPolicy.Enabled
             || processExitConfiguration.TimeoutPolicy.TimeoutThreshold <= TimeSpan.Zero)
         {
@@ -871,9 +856,7 @@ internal class ProcessWrapper : Process
         ArgumentOutOfRangeException.ThrowIfLessThan(
             exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
 
-        // A disabled timeout policy skips timeout enforcement entirely: there is no
-        // threshold after which to send the interrupt or fall back, so wait for exit or
-        // caller cancellation only.
+        // Disabled policy: no threshold to interrupt at, so wait for exit or cancellation.
         if (!exitConfiguration.TimeoutPolicy.Enabled)
         {
             await WaitForExitOrCancellationAsync(exitConfiguration, cancellationToken)
@@ -949,7 +932,6 @@ internal class ProcessWrapper : Process
         bool isGraceful,
         bool fallbackToForceful = true)
     {
-        // Use semaphore to prevent simultaneous cancellation attempts
         if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
         {
             // Another cancellation is already in progress, wait for it to complete
@@ -1105,7 +1087,6 @@ internal class ProcessWrapper : Process
 
             CancellationToken actualCancellationToken = cts.Token;
 
-            // Use semaphore to prevent simultaneous cancellation attempts
             if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
             {
                 // Another cancellation is already in progress, wait for it to complete
