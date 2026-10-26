@@ -138,7 +138,7 @@ public class RunnerConfigurationFactoryTests
         try
         {
             _ = await invoker.ExecuteBufferedAsync(wrapped,
-                ProcessExitConfiguration.CreateGraceful());
+                ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
         }
         catch
         {
@@ -307,7 +307,7 @@ public class RunnerConfigurationFactoryTests
         bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
             factory, runner, @"C:\nonexistent\app.exe",
             "a\" ; Set-Content -Path \"" + MarkerPath("B_PS_QS") + "\" 'pwned'",
-            "B_PS_QS");
+            "B_PS_QS").ConfigureAwait(true);
 
         await Assert.That(markerFired).IsFalse();
     }
@@ -325,7 +325,7 @@ public class RunnerConfigurationFactoryTests
         bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
             factory, runner, @"C:\nonexistent\app.exe",
             "a\" & Set-Content -Path \"" + MarkerPath("B_PS_QA") + "\" 'pwned'",
-            "B_PS_QA");
+            "B_PS_QA").ConfigureAwait(true);
 
         await Assert.That(markerFired).IsFalse();
     }
@@ -343,7 +343,7 @@ public class RunnerConfigurationFactoryTests
         bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
             factory, runner, @"C:\nonexistent\app.exe",
             "a\"\" ; Set-Content -Path \"" + MarkerPath("B_PS_QQ") + "\" 'pwned'",
-            "B_PS_QQ");
+            "B_PS_QQ").ConfigureAwait(true);
 
         await Assert.That(markerFired).IsFalse();
     }
@@ -361,7 +361,7 @@ public class RunnerConfigurationFactoryTests
         bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
             factory, runner, @"C:\nonexistent\app.exe",
             "$(Set-Content -Path \"" + MarkerPath("B_PS_DOLLAR") + "\" 'pwned')",
-            "B_PS_DOLLAR");
+            "B_PS_DOLLAR").ConfigureAwait(true);
 
         await Assert.That(markerFired).IsFalse();
     }
@@ -380,7 +380,7 @@ public class RunnerConfigurationFactoryTests
             factory, runner,
             @"C:\nonexistent\ap""p.exe",
             "x",
-            "B_PS_QT");
+            "B_PS_QT").ConfigureAwait(true);
 
         await Assert.That(markerFired).IsFalse();
     }
@@ -401,7 +401,7 @@ public class RunnerConfigurationFactoryTests
         bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
             factory, runner, @"C:\nonexistent\app.exe",
             "a\" & echo pwned>\"" + MarkerPath("B_CMD_QA") + "\"",
-            "B_CMD_QA");
+            "B_CMD_QA").ConfigureAwait(true);
 
         await Assert.That(markerFired).IsFalse();
     }
@@ -418,7 +418,7 @@ public class RunnerConfigurationFactoryTests
         bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
             factory, runner, @"C:\nonexistent\app.exe",
             "x & echo pwned>\"" + MarkerPath("B_CMD_BARE") + "\"",
-            "B_CMD_BARE");
+            "B_CMD_BARE").ConfigureAwait(true);
 
         await Assert.That(markerFired).IsFalse();
     }
@@ -435,7 +435,7 @@ public class RunnerConfigurationFactoryTests
         bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
             factory, runner, @"C:\nonexistent\app.exe",
             "a\"\" & echo pwned>\"" + MarkerPath("B_CMD_QQ") + "\"",
-            "B_CMD_QQ");
+            "B_CMD_QQ").ConfigureAwait(true);
 
         await Assert.That(markerFired).IsFalse();
     }
@@ -458,7 +458,7 @@ public class RunnerConfigurationFactoryTests
 
         IProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory());
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
-            wrapped, ProcessExitConfiguration.CreateGraceful());
+            wrapped, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         // The exit code from the wrapped command chain must reach the caller.
         await Assert.That(result.ExitCode).IsEqualTo(42);
@@ -478,7 +478,7 @@ public class RunnerConfigurationFactoryTests
 
         IProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory());
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
-            wrapped, ProcessExitConfiguration.CreateGraceful());
+            wrapped, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         // whoami is a real external program; the wrapper must actually run it, exit 0,
         // and propagate the username to the caller. A previous implementation of this

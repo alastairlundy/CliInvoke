@@ -158,7 +158,7 @@ public class DependencyInjectionExtensionsTests
 
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,
-            ProcessExitConfiguration.CreateGraceful());
+            ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
     }

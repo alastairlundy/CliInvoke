@@ -1,0 +1,7 @@
+[*.cs]
+
+# Executable/test code: continuations have no meaningful SynchronizationContext, so use an explicit
+# .ConfigureAwait(true) (see CONTRIBUTING.md "ConfigureAwait"). MA0004.report = Always avoids the
+# analyzer's context-detection mode silently skipping cases it thinks are unimportant.
+dotnet_diagnostic.MA0004.severity = error
+MA0004.report = Always

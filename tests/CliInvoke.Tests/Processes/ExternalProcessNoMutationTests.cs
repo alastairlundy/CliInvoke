@@ -32,7 +32,7 @@ public class ExternalProcessNoMutationTests
         using ExternalProcess process = new(new FilePathResolver(), configuration);
 
         process.Start();
-        ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);
+        ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None).ConfigureAwait(true);
 
         try
         {
@@ -44,7 +44,7 @@ public class ExternalProcessNoMutationTests
         }
         finally
         {
-            await process.Kill();
+            await process.Kill().ConfigureAwait(true);
         }
     }
 
@@ -57,8 +57,8 @@ public class ExternalProcessNoMutationTests
 
         using ExternalProcess process = new(new FilePathResolver(), configuration);
 
-        await process.StartAsync(CancellationToken.None);
-        ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);
+        await process.StartAsync(CancellationToken.None).ConfigureAwait(true);
+        ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None).ConfigureAwait(true);
 
         try
         {
@@ -70,7 +70,7 @@ public class ExternalProcessNoMutationTests
         }
         finally
         {
-            await process.Kill();
+            await process.Kill().ConfigureAwait(true);
         }
     }
 
@@ -83,8 +83,8 @@ public class ExternalProcessNoMutationTests
 
         using ExternalProcess process = new(new FilePathResolver(), callerConfig);
 
-        await process.StartAsync(callerConfig, CancellationToken.None);
-        ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);
+        await process.StartAsync(callerConfig, CancellationToken.None).ConfigureAwait(true);
+        ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None).ConfigureAwait(true);
 
         try
         {
@@ -96,7 +96,7 @@ public class ExternalProcessNoMutationTests
         }
         finally
         {
-            await process.Kill();
+            await process.Kill().ConfigureAwait(true);
         }
     }
 
@@ -110,7 +110,7 @@ public class ExternalProcessNoMutationTests
         using ExternalProcess process = new(new FilePathResolver(), configuration);
 
         process.Start();
-        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None);
+        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None).ConfigureAwait(true);
 
         try
         {
@@ -122,7 +122,7 @@ public class ExternalProcessNoMutationTests
         }
         finally
         {
-            await process.Kill();
+            await process.Kill().ConfigureAwait(true);
         }
     }
 }

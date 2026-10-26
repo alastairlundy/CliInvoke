@@ -69,7 +69,7 @@ public class StdinPipingClaimTests
 
         ProcessResult result = await CliRun.RunAsync(configuration,
                 ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(GuardTimeout);
+            .WaitAsync(GuardTimeout).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.Canceled).IsFalse();
@@ -107,7 +107,7 @@ public class StdinPipingClaimTests
 
         BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
                 ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(GuardTimeout);
+            .WaitAsync(GuardTimeout).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput).Contains(firstLine);
@@ -139,16 +139,16 @@ public class StdinPipingClaimTests
 
         using ExternalProcess process = new(new FilePathResolver(), configuration);
 
-        await process.StartAsync(configuration, CancellationToken.None).WaitAsync(GuardTimeout);
+        await process.StartAsync(configuration, CancellationToken.None).WaitAsync(GuardTimeout).ConfigureAwait(true);
 
         await ProcessTestHelper.WaitForConditionAsync(
             () => process.HasExited,
             GuardTimeout,
             failureMessage:
-            "The stdin-reading child never exited: the child's stdin write end was not closed, so end-of-file was never delivered.");
+            "The stdin-reading child never exited: the child's stdin write end was not closed, so end-of-file was never delivered.").ConfigureAwait(true);
 
         ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None)
-            .WaitAsync(GuardTimeout);
+            .WaitAsync(GuardTimeout).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.Canceled).IsFalse();

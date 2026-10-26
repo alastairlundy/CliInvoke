@@ -4,3 +4,10 @@ csharp_style_var_for_built_in_types = false
 csharp_style_var_elsewhere = false
 dotnet_separate_import_directive_groups = true
 max_line_length = 100
+
+# Require every awaited task in src/ to explicitly call ConfigureAwait —
+# .ConfigureAwait(false) is the library default (see scripts/guard-configureawait.sh,
+# which this mirrors). MA0004.report = Always avoids the analyzer's
+# context-detection mode silently skipping cases it thinks are unimportant.
+dotnet_diagnostic.MA0004.severity = error
+MA0004.report = Always

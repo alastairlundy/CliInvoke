@@ -48,7 +48,7 @@ public class RetryStdinReplayTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(context, next);
+        await middleware.InvokeAsync(context, next).ConfigureAwait(true);
 
         // Attempt 1 consumed the payload to the end; the middleware must rewind it before
         // attempt 2, so both attempts observe position 0 when they start.
@@ -85,7 +85,7 @@ public class RetryStdinReplayTests
                 return Task.CompletedTask;
             };
 
-            await middleware.InvokeAsync(context, next);
+            await middleware.InvokeAsync(context, next).ConfigureAwait(true);
 
             await Assert.That(attempts).IsEqualTo(2);
             await Assert.That(positionsAtAttemptStart.Count).IsEqualTo(2);
@@ -119,7 +119,7 @@ public class RetryStdinReplayTests
         InvalidOperationException? thrown = null;
         try
         {
-            await middleware.InvokeAsync(context, next);
+            await middleware.InvokeAsync(context, next).ConfigureAwait(true);
         }
         catch (InvalidOperationException exception)
         {
@@ -148,7 +148,7 @@ public class RetryStdinReplayTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(context, next);
+        await middleware.InvokeAsync(context, next).ConfigureAwait(true);
 
         await Assert.That(attempts).IsEqualTo(1);
         await Assert.That(context.Result).IsNotNull();
@@ -170,7 +170,7 @@ public class RetryStdinReplayTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(context, next);
+        await middleware.InvokeAsync(context, next).ConfigureAwait(true);
 
         await Assert.That(attempts).IsEqualTo(1);
         await Assert.That(context.Result).IsNotNull();
@@ -194,7 +194,7 @@ public class RetryStdinReplayTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(context, next);
+        await middleware.InvokeAsync(context, next).ConfigureAwait(true);
 
         await Assert.That(attempts).IsEqualTo(2);
         await Assert.That(context.Result).IsNotNull();

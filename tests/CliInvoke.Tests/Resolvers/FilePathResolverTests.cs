@@ -41,7 +41,7 @@ public class FilePathResolverTests
                 IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
 
                 BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
-                    cancellationToken: CancellationToken.None);
+                    cancellationToken: CancellationToken.None).ConfigureAwait(true);
 
                 expected = new FileInfo(task.StandardOutput.Split(Environment.NewLine).First());
             }
@@ -53,7 +53,7 @@ public class FilePathResolverTests
             IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
 
             BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
-                cancellationToken: CancellationToken.None);
+                cancellationToken: CancellationToken.None).ConfigureAwait(true);
 
             string resolvedPath = task.StandardOutput.Trim().Split(Environment.NewLine).First();
             expected = new FileInfo(resolvedPath);
@@ -88,7 +88,7 @@ public class FilePathResolverTests
             IProcessInvoker processInvoker = new ProcessInvoker(externalProcessFactory);
 
             BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
-                cancellationToken: CancellationToken.None);
+                cancellationToken: CancellationToken.None).ConfigureAwait(true);
 
             string expectedPath = task.StandardOutput.Trim().Split(Environment.NewLine).First();
 

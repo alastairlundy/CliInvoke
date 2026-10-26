@@ -48,7 +48,7 @@ public class MiddlewareChainNextTests
             });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(
             new List<string> { "A", "B", "terminal" }, CollectionOrdering.Matching);
@@ -73,7 +73,7 @@ public class MiddlewareChainNextTests
             });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(
             new List<string> { "A", "B", "terminal", "B", "terminal" }, CollectionOrdering.Matching);
@@ -96,7 +96,7 @@ public class MiddlewareChainNextTests
 
         using CancellationTokenSource cts = new CancellationTokenSource();
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, cts.Token);
+        await chain.RunAsync(ctx, cts.Token).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(
             new List<string> { "A", "B", "terminal" }, CollectionOrdering.Matching);
@@ -136,14 +136,14 @@ public class MiddlewareChainNextTests
 
             if (_useContextNext)
             {
-                await context.Middleware!.Next(context);
+                await context.Middleware!.Next(context).ConfigureAwait(true);
                 return;
             }
 
-            await next(context);
+            await next(context).ConfigureAwait(true);
 
             if (_invokeNextTwice)
-                await context.Middleware!.Next(context);
+                await context.Middleware!.Next(context).ConfigureAwait(true);
         }
     }
 
@@ -169,7 +169,7 @@ public class MiddlewareChainNextTests
         {
             _callLog.Add(_name);
             ObservedBefore = context.Middleware;
-            await next(context);
+            await next(context).ConfigureAwait(true);
             ObservedAfter = context.Middleware;
         }
     }

@@ -241,7 +241,7 @@ public class ProcessConfigurationBuilderTests
         // Assert — spawn a real child and verify the OS parses the produced command line
         // back to the original value. Newlines are dropped by design, so strip them first.
         string expected = input.Replace("\n", "").Replace("\r", "");
-        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments).ConfigureAwait(true);
         await Assert.That(parsed.Length).IsEqualTo(1);
         await Assert.That(parsed[0]).IsEqualTo(expected);
     }
@@ -308,7 +308,7 @@ public class ProcessConfigurationBuilderTests
         // Assert — AddEnumerable joins the values (newlines dropped) and wraps the joined
         // result in a single pair of double quotes, so the child receives ONE argument.
         string expected = string.Join(" ", values.Select(v => v.Replace("\n", "").Replace("\r", "")));
-        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments).ConfigureAwait(true);
         await Assert.That(parsed.Length).IsEqualTo(1);
         await Assert.That(parsed[0]).IsEqualTo(expected);
     }
@@ -326,7 +326,7 @@ public class ProcessConfigurationBuilderTests
 
         // Assert — the OS must parse the produced command line back to the original value,
         // exercising the embedded-double-quote escaping on both Windows and POSIX.
-        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments).ConfigureAwait(true);
         await Assert.That(parsed.Length).IsEqualTo(1);
         await Assert.That(parsed[0]).IsEqualTo(input);
     }
@@ -344,7 +344,7 @@ public class ProcessConfigurationBuilderTests
 
         // Assert — the trailing backslashes must round-trip exactly (doubled for the
         // Windows C-runtime closing quote; passed through literally on POSIX).
-        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments).ConfigureAwait(true);
         await Assert.That(parsed.Length).IsEqualTo(1);
         await Assert.That(parsed[0]).IsEqualTo(input);
     }
@@ -362,7 +362,7 @@ public class ProcessConfigurationBuilderTests
 
         // Assert — backslashes before an embedded quote must round-trip exactly (doubled
         // for the Windows C-runtime so the quote is literal; passed through on POSIX).
-        string[] parsed = await RunHelperAndParseArgs(config.Arguments);
+        string[] parsed = await RunHelperAndParseArgs(config.Arguments).ConfigureAwait(true);
         await Assert.That(parsed.Length).IsEqualTo(1);
         await Assert.That(parsed[0]).IsEqualTo(input);
     }
@@ -370,7 +370,7 @@ public class ProcessConfigurationBuilderTests
     private static async Task<string[]> RunHelperAndParseArgs(string arguments)
     {
         string helperPath = ProcessTestHelper.GetSignalTrappingHelperPath();
-        BufferedProcessResult result = await CliRun.RunBufferedAsync(helperPath, $"echo-args {arguments}");
+        BufferedProcessResult result = await CliRun.RunBufferedAsync(helperPath, $"echo-args {arguments}").ConfigureAwait(true);
         await Assert.That(result.ExitCode).IsEqualTo(0);
         return (result.StandardOutput ?? string.Empty).TrimEnd('\n').TrimEnd('\r').Split('\n');
     }

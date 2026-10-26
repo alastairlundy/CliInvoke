@@ -57,7 +57,7 @@ public class RawModeRedirectionNormalizationTests
 
         ProcessResult result = await CliRun.RunAsync(configuration,
                 ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(GuardTimeout);
+            .WaitAsync(GuardTimeout).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.Canceled).IsFalse();
@@ -78,7 +78,7 @@ public class RawModeRedirectionNormalizationTests
 
         ProcessResult result = await CliRun.RunAsync(configuration,
                 ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(GuardTimeout);
+            .WaitAsync(GuardTimeout).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.Canceled).IsFalse();

@@ -48,14 +48,14 @@ public class ProcessRuntimeBugfixTests
 
         try
         {
-            await process.StartAsync(configuration, CancellationToken.None);
+            await process.StartAsync(configuration, CancellationToken.None).ConfigureAwait(true);
 
             await Assert.That(process.HasStarted).IsTrue();
             await Assert.That(source.Position).IsEqualTo(0);
         }
         finally
         {
-            await process.Kill();
+            await process.Kill().ConfigureAwait(true);
         }
     }
 
@@ -83,12 +83,12 @@ public class ProcessRuntimeBugfixTests
 
             // Well past the disabled 1ms threshold the wait must still be pending: the
             // child sleeps 10s and a disabled policy never arms the timeout machinery.
-            await Task.Delay(TimeSpan.FromSeconds(2));
+            await Task.Delay(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
             await Assert.That(waitTask.IsCompleted).IsFalse();
 
             // The wait still ends when the process does.
             process.ForcefulExit();
-            await waitTask.WaitAsync(TimeSpan.FromSeconds(10));
+            await waitTask.WaitAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(true);
             await Assert.That(process.HasExited).IsTrue();
         }
         finally
@@ -144,7 +144,7 @@ public class ProcessRuntimeBugfixTests
             OperationCanceledException? propagated = null;
             try
             {
-                await waitTask;
+                await waitTask.ConfigureAwait(true);
             }
             catch (OperationCanceledException exception)
             {
@@ -156,7 +156,7 @@ public class ProcessRuntimeBugfixTests
             await ProcessTestHelper.WaitForConditionAsync(
                 () => process.HasExited,
                 TimeSpan.FromSeconds(5),
-                failureMessage: "Process was not terminated by the cancellation machinery within 5s.");
+                failureMessage: "Process was not terminated by the cancellation machinery within 5s.").ConfigureAwait(true);
 
             await Assert.That(process.HasExited).IsTrue();
             await Assert.That(process.Canceled).IsTrue();
@@ -201,12 +201,12 @@ public class ProcessRuntimeBugfixTests
                 cancellationTokenSource.Token);
             cancellationTokenSource.Cancel();
 
-            await waitTask.WaitAsync(TimeSpan.FromSeconds(15));
+            await waitTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
 
             await ProcessTestHelper.WaitForConditionAsync(
                 () => process.HasExited,
                 TimeSpan.FromSeconds(5),
-                failureMessage: "Process was not terminated by the cancellation machinery within 5s.");
+                failureMessage: "Process was not terminated by the cancellation machinery within 5s.").ConfigureAwait(true);
         }
         finally
         {
@@ -241,14 +241,14 @@ public class ProcessRuntimeBugfixTests
             process.Start();
 
             ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None)
-                .WaitAsync(TimeSpan.FromSeconds(30));
+                .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
 
             await Assert.That(result.ExitTime).IsNotEqualTo(default(DateTime));
             await Assert.That(process.HasExited).IsTrue();
         }
         finally
         {
-            await process.Kill();
+            await process.Kill().ConfigureAwait(true);
         }
     }
 }

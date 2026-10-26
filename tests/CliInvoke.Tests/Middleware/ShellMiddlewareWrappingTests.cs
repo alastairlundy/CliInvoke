@@ -77,7 +77,7 @@ public class ShellMiddlewareWrappingTests
         IProcessInvoker invoker = scope.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config = new ProcessConfiguration("echo", "hello from shell wrapping");
-        await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
+        await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(factory.LastConfiguration).IsNotNull();
         return factory.LastConfiguration!;
@@ -91,7 +91,7 @@ public class ShellMiddlewareWrappingTests
     public async Task UsePowerShell_WrapsWithNoProfileNonInteractiveCommandSwitches()
     {
         ProcessConfiguration wrapped = await RunThroughShellMiddlewareAsync(
-            builder => builder.UsePowerShell());
+            builder => builder.UsePowerShell()).ConfigureAwait(true);
 
         await Assert.That(wrapped.TargetFilePath)
             .IsEqualTo(OperatingSystem.IsWindows() ? "pwsh.exe" : "pwsh");
@@ -110,7 +110,7 @@ public class ShellMiddlewareWrappingTests
 
         ProcessConfiguration wrapped = await RunThroughShellMiddlewareAsync(
             builder => builder.UseDefaultShell(),
-            shellDetector: new FixedShellDetector("pwsh", shellPath));
+            shellDetector: new FixedShellDetector("pwsh", shellPath)).ConfigureAwait(true);
 
         await Assert.That(wrapped.TargetFilePath).IsEqualTo(new FileInfo(shellPath).FullName);
         await Assert.That(wrapped.ArgumentList.Count).IsEqualTo(4);
@@ -128,7 +128,7 @@ public class ShellMiddlewareWrappingTests
 
         ProcessConfiguration wrapped = await RunThroughShellMiddlewareAsync(
             builder => builder.UseDefaultShell(),
-            shellDetector: new FixedShellDetector("sh", shellPath));
+            shellDetector: new FixedShellDetector("sh", shellPath)).ConfigureAwait(true);
 
         await Assert.That(wrapped.TargetFilePath).IsEqualTo(new FileInfo(shellPath).FullName);
         await Assert.That(wrapped.ArgumentList.Count).IsEqualTo(2);
@@ -150,7 +150,7 @@ public class ShellMiddlewareWrappingTests
 
         ProcessConfiguration wrapped = await RunThroughShellMiddlewareAsync(
             builder => builder.UsePowerShell(),
-            options: options);
+            options: options).ConfigureAwait(true);
 
         await Assert.That(wrapped.WindowCreation).IsTrue();
         await Assert.That(wrapped.UseShellExecution).IsTrue();

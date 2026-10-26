@@ -39,7 +39,7 @@ public class ProcessCancellationTests
         {
             Task waitTask = process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
             Task ceiling = Task.Delay(TimeSpan.FromSeconds(ceilingSeconds));
-            Task completed = await Task.WhenAny(waitTask, ceiling);
+            Task completed = await Task.WhenAny(waitTask, ceiling).ConfigureAwait(true);
 
             if (completed == ceiling)
             {
@@ -50,7 +50,7 @@ public class ProcessCancellationTests
             await ProcessTestHelper.WaitForConditionAsync(
                 () => !Process.GetProcesses().Any(x => x.Id == processId),
                 TimeSpan.FromSeconds(5),
-                failureMessage: $"Process {processId} still running 5s after cancellation");
+                failureMessage: $"Process {processId} still running 5s after cancellation").ConfigureAwait(true);
         }
         finally
         {
@@ -100,7 +100,7 @@ public class ProcessCancellationTests
         {
             Task waitTask = process.WaitForExitOrTimeoutAsync(processExitConfiguration, CancellationToken.None);
             Task ceiling = Task.Delay(TimeSpan.FromSeconds(ceilingSeconds));
-            Task completed = await Task.WhenAny(waitTask, ceiling);
+            Task completed = await Task.WhenAny(waitTask, ceiling).ConfigureAwait(true);
 
             if (completed == ceiling)
             {
@@ -111,7 +111,7 @@ public class ProcessCancellationTests
             await ProcessTestHelper.WaitForConditionAsync(
                 () => !Process.GetProcesses().Any(x => x.Id == processId),
                 TimeSpan.FromSeconds(5),
-                failureMessage: $"Process {processId} still running 5s after cancellation");
+                failureMessage: $"Process {processId} still running 5s after cancellation").ConfigureAwait(true);
         }
         finally
         {

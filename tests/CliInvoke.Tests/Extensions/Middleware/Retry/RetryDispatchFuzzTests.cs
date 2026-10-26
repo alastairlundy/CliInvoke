@@ -66,7 +66,7 @@ public class RetryDispatchFuzzTests
                     return Task.CompletedTask;
                 };
 
-                await middleware.InvokeAsync(context, next);
+                await middleware.InvokeAsync(context, next).ConfigureAwait(true);
 
                 return attempts == (exitCode != 0 ? maxAttempts : 1);
             })
@@ -103,7 +103,7 @@ public class RetryDispatchFuzzTests
                     return Task.CompletedTask;
                 };
 
-                await middleware.InvokeAsync(context, next);
+                await middleware.InvokeAsync(context, next).ConfigureAwait(true);
 
                 return attempts == 1;
             })

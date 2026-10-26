@@ -59,18 +59,20 @@ public class PowerShellMiddlewareIntegrationTests
     [SupportedOSPlatform("freebsd")]
     private static async Task<BufferedProcessResult> ExecuteDotnetVersionThroughPwshAsync()
     {
-        await using ServiceProvider provider = new ServiceCollection()
+        ServiceProvider provider = new ServiceCollection()
             .AddCliInvokeSpecializations()
             .AddCliInvoke(builder => builder.UsePowerShell())
             .BuildServiceProvider();
-
-        IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
+        await using (provider.ConfigureAwait(true))
+        {
+            IProcessInvoker invoker = provider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
         return await invoker.ExecuteBufferedAsync(
             config,
-            ProcessExitConfiguration.CreateGraceful());
+            ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
+        }
     }
 
     [Test]
@@ -93,7 +95,7 @@ public class PowerShellMiddlewareIntegrationTests
         // `pwsh -NoProfile -Command "..."`. We wire the middleware onto a normal
         // ProcessInvoker through the supported DI entry points; the dedicated
         // `PowershellProcessInvoker` type was removed in favour of this pipeline.
-        BufferedProcessResult result = await ExecuteDotnetVersionThroughPwshAsync();
+        BufferedProcessResult result = await ExecuteDotnetVersionThroughPwshAsync().ConfigureAwait(true);
 
         // pwsh occasionally dies from a signal on hosted Linux runners (observed
         // SIGABRT/exit 134 on ubuntu-latest) before producing any output. That is an
@@ -102,7 +104,7 @@ public class PowerShellMiddlewareIntegrationTests
         // on Unix are reserved for signal deaths (128 + signal number).
         if (OperatingSystem.IsLinux() && result.ExitCode > 127)
         {
-            result = await ExecuteDotnetVersionThroughPwshAsync();
+            result = await ExecuteDotnetVersionThroughPwshAsync().ConfigureAwait(true);
         }
 
         // Fail with captured output first so a crash like the one above is diagnosable

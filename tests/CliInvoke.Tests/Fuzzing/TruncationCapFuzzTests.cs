@@ -115,7 +115,7 @@ public class TruncationCapFuzzTests
                     return Task.CompletedTask;
                 };
 
-                await middleware.InvokeAsync(context, next);
+                await middleware.InvokeAsync(context, next).ConfigureAwait(true);
 
                 return captured is not null && captured.MaxBufferedOutputBytes == maxSize;
             })

@@ -56,7 +56,7 @@ public class ShellInjectionSecurityTests
         await middleware.InvokeAsync(
             new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
                 InvocationMode.Buffered),
-            next.Invoke);
+            next.Invoke).ConfigureAwait(true);
 
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 
@@ -98,7 +98,7 @@ public class ShellInjectionSecurityTests
         await middleware.InvokeAsync(
             new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
                 InvocationMode.Buffered),
-            next.Invoke);
+            next.Invoke).ConfigureAwait(true);
 
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 
@@ -129,7 +129,7 @@ public class ShellInjectionSecurityTests
         await middleware.InvokeAsync(
             new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
                 InvocationMode.Buffered),
-            next.Invoke);
+            next.Invoke).ConfigureAwait(true);
 
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 
@@ -162,7 +162,7 @@ public class ShellInjectionSecurityTests
         await middleware.InvokeAsync(
             new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
                 InvocationMode.Buffered),
-            next.Invoke);
+            next.Invoke).ConfigureAwait(true);
 
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 

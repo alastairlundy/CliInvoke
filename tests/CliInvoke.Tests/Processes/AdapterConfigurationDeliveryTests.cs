@@ -62,7 +62,7 @@ public class AdapterConfigurationDeliveryTests
         };
 
         BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
-            ProcessExitConfiguration.CreateGraceful());
+            ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         // Exit code 1 means the child could not find the variable at all.
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -121,7 +121,7 @@ public class AdapterConfigurationDeliveryTests
             };
 
             BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
-                ProcessExitConfiguration.CreateGraceful());
+                ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
             await Assert.That(result.ExitCode).IsEqualTo(1);
             await Assert.That(result.StandardOutput).IsEqualTo(string.Empty);
@@ -153,7 +153,7 @@ public class AdapterConfigurationDeliveryTests
             };
 
             BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
-                ProcessExitConfiguration.CreateGraceful());
+                ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
             await Assert.That(result.ExitCode).IsEqualTo(0);
             await Assert.That(result.StandardOutput).IsEqualTo(string.Empty);

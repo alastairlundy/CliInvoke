@@ -57,7 +57,7 @@ public class RetryMiddlewareTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(ctx, next);
+        await middleware.InvokeAsync(ctx, next).ConfigureAwait(true);
 
         await Assert.That(attempts).IsEqualTo(3);
     }
@@ -81,7 +81,7 @@ public class RetryMiddlewareTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(ctx, next);
+        await middleware.InvokeAsync(ctx, next).ConfigureAwait(true);
 
         await Assert.That(attempts).IsEqualTo(1);
     }
@@ -105,7 +105,7 @@ public class RetryMiddlewareTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(ctx, next);
+        await middleware.InvokeAsync(ctx, next).ConfigureAwait(true);
 
         await Assert.That(attempts).IsEqualTo(1);
     }
@@ -129,7 +129,7 @@ public class RetryMiddlewareTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(ctx, next);
+        await middleware.InvokeAsync(ctx, next).ConfigureAwait(true);
 
         await Assert.That(attempts).IsEqualTo(1);
     }
@@ -171,7 +171,7 @@ public class RetryMiddlewareTests
             return Task.CompletedTask;
         };
 
-        await middleware.InvokeAsync(ctx, next);
+        await middleware.InvokeAsync(ctx, next).ConfigureAwait(true);
 
         await Assert.That(attempts).IsEqualTo(1);
     }
@@ -206,7 +206,7 @@ public class RetryMiddlewareTests
         // The retry middleware is registered and active: the retryable result is attempted
         // MaxAttempts times rather than once, and the classifier is consulted once per attempt.
         ProcessConfiguration config = new ProcessConfiguration("cmd.exe", "/C echo hi");
-        await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
+        await invoker.ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(policy.Calls).IsEqualTo(RetryOptions.Default.MaxAttempts);
     }

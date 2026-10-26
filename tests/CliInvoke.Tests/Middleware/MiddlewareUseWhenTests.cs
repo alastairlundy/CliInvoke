@@ -23,7 +23,7 @@ public class MiddlewareUseWhenTests
         });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "SubA", "terminal" }, CollectionOrdering.Matching);
     }
@@ -46,7 +46,7 @@ public class MiddlewareUseWhenTests
         });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "terminal" }, CollectionOrdering.Matching);
     }
@@ -69,7 +69,7 @@ public class MiddlewareUseWhenTests
         });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "SubA", "terminal" }, CollectionOrdering.Matching);
     }
@@ -92,7 +92,7 @@ public class MiddlewareUseWhenTests
         });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "terminal" }, CollectionOrdering.Matching);
     }
@@ -116,7 +116,7 @@ public class MiddlewareUseWhenTests
         });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "Outer", "SubA", "terminal" }, CollectionOrdering.Matching);
     }
@@ -140,7 +140,7 @@ public class MiddlewareUseWhenTests
         });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "Outer", "terminal" }, CollectionOrdering.Matching);
     }
@@ -169,7 +169,7 @@ public class MiddlewareUseWhenTests
         });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "OuterSub", "InnerSub", "terminal" }, CollectionOrdering.Matching);
     }
@@ -198,7 +198,7 @@ public class MiddlewareUseWhenTests
         });
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "OuterSub", "terminal" }, CollectionOrdering.Matching);
     }

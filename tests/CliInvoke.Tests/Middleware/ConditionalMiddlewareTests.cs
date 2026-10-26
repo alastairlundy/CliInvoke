@@ -21,7 +21,7 @@ public class ConditionalMiddlewareTests
         };
 
         InvocationContext ctx = CreateContext();
-        await conditional.InvokeAsync(ctx, outerNext);
+        await conditional.InvokeAsync(ctx, outerNext).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "SubA", "outerNext" }, CollectionOrdering.Matching);
     }
@@ -42,7 +42,7 @@ public class ConditionalMiddlewareTests
         };
 
         InvocationContext ctx = CreateContext();
-        await conditional.InvokeAsync(ctx, outerNext);
+        await conditional.InvokeAsync(ctx, outerNext).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "outerNext" }, CollectionOrdering.Matching);
     }
@@ -63,7 +63,7 @@ public class ConditionalMiddlewareTests
             new List<IProcessMiddleware> { blockingMiddleware });
 
         InvocationContext ctx = CreateContext();
-        await conditional.InvokeAsync(ctx, outerNext);
+        await conditional.InvokeAsync(ctx, outerNext).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "SubA" }, CollectionOrdering.Matching);
     }
@@ -85,7 +85,7 @@ public class ConditionalMiddlewareTests
         };
 
         InvocationContext ctx = CreateContext();
-        await conditional.InvokeAsync(ctx, outerNext);
+        await conditional.InvokeAsync(ctx, outerNext).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "SubA", "SubB", "outerNext" }, CollectionOrdering.Matching);
     }
@@ -106,7 +106,7 @@ public class ConditionalMiddlewareTests
         };
 
         InvocationContext ctx = CreateContext();
-        await conditional.InvokeAsync(ctx, outerNext);
+        await conditional.InvokeAsync(ctx, outerNext).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "SubA", "outerNext" }, CollectionOrdering.Matching);
     }

@@ -36,7 +36,7 @@ public class ProcessResultCanceledSignalTests
         CountingExternalProcessFactory factory = new() { DefaultCanceled = true };
         ProcessInvocationPipeline pipeline = new(factory);
 
-        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(RawContext(_configuration));
+        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(RawContext(_configuration)).ConfigureAwait(true);
 
         await Assert.That(result.Canceled).IsTrue();
         await Assert.That(result.Signal).IsNull();
@@ -48,7 +48,7 @@ public class ProcessResultCanceledSignalTests
         CountingExternalProcessFactory factory = new() { DefaultCanceled = false };
         ProcessInvocationPipeline pipeline = new(factory);
 
-        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(RawContext(_configuration));
+        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(RawContext(_configuration)).ConfigureAwait(true);
 
         await Assert.That(result.Canceled).IsFalse();
     }
@@ -61,7 +61,7 @@ public class ProcessResultCanceledSignalTests
         InvocationContext ctx = new(_configuration, ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Buffered, CancellationToken.None);
 
-        BufferedProcessResult result = await pipeline.InvokeAsync<BufferedProcessResult>(ctx);
+        BufferedProcessResult result = await pipeline.InvokeAsync<BufferedProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(result.Canceled).IsTrue();
     }
@@ -78,7 +78,7 @@ public class ProcessResultCanceledSignalTests
         };
         ProcessInvocationPipeline pipeline = new(factory);
 
-        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(RawContext(_configuration));
+        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(RawContext(_configuration)).ConfigureAwait(true);
 
         await Assert.That(result.Signal).IsEqualTo(PosixSignal.SIGTERM);
         await Assert.That(result.Canceled).IsFalse();
@@ -94,7 +94,7 @@ public class ProcessResultCanceledSignalTests
         };
         ProcessInvocationPipeline pipeline = new(factory);
 
-        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(RawContext(_configuration));
+        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(RawContext(_configuration)).ConfigureAwait(true);
 
         await Assert.That(result.Canceled).IsTrue();
         await Assert.That(result.Signal).IsNull();
@@ -115,7 +115,7 @@ public class ProcessResultCanceledSignalTests
         InvocationContext ctx = new(_configuration, ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.FireAndForget, CancellationToken.None);
 
-        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(ctx);
+        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(result.Canceled).IsFalse();
         await Assert.That(result.Signal).IsNull();
@@ -142,13 +142,13 @@ public class ProcessResultCanceledSignalTests
             await ProcessTestHelper.WaitForConditionAsync(
                 () => process.HasStarted && !process.HasExited,
                 TimeSpan.FromSeconds(5),
-                failureMessage: "Process did not start within 5s");
+                failureMessage: "Process did not start within 5s").ConfigureAwait(true);
 
             // Process.Kill() terminates a Unix process with SIGKILL (exit code 137), not
             // SIGTERM (exit code 143), so send the expected signal explicitly.
             ProcessTestHelper.SendTerminationSignal(process.Id);
 
-            await process.WaitForExitAsync(CancellationToken.None);
+            await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(true);
 
             await Assert.That(process.HasExited).IsTrue();
             await Assert.That(process.ExitCode).IsEqualTo(143);
@@ -196,11 +196,11 @@ public class ProcessResultCanceledSignalTests
             await ProcessTestHelper.WaitForConditionAsync(
                 () => process.HasStarted && !process.HasExited,
                 TimeSpan.FromSeconds(5),
-                failureMessage: "Process did not start within 5s");
+                failureMessage: "Process did not start within 5s").ConfigureAwait(true);
 
             process.Kill();
 
-            await process.WaitForExitAsync(CancellationToken.None);
+            await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(true);
 
             await Assert.That(process.HasExited).IsTrue();
             await Assert.That(process.ExitCode).IsEqualTo(137);
@@ -238,7 +238,7 @@ public class ProcessResultCanceledSignalTests
 
         try
         {
-            await process.WaitForExitAsync(CancellationToken.None);
+            await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(true);
 
             await Assert.That(process.HasExited).IsTrue();
             await Assert.That(process.ExitCode).IsEqualTo(0);

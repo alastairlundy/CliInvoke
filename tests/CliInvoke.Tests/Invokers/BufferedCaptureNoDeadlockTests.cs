@@ -44,7 +44,7 @@ public class BufferedCaptureNoDeadlockTests
         // Wrap with a timeout so a regression (deadlock) fails fast instead of hanging the run.
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(30));
+            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);

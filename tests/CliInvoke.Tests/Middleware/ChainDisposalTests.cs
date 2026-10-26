@@ -24,7 +24,7 @@ public class ChainDisposalTests
             ProcessExitConfiguration.Default,
             InvocationMode.Buffered);
 
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(ctx.Result).IsEqualTo(bufferedResult);
         await Assert.That(bufferedResult.StandardOutput).IsEqualTo("output");
@@ -50,7 +50,7 @@ public class ChainDisposalTests
             ProcessExitConfiguration.Default,
             InvocationMode.Buffered);
 
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         BufferedProcessResult result = (BufferedProcessResult)ctx.Result!;
         await Assert.That(result.StandardOutput).IsEqualTo("output");

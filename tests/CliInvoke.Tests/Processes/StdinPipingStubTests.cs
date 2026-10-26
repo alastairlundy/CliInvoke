@@ -53,7 +53,7 @@ public class StdinPipingStubTests : IDisposable
         ProcessInvocationPipeline pipeline = new(_factory);
 
         ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(
-            CreateContext(CreateStdinConfiguration(source), InvocationMode.Raw));
+            CreateContext(CreateStdinConfiguration(source), InvocationMode.Raw)).ConfigureAwait(true);
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
             [
@@ -83,7 +83,7 @@ public class StdinPipingStubTests : IDisposable
         InvocationContext context = CreateContext(CreateStdinConfiguration(source),
             InvocationMode.Raw, cancellationTokenSource.Token);
 
-        await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(context))
+        await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(context).ConfigureAwait(true))
             .Throws<OperationCanceledException>();
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
@@ -112,7 +112,7 @@ public class StdinPipingStubTests : IDisposable
         ProcessInvocationPipeline pipeline = new(_factory);
 
         ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(
-            CreateContext(CreateStdinConfiguration(source), InvocationMode.Raw));
+            CreateContext(CreateStdinConfiguration(source), InvocationMode.Raw)).ConfigureAwait(true);
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
             [
@@ -140,7 +140,7 @@ public class StdinPipingStubTests : IDisposable
 
         BufferedProcessResult result =
             await pipeline.InvokeAsync<BufferedProcessResult>(
-                CreateContext(CreateStdinConfiguration(source), InvocationMode.Buffered));
+                CreateContext(CreateStdinConfiguration(source), InvocationMode.Buffered)).ConfigureAwait(true);
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(
             [
@@ -169,7 +169,7 @@ public class StdinPipingStubTests : IDisposable
         InvocationContext context = CreateContext(CreateStdinConfiguration(source),
             InvocationMode.Buffered);
 
-        await Assert.That(async () => await pipeline.InvokeAsync<BufferedProcessResult>(context))
+        await Assert.That(async () => await pipeline.InvokeAsync<BufferedProcessResult>(context).ConfigureAwait(true))
             .Throws<IOException>();
 
         await Assert.That(_factory.StdinPiping.Events).IsEquivalentTo(

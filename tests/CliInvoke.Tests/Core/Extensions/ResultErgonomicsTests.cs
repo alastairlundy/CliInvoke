@@ -421,7 +421,7 @@ public class ResultErgonomicsTests
         // The diagnostic representation must remain a single line.
         int lineCount = 0;
         using StringReader reader = new(text);
-        while (await reader.ReadLineAsync() is not null)
+        while (await reader.ReadLineAsync().ConfigureAwait(true) is not null)
             lineCount++;
         await Assert.That(lineCount).IsEqualTo(1);
     }

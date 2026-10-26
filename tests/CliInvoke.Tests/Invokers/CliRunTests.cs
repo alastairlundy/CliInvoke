@@ -32,7 +32,7 @@ public class CliRunTests
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         ProcessResult result = await CliRun.RunAsync(configuration,
-            ProcessExitConfiguration.CreateGraceful());
+            ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -45,7 +45,7 @@ public class CliRunTests
             new ProcessConfiguration(TargetFilePath, TargetArguments);
 
         BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
-            ProcessExitConfiguration.CreateGraceful());
+            ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -54,7 +54,7 @@ public class CliRunTests
     [Test]
     public async Task RunAsync_WithStringArgs_RunsProcessAndReturnsSuccess()
     {
-        ProcessResult result = await CliRun.RunAsync(TargetFilePath, TargetArguments);
+        ProcessResult result = await CliRun.RunAsync(TargetFilePath, TargetArguments).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -63,7 +63,7 @@ public class CliRunTests
     [Test]
     public async Task RunBufferedAsync_WithStringArgs_RunsProcessAndReturnsSuccess()
     {
-        BufferedProcessResult result = await CliRun.RunBufferedAsync(TargetFilePath, TargetArguments);
+        BufferedProcessResult result = await CliRun.RunBufferedAsync(TargetFilePath, TargetArguments).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -75,7 +75,7 @@ public class CliRunTests
     public async Task RunAsync_WhenProcessCannotBeResolved_Throws()
     {
         await Assert.That(async () =>
-                await CliRun.RunAsync("NONEXISTENT_COMMAND_ABC123.exe", ""))
+                await CliRun.RunAsync("NONEXISTENT_COMMAND_ABC123.exe", "").ConfigureAwait(true))
             .Throws<FileNotFoundException>();
     }
 

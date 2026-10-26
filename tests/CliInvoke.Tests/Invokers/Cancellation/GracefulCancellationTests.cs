@@ -28,7 +28,7 @@ public class GracefulCancellationTests
 
         try
         {
-            await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None, false);
+            await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None, false).ConfigureAwait(true);
 
             await Assert.That(process.HasExited).IsTrue();
 
@@ -77,7 +77,7 @@ public class GracefulCancellationTests
 
         try
         {
-            await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None);
+            await process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration, CancellationToken.None).ConfigureAwait(true);
 
             await Assert.That(process.HasExited).IsTrue();
             await Assert.That(process.Canceled).IsTrue();
@@ -113,7 +113,7 @@ public class GracefulCancellationTests
             new FilePathResolver());
 
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-            await detector.ResolveDefaultShellAsync(cts.Token));
+            await detector.ResolveDefaultShellAsync(cts.Token).ConfigureAwait(true));
     }
 
     [Test]
@@ -143,7 +143,7 @@ public class GracefulCancellationTests
             using ExternalProcess process = new(new FilePathResolver(), configuration, exitConfiguration);
             process.Start();
 
-            ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None);
+            ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None).ConfigureAwait(true);
 
             await Assert.That(process.HasExited).IsTrue();
             await Assert.That(result.Canceled).IsTrue();

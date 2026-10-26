@@ -21,7 +21,7 @@ public class MiddlewareChainTests
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
 
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "A", "B", "terminal" }, CollectionOrdering.Matching);
     }
@@ -42,7 +42,7 @@ public class MiddlewareChainTests
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
 
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "A" });
     }
@@ -137,7 +137,7 @@ public class MiddlewareChainTests
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
 
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog[^1]).IsEqualTo("terminal");
     }
@@ -156,7 +156,7 @@ public class MiddlewareChainTests
             ProcessExitConfiguration.Default,
             InvocationMode.Raw);
 
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "terminal" });
     }

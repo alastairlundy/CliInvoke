@@ -3,6 +3,7 @@ using CliInvoke.Core;
 using CliInvoke.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Globalization;
 
 // ReSharper disable LocalizableElement
 
@@ -30,9 +31,9 @@ int randomNumber = Random.Shared.Next();
 
 Console.WriteLine($"Random number is {randomNumber}");
 
-ProcessConfiguration procConfig = new ProcessConfiguration("echo", randomNumber.ToString());
+ProcessConfiguration procConfig = new ProcessConfiguration("echo", randomNumber.ToString(CultureInfo.InvariantCulture));
 
-BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procConfig);
+BufferedProcessResult processResult = await invoker.ExecuteBufferedAsync(procConfig).ConfigureAwait(true);
 
 Console.WriteLine($"Standard Output was: {processResult.StandardOutput}");
 

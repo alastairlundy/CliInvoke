@@ -41,7 +41,7 @@ public class OutputTruncationMiddlewareTests
         {
             downstream = c;
             return Task.CompletedTask;
-        });
+        }).ConfigureAwait(true);
 
         await Assert.That(downstream).IsNotNull();
         await Assert.That(downstream!.ExitConfiguration.MaxBufferedOutputBytes).IsEqualTo(1_048_576);
@@ -59,7 +59,7 @@ public class OutputTruncationMiddlewareTests
         {
             downstream = c;
             return Task.CompletedTask;
-        });
+        }).ConfigureAwait(true);
 
         await Assert.That(downstream).IsNotNull();
         await Assert.That(downstream!.ExitConfiguration.MaxBufferedOutputBytes).IsEqualTo(2048);
@@ -77,7 +77,7 @@ public class OutputTruncationMiddlewareTests
         {
             nextCalled = true;
             return Task.CompletedTask;
-        });
+        }).ConfigureAwait(true);
 
         await Assert.That(nextCalled).IsTrue();
     }

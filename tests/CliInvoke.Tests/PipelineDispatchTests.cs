@@ -39,7 +39,7 @@ internal class PipelineDispatchTests : IDisposable
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
         InvocationContext ctx = CreateContext(InvocationMode.Raw);
 
-        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(ctx);
+        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -53,7 +53,7 @@ internal class PipelineDispatchTests : IDisposable
         InvocationContext ctx = CreateContext(InvocationMode.Buffered);
 
         BufferedProcessResult result =
-            await pipeline.InvokeAsync<BufferedProcessResult>(ctx);
+            await pipeline.InvokeAsync<BufferedProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -66,7 +66,7 @@ internal class PipelineDispatchTests : IDisposable
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
         InvocationContext ctx = CreateContext(InvocationMode.FireAndForget);
 
-        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(ctx);
+        ProcessResult result = await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(_factory.CreateCount).IsEqualTo(1);
@@ -79,7 +79,7 @@ internal class PipelineDispatchTests : IDisposable
         InvocationContext ctx = CreateContext(InvocationMode.Raw,
             new CancellationToken(true));
 
-        await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(ctx))
+        await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true))
             .Throws<OperationCanceledException>();
     }
 
@@ -91,7 +91,7 @@ internal class PipelineDispatchTests : IDisposable
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
         InvocationContext ctx = CreateContext(InvocationMode.Raw);
 
-        await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(ctx))
+        await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true))
             .Throws<InvalidOperationException>();
     }
 
@@ -111,7 +111,7 @@ internal class PipelineDispatchTests : IDisposable
             InvocationMode.Raw, default);
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
 
-        await pipeline.InvokeAsync<ProcessResult>(ctx);
+        await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(_factory.LastConfiguration).IsNotNull();
         await Assert.That(_factory.LastConfiguration!.OutputRedirection).IsFalse();
@@ -134,7 +134,7 @@ internal class PipelineDispatchTests : IDisposable
             InvocationMode.Buffered, default);
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
 
-        await pipeline.InvokeAsync<BufferedProcessResult>(ctx);
+        await pipeline.InvokeAsync<BufferedProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(_factory.LastConfiguration).IsNotNull();
         await Assert.That(_factory.LastConfiguration!.OutputRedirection).IsTrue();
@@ -154,7 +154,7 @@ internal class PipelineDispatchTests : IDisposable
             InvocationMode.Raw, default);
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
 
-        await pipeline.InvokeAsync<ProcessResult>(ctx);
+        await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(_factory.LastConfiguration).IsNotNull();
         await Assert.That(_factory.LastConfiguration).IsSameReferenceAs(config);
@@ -185,7 +185,7 @@ internal class PipelineDispatchTests : IDisposable
             InvocationMode.Raw, default);
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
 
-        await pipeline.InvokeAsync<ProcessResult>(ctx);
+        await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(_factory.LastConfiguration).IsNotNull();
         await Assert.That(_factory.LastConfiguration!.EnvironmentVariables[VariableName])

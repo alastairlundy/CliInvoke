@@ -40,7 +40,7 @@ public class ProcessInvokerIntegrationTests
 
         ProcessResult result =
             await processInvoker.ExecuteAsync(config,
-                ProcessExitConfiguration.CreateGraceful());
+                ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -57,7 +57,7 @@ public class ProcessInvokerIntegrationTests
 
         BufferedProcessResult result =
             await processInvoker.ExecuteBufferedAsync(config,
-                ProcessExitConfiguration.CreateGraceful());
+                ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -75,7 +75,7 @@ public class ProcessInvokerIntegrationTests
         await Assert.That(async () =>
                 await processInvoker.ExecuteAsync(config,
                     ProcessExitConfiguration.CreateGraceful(),
-                    new CancellationToken(true)))
+                    new CancellationToken(true)).ConfigureAwait(true))
             .Throws<OperationCanceledException>();
     }
 
@@ -91,7 +91,7 @@ public class ProcessInvokerIntegrationTests
         await Assert.That(async () =>
                 await processInvoker.ExecuteBufferedAsync(config,
                     ProcessExitConfiguration.CreateGraceful(),
-                    new CancellationToken(true)))
+                    new CancellationToken(true)).ConfigureAwait(true))
             .Throws<OperationCanceledException>();
     }
 

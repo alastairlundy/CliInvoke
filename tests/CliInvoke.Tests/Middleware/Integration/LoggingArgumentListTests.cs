@@ -40,7 +40,7 @@ public class LoggingArgumentListTests
             ProcessExitConfiguration.CreateGraceful(),
             InvocationMode.Buffered);
 
-        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
+        await middleware.InvokeAsync(context, _ => Task.CompletedTask).ConfigureAwait(true);
 
         (LogLevel Level, string Message) entry = logger.Entries.First(e =>
             e.Level == LogLevel.Information && e.Message.Contains("with arguments"));
@@ -56,7 +56,7 @@ public class LoggingArgumentListTests
             ArgumentList = ["--flag", "value"],
         };
 
-        string message = await InvokeAndCaptureEntryAsync(configuration);
+        string message = await InvokeAndCaptureEntryAsync(configuration).ConfigureAwait(true);
 
         await Assert.That(message.Contains("--flag value")).IsTrue();
     }
@@ -70,7 +70,7 @@ public class LoggingArgumentListTests
             ArgumentList = ["--flag", "value"],
         };
 
-        string message = await InvokeAndCaptureEntryAsync(configuration);
+        string message = await InvokeAndCaptureEntryAsync(configuration).ConfigureAwait(true);
 
         await Assert.That(message.Contains("--flag value")).IsTrue();
     }
@@ -83,7 +83,7 @@ public class LoggingArgumentListTests
             ArgumentList = ["--password", "hunter2"],
         };
 
-        string message = await InvokeAndCaptureEntryAsync(configuration);
+        string message = await InvokeAndCaptureEntryAsync(configuration).ConfigureAwait(true);
 
         await Assert.That(message.Contains("***")).IsTrue();
         await Assert.That(message.Contains("hunter2")).IsFalse();
@@ -97,7 +97,7 @@ public class LoggingArgumentListTests
             ArgumentList = ["--ignored", "value"],
         };
 
-        string message = await InvokeAndCaptureEntryAsync(configuration);
+        string message = await InvokeAndCaptureEntryAsync(configuration).ConfigureAwait(true);
 
         await Assert.That(message.Contains("--password ***")).IsTrue();
         await Assert.That(message.Contains("hunter2")).IsFalse();

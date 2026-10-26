@@ -47,12 +47,12 @@ public class ProcessSuspendResumeTests
             await ProcessTestHelper.WaitForConditionAsync(
                 () => !process.HasExited,
                 TimeSpan.FromSeconds(3),
-                failureMessage: "Process exited before suspend could take effect");
+                failureMessage: "Process exited before suspend could take effect").ConfigureAwait(true);
 
             process.ResumeProcess();
 
             Task waitForExit = process.WaitForExitAsync(CancellationToken.None);
-            await Task.WhenAny(waitForExit, Task.Delay(TimeSpan.FromSeconds(sleepTimeSeconds + 20)));
+            await Task.WhenAny(waitForExit, Task.Delay(TimeSpan.FromSeconds(sleepTimeSeconds + 20))).ConfigureAwait(true);
 
             await Assert.That(process.HasExited).IsTrue();
         }

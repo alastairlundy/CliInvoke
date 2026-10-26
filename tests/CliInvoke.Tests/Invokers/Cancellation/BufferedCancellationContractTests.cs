@@ -56,7 +56,7 @@ public class BufferedCancellationContractTests
             cancellationTokenSource.Cancel();
 
             BufferedProcessResult result =
-                await captureTask.WaitAsync(TimeSpan.FromSeconds(15));
+                await captureTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
 
             await Assert.That(result.Canceled).IsTrue();
             await Assert.That(result.StandardOutput).IsEqualTo(string.Empty);
@@ -66,7 +66,7 @@ public class BufferedCancellationContractTests
         {
             if (!process.HasExited)
             {
-                await process.Kill();
+                await process.Kill().ConfigureAwait(true);
             }
 
             process.Dispose();
@@ -110,7 +110,7 @@ public class BufferedCancellationContractTests
             OperationCanceledException? propagated = null;
             try
             {
-                await captureTask.WaitAsync(TimeSpan.FromSeconds(15));
+                await captureTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
             }
             catch (OperationCanceledException exception)
             {
@@ -123,7 +123,7 @@ public class BufferedCancellationContractTests
         {
             if (!process.HasExited)
             {
-                await process.Kill();
+                await process.Kill().ConfigureAwait(true);
             }
 
             process.Dispose();
@@ -164,7 +164,7 @@ public class BufferedCancellationContractTests
                 process.WaitForExitOrTimeoutAsync(cancellationTokenSource.Token);
             cancellationTokenSource.Cancel();
 
-            ProcessResult result = await waitTask.WaitAsync(TimeSpan.FromSeconds(15));
+            ProcessResult result = await waitTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
 
             await Assert.That(result.Canceled).IsTrue();
         }
@@ -172,7 +172,7 @@ public class BufferedCancellationContractTests
         {
             if (!process.HasExited)
             {
-                await process.Kill();
+                await process.Kill().ConfigureAwait(true);
             }
 
             process.Dispose();

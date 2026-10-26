@@ -39,7 +39,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await CliRun
             .RunBufferedAsync(target, arguments, maxBufferedOutputBytes: 1000)
-            .WaitAsync(TimeSpan.FromSeconds(30));
+            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsTrue();
         await Assert.That(result.StandardOutput.Length).IsLessThanOrEqualTo(1000);
@@ -52,7 +52,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await CliRun
             .RunBufferedAsync(target, arguments)
-            .WaitAsync(TimeSpan.FromSeconds(30));
+            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsFalse();
         await Assert.That(result.StandardOutput.Length).IsGreaterThan(1000);
@@ -69,7 +69,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await CliRun
             .RunBufferedAsync(configuration, exit)
-            .WaitAsync(TimeSpan.FromSeconds(30));
+            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsTrue();
         await Assert.That(result.StandardOutput.Length).IsLessThanOrEqualTo(1000);
@@ -87,7 +87,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(30));
+            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsTrue();
@@ -106,7 +106,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(30));
+            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsFalse();
@@ -129,7 +129,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, exit)
-            .WaitAsync(TimeSpan.FromSeconds(30));
+            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsTrue();

@@ -53,7 +53,7 @@ public class ConditionalMiddlewareContextRestoreTests
             new List<IProcessMiddleware> { upstream, conditional }, callLog);
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(
             new List<string> { "Upstream", "SubA", "terminal" }, CollectionOrdering.Matching);
@@ -80,7 +80,7 @@ public class ConditionalMiddlewareContextRestoreTests
             new List<IProcessMiddleware> { upstream, conditional }, callLog);
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(
             new List<string> { "Upstream", "BlockingSub" }, CollectionOrdering.Matching);
@@ -103,7 +103,7 @@ public class ConditionalMiddlewareContextRestoreTests
             new List<IProcessMiddleware> { upstream, conditional, downstream }, callLog);
 
         InvocationContext ctx = CreateContext();
-        await chain.RunAsync(ctx, CancellationToken.None);
+        await chain.RunAsync(ctx, CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(callLog).IsEquivalentTo(
             new List<string> { "Upstream", "SubA", "Downstream", "terminal" },
@@ -137,7 +137,7 @@ public class ConditionalMiddlewareContextRestoreTests
         {
             _callLog.Add(_name);
             ObservedBefore = context.Middleware;
-            await next(context);
+            await next(context).ConfigureAwait(true);
             ObservedAfter = context.Middleware;
         }
     }

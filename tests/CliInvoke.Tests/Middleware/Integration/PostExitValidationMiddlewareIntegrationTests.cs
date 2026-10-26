@@ -30,7 +30,7 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         ProcessResult result = await invoker.ExecuteAsync(
             config,
-            ProcessExitConfiguration.CreateGraceful());
+            ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
     }
@@ -48,7 +48,7 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(
                 config,
-                ProcessExitConfiguration.CreateGraceful()))
+                ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true))
             .Throws<ProcessValidationException>();
 
         await Assert.That(exception.Message).Contains("exit", StringComparison.OrdinalIgnoreCase);
@@ -67,7 +67,7 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
             config,
-            ProcessExitConfiguration.CreateGraceful());
+            ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput).Contains(".");
@@ -90,7 +90,7 @@ public class PostExitValidationMiddlewareIntegrationTests
                 "The process was expected to fail validation.")]
         };
 
-        ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(config, exit))
+        ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(config, exit).ConfigureAwait(true))
             .Throws<ProcessValidationException>();
 
         await Assert.That(exception.Result).IsNotNull();
@@ -105,7 +105,7 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
-        ProcessResult result = await invoker.ExecuteAsync(config, new ProcessExitConfiguration());
+        ProcessResult result = await invoker.ExecuteAsync(config, new ProcessExitConfiguration()).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
     }
@@ -128,7 +128,7 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(
                 config,
-                ProcessExitConfiguration.CreateGraceful()))
+                ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true))
             .Throws<ProcessValidationException>();
 
         await Assert.That(exception.Message).IsEqualTo("Process result failed validation: FirstFailingRule: The first rule failed.; SecondFailingRule: The second rule failed.");
@@ -157,7 +157,7 @@ public class PostExitValidationMiddlewareIntegrationTests
             ]
         };
 
-        ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(config, exit))
+        ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(config, exit).ConfigureAwait(true))
             .Throws<ProcessValidationException>();
 
         await Assert.That(exception.Message).IsEqualTo("Process result failed validation: ConfigRule: The configuration rule failed.; SugarRule: The sugar rule failed.");
@@ -210,7 +210,7 @@ public class PostExitValidationMiddlewareIntegrationTests
 
         ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 
-        ProcessResult result = await invoker.ExecuteAsync(config, exit);
+        ProcessResult result = await invoker.ExecuteAsync(config, exit).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
 

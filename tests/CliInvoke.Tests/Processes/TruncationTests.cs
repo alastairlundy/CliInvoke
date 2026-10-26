@@ -37,7 +37,7 @@ public class TruncationTests
 
         process.Start();
 
-        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 1000, 1000);
+        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 1000, 1000).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsTrue();
         await Assert.That(result.StandardOutput.Length).IsLessThanOrEqualTo(1000);
@@ -53,7 +53,7 @@ public class TruncationTests
 
         process.Start();
 
-        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None);
+        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsFalse();
         await Assert.That(result.StandardOutput.Length).IsGreaterThan(1000);
@@ -69,7 +69,7 @@ public class TruncationTests
 
         process.Start();
 
-        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, -1, -1);
+        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, -1, -1).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsFalse();
         await Assert.That(result.StandardOutput.Length).IsGreaterThan(1000);
@@ -85,7 +85,7 @@ public class TruncationTests
 
         process.Start();
 
-        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 0, 0);
+        BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 0, 0).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsTrue();
         await Assert.That(result.StandardOutput).IsEmpty();
@@ -110,7 +110,7 @@ public class TruncationTests
             process.Start();
 
             // '你好世界' is 12 bytes in UTF-8. Cap at 7 bytes (cuts mid-character).
-            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 7, 7);
+            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 7, 7).ConfigureAwait(true);
 
             await Assert.That(result.WasTruncated).IsTrue();
             await Assert.That(result.StandardOutput).DoesNotContain('\uFFFD');
@@ -127,7 +127,7 @@ public class TruncationTests
             process.Start();
 
             // '你好世界' is 12 bytes in UTF-8. Cap at 7 bytes (cuts mid-character).
-            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 7, 7);
+            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 7, 7).ConfigureAwait(true);
 
             await Assert.That(result.WasTruncated).IsTrue();
             await Assert.That(result.StandardOutput).DoesNotContain('\uFFFD');
@@ -150,7 +150,7 @@ public class TruncationTests
             process.Start();
 
             // 3 bytes of '你' + 3 bytes of '好' = 6 bytes. Cap at 6 = 2 complete characters.
-            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 6, 6);
+            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 6, 6).ConfigureAwait(true);
 
             await Assert.That(result.WasTruncated).IsTrue();
             await Assert.That(result.StandardOutput.Length).IsEqualTo(2);
@@ -166,7 +166,7 @@ public class TruncationTests
             process.Start();
 
             // 3 bytes of '你' + 3 bytes of '好' = 6 bytes. Cap at 6 = 2 complete characters.
-            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 6, 6);
+            BufferedProcessResult result = await process.CaptureBufferedResultAsync(CancellationToken.None, 6, 6).ConfigureAwait(true);
 
             await Assert.That(result.WasTruncated).IsTrue();
             await Assert.That(result.StandardOutput.Length).IsEqualTo(2);

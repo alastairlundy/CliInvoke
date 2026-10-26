@@ -121,7 +121,7 @@ internal class ProcessTestHelper
                 return;
             }
 
-            await Task.Delay(pollIntervalMs);
+            await Task.Delay(pollIntervalMs).ConfigureAwait(true);
         }
     }
 }
