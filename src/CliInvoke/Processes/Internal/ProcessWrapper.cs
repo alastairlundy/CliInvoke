@@ -153,28 +153,17 @@ internal class ProcessWrapper : Process
             {
                 PosixSignal? signal = exitStatus.Signal;
 
-                // The runtime's Unix wait reporting casts the RAW positive native signal
-                // number (WTERMSIG) into the PosixSignal type ((PosixSignal)terminatingSignal
-                // in ProcessWaitState.Unix.cs), but the BCL PosixSignal members are negative
-                // sentinels (SIGTERM = -4, SIGKILL = -11), so a positive value can never
-                // compare equal to a member. Convert positive native numbers through the
-                // adapter's platform-specific mapping (Linux vs BSD numbering) BEFORE the
-                // SIGKILL and undefined-value checks below: raw 15 becomes genuine
-                // PosixSignal.SIGTERM, while numbers the platform mapping table cannot
-                // represent — including SIGKILL (9), which has no entry by contract —
-                // collapse to null.
-                // Negative values (if the runtime ever delivers actual members instead of
-                // raw numbers) pass through untouched; null stays null.
+                // The runtime casts the raw positive WTERMSIG into PosixSignal, but BCL members
+                // are negative sentinels (SIGTERM = -4), so a raw positive value can never equal
+                // a member. Map it through the adapter (Linux vs BSD numbering) BEFORE the
+                // SIGKILL/undefined checks below; negative values pass through untouched.
                 if (signal is not null && (int)signal.Value > 0)
                 {
                     signal = ProcessControlAdapter.MapNativeSignalNumber((int)signal.Value);
                 }
 
-                // Parity with the net10.0 heuristic's contracts: SIGKILL maps to null (a
-                // process cannot catch SIGKILL; callers distinguish library-initiated
-                // forceful kills via ProcessResult.Canceled rather than Signal), and
-                // undefined values (numbers no PosixSignal member models) map to null
-                // just like a table miss in the mapping above.
+                // Parity with the net10.0 heuristic: SIGKILL and undefined values both map to
+                // null (see the property remarks).
 #pragma warning disable CA1416 // PosixSignal members are unix-flavoured; Signal is always null on Windows so this comparison never fires there.
                 if (signal is PosixSignal.SIGKILL)
                     return null;
@@ -577,10 +566,7 @@ internal class ProcessWrapper : Process
             }
             finally
             {
-                // Close the child's pipe write end so stdin-reading processes receive
-                // the end-of-file signal on every exit path, including cancellation
-                // and source-stream errors. The cached writer survives fast-exiting
-                // processes; the caller's source stream is never touched here.
+                // In the finally so EOF is delivered on every exit path; see remarks above.
                 _cachedStdInWriter?.Close();
             }
         }
@@ -964,27 +950,19 @@ internal class ProcessWrapper : Process
                 Task secondExitWatch = WaitForExitSafeAsync(cancellationToken);
                 await Task.WhenAny([interruptGraceDelay, secondExitWatch]).ConfigureAwait(false);
 
-                // Task.WhenAny never surfaces the faults of its candidates, and these three
-                // all fault with OperationCanceledException when the caller's token is
-                // cancelled. Observe them without propagating: policy-approved propagation
-                // is the interrupt task's job (below), so the default
+                // Task.WhenAny never surfaces candidate faults; observe them without propagating.
+                // Policy-approved propagation is the interrupt task's job (below), so the default
                 // CancellationThrowsException=false configuration still does not throw OCE.
                 ObserveFault(firstExitWatch);
                 ObserveFault(interruptGraceDelay);
                 ObserveFault(secondExitWatch);
 
                 // Await the interrupt/timeout resolution so _cancellationReason is persisted
-                // before the caller reads Cancelled; otherwise ProcessResult could report
-                // Cancelled as false for a process the cancellation machinery terminated.
-                // Awaiting a completed task always observes its fault, so an exception that
-                // CancellationHelper approved for propagation surfaces every time instead of
-                // depending on timing. When the caller's token has fired, the task is also
-                // bounded: its delay already faulted and its cleanup no-ops once the child
-                // is dead, so it is awaited even when the child has exited, guaranteeing
-                // propagation of the approved cancellation fault. Skipping a not-yet-
-                // completed task is reserved for the natural-exit race: the wait succeeded
-                // for reasons unrelated to cancellation, so the late fault is only
-                // observed there.
+                // before the caller reads Cancelled, and so a cancellation fault CancellationHelper
+                // approved for propagation surfaces every time rather than depending on timing.
+                // A completed task is always safe to await; skipping a still-running one is
+                // reserved for the natural-exit race, where the wait succeeded unrelated to
+                // cancellation and the late fault is only observed.
                 if (cancelWithInterruptTask.IsCompleted
                     || !HasExited
                     || cancellationToken.IsCancellationRequested)

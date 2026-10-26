@@ -53,12 +53,7 @@ internal static class ArgumentEscaper
 
         if (OperatingSystem.IsWindows())
         {
-            // Windows C-runtime argument parsing: a literal " inside a quoted token is
-            // written as "". Backslashes only gain special meaning immediately before a
-            // quote, so a run of N backslashes is doubled to 2N before an embedded quote
-            // and before the (implicit) closing quote the caller adds. Newlines would
-            // terminate the command line, so they are dropped. Shell metacharacters are
-            // intentionally left untouched here.
+            // Escaping rules for the Windows C-runtime parser: documented in the class remarks.
             StringBuilder builder = new(argument.Length + 8);
 
             int backslashCount = 0;
@@ -78,11 +73,9 @@ internal static class ArgumentEscaper
                 }
                 else if (c is '\n' or '\r')
                 {
-                    // Drop bare newlines so they cannot terminate the command line.
-                    // Do not flush the pending backslash run here: a dropped newline is
-                    // not content, so the run still applies to whatever follows (a
-                    // later char flushes it raw, an embedded quote or the end of the
-                    // content doubles it for the closing quote).
+                    // Dropped, so they cannot terminate the command line. The pending backslash
+                    // run is NOT flushed: a dropped newline is not content, so the run still
+                    // applies to whatever follows.
                 }
                 else
                 {
@@ -98,15 +91,9 @@ internal static class ArgumentEscaper
             return builder.ToString();
         }
 
-        // POSIX: the caller supplies the surrounding double quotes (AddEnumerable always
-        // wraps; Add wraps when NeedsQuoting). .NET's Unix argument parser applies the same
-        // backslash rule as the Windows C-runtime: a backslash is special only immediately
-        // before a double quote, where a run of N backslashes is halved (an odd run makes the
-        // following quote literal instead of a delimiter), and a trailing run before the closing
-        // quote the caller adds must be doubled. So the inner content uses identical escaping to
-        // the Windows branch — doubled backslashes before an embedded quote and before the closing
-        // quote, embedded quotes written as "" — with no outer single quotes added here. Bare
-        // newlines are dropped so they cannot terminate the command line.
+        // POSIX: the surrounding double quotes are the caller's job. .NET's Unix parser applies
+        // the same backslash rule as the Windows C-runtime, so the inner escaping below is
+        // identical to the Windows branch.
         StringBuilder posixBuilder = new(argument.Length + 8);
 
         int posixBackslashCount = 0;
@@ -126,8 +113,7 @@ internal static class ArgumentEscaper
             }
             else if (c is '\n' or '\r')
             {
-                // Drop bare newlines so they cannot terminate the command line; the
-                // pending backslash run carries across the drop, same reasoning as the
+                // Dropped; the pending backslash run carries across the drop, as in the
                 // Windows branch above.
             }
             else
@@ -175,13 +161,8 @@ internal static class ArgumentEscaper
             return false;
         }
 
-        // On POSIX, EscapeInner returns content escaped for a double-quoted context
-        // (backslashes and embedded double quotes are backslash-escaped; the caller adds
-        // the surrounding double quotes). A value must still be wrapped when it contains
-        // whitespace (otherwise the OS would split it into multiple tokens), a double
-        // quote, a backslash, or a shell metacharacter that is literal inside double
-        // quotes — this keeps the single-value Add path consistent with AddEnumerable's
-        // double-quote wrapping.
+        // Same check as Windows: the escaped content is emitted in a double-quoted context,
+        // so the same set of characters forces a wrap.
         foreach (char c in argument)
         {
             if (char.IsWhiteSpace(c)

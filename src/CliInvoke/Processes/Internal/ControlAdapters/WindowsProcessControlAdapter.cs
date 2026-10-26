@@ -204,17 +204,17 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
     {
         // Try to share the child process's console so we can send it control events.
-        // If the child has no console (started with CreateNoWindow=true), this will fail
-        // with ERROR_INVALID_HANDLE — Fix #2: give up cleanly instead of sending no-op signals.
+        // If the child has no console (started with CreateNoWindow=true) this fails with
+        // ERROR_INVALID_HANDLE; give up cleanly rather than sending no-op signals.
         bool attached = AttachConsoleWin((uint)process.Id);
 
         bool signalSent = false;
         if (attached)
         {
-            // Fix #3: CTRL_BREAK_EVENT (1) CAN target a specific process group, unlike
-            // CTRL_C_EVENT which is a documented no-op with a non-zero group id.
-            // Fix #4: use GetProcessGroupId which returns the PID — the correct group id
-            // for processes started without CREATE_NEW_PROCESS_GROUP.
+            // CTRL_BREAK_EVENT (1) can target a specific process group, unlike CTRL_C_EVENT
+            // (a documented no-op with a non-zero group id). GetProcessGroupId returns the PID,
+            // which is the correct group id for processes started without
+            // CREATE_NEW_PROCESS_GROUP.
             signalSent = SendCtrlCToConsoleWin(CtrlBreakSignalEvent, GetProcessGroupId(process));
 
             if (!signalSent)
@@ -233,8 +233,8 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
     /// <summary>
     ///     Returns the process group ID for use with GenerateConsoleCtrlEvent.
     ///     For processes started without <c>CREATE_NEW_PROCESS_GROUP</c>, the process ID is the
-    ///     correct group identifier. Fix #4: returns the PID directly instead of querying the
-    ///     EPROCESS-level group id which GenerateConsoleCtrlEvent does not interpret.
+    ///     correct group identifier — the EPROCESS-level group id is not what
+    ///     GenerateConsoleCtrlEvent interprets, so the PID is returned directly.
     /// </summary>
     private static uint GetProcessGroupId(Process process) => (uint)process.Id;
 
