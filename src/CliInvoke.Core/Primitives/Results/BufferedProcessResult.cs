@@ -139,7 +139,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
             return false;
 
 #pragma warning disable CA1416
-        return ExecutedFilePath == other.ExecutedFilePath &&
+        return PathsEqual(ExecutedFilePath, other.ExecutedFilePath) &&
                ProcessId == other.ProcessId &&
                string.Equals(StandardOutput, other.StandardOutput
                    , StringComparison.Ordinal) && string.Equals(StandardError, other.StandardError
@@ -182,7 +182,7 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     {
 #pragma warning disable CA1416
         HashCode hash = new();
-        hash.Add(ExecutedFilePath);
+        hash.Add(PathHashCode(ExecutedFilePath));
         hash.Add(ProcessId);
         hash.Add(StandardOutput, StringComparer.Ordinal);
         hash.Add(StandardError, StringComparer.Ordinal);
@@ -194,6 +194,40 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
         hash.Add(WasTruncated);
         return hash.ToHashCode();
 #pragma warning restore CA1416
+    }
+
+    /// <summary>
+    ///     Compares two file paths using <see cref="StringComparison.OrdinalIgnoreCase"/> on
+    ///     Windows (where file-system paths are case-insensitive) and
+    ///     <see cref="StringComparison.Ordinal"/> elsewhere.
+    /// </summary>
+    /// <param name="left">The first path to compare.</param>
+    /// <param name="right">The second path to compare.</param>
+    /// <returns><c>true</c> when both paths are equal under the platform comparison.</returns>
+    private static bool PathsEqual(string left, string right)
+    {
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.Equals(left, right, comparison);
+    }
+
+    /// <summary>
+    ///     Computes a hash code for a file path using the same platform-aware comparison as
+    ///     <see cref="PathsEqual"/>, so that equal paths (per platform comparison) produce
+    ///     equal hash codes and the <see cref="Equals(BufferedProcessResult?)"/> /
+    ///     <see cref="GetHashCode"/> contract is preserved.
+    /// </summary>
+    /// <param name="path">The file path to hash.</param>
+    /// <returns>A hash code consistent with <see cref="PathsEqual"/>.</returns>
+    private static int PathHashCode(string path)
+    {
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.GetHashCode(path, comparison);
     }
 
     /// <summary>
