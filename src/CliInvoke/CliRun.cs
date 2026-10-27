@@ -320,10 +320,7 @@ public static class CliRun
     {
         if (configuration.OutputRedirection || configuration.RedirectStandardInput)
             throw new ArgumentException(
-                "FireAndForget does not support redirected output or standard input: the "
-                + "process handle is disposed immediately after start, so no one drains the "
-                + "pipes. Use RunAsync or RunBufferedAsync instead, or the string-arguments "
-                + "FireAndForget overload, which forces output redirection off.",
+                Resources.Exceptions_Invocation_FireAndForget_RedirectionNotSupported,
                 nameof(configuration));
 
         using IExternalProcess p = new ExternalProcessFactory().CreateExternalProcess(configuration);
@@ -383,7 +380,7 @@ public static class CliRun
         workingDirectory ??= Environment.CurrentDirectory;
 
         ProcessConfiguration configuration = new(
-            targetFilePath, arguments, outputRedirection)
+                targetFilePath, arguments, outputRedirection)
             { WorkingDirectoryPath = workingDirectory };
 
         ProcessExitConfiguration exitConfiguration =

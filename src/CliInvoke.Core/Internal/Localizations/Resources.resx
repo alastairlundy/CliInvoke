@@ -65,4 +65,7 @@
     <data name="Exceptions.ProcessNotSuccessful.Generic" xml:space="preserve">
         <value>The executed process was not successful and returned an exit code of {x}.</value>
     </data>
+    <data name="Exceptions.Arguments.ArgumentList.CountEqualsOne" xml:space="preserve">
+        <value>Argument List must contain multiple strings. Use argument string instead for providing a single string.</value>
+    </data>
 </root>

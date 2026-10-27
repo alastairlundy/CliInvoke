@@ -114,7 +114,16 @@ namespace CliInvoke.Core.Internal.Localizations {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Working directory '{0}' does not exist..
+        ///   Looks up a localized string similar to Argument List must contain multiple strings. Use argument string instead for providing a single string..
+        /// </summary>
+        internal static string Exceptions_Arguments_ArgumentList_CountEqualsOne {
+            get {
+                return ResourceManager.GetString("Exceptions.Arguments.ArgumentList.CountEqualsOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working directory &apos;{0}&apos; does not exist..
         /// </summary>
         internal static string Exceptions_DirectoryNotFound_WorkingDirectory {
             get {
