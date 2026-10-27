@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks. The test suite runs both legs.
+- All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks. `tests/CliInvoke.Tests` runs both legs; the Specializations tests stay on `net10.0`. Building from source now requires the .NET 11 SDK (`global.json` pins `11.0.100-rc.2`, CI installs `11.0.100-rc.3`); the `net10.0` test leg still needs a .NET 10 runtime.
 - On the `net11.0` leg, Windows and macOS children start suspended (`ProcessStartInfo.StartSuspended`) so a configured `ProcessResourcePolicy` is applied before the child first runs; Linux and FreeBSD keep the previous behaviour (the runtime rejects suspended start there). If resuming a creation-suspended child fails for a reason other than the child already having exited, the child is forceful-exited and the failure propagates from `Start`/`StartAsync` instead of leaving it suspended forever.
 - Guarded-execution guide (`site/docs/guides/guarded-execution.md`): failure-mode-organised reference mapping hangs, runaway output, ignored exit codes, and secret leaks onto CliInvoke's timeout, cancellation, and exit-configuration guards, for automation and agent harnesses.
 - OpenTelemetry middleware recipe (`site/docs/guides/opentelemetry-middleware.md`): a ~30-line `IProcessMiddleware` sample emitting one `ActivitySource` span per invocation (exit code, duration, canceled, mode), with registration and OTLP listener snippets. Spans deliberately carry no output content or raw arguments.
@@ -22,8 +22,12 @@ adheres to [Semantic Versioning](https://semver.org/).
 - **`ExternalProcess` resolves `TargetFilePath` once, at construction.** An unresolvable path now throws `FileNotFoundException` at construction rather than at `Start`/`StartAsync`, and repeated starts reuse the resolved path instead of re-resolving.
 - **Retry middleware replays standard input correctly.** `RetryMiddleware` rewinds a seekable standard-input stream (`Position = 0`) before every retry attempt after the first, instead of silently replaying an empty, already-consumed stream. A non-seekable stdin source throws `InvalidOperationException` at the moment a retry would occur. The replay contract is documented on `UseRetryPolicy`/`RetryOptions`.
 - **`LoggingMiddleware` logs `ArgumentList` when the argument string is empty.** Shell-wrapped and `ArgumentList`-based invocations no longer log blank arguments; the display string still passes through the `Sanitize` redactor.
+- **`ProcessResult` and `BufferedProcessResult` equality now uses the platform path comparison for `ExecutedFilePath`.** `Equals` compares the path with `OrdinalIgnoreCase` on Windows (where file-system paths are case-insensitive) and `Ordinal` elsewhere — matching `ProcessConfiguration`'s path comparison — and `GetHashCode` uses the matching platform-aware path hash, so two results whose paths differ only by casing now compare equal on Windows (previously ordinal everywhere).
+- **`ProcessConfiguration.Equals` is faster and order-independent for environment variables.** Environment-variable snapshots are compared by count plus per-key ordinal lookup instead of a pairwise `SequenceEqual` over the sorted pairs (same order-independent result, less work, no per-pair boxing). String comparisons in the `Equals`/`GetHashCode` paths are now explicitly ordinal (analyzer-driven; no behaviour change).
 - **`Polyfill` moved from `CliInvoke.Core` to `CliInvoke`**, and the `CliInvoke` package adopts `Squash` build-time trimming.
 - The `net11.0` leg uses the new .NET 11 `Process` APIs (`Process.Signal`, `TryWaitForExitStatus`, `TryGetProcessById`) at the platform control-adapter sites; the `net10.0` leg is unchanged.
+- **Updated Microsoft.Extensions dependencies from 10.0.13 to 10.0.14** (`Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, `Microsoft.Extensions.Caching.Memory`); the examples now reference the stable CliInvoke 3.1.0 packages and System.CommandLine 2.0.14.
+- **Build analysis hardened.** Meziantou.Analyzer is referenced from all three src packages and the test projects via CPM, and the MA0004 rule (a missing `ConfigureAwait`) is now a build error in `src/` and `tests/`; `scripts/guard-configureawait.sh` remains the CI backstop. CONTRIBUTING.md documents the coding standard, the ConfigureAwait policy, and contribution-licensing terms.
 - README now leads with outcome-oriented framing, and the NuGet package descriptions and tags for all three packages were rewritten so search results carry the searched words.
 
 ### Fixed
@@ -38,6 +42,10 @@ adheres to [Semantic Versioning](https://semver.org/).
 ### Docs
 
 - Troubleshooting guide: new "Child Output Encoding (Mojibake)" section covering the UTF-8 output-decoding default, with detection steps and code samples for overriding encodings on legacy Windows OEM/ANSI children. Documentation only; no behavior change.
+- SECURITY.md support table reworked: 3.1 gets features, bug fixes, and security fixes; 3.0 and 2.11 are security-fixes-only until December 1st 2026; 2.10 and older are end-of-life (ended October 14th 2026).
+- Public XML documentation pass across `src/`: empty `<summary>`/`<param>`/`<returns>` stubs on `IProcessConfigurationBuilder`, `InvocationMode`, `ProcessTimeoutPolicy`, `ProcessExceptionInfo`, and others filled with real descriptions; duplicate and restating comments collapsed to a single copy; grammar and legibility fixes in `CliRun` overloads, `MiddlewareContext`, and `DefaultShellMiddleware`.
+- CONTRIBUTING.md now spells out the required coding standard (`src/.editorconfig`), the `ConfigureAwait` policy and its analyzer/CI enforcement, the test-everywhere expectation (Windows, macOS, Linux), and the contribution-licensing terms.
+- THIRD_PARTY_NOTICES.txt: corrected the DotExtensions attribution path after `PathEnvironmentVariable` moved from `CliInvoke.Core` to `CliInvoke` (`CliInvoke.Core.Internal.IO` -> `CliInvoke.Internal.IO`).
 
 ## [3.1.0] - 2026-10-19
 
