@@ -76,7 +76,7 @@ public static class CliRun
     /// The path of the executable file to be run.
     /// </param>
     /// <param name="arguments">
-    /// An enumerable of individual arguments to pass to the executable.
+    /// A sequence of individual arguments to pass to the executable.
     /// </param>
     /// <param name="workingDirectory">
     /// The directory in which the process will be executed. If null, the current directory is used.
@@ -118,7 +118,7 @@ public static class CliRun
     ///     deadlock). Nothing readable is lost: no public Raw-mode surface exposes
     ///     output. To capture output, use
     ///     <see cref="RunBufferedAsync(ProcessConfiguration, ProcessExitConfiguration?, CancellationToken)"/>.
-    ///     Direct <see cref="IExternalProcess"/> users bypass this normalization — see
+    ///     Direct <see cref="IExternalProcess"/> users bypass this normalisation — see
     ///     <see cref="IExternalProcess.WaitForExitOrTimeoutAsync(CancellationToken)"/>.
     /// </remarks>
     /// <param name="configuration">
@@ -211,7 +211,7 @@ public static class CliRun
     /// The path of the executable file to run.
     /// </param>
     /// <param name="arguments">
-    /// An enumerable of individual arguments to pass to the executable.
+    /// A sequence of individual arguments to pass to the executable.
     /// </param>
     /// <param name="workingDirectory">
     /// The working directory for the process. If null, the current directory is used.
