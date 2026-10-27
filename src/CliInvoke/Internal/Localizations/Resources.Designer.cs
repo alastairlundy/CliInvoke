@@ -150,6 +150,15 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FireAndForget does not support redirected output or standard input: the process handle is disposed immediately after start, so no one drains the pipes. Use RunAsync or RunBufferedAsync instead, or the string-arguments FireAndForget overload, which forces output redirection off..
+        /// </summary>
+        internal static string Exceptions_Invocation_FireAndForget_RedirectionNotSupported {
+            get {
+                return ResourceManager.GetString("Exceptions.Invocation.FireAndForget.RedirectionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The middleware chain completed without setting a result. Short-circuiting middleware must assign InvocationContext.Result before returning..
         /// </summary>
         internal static string Exceptions_Middleware_ChainCompletedWithoutResult {
@@ -213,6 +222,15 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to retrying an invocation with a non-seekable standard input stream cannot replay the input.
+        /// </summary>
+        internal static string Exceptions_RetryMiddleware_NonSeekableStandardInput {
+            get {
+                return ResourceManager.GetString("Exceptions.RetryMiddleware.NonSeekableStandardInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to RetryOptions.MaxAttempts must be at least 1; zero or negative attempts are not allowed..
         /// </summary>
         internal static string Exceptions_RetryMiddleware_RetryOptions_MaxAttempts_GreaterThanOrEqualToOne {
@@ -263,15 +281,6 @@ namespace CliInvoke.Internal.Localizations {
         internal static string Excpetions_RetryMiddleware_RetryOptions_BaseDelay_NotNegative {
             get {
                 return ResourceManager.GetString("Excpetions.RetryMiddleware.RetryOptions.BaseDelay.NotNegative", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to retrying an invocation with a non-seekable standard input stream cannot replay the input.
-        /// </summary>
-        internal static string Exceptions_RetryMiddleware_NonSeekableStandardInput {
-            get {
-                return ResourceManager.GetString("Exceptions.RetryMiddleware.NonSeekableStandardInput", resourceCulture);
             }
         }
     }

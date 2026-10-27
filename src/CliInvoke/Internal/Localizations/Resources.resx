@@ -95,4 +95,7 @@
     <data name="Exceptions.RetryMiddleware.NonSeekableStandardInput" xml:space="preserve">
         <value>retrying an invocation with a non-seekable standard input stream cannot replay the input</value>
     </data>
+    <data name="Exceptions.Invocation.FireAndForget.RedirectionNotSupported" xml:space="preserve">
+        <value>FireAndForget does not support redirected output or standard input: the process handle is disposed immediately after start, so no one drains the pipes. Use RunAsync or RunBufferedAsync instead, or the string-arguments FireAndForget overload, which forces output redirection off.</value>
+    </data>
 </root>
