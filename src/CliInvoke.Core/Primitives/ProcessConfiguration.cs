@@ -321,8 +321,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
         if (other is null) return false;
         
         return PathsEqual(TargetFilePath, other.TargetFilePath)
-               && EnvironmentVariables.Count == other.EnvironmentVariables.Count
-               && EnvironmentVariables.SequenceEqual(other.EnvironmentVariables)
+               && EnvironmentVariablesEqual(EnvironmentVariables, other.EnvironmentVariables)
                && Arguments.Equals(other.Arguments, StringComparison.Ordinal)
                && ArgumentList.SequenceEqual(other.ArgumentList, StringComparer.Ordinal)
                && ResourcePolicy.Equals(other.ResourcePolicy)
@@ -371,6 +370,40 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
             : StringComparison.Ordinal;
 
         return string.GetHashCode(path, comparison);
+    }
+
+    /// <summary>
+    ///     Compares two environment-variable dictionaries using ordinal string comparison for
+    ///     both keys and values.
+    /// </summary>
+    /// <remarks>
+    ///     Compares the strings directly rather than the <c>KeyValuePair</c> elements: pairs do
+    ///     not override <c>Equals</c>/<c>GetHashCode</c>, so default struct equality would box
+    ///     every pair and fall back to reflection. A matching count plus a successful lookup for
+    ///     every key proves set equality, so enumeration order is irrelevant even though both
+    ///     operands are snapshots normalised by <see cref="EnvironmentVariables"/>.
+    /// </remarks>
+    /// <param name="left">The environment variables of the configuration being compared.</param>
+    /// <param name="right">The environment variables of the other configuration.</param>
+    /// <returns>
+    ///     <c>true</c> when both dictionaries hold identical keys and values under ordinal
+    ///     comparison; otherwise, <c>false</c>.
+    /// </returns>
+    private static bool EnvironmentVariablesEqual(
+        IReadOnlyDictionary<string, string> left,
+        IReadOnlyDictionary<string, string> right)
+    {
+        if (left.Count != right.Count)
+            return false;
+
+        foreach (KeyValuePair<string, string> pair in left)
+        {
+            if (!right.TryGetValue(pair.Key, out string? value)
+                || !string.Equals(pair.Value, value, StringComparison.Ordinal))
+                return false;
+        }
+
+        return true;
     }
 
     /// <summary>
