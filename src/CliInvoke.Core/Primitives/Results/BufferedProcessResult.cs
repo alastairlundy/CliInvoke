@@ -141,9 +141,9 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
 #pragma warning disable CA1416
         return ExecutedFilePath == other.ExecutedFilePath &&
                ProcessId == other.ProcessId &&
-               StandardOutput == other.StandardOutput
-               && StandardError == other.StandardError
-               && ExitCode == other.ExitCode &&
+               string.Equals(StandardOutput, other.StandardOutput
+                   , StringComparison.Ordinal) && string.Equals(StandardError, other.StandardError
+                   , StringComparison.Ordinal) && ExitCode == other.ExitCode &&
                StartTime == other.StartTime &&
                ExitTime == other.ExitTime &&
                Canceled == other.Canceled &&
@@ -181,11 +181,11 @@ public class BufferedProcessResult : ProcessResult, IEquatable<BufferedProcessRe
     public override int GetHashCode()
     {
 #pragma warning disable CA1416
-        HashCode hash = new HashCode();
+        HashCode hash = new();
         hash.Add(ExecutedFilePath);
         hash.Add(ProcessId);
-        hash.Add(StandardOutput);
-        hash.Add(StandardError);
+        hash.Add(StandardOutput, StringComparer.Ordinal);
+        hash.Add(StandardError, StringComparer.Ordinal);
         hash.Add(ExitCode);
         hash.Add(StartTime);
         hash.Add(ExitTime);

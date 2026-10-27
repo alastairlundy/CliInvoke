@@ -323,8 +323,8 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
         return PathsEqual(TargetFilePath, other.TargetFilePath)
                && EnvironmentVariables.Count == other.EnvironmentVariables.Count
                && EnvironmentVariables.SequenceEqual(other.EnvironmentVariables)
-               && Arguments.Equals(other.Arguments)
-               && ArgumentList.SequenceEqual(other.ArgumentList)
+               && Arguments.Equals(other.Arguments, StringComparison.Ordinal)
+               && ArgumentList.SequenceEqual(other.ArgumentList, StringComparer.Ordinal)
                && ResourcePolicy.Equals(other.ResourcePolicy)
                && PathsEqual(WorkingDirectoryPath, other.WorkingDirectoryPath)
                && UseShellExecution.Equals(other.UseShellExecution)
@@ -393,17 +393,17 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <returns>The hash code for the current ProcessConfiguration.</returns>
     public override int GetHashCode()
     {
-        HashCode hashCode = new HashCode();
+        HashCode hashCode = new();
 
         hashCode.Add(PathHashCode(TargetFilePath));
-        hashCode.Add(Arguments);
+        hashCode.Add(Arguments, StringComparer.Ordinal);
         foreach (string arg in ArgumentList)
-            hashCode.Add(arg);
+            hashCode.Add(arg, StringComparer.Ordinal);
         hashCode.Add(PathHashCode(WorkingDirectoryPath));
         foreach (KeyValuePair<string, string> kvp in EnvironmentVariables)
         {
-            hashCode.Add(kvp.Key);
-            hashCode.Add(kvp.Value);
+            hashCode.Add(kvp.Key, StringComparer.Ordinal);
+            hashCode.Add(kvp.Value, StringComparer.Ordinal);
         }
 
         hashCode.Add(Credential);

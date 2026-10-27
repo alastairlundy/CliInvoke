@@ -28,7 +28,7 @@ public static class CommonValidationRules<TProcessResult>
 {
     // Compiling a Regex is expensive; cache one instance per distinct pattern so the
     // cost is paid only once instead of on every RequiresStandardOutputMatches call.
-    private static readonly ConcurrentDictionary<string, Regex> s_regexCache = new();
+    private static readonly ConcurrentDictionary<string, Regex> s_regexCache = new(StringComparer.Ordinal);
 
     /// <summary>
     ///     A predefined validation rule that ensures the process result's exit code is zero.
