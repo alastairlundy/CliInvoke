@@ -35,7 +35,7 @@ public class EqualityPropertyTests
     public async Task ProcessResult_Equality_IsTransitive()
     {
         ProcessResult a = ArbitraryProcessResult();
-        ProcessResult b = ArbitraryProcessResult();
+        ProcessResult unused = ArbitraryProcessResult();
         ProcessResult c = ArbitraryProcessResult();
 
         await Assert.That(a.Equals(c)).IsTrue();
@@ -71,7 +71,7 @@ public class EqualityPropertyTests
     public async Task BufferedProcessResult_Equality_IsTransitive()
     {
         BufferedProcessResult a = ArbitraryBufferedProcessResult();
-        BufferedProcessResult b = ArbitraryBufferedProcessResult();
+        BufferedProcessResult unused = ArbitraryBufferedProcessResult();
         BufferedProcessResult c = ArbitraryBufferedProcessResult();
 
         await Assert.That(a.Equals(c)).IsTrue();
@@ -107,7 +107,7 @@ public class EqualityPropertyTests
     public async Task ProcessConfiguration_Equality_IsTransitive()
     {
         ProcessConfiguration a = new("foo.exe", "arg1");
-        ProcessConfiguration b = new("foo.exe", "arg1");
+        ProcessConfiguration unused = new("foo.exe", "arg1");
         ProcessConfiguration c = new("foo.exe", "arg1");
 
         await Assert.That(a.Equals(c)).IsTrue();
@@ -143,7 +143,7 @@ public class EqualityPropertyTests
     public async Task ShellInformation_Equality_IsTransitive()
     {
         ShellInformation a = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
-        ShellInformation b = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
+        ShellInformation unused = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
         ShellInformation c = new("bash", new FileInfo("/bin/bash"), new Version(5, 1));
 
         await Assert.That(a.Equals(c)).IsTrue();

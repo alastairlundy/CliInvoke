@@ -35,8 +35,8 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
     private readonly Func<string?, string>? _redactor;
 
     [GeneratedRegex(@"(--password|--token|--api-key)(\s*=\s*|\s+)(?:""[^""]*""|'[^']*'|[^\s-][^\s]*)",
-        RegexOptions.IgnoreCase)]
-    private static partial Regex SensitiveArgPattern();
+        RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture, 3000)]
+    private static partial Regex SensitiveArgPattern { get; }
 
     /// <summary>
     ///     Initialises a new instance of the <see cref="LoggingMiddleware"/> class.
@@ -146,6 +146,6 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
         if (string.IsNullOrWhiteSpace(value))
             return string.Empty;
 
-        return SensitiveArgPattern().Replace(value, "$1$2***");
+        return SensitiveArgPattern.Replace(value, "$1$2***");
     }
 }

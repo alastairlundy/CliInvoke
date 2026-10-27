@@ -2,13 +2,6 @@ using CliInvoke.Core.Middleware;
 
 namespace CliInvoke.Tests.Middleware;
 
-public enum FakeMiddlewareMode
-{
-    AlwaysInvokeNext,
-    NeverInvokeNext,
-    ThrowOnInvoke
-}
-
 public class FakeMiddleware : IProcessMiddleware
 {
     private readonly string _name;
