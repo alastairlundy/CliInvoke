@@ -9,15 +9,8 @@ updates:
   - package-ecosystem: "nuget" # src/ package manifests (Directory.Packages.props)
     directories:
         - "src/"
-    schedule:
-      interval: weekly
-      day: monday
-    cooldown:
-      default-days: 14
-
-  - package-ecosystem: "nuget" # tests/ package manifests (Directory.Packages.props)
-    directories:
         - "tests/"
+        - "benchmarks/"
     schedule:
       interval: weekly
       day: monday
