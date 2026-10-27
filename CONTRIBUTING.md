@@ -22,9 +22,9 @@ If you follow these steps, and your contribution makes a helpful change, the mai
 
 ### How to build & test
 
-CliInvoke targets .NET 10 (see `global.json`) and uses the [TUnit](https://www.tunit.dev/) test framework. CI runs the test suite on Windows, macOS, and Linux; your changes must pass on all three. Some tests are OS-specific by design (for example, Windows-only cmd-runner tests) and skip automatically elsewhere — that is expected behavior, not a failure.
+CliInvoke targets .NET 10 and .NET 11 (see the `TargetFrameworks` in the csproj files; `global.json` pins the .NET 11 SDK needed to build `net11.0`) and uses the [TUnit](https://www.tunit.dev/) test framework. CI runs the test suite on Windows, macOS, and Linux; your changes must pass on all three. Some tests are OS-specific by design (for example, Windows-only cmd-runner tests) and skip automatically elsewhere — that is expected behavior, not a failure.
 
-1. Install the .NET 10 SDK (matching `global.json`).
+1. Install the .NET 11 SDK (matching `global.json`). The .NET 10 SDK/runtime is also needed to run the `net10.0` test leg.
 2. Restore and build the solution from the repo root:
    ```bash
    dotnet build src/CliInvoke.sln -c Debug
@@ -34,11 +34,12 @@ CliInvoke targets .NET 10 (see `global.json`) and uses the [TUnit](https://www.t
    cd tests/CliInvoke.Tests
    dotnet test
    ```
+   Run `dotnet test` from inside the project directory, not against a project path. On the .NET 11 RC SDKs, `dotnet test <path>` fails with a doubled-path error ([dotnet/sdk#56196](https://github.com/dotnet/sdk/issues/56196)); the fix ships with the .NET 11 GA release, and an absolute path works as a workaround until then.
 4. For full build, release, and packaging guidance, see [building-cliinvoke.md](site/docs/building-cliinvoke.md).
 
 ### Development setup, standards & PR conventions
 
-- **SDK & target frameworks:** Use the .NET 10 SDK and respect the `net10.0` target frameworks declared in the project files.
+- **SDK & target frameworks:** Use the .NET 11 SDK (matching `global.json`) and respect the `net10.0`/`net11.0` target frameworks declared in the project files.
 - **Code style:** [`src/.editorconfig`](src/.editorconfig) is the required coding standard — IDEs with EditorConfig support enforce its rules automatically. Beyond what it can check, match the surrounding code's naming and layout, and keep changes small and focused. You can auto-fix formatting with `dotnet format src/CliInvoke.sln`, but scope it to the files you change — the solution still contains pre-existing formatting debt, so a whole-solution `--verify-no-changes` pass is not currently treated as a merge gate.
 - **ConfigureAwait:** Every `await` in library code (`src/`) must call `.ConfigureAwait(false)` — without it, continuations marshal back to the caller's `SynchronizationContext`, which can deadlock UI applications that invoke the library and avoids unnecessary context hops elsewhere. CI enforces this with `scripts/guard-configureawait.sh`; `await foreach` and `await using` are exempt because those constructs cannot accept ConfigureAwait. Executable applications (tests, examples, benchmarks) are exempt from the `false` requirement — their continuations typically have no meaningful SynchronizationContext, so use an explicit `.ConfigureAwait(true)` there to show the decision was made deliberately. The `MA0004` analyzer rule treats missing ConfigureAwait calls as build errors in `src/` (`src/.editorconfig`); `scripts/guard-configureawait.sh` remains the CI backstop.
 - **Tests:** New behavior requires a new [TUnit](https://www.tunit.dev/) test; bug fixes require a regression test that fails before the fix passes. Tests must pass on Windows, macOS, and Linux (see [How to build & test](#how-to-build--test)).

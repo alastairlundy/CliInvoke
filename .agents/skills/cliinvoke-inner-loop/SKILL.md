@@ -19,7 +19,7 @@ The daily development and validation sequence. It mirrors `.github/workflows/tes
 
 ## Prerequisites
 
-- The .NET 10 SDK pinned by `global.json`.
+- The .NET 11 SDK pinned by `global.json`, plus the .NET 10 SDK/runtime to run the `net10.0` test leg.
 - Git Bash or WSL on Windows, for the guard script in Step 1.
 
 ## Workflow
@@ -50,7 +50,7 @@ Build the solution, not a single project. It covers all three shipped packages p
 dotnet test
 ```
 
-Run this from `tests/CliInvoke.Tests/`. That is the only test project CI executes. There is no test project anywhere under `src/`, so `dotnet test src/CliInvoke/` fails with `No test projects were found.`
+Run this from `tests/CliInvoke.Tests/`, never as `dotnet test <path>`: on the .NET 11 RC SDKs a path argument fails with a doubled-path error (dotnet/sdk#56196, fixed in .NET 11 GA). That is the only test project CI executes. There is no test project anywhere under `src/`, so `dotnet test src/CliInvoke/` fails anyway.
 
 The suite spawns real executables (`dotnet`, `powershell.exe`, `pwsh`), so it takes considerably longer than the build. Tests that need PowerShell Core call `SkipTestIfNull` when `pwsh` is off `PATH`, which is the situation on GitHub-hosted Windows runners but not on most dev machines. A skip is not a failure, so compare the passed count against your own baseline rather than expecting a fixed total.
 

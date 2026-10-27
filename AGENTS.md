@@ -3,7 +3,7 @@
 ## What this repo is
 CliInvoke — a .NET/C# library for launching and interacting with command-line processes (builders, configuration models, invokers, middleware, DI, and platform specializations).
 
-- Single TFM: `net10.0` (see `global.json` and csproj files). Current release line: `3.1.0`.
+- TFMs: `net10.0` and `net11.0` (src packages and `CliInvoke.Tests` multi-target; `global.json` pins the .NET 11 SDK, which builds both). Current release line: `3.1.0`.
 - Docs portal lives in `site/` (built with Lunet; published to GitHub Pages on release by `.github/workflows/docs-publish.yml`).
 
 ## Codebase Organization
@@ -15,7 +15,7 @@ CliInvoke — a .NET/C# library for launching and interacting with command-line 
 - `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. (`tests/CliInvoke.Extensions.Tests/` was removed; extension tests now live in `tests/CliInvoke.Tests/`.)
 - **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs `tests/CliInvoke.Tests/` **and** `tests/CliInvoke.Specializations.Tests/` on the ubuntu-latest, windows-latest, and macos-latest matrix legs.
 - **Benchmarks**: `benchmarks/`.
-- **SDK**: `global.json` pins .NET 10 SDK (`rollForward: latestFeature`). Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
+- **SDK**: `global.json` pins the .NET 11 SDK (`11.0.100-rc.2`, `rollForward: latestFeature`; CI installs `11.0.100-rc.3` explicitly). The .NET 10 runtime is also needed to run the `net10.0` test leg. Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
 
 ## Build & Test (replicate CI order)
 From repo root (see `.github/workflows/test.yml`):
@@ -23,6 +23,8 @@ From repo root (see `.github/workflows/test.yml`):
 2. `dotnet build src/CliInvoke.sln`
 3. From `tests/CliInvoke.Tests/`: `dotnet test`
 4. From `tests/CliInvoke.Specializations.Tests/`: `dotnet test`
+
+**Run `dotnet test` from inside the project directory, never against a project path.** On the .NET 11 RC SDKs, `dotnet test <path>` (positional or `--project`) fails with a doubled-path error (dotnet/sdk#56196), fixed in the .NET 11 GA release. An absolute path is the only workaround until then.
 
 Other gates/quirks:
 - **XML doc comments are build errors**: `Directory.Build.props` escalates CS1574/1580/1581/1584/1658/1734/1762 to errors. Keep `<summary>`/`<paramref>`/`<see>` valid on public API.

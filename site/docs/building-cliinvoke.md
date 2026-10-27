@@ -42,12 +42,14 @@ Coverage for the middleware feature lives in:
 * ``tests/CliInvoke.Tests/Middleware/Integration/`` — real-process integration tests for ``LoggingMiddleware`` and ``PostExitValidationMiddleware``.
 * ``tests/CliInvoke.Specializations.Tests/Middleware/`` — a real-process integration test for ``PowerShellMiddleware`` (skipped automatically when ``pwsh`` is not on ``PATH``, e.g. on Windows CI).
 
-Run the middleware integration tests with:
+Run the middleware integration tests with (from the repository root):
 
 ```bash
-dotnet test tests/CliInvoke.Tests/CliInvoke.Tests.csproj -c Debug
-dotnet test tests/CliInvoke.Specializations.Tests/CliInvoke.Specializations.Tests.csproj -c Debug
+(cd tests/CliInvoke.Tests && dotnet test -c Debug)
+(cd tests/CliInvoke.Specializations.Tests && dotnet test -c Debug)
 ```
+
+Run `dotnet test` from inside the test project directory rather than passing a project path. On the .NET 11 RC SDKs, `dotnet test <path>` fails with a doubled-path error (see [dotnet/sdk#56196](https://github.com/dotnet/sdk/issues/56196)). The fix ships with the .NET 11 GA release; until then an absolute path is the only workaround if you must pass one.
 
 ### Building for Release
 Before building a release build, ensure you apply the relevant changes to the relevant ``.csproj`` file corresponding to the package you are trying to build:

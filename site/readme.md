@@ -22,7 +22,7 @@ boilerplate — pipe setup, output buffering, exit-code handling, disposal,
 thread-safety, cross-platform path lookup — is left to you. CliInvoke
 provides the layer on top.
 
-The library targets .NET 10, runs on Windows, macOS,
+The library targets .NET 10 and .NET 11, runs on Windows, macOS,
 Linux, and BSD, and ships with first-class dependency-integration helpers
 (`AddCliInvoke`, namespace `CliInvoke.Extensions`) in the `CliInvoke` package.
 
