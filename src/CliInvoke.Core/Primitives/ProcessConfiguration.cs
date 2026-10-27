@@ -180,7 +180,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
             ArgumentNullException.ThrowIfNull(value);
 
             if (value.Count == 1) 
-                ArgumentException.ThrowIfNullOrEmpty(value[0]);
+                throw new ArgumentException(Resources.Exceptions_Arguments_ArgumentList_CountEqualsOne, nameof(value));
 
             foreach (string argument in value)
                 ArgumentNullException.ThrowIfNull(argument, nameof(value));
