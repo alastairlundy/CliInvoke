@@ -17,7 +17,7 @@ namespace CliInvoke.Core.Middleware;
 public sealed class MiddlewareContext
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MiddlewareContext"/> class.
+    ///     Initialises a new instance of the <see cref="MiddlewareContext"/> class.
     /// </summary>
     /// <param name="next">
     ///     The delegate that continues the chain (the terminal pipeline for a freshly created
@@ -48,7 +48,7 @@ public sealed class MiddlewareContext
     ///     Gets the delegate to invoke the next middleware in the chain, or the terminal pipeline
     ///     for the innermost middleware. The chain walker points this at the forward delegate of
     ///     the middleware currently executing and restores the caller's value when that middleware
-    ///     returns, so invoking it only ever runs middleware further down the chain, never the
+    ///     returns. Invoking it only ever runs middleware further down the chain, never the
     ///     current middleware or anything upstream of it. This property is read-only to consumers
     ///     and retained for diagnostics and introspection. Middleware should normally receive the
     ///     <c>next</c> delegate via the <see cref="IProcessMiddleware.InvokeAsync"/> parameter

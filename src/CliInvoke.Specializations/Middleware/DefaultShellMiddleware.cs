@@ -76,8 +76,8 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
 
         if (DetectionInProgress.Value)
         {
-            // Re-entrant call: an outer shell-detection probe is running through this
-            // chain again. Pass through without re-detecting (a probe must not be
+            // Re-entrant call: an outer shell-detection probe is running through this chain again.
+            // Pass through without re-detecting (a probe must not be
             // shell-wrapped anyway) to break the recursion cycle.
             await next(context).ConfigureAwait(false);
             return;
@@ -111,7 +111,7 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
 #pragma warning disable CA1416
                 ShellKind.PowerShell => PowerShellMiddleware.PowerShellRunnerArgs,
 #pragma warning restore CA1416
-                _ => "-c"
+                _ => "-c",
             };
 
             ProcessConfiguration rewritten = ShellRewriter.Rewrite(
