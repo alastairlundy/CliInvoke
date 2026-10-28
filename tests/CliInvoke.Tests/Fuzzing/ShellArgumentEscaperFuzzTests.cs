@@ -67,7 +67,7 @@ public class ShellRewriterFuzzTests
                     }
                 }
 
-                return escaped == expected.ToString();
+                return string.Equals(escaped, expected.ToString(), StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -82,7 +82,7 @@ public class ShellRewriterFuzzTests
                     return true;
 
                 string escaped = ShellRewriter.EscapeForPosixShell(value);
-                return escaped == value;
+                return string.Equals(escaped, value, StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -125,7 +125,7 @@ public class ShellRewriterFuzzTests
                     }
                 }
 
-                return escaped == expected.ToString();
+                return string.Equals(escaped, expected.ToString(), StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -140,7 +140,7 @@ public class ShellRewriterFuzzTests
                     return true;
 
                 string escaped = ShellRewriter.EscapeForPowerShell(value);
-                return escaped == value;
+                return string.Equals(escaped, value, StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -187,7 +187,7 @@ public class ShellRewriterFuzzTests
                     }
                 }
 
-                return escaped == expected.ToString();
+                return string.Equals(escaped, expected.ToString(), StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -202,7 +202,7 @@ public class ShellRewriterFuzzTests
                     return true;
 
                 string escaped = ShellRewriter.EscapeForCmd(value);
-                return escaped == value;
+                return string.Equals(escaped, value, StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -224,10 +224,11 @@ public class ShellRewriterFuzzTests
                     windowCreation: false,
                     useShellExecution: false);
 
-                return rewritten.TargetFilePath == "pwsh.exe" &&
-                       rewritten.ArgumentList.Count == 4 &&
-                       rewritten.ArgumentList[2] == "-Command" &&
-                       rewritten.ArgumentList[^1].Contains("& \"");
+                IReadOnlyList<string> argumentList = rewritten.ArgumentList;
+                return string.Equals(rewritten.TargetFilePath, "pwsh.exe", StringComparison.Ordinal)
+                       && argumentList.Count == 4
+                       && string.Equals(argumentList[2], "-Command", StringComparison.Ordinal)
+                       && argumentList[^1].Contains("& \"");
             })
             .QuickCheckThrowOnFailure();
     }
@@ -249,9 +250,9 @@ public class ShellRewriterFuzzTests
                     windowCreation: false,
                     useShellExecution: false);
 
-                return rewritten.TargetFilePath == "cmd.exe" &&
-                       rewritten.ArgumentList.Count == 0 &&
-                       !string.IsNullOrEmpty(rewritten.Arguments);
+                return string.Equals(rewritten.TargetFilePath, "cmd.exe", StringComparison.Ordinal)
+                       && rewritten.ArgumentList.Count == 0
+                       && !string.IsNullOrEmpty(rewritten.Arguments);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -273,10 +274,11 @@ public class ShellRewriterFuzzTests
                     windowCreation: false,
                     useShellExecution: false);
 
-                return rewritten.TargetFilePath == "/bin/sh" &&
-                       rewritten.ArgumentList.Count == 2 &&
-                       rewritten.ArgumentList[0] == "-c" &&
-                       rewritten.Arguments == string.Empty;
+                IReadOnlyList<string> argumentList = rewritten.ArgumentList;
+                return string.Equals(rewritten.TargetFilePath, "/bin/sh", StringComparison.Ordinal)
+                       && argumentList.Count == 2
+                       && string.Equals(argumentList[0], "-c", StringComparison.Ordinal)
+                       && rewritten.Arguments == string.Empty;
             })
             .QuickCheckThrowOnFailure();
     }

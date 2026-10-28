@@ -270,7 +270,7 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe",
-            argumentValidationLogic: s => s != "bad");
+            argumentValidationLogic: s => !string.Equals(s, "bad", StringComparison.Ordinal));
 
         // Act & Assert
         await Assert.That(() =>

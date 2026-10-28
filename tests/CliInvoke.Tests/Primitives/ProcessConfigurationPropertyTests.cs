@@ -71,7 +71,8 @@ public class ProcessConfigurationPropertyTests
     {
         Prop.ForAll<string, string>((a, b) =>
             {
-                if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b) || a == b)
+                if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b) ||
+                    string.Equals(a, b, StringComparison.Ordinal))
                     return true;
 
                 ProcessConfiguration config1 = new() { TargetFilePath = a };
