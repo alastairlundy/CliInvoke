@@ -11,7 +11,7 @@ public class ProcessConfigurationPropertyTests
         Prop.ForAll<int>(seed =>
             {
                 Random rng = new Random(seed);
-                Dictionary<string, string> original = new();
+                Dictionary<string, string> original = new(StringComparer.Ordinal);
 
                 int count = Math.Abs(rng.Next() % 10) + 1;
                 for (int i = 0; i < count; i++)
@@ -86,14 +86,14 @@ public class ProcessConfigurationPropertyTests
     public async Task EnvironmentVariables_EqualAcrossInsertionOrder()
     {
         // Arrange - same entries inserted in different order
-        Dictionary<string, string> dict1 = new()
+        Dictionary<string, string> dict1 = new(StringComparer.Ordinal)
         {
             ["KEY_0"] = "VALUE_A",
             ["KEY_1"] = "VALUE_B",
             ["KEY_2"] = "VALUE_C",
         };
 
-        Dictionary<string, string> dict2 = new()
+        Dictionary<string, string> dict2 = new(StringComparer.Ordinal)
         {
             ["KEY_2"] = "VALUE_C",
             ["KEY_1"] = "VALUE_B",
