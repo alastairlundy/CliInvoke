@@ -9,6 +9,13 @@
 
 using CliInvoke.Processes;
 
+// MA0032 ("use an overload with a CancellationToken argument") suggests passing a token to
+// Task.WaitAsync here. Suppressed deliberately: in these tests the caller's token has already
+// been cancelled when WaitAsync is called, so passing it would make WaitAsync throw
+// TaskCanceledException immediately instead of awaiting the task that absorbs cancellation into
+// result.Canceled == true — which is exactly the contract these tests verify.
+#pragma warning disable MA0032
+
 namespace CliInvoke.Tests.Invokers.Cancellation;
 
 /// <summary>
@@ -56,7 +63,7 @@ public class BufferedCancellationContractTests
             await cancellationTokenSource.CancelAsync().ConfigureAwait(true);
 
             BufferedProcessResult result =
-                await captureTask.WaitAsync(TimeSpan.FromSeconds(15), cancellationTokenSource.Token).ConfigureAwait(true);
+                await captureTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
 
             await Assert.That(result.Canceled).IsTrue();
             await Assert.That(result.StandardOutput).IsEqualTo(string.Empty);
@@ -110,7 +117,7 @@ public class BufferedCancellationContractTests
             OperationCanceledException? propagated = null;
             try
             {
-                await captureTask.WaitAsync(TimeSpan.FromSeconds(15), cancellationTokenSource.Token).ConfigureAwait(true);
+                await captureTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
             }
             catch (OperationCanceledException exception)
             {
@@ -164,7 +171,7 @@ public class BufferedCancellationContractTests
                 process.WaitForExitOrTimeoutAsync(cancellationTokenSource.Token);
             await cancellationTokenSource.CancelAsync().ConfigureAwait(true);
 
-            ProcessResult result = await waitTask.WaitAsync(TimeSpan.FromSeconds(15), cancellationTokenSource.Token).ConfigureAwait(true);
+            ProcessResult result = await waitTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
 
             await Assert.That(result.Canceled).IsTrue();
         }
