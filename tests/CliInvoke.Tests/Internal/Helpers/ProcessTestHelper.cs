@@ -31,6 +31,17 @@ internal class ProcessTestHelper
     }
 
     /// <summary>
+    ///     Arguments that make <see cref="GetTargetFilePath"/>'s target exit immediately
+    ///     instead of waiting at an interactive REPL. A bare cmd on Windows reads stdin
+    ///     until end-of-file, so its lifetime depends on whichever stdin the host process
+    ///     happens to inherit: tests that need a short-lived child must supply a
+    ///     terminating command rather than empty arguments, or they stall (or leak the
+    ///     child) whenever the host's stdin stays open.
+    /// </summary>
+    internal static string GetExitingArguments()
+        => OperatingSystem.IsWindows() ? "/c exit 0" : string.Empty;
+
+    /// <summary>
     ///     Resolves the absolute path to the built signal-trapping helper binary.
     /// </summary>
     internal static string GetSignalTrappingHelperPath()

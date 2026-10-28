@@ -918,7 +918,23 @@ internal class ProcessWrapper : Process
         bool isGraceful,
         bool fallbackToForceful = true)
     {
-        if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
+        bool semaphoreAcquired;
+        try
+        {
+            semaphoreAcquired = await _cancellationSemaphore
+                .WaitAsync(0, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // The token was already canceled on entry, so no cancellation machinery was
+            // ever armed for this wait and nothing will terminate the child. Without
+            // this forceful exit, a pre-canceled invocation would orphan the started
+            // child: the caller receives the exception and holds no handle to it.
+            ForcefulExit();
+            throw;
+        }
+
+        if (!semaphoreAcquired)
         {
             // Another cancellation is already in progress, wait for it to complete
             await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);
@@ -1065,7 +1081,22 @@ internal class ProcessWrapper : Process
 
             CancellationToken actualCancellationToken = cts.Token;
 
-            if (!await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false))
+            bool semaphoreAcquired;
+            try
+            {
+                semaphoreAcquired = await _cancellationSemaphore
+                    .WaitAsync(0, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // Same pre-canceled-token gap as WaitForExitCoreAsync: the throw escapes
+                // below this point's kill machinery, so terminate the started child here
+                // instead of orphaning it when the exception propagates.
+                ForcefulExit();
+                throw;
+            }
+
+            if (!semaphoreAcquired)
             {
                 // Another cancellation is already in progress, wait for it to complete
                 await WaitForExitSafeAsync(cancellationToken).ConfigureAwait(false);

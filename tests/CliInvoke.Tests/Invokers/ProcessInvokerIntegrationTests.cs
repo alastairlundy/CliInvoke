@@ -35,8 +35,7 @@ public class ProcessInvokerIntegrationTests
         // and waits at its REPL for keyboard input instead of exiting. The test's intent
         // is a trivially successful process, not cmd's REPL behaviour.
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath,
-                OperatingSystem.IsWindows() ? "/c exit 0" : string.Empty);
+            new ProcessConfiguration(_targetFilePath, ProcessTestHelper.GetExitingArguments());
 
         ProcessResult result =
             await processInvoker.ExecuteAsync(config,
@@ -53,7 +52,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath);
+            new ProcessConfiguration(_targetFilePath, ProcessTestHelper.GetExitingArguments());
 
         BufferedProcessResult result =
             await processInvoker.ExecuteBufferedAsync(config,
@@ -70,7 +69,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath);
+            new ProcessConfiguration(_targetFilePath, ProcessTestHelper.GetExitingArguments());
 
         await Assert.That(async () =>
                 await processInvoker.ExecuteAsync(config,
@@ -86,7 +85,7 @@ public class ProcessInvokerIntegrationTests
             _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath);
+            new ProcessConfiguration(_targetFilePath, ProcessTestHelper.GetExitingArguments());
 
         await Assert.That(async () =>
                 await processInvoker.ExecuteBufferedAsync(config,

@@ -203,6 +203,14 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 // (a broken pipe after ForcefulExit) is absorbed here; a genuine
                 // source-stream read error propagates to the caller.
             }
+            catch (Exception)
+            {
+                // A genuine stdin fault escaping while the child is still running: the
+                // kill machinery never ran, so terminate the child instead of orphaning
+                // it when the exception propagates.
+                TerminateAbandonedChild();
+                throw;
+            }
         }
     }
 
@@ -276,6 +284,14 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 // (a broken pipe after ForcefulExit) is absorbed here, mirroring the
                 // StartAsync(CancellationToken) overload; a genuine source-stream read
                 // error propagates to the caller.
+            }
+            catch (Exception)
+            {
+                // A genuine stdin fault escaping while the child is still running: the
+                // kill machinery never ran, so terminate the child instead of orphaning
+                // it when the exception propagates.
+                TerminateAbandonedChild();
+                throw;
             }
         }
     }
@@ -441,6 +457,15 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
 
             return result;
         }
+        catch (Exception)
+        {
+            // Only a propagating path reaches this handler (a genuine stream failure or a
+            // wait fault); the absorbed cancellation paths above return results instead.
+            // The kill machinery never ran there, so terminate a still-running child
+            // rather than orphaning it when the exception escapes.
+            TerminateAbandonedChild();
+            throw;
+        }
         finally
         {
             outputStrings.Dispose();
@@ -530,6 +555,37 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             default:
                 wrapper.Kill();
                 break;
+        }
+    }
+
+    /// <summary>
+    ///     Terminates a started child that is still running when an invocation ends via an
+    ///     exception path, so an abandoned invocation (a pre-canceled token, a genuine
+    ///     stdin-stream failure, or any other fault between start and result) can never
+    ///     orphan a process the caller holds no handle to.
+    /// </summary>
+    /// <remarks>
+    ///     This is a plain forceful exit: it deliberately bypasses <see cref="Kill"/>'s
+    ///     <see cref="ProcessExitConfiguration.RequestedCancellationExitBehaviour"/>
+    ///     handling, which may wait out the timeout policy before terminating. The
+    ///     invocation has already failed and its exception must surface promptly.
+    /// </remarks>
+    private void TerminateAbandonedChild()
+    {
+        ProcessWrapper wrapper;
+        lock (_lifecycleLock)
+        {
+            wrapper = _processWrapper;
+        }
+
+        try
+        {
+            wrapper.ForcefulExit();
+        }
+        catch (Exception)
+        {
+            // The child never started, was already reaped, or cannot be terminated;
+            // the invocation's own outcome is what surfaces to the caller.
         }
     }
 
