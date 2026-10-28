@@ -31,10 +31,10 @@ public class AdapterConfigurationDeliveryTests
 
         ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(), string.Empty)
         {
-            EnvironmentVariables = new Dictionary<string, string>
+            EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 [variableName] = variableValue
-            }
+            },
         };
 
         FilePathResolver resolver = new();
@@ -55,10 +55,10 @@ public class AdapterConfigurationDeliveryTests
 
         ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
         {
-            EnvironmentVariables = new Dictionary<string, string>
+            EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 [variableName] = variableValue
-            }
+            },
         };
 
         BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
@@ -81,10 +81,10 @@ public class AdapterConfigurationDeliveryTests
         {
             ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(), string.Empty)
             {
-                EnvironmentVariables = new Dictionary<string, string>
+                EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
                 {
                     [variableName] = null!
-                }
+                },
             };
 
             FilePathResolver resolver = new();
@@ -114,10 +114,10 @@ public class AdapterConfigurationDeliveryTests
         {
             ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
             {
-                EnvironmentVariables = new Dictionary<string, string>
+                EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
                 {
                     [variableName] = null!
-                }
+                },
             };
 
             BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
@@ -146,10 +146,10 @@ public class AdapterConfigurationDeliveryTests
         {
             ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
             {
-                EnvironmentVariables = new Dictionary<string, string>
+                EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
                 {
                     [variableName] = string.Empty
-                }
+                },
             };
 
             BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
@@ -172,7 +172,7 @@ public class AdapterConfigurationDeliveryTests
 
         ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(), string.Empty)
         {
-            RequiresAdministrator = true
+            RequiresAdministrator = true,
         };
 
         FilePathResolver resolver = new();
@@ -189,7 +189,7 @@ public class AdapterConfigurationDeliveryTests
 
         ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(), string.Empty)
         {
-            Credential = new UserCredential("SOMEDOMAIN", "someuser", null, true)
+            Credential = new UserCredential("SOMEDOMAIN", "someuser", null, true),
         };
 
         FilePathResolver resolver = new();

@@ -8,7 +8,6 @@
 */
 
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CliInvoke.Extensions;
@@ -26,7 +25,7 @@ public class PowerShellMiddlewareIntegrationTests
     /// </summary>
     private static string? ResolvePwshPath()
     {
-        string fileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        string fileName = OperatingSystem.IsWindows()
             ? "pwsh.exe"
             : "pwsh";
 
@@ -120,7 +119,7 @@ public class PowerShellMiddlewareIntegrationTests
         await Assert.That(result.StandardOutput).IsNotNull();
 
         // The rewritten config's ExecutedFilePath should be pwsh (or pwsh.exe on Windows).
-        string expectedPwshName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        string expectedPwshName = OperatingSystem.IsWindows()
             ? "pwsh.exe"
             : "pwsh";
         await Assert.That(result.ExecutedFilePath)

@@ -4,5 +4,5 @@ public enum FakeMiddlewareMode
 {
     AlwaysInvokeNext,
     NeverInvokeNext,
-    ThrowOnInvoke
+    ThrowOnInvoke,
 }

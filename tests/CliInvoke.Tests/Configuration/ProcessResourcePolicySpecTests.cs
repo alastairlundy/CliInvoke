@@ -36,8 +36,8 @@ public class ProcessResourcePolicySpecTests
 
         // Act
         ProcessResourcePolicySpec afterAffinity = spec.SetProcessorAffinity(1);
-        ProcessResourcePolicySpec afterMin = spec.SetMinWorkingSet((nint)1024);
-        ProcessResourcePolicySpec afterMax = spec.SetMaxWorkingSet((nint)8192);
+        ProcessResourcePolicySpec afterMin = spec.SetMinWorkingSet(1024);
+        ProcessResourcePolicySpec afterMax = spec.SetMaxWorkingSet(8192);
         ProcessResourcePolicySpec afterPriority = spec.SetPriorityClass(ProcessPriorityClass.High);
         ProcessResourcePolicySpec afterBoost = spec.ConfigurePriorityBoost(true);
 
@@ -92,7 +92,7 @@ public class ProcessResourcePolicySpecTests
         ProcessResourcePolicy policy = spec.SetProcessorAffinity(1).Build();
 
         // Assert
-        await Assert.That(policy.ProcessorAffinity).IsEqualTo((nint)1);
+        await Assert.That(policy.ProcessorAffinity).IsEqualTo(1);
     }
 
     [Test]
@@ -102,7 +102,7 @@ public class ProcessResourcePolicySpecTests
         ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
 
         // Assert
-        await Assert.That(() => spec.SetMinWorkingSet((nint)(-1))).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(() => spec.SetMinWorkingSet(-1)).Throws<ArgumentOutOfRangeException>();
     }
 
     [Test]
@@ -112,7 +112,7 @@ public class ProcessResourcePolicySpecTests
         ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
 
         // Assert
-        await Assert.That(() => spec.SetMaxWorkingSet((nint)0)).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(() => spec.SetMaxWorkingSet(0)).Throws<ArgumentOutOfRangeException>();
     }
 
     [Test]
@@ -123,23 +123,23 @@ public class ProcessResourcePolicySpecTests
 
         // Act
         ProcessResourcePolicy policy = spec
-            .SetMinWorkingSet((nint)1024)
-            .SetMaxWorkingSet((nint)8192)
+            .SetMinWorkingSet(1024)
+            .SetMaxWorkingSet(8192)
             .Build();
 
         // Assert
-        await Assert.That(policy.MinWorkingSet).IsEqualTo((nint)1024);
-        await Assert.That(policy.MaxWorkingSet).IsEqualTo((nint)8192);
+        await Assert.That(policy.MinWorkingSet).IsEqualTo(1024);
+        await Assert.That(policy.MaxWorkingSet).IsEqualTo(8192);
     }
 
     [Test]
     public async Task SetMaxWorkingSet_LessThanMin_Throws()
     {
         // Arrange
-        ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec().SetMinWorkingSet((nint)8192);
+        ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec().SetMinWorkingSet(8192);
 
         // Assert
-        await Assert.That(() => spec.SetMaxWorkingSet((nint)1024))
+        await Assert.That(() => spec.SetMaxWorkingSet(1024))
             .Throws<ArgumentOutOfRangeException>();
     }
 
@@ -147,10 +147,10 @@ public class ProcessResourcePolicySpecTests
     public async Task SetMinWorkingSet_GreaterThanMax_Throws()
     {
         // Arrange
-        ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec().SetMaxWorkingSet((nint)1024);
+        ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec().SetMaxWorkingSet(1024);
 
         // Assert
-        await Assert.That(() => spec.SetMinWorkingSet((nint)8192))
+        await Assert.That(() => spec.SetMinWorkingSet(8192))
             .Throws<ArgumentOutOfRangeException>();
     }
 
@@ -177,8 +177,8 @@ public class ProcessResourcePolicySpecTests
         // Arrange
         ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec()
             .SetProcessorAffinity(1)
-            .SetMinWorkingSet((nint)1024)
-            .SetMaxWorkingSet((nint)8192)
+            .SetMinWorkingSet(1024)
+            .SetMaxWorkingSet(8192)
             .SetPriorityClass(ProcessPriorityClass.BelowNormal)
             .ConfigurePriorityBoost(true);
 
@@ -186,9 +186,9 @@ public class ProcessResourcePolicySpecTests
         ProcessResourcePolicy policy = spec.Build();
 
         // Assert
-        await Assert.That(policy.ProcessorAffinity).IsEqualTo((nint)1);
-        await Assert.That(policy.MinWorkingSet).IsEqualTo((nint)1024);
-        await Assert.That(policy.MaxWorkingSet).IsEqualTo((nint)8192);
+        await Assert.That(policy.ProcessorAffinity).IsEqualTo(1);
+        await Assert.That(policy.MinWorkingSet).IsEqualTo(1024);
+        await Assert.That(policy.MaxWorkingSet).IsEqualTo(8192);
         await Assert.That(policy.PriorityClass).IsEqualTo(ProcessPriorityClass.BelowNormal);
         await Assert.That(policy.EnablePriorityBoost).IsTrue();
     }

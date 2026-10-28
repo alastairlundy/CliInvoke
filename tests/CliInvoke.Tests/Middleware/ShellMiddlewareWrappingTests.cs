@@ -145,7 +145,7 @@ public class ShellMiddlewareWrappingTests
         ShellMiddlewareOptions options = new ShellMiddlewareOptions
         {
             WindowCreation = true,
-            UseShellExecution = true
+            UseShellExecution = true,
         };
 
         ProcessConfiguration wrapped = await RunThroughShellMiddlewareAsync(

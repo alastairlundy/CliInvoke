@@ -72,7 +72,7 @@ public class ProcessInvokerTests
     {
         IProcessInvoker processInvoker = _testFixture.ServiceProvider.GetRequiredService<IProcessInvoker>();
 
-        ProcessConfiguration config = new ProcessConfiguration("FAKE.FILE", "");
+        ProcessConfiguration config = new ProcessConfiguration("FAKE.FILE");
 
         await Assert.That(async () => await processInvoker.ExecuteBufferedAsync(config,
             ProcessExitConfiguration.CreateGraceful(), cancellationToken: CancellationToken.None).ConfigureAwait(true)).Throws<FileNotFoundException>();

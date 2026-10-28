@@ -66,7 +66,7 @@ public class MiddlewareChainTests
         InvalidOperationException? thrown = await Assert.That(() => chain.RunAsync(ctx, CancellationToken.None))
             .Throws<InvalidOperationException>();
         
-        await Assert.That(thrown.Message).IsEqualTo("terminal failed");
+        await Assert.That(thrown?.Message).IsEqualTo("terminal failed");
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class MiddlewareChainTests
         InvalidOperationException? thrown = await Assert.That(() => chain.RunAsync(ctx, CancellationToken.None))
             .Throws<InvalidOperationException>();
 
-        await Assert.That(thrown.Message).IsEqualTo("upstream failed");
+        await Assert.That(thrown?.Message).IsEqualTo("upstream failed");
         await Assert.That(callLog).IsEquivalentTo(new List<string> { "A" });
     }
 
@@ -109,7 +109,7 @@ public class MiddlewareChainTests
             });
 
         using CancellationTokenSource cts = new CancellationTokenSource();
-        cts.Cancel();
+        await cts.CancelAsync().ConfigureAwait(true);
 
         InvocationContext ctx = new InvocationContext(
             new ProcessConfigurationBuilder("test.exe").Build(),

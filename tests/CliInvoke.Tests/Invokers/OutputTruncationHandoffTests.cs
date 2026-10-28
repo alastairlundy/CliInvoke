@@ -26,7 +26,7 @@ public class OutputTruncationHandoffTests
     // Produces ~20000 bytes of 'a' on stdout so a 1000-byte cap is unambiguously exceeded.
     private static (string Target, string Arguments) GetLargeOutputCommand()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
             return ("powershell.exe", "-NoProfile -Command \"Write-Output('a' * 20000)\"");
 
         return ("/bin/bash", "-c \"printf 'a%.0s' {1..20000}\"");

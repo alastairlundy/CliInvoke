@@ -121,7 +121,7 @@ public class ProcessMiddlewareBuilderTests
         FakeMiddleware expected = new FakeMiddleware("SP", callLog);
         Dictionary<Type, object> services = new Dictionary<Type, object>
         {
-            [typeof(FakeMiddleware)] = expected
+            [typeof(FakeMiddleware)] = expected,
         };
         IServiceProvider provider = new SimpleServiceProvider(services);
         ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(provider);

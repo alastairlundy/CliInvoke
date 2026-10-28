@@ -74,7 +74,7 @@ public class ProcessResultCanceledSignalTests
         CountingExternalProcessFactory factory = new()
         {
             DefaultCanceled = false,
-            DefaultSignal = PosixSignal.SIGTERM
+            DefaultSignal = PosixSignal.SIGTERM,
         };
         ProcessInvocationPipeline pipeline = new(factory);
 
@@ -90,7 +90,7 @@ public class ProcessResultCanceledSignalTests
         CountingExternalProcessFactory factory = new()
         {
             DefaultCanceled = true,
-            DefaultSignal = null
+            DefaultSignal = null,
         };
         ProcessInvocationPipeline pipeline = new(factory);
 
@@ -109,7 +109,7 @@ public class ProcessResultCanceledSignalTests
         CountingExternalProcessFactory factory = new()
         {
             DefaultCanceled = true,
-            DefaultSignal = PosixSignal.SIGTERM
+            DefaultSignal = PosixSignal.SIGTERM,
         };
         ProcessInvocationPipeline pipeline = new(factory);
         InvocationContext ctx = new(_configuration, ProcessExitConfiguration.CreateGraceful(),
@@ -134,7 +134,7 @@ public class ProcessResultCanceledSignalTests
         string markerPath = Path.Combine(Path.GetTempPath(),
             $"cliinvoke-canceled-signal-{Guid.NewGuid():N}.marker");
 
-        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 5);
+        using ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 5);
         process.Start();
 
         try
@@ -188,7 +188,7 @@ public class ProcessResultCanceledSignalTests
         if (OperatingSystem.IsWindows())
             return;
 
-        ProcessWrapper process = ProcessTestHelper.CreateProcess("sleep", "30");
+        using ProcessWrapper process = ProcessTestHelper.CreateProcess("sleep", "30");
         process.Start();
 
         try

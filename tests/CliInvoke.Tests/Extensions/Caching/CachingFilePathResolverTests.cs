@@ -50,9 +50,9 @@ public class CachingFilePathResolverTests
     {
         // Use a real, existing file so the cache's existence re-verification passes on the hit.
         string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
-        var inner = new FakeResolver(existing);
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver(existing);
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         FileInfo first = resolver.ResolveFilePath("tool");
         FileInfo second = resolver.ResolveFilePath("tool");
@@ -67,9 +67,9 @@ public class CachingFilePathResolverTests
     public async Task TryResolveFilePath_CachesAndDelegatesOnlyOnMiss()
     {
         string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
-        var inner = new FakeResolver(existing);
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver(existing);
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         bool firstOk = resolver.TryResolveFilePath("tool", out FileInfo? first);
         bool secondOk = resolver.TryResolveFilePath("tool", out FileInfo? second);
@@ -77,16 +77,16 @@ public class CachingFilePathResolverTests
         await Assert.That(firstOk).IsTrue();
         await Assert.That(secondOk).IsTrue();
         await Assert.That(inner.TryResolveCount).IsEqualTo(1);
-        await Assert.That(first!.FullName).IsEqualTo(second!.FullName);
+        await Assert.That(first?.FullName).IsEqualTo(second?.FullName);
     }
 
     [Test]
     public async Task ResolveFilePath_MissDelegatesToInner()
     {
         string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
-        var inner = new FakeResolver(existing);
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver(existing);
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         FileInfo result = resolver.ResolveFilePath("tool");
 
@@ -97,15 +97,15 @@ public class CachingFilePathResolverTests
     [Test]
     public async Task ResolveFilePath_WindowsCaseInsensitive_CachesSameEntry()
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (!OperatingSystem.IsWindows())
         {
             return;
         }
 
         string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
-        var inner = new FakeResolver(existing);
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver(existing);
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         FileInfo first = resolver.ResolveFilePath("Tool");
         FileInfo second = resolver.ResolveFilePath("tool");
@@ -118,15 +118,15 @@ public class CachingFilePathResolverTests
     [Test]
     public async Task TryResolveFilePath_WindowsCaseInsensitive_CachesSameEntry()
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (!OperatingSystem.IsWindows())
         {
             return;
         }
 
         string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
-        var inner = new FakeResolver(existing);
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver(existing);
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         bool firstOk = resolver.TryResolveFilePath("Tool", out FileInfo? first);
         bool secondOk = resolver.TryResolveFilePath("tool", out FileInfo? second);
@@ -134,16 +134,16 @@ public class CachingFilePathResolverTests
         await Assert.That(firstOk).IsTrue();
         await Assert.That(secondOk).IsTrue();
         await Assert.That(inner.TryResolveCount).IsEqualTo(1);
-        await Assert.That(first!.FullName).IsEqualTo(second!.FullName);
+        await Assert.That(first?.FullName).IsEqualTo(second?.FullName);
     }
 
     [Test]
     public async Task ResolveFilePath_CacheHit_FileExistsReVerified()
     {
         string existing = typeof(CachingFilePathResolverTests).Assembly.Location;
-        var inner = new FakeResolver(existing);
-        using var cache = new MemoryCache(new MemoryCacheOptions());
-        var resolver = new CachingFilePathResolver(inner, cache);
+        FakeResolver inner = new FakeResolver(existing);
+        using MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        CachingFilePathResolver resolver = new CachingFilePathResolver(inner, cache);
 
         FileInfo first = resolver.ResolveFilePath("tool");
         FileInfo second = resolver.ResolveFilePath("tool");

@@ -21,7 +21,7 @@ public class TruncationTests
     // Produces ~20000 bytes of 'a' on stdout so a 1000-byte cap is unambiguously exceeded.
     private static (string Target, string Arguments) GetLargeOutputCommand()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
             return ("powershell.exe", "-NoProfile -Command \"Write-Output('a' * 20000)\"");
 
         return ("/bin/bash", "-c \"printf 'a%.0s' {1..20000}\"");
@@ -98,7 +98,7 @@ public class TruncationTests
         // Build a payload with multibyte UTF-8 characters (e.g. Chinese characters).
         // Each character is 3 bytes in UTF-8. Use a cap that cuts mid-character to
         // verify the incremental decoder drops the split sequence cleanly.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
         {
             // PowerShell approach: output multibyte characters then cap at an odd byte boundary.
             ProcessConfiguration configuration = new ProcessConfiguration(
@@ -139,7 +139,7 @@ public class TruncationTests
     {
         // Verify that when the cap splits a multibyte sequence, only complete characters
         // are included in the output.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
         {
             ProcessConfiguration configuration = new ProcessConfiguration(
                 "powershell.exe",

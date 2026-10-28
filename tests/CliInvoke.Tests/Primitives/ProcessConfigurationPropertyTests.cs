@@ -10,7 +10,7 @@ public class ProcessConfigurationPropertyTests
     {
         Prop.ForAll<int>(seed =>
             {
-                var rng = new Random(seed);
+                Random rng = new Random(seed);
                 Dictionary<string, string> original = new();
 
                 int count = Math.Abs(rng.Next() % 10) + 1;
@@ -20,7 +20,7 @@ public class ProcessConfigurationPropertyTests
                 ProcessConfiguration config = new()
                 {
                     TargetFilePath = "foo.exe",
-                    EnvironmentVariables = original
+                    EnvironmentVariables = original,
                 };
 
                 // Snapshot the configuration's env vars
@@ -90,26 +90,26 @@ public class ProcessConfigurationPropertyTests
         {
             ["KEY_0"] = "VALUE_A",
             ["KEY_1"] = "VALUE_B",
-            ["KEY_2"] = "VALUE_C"
+            ["KEY_2"] = "VALUE_C",
         };
 
         Dictionary<string, string> dict2 = new()
         {
             ["KEY_2"] = "VALUE_C",
             ["KEY_1"] = "VALUE_B",
-            ["KEY_0"] = "VALUE_A"
+            ["KEY_0"] = "VALUE_A",
         };
 
         ProcessConfiguration config1 = new()
         {
             TargetFilePath = "foo.exe",
-            EnvironmentVariables = dict1
+            EnvironmentVariables = dict1,
         };
 
         ProcessConfiguration config2 = new()
         {
             TargetFilePath = "foo.exe",
-            EnvironmentVariables = dict2
+            EnvironmentVariables = dict2,
         };
 
         // Assert - the ImmutableSortedDictionary is sorted by key, so both

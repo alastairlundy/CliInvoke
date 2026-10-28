@@ -26,7 +26,7 @@ public class FakeMiddleware : IProcessMiddleware
             FakeMiddlewareMode.AlwaysInvokeNext => next(context),
             FakeMiddlewareMode.NeverInvokeNext => Task.CompletedTask,
             FakeMiddlewareMode.ThrowOnInvoke => throw _exceptionToThrow ?? new InvalidOperationException($" {_name} threw"),
-            _ => Task.CompletedTask
+            _ => Task.CompletedTask,
         };
     }
 }

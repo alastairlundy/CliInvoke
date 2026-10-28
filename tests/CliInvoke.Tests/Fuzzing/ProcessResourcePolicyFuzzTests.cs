@@ -28,7 +28,7 @@ public class ProcessResourcePolicyFuzzTests
                 {
                     if (min <= 1 || min > nint.MaxValue / 2) return true;
 
-                    var spec = new ProcessResourcePolicySpec();
+                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
                     spec.SetMaxWorkingSet((nint)(min - 1));
 
                     try
@@ -55,7 +55,7 @@ public class ProcessResourcePolicyFuzzTests
                 {
                     if (max <= 1 || max >= int.MaxValue - 1) return true;
 
-                    var spec = new ProcessResourcePolicySpec();
+                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
                     spec.SetMinWorkingSet((nint)(max + 1));
 
                     try
@@ -82,7 +82,7 @@ public class ProcessResourcePolicyFuzzTests
                 {
                     if (value >= 0) return true;
 
-                    var spec = new ProcessResourcePolicySpec();
+                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
 
                     try
                     {
@@ -108,7 +108,7 @@ public class ProcessResourcePolicyFuzzTests
                 {
                     if (value >= 0) return true;
 
-                    var spec = new ProcessResourcePolicySpec();
+                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
 
                     try
                     {
@@ -130,7 +130,7 @@ public class ProcessResourcePolicyFuzzTests
     [Test]
     public async Task SetMaxWorkingSet_Zero_ThrowsArgumentOutOfRangeException()
     {
-        var spec = new ProcessResourcePolicySpec();
+        ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
 
         await Assert.That(() => spec.SetMaxWorkingSet(0)).Throws<ArgumentOutOfRangeException>();
     }
@@ -147,11 +147,11 @@ public class ProcessResourcePolicyFuzzTests
                     if (min < 1 || max <= min || max > 100_000_000)
                         return true;
 
-                    var spec = new ProcessResourcePolicySpec();
+                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
                     spec.SetMinWorkingSet((nint)min);
                     spec.SetMaxWorkingSet((nint)max);
 
-                    var policy = spec.Build();
+                    ProcessResourcePolicy policy = spec.Build();
 
                     return policy.MinWorkingSet == (nint)min &&
                            policy.MaxWorkingSet == (nint)max;
@@ -166,8 +166,8 @@ public class ProcessResourcePolicyFuzzTests
     [Test]
     public async Task Build_DefaultSpec_HasExpectedDefaults()
     {
-        var spec = new ProcessResourcePolicySpec();
-        var policy = spec.Build();
+        ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
+        ProcessResourcePolicy policy = spec.Build();
 
         await Assert.That(policy.MinWorkingSet).IsNull();
         await Assert.That(policy.MaxWorkingSet).IsNull();

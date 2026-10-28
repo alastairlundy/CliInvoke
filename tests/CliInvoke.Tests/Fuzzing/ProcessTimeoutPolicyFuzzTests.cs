@@ -21,10 +21,9 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 0) return true;
 
-                    var policy = new ProcessTimeoutPolicy(
+                    ProcessTimeoutPolicy policy = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds),
-                        enabled: true,
-                        ProcessExitBehaviour.GracefulExit);
+                        enabled: true);
 
                     return policy.Equals(policy);
                 })
@@ -38,9 +37,9 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 0) return true;
 
-                    var ts = TimeSpan.FromMilliseconds(milliseconds);
-                    var a = new ProcessTimeoutPolicy(ts, enabled, ProcessExitBehaviour.GracefulExit);
-                    var b = new ProcessTimeoutPolicy(ts, enabled, ProcessExitBehaviour.GracefulExit);
+                    TimeSpan ts = TimeSpan.FromMilliseconds(milliseconds);
+                    ProcessTimeoutPolicy a = new ProcessTimeoutPolicy(ts, enabled);
+                    ProcessTimeoutPolicy b = new ProcessTimeoutPolicy(ts, enabled);
 
                     return a.Equals(b) && b.Equals(a);
                 })
@@ -54,15 +53,13 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 1 || milliseconds >= int.MaxValue - 1) return true;
 
-                    var a = new ProcessTimeoutPolicy(
+                    ProcessTimeoutPolicy a = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds),
-                        enabled: true,
-                        ProcessExitBehaviour.GracefulExit);
+                        enabled: true);
 
-                    var b = new ProcessTimeoutPolicy(
+                    ProcessTimeoutPolicy b = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds + 1),
-                        enabled: true,
-                        ProcessExitBehaviour.GracefulExit);
+                        enabled: true);
 
                     return !a.Equals(b);
                 })
@@ -76,7 +73,7 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 0) return true;
 
-                    var policy = new ProcessTimeoutPolicy(
+                    ProcessTimeoutPolicy? policy = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds),
                         enabled: true);
 
@@ -92,9 +89,9 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 0) return true;
 
-                    var ts = TimeSpan.FromMilliseconds(milliseconds);
-                    var a = new ProcessTimeoutPolicy(ts, enabled, ProcessExitBehaviour.GracefulExit);
-                    var b = new ProcessTimeoutPolicy(ts, enabled, ProcessExitBehaviour.GracefulExit);
+                    TimeSpan ts = TimeSpan.FromMilliseconds(milliseconds);
+                    ProcessTimeoutPolicy a = new ProcessTimeoutPolicy(ts, enabled);
+                    ProcessTimeoutPolicy b = new ProcessTimeoutPolicy(ts, enabled);
 
                     return a.Equals(b) && a.GetHashCode() == b.GetHashCode();
                 })
@@ -130,7 +127,7 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 0) return true;
 
-                    var policy = ProcessTimeoutPolicy.FromTimeSpan(
+                    ProcessTimeoutPolicy policy = ProcessTimeoutPolicy.FromTimeSpan(
                         TimeSpan.FromMilliseconds(milliseconds));
 
                     return policy.TimeoutThreshold == TimeSpan.FromMilliseconds(milliseconds) &&
@@ -146,9 +143,9 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 0) return true;
 
-                    var ts = TimeSpan.FromMilliseconds(milliseconds);
-                    var a = new ProcessTimeoutPolicy(ts, enabled, ProcessExitBehaviour.GracefulExit);
-                    var b = new ProcessTimeoutPolicy(ts, enabled, ProcessExitBehaviour.GracefulExit);
+                    TimeSpan ts = TimeSpan.FromMilliseconds(milliseconds);
+                    ProcessTimeoutPolicy a = new ProcessTimeoutPolicy(ts, enabled);
+                    ProcessTimeoutPolicy b = new ProcessTimeoutPolicy(ts, enabled);
 
                     return (a == b) && (b == a);
                 })
@@ -162,10 +159,10 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 1 || milliseconds >= int.MaxValue - 1) return true;
 
-                    var a = new ProcessTimeoutPolicy(
+                    ProcessTimeoutPolicy a = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds),
                         enabled: true);
-                    var b = new ProcessTimeoutPolicy(
+                    ProcessTimeoutPolicy b = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds + 1),
                         enabled: true);
 
@@ -181,7 +178,7 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 0) return true;
 
-                    var policy = new ProcessTimeoutPolicy(
+                    ProcessTimeoutPolicy policy = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds),
                         enabled: true);
 
@@ -197,7 +194,7 @@ public class ProcessTimeoutPolicyFuzzTests
                 {
                     if (milliseconds < 0) return true;
 
-                    var policy = new ProcessTimeoutPolicy(
+                    ProcessTimeoutPolicy policy = new ProcessTimeoutPolicy(
                         TimeSpan.FromMilliseconds(milliseconds),
                         enabled: true);
 

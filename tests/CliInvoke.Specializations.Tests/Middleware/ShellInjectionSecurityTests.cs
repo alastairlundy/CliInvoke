@@ -8,7 +8,6 @@
 */
 
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CliInvoke.Specializations.Middleware;
@@ -178,7 +177,7 @@ public class ShellInjectionSecurityTests
 
     private static string? ResolvePwshPath()
     {
-        string fileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        string fileName = OperatingSystem.IsWindows()
             ? "pwsh.exe"
             : "pwsh";
 

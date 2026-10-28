@@ -181,7 +181,7 @@ public class RetryStdinReplayTests
     {
         ProcessConfiguration configuration = new ProcessConfiguration("dotnet", "--version")
         {
-            StandardInput = null
+            StandardInput = null,
         };
         RetryMiddleware middleware = new RetryMiddleware(new AlwaysRetry(), CreateOptions(2));
         InvocationContext context = CreateContext(configuration);
@@ -204,7 +204,7 @@ public class RetryStdinReplayTests
         => new("dotnet", "--version")
         {
             RedirectStandardInput = true,
-            StandardInput = new StreamWriter(source)
+            StandardInput = new StreamWriter(source),
         };
 
     private static InvocationContext CreateContext(ProcessConfiguration configuration)
@@ -216,7 +216,7 @@ public class RetryStdinReplayTests
         {
             MaxAttempts = maxAttempts,
             BaseDelay = TimeSpan.FromMilliseconds(1),
-            Strategy = RetryBackoffStrategy.Fixed
+            Strategy = RetryBackoffStrategy.Fixed,
         };
 
     private static ProcessResult MakeResult()

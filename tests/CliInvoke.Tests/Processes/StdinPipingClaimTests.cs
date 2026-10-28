@@ -142,10 +142,11 @@ public class StdinPipingClaimTests
         await process.StartAsync(configuration, CancellationToken.None).WaitAsync(GuardTimeout).ConfigureAwait(true);
 
         await ProcessTestHelper.WaitForConditionAsync(
-            () => process.HasExited,
-            GuardTimeout,
-            failureMessage:
-            "The stdin-reading child never exited: the child's stdin write end was not closed, so end-of-file was never delivered.").ConfigureAwait(true);
+                () => process.HasExited,
+                GuardTimeout,
+                failureMessage:
+                "The stdin-reading child never exited: the child's stdin write end was not closed, so end-of-file was never delivered.")
+            .ConfigureAwait(true);
 
         ProcessResult result = await process.WaitForExitOrTimeoutAsync(CancellationToken.None)
             .WaitAsync(GuardTimeout).ConfigureAwait(true);

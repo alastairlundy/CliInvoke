@@ -7,7 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+#if NET11_0
 using System.ComponentModel;
+#endif
 using System.Runtime.InteropServices;
 
 using CliInvoke.Processes.Internal.Cancellation;
@@ -147,8 +149,10 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
 
     internal override void SetUserCredential(Process process, UserCredential credential)
     {
+        ArgumentNullException.ThrowIfNull(credential);
+        
         // A null credential is treated the same as the Null sentinel: a no-op.
-        if (credential is null || credential.Equals(UserCredential.Null))
+        if (credential.Equals(UserCredential.Null))
             return;
 
         // An "empty" credential (all fields null) is a no-op, matching the

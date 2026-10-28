@@ -26,7 +26,7 @@ public class CommandLineLengthCheckTests
 
         ProcessConfiguration configuration = new ProcessConfiguration("dotnet.exe")
         {
-            Arguments = longArgument
+            Arguments = longArgument,
         };
 
         await Assert.That(() => new ProcessWrapper(
@@ -49,7 +49,7 @@ public class CommandLineLengthCheckTests
 
         ProcessConfiguration configuration = new ProcessConfiguration("dotnet.exe")
         {
-            ArgumentList = args
+            ArgumentList = args,
         };
 
         await Assert.That(() => new ProcessWrapper(

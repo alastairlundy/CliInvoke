@@ -51,7 +51,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
 
         // Act
         ProcessExitConfiguration config = ProcessExitConfiguration.Create(
-            policy, ProcessExitBehaviour.GracefulExit, suppressExceptions: true);
+            policy, suppressExceptions: true);
 
         // Assert
         await Assert.That(config.TimeoutPolicy).IsEqualTo(policy);
@@ -153,11 +153,10 @@ public class ProcessExitConfigurationCreationExtensionsTests
         ProcessExitConfiguration source = new ProcessExitConfiguration(
             policy,
             ProcessExitBehaviour.ForcefulExit,
-            ProcessExceptionBehaviour.SuppressExceptions,
-            false)
+            ProcessExceptionBehaviour.SuppressExceptions)
         {
             ValidationRules = [existingRule],
-            MaxBufferedOutputBytes = 1024
+            MaxBufferedOutputBytes = 1024,
         };
 
         // Act
@@ -191,7 +190,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
             true)
         {
             ValidationRules = [rule],
-            MaxBufferedOutputBytes = 512
+            MaxBufferedOutputBytes = 512,
         };
 
         // Act
@@ -217,7 +216,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
         // Arrange
         ProcessExitConfiguration source = new()
         {
-            MaxBufferedOutputBytes = 512
+            MaxBufferedOutputBytes = 512,
         };
 
         // Act
@@ -237,7 +236,7 @@ public class ProcessExitConfigurationCreationExtensionsTests
         ValidationRule<ProcessResult> newRule = new(_ => true, "New");
         ProcessExitConfiguration source = new()
         {
-            MaxBufferedOutputBytes = 512
+            MaxBufferedOutputBytes = 512,
         };
 
         // Act

@@ -41,7 +41,7 @@ public class ArgumentEscaperFuzzTests
                     return true;
 
                 string escaped = ArgumentEscaper.EscapeInner(value);
-                return escaped == value;
+                return string.Equals(escaped, value, StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }

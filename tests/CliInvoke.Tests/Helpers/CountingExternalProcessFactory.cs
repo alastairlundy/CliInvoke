@@ -66,7 +66,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
         {
             Canceled = DefaultCanceled,
             Signal = DefaultSignal,
-            Piping = StdinPiping
+            Piping = StdinPiping,
         };
     }
 
@@ -80,7 +80,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
         {
             Canceled = DefaultCanceled,
             Signal = DefaultSignal,
-            Piping = StdinPiping
+            Piping = StdinPiping,
         };
     }
 
@@ -169,7 +169,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
                 try
                 {
                     await PipeStandardInputAsync(Configuration.StandardInput.BaseStream,
-                        cancellationToken).ConfigureAwait(false);
+                        cancellationToken).ConfigureAwait(true);
                 }
                 catch (Exception) when (Canceled)
                 {
@@ -189,7 +189,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
             // no join of its own - every fault propagates, mirroring ExternalProcess.
             if (configuration.StandardInput is not null)
                 await PipeStandardInputAsync(configuration.StandardInput.BaseStream,
-                    cancellationToken).ConfigureAwait(false);
+                    cancellationToken).ConfigureAwait(true);
         }
 
         private void BeginStart(CancellationToken cancellationToken)
@@ -223,7 +223,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 
             try
             {
-                await source.CopyToAsync(Piping.WriteEnd, cancellationToken).ConfigureAwait(false);
+                await source.CopyToAsync(Piping.WriteEnd, cancellationToken).ConfigureAwait(true);
                 Piping.Record(StdinPipingEvent.CopyCompleted);
             }
             catch
@@ -272,7 +272,7 @@ internal sealed class CountingExternalProcessFactory : IExternalProcessFactory, 
 
             try
             {
-                await Task.WhenAll(standardInputCopy, waitTask, drainTask).ConfigureAwait(false);
+                await Task.WhenAll(standardInputCopy, waitTask, drainTask).ConfigureAwait(true);
             }
             catch (Exception) when (standardInputCopy.IsFaulted
                                     && !waitTask.IsFaulted
@@ -310,7 +310,7 @@ internal enum StdinPipingEvent
     CopyStarted,
     CopyCompleted,
     CopyFaulted,
-    WriteEndClosed
+    WriteEndClosed,
 }
 
 /// <summary>

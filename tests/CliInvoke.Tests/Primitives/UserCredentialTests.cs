@@ -44,7 +44,7 @@ public class UserCredentialTests
         using SecureString password = MakeSecureString("hunter2");
 
         // Act
-        UserCredential credential = new("CONTOSO", "alice", password, true);
+        UserCredential credential = new("CONTOSO", "alice", password, loadUserProfile: true);
 
         // Assert
         await Assert.That(credential.Domain).IsEqualTo("CONTOSO");
@@ -70,8 +70,8 @@ public class UserCredentialTests
         // UserCredential compares SecureString by reference, so equal credentials must share
         // the same SecureString instance.
         using SecureString password = MakeSecureString("secret");
-        UserCredential a = new("DOM", "user", password, false);
-        UserCredential b = new("DOM", "user", password, false);
+        UserCredential a = new("DOM", "user", password, loadUserProfile: false);
+        UserCredential b = new("DOM", "user", password, loadUserProfile: false);
 
         // Assert
         await Assert.That(a.Equals(b)).IsTrue();
@@ -83,8 +83,8 @@ public class UserCredentialTests
     public async Task Equals_DifferentUserNames_AreNotEqual()
     {
         // Arrange
-        UserCredential a = new("DOM", "userA", null, null);
-        UserCredential b = new("DOM", "userB", null, null);
+        UserCredential a = new("DOM", "userA", password: null, loadUserProfile: null);
+        UserCredential b = new("DOM", "userB", password: null, loadUserProfile: null);
 
         // Assert
         await Assert.That(a.Equals(b)).IsFalse();
@@ -96,8 +96,8 @@ public class UserCredentialTests
     public async Task Equals_DifferentDomains_AreNotEqual()
     {
         // Arrange
-        UserCredential a = new("DOM1", "user", null, null);
-        UserCredential b = new("DOM2", "user", null, null);
+        UserCredential a = new("DOM1", "user", password: null, loadUserProfile: null);
+        UserCredential b = new("DOM2", "user", password: null, loadUserProfile: null);
 
         // Assert
         await Assert.That(a.Equals(b)).IsFalse();
@@ -109,8 +109,8 @@ public class UserCredentialTests
         // Arrange
         using SecureString passwordA = MakeSecureString("secret");
         using SecureString passwordB = MakeSecureString("different");
-        UserCredential a = new(null, "user", passwordA, null);
-        UserCredential b = new(null, "user", passwordB, null);
+        UserCredential a = new(domain: null, "user", passwordA, loadUserProfile: null);
+        UserCredential b = new(domain: null, "user", passwordB, loadUserProfile: null);
 
         // Assert
         await Assert.That(a.Equals(b)).IsFalse();
@@ -120,8 +120,8 @@ public class UserCredentialTests
     public async Task Equals_DifferentLoadUserProfile_AreNotEqual()
     {
         // Arrange
-        UserCredential a = new(null, "user", null, true);
-        UserCredential b = new(null, "user", null, false);
+        UserCredential a = new(domain: null, "user", password: null, loadUserProfile: true);
+        UserCredential b = new(domain: null, "user", password: null, loadUserProfile: false);
 
         // Assert
         await Assert.That(a.Equals(b)).IsFalse();
@@ -131,8 +131,8 @@ public class UserCredentialTests
     public async Task Equals_NullFieldVsNonNullField_AreNotEqual()
     {
         // Arrange
-        UserCredential a = new(null, "user", null, null);
-        UserCredential b = new("DOM", "user", null, null);
+        UserCredential a = new(domain: null, "user", password: null, loadUserProfile: null);
+        UserCredential b = new("DOM", "user", password: null, loadUserProfile: null);
 
         // Assert
         await Assert.That(a.Equals(b)).IsFalse();
@@ -142,7 +142,7 @@ public class UserCredentialTests
     public async Task Equals_NullOther_ReturnsFalse()
     {
         // Arrange
-        UserCredential a = new("DOM", "user", null, null);
+        UserCredential a = new("DOM", "user", password: null, loadUserProfile: null);
 
         // Assert
         await Assert.That(a.Equals((UserCredential?)null)).IsFalse();
@@ -154,25 +154,25 @@ public class UserCredentialTests
     public async Task StaticEquals_BothNull_ReturnsTrue()
     {
         // Assert
-        await Assert.That(UserCredential.Equals(null, null)).IsTrue();
+        await Assert.That(UserCredential.Equals(left: null, right: null)).IsTrue();
     }
 
     [Test]
     public async Task StaticEquals_OneNull_ReturnsFalse()
     {
         // Arrange
-        UserCredential a = new("DOM", "user", null, null);
+        UserCredential a = new("DOM", "user", password: null, loadUserProfile: null);
 
         // Assert
-        await Assert.That(UserCredential.Equals(a, null)).IsFalse();
-        await Assert.That(UserCredential.Equals(null, a)).IsFalse();
+        await Assert.That(UserCredential.Equals(a, right: null)).IsFalse();
+        await Assert.That(UserCredential.Equals(left: null, a)).IsFalse();
     }
 
     [Test]
     public async Task Equals_NonUserCredentialObject_ReturnsFalse()
     {
         // Arrange
-        UserCredential a = new("DOM", "user", null, null);
+        UserCredential a = new("DOM", "user", password: null, loadUserProfile: null);
 
         // Assert
         await Assert.That(a.Equals((object)"not a credential")).IsFalse();
@@ -183,8 +183,8 @@ public class UserCredentialTests
     {
         // Arrange
         using SecureString password = MakeSecureString("secret");
-        UserCredential a = new("DOM", "user", password, true);
-        UserCredential b = new("DOM", "user", password, true);
+        UserCredential a = new("DOM", "user", password, loadUserProfile: true);
+        UserCredential b = new("DOM", "user", password, loadUserProfile: true);
 
         // Assert
         await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
@@ -205,7 +205,7 @@ public class UserCredentialTests
     {
         // Arrange
         using SecureString password = MakeSecureString("secret");
-        UserCredential credential = new(null, "user", password, null);
+        UserCredential credential = new(domain: null, "user", password, loadUserProfile: null);
 
         // Assert - the credential holds the same SecureString reference (no copy is made)
         await Assert.That(credential.Password).IsSameReferenceAs(password);
@@ -226,8 +226,8 @@ public class UserCredentialTests
         using SecureString passwordA = MakeSecureString("secret");
         using SecureString passwordB = MakeSecureString("different");
 
-        UserCredential a = new("DOM", "user", passwordA, true);
-        UserCredential b = new("DOM", "user", passwordB, true);
+        UserCredential a = new("DOM", "user", passwordA, loadUserProfile: true);
+        UserCredential b = new("DOM", "user", passwordB, loadUserProfile: true);
 
         await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
     }
@@ -235,8 +235,8 @@ public class UserCredentialTests
     [Test]
     public async Task GetHashCode_DifferentDomains_Differ()
     {
-        UserCredential a = new("DOM1", "user", null, null);
-        UserCredential b = new("DOM2", "user", null, null);
+        UserCredential a = new("DOM1", "user", password: null, loadUserProfile: null);
+        UserCredential b = new("DOM2", "user", password: null, loadUserProfile: null);
 
         await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
     }
@@ -244,8 +244,8 @@ public class UserCredentialTests
     [Test]
     public async Task GetHashCode_DifferentUserNames_Differ()
     {
-        UserCredential a = new("DOM", "userA", null, null);
-        UserCredential b = new("DOM", "userB", null, null);
+        UserCredential a = new("DOM", "userA", password: null, loadUserProfile: null);
+        UserCredential b = new("DOM", "userB", password: null, loadUserProfile: null);
 
         await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
     }

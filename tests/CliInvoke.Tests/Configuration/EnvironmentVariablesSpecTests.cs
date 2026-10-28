@@ -103,7 +103,7 @@ public class EnvironmentVariablesSpecTests
         List<KeyValuePair<string, string>> vars =
         [
             new("A", "1"),
-            new("B", "2")
+            new("B", "2"),
         ];
 
         // Act
@@ -122,7 +122,7 @@ public class EnvironmentVariablesSpecTests
         EnvironmentVariablesSpec spec = new();
 
         // Assert
-        await Assert.That(() => spec.SetEnumerable((IEnumerable<KeyValuePair<string, string>>)null!))
+        await Assert.That(() => spec.SetEnumerable(null!))
             .Throws<ArgumentNullException>();
     }
 
@@ -133,7 +133,7 @@ public class EnvironmentVariablesSpecTests
         EnvironmentVariablesSpec spec = new();
         List<KeyValuePair<string, string>> vars =
         [
-            new("EMPTY", "")
+            new("EMPTY", ""),
         ];
 
         // Act
@@ -144,7 +144,7 @@ public class EnvironmentVariablesSpecTests
 
         List<KeyValuePair<string, string>> withNull =
         [
-            new("NULL", null!)
+            new("NULL", null!),
         ];
 
         await Assert.That(() => spec.SetEnumerable(withNull))
@@ -159,7 +159,7 @@ public class EnvironmentVariablesSpecTests
         List<KeyValuePair<string, string>> vars =
         [
             new("K", "1"),
-            new("K", "2")
+            new("K", "2"),
         ];
 
         // Assert

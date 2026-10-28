@@ -9,7 +9,7 @@ public class ProcessConfigurationArgumentsListTests
         ProcessConfiguration config = new()
         {
             TargetFilePath = "foo.exe",
-            ArgumentList = ["--verbose", "--output", "result.txt"]
+            ArgumentList = ["--verbose", "--output", "result.txt"],
         };
 
         // Assert
@@ -29,7 +29,7 @@ public class ProcessConfigurationArgumentsListTests
         ProcessConfiguration config = new()
         {
             TargetFilePath = "foo.exe",
-            ArgumentList = args
+            ArgumentList = args,
         };
 
         // Mutate original list
@@ -46,7 +46,7 @@ public class ProcessConfigurationArgumentsListTests
         await Assert.That(() => _ = new ProcessConfiguration()
         {
             TargetFilePath = "foo.exe",
-            ArgumentList = null!
+            ArgumentList = null!,
         }).Throws<ArgumentNullException>();
     }
 
@@ -57,7 +57,7 @@ public class ProcessConfigurationArgumentsListTests
         await Assert.That(() => _ = new ProcessConfiguration()
         {
             TargetFilePath = "foo.exe",
-            ArgumentList = ["--verbose", null!, "--debug"]
+            ArgumentList = ["--verbose", null!, "--debug"],
         }).Throws<ArgumentNullException>();
     }
 
@@ -68,7 +68,7 @@ public class ProcessConfigurationArgumentsListTests
         ProcessConfiguration config = new()
         {
             TargetFilePath = "foo.exe",
-            ArgumentList = ["--verbose", "", "--debug"]
+            ArgumentList = ["--verbose", "", "--debug"],
         };
 
         // Assert
@@ -83,7 +83,7 @@ public class ProcessConfigurationArgumentsListTests
         ProcessConfiguration config = new()
         {
             TargetFilePath = "foo.exe",
-            ArgumentList = Array.Empty<string>()
+            ArgumentList = Array.Empty<string>(),
         };
 
         // Assert
@@ -96,7 +96,7 @@ public class ProcessConfigurationArgumentsListTests
         // Arrange & Act
         ProcessConfiguration config = new()
         {
-            TargetFilePath = "foo.exe"
+            TargetFilePath = "foo.exe",
         };
 
         // Assert
@@ -111,7 +111,7 @@ public class ProcessConfigurationArgumentsListTests
         {
             TargetFilePath = "foo.exe",
             Arguments = "--version",
-            ArgumentList = ["--verbose", "--debug"]
+            ArgumentList = ["--verbose", "--debug"],
         };
 
         // Assert

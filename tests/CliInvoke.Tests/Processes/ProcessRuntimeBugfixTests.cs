@@ -36,6 +36,7 @@ public class ProcessRuntimeBugfixTests
         // Not flushed on purpose: the pipe (when it runs) reads BaseStream directly, so a
         // consumed source is observable as an advanced position while a no-op leaves it at 0.
         using MemoryStream source = new(Encoding.ASCII.GetBytes("stdin payload"));
+        // ReSharper disable once UseAwaitUsing
         using StreamWriter writer = new(source);
 
         ProcessConfiguration configuration = new(targetFilePath, arguments, outputRedirection: false)
@@ -70,7 +71,7 @@ public class ProcessRuntimeBugfixTests
         string markerPath = Path.Combine(Path.GetTempPath(),
             $"cliinvoke-disabled-timeout-{Guid.NewGuid():N}.marker");
 
-        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 10);
+        using ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 10);
 
         ProcessExitConfiguration exitConfiguration = new(
             new ProcessTimeoutPolicy(TimeSpan.FromMilliseconds(1), enabled: false));
@@ -97,9 +98,7 @@ public class ProcessRuntimeBugfixTests
             {
                 try { process.Kill(true); } catch { process.Kill(); }
             }
-
-            process.Dispose();
-
+            
             if (File.Exists(markerPath))
                 File.Delete(markerPath);
         }
@@ -119,7 +118,7 @@ public class ProcessRuntimeBugfixTests
         string markerPath = Path.Combine(Path.GetTempPath(),
             $"cliinvoke-cancel-throws-{Guid.NewGuid():N}.marker");
 
-        ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 10);
+        using ProcessWrapper process = ProcessTestHelper.CreateSignalTrappingProcess(markerPath, sleepSeconds: 10);
 
         using CancellationTokenSource cancellationTokenSource = new();
         ProcessExitConfiguration exitConfiguration = new(
@@ -135,7 +134,7 @@ public class ProcessRuntimeBugfixTests
             // below deterministically interrupts it.
             Task waitTask = process.WaitForExitOrGracefulTimeoutAsync(exitConfiguration,
                 cancellationTokenSource.Token);
-            cancellationTokenSource.Cancel();
+            await cancellationTokenSource.CancelAsync().ConfigureAwait(true);
 
             // The approved cancellation fault must reach the caller even when the
             // interrupted child exits before the machinery finishes its bookkeeping:
@@ -167,9 +166,7 @@ public class ProcessRuntimeBugfixTests
             {
                 try { process.Kill(true); } catch { process.Kill(); }
             }
-
-            process.Dispose();
-
+            
             if (File.Exists(markerPath))
                 File.Delete(markerPath);
         }
@@ -214,9 +211,7 @@ public class ProcessRuntimeBugfixTests
             {
                 try { process.Kill(true); } catch { process.Kill(); }
             }
-
-            process.Dispose();
-
+            
             if (File.Exists(markerPath))
                 File.Delete(markerPath);
         }

@@ -44,7 +44,7 @@ public class RetryMiddlewareTests
         {
             MaxAttempts = 3,
             BaseDelay = TimeSpan.FromMilliseconds(1),
-            Strategy = RetryBackoffStrategy.Fixed
+            Strategy = RetryBackoffStrategy.Fixed,
         };
         RetryMiddleware middleware = new RetryMiddleware(AlwaysRetry(), options);
         InvocationContext ctx = CreateContext();
@@ -68,7 +68,7 @@ public class RetryMiddlewareTests
         RetryOptions options = new RetryOptions
         {
             MaxAttempts = 3,
-            BaseDelay = TimeSpan.FromMilliseconds(1)
+            BaseDelay = TimeSpan.FromMilliseconds(1),
         };
         RetryMiddleware middleware = new RetryMiddleware(NeverRetry(), options);
         InvocationContext ctx = CreateContext();
@@ -92,7 +92,7 @@ public class RetryMiddlewareTests
         RetryOptions options = new RetryOptions
         {
             MaxAttempts = 3,
-            BaseDelay = TimeSpan.FromMilliseconds(1)
+            BaseDelay = TimeSpan.FromMilliseconds(1),
         };
         RetryMiddleware middleware = new RetryMiddleware(AlwaysRetry(), options);
         InvocationContext ctx = CreateContext();
@@ -116,7 +116,7 @@ public class RetryMiddlewareTests
         RetryOptions options = new RetryOptions
         {
             MaxAttempts = 3,
-            BaseDelay = TimeSpan.FromMilliseconds(1)
+            BaseDelay = TimeSpan.FromMilliseconds(1),
         };
         RetryMiddleware middleware = new RetryMiddleware(RetryConditions.NonZeroExitCode(), options);
         InvocationContext ctx = CreateContext();
@@ -158,7 +158,7 @@ public class RetryMiddlewareTests
         RetryOptions options = new RetryOptions
         {
             MaxAttempts = 1,
-            BaseDelay = TimeSpan.FromMilliseconds(1)
+            BaseDelay = TimeSpan.FromMilliseconds(1),
         };
         RetryMiddleware middleware = new RetryMiddleware(AlwaysRetry(), options);
         InvocationContext ctx = CreateContext();
@@ -217,7 +217,7 @@ public class RetryMiddlewareTests
         RetryOptions options = new RetryOptions
         {
             BaseDelay = TimeSpan.FromMilliseconds(10),
-            Strategy = RetryBackoffStrategy.Linear
+            Strategy = RetryBackoffStrategy.Linear,
         };
 
         await Assert.That(RetryMiddleware.ComputeDelay(1, options).Ticks)
@@ -234,7 +234,7 @@ public class RetryMiddlewareTests
         RetryOptions options = new RetryOptions
         {
             BaseDelay = TimeSpan.FromMilliseconds(10),
-            Strategy = RetryBackoffStrategy.Exponential
+            Strategy = RetryBackoffStrategy.Exponential,
         };
 
         await Assert.That(RetryMiddleware.ComputeDelay(1, options).Ticks)
@@ -254,7 +254,7 @@ public class RetryMiddlewareTests
         {
             BaseDelay = maxDelay,
             Strategy = RetryBackoffStrategy.Exponential,
-            MaxAttempts = 3
+            MaxAttempts = 3,
         };
 
         await Assert.That(RetryMiddleware.ComputeDelay(1, options).Ticks).IsEqualTo(maxDelay.Ticks);
@@ -269,7 +269,7 @@ public class RetryMiddlewareTests
         {
             BaseDelay = maxDelay,
             Strategy = RetryBackoffStrategy.Exponential,
-            MaxAttempts = 50
+            MaxAttempts = 50,
         };
 
         TimeSpan delay = RetryMiddleware.ComputeDelay(2, options);
@@ -286,7 +286,7 @@ public class RetryMiddlewareTests
         {
             BaseDelay = maxDelay,
             Strategy = RetryBackoffStrategy.Linear,
-            MaxAttempts = 50
+            MaxAttempts = 50,
         };
 
         TimeSpan delay = RetryMiddleware.ComputeDelay(2, options);
@@ -303,7 +303,7 @@ public class RetryMiddlewareTests
         {
             BaseDelay = TimeSpan.FromMilliseconds(100),
             Strategy = RetryBackoffStrategy.Exponential,
-            MaxAttempts = 1000
+            MaxAttempts = 1000,
         };
 
         TimeSpan delay = RetryMiddleware.ComputeDelay(50, options);
@@ -320,7 +320,7 @@ public class RetryMiddlewareTests
         {
             BaseDelay = TimeSpan.FromMilliseconds(1000),
             Strategy = RetryBackoffStrategy.Exponential,
-            MaxAttempts = int.MaxValue / 2
+            MaxAttempts = int.MaxValue / 2,
         };
 
         for (int attempt = 1; attempt <= 10; attempt++)
@@ -437,7 +437,7 @@ public class RetryMiddlewareTests
             DateTime now = DateTime.UtcNow;
             return Task.FromResult(new BufferedProcessResult(
                 Configuration.TargetFilePath, 0, 0, string.Empty, string.Empty,
-                now, now, false, null, false));
+                now, now, false, null));
         }
 
         public Task Kill() => Task.CompletedTask;

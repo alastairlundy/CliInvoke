@@ -59,12 +59,12 @@ public class LoggingMiddlewareIntegrationTests
 {
     private static (string FilePath, string Arguments) ResolveEchoCommand()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
             return ("cmd.exe", "/C echo Hello from CliInvoke");
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
-            RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
-            RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+        if (OperatingSystem.IsLinux() ||
+            OperatingSystem.IsMacOS() ||
+            OperatingSystem.IsFreeBSD())
             return ("/bin/echo", "Hello from CliInvoke");
 
         throw new PlatformNotSupportedException("Unsupported OS for the echo integration test.");

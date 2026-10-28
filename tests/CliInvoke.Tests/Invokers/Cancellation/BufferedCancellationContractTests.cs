@@ -53,10 +53,10 @@ public class BufferedCancellationContractTests
             // and the cancellation below deterministically cancels them.
             Task<BufferedProcessResult> captureTask =
                 process.CaptureBufferedResultAsync(cancellationTokenSource.Token);
-            cancellationTokenSource.Cancel();
+            await cancellationTokenSource.CancelAsync().ConfigureAwait(true);
 
             BufferedProcessResult result =
-                await captureTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
+                await captureTask.WaitAsync(TimeSpan.FromSeconds(15), cancellationTokenSource.Token).ConfigureAwait(true);
 
             await Assert.That(result.Canceled).IsTrue();
             await Assert.That(result.StandardOutput).IsEqualTo(string.Empty);
@@ -105,12 +105,12 @@ public class BufferedCancellationContractTests
 
             Task<BufferedProcessResult> captureTask =
                 process.CaptureBufferedResultAsync(cancellationTokenSource.Token);
-            cancellationTokenSource.Cancel();
+            await cancellationTokenSource.CancelAsync().ConfigureAwait(true);
 
             OperationCanceledException? propagated = null;
             try
             {
-                await captureTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
+                await captureTask.WaitAsync(TimeSpan.FromSeconds(15), cancellationTokenSource.Token).ConfigureAwait(true);
             }
             catch (OperationCanceledException exception)
             {
@@ -162,9 +162,9 @@ public class BufferedCancellationContractTests
 
             Task<ProcessResult> waitTask =
                 process.WaitForExitOrTimeoutAsync(cancellationTokenSource.Token);
-            cancellationTokenSource.Cancel();
+            await cancellationTokenSource.CancelAsync().ConfigureAwait(true);
 
-            ProcessResult result = await waitTask.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(true);
+            ProcessResult result = await waitTask.WaitAsync(TimeSpan.FromSeconds(15), cancellationTokenSource.Token).ConfigureAwait(true);
 
             await Assert.That(result.Canceled).IsTrue();
         }

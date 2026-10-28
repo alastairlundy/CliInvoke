@@ -4,12 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 
 // Echo-args mode for escaping tests: print each subsequent argument to stdout,
 // newline-delimited, then exit. This lets a test verify that the OS actually parsed
 // the produced command line back into the original values.
-if (args.Length >= 1 && args[0] == "echo-args")
+if (args.Length >= 1 && string.Equals(args[0], "echo-args", StringComparison.Ordinal))
 {
     Stream stdout = Console.OpenStandardOutput();
     for (int i = 1; i < args.Length; i++)
@@ -25,13 +24,13 @@ if (args.Length >= 1 && args[0] == "echo-args")
 // Echo-env mode for environment-variable delivery tests: print the value of the named
 // environment variable to stdout, then exit. Exit code 1 signals that the variable was
 // absent, letting a test distinguish "variable missing" from "variable delivered empty".
-if (args.Length == 2 && args[0] == "echo-env")
+if (args.Length == 2 && string.Equals(args[0], "echo-env", StringComparison.Ordinal))
 {
     string? value = Environment.GetEnvironmentVariable(args[1]);
     Stream stdout = Console.OpenStandardOutput();
     byte[] valueBytes = Encoding.UTF8.GetBytes(value ?? string.Empty);
-    stdout.Write(valueBytes, 0, valueBytes.Length);
-    stdout.Flush();
+    await stdout.WriteAsync(valueBytes).ConfigureAwait(true);
+    await stdout.FlushAsync().ConfigureAwait(true);
     return value is null ? 1 : 0;
 }
 
@@ -72,6 +71,6 @@ if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.Is
     });
 }
 
-Thread.Sleep(TimeSpan.FromSeconds(sleepSeconds));
+await System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(sleepSeconds)).ConfigureAwait(true);
 
 return 0;

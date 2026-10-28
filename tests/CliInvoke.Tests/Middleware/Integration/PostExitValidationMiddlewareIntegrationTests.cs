@@ -87,7 +87,7 @@ public class PostExitValidationMiddlewareIntegrationTests
             ValidationRules = [new ValidationRule<ProcessResult>(
                 result => result.ExitCode != 0,
                 "ExpectedNonZeroExit",
-                "The process was expected to fail validation.")]
+                "The process was expected to fail validation.")],
         };
 
         ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(config, exit).ConfigureAwait(true))
@@ -116,7 +116,7 @@ public class PostExitValidationMiddlewareIntegrationTests
         IProcessResultValidator<ProcessResult> validator = new ProcessResultValidator<ProcessResult>(
         [
             new ValidationRule<ProcessResult>(_ => false, "FirstFailingRule", "The first rule failed."),
-            new ValidationRule<ProcessResult>(_ => false, "SecondFailingRule", "The second rule failed.")
+            new ValidationRule<ProcessResult>(_ => false, "SecondFailingRule", "The second rule failed."),
         ]);
 
         ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
@@ -139,7 +139,7 @@ public class PostExitValidationMiddlewareIntegrationTests
     {
         IProcessResultValidator<ProcessResult> validator = new ProcessResultValidator<ProcessResult>(
         [
-            new ValidationRule<ProcessResult>(_ => false, "SugarRule", "The sugar rule failed.")
+            new ValidationRule<ProcessResult>(_ => false, "SugarRule", "The sugar rule failed."),
         ]);
 
         ProcessMiddlewareBuilder builder = new(_ => throw new InvalidOperationException("Not expected"));
@@ -154,7 +154,7 @@ public class PostExitValidationMiddlewareIntegrationTests
             ValidationRules =
             [
                 new ValidationRule<ProcessResult>(_ => false, "ConfigRule", "The configuration rule failed.")
-            ]
+            ],
         };
 
         ProcessValidationException exception = await Assert.That(async () => await invoker.ExecuteAsync(config, exit).ConfigureAwait(true))

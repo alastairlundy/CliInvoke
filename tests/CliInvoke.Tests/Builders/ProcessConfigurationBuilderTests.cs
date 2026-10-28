@@ -474,7 +474,7 @@ public class ProcessConfigurationBuilderTests
         [
             new("KEY1", "VALUE1"),
             new("KEY2", "VALUE2"),
-            new("KEY3", "VALUE3")
+            new("KEY3", "VALUE3"),
         ];
 
         // Act
@@ -494,7 +494,7 @@ public class ProcessConfigurationBuilderTests
         Dictionary<string, string> dictionary = new()
         {
             { "D_KEY1", "D_VALUE1" },
-            { "D_KEY2", "D_VALUE2" }
+            { "D_KEY2", "D_VALUE2" },
         };
 
         // Act
@@ -514,7 +514,7 @@ public class ProcessConfigurationBuilderTests
         Dictionary<string, string> source = new()
         {
             { "RO_KEY1", "RO_VALUE1" },
-            { "RO_KEY2", "RO_VALUE2" }
+            { "RO_KEY2", "RO_VALUE2" },
         };
         ReadOnlyDictionary<string, string> readOnlyDictionary = new(source);
 

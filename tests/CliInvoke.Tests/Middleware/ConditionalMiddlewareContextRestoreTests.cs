@@ -73,7 +73,7 @@ public class ConditionalMiddlewareContextRestoreTests
             _ => Task.FromResult(true),
             new List<IProcessMiddleware>
             {
-                new FakeMiddleware("BlockingSub", callLog, FakeMiddlewareMode.NeverInvokeNext)
+                new FakeMiddleware("BlockingSub", callLog, FakeMiddlewareMode.NeverInvokeNext),
             });
 
         MiddlewareChain chain = CreateChain(

@@ -6,7 +6,7 @@ public static class WindowsTestExecutables
     {
         get
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (OperatingSystem.IsWindows())
                 return string.Format("{0}{1}calc.exe",
                     Environment.SystemDirectory,
                     Path.DirectorySeparatorChar);

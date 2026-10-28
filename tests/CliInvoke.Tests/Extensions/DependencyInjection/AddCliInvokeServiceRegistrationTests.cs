@@ -29,7 +29,7 @@ public class AddCliInvokeServiceRegistrationTests
         [
             ServiceLifetime.Singleton,
             ServiceLifetime.Scoped,
-            ServiceLifetime.Transient
+            ServiceLifetime.Transient,
         ];
 
         foreach (ServiceLifetime lifetime in lifetimes)

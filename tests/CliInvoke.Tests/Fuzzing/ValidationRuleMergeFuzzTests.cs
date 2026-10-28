@@ -194,7 +194,7 @@ public class ValidationRuleMergeFuzzTests
 
                 ValidationRule<ProcessResult>[] rules =
                 [
-                    new(_ => true, "rule-0")
+                    new(_ => true, "rule-0"),
                 ];
 
                 ProcessExitConfiguration source = ProcessExitConfiguration.WithMaxBufferedOutputBytes(

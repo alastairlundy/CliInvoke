@@ -47,7 +47,7 @@ public class RetryDispatchFuzzTests
                 {
                     MaxAttempts = maxAttempts,
                     BaseDelay = TimeSpan.FromMilliseconds(1),
-                    Strategy = RetryBackoffStrategy.Fixed
+                    Strategy = RetryBackoffStrategy.Fixed,
                 };
 
                 RetryMiddleware middleware = new RetryMiddleware(new ExitCodeNonZeroRetry(), options);
@@ -84,7 +84,7 @@ public class RetryDispatchFuzzTests
                 {
                     MaxAttempts = maxAttempts,
                     BaseDelay = TimeSpan.FromMilliseconds(1),
-                    Strategy = RetryBackoffStrategy.Fixed
+                    Strategy = RetryBackoffStrategy.Fixed,
                 };
 
                 RetryMiddleware middleware = new RetryMiddleware(new NeverRetry(), options);

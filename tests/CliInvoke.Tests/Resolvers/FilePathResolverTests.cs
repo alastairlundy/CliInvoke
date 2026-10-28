@@ -114,7 +114,7 @@ public class FilePathResolverTests
         try
         {
             Directory.CreateDirectory(subDir);
-            File.WriteAllText(testFile, "test content");
+            await File.WriteAllTextAsync(testFile, "test content").ConfigureAwait(true);
 
             // Resolve using relative subdirectory path
             string relativePath = Path.Combine("subdir", "test.txt");

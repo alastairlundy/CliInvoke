@@ -35,7 +35,7 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
     private readonly Func<string?, string>? _redactor;
 
     [GeneratedRegex(@"(--password|--token|--api-key)(\s*=\s*|\s+)(?:""[^""]*""|'[^']*'|[^\s-][^\s]*)",
-        RegexOptions.IgnoreCase, 3000)]
+        RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture, 3000)]
     private static partial Regex SensitiveArgPattern { get; }
 
     /// <summary>

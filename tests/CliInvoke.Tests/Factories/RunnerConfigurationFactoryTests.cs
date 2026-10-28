@@ -41,7 +41,7 @@ public class RunnerConfigurationFactoryTests
         // Arrange
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
 
-        var envVars = new Dictionary<string, string> { { "MY_VAR", "hello" } };
+        Dictionary<string, string> envVars = new Dictionary<string, string>(StringComparer.Ordinal) { { "MY_VAR", "hello" } };
 
         ProcessConfiguration processConfigToBeRun = new ProcessConfigurationBuilder("target.exe")
             .SetArguments("--input value")

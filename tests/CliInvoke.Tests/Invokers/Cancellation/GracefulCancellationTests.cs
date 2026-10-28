@@ -105,8 +105,8 @@ public class GracefulCancellationTests
             return;
         }
 
-        using var cts = new CancellationTokenSource();
-        cts.Cancel(); // Pre-cancel the token
+        using CancellationTokenSource cts = new CancellationTokenSource();
+        await cts.CancelAsync().ConfigureAwait(true); // Pre-cancel the token
 
         ShellDetector detector = new ShellDetector(
             new ProcessInvoker(new ExternalProcessFactory()),

@@ -17,10 +17,12 @@ namespace CliInvoke.Tests.Core.Extensions;
 public class ProcessResultHelperExtensionsTests
 {
     private static ProcessResult MakeResult(int exitCode) =>
-        new("app.exe", exitCode, 1, DateTime.UtcNow, DateTime.UtcNow, canceled: false, signal: null);
+        new("app.exe", exitCode, 1, DateTime.UtcNow,
+            DateTime.UtcNow, canceled: false, signal: null);
 
     private static BufferedProcessResult MakeBuffered(string stdout, string stderr) =>
-        new("app.exe", 0, 1, stdout, stderr, DateTime.UtcNow, DateTime.UtcNow, canceled: false, signal: null);
+        new("app.exe", 0, 1, stdout,
+            stderr, DateTime.UtcNow, DateTime.UtcNow, canceled: false, signal: null);
 
     private static ProcessResultValidator<ProcessResult> AlwaysPass() =>
         new([_ => true]);
@@ -69,8 +71,8 @@ public class ProcessResultHelperExtensionsTests
 
         // Assert
         await Assert.That(caught).IsNotNull();
-        await Assert.That(caught!.ExecutedProcessInfo).IsNotNull();
-        await Assert.That(caught.ExecutedProcessInfo!.Configuration).IsSameReferenceAs(config);
+        await Assert.That(caught.ExecutedProcessInfo).IsNotNull();
+        await Assert.That(caught.ExecutedProcessInfo.Configuration).IsSameReferenceAs(config);
     }
 
     [Test]

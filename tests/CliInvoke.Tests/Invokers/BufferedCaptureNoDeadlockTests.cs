@@ -25,7 +25,7 @@ public class BufferedCaptureNoDeadlockTests
     // pipeline awaits exit before the capture reader starts.
     private static (string Target, string Arguments) GetLargeOutputCommand()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
             return ("powershell.exe", "-NoProfile -Command \"Write-Output('a' * 200000)\"");
 
         return ("/bin/bash", "-c \"printf 'a%.0s' {1..200000}\"");

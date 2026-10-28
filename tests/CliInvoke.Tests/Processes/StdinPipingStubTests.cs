@@ -35,7 +35,7 @@ public class StdinPipingStubTests : IDisposable
         => new(_targetFilePath, string.Empty)
         {
             RedirectStandardInput = true,
-            StandardInput = new StreamWriter(source)
+            StandardInput = new StreamWriter(source),
         };
 
     private static InvocationContext CreateContext(ProcessConfiguration configuration,
@@ -59,7 +59,7 @@ public class StdinPipingStubTests : IDisposable
             [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyCompleted,
-                StdinPipingEvent.WriteEndClosed
+                StdinPipingEvent.WriteEndClosed,
             ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
@@ -77,7 +77,7 @@ public class StdinPipingStubTests : IDisposable
         using CancellationTokenSource cancellationTokenSource = new();
         InjectableStdinSourceStream source = new("stdin payload")
         {
-            OnFirstRead = cancellationTokenSource.Cancel
+            OnFirstRead = cancellationTokenSource.Cancel,
         };
         ProcessInvocationPipeline pipeline = new(_factory);
         InvocationContext context = CreateContext(CreateStdinConfiguration(source),
@@ -90,7 +90,7 @@ public class StdinPipingStubTests : IDisposable
             [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyFaulted,
-                StdinPipingEvent.WriteEndClosed
+                StdinPipingEvent.WriteEndClosed,
             ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
@@ -118,7 +118,7 @@ public class StdinPipingStubTests : IDisposable
             [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyFaulted,
-                StdinPipingEvent.WriteEndClosed
+                StdinPipingEvent.WriteEndClosed,
             ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
@@ -146,7 +146,7 @@ public class StdinPipingStubTests : IDisposable
             [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyFaulted,
-                StdinPipingEvent.WriteEndClosed
+                StdinPipingEvent.WriteEndClosed,
             ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();
@@ -163,7 +163,7 @@ public class StdinPipingStubTests : IDisposable
     {
         InjectableStdinSourceStream source = new("stdin payload")
         {
-            FaultAfterFirstRead = new IOException("genuine source-stream read failure")
+            FaultAfterFirstRead = new IOException("genuine source-stream read failure"),
         };
         ProcessInvocationPipeline pipeline = new(_factory);
         InvocationContext context = CreateContext(CreateStdinConfiguration(source),
@@ -176,7 +176,7 @@ public class StdinPipingStubTests : IDisposable
             [
                 StdinPipingEvent.CopyStarted,
                 StdinPipingEvent.CopyFaulted,
-                StdinPipingEvent.WriteEndClosed
+                StdinPipingEvent.WriteEndClosed,
             ],
             CollectionOrdering.Matching);
         await Assert.That(_factory.StdinPiping.WriteEnd.CanWrite).IsFalse();

@@ -206,7 +206,7 @@ public class MiddlewareUseWhenTests
     [Test]
     public async Task UseWhen_ThrowsArgumentNullException_ForNullPredicate()
     {
-        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(_ => null!);
+        ProcessMiddlewareBuilder builder = new (_ => null!);
 
         await Assert.That(() => builder.UseWhen((Func<InvocationContext, bool>)null!, _ => { }))
             .Throws<ArgumentNullException>();
@@ -215,7 +215,7 @@ public class MiddlewareUseWhenTests
     [Test]
     public async Task UseWhen_ThrowsArgumentNullException_ForNullConfiguration()
     {
-        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(_ => null!);
+        ProcessMiddlewareBuilder builder = new (_ => null!);
 
         await Assert.That(() => builder.UseWhen(_ => true, null!))
             .Throws<ArgumentNullException>();
@@ -224,7 +224,7 @@ public class MiddlewareUseWhenTests
     [Test]
     public async Task UseWhen_ThrowsArgumentNullException_ForNullAsyncPredicate()
     {
-        ProcessMiddlewareBuilder builder = new ProcessMiddlewareBuilder(_ => null!);
+        ProcessMiddlewareBuilder builder = new(_ => null!);
 
         await Assert.That(() => builder.UseWhen((Func<InvocationContext, Task<bool>>)null!, _ => { }))
             .Throws<ArgumentNullException>();

@@ -69,13 +69,12 @@ public class CliRunTests
         await Assert.That(result.ExitCode).IsEqualTo(0);
     }
 
-
-
     [Test]
     public async Task RunAsync_WhenProcessCannotBeResolved_Throws()
     {
         await Assert.That(async () =>
-                await CliRun.RunAsync("NONEXISTENT_COMMAND_ABC123.exe", "").ConfigureAwait(true))
+                await CliRun.RunAsync("NONEXISTENT_COMMAND_ABC123.exe")
+                    .ConfigureAwait(true))
             .Throws<FileNotFoundException>();
     }
 
@@ -105,7 +104,8 @@ public class CliRunTests
     public async Task FireAndForget_WithInvalidConfig_Throws()
     {
         ProcessConfiguration configuration =
-            new ProcessConfiguration("NONEXISTENT_COMMAND_ABC123.exe", "", outputRedirection: false);
+            new ProcessConfiguration("NONEXISTENT_COMMAND_ABC123.exe", 
+                outputRedirection: false);
 
         await Assert.That(() => CliRun.FireAndForget(configuration))
             .Throws<FileNotFoundException>();

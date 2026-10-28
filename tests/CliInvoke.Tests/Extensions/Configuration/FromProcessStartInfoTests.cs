@@ -25,9 +25,10 @@ public class FromProcessStartInfoTests
     [Test]
     public async Task FromProcessStartInfo_RedirectStandardInputTrue_MapsFlag()
     {
-        ProcessStartInfo startInfo = new ProcessStartInfo("test.exe")
+        ProcessStartInfo startInfo = new("test.exe")
         {
-            RedirectStandardInput = true
+            UseShellExecute = false,
+            RedirectStandardInput = true,
         };
 
         ProcessConfiguration config = ProcessConfiguration.FromProcessStartInfo(startInfo);
@@ -40,7 +41,7 @@ public class FromProcessStartInfoTests
     {
         ProcessStartInfo startInfo = new ProcessStartInfo("test.exe")
         {
-            RedirectStandardInput = false
+            RedirectStandardInput = false,
         };
 
         ProcessConfiguration config = ProcessConfiguration.FromProcessStartInfo(startInfo);
@@ -68,7 +69,7 @@ public class FromProcessStartInfoTests
     {
         ProcessStartInfo startInfo = new ProcessStartInfo("test.exe")
         {
-            Arguments = "--raw value"
+            Arguments = "--raw value",
         };
 
         ProcessConfiguration config = ProcessConfiguration.FromProcessStartInfo(startInfo);
@@ -99,7 +100,7 @@ public class FromProcessStartInfoTests
 
         ProcessStartInfo startInfo = new ProcessStartInfo("test.exe")
         {
-            UseShellExecute = false
+            UseShellExecute = false,
         };
         startInfo.Domain = "WORKGROUP";
         startInfo.UserName = "service-account";

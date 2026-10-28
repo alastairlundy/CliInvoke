@@ -15,19 +15,22 @@ namespace CliInvoke.Tests.Validation;
 public class ProcessResultValidatorTests
 {
     private static ProcessResult MakeResult(int exitCode) =>
-        new("app.exe", exitCode, 1, DateTime.UtcNow, DateTime.UtcNow, canceled: false, signal: null);
+        new("app.exe", exitCode, 1, DateTime.UtcNow,
+            DateTime.UtcNow, canceled: false, signal: null);
 
     [Test]
     public async Task Constructor_FromPredicates_NullRules_Throws()
     {
-        await Assert.That(() => new ProcessResultValidator<ProcessResult>((Func<ProcessResult, bool>[])null!))
+        await Assert.That(() => new ProcessResultValidator<ProcessResult>(
+                (Func<ProcessResult, bool>[])null!))
             .Throws<ArgumentNullException>();
     }
 
     [Test]
     public async Task Constructor_FromRules_NullRules_Throws()
     {
-        await Assert.That(() => new ProcessResultValidator<ProcessResult>((ValidationRule<ProcessResult>[])null!))
+        await Assert.That(() => new ProcessResultValidator<ProcessResult>(
+                (ValidationRule<ProcessResult>[])null!))
             .Throws<ArgumentNullException>();
     }
 

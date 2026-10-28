@@ -80,7 +80,7 @@ public class ArgumentsSpecFuzzTests
                 if (string.IsNullOrEmpty(value))
                     return true;
 
-                var spec = new ArgumentsSpec(rejectAll);
+                ArgumentsSpec spec = new ArgumentsSpec(rejectAll);
 
                 try
                 {
@@ -98,7 +98,7 @@ public class ArgumentsSpecFuzzTests
     [Test]
     public async Task AddEnumerable_WithEmptyValues_ThrowsArgumentException()
     {
-        var spec = new ArgumentsSpec();
+        ArgumentsSpec spec = new ArgumentsSpec();
 
         await Assert.That(() => spec.AddEnumerable(Enumerable.Empty<string>(), escape: false)).Throws<ArgumentException>();
     }
@@ -106,7 +106,7 @@ public class ArgumentsSpecFuzzTests
     [Test]
     public async Task Add_NullValue_ThrowsArgumentNullException()
     {
-        var spec = new ArgumentsSpec();
+        ArgumentsSpec spec = new ArgumentsSpec();
 
         await Assert.That(() => spec.Add((string)null!, escape: false)).Throws<ArgumentNullException>();
     }
@@ -119,7 +119,7 @@ public class ArgumentsSpecFuzzTests
                 if (string.IsNullOrEmpty(value))
                     return true;
 
-                var spec = new ArgumentsSpec();
+                ArgumentsSpec spec = new ArgumentsSpec();
                 spec.Add(value, escape: false);
                 spec.Clear();
                 string result = spec.Build();

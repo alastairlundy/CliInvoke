@@ -26,7 +26,8 @@ public class StartSuspendedTests
     [Test]
     public async Task Start_SetsStartSuspended_OnWindowsAndMacOSOnly()
     {
-        ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(), string.Empty);
+        ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(),
+            string.Empty);
 
         FilePathResolver resolver = new();
         ProcessWrapper process = new(configuration, resolver.ResolveFilePath(configuration.TargetFilePath));

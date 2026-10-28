@@ -45,7 +45,7 @@ public class ProcessConfigurationDerivationPropertyTests
     {
         Prop.ForAll<int>(seed =>
             {
-                var rng = new Random(seed);
+                Random rng = new Random(seed);
 
                 // Randomise UseShellExecution first; it constrains
                 // RedirectStandardInput and StandardInput via the Build() guard.
@@ -64,7 +64,7 @@ public class ProcessConfigurationDerivationPropertyTests
                 else
                     stdIn = new StreamWriter(new MemoryStream());
 
-                Dictionary<string, string> envVars = new();
+                Dictionary<string, string> envVars = new(StringComparer.Ordinal);
                 int envCount = Math.Abs(rng.Next() % 5);
                 for (int i = 0; i < envCount; i++)
                     envVars[$"KEY_{rng.Next()}"] = $"VALUE_{rng.Next()}";
@@ -110,11 +110,12 @@ public class ProcessConfigurationDerivationPropertyTests
                     // 1. TargetFilePath
                     derived.TargetFilePath == source.TargetFilePath
                     // 2. Arguments
-                    && derived.Arguments == source.Arguments
+                    && string.Equals(derived.Arguments, source.Arguments, StringComparison.Ordinal)
                     // 3. WorkingDirectoryPath
-                    && derived.WorkingDirectoryPath == source.WorkingDirectoryPath
+                    && string.Equals(derived.WorkingDirectoryPath, source.WorkingDirectoryPath
+                        , StringComparison.Ordinal)
                     // 4. ArgumentList
-                    && derived.ArgumentList.SequenceEqual(source.ArgumentList)
+                    && derived.ArgumentList.SequenceEqual(source.ArgumentList, StringComparer.Ordinal)
                     // 5. RequiresAdministrator
                     && derived.RequiresAdministrator == source.RequiresAdministrator
                     // 6. WindowCreation
@@ -127,7 +128,7 @@ public class ProcessConfigurationDerivationPropertyTests
                     && derived.OutputRedirection == source.OutputRedirection
                     // 10. EnvironmentVariables (content equality)
                     && derived.EnvironmentVariables.Count
-                       == source.EnvironmentVariables.Count
+                    == source.EnvironmentVariables.Count
                     && derived.EnvironmentVariables.SequenceEqual(
                         source.EnvironmentVariables)
                     // 11. ResourcePolicy

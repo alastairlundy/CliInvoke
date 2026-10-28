@@ -8,6 +8,7 @@
  */
 
 using System.Linq;
+using System.Text;
 using CliInvoke.Internal;
 
 namespace CliInvoke.Tests.Fuzzing;
@@ -53,7 +54,7 @@ public class ShellRewriterFuzzTests
                 string escaped = ShellRewriter.EscapeForPosixShell(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
-                var expected = new System.Text.StringBuilder(value.Length + 16);
+                StringBuilder expected = new System.Text.StringBuilder(value.Length + 16);
                 foreach (char c in value)
                 {
                     if (Array.IndexOf(PosixShellMetacharacters, c) >= 0)
@@ -111,7 +112,7 @@ public class ShellRewriterFuzzTests
                 string escaped = ShellRewriter.EscapeForPowerShell(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
-                var expected = new System.Text.StringBuilder(value.Length + 16);
+                StringBuilder expected = new System.Text.StringBuilder(value.Length + 16);
                 foreach (char c in value)
                 {
                     if (Array.IndexOf(PowerShellMetacharacters, c) >= 0)
@@ -169,7 +170,7 @@ public class ShellRewriterFuzzTests
                 string escaped = ShellRewriter.EscapeForCmd(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
-                var expected = new System.Text.StringBuilder(value.Length + 16);
+                StringBuilder expected = new System.Text.StringBuilder(value.Length + 16);
                 foreach (char c in value)
                 {
                     if (Array.IndexOf(CmdMetacharacters, c) >= 0)

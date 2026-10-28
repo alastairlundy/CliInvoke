@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Runtime.InteropServices;
 
 namespace CliInvoke.Specializations.Tests.Helpers;
 
@@ -9,7 +8,7 @@ internal static class ExecutedCommandHelper
     {
         get
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (OperatingSystem.IsWindows())
                 return $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}calc.exe";
 
             throw new PlatformNotSupportedException();

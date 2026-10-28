@@ -67,5 +67,4 @@ public class MiddlewareItemsTests
 
         await Assert.That(result).IsEqualTo(2);
     }
-
 }

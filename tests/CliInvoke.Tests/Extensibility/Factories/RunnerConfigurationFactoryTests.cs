@@ -57,7 +57,7 @@ public class RunnerConfigurationFactoryTests
 
     private static string? ResolvePwshPath()
     {
-        string fileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        string fileName = OperatingSystem.IsWindows()
             ? "pwsh.exe"
             : "pwsh";
 
@@ -89,16 +89,14 @@ public class RunnerConfigurationFactoryTests
         string marker = MarkerPath(markerId);
         if (File.Exists(marker)) File.Delete(marker);
 
-        using System.Diagnostics.Process p = new()
+        using Process p = new();
+        p.StartInfo = new ProcessStartInfo(fileName)
         {
-            StartInfo = new System.Diagnostics.ProcessStartInfo(fileName)
-            {
-                Arguments = arguments,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-            }
+            Arguments = arguments,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
         };
         p.Start();
         p.WaitForExit(30000);

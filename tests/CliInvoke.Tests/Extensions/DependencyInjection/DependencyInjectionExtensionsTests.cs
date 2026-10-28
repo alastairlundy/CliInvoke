@@ -22,12 +22,12 @@ public class DependencyInjectionExtensionsTests
 {
     private static (string FilePath, string Arguments) ResolveEchoCommand()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
             return ("cmd.exe", "/C echo Hello from CliInvoke");
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
-            RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
-            RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+        if (OperatingSystem.IsLinux() ||
+            OperatingSystem.IsMacOS() ||
+            OperatingSystem.IsFreeBSD())
             return ("/bin/echo", "Hello from CliInvoke");
 
         throw new PlatformNotSupportedException("Unsupported OS for the echo integration test.");
@@ -92,7 +92,7 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCliInvoke_WithConfigure_Scoped_RegistersAsScoped()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddCliInvoke(builder => builder.UseLogging(), ServiceLifetime.Scoped);
+        services.AddCliInvoke(builder => builder.UseLogging());
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope1 = provider.CreateScope();
@@ -256,7 +256,7 @@ public class DependencyInjectionExtensionsTests
     [Test]
     public async Task AddCustomResultValidators_RegistersValidator()
     {
-        var customValidator = new ProcessResultValidator<ProcessResult>(
+        ProcessResultValidator<ProcessResult> customValidator = new ProcessResultValidator<ProcessResult>(
             [result => result.ExitCode == 0]);
 
         IServiceCollection services = new ServiceCollection();
@@ -275,9 +275,9 @@ public class DependencyInjectionExtensionsTests
     [Test]
     public async Task AddCustomResultValidators_DoubleCall_LastRegistrationWins()
     {
-        var first = new ProcessResultValidator<ProcessResult>(
+        ProcessResultValidator<ProcessResult> first = new ProcessResultValidator<ProcessResult>(
             [result => result.ExitCode == 0]);
-        var second = new ProcessResultValidator<ProcessResult>(
+        ProcessResultValidator<ProcessResult> second = new ProcessResultValidator<ProcessResult>(
             [result => result.ExitCode != 0]);
 
         IServiceCollection services = new ServiceCollection();

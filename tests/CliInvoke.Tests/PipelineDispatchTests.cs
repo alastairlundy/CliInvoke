@@ -28,7 +28,7 @@ internal class PipelineDispatchTests : IDisposable
     private InvocationContext CreateContext(InvocationMode mode,
         CancellationToken cancellationToken = default)
     {
-        ProcessConfiguration config = new ProcessConfiguration(_targetFilePath, "");
+        ProcessConfiguration config = new ProcessConfiguration(_targetFilePath);
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
         return new InvocationContext(config, exitConfig, mode, cancellationToken);
     }
@@ -77,7 +77,7 @@ internal class PipelineDispatchTests : IDisposable
     {
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
         InvocationContext ctx = CreateContext(InvocationMode.Raw,
-            new CancellationToken(true));
+            new CancellationToken(canceled: true));
 
         await Assert.That(async () => await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true))
             .Throws<OperationCanceledException>();
@@ -105,39 +105,39 @@ internal class PipelineDispatchTests : IDisposable
     public async Task InvokeAsync_Raw_RedirectedConfig_FactoryReceivesRedirectionDisabledCopy()
     {
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath, "", outputRedirection: true);
+            new ProcessConfiguration(_targetFilePath);
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
         InvocationContext ctx = new InvocationContext(config, exitConfig,
-            InvocationMode.Raw, default);
+            InvocationMode.Raw, CancellationToken.None);
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
 
         await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(_factory.LastConfiguration).IsNotNull();
-        await Assert.That(_factory.LastConfiguration!.OutputRedirection).IsFalse();
+        await Assert.That(_factory.LastConfiguration.OutputRedirection).IsFalse();
         await Assert.That(_factory.LastConfiguration).IsNotSameReferenceAs(config);
         await Assert.That(config.OutputRedirection).IsTrue();
     }
 
     /// <summary>
     ///     Buffered mode drains its redirected streams via the capture methods, so the
-    ///     Raw-mode normalization must leave its redirection enabled — stripping it would
+    ///     Raw-mode normalisation must leave its redirection enabled — stripping it would
     ///     silently discard buffered output.
     /// </summary>
     [Test]
     public async Task InvokeAsync_Buffered_RedirectedConfig_PreservesRedirection()
     {
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath, "", outputRedirection: true);
+            new ProcessConfiguration(_targetFilePath);
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
         InvocationContext ctx = new InvocationContext(config, exitConfig,
-            InvocationMode.Buffered, default);
+            InvocationMode.Buffered, CancellationToken.None);
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
 
         await pipeline.InvokeAsync<BufferedProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(_factory.LastConfiguration).IsNotNull();
-        await Assert.That(_factory.LastConfiguration!.OutputRedirection).IsTrue();
+        await Assert.That(_factory.LastConfiguration.OutputRedirection).IsTrue();
     }
 
     /// <summary>
@@ -148,24 +148,24 @@ internal class PipelineDispatchTests : IDisposable
     public async Task InvokeAsync_Raw_NonRedirectedConfig_PassesThroughWithoutCopy()
     {
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath, "", outputRedirection: false);
+            new ProcessConfiguration(_targetFilePath, outputRedirection: false);
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
         InvocationContext ctx = new InvocationContext(config, exitConfig,
-            InvocationMode.Raw, default);
+            InvocationMode.Raw, CancellationToken.None);
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
 
         await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(_factory.LastConfiguration).IsNotNull();
         await Assert.That(_factory.LastConfiguration).IsSameReferenceAs(config);
-        await Assert.That(_factory.LastConfiguration!.OutputRedirection).IsFalse();
+        await Assert.That(_factory.LastConfiguration.OutputRedirection).IsFalse();
     }
 
     /// <summary>
-    ///     L6 regression guard for the H2 normalization: a null env-var value is the
+    ///     L6 regression guard for the H2 normalisation: a null env-var value is the
     ///     documented removal signal and must survive the Raw-mode copy. A builder
     ///     round-trip would throw <see cref="ArgumentNullException"/> here because
-    ///     <c>EnvironmentVariablesSpec</c> rejects nulls — the normalization is therefore
+    ///     <c>EnvironmentVariablesSpec</c> rejects nulls — the normalisation is therefore
     ///     a faithful member-wise copy.
     /// </summary>
     [Test]
@@ -173,22 +173,22 @@ internal class PipelineDispatchTests : IDisposable
     {
         const string VariableName = "CLIINVOKE_H2_NULL_ENV";
         ProcessConfiguration config =
-            new ProcessConfiguration(_targetFilePath, "", outputRedirection: true)
+            new ProcessConfiguration(_targetFilePath)
             {
-                EnvironmentVariables = new Dictionary<string, string>
+                EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
                 {
-                    [VariableName] = null!
-                }
+                    [VariableName] = null!,
+                },
             };
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
         InvocationContext ctx = new InvocationContext(config, exitConfig,
-            InvocationMode.Raw, default);
+            InvocationMode.Raw, CancellationToken.None);
         ProcessInvocationPipeline pipeline = new ProcessInvocationPipeline(_factory);
 
         await pipeline.InvokeAsync<ProcessResult>(ctx).ConfigureAwait(true);
 
         await Assert.That(_factory.LastConfiguration).IsNotNull();
-        await Assert.That(_factory.LastConfiguration!.EnvironmentVariables[VariableName])
+        await Assert.That(_factory.LastConfiguration.EnvironmentVariables[VariableName])
             .IsNull();
     }
 }

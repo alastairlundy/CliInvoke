@@ -10,7 +10,7 @@ public class ProcessConfigurationInitConstructionTests
         {
             ProcessConfiguration _ = new()
             {
-                TargetFilePath = null!
+                TargetFilePath = null!,
             };
         }).Throws<ArgumentException>();
     }
@@ -23,7 +23,7 @@ public class ProcessConfigurationInitConstructionTests
         {
             ProcessConfiguration _ = new()
             {
-                TargetFilePath = string.Empty
+                TargetFilePath = string.Empty,
             };
         }).Throws<ArgumentException>();
     }
@@ -40,7 +40,7 @@ public class ProcessConfigurationInitConstructionTests
             ProcessConfiguration _ = new()
             {
                 TargetFilePath = "foo.exe",
-                WorkingDirectoryPath = nonExistentPath
+                WorkingDirectoryPath = nonExistentPath,
             };
         }).Throws<DirectoryNotFoundException>();
     }
@@ -57,7 +57,7 @@ public class ProcessConfigurationInitConstructionTests
             ProcessConfiguration _ = new()
             {
                 TargetFilePath = "foo.exe",
-                WorkingDirectoryPath = tempDir
+                WorkingDirectoryPath = tempDir,
             };
         }).ThrowsNothing();
     }
@@ -70,7 +70,7 @@ public class ProcessConfigurationInitConstructionTests
         {
             ProcessConfiguration _ = new()
             {
-                TargetFilePath = "foo.exe"
+                TargetFilePath = "foo.exe",
             };
         }).ThrowsNothing();
     }
@@ -86,7 +86,8 @@ public class ProcessConfigurationInitConstructionTests
     public async Task ConvenienceConstructor_WithNullTarget_ThrowsArgumentException()
     {
         // Arrange & Act & Assert
-        await Assert.That(() => new ProcessConfiguration(null!)).Throws<ArgumentException>();
+        await Assert.That(() => new ProcessConfiguration(null!))
+            .Throws<ArgumentException>();
     }
 
     [Test]
@@ -95,7 +96,7 @@ public class ProcessConfigurationInitConstructionTests
         // Arrange & Act
         ProcessConfiguration config = new()
         {
-            TargetFilePath = "foo.exe"
+            TargetFilePath = "foo.exe",
         };
 
         // Assert
@@ -108,7 +109,7 @@ public class ProcessConfigurationInitConstructionTests
         // Arrange & Act
         ProcessConfiguration config = new()
         {
-            TargetFilePath = "foo.exe"
+            TargetFilePath = "foo.exe",
         };
 
         // Assert
