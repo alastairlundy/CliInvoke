@@ -25,7 +25,7 @@ public class ExternalProcessNoMutationTests
     [Test]
     public async Task Start_DoesNotMutateConfiguration_ExecutedFilePathIsResolved()
     {
-        ProcessConfiguration configuration = new(_targetFilePath);
+        ProcessConfiguration configuration = new(_targetFilePath, ProcessTestHelper.GetExitingArguments());
 
         string originalTargetFilePath = configuration.TargetFilePath;
 
@@ -51,7 +51,7 @@ public class ExternalProcessNoMutationTests
     [Test]
     public async Task StartAsync_DoesNotMutateConfiguration_ExecutedFilePathIsResolved()
     {
-        ProcessConfiguration configuration = new(_targetFilePath);
+        ProcessConfiguration configuration = new(_targetFilePath, ProcessTestHelper.GetExitingArguments());
 
         string originalTargetFilePath = configuration.TargetFilePath;
 
@@ -77,7 +77,7 @@ public class ExternalProcessNoMutationTests
     [Test]
     public async Task StartAsync_WithConfiguration_DoesNotMutateCallerConfiguration()
     {
-        ProcessConfiguration callerConfig = new(_targetFilePath);
+        ProcessConfiguration callerConfig = new(_targetFilePath, ProcessTestHelper.GetExitingArguments());
 
         string originalTargetFilePath = callerConfig.TargetFilePath;
 
@@ -103,7 +103,7 @@ public class ExternalProcessNoMutationTests
     [Test]
     public async Task CaptureBufferedResult_Start_DoesNotMutateConfiguration()
     {
-        ProcessConfiguration configuration = new(_targetFilePath);
+        ProcessConfiguration configuration = new(_targetFilePath, ProcessTestHelper.GetExitingArguments());
 
         string originalTargetFilePath = configuration.TargetFilePath;
 

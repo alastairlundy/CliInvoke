@@ -34,7 +34,10 @@ internal sealed partial class LoggingMiddleware : IProcessMiddleware
     private readonly ILogger<LoggingMiddleware> _logger;
     private readonly Func<string?, string>? _redactor;
 
-    [GeneratedRegex(@"(--password|--token|--api-key)(\s*=\s*|\s+)(?:""[^""]*""|'[^']*'|[^\s-][^\s]*)",
+    // The groups must stay named: under RegexOptions.ExplicitCapture, unnamed groups do not
+    // capture, so the "$1$2" references in Sanitize would emit literal text and silently break
+    // redaction (see MA0023; regression history: 8c280d9e / 328291c5 / 0e79933a).
+    [GeneratedRegex(@"(?<flag>--password|--token|--api-key)(?<sep>\s*=\s*|\s+)(?:""[^""]*""|'[^']*'|[^\s-][^\s]*)",
         RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture, 3000)]
     private static partial Regex SensitiveArgPattern { get; }
 
