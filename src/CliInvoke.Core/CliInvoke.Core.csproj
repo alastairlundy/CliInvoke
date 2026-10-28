@@ -22,14 +22,22 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
         <PackageVersion>3.2.0-alpha.1</PackageVersion>
-        <PackageReleaseNotes>#### Changed
+        <PackageReleaseNotes>#### Added
 - Multi-targets `net10.0` and `net11.0`.
+
+#### Changed
+- `ProcessResult` / `BufferedProcessResult` equality now compares `ExecutedFilePath` with the platform path comparison (`OrdinalIgnoreCase` on Windows, `Ordinal` elsewhere), so results differing only by path casing compare equal on Windows.
+- `ProcessConfiguration.Equals` computes faster and order-independent environment-variable comparisons; string comparisons in the equality paths are explicitly ordinal.
+
 #### Fixed
-- `ProcessExitConfiguration.CancellationThrowsException` is now honoured
-- The default `ProcessResourcePolicy` affinity mask now selects every logical processor instead of pinning multi-core machines to half the cores.</PackageReleaseNotes>
+- `ProcessExitConfigurationCreationExtensions.Default` now matches the constructor default (allows unexpected-exit exceptions) instead of aliasing `CreateGraceful()`.
+- Null environment-variable values are honored as BCL variable removal instead of being silently dropped; empty-string values remain a valid way to clear a variable.
+
+#### Removed
+- The `Polyfill` dependency - Core now has **zero runtime package dependencies**.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>3.1.0.0</AssemblyVersion>
-        <FileVersion>3.1.0.0</FileVersion>
+        <AssemblyVersion>3.2.0.0</AssemblyVersion>
+        <FileVersion>3.2.0.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>

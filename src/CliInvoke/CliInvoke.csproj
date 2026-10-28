@@ -13,29 +13,31 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### Changed
-* Multi-targets `net10.0` and `net11.0`.
-#### Added
-* Windows command-line length check. When the assembled command line exceeds the Windows
-  `CreateProcess` limit (~32,767 characters), you get an `ArgumentException` before the process
-  starts instead of Win32 error 206. Skipped when `UseShellExecute` is enabled.
+        <PackageReleaseNotes>#### Added
+- Multi-targets `net10.0` and `net11.0`; on `net11.0` the platform control adapters use the new .NET 11 `Process` APIs (`Process.Signal`, `TryWaitForExitStatus`, `TryGetProcessById`). Windows and macOS children start suspended and resume only after the configured `ProcessResourcePolicy` is applied.
+
+#### Changed
+- `CliInvoke` adopts `Squash` (2.1.0) build-time trimming. The IL linker now strips unreachable non-public code from the shipped assemblies at Release build time; the public API surface is untouched. Measured as of this release: CliInvoke.dll for net10.0 TFM shrinks ~37% (218 KB → 138 KB) and the package as a whole shrinks ~15% (311 KB → 264 KB) - the removed code is almost entirely unreferenced Polyfill-emitted types.
+- `Polyfill` bundling moved here from `CliInvoke.Core` (which is now dependency-free)
+- `CliRun.FireAndForget(ProcessConfiguration)` fails fast on redirected configurations (`ArgumentException` before start) - the handle is disposed immediately after launch, so redirected pipes would never be drained.
+- `ExternalProcess` resolves `TargetFilePath` once at construction; an unresolvable path now throws `FileNotFoundException` there instead of at start, and repeat starts reuse the resolved path.
+- Retry middleware rewinds seekable standard input (`Position = 0`) before every retry attempt; a non-seekable stdin source throws `InvalidOperationException` when a retry would occur.
+- `LoggingMiddleware` logs the joined `ArgumentList` when the argument string is empty.
+- Updated `Microsoft.Extensions.*` dependencies to 10.0.14.
 
 #### Fixed
-* `ProcessTimeoutPolicy.Enabled = false` now means no timeout in all three waits instead of
-  arming the kill timer anyway, and interrupt-task faults are always observed.
-* `MiddlewareContext.Next` invokes only the next middleware and the rest of the chain, not the
-  composed chain head, which previously caused unbounded recursion.
-* `AddCliInvoke` registers `IProcessConfigurationBuilder` as a blank-builder factory. The old
-  by-type mapping threw on every `GetService`.
-* `IExternalProcess.StartAsync(configuration, ct)` honors `RedirectStandardInput` like the
-  instance overloads. A configured writer with redirection disabled is a no-op in every path.
-* `FromProcessStartInfo` accepts empty-string environment values as a valid way to clear a
-  variable. Keys must be non-null and non-empty.</PackageReleaseNotes>
+- Raw-mode invocations no longer deadlock on chatty children: `OutputRedirection` is forced off before start in `InvocationMode.Raw` (caller configuration untouched).
+- Buffered cancellation is deterministic: a drain-side `OperationCanceledException` is absorbed under `CancellationThrowsException=false` and propagated when `true`.
+- Wait paths poll for actual child exit after a forceful kill, so `ExitCode` is readable immediately after a kill-timed-out wait.
+- `AllowExceptionsIfUnexpected` no longer swallows genuine failures that resolve near an expected timeout - only CliInvoke's own cancellation `OperationCanceledException`s are absorbed.
+- Null environment-variable values reach the child process for removal instead of being dropped by the control adapter.
+- `ProcessResult.Signal` is correct on the `net11.0` Unix leg: raw native signal numbers are mapped through the platform table before the SIGKILL and unknown-signal filters.
+- `LoggingMiddleware` argument redaction works again (`RegexOptions.ExplicitCapture` had broken capture references, emitting the redaction marker with the wrong formatting).</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>3.2.0-alpha.1</PackageVersion>
-        <AssemblyVersion>3.1.0.0</AssemblyVersion>
+        <AssemblyVersion>3.2.0.0</AssemblyVersion>
         <PackageTags>shell,command-line,cli,automation,execute,executable,wrapper,powershell,cmd,timeout,cancellation,standard-input,standard-output,standard-error,invoke,process,invocation,execution</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -43,7 +45,7 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
-        <FileVersion>3.1.0.0</FileVersion>
+        <FileVersion>3.2.0.0</FileVersion>
 <!--
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
 -->

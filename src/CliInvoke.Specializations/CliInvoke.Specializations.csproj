@@ -16,18 +16,19 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Multi-targets `net10.0` and `net11.0`.
-### Fixed
-* `UseDefaultShell()` wraps PowerShell with `-NoProfile -NonInteractive -Command`, so profile
-  scripts cannot run or block, and a conditional middleware's sub-chain no longer leaks its
-  `MiddlewareContext` into the outer chain.</PackageReleaseNotes>
+        <PackageReleaseNotes>
+#### Added
+- Multi-targets `net10.0` and `net11.0`.
+
+#### Changed
+- XML documentation improvements in `DefaultShellMiddleware` and refreshed package metadata/description/tags.</PackageReleaseNotes>
         <Description>Shell middleware for CliInvoke. Run commands through PowerShell, CMD, or the user's default shell with UsePowerShell, UseCmd, and UseDefaultShell. Requires the CliInvoke package.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>3.1.0</AssemblyVersion>
-        <FileVersion>3.1.0</FileVersion>
+        <AssemblyVersion>3.2.0.0</AssemblyVersion>
+        <FileVersion>3.2.0.0</FileVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, powershell, cmd, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, invocation, execution, middleware, automation</PackageTags>
     </PropertyGroup>
 
