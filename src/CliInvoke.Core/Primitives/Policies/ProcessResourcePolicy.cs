@@ -37,7 +37,8 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
     {
         if (minWorkingSet is not null)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfNegative((nint)minWorkingSet,
+                nameof(minWorkingSet));
 
 #pragma warning disable CA1416
             MinWorkingSet = minWorkingSet;
@@ -46,21 +47,26 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 
         if (maxWorkingSet is not null)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative((nint)maxWorkingSet);
-            ArgumentOutOfRangeException.ThrowIfZero((nint)maxWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfNegative((nint)maxWorkingSet,
+                nameof(maxWorkingSet));
+            ArgumentOutOfRangeException.ThrowIfZero((nint)maxWorkingSet,
+                nameof(maxWorkingSet));
         }
 
         if (minWorkingSet is not null && maxWorkingSet is not null)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan((nint)maxWorkingSet, (nint)minWorkingSet);
+            ArgumentOutOfRangeException.ThrowIfLessThan((nint)maxWorkingSet,
+                (nint)minWorkingSet, nameof(maxWorkingSet));
             ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)minWorkingSet,
-                (nint)maxWorkingSet);
+                (nint)maxWorkingSet, nameof(minWorkingSet));
         }
 
         if (processorAffinity is not null)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan((nint)processorAffinity, 0x0001);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity, GetAllProcessorAffinityMask());
+            ArgumentOutOfRangeException.ThrowIfLessThan((nint)processorAffinity,
+                0x0001, nameof(processorAffinity));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan((nint)processorAffinity,
+                GetAllProcessorAffinityMask(), nameof(processorAffinity));
         }
 
         if (maxWorkingSet is not null)

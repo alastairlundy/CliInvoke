@@ -52,7 +52,8 @@ public class ProcessTimeoutPolicy : IEquatable<ProcessTimeoutPolicy>
     public ProcessTimeoutPolicy(TimeSpan timeoutThreshold, bool enabled, 
         ProcessExitBehaviour exitBehaviour = ProcessExitBehaviour.GracefulExit)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(timeoutThreshold.TotalMilliseconds);
+        ArgumentOutOfRangeException.ThrowIfNegative(timeoutThreshold.TotalMilliseconds,
+            nameof(timeoutThreshold));
         ArgumentOutOfRangeException.ThrowIfLessThan(timeoutThreshold, TimeSpan.Zero);
 
         TimeoutThreshold = timeoutThreshold;

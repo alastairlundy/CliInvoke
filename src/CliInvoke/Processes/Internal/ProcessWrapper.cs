@@ -10,6 +10,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 using CliInvoke.Processes.Internal.Cancellation;
 using CliInvoke.Processes.Internal.ControlAdapters;
@@ -54,7 +55,7 @@ internal class ProcessWrapper : Process
     // Guards ExitTime: written once by the Exited event callback (OnExited) or, when that
     // callback has not run yet, by the wait paths' fallback (EnsureExitTime). Single-assignment
     // under this lock keeps readers from ever observing default(DateTime) or a torn value.
-    private readonly object _exitTimeSync = new();
+    private readonly Lock _exitTimeSync = new();
 
     // Resolved cancellation reason, persisted across the wait so Cancelled can be computed afterward.
     private CancellationReason _cancellationReason = CancellationReason.NotKnown;
@@ -840,7 +841,8 @@ internal class ProcessWrapper : Process
         bool fallbackToForceful = true)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(
-            exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
+            exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero,
+            nameof(exitConfiguration));
 
         // Disabled policy: no threshold to interrupt at, so wait for exit or cancellation.
         if (!exitConfiguration.TimeoutPolicy.Enabled)
@@ -1062,7 +1064,8 @@ internal class ProcessWrapper : Process
         CancellationToken cancellationToken)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(
-            exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
+            exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero,
+            nameof(exitConfiguration));
 
         DateTime expectedExitTime =
             DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
@@ -1244,7 +1247,9 @@ internal class ProcessWrapper : Process
                     case ProcessExitBehaviour.WaitForExit:
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(nameof(exitConfiguration),
+                            exitConfiguration.RequestedCancellationExitBehaviour,
+                            "The exit behaviour is not a valid ProcessExitBehaviour value.");
                 }
 
                 break;

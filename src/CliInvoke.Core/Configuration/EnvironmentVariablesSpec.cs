@@ -65,8 +65,8 @@ public sealed class EnvironmentVariablesSpec
 
         foreach (KeyValuePair<string, string> pair in variables)
         {
-            ArgumentException.ThrowIfNullOrEmpty(pair.Key);
-            ArgumentNullException.ThrowIfNull(pair.Value);
+            ArgumentException.ThrowIfNullOrEmpty(pair.Key, nameof(variables));
+            ArgumentNullException.ThrowIfNull(pair.Value, nameof(variables));
 
             if (_throwExceptionIfDuplicateKeyFound)
             {

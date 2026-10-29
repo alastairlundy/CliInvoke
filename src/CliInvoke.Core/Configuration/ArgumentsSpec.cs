@@ -84,7 +84,7 @@ public sealed class ArgumentsSpec
 
         if (!IsValidArgument(value))
             throw new ArgumentException(
-                $"Argument '{value}' not permitted based on validation logic.");
+                $"Argument '{value}' not permitted based on validation logic.", nameof(value));
 
         string processedValue = escape ? EscapeCharacters(value) : value;
 
@@ -113,7 +113,7 @@ public sealed class ArgumentsSpec
 
         if (!IsValidArgument(value, _formatProvider))
             throw new ArgumentException(
-                $"Argument '{value.ToString()}' not permitted based on validation logic.");
+                $"Argument '{value.ToString()}' not permitted based on validation logic.", nameof(value));
 
         string valueActual = value.ToString(null, _formatProvider);
 
@@ -138,7 +138,7 @@ public sealed class ArgumentsSpec
 
         foreach (string item in values)
         {
-            ArgumentNullException.ThrowIfNull(item);
+            ArgumentNullException.ThrowIfNull(item, nameof(values));
 
             if (!_argumentValidationLogic.Invoke(item))
                 continue;
@@ -153,7 +153,7 @@ public sealed class ArgumentsSpec
         }
 
         if (validCount == 0)
-            throw new ArgumentException("No valid arguments to add.");
+            throw new ArgumentException("No valid arguments to add.", nameof(values));
 
         string wrappedValue = $"\"{joined}\"";
 
@@ -185,7 +185,7 @@ public sealed class ArgumentsSpec
 
         foreach (IFormattable item in values)
         {
-            ArgumentNullException.ThrowIfNull(item);
+            ArgumentNullException.ThrowIfNull(item, nameof(values));
 
             string str = item.ToString(null, _formatProvider);
 
@@ -202,7 +202,7 @@ public sealed class ArgumentsSpec
         }
 
         if (validCount == 0)
-            throw new ArgumentException("No valid arguments to add.");
+            throw new ArgumentException("No valid arguments to add.", nameof(values));
 
         if (joined is null)
             joined = new StringBuilder();

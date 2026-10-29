@@ -158,6 +158,10 @@ simple constructors cannot express:
   for processor affinity and resource settings with cross-validation
   (e.g., `SetMinWorkingSet` throws `ArgumentOutOfRangeException` when
   it exceeds an already-set maximum working set).
+- **Cross-field validation in `Build()`.** Combining
+  `UseShellExecution(true)` with redirected standard input throws
+  `InvalidOperationException`, because `System.Diagnostics.Process`
+  cannot honour both at once.
 
 ```csharp
 using CliInvoke.Builders;
@@ -201,6 +205,12 @@ same model** for the same input. Concretely:
   inconsistent value throws `ArgumentOutOfRangeException`. Neither
   call fabricates a value for the other, and the model allows `Min`
   and `Max` to be set independently.
+- **Shell execution plus stdin redirection is rejected only by the
+  builder.** `Build()` throws `InvalidOperationException` when
+  `UseShellExecution` is combined with redirected standard input. The
+  init-construction path does not check this combination, so a
+  directly constructed `ProcessConfiguration` carrying both fails
+  when the process is started, not at construction.
 
 ### Builder-methods-to-init-properties table
 
@@ -213,7 +223,7 @@ same model** for the same input. Concretely:
 | `SetOutputRedirection(bool)` | `OutputRedirection` | Property defaults to `false`; the constructors taking a `targetFilePath` default it to `true` |
 | `SetWorkingDirectory(string)` | `WorkingDirectoryPath` | Builder validates existence |
 | `EnableWindowCreation(bool)` | `WindowCreation` | |
-| `UseShellExecution(bool)` | `UseShellExecution` | |
+| `UseShellExecution(bool)` | `UseShellExecution` | Conflicts with stdin redirection; `Build()` throws `InvalidOperationException` when both are set |
 | `ConfigureEnvironmentVariables(Action<EnvironmentVariablesSpec>)` | `EnvironmentVariables` | |
 | `ConfigureUserCredential(Action<UserCredentialSpec>)` | `Credential` | Advanced: `SecureString` staging |
 | `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` | `ResourcePolicy` | Advanced: working-set cross-validation |

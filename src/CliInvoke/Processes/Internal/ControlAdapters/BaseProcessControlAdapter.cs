@@ -41,7 +41,8 @@ internal abstract class BaseProcessControlAdapter
 
     internal virtual void ApplyConfiguration(ProcessWrapper process, ProcessConfiguration processConfiguration)
     {
-        ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath);
+        ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath,
+            nameof(processConfiguration));
 
         ProcessStartInfo processStartInfo = new()
         {
@@ -157,7 +158,8 @@ internal abstract class BaseProcessControlAdapter
                 $"The assembled command line for '{processStartInfo.FileName}' is approximately " +
                 $"{totalLength} characters long, which is at or above the Windows CreateProcess " +
                 $"limit of approximately {windowsCommandLineLengthLimit} characters. " +
-                $"Note that this limit is approximate and includes the null terminator.");
+                $"Note that this limit is approximate and includes the null terminator.",
+                nameof(processStartInfo));
         }
     }
 

@@ -77,8 +77,9 @@ public class ProcessConfigurationBuilderTests
         await Assert.That(() =>
         {
             processConfigBuilder.UseShellExecution(true)
-                .SetStandardInputPipe(new StreamWriter(Console.OpenStandardInput()));
-        }).Throws<ArgumentException>();
+                .SetStandardInputPipe(new StreamWriter(new MemoryStream()))
+                .Build();
+        }).Throws<InvalidOperationException>();
     }
 
     [Test]

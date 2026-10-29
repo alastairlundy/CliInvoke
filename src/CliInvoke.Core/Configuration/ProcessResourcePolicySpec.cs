@@ -81,10 +81,12 @@ public sealed class ProcessResourcePolicySpec
     {
         if (minWorkingSet is not null)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet.Value);
+            ArgumentOutOfRangeException.ThrowIfNegative(minWorkingSet.Value,
+                nameof(minWorkingSet));
 
             if (_maxWorkingSet is not null)
-                ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet.Value, _maxWorkingSet.Value);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(minWorkingSet.Value,
+                    _maxWorkingSet.Value, nameof(minWorkingSet));
         }
 
         _minWorkingSet = minWorkingSet;
@@ -105,11 +107,14 @@ public sealed class ProcessResourcePolicySpec
     {
         if (maxWorkingSet is not null)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(maxWorkingSet.Value);
-            ArgumentOutOfRangeException.ThrowIfZero(maxWorkingSet.Value);
+            ArgumentOutOfRangeException.ThrowIfNegative(maxWorkingSet.Value,
+                nameof(maxWorkingSet));
+            ArgumentOutOfRangeException.ThrowIfZero(maxWorkingSet.Value,
+                nameof(maxWorkingSet));
 
             if (_minWorkingSet is not null)
-                ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet.Value, _minWorkingSet.Value);
+                ArgumentOutOfRangeException.ThrowIfLessThan(maxWorkingSet.Value,
+                    _minWorkingSet.Value, nameof(maxWorkingSet));
         }
 
         _maxWorkingSet = maxWorkingSet;

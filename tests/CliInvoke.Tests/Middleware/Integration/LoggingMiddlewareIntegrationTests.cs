@@ -8,6 +8,8 @@
 */
 
 using System.Linq;
+using System.Threading;
+
 using CliInvoke.Core.Middleware;
 using CliInvoke.Extensions.Middleware.Logging;
 using CliInvoke.Factories;
@@ -22,7 +24,7 @@ namespace CliInvoke.Tests.Middleware.Integration;
 /// </summary>
 internal sealed class CapturingLogger<T> : ILogger<T>
 {
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private readonly List<(LogLevel Level, string Message)> _entries = [];
 
     public IReadOnlyList<(LogLevel Level, string Message)> Entries

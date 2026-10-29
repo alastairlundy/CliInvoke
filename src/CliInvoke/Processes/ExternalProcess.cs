@@ -7,6 +7,8 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Threading;
+
 using CliInvoke.Core.Processes;
 using CliInvoke.Processes.Internal;
 
@@ -19,7 +21,7 @@ namespace CliInvoke.Processes;
 public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProcess
 {
     private ProcessWrapper _processWrapper;
-    private readonly object _lifecycleLock = new();
+    private readonly Lock _lifecycleLock = new();
     private EventHandler? _startedHandler;
     private EventHandler? _exitedHandler;
     private bool _disposed;

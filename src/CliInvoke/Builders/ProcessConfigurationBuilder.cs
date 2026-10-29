@@ -501,14 +501,15 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
     ///     Builds and returns a ProcessConfiguration object with the specified properties.
     /// </summary>
     /// <returns>The configured ProcessConfiguration object.</returns>
-    /// <exception cref="ArgumentException">
+    /// <exception cref="InvalidOperationException">
     ///     Thrown if shell execution is enabled while standard input is redirected.
     /// </exception>
     [Pure]
     public ProcessConfiguration Build()
     {
         if (_useShellExecution && (_redirectStandardInput || _standardInput != StreamWriter.Null))
-            throw new ArgumentException("Using shell execution whilst also redirecting standard input is not supported.");
+            throw new InvalidOperationException(
+                "Using shell execution whilst also redirecting standard input is not supported.");
 
         string arguments = _argumentsSpec.Build();
         

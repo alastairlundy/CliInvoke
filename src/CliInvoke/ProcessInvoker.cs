@@ -49,7 +49,7 @@ public class ProcessInvoker : IProcessInvoker
 
         foreach (IProcessMiddleware middleware in materialized)
         {
-            ArgumentNullException.ThrowIfNull(middleware);
+            ArgumentNullException.ThrowIfNull(middleware, nameof(middlewareSequence));
         }
 
         _pipeline = new ProcessInvocationPipeline(externalProcessFactory);
