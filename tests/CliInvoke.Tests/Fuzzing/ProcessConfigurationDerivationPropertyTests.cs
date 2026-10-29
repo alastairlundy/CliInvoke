@@ -108,7 +108,8 @@ public class ProcessConfigurationDerivationPropertyTests
                 // ---------------------------------------------------------------
                 bool memberParity =
                     // 1. TargetFilePath
-                    derived.TargetFilePath == source.TargetFilePath
+                    string.Equals(derived.TargetFilePath,
+                        source.TargetFilePath, StringComparison.Ordinal)
                     // 2. Arguments
                     && string.Equals(derived.Arguments, source.Arguments, StringComparison.Ordinal)
                     // 3. WorkingDirectoryPath

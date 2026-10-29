@@ -41,7 +41,8 @@ public class ResultErgonomicsPropertyTests
 
                 for (int i = 0; i < split.Length; i++)
                 {
-                    if (enumerated[i] != split[i]) return false;
+                    if (!string.Equals(enumerated[i], split[i], StringComparison.Ordinal))
+                        return false;
                 }
 
                 return true;
@@ -68,7 +69,8 @@ public class ResultErgonomicsPropertyTests
 
                 for (int i = 0; i < split.Length; i++)
                 {
-                    if (enumerated[i] != split[i]) return false;
+                    if (!string.Equals(enumerated[i], split[i], StringComparison.Ordinal))
+                        return false;
                 }
 
                 return true;
@@ -98,7 +100,8 @@ public class ResultErgonomicsPropertyTests
 
                 string text = result.ToString();
 
-                return text.StartsWith("[ExitCode=") && text.EndsWith("]");
+                return text.StartsWith("[ExitCode=", StringComparison.Ordinal) &&
+                       text.EndsWith("]", StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -129,10 +132,10 @@ public class ResultErgonomicsPropertyTests
 
                 string text = result.ToString();
 
-                return text.StartsWith("[ExitCode=")
+                return text.StartsWith("[ExitCode=", StringComparison.Ordinal)
                        && text.Contains("StdOutLen=")
                        && text.Contains("StdErrLen=")
-                       && text.EndsWith("]");
+                       && text.EndsWith("]", StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }

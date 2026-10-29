@@ -278,7 +278,9 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
     [LibraryImport("kernel32.dll", SetLastError = true)]
     private static partial uint GetProcessId(IntPtr hProcess);
 
-    [Flags]
+    // Deliberately not marked [Flags]: the values mirror the Win32 THREAD_* access masks,
+    // but this enum is only ever passed to OpenThread as a single right (never combined),
+    // and THREAD_ALL_ACCESS (0x001F03FF) is not a clean combination of the other members.
     private enum ThreadAccess : uint
     {
         THREAD_SUSPEND_RESUME = 0x0002,

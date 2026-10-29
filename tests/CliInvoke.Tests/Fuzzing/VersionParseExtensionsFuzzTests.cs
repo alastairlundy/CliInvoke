@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Globalization;
 using System.Linq;
 using CliInvoke.Internal.Versions;
 
@@ -141,7 +142,7 @@ public class VersionParseExtensionsFuzzTests
                 Version result = Version.GracefulParse(value);
 
                 // Parse each segment and compare with parsed components
-                if (!int.TryParse(segments[0], out int expectedMajor))
+                if (!int.TryParse(segments[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int expectedMajor))
                     return true;
 
                 if (result.Major != expectedMajor)
@@ -149,7 +150,7 @@ public class VersionParseExtensionsFuzzTests
 
                 if (segments.Length >= 2)
                 {
-                    if (!int.TryParse(segments[1], out int expectedMinor))
+                    if (!int.TryParse(segments[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int expectedMinor))
                         return true;
                     if (result.Minor != expectedMinor)
                         return false;
@@ -157,7 +158,7 @@ public class VersionParseExtensionsFuzzTests
 
                 if (segments.Length >= 3)
                 {
-                    if (!int.TryParse(segments[2], out int expectedBuild))
+                    if (!int.TryParse(segments[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int expectedBuild))
                         return true;
                     if (result.Build != expectedBuild)
                         return false;
@@ -165,7 +166,7 @@ public class VersionParseExtensionsFuzzTests
 
                 if (segments.Length >= 4)
                 {
-                    if (!int.TryParse(segments[3], out int expectedRevision))
+                    if (!int.TryParse(segments[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out int expectedRevision))
                         return true;
                     if (result.Revision != expectedRevision)
                         return false;
