@@ -57,7 +57,10 @@ public class ShellInformation : IEquatable<ShellInformation>
     {
         if (other is null) return false;
 
-        return Name == other.Name && Version == other.Version && TargetFilePath.FullName.Equals(other.TargetFilePath.FullName, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(Name, other.Name, StringComparison.Ordinal) &&
+               Version == other.Version &&
+               TargetFilePath.FullName.Equals(other.TargetFilePath.FullName,
+                                             StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc />

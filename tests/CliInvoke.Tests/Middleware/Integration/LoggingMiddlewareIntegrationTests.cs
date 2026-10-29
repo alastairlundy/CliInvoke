@@ -19,44 +19,6 @@ using LoggingMiddleware = CliInvoke.Extensions.Middleware.Logging.LoggingMiddlew
 
 namespace CliInvoke.Tests.Middleware.Integration;
 
-/// <summary>
-///     A minimal <see cref="ILogger"/> implementation that captures log entries for assertions.
-/// </summary>
-internal sealed class CapturingLogger<T> : ILogger<T>
-{
-    private readonly Lock _lock = new();
-    private readonly List<(LogLevel Level, string Message)> _entries = [];
-
-    public IReadOnlyList<(LogLevel Level, string Message)> Entries
-    {
-        get { lock (_lock) { return _entries.ToArray(); } }
-    }
-
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull
-        => NullScope.Instance;
-
-    public bool IsEnabled(LogLevel logLevel) => true;
-
-    public void Log<TState>(
-        LogLevel logLevel,
-        EventId eventId,
-        TState state,
-        Exception? exception,
-        Func<TState, Exception?, string> formatter)
-    {
-        lock (_lock)
-        {
-            _entries.Add((logLevel, formatter(state, exception)));
-        }
-    }
-
-    private sealed class NullScope : IDisposable
-    {
-        public static readonly NullScope Instance = new();
-        public void Dispose() { }
-    }
-}
-
 public class LoggingMiddlewareIntegrationTests
 {
     private static (string FilePath, string Arguments) ResolveEchoCommand()

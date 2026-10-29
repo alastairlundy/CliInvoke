@@ -169,7 +169,7 @@ public class ShellDetector : IShellDetector
 
             if (openBracket < 0 || closeBracket <= openBracket)
                 throw new InvalidOperationException(
-                    "cmd version banner output was not in the expected format.");
+                    "cmd version banner output was not in the expected format.", ex);
 
             string versionString = result.StandardOutput[(openBracket + 1)..closeBracket];
 
