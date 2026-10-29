@@ -171,7 +171,7 @@ public class EnvironmentVariablesSpecTests
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
-        Dictionary<string, string> vars = new() { ["X"] = "9" };
+        Dictionary<string, string> vars = new(StringComparer.Ordinal) { ["X"] = "9" };
 
         // Act
         spec.SetDictionary(vars);
@@ -186,7 +186,7 @@ public class EnvironmentVariablesSpecTests
         // Arrange
         EnvironmentVariablesSpec spec = new();
         IReadOnlyDictionary<string, string> vars = new ReadOnlyDictionary<string, string>(
-            new Dictionary<string, string> { ["R"] = "7" });
+            new Dictionary<string, string>(StringComparer.Ordinal) { ["R"] = "7" });
 
         // Act
         spec.SetReadOnlyDictionary(vars);

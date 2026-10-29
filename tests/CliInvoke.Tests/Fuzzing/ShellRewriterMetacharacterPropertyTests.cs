@@ -214,11 +214,12 @@ public class ShellRewriterMetacharacterPropertyTests
 
                 // The middleware-owned switches must be discrete entries preceding the
                 // script entry, and the script must be a single escaped command element.
-                return rewritten.ArgumentList.Count == 4 &&
-                       rewritten.ArgumentList[0] == "-NoProfile" &&
-                       rewritten.ArgumentList[1] == "-NonInteractive" &&
-                       rewritten.ArgumentList[2] == "-Command" &&
-                       rewritten.ArgumentList[3] == expectedScript &&
+                IReadOnlyList<string> argList = rewritten.ArgumentList;
+                return argList.Count == 4 &&
+                       string.Equals(argList[0], "-NoProfile", StringComparison.Ordinal) &&
+                       string.Equals(argList[1], "-NonInteractive", StringComparison.Ordinal) &&
+                       string.Equals(argList[2], "-Command", StringComparison.Ordinal) &&
+                       string.Equals(argList[3], expectedScript, StringComparison.Ordinal) &&
                        rewritten.Arguments == string.Empty;
             })
             .QuickCheckThrowOnFailure();
@@ -246,10 +247,11 @@ public class ShellRewriterMetacharacterPropertyTests
 
                 string expectedScript = $"& {QuotePowerShellPath("prog.exe")} {EscapePowerShellArg(metaArguments)}";
 
-                string script = rewritten.ArgumentList[3];
-                return script == expectedScript &&
-                       rewritten.ArgumentList.Count == 4 &&
-                       rewritten.ArgumentList[2] == "-Command";
+                IReadOnlyList<string> argList = rewritten.ArgumentList;
+                string script = argList[3];
+                return string.Equals(script, expectedScript, StringComparison.Ordinal) &&
+                       argList.Count == 4 &&
+                       string.Equals(argList[2], "-Command", StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -279,7 +281,8 @@ public class ShellRewriterMetacharacterPropertyTests
                 // the target path is emitted as the expected quoted, caret-escaped token
                 // wrapped in double quotes after the /c switch.
                 string expectedArguments = $"/c \"{QuoteCmdPath(metaPath)} arg1\"";
-                return rewritten.Arguments == expectedArguments &&
+                string arguments = rewritten.Arguments;
+                return string.Equals(arguments, expectedArguments, StringComparison.Ordinal) &&
                        rewritten.ArgumentList.Count == 0;
             })
             .QuickCheckThrowOnFailure();
@@ -309,7 +312,7 @@ public class ShellRewriterMetacharacterPropertyTests
                 string innerPrefix = "/c \"";
                 string args = rewritten.Arguments;
                 string command = args.Substring(innerPrefix.Length, args.Length - innerPrefix.Length - 1);
-                return command == expectedCommand &&
+                return string.Equals(command, expectedCommand, StringComparison.Ordinal) &&
                        !command.Contains("&&") &&
                        rewritten.ArgumentList.Count == 0;
             })
@@ -340,10 +343,11 @@ public class ShellRewriterMetacharacterPropertyTests
                 // script must not use the PowerShell & call operator (POSIX syntax error).
                 // The target path is single-quoted so every metacharacter is literal data.
                 string expectedScript = $"{QuotePosixPath(metaPath)} arg1";
-                return rewritten.ArgumentList.Count == 2 &&
-                       rewritten.ArgumentList[0] == "-c" &&
-                       rewritten.ArgumentList[1] == expectedScript &&
-                       !rewritten.ArgumentList[1].StartsWith("& ") &&
+                IReadOnlyList<string> argList = rewritten.ArgumentList;
+                return argList.Count == 2 &&
+                       string.Equals(argList[0], "-c", StringComparison.Ordinal) &&
+                       string.Equals(argList[1], expectedScript, StringComparison.Ordinal) &&
+                       !argList[1].StartsWith("& ", StringComparison.Ordinal) &&
                        rewritten.Arguments == string.Empty;
             })
             .QuickCheckThrowOnFailure();
@@ -370,8 +374,8 @@ public class ShellRewriterMetacharacterPropertyTests
                 string expectedScript = $"{QuotePosixPath("prog.exe")} {EscapePosixArg(metaArguments)}";
 
                 string script = rewritten.ArgumentList[1];
-                return script == expectedScript &&
-                       !script.StartsWith("& ") &&
+                return string.Equals(script, expectedScript, StringComparison.Ordinal) &&
+                       !script.StartsWith("& ", StringComparison.Ordinal) &&
                        rewritten.ArgumentList.Count == 2;
             })
             .QuickCheckThrowOnFailure();

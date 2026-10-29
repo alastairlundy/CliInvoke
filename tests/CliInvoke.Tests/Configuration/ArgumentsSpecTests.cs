@@ -64,7 +64,7 @@ public class ArgumentsSpecTests
     public async Task Add_WithCustomValidation_AllowsValidArgument()
     {
         // Arrange
-        ArgumentsSpec spec = new(arg => !arg.StartsWith("-"));
+        ArgumentsSpec spec = new(arg => !arg.StartsWith("-", StringComparison.Ordinal));
 
         // Act
         spec.Add("allowed", escape: false);
