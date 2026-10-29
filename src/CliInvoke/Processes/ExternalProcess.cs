@@ -56,8 +56,10 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         Configuration = configuration;
         ExitConfiguration = exitConfiguration ?? ProcessExitConfiguration.CreateGraceful();
 
-        _startedHandler = (sender, args) => Started?.Invoke(sender, args);
-        _exitedHandler = (sender, args) => Exited?.Invoke(sender, args);
+        // Re-raise with 'this' as sender: these are this class's own instance events, and
+        // subscribers should not be handed the internal ProcessWrapper as the sender.
+        _startedHandler = (_, args) => Started?.Invoke(this, args);
+        _exitedHandler = (_, args) => Exited?.Invoke(this, args);
         _processWrapper.Started += _startedHandler;
         _processWrapper.Exited += _exitedHandler;
     }

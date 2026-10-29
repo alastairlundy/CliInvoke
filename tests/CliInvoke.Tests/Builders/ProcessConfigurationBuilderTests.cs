@@ -271,7 +271,7 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe",
-            argumentValidationLogic: s => s != "bad");
+            argumentValidationLogic: s => !string.Equals(s, "bad", StringComparison.Ordinal));
 
         // Act & Assert
         await Assert.That(() =>
@@ -492,7 +492,7 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
-        Dictionary<string, string> dictionary = new()
+        Dictionary<string, string> dictionary = new(StringComparer.Ordinal)
         {
             { "D_KEY1", "D_VALUE1" },
             { "D_KEY2", "D_VALUE2" },
@@ -512,7 +512,7 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
-        Dictionary<string, string> source = new()
+        Dictionary<string, string> source = new(StringComparer.Ordinal)
         {
             { "RO_KEY1", "RO_VALUE1" },
             { "RO_KEY2", "RO_VALUE2" },
@@ -533,7 +533,7 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
-        Dictionary<string, string> dictionary = new() { { "D_KEY", "D_VALUE" } };
+        Dictionary<string, string> dictionary = new(StringComparer.Ordinal) { { "D_KEY", "D_VALUE" } };
         List<KeyValuePair<string, string>> list = [new("L_KEY", "L_VALUE")];
 
         // Act

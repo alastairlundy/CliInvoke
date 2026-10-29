@@ -60,10 +60,12 @@ public class ValidationRuleMergeFuzzTests
                 if (captured.Length != k + j) return false;
 
                 for (int i = 0; i < k; i++)
-                    if (captured[i].Name != $"cfg-{i}") return false;
+                    if (!string.Equals(captured[i].Name, $"cfg-{i}", StringComparison.Ordinal))
+                        return false;
 
                 for (int i = 0; i < j; i++)
-                    if (captured[k + i].Name != $"val-{i}") return false;
+                    if (!string.Equals(captured[k + i].Name, $"val-{i}", StringComparison.Ordinal))
+                        return false;
 
                 return true;
 
@@ -141,7 +143,8 @@ public class ValidationRuleMergeFuzzTests
                 if (firstFailing != f) return false;
 
                 string expectedName = f < k ? $"cfg-{f}" : $"val-{f - k}";
-                return captured[firstFailing].Name == expectedName;
+                return string.Equals(captured[firstFailing].Name, expectedName,
+                    StringComparison.Ordinal);
 
                 Task Next(InvocationContext c)
                 {
@@ -173,7 +176,9 @@ public class ValidationRuleMergeFuzzTests
                 {
                     // Exact supplied rules, in order, by reference and by name.
                     if (!ReferenceEquals(result.ValidationRules[i], supplied[i])) return false;
-                    if (result.ValidationRules[i].Name != $"sup-{i}") return false;
+                    if (!string.Equals(result.ValidationRules[i].Name, $"sup-{i}",
+                        StringComparison.Ordinal))
+                        return false;
                 }
 
                 // The source configuration's own rules array is untouched (still the default empty array).
