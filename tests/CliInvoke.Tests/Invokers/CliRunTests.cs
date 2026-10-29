@@ -15,21 +15,28 @@ namespace CliInvoke.Tests.Invokers;
 /// <remarks>
 /// <para>
 /// <see cref="CliRun"/> is a batteries-included defaults facade with no injectable
-/// factory, so these tests spawn a real, cross-platform process (<c>dotnet --version</c>)
-/// and assert on its exit code rather than on a fake factory. They are deterministic and
+/// factory, so these tests spawn a real, per-OS child process — the quiet child from
+/// <see cref="ProcessTestHelper.GetQuietChildCommand"/> — and assert on its exit code
+/// or process id rather than on a fake factory. They are deterministic and
 /// do not touch shared static state.
+/// </para>
+/// <para>
+/// The child is deliberately quiet: <see cref="CliRun.RunAsync(CliInvoke.Core.ProcessConfiguration, CliInvoke.Core.ProcessExitConfiguration?, System.Threading.CancellationToken)"/>
+/// (Raw mode) and <c>FireAndForget</c> leave redirection off, so those children inherit
+/// the test host's console, and an output-producing child — such as <c>dotnet --version</c> —
+/// leaks its banner into test output (a raw child write displaces the test runner's live
+/// console redraws, wrapping into blank rows). No assertion here depends on what the
+/// child writes, only on its exit code and process id.
 /// </para>
 /// </remarks>
 public class CliRunTests
 {
-    private const string TargetFilePath = "dotnet";
-    private const string TargetArguments = "--version";
-
     [Test]
     public async Task RunAsync_WithConfig_RunsProcessAndReturnsSuccess()
     {
-        ProcessConfiguration configuration =
-            new ProcessConfiguration(TargetFilePath, TargetArguments);
+        (string targetFilePath, string arguments) = ProcessTestHelper.GetQuietChildCommand();
+
+        ProcessConfiguration configuration = new(targetFilePath, arguments);
 
         ProcessResult result = await CliRun.RunAsync(configuration,
             ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
@@ -41,8 +48,9 @@ public class CliRunTests
     [Test]
     public async Task RunBufferedAsync_WithConfig_RunsProcessAndReturnsSuccess()
     {
-        ProcessConfiguration configuration =
-            new ProcessConfiguration(TargetFilePath, TargetArguments);
+        (string targetFilePath, string arguments) = ProcessTestHelper.GetQuietChildCommand();
+
+        ProcessConfiguration configuration = new(targetFilePath, arguments);
 
         BufferedProcessResult result = await CliRun.RunBufferedAsync(configuration,
             ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
@@ -54,7 +62,9 @@ public class CliRunTests
     [Test]
     public async Task RunAsync_WithStringArgs_RunsProcessAndReturnsSuccess()
     {
-        ProcessResult result = await CliRun.RunAsync(TargetFilePath, TargetArguments).ConfigureAwait(true);
+        (string targetFilePath, string arguments) = ProcessTestHelper.GetQuietChildCommand();
+
+        ProcessResult result = await CliRun.RunAsync(targetFilePath, arguments).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -63,7 +73,9 @@ public class CliRunTests
     [Test]
     public async Task RunBufferedAsync_WithStringArgs_RunsProcessAndReturnsSuccess()
     {
-        BufferedProcessResult result = await CliRun.RunBufferedAsync(TargetFilePath, TargetArguments).ConfigureAwait(true);
+        (string targetFilePath, string arguments) = ProcessTestHelper.GetQuietChildCommand();
+
+        BufferedProcessResult result = await CliRun.RunBufferedAsync(targetFilePath, arguments).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
@@ -84,8 +96,10 @@ public class CliRunTests
         // Redirecting output is rejected by FireAndForget (the process handle is
         // disposed immediately after start, so nobody drains the pipes); pass
         // outputRedirection: false explicitly, because the ctor defaults it to true.
+        (string targetFilePath, string arguments) = ProcessTestHelper.GetQuietChildCommand();
+
         ProcessConfiguration configuration =
-            new ProcessConfiguration(TargetFilePath, TargetArguments, outputRedirection: false);
+            new ProcessConfiguration(targetFilePath, arguments, outputRedirection: false);
 
         int processId = CliRun.FireAndForget(configuration);
 
@@ -95,7 +109,9 @@ public class CliRunTests
     [Test]
     public async Task FireAndForget_WithStringArgs_StartsProcessAndReturnsProcessId()
     {
-        int processId = CliRun.FireAndForget(TargetFilePath, TargetArguments);
+        (string targetFilePath, string arguments) = ProcessTestHelper.GetQuietChildCommand();
+
+        int processId = CliRun.FireAndForget(targetFilePath, arguments);
 
         await Assert.That(processId).IsGreaterThan(0);
     }
@@ -114,8 +130,10 @@ public class CliRunTests
     [Test]
     public async Task FireAndForget_WithRedirectedOutput_Throws()
     {
+        (string targetFilePath, string arguments) = ProcessTestHelper.GetQuietChildCommand();
+
         ProcessConfiguration configuration =
-            new ProcessConfiguration(TargetFilePath, TargetArguments)
+            new ProcessConfiguration(targetFilePath, arguments)
                 { OutputRedirection = true };
 
         await Assert.That(() => CliRun.FireAndForget(configuration))
@@ -125,8 +143,10 @@ public class CliRunTests
     [Test]
     public async Task FireAndForget_WithRedirectedStandardInput_Throws()
     {
+        (string targetFilePath, string arguments) = ProcessTestHelper.GetQuietChildCommand();
+
         ProcessConfiguration configuration =
-            new ProcessConfiguration(TargetFilePath, TargetArguments)
+            new ProcessConfiguration(targetFilePath, arguments)
                 { RedirectStandardInput = true };
 
         await Assert.That(() => CliRun.FireAndForget(configuration))
