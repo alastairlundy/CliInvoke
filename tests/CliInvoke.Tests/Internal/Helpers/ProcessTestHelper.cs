@@ -1,4 +1,5 @@
 using CliInvoke.Processes.Internal;
+using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Tests.Internal.Helpers;
 
@@ -40,6 +41,62 @@ internal class ProcessTestHelper
     /// </summary>
     internal static string GetExitingArguments()
         => OperatingSystem.IsWindows() ? "/c exit 0" : string.Empty;
+
+    /// <summary>
+    ///     Resolves <paramref name="fileName"/> against every PATH entry, mirroring
+    ///     the resolve convention used by <c>RawModeRedirectionNormalizationTests</c>
+    ///     and <c>StdinPipingClaimTests</c>.
+    /// </summary>
+    /// <param name="fileName">The executable file name to locate.</param>
+    /// <returns>The full path to the executable, or <c>null</c> when not found.</returns>
+    internal static string? ResolveOnPath(string fileName)
+    {
+        string? pathEnv = Environment.GetEnvironmentVariable("PATH");
+        if (pathEnv is null)
+            return null;
+
+        foreach (string directory in pathEnv.Split(Path.PathSeparator))
+        {
+            string trimmed = directory.Trim();
+            if (trimmed.Length == 0) continue;
+
+            string candidate = Path.Combine(trimmed, fileName);
+            if (File.Exists(candidate)) return candidate;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Returns the per-OS quiet child that writes nothing to stdout and exits 0.
+    ///     Skips the test when the child executable is unavailable on PATH.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Raw, unredirected spawns inherit the test host's console, so every byte
+    ///     the child writes lands in test output; in an interactive terminal an
+    ///     output-producing child also disturbs the test runner's live console
+    ///     redraws (that is why the <c>dotnet --version</c> banner, spawned raw by
+    ///     the CliRun surface tests, appeared in <c>dotnet test</c> output).
+    ///     </para>
+    ///     <para>
+    ///     On Unix this cannot fall back to <see cref="GetTargetFilePath"/> +
+    ///     <see cref="GetExitingArguments"/>, because the dual of <c>cmd /c exit 0</c>
+    ///     there (<c>echo</c> with empty arguments) prints a blank line — quiet only
+    ///     on Windows, by design.
+    ///     </para>
+    /// </remarks>
+    internal static (string TargetFilePath, string Arguments) GetQuietChildCommand()
+    {
+        if (OperatingSystem.IsWindows())
+            return (GetTargetFilePath(), GetExitingArguments());
+
+        string? sh = ResolveOnPath("sh");
+        if (sh is null)
+            throw new SkipTestException("A POSIX shell (sh) is not available on PATH.");
+
+        return (sh, "-c \"exit 0\"");
+    }
 
     /// <summary>
     ///     Resolves the absolute path to the built signal-trapping helper binary.

@@ -28,9 +28,13 @@ public class RawModeRedirectionNormalizationTests
     ///     Payload size the chatty child writes to stdout. Deliberately larger than the
     ///     largest default OS pipe buffer (64 KiB on Linux) so that, without the
     ///     normalization, the child blocks mid-write on the undrained pipe and the run
-    ///     deadlocks. With the fix in place the child inherits the test host's stdout,
-    ///     so the payload lands in the captured test output — written as spaces it
-    ///     renders as one blank line instead of flooding the log.
+    ///     deadlocks. The payload moves only when it must travel through stdout, so
+    ///     its volume has to stay beyond the pipe buffer; its CONTENT is free, and
+    ///     NUL bytes are used: they advance no cursor in a console (verified against
+    ///     the Windows console cursor position) and render as nothing in captured
+    ///     test output and CI logs. An earlier version wrote spaces for the same
+    ///     reason, but spaces wrap into dozens of blank rows when the console is
+    ///     interactive, so they leaked a different artifact than the one they hid.
     /// </summary>
     private const int ChattyPayloadBytes = 70000;
 
@@ -96,12 +100,12 @@ public class RawModeRedirectionNormalizationTests
             string powerShell = ResolveRequired("powershell.exe",
                 "Windows PowerShell (powershell.exe) is not available on PATH.");
             return (powerShell,
-                $@"-NoProfile -Command ""[Console]::Out.Write(' ' * {ChattyPayloadBytes})""");
+                $@"-NoProfile -Command ""[Console]::Out.Write([string][char]0 * {ChattyPayloadBytes})""");
         }
 
         string sh = ResolveRequired("sh", "A POSIX shell (sh) is not available on PATH.");
         return (sh,
-            $@"-c ""dd if=/dev/zero bs={ChattyPayloadBytes} count=1 2>/dev/null | tr '\0' ' '""");
+            $@"-c ""dd if=/dev/zero bs={ChattyPayloadBytes} count=1 2>/dev/null""");
     }
 
     /// <summary>
