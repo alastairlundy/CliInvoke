@@ -40,7 +40,8 @@ public class ArgumentTokenizerFuzzTests
                     return true;
 
                 IReadOnlyList<string> tokens = ArgumentTokenizer.Tokenize(value);
-                return tokens.Count == 1 && tokens[0] == value;
+                return tokens.Count == 1 &&
+                       string.Equals(tokens[0], value, StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -59,7 +60,9 @@ public class ArgumentTokenizerFuzzTests
 
                         string input = word1 + " " + word2;
                         IReadOnlyList<string> tokens = ArgumentTokenizer.Tokenize(input);
-                        return tokens.Count == 2 && tokens[0] == word1 && tokens[1] == word2;
+                        return tokens.Count == 2 &&
+                               string.Equals(tokens[0], word1, StringComparison.Ordinal) &&
+                               string.Equals(tokens[1], word2, StringComparison.Ordinal);
                     });
             })
             .QuickCheckThrowOnFailure();
@@ -75,7 +78,8 @@ public class ArgumentTokenizerFuzzTests
 
                 string input = "\"" + value + "\"";
                 IReadOnlyList<string> tokens = ArgumentTokenizer.Tokenize(input);
-                return tokens.Count == 1 && tokens[0] == value;
+                return tokens.Count == 1 &&
+                       string.Equals(tokens[0], value, StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -90,7 +94,8 @@ public class ArgumentTokenizerFuzzTests
 
                 string input = "\"" + value + "\"\"" + value + "\"";
                 IReadOnlyList<string> tokens = ArgumentTokenizer.Tokenize(input);
-                return tokens.Count == 1 && tokens[0] == value + "\"" + value;
+                return tokens.Count == 1 &&
+                       string.Equals(tokens[0], value + "\"" + value, StringComparison.Ordinal);
             })
             .QuickCheckThrowOnFailure();
     }
