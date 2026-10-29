@@ -15,7 +15,7 @@ namespace CliInvoke.Core.Middleware;
 /// </summary>
 public sealed class MiddlewareItems
 {
-    private readonly Dictionary<string, object?> _items = new();
+    private readonly Dictionary<string, object?> _items = new(StringComparer.Ordinal);
 
     /// <summary>
     ///     Gets a value by key, cast to the specified type.

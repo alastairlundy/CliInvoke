@@ -192,8 +192,8 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
             return 0;
 
         HashCode hash = new HashCode();
-        hash.Add(Domain);
-        hash.Add(UserName);
+        hash.Add(Domain, StringComparer.Ordinal);
+        hash.Add(UserName, StringComparer.Ordinal);
         hash.Add(LoadUserProfile);
         return hash.ToHashCode();
 #pragma warning restore CA1416
