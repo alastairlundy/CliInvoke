@@ -246,7 +246,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
     // and Signal(SIGTERM) throw PlatformNotSupportedException (SIGKILL maps to
     // TerminateProcess). GenerateConsoleCtrlEvent remains the only way to deliver a
     // graceful CTRL_BREAK/CTRL_C to a child console group, so interrupt dispatch here
-    // keeps its P/Invoke to stay behavior-identical on the net11.0 leg.
+    // keeps its P/Invoke to stay behaviour-identical on the net11.0 leg.
     [LibraryImport("Kernel32.dll", EntryPoint = "GenerateConsoleCtrlEvent", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SendCtrlCToConsoleWin(uint ctrlEvent, uint processGroupEventId);
