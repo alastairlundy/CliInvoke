@@ -28,7 +28,7 @@ public class ConfigurationSubclassDeprecationTests
 #pragma warning restore CS0618
 
         await Assert.That(obsolete).IsNotNull();
-        await Assert.That(obsolete!.Message).Contains("Use ProcessConfiguration with shell wrapping middleware");
+        await Assert.That(obsolete.Message).Contains("Use ProcessConfiguration with shell wrapping middleware");
         await Assert.That(obsolete.Message).Contains("PowershellProcessConfiguration will be removed in 4.0");
     }
 
@@ -43,7 +43,7 @@ public class ConfigurationSubclassDeprecationTests
 #pragma warning restore CS0618
 
         await Assert.That(obsolete).IsNotNull();
-        await Assert.That(obsolete!.Message).Contains("Use ProcessConfiguration with shell wrapping middleware");
+        await Assert.That(obsolete.Message).Contains("Use ProcessConfiguration with shell wrapping middleware");
         await Assert.That(obsolete.Message).Contains("CmdProcessConfiguration will be removed in 4.0");
     }
 }

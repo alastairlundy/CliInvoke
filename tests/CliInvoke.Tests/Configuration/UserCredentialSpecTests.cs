@@ -106,7 +106,7 @@ public class UserCredentialSpecTests
         await Assert.That(built.Domain).IsEqualTo("CONTOSO");
         await Assert.That(built.UserName).IsEqualTo("alice");
         await Assert.That(built.Password).IsNotSameReferenceAs(password); // a copy is held
-        await Assert.That(built.Password!.Length).IsEqualTo(password.Length);
+        await Assert.That(built.Password?.Length).IsEqualTo(password.Length);
         await Assert.That(built.LoadUserProfile).IsTrue();
     }
 
@@ -123,7 +123,7 @@ public class UserCredentialSpecTests
 
         // Assert - Build reflects the latest password, not the first
         UserCredential built = spec.Build();
-        await Assert.That(built.Password!.Length).IsEqualTo(second.Length);
+        await Assert.That(built.Password?.Length).IsEqualTo(second.Length);
         await Assert.That(built.Password).IsNotSameReferenceAs(second); // a copy is held
         // The caller-owned SecureStrings remain usable; the spec only disposes its own copies.
         await Assert.That(first.Length).IsEqualTo(5);

@@ -150,7 +150,7 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     internal override void SetUserCredential(Process process, UserCredential credential)
     {
         // A null credential is treated the same as the Null sentinel: a no-op.
-        if (credential is null || credential.Equals(UserCredential.Null))
+        if (credential.Equals(UserCredential.Null))
             return;
 
         // An "empty" credential (all fields null) is a no-op, matching the
