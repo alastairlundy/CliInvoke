@@ -276,6 +276,15 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The assembled command line for &apos;{0}&apos; is approximately {1} characters long, which is at or above the Windows CreateProcess limit of approximately {2} characters. Note that this limit is approximate and includes the null terminator..
+        /// </summary>
+        internal static string Exceptions_Windows_CommandLineLength_TooLong {
+            get {
+                return ResourceManager.GetString("Exceptions.Windows.CommandLineLength.TooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to RetryOptions.BaseDelay must not be negative; a negative delay would cause Task.Delay to throw on the first retry..
         /// </summary>
         internal static string Excpetions_RetryMiddleware_RetryOptions_BaseDelay_NotNegative {

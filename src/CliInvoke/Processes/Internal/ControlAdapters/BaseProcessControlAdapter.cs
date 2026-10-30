@@ -155,10 +155,7 @@ internal abstract class BaseProcessControlAdapter
         if (totalLength >= windowsCommandLineLengthLimit)
         {
             throw new ArgumentException(
-                $"The assembled command line for '{processStartInfo.FileName}' is approximately " +
-                $"{totalLength} characters long, which is at or above the Windows CreateProcess " +
-                $"limit of approximately {windowsCommandLineLengthLimit} characters. " +
-                $"Note that this limit is approximate and includes the null terminator.",
+                string.Format(Resources.Exceptions_Windows_CommandLineLength_TooLong, processStartInfo.FileName, totalLength, windowsCommandLineLengthLimit),
                 nameof(processStartInfo));
         }
     }
@@ -173,7 +170,7 @@ internal abstract class BaseProcessControlAdapter
     {
         ReadOnlySpan<char> trimmed = fileName.AsSpan().Trim();
         bool alreadyFullyQuoted =
-            trimmed.Length >= 2 && trimmed[0] == '"' && trimmed[trimmed.Length - 1] == '"';
+            trimmed.Length >= 2 && trimmed[0] == '"' && trimmed[^1] == '"';
 
         int length = trimmed.Length;
         return alreadyFullyQuoted ? length : length + 2;
@@ -231,10 +228,9 @@ internal abstract class BaseProcessControlAdapter
 
     private static bool ContainsNoWhitespaceOrQuotes(string value)
     {
-        for (int i = 0; i < value.Length; i++)
+        foreach (char c in value)
         {
-            char current = value[i];
-            if (char.IsWhiteSpace(current) || current == '"')
+            if (char.IsWhiteSpace(c) || c == '"')
                 return false;
         }
 

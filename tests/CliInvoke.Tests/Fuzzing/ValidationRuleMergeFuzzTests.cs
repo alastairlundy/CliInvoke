@@ -126,7 +126,8 @@ public class ValidationRuleMergeFuzzTests
 
                 // Walk the merged set in order, invoking each rule's real predicate; the first that returns
                 // false is the failing rule.
-                ProcessResult result = new ProcessResult("dummy", 0, 1, DateTime.UtcNow, DateTime.UtcNow, false, null);
+                ProcessResult result = new("dummy", 0, 1, DateTime.UtcNow, DateTime.UtcNow,
+                    canceled: false, signal: null);
                 int firstFailing = -1;
                 for (int i = 0; i < captured.Length; i++)
                 {
@@ -177,7 +178,7 @@ public class ValidationRuleMergeFuzzTests
                     // Exact supplied rules, in order, by reference and by name.
                     if (!ReferenceEquals(result.ValidationRules[i], supplied[i])) return false;
                     if (!string.Equals(result.ValidationRules[i].Name, $"sup-{i}",
-                        StringComparison.Ordinal))
+                            StringComparison.Ordinal))
                         return false;
                 }
 

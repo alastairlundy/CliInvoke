@@ -153,7 +153,7 @@ public sealed class ArgumentsSpec
         }
 
         if (validCount == 0)
-            throw new ArgumentException("No valid arguments to add.", nameof(values));
+            throw new ArgumentException(Resources.Exceptions_Arguments_AddEnumerable_NoValidArgumentsToAdd, nameof(values));
 
         string wrappedValue = $"\"{joined}\"";
 
@@ -202,7 +202,7 @@ public sealed class ArgumentsSpec
         }
 
         if (validCount == 0)
-            throw new ArgumentException("No valid arguments to add.", nameof(values));
+            throw new ArgumentException(Resources.Exceptions_Arguments_AddEnumerable_NoValidArgumentsToAdd, nameof(values));
 
         if (joined is null)
             joined = new StringBuilder();

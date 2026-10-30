@@ -8,8 +8,6 @@
 */
 
 using System.Linq;
-using CliInvoke.Extensions.Middleware.Logging;
-
 using Microsoft.Extensions.Logging;
 using LoggingMiddleware = CliInvoke.Extensions.Middleware.Logging.LoggingMiddleware;
 
@@ -72,7 +70,7 @@ public class LoggingArgumentListTests
 
         string message = await InvokeAndCaptureEntryAsync(configuration).ConfigureAwait(true);
 
-        await Assert.That(message.Contains("--flag value")).IsTrue();
+        await Assert.That(message.Contains("--flag value", StringComparison.CurrentCultureIgnoreCase)).IsTrue();
     }
 
     [Test]

@@ -65,4 +65,7 @@
     <data name="Exceptions.ProcessNotSuccessful.Generic" xml:space="preserve">
         <value>The executed process was not successful and returned an exit code of {x}.</value>
     </data>
+    <data name="Exceptions.Arguments.AddEnumerable.NoValidArgumentsToAdd" xml:space="preserve">
+        <value>No valid arguments to add.</value>
+    </data>
 </root>

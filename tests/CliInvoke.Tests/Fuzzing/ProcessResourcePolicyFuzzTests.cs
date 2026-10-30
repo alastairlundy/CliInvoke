@@ -25,22 +25,22 @@ public class ProcessResourcePolicyFuzzTests
     public void SetMinWorkingSet_GreaterThanMax_ThrowsArgumentOutOfRangeException()
     {
         Prop.ForAll<int>(min =>
+            {
+                if (min <= 1 || min > nint.MaxValue / 2) return true;
+
+                ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
+                spec.SetMaxWorkingSet(min - 1);
+
+                try
                 {
-                    if (min <= 1 || min > nint.MaxValue / 2) return true;
-
-                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
-                    spec.SetMaxWorkingSet((nint)(min - 1));
-
-                    try
-                    {
-                        spec.SetMinWorkingSet((nint)min);
-                        return false;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        return true;
-                    }
-                })
+                    spec.SetMinWorkingSet(min);
+                    return false;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return true;
+                }
+            })
             .QuickCheckThrowOnFailure();
     }
 
@@ -52,22 +52,22 @@ public class ProcessResourcePolicyFuzzTests
     public void SetMaxWorkingSet_LessThanMin_ThrowsArgumentOutOfRangeException()
     {
         Prop.ForAll<int>(max =>
+            {
+                if (max <= 1 || max >= int.MaxValue - 1) return true;
+
+                ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
+                spec.SetMinWorkingSet(max + 1);
+
+                try
                 {
-                    if (max <= 1 || max >= int.MaxValue - 1) return true;
-
-                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
-                    spec.SetMinWorkingSet((nint)(max + 1));
-
-                    try
-                    {
-                        spec.SetMaxWorkingSet((nint)max);
-                        return false;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        return true;
-                    }
-                })
+                    spec.SetMaxWorkingSet(max);
+                    return false;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return true;
+                }
+            })
             .QuickCheckThrowOnFailure();
     }
 
@@ -79,21 +79,21 @@ public class ProcessResourcePolicyFuzzTests
     public void SetMinWorkingSet_Negative_ThrowsArgumentOutOfRangeException()
     {
         Prop.ForAll<int>(value =>
+            {
+                if (value >= 0) return true;
+
+                ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
+
+                try
                 {
-                    if (value >= 0) return true;
-
-                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
-
-                    try
-                    {
-                        spec.SetMinWorkingSet((nint)value);
-                        return false;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        return true;
-                    }
-                })
+                    spec.SetMinWorkingSet(value);
+                    return false;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return true;
+                }
+            })
             .QuickCheckThrowOnFailure();
     }
 
@@ -105,21 +105,21 @@ public class ProcessResourcePolicyFuzzTests
     public void SetMaxWorkingSet_Negative_ThrowsArgumentOutOfRangeException()
     {
         Prop.ForAll<int>(value =>
+            {
+                if (value >= 0) return true;
+
+                ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
+
+                try
                 {
-                    if (value >= 0) return true;
-
-                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
-
-                    try
-                    {
-                        spec.SetMaxWorkingSet((nint)value);
-                        return false;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        return true;
-                    }
-                })
+                    spec.SetMaxWorkingSet(value);
+                    return false;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return true;
+                }
+            })
             .QuickCheckThrowOnFailure();
     }
 
@@ -143,19 +143,19 @@ public class ProcessResourcePolicyFuzzTests
     public void Build_WithValidMinAndMax_ReturnsPolicyWithCorrectValues()
     {
         Prop.ForAll<int, int>((min, max) =>
-                {
-                    if (min < 1 || max <= min || max > 100_000_000)
-                        return true;
+            {
+                if (min < 1 || max <= min || max > 100_000_000)
+                    return true;
 
-                    ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
-                    spec.SetMinWorkingSet((nint)min);
-                    spec.SetMaxWorkingSet((nint)max);
+                ProcessResourcePolicySpec spec = new ProcessResourcePolicySpec();
+                spec.SetMinWorkingSet(min);
+                spec.SetMaxWorkingSet(max);
 
-                    ProcessResourcePolicy policy = spec.Build();
+                ProcessResourcePolicy policy = spec.Build();
 
-                    return policy.MinWorkingSet == (nint)min &&
-                           policy.MaxWorkingSet == (nint)max;
-                })
+                return policy.MinWorkingSet == min &&
+                       policy.MaxWorkingSet == max;
+            })
             .QuickCheckThrowOnFailure();
     }
 

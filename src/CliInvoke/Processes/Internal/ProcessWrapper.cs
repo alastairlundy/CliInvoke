@@ -189,19 +189,15 @@ internal class ProcessWrapper : Process
         if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
             || OperatingSystem.IsFreeBSD())
         {
-            // Fast-exiting processes (e.g. `which`, `echo`) may have already exited
-            // between base.Start() returning and this handler running. Skip the
-            // suspend/resume cycle in that case to avoid races on process handles.
+            // Fast-exiting processes (e.g. `which`, `echo`) may have already exited between base.Start()
+            // returning and this handler running. Skip the suspend/resume cycle in that case to avoid races on process handles.
             if (HasExited) return;
 
 #if NET11_0
-            // On the net11.0 leg, Windows/macOS processes are created suspended via
-            // ProcessStartInfo.StartSuspended (see Start()), so they cannot have run yet
-            // and no suspend step is needed here — the process is simply resumed below
-            // after the resource policy has been applied. Linux/FreeBSD (StartSuspended
-            // is unsupported there) and shell-executed starts (StartSuspended is
-            // incompatible with UseShellExecute) fall through to the legacy
-            // suspend → apply → resume cycle.
+            // On the net11.0 leg, Windows/macOS processes are created suspended via ProcessStartInfo.StartSuspended
+            // (see Start()), so they cannot have run yet and no suspend step is needed here — the process is simply resumed below
+            // after the resource policy has been applied. Linux/FreeBSD (StartSuspended is unsupported there) and shell-executed
+            // starts (StartSuspended is incompatible with UseShellExecute) fall through to the legacy suspend → apply → resume cycle.
             if (!_awaitingInitialResume)
 #endif
             {
@@ -216,16 +212,15 @@ internal class ProcessWrapper : Process
                 }
                 catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
                 {
-                    // Adapter suspend signals a just-exited child; errno ESRCH means it is
-                    // gone. Same race as the exiting-before-suspend case above.
+                    // Adapter suspend signals a just-exited child; errno ESRCH means it is gone.
+                    // Same race as the exiting-before-suspend case above.
                     return;
                 }
             }
 
 #if NET11_0
-            // Throwing from inside the finally block below (MA0072) would mask any
-            // in-flight exception raised by SetResourcePolicy, so a failed resume of a
-            // live child is captured here and rethrown after the try/finally completes.
+            // Throwing from inside the finally block below (MA0072) would mask any in-flight exception
+            // raised by SetResourcePolicy, so a failed resume of a live child is captured here and rethrown after the try/finally completes.
             Win32Exception? resumeFailure = null;
 #endif
 
@@ -241,9 +236,8 @@ internal class ProcessWrapper : Process
             }
             catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
             {
-                // PriorityClass and working-set setters translate libc ESRCH into
-                // Win32Exception ("No such process") when the fast-exiting child is
-                // already reaped (observed on macOS arm64 runners). Unrelated access
+                // PriorityClass and working-set setters translate libc ESRCH into Win32Exception ("No such process")
+                // when the fast-exiting child is already reaped (observed on macOS arm64 runners). Unrelated access
                 // failures keep surfacing.
             }
             finally
@@ -266,11 +260,9 @@ internal class ProcessWrapper : Process
 #if NET11_0
                 catch (Win32Exception exception)
                 {
-                    // SafeProcessHandle.Resume() (net11.0, Windows/macOS) reports OS
-                    // failures as Win32Exception. Only the exit race is benign: when
-                    // the child is already gone there is nothing to resume. A live
-                    // child whose resume failed would stay creation-suspended forever,
-                    // so terminate it and surface the failure to the caller instead.
+                    // SafeProcessHandle.Resume() (net11.0, Windows/macOS) reports OS failures as Win32Exception.
+                    // Only the exit race is benign: when the child is already gone there is nothing to resume. A live
+                    // child whose resume failed would stay creation-suspended forever, so terminate it and surface the failure to the caller instead.
                     if (!HasExited)
                     {
                         try
@@ -292,8 +284,8 @@ internal class ProcessWrapper : Process
             }
 
 #if NET11_0
-            // The entire suspend → apply → resume sequence has now run, so the child
-            // cannot remain creation-suspended: safe to surface the resume failure.
+            // The entire suspend → apply → resume sequence has now run, so the child cannot remain creation-suspended:
+            // safe to surface the resume failure.
             if (resumeFailure is not null)
                 throw resumeFailure;
 #endif
@@ -425,12 +417,10 @@ internal class ProcessWrapper : Process
     public new bool Start()
     {
 #if NET11_0
-        // net11.0 leg, Windows/macOS ONLY: StartSuspended is annotated for those two
-        // platforms and the runtime throws PlatformNotSupportedException elsewhere —
-        // Linux/FreeBSD have no create-suspended OS primitive — so the property is never
-        // even assigned on those platforms. Shell-executed starts are excluded because
-        // StartSuspended cannot be combined with UseShellExecute (the runtime throws);
-        // those keep the legacy suspend → apply → resume cycle in OnStarted, as do
+        // net11.0 leg, Windows/macOS ONLY: StartSuspended is annotated for those two platforms and the runtime
+        // throws PlatformNotSupportedException elsewhere — Linux/FreeBSD have no create-suspended OS primitive — so the property is never
+        // even assigned on those platforms. Shell-executed starts are excluded because StartSuspended cannot be combined
+        // with UseShellExecute (the runtime throws); those keep the legacy suspend → apply → resume cycle in OnStarted, as do
         // Linux/FreeBSD on every start.
         if ((OperatingSystem.IsWindows() || OperatingSystem.IsMacOS())
             && !StartInfo.UseShellExecute)
@@ -455,12 +445,10 @@ internal class ProcessWrapper : Process
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
         }
 
-        // Cache StandardOutput/StandardError StreamReaders and the child's stdin writer
-        // while the process is still guaranteed alive. These properties internally call
-        // EnsureState, which in .NET 10 throws InvalidOperationException("process has
-        // exited") on fast-exiting processes (e.g. `which dotnet`) that exit before the
-        // next line of code runs. Touching them here means downstream code that reads
-        // from the cached readers — or closes the cached stdin writer — works even if
+        // Cache StandardOutput/StandardError StreamReaders and the child's stdin writer while the process is still guaranteed alive.
+        // These properties internally call EnsureState, which in .NET 10 throws InvalidOperationException("process has
+        // exited") on fast-exiting processes (e.g. `which dotnet`) that exit before the next line of code runs. Touching them
+        // here means downstream code that reads from the cached readers — or closes the cached stdin writer — works even if
         // the process has already exited.
         try
         {
@@ -474,12 +462,10 @@ internal class ProcessWrapper : Process
             // Downstream code must tolerate an exited process (see HasExited guards).
         }
 
-        // Capture Id (safe after Start) and ProcessName (throws if exited).
-        // base.Id does not throw on exit; base.ProcessName does.
+        // Capture Id (safe after Start) and ProcessName (throws if exited). base.Id does not throw on exit; base.ProcessName does.
         Id = base.Id;
 
-        // Fast-exiting processes (e.g. `which dotnet`) can exit between the
-        // HasExited check and the base.ProcessName call, so guard with a
+        // Fast-exiting processes (e.g. `which dotnet`) can exit between the HasExited check and the base.ProcessName call, so guard with a
         // try/catch as well. Fall back to StartInfo.FileName in that case.
         try
         {
@@ -684,8 +670,9 @@ internal class ProcessWrapper : Process
 
         await Task.WhenAll(standardOutputTask, standardErrorTask).ConfigureAwait(false);
 
-        return (standardOutputTask.Result.Text, standardErrorTask.Result.Text,
-            standardOutputTask.Result.Truncated || standardErrorTask.Result.Truncated);
+        return ((await standardOutputTask.ConfigureAwait(false)).Text,
+            (await standardErrorTask.ConfigureAwait(false)).Text,
+            (await standardOutputTask.ConfigureAwait(false)).Truncated || (await standardErrorTask.ConfigureAwait(false)).Truncated);
     }
 
     /// <summary>
@@ -699,9 +686,7 @@ internal class ProcessWrapper : Process
     ///     cleanly (no U+FFFD replacement characters).
     /// </remarks>
     private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
-        StreamReader reader,
-        bool redirected,
-        long? maxBytes,
+        StreamReader reader, bool redirected, long? maxBytes,
         CancellationToken cancellationToken)
     {
         if (!redirected || reader == StreamReader.Null)
@@ -713,7 +698,7 @@ internal class ProcessWrapper : Process
         // null or negative = no cap
         if (maxBytes is null or < 0)
         {
-            using MemoryStream memoryStream = new MemoryStream();
+            using MemoryStream memoryStream = new();
             await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
             return (encoding.GetString(memoryStream.ToArray()), false);
         }
@@ -748,7 +733,7 @@ internal class ProcessWrapper : Process
             }
 
             int bytesToCopy = (int)Math.Min(bytesRead, room);
-            outputStream.Write(buffer, 0, bytesToCopy);
+            await outputStream.WriteAsync(buffer.AsMemory(0, bytesToCopy), cancellationToken).ConfigureAwait(false);
             totalBytes += bytesToCopy;
 
             if (bytesToCopy < bytesRead)
@@ -932,8 +917,7 @@ internal class ProcessWrapper : Process
     private async Task WaitForExitCoreAsync(
         ProcessExitConfiguration processExitConfiguration,
         CancellationToken cancellationToken,
-        bool isGraceful,
-        bool fallbackToForceful = true)
+        bool isGraceful, bool fallbackToForceful = true)
     {
         bool semaphoreAcquired;
         try
@@ -943,10 +927,9 @@ internal class ProcessWrapper : Process
         }
         catch (OperationCanceledException)
         {
-            // The token was already canceled on entry, so no cancellation machinery was
-            // ever armed for this wait and nothing will terminate the child. Without
-            // this forceful exit, a pre-canceled invocation would orphan the started
-            // child: the caller receives the exception and holds no handle to it.
+            // The token was already cancelled on entry, so no cancellation machinery was ever armed for this wait
+            // and nothing will terminate the child. Without this forceful exit, a pre-cancelled invocation would
+            // orphan the started child: the caller receives the exception and holds no handle to it.
             ForcefulExit();
             throw;
         }
@@ -958,8 +941,7 @@ internal class ProcessWrapper : Process
             return;
         }
 
-        // Captured before the wait so exception handling measures how far the
-        // cancellation resolved from the expected exit time.
+        // Captured before the wait so exception handling measures how far the cancellation resolved from the expected exit time.
         DateTime expectedExitTime =
             CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
 
@@ -990,12 +972,10 @@ internal class ProcessWrapper : Process
                 ObserveFault(interruptGraceDelay);
                 ObserveFault(secondExitWatch);
 
-                // Await the interrupt/timeout resolution so _cancellationReason is persisted
-                // before the caller reads Cancelled, and so a cancellation fault CancellationHelper
-                // approved for propagation surfaces every time rather than depending on timing.
-                // A completed task is always safe to await; skipping a still-running one is
-                // reserved for the natural-exit race, where the wait succeeded unrelated to
-                // cancellation and the late fault is only observed.
+                // Await the interrupt/timeout resolution so _cancellationReason is persisted before the caller reads Cancelled,
+                // and so a cancellation fault CancellationHelper approved for propagation surfaces every time rather than depending on timing.
+                // A completed task is always safe to await; skipping a still-running one is reserved for the natural-exit race,
+                // where the wait succeeded unrelated to cancellation and the late fault is only observed.
                 if (cancelWithInterruptTask.IsCompleted
                     || !HasExited
                     || cancellationToken.IsCancellationRequested)
@@ -1085,14 +1065,12 @@ internal class ProcessWrapper : Process
         DateTime expectedExitTime =
             DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
 
-        CancellationTokenSource cts =
-            CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         try
         {
-            // A disabled timeout policy never arms the timer, so the wait below is bounded
-            // only by the caller's token and the process's own exit, the same behaviour
-            // ProcessTimeoutPolicy.None already exhibited for a zero threshold.
+            // A disabled timeout policy never arms the timer, so the wait below is bounded only by the caller's token
+            // and the process's own exit, the same behaviour ProcessTimeoutPolicy.None already exhibited for a zero threshold.
             if (exitConfiguration.TimeoutPolicy.Enabled
                 && exitConfiguration.TimeoutPolicy.TimeoutThreshold > TimeSpan.Zero)
                 cts.CancelAfter(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
@@ -1107,9 +1085,8 @@ internal class ProcessWrapper : Process
             }
             catch (OperationCanceledException)
             {
-                // Same pre-canceled-token gap as WaitForExitCoreAsync: the throw escapes
-                // below this point's kill machinery, so terminate the started child here
-                // instead of orphaning it when the exception propagates.
+                // Same pre-cancelled-token gap as WaitForExitCoreAsync: the throw escapes below this point's kill machinery,
+                // so terminate the started child here instead of orphaning it when the exception propagates.
                 ForcefulExit();
                 throw;
             }
@@ -1187,9 +1164,8 @@ internal class ProcessWrapper : Process
             if (HasExited)
                 return true;
 
-            // Reaching this point means the delay elapsed without the token being
-            // cancelled, i.e. a graceful timeout. Persist the resolved reason before
-            // sending the interrupt so Cancelled can be computed from it afterward.
+            // Reaching this point means the delay elapsed without the token being cancelled, i.e. a graceful timeout.
+            // Persist the resolved reason before sending the interrupt so Cancelled can be computed from it afterward.
             _cancellationReason = CancellationReason.Timeout;
 
             return await ProcessControlAdapter.SendInterruptSignalAsync(this,
@@ -1201,9 +1177,8 @@ internal class ProcessWrapper : Process
             CancellationReason cancellationReason =
                 CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
 
-            // Persist the reason BEFORE the propagation decision: on approved-throw
-            // configurations HandleCancellationExceptions below throws, and an assignment
-            // placed after it would be unreachable — leaving Cancelled false even though
+            // Persist the reason BEFORE the propagation decision: on approved-throw configurations HandleCancellationExceptions
+            // below throws, and an assignment placed after it would be unreachable — leaving Cancelled false even though
             // the cancellation machinery performed the termination.
             _cancellationReason = cancellationReason;
 
