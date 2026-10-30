@@ -13,7 +13,6 @@ using System.Security;
 
 using CliInvoke.Builders;
 
-// ReSharper disable once CheckNamespace
 namespace CliInvoke.Extensions.Configuration;
 
 /// <summary>
