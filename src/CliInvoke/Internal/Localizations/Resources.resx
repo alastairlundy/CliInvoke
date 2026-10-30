@@ -98,4 +98,7 @@
     <data name="Exceptions.Invocation.FireAndForget.RedirectionNotSupported" xml:space="preserve">
         <value>FireAndForget does not support redirected output or standard input: the process handle is disposed immediately after start, so no one drains the pipes. Use RunAsync or RunBufferedAsync instead, or the string-arguments FireAndForget overload, which forces output redirection off.</value>
     </data>
+    <data name="Exceptions.Windows.CommandLineLength.TooLong" xml:space="preserve">
+        <value>The assembled command line for '{0}' is approximately {1} characters long, which is at or above the Windows CreateProcess limit of approximately {2} characters. Note that this limit is approximate and includes the null terminator.</value>
+    </data>
 </root>

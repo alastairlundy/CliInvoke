@@ -7,8 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using System.Threading;
-
 using CliInvoke.Core.Processes;
 using CliInvoke.Processes.Internal;
 
@@ -102,14 +100,14 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         }
     }
 
-/// <summary>
-///     Occurs when the process starts.
-/// </summary>
+    /// <summary>
+    ///     Occurs when the process starts.
+    /// </summary>
     public event EventHandler? Started;
 
-/// <summary>
-///     Occurs when the process exits.
-/// </summary>
+    /// <summary>
+    ///     Occurs when the process exits.
+    /// </summary>
     public event EventHandler? Exited;
 
     /// <summary>
@@ -203,7 +201,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             }
             catch (Exception) when (wrapper.Canceled)
             {
-                // A copy fault that is an artifact of this instance's own kill machinery
+                // A copy fault that is an artefact of this instance's own kill machinery
                 // (a broken pipe after ForcefulExit) is absorbed here; a genuine
                 // source-stream read error propagates to the caller.
             }
@@ -397,7 +395,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         // Feed stdin alongside the drain-and-wait so the copy runs at the child's
         // pace instead of blocking ahead of it.
         Task standardInputCopy = Configuration.StandardInput is not null
-            && wrapper.StartInfo.RedirectStandardInput
+                                 && wrapper.StartInfo.RedirectStandardInput
             ? wrapper.PipeStandardInputAsync(Configuration.StandardInput.BaseStream,
                 cancellationToken)
             : Task.CompletedTask;
@@ -416,9 +414,9 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                                     && !outputStrings.IsFaulted
                                     && wrapper.Canceled)
             {
-                // A stdin copy fault that is an artifact of this instance's own
+                // A stdin copy fault that is an artefact of this instance's own
                 // timeout/cancellation kill (a broken pipe after ForcefulExit) is
-                // absorbed at this join; a genuine source-stream read error leaves
+                // absorbed in this join; a genuine source-stream read error leaves
                 // the kill machinery un-run and still propagates, as do any wait
                 // or drain faults.
             }
@@ -433,12 +431,12 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
                 // own cancellation machinery (the drains observe the caller's token)
                 // is absorbed so the documented CancellationThrowsException=false
                 // contract holds: the caller receives a normal BufferedProcessResult
-                // with Canceled set and empty captured output instead of an escaping
+                // with Cancelled set and empty captured output instead of an escaping
                 // exception. When CancellationThrowsException is true nothing from
                 // the cancellation machinery is absorbed — the OCE propagates whether
-                // it surfaces from the wait or from the drain (the two faults race,
+                // it surfaces from the wait or from the drain. (The two faults race,
                 // so the knob is checked here rather than relying on which task
-                // faults first). Genuine (non-OCE) read failures and wait faults
+                // faults first.) Genuine (non-OCE) read failures and wait faults
                 // always propagate.
             }
 

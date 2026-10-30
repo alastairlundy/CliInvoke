@@ -7,7 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-using System.IO;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using CliInvoke.Specializations.Middleware;
@@ -173,29 +172,5 @@ public class ShellInjectionSecurityTests
         // argument, it terminates the command and runs 'evil.exe' as a second one.
         await Assert.That(rewritten?.Arguments)
             .IsEqualTo("/c \"\"prog.exe\" \"first\" \"second^&evil.exe\" \"third arg\"\"");
-    }
-
-    private static string? ResolvePwshPath()
-    {
-        string fileName = OperatingSystem.IsWindows()
-            ? "pwsh.exe"
-            : "pwsh";
-
-        string? pathEnv = Environment.GetEnvironmentVariable("PATH");
-        if (pathEnv is null)
-            return null;
-
-        foreach (string directory in pathEnv.Split(Path.PathSeparator))
-        {
-            string trimmed = directory.Trim();
-            if (trimmed.Length == 0)
-                continue;
-
-            string candidate = Path.Combine(trimmed, fileName);
-            if (File.Exists(candidate))
-                return candidate;
-        }
-
-        return null;
     }
 }

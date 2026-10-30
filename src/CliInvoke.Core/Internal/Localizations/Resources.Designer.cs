@@ -112,7 +112,16 @@ namespace CliInvoke.Core.Internal.Localizations {
                 return ResourceManager.GetString("CommandBuilder.ArgumentConflict.ShellExecution.Output", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No valid arguments to add..
+        /// </summary>
+        internal static string Exceptions_Arguments_AddEnumerable_NoValidArgumentsToAdd {
+            get {
+                return ResourceManager.GetString("Exceptions.Arguments.AddEnumerable.NoValidArgumentsToAdd", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Working directory &apos;{0}&apos; does not exist..
         /// </summary>

@@ -26,20 +26,20 @@ public class ShellRewriterFuzzTests
         ['^', '&', '|', '<', '>', '%'];
 
     private static readonly char[] PosixShellMetacharacters =
-        ['\\', '$', '`', '"', '\'', '!', '&', '|', ';', '(', ')',
-         '<', '>', '{', '}', '[', ']', '~', '#', '*', '?'];
+    ['\\', '$', '`', '"', '\'', '!', '&', '|', ';', '(', ')',
+        '<', '>', '{', '}', '[', ']', '~', '#', '*', '?'];
 
     [Test]
     public void EscapeForPosixShell_NullOrEmpty_ReturnsEmpty()
     {
         Prop.ForAll<string?>(value =>
-                {
-                    if (value is not null and { Length: > 0 })
-                        return true;
+            {
+                if (value is { Length: > 0 })
+                    return true;
 
-                    string result = ShellRewriter.EscapeForPosixShell(value);
-                    return result == string.Empty;
-                })
+                string result = ShellRewriter.EscapeForPosixShell(value);
+                return result == string.Empty;
+            })
             .QuickCheckThrowOnFailure();
     }
 
@@ -54,7 +54,7 @@ public class ShellRewriterFuzzTests
                 string escaped = ShellRewriter.EscapeForPosixShell(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
-                StringBuilder expected = new System.Text.StringBuilder(value.Length + 16);
+                StringBuilder expected = new StringBuilder(value.Length + 16);
                 foreach (char c in value)
                 {
                     if (Array.IndexOf(PosixShellMetacharacters, c) >= 0)
@@ -91,13 +91,13 @@ public class ShellRewriterFuzzTests
     public void EscapeForPowerShell_NullOrEmpty_ReturnsEmpty()
     {
         Prop.ForAll<string?>(value =>
-                {
-                    if (value is not null and { Length: > 0 })
-                        return true;
+            {
+                if (value is { Length: > 0 })
+                    return true;
 
-                    string result = ShellRewriter.EscapeForPowerShell(value);
-                    return result == string.Empty;
-                })
+                string result = ShellRewriter.EscapeForPowerShell(value);
+                return result == string.Empty;
+            })
             .QuickCheckThrowOnFailure();
     }
 
@@ -112,7 +112,7 @@ public class ShellRewriterFuzzTests
                 string escaped = ShellRewriter.EscapeForPowerShell(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
-                StringBuilder expected = new System.Text.StringBuilder(value.Length + 16);
+                StringBuilder expected = new(value.Length + 16);
                 foreach (char c in value)
                 {
                     if (Array.IndexOf(PowerShellMetacharacters, c) >= 0)
@@ -149,13 +149,13 @@ public class ShellRewriterFuzzTests
     public void EscapeForCmd_NullOrEmpty_ReturnsEmpty()
     {
         Prop.ForAll<string?>(value =>
-                {
-                    if (value is not null and { Length: > 0 })
-                        return true;
+            {
+                if (value is { Length: > 0 })
+                    return true;
 
-                    string result = ShellRewriter.EscapeForCmd(value);
-                    return result == string.Empty;
-                })
+                string result = ShellRewriter.EscapeForCmd(value);
+                return result == string.Empty;
+            })
             .QuickCheckThrowOnFailure();
     }
 
@@ -170,7 +170,7 @@ public class ShellRewriterFuzzTests
                 string escaped = ShellRewriter.EscapeForCmd(value);
 
                 // Build expected output character-by-character, mirroring the escaper logic
-                StringBuilder expected = new System.Text.StringBuilder(value.Length + 16);
+                StringBuilder expected = new StringBuilder(value.Length + 16);
                 foreach (char c in value)
                 {
                     if (Array.IndexOf(CmdMetacharacters, c) >= 0)

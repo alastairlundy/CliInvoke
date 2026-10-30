@@ -374,7 +374,7 @@ public class ProcessConfigurationBuilderTests
         string helperPath = ProcessTestHelper.GetSignalTrappingHelperPath();
         BufferedProcessResult result = await CliRun.RunBufferedAsync(helperPath, $"echo-args {arguments}").ConfigureAwait(true);
         await Assert.That(result.ExitCode).IsEqualTo(0);
-        return (result.StandardOutput ?? string.Empty).TrimEnd('\n').TrimEnd('\r').Split('\n');
+        return (result.StandardOutput).TrimEnd('\n').TrimEnd('\r').Split('\n');
     }
 
     [Test]
