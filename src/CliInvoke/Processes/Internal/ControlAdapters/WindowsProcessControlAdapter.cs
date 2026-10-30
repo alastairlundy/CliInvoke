@@ -26,7 +26,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         Process proc;
 #if NET11_0
         // net11.0: TryGetProcessById replaces GetProcessById+catch; false means already exited.
-        if (!Process.TryGetProcessById((int)actualPid, out Process? found) || found is null)
+        if (!Process.TryGetProcessById((int)actualPid, out Process? found))
         {
             return;
         }
@@ -85,9 +85,10 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         uint actualPid = GetProcessId(process.Handle);
 
         Process proc;
+        
 #if NET11_0
         // net11.0: TryGetProcessById replaces GetProcessById+catch; false means already exited.
-        if (!Process.TryGetProcessById((int)actualPid, out Process? found) || found is null)
+        if (!Process.TryGetProcessById((int)actualPid, out Process? found))
         {
             return;
         }
@@ -181,7 +182,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
     internal override void SetUserCredential(Process process, UserCredential credential)
     {
         // A null credential is a no-op, matching UnixProcessControlAdapter semantics.
-        if (credential is null)
+        if (credential.Equals(UserCredential.Null))
             return;
 
         if (credential.Domain is not null && OperatingSystem.IsWindows())

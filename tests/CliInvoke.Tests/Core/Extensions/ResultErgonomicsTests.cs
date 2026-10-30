@@ -131,7 +131,7 @@ public class ResultErgonomicsTests
 
         await Assert.That(caught).IsNotNull();
         await Assert.That(caught.ExecutedProcessInfo).IsNotNull();
-        await Assert.That(caught.ExecutedProcessInfo!.Result).IsSameReferenceAs(result);
+        await Assert.That(caught.ExecutedProcessInfo.Result).IsSameReferenceAs(result);
     }
 
     [Test]

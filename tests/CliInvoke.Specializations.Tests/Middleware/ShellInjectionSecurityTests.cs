@@ -45,36 +45,36 @@ public class ShellInjectionSecurityTests
     [SupportedOSPlatform("linux")]
     public async Task PowerShell_Wrapper_PreventsCommandInjectionFromTargetAndArguments()
     {
-        // A target containing a double-quote and ampersand: under the old re-tokenized-Arguments
+        // A target containing a double-quote and ampersand: under the old re-tokenised-Arguments
         // bug this would break OS-level quoting and inject a second command.
         ProcessConfiguration original = MakeConfig("prog\" & evil.exe & \"", "a & b | c");
 
         CapturingNext next = new();
-        var middleware = new PowerShellMiddleware();
+        PowerShellMiddleware middleware = new PowerShellMiddleware();
 
         await middleware.InvokeAsync(
             new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
                 InvocationMode.Buffered),
             next.Invoke).ConfigureAwait(true);
 
-        ProcessConfiguration rewritten = next.Captured!.Configuration;
+        ProcessConfiguration rewritten = next.Captured?.Configuration;
 
         // The fix: the dangerous single-string path is empty and the wrapper is a verbatim list.
-        await Assert.That(rewritten.Arguments).IsEqualTo(string.Empty);
-        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(4);
-        await Assert.That(rewritten.ArgumentList[0]).IsEqualTo("-NoProfile");
-        await Assert.That(rewritten.ArgumentList[1]).IsEqualTo("-NonInteractive");
-        await Assert.That(rewritten.ArgumentList[2]).IsEqualTo("-Command");
+        await Assert.That(rewritten?.Arguments).IsEqualTo(string.Empty);
+        await Assert.That(rewritten?.ArgumentList.Count).IsEqualTo(4);
+        await Assert.That(rewritten?.ArgumentList[0]).IsEqualTo("-NoProfile");
+        await Assert.That(rewritten?.ArgumentList[1]).IsEqualTo("-NonInteractive");
+        await Assert.That(rewritten?.ArgumentList[2]).IsEqualTo("-Command");
 
         // The -Command value is a single element, so the OS passes it to pwsh unmodified.
-        string command = rewritten.ArgumentList[3];
+        string command = rewritten?.ArgumentList[3];
         await Assert.That(command).StartsWith("& \"");
         // The target is quoted; an embedded quote stays backtick-escaped and the
         // ampersands remain literal data inside the quoted string, so no raw break
         // or second command can materialise.
         await Assert.That(command).Contains("`\"", StringComparison.Ordinal);
         await Assert.That(command).Contains("& evil.exe", StringComparison.Ordinal);
-        await Assert.That(command.Contains("`& evil.exe", StringComparison.Ordinal)).IsFalse();
+        await Assert.That(command?.Contains("`& evil.exe", StringComparison.Ordinal)).IsFalse();
         await Assert.That(command).Contains("a `& b `| c", StringComparison.Ordinal);
     }
 
@@ -107,7 +107,7 @@ public class ShellInjectionSecurityTests
         // ArgumentList takes precedence over Arguments and every entry is quoted on its
         // own. The per-entry quoting is what preserves argument boundaries and keeps the
         // ';' literal; concatenating the entries as bare words would both re-tokenize
-        // 'third arg' into two arguments and leave the metacharacter to be re-parsed.
+        // 'third arg' into two arguments and leave the metacharacter to be reparsed.
         await Assert.That(rewritten.ArgumentList[3])
             .IsEqualTo("& \"prog.exe\" \"first\" \"second;evil.exe\" \"third arg\"");
     }
@@ -130,14 +130,14 @@ public class ShellInjectionSecurityTests
                 InvocationMode.Buffered),
             next.Invoke).ConfigureAwait(true);
 
-        ProcessConfiguration rewritten = next.Captured!.Configuration;
+        ProcessConfiguration rewritten = next.Captured?.Configuration;
 
         // cmd.exe applies its own quote-stripping rules, so it receives a single
         // escaped Arguments string rather than a ProcessStartInfo.ArgumentList.
-        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(0);
-        await Assert.That(rewritten.Arguments).StartsWith("/c \"");
-        await Assert.That(rewritten.Arguments).Contains("^&", StringComparison.Ordinal);
-        await Assert.That(rewritten.Arguments).Contains("^|", StringComparison.Ordinal);
+        await Assert.That(rewritten?.ArgumentList.Count).IsEqualTo(0);
+        await Assert.That(rewritten?.Arguments).StartsWith("/c \"");
+        await Assert.That(rewritten?.Arguments).Contains("^&", StringComparison.Ordinal);
+        await Assert.That(rewritten?.Arguments).Contains("^|", StringComparison.Ordinal);
     }
 
     [Test]
@@ -163,15 +163,15 @@ public class ShellInjectionSecurityTests
                 InvocationMode.Buffered),
             next.Invoke).ConfigureAwait(true);
 
-        ProcessConfiguration rewritten = next.Captured!.Configuration;
+        ProcessConfiguration rewritten = next.Captured?.Configuration;
 
-        await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(0);
+        await Assert.That(rewritten?.ArgumentList.Count).IsEqualTo(0);
 
         // The outer quoting pair is mandatory: cmd.exe strips one leading and one trailing
-        // quote before re-parsing the remainder. Quoting each entry inside it is what keeps
+        // quote before reparsing the remainder. Quoting each entry inside it is what keeps
         // argument boundaries intact. An unquoted 'second^&evil.exe' does not merely lose the
         // argument, it terminates the command and runs 'evil.exe' as a second one.
-        await Assert.That(rewritten.Arguments)
+        await Assert.That(rewritten?.Arguments)
             .IsEqualTo("/c \"\"prog.exe\" \"first\" \"second^&evil.exe\" \"third arg\"\"");
     }
 

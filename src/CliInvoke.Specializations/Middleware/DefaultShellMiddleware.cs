@@ -71,14 +71,12 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
-
         ThrowIfUnsupported();
 
         if (DetectionInProgress.Value)
         {
             // Re-entrant call: an outer shell-detection probe is running through this chain again.
-            // Pass through without re-detecting (a probe must not be
-            // shell-wrapped anyway) to break the recursion cycle.
+            // Pass through without re-detecting (a probe must not be shell-wrapped anyway) to break the recursion cycle.
             await next(context).ConfigureAwait(false);
             return;
         }
@@ -102,9 +100,8 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
                 context.Configuration,
                 b => b.SetOutputRedirection(context.Mode != InvocationMode.Raw));
 
-            // Shell switches are caller-owned: each kind needs its own execution switch to
-            // make the composed inner command run rather than being ignored. PowerShell uses
-            // the shared safe switch set so wrapping here matches PowerShellMiddleware.
+            // Shell switches are caller-owned: each kind needs its own execution switch to make the composed inner command
+            // run rather than being ignored. PowerShell uses the shared safe switch set so wrapping here matches PowerShellMiddleware.
             string runnerArgs = kind switch
             {
                 ShellKind.Cmd => "/c",
@@ -123,7 +120,6 @@ internal sealed class DefaultShellMiddleware : IProcessMiddleware
                 useShellExecution: _options.UseShellExecution);
 
             InvocationContext newContext = context.WithConfiguration(rewritten);
-
             await next(newContext).ConfigureAwait(false);
 
             context.Result = newContext.Result;

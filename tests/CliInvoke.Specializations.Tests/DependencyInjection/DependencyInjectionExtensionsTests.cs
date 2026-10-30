@@ -112,6 +112,6 @@ public class DependencyInjectionExtensionsTests
 
         await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved).IsSameReferenceAs(customOptions);
-        await Assert.That(resolved!.WindowCreation).IsTrue();
+        await Assert.That(resolved.WindowCreation).IsTrue();
     }
 }

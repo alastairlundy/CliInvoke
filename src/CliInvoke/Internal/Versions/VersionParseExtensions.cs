@@ -31,6 +31,7 @@ namespace CliInvoke.Internal.Versions;
 /// </summary>
 internal static class VersionParseExtensions
 {
+    private static readonly System.Buffers.SearchValues<char> s_myChars = System.Buffers.SearchValues.Create("0123456789");
     #region Version Parsing Helpers
 
     /// <summary>
@@ -136,7 +137,7 @@ internal static class VersionParseExtensions
             if (segmentEnd > remainingStart)
             {
                 ReadOnlySpan<char> segment = input[remainingStart..segmentEnd];
-                int firstDigit = segment.IndexOfAny(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
+                int firstDigit = segment.IndexOfAny(s_myChars);
 
                 if (firstDigit != -1)
                 {
@@ -169,17 +170,14 @@ internal static class VersionParseExtensions
         {
             major = int.Parse(input[components[0]], NumberStyles.Integer, CultureInfo.InvariantCulture);
         }
-
         if (count > 1)
         {
             minor = int.Parse(input[components[1]], NumberStyles.Integer, CultureInfo.InvariantCulture);
         }
-
         if (count > 2)
         {
             build = int.Parse(input[components[2]], NumberStyles.Integer, CultureInfo.InvariantCulture);
         }
-
         if (count > 3)
         {
             revision = int.Parse(input[components[3]], NumberStyles.Integer, CultureInfo.InvariantCulture);

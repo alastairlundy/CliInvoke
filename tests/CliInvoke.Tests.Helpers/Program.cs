@@ -55,7 +55,7 @@ if (!string.IsNullOrEmpty(parentDir) && !Directory.Exists(parentDir))
 Action writeMarker = () =>
     File.WriteAllText(markerPath, DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture));
 
-Console.CancelKeyPress += (sender, e) =>
+Console.CancelKeyPress += (_, e) =>
 {
     writeMarker();
     e.Cancel = false;
