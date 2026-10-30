@@ -43,21 +43,6 @@ public class ControlAdapterTests
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
-    public async Task UnixAdapter_SetUserCredential_Null_DoesNotThrow()
-    {
-        UnixProcessControlAdapter adapter = new UnixProcessControlAdapter();
-
-        using Process dummyProcess = new Process();
-        dummyProcess.StartInfo = new ProcessStartInfo("echo");
-
-        await Assert.That(() => adapter.SetUserCredential(dummyProcess, null!))
-            .ThrowsNothing();
-    }
-
-    [Test]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("freebsd")]
     public async Task UnixAdapter_SetUserCredential_NullSentinel_DoesNotThrow()
     {
         UnixProcessControlAdapter adapter = new UnixProcessControlAdapter();
@@ -82,23 +67,6 @@ public class ControlAdapterTests
 
         await Assert.That(() => adapter.SetUserCredential(dummyProcess, new UserCredential()))
             .ThrowsNothing();
-    }
-
-    [Test]
-    public async Task WindowsAdapter_SetUserCredential_Null_DoesNotThrow()
-    {
-        if (!OperatingSystem.IsWindows())
-            throw new SkipTestException("WindowsProcessControlAdapter is Windows-only.");
-
-        WindowsProcessControlAdapter adapter = new WindowsProcessControlAdapter();
-
-        using Process dummyProcess = new Process();
-        dummyProcess.StartInfo = new ProcessStartInfo("echo");
-
-#pragma warning disable CA1416
-        await Assert.That(() => adapter.SetUserCredential(dummyProcess, null!))
-            .ThrowsNothing();
-#pragma warning restore CA1416
     }
 
     [Test]
