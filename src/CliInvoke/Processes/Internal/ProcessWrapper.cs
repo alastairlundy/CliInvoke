@@ -223,6 +223,13 @@ internal class ProcessWrapper : Process
                 }
             }
 
+#if NET11_0
+            // Throwing from inside the finally block below (MA0072) would mask any
+            // in-flight exception raised by SetResourcePolicy, so a failed resume of a
+            // live child is captured here and rethrown after the try/finally completes.
+            Win32Exception? resumeFailure = null;
+#endif
+
             try
             {
 #pragma warning disable CA1416
@@ -258,7 +265,7 @@ internal class ProcessWrapper : Process
                     // Same as above: the child exited mid-sequence.
                 }
 #if NET11_0
-                catch (Win32Exception)
+                catch (Win32Exception exception)
                 {
                     // SafeProcessHandle.Resume() (net11.0, Windows/macOS) reports OS
                     // failures as Win32Exception. Only the exit race is benign: when
@@ -277,11 +284,20 @@ internal class ProcessWrapper : Process
                             // the resume failure rethrown below.
                         }
 
-                        throw;
+                        // Capture instead of throwing from the finally block (MA0072) —
+                        // a bare throw here would replace the exception from the try.
+                        resumeFailure = exception;
                     }
                 }
 #endif
             }
+
+#if NET11_0
+            // The entire suspend → apply → resume sequence has now run, so the child
+            // cannot remain creation-suspended: safe to surface the resume failure.
+            if (resumeFailure is not null)
+                throw resumeFailure;
+#endif
         }
     }
 

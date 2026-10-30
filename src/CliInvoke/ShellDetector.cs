@@ -47,7 +47,7 @@ public class ShellDetector : IShellDetector
     [UnsupportedOSPlatform("tvOS")]
     [UnsupportedOSPlatform("browser")]
     public async Task<ShellInformation> ResolveDefaultShellAsync(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         if (isUnix)
             return await ResolveDefaultShellOnUnixAsync(cancellationToken).ConfigureAwait(false);
