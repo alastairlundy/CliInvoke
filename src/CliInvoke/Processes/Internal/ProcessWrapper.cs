@@ -44,10 +44,8 @@ internal class ProcessWrapper : Process
     /// <returns>
     /// <c>timeoutSeconds + CalculatePostInterruptGracePeriodSeconds(timeoutSeconds)</c>.
     /// </returns>
-    internal static int CalculateGracefulTimeoutWaitSeconds(int timeoutSeconds)
-    {
-        return timeoutSeconds + CalculatePostInterruptGracePeriodSeconds(timeoutSeconds);
-    }
+    internal static int CalculateGracefulTimeoutWaitSeconds(int timeoutSeconds) 
+        => timeoutSeconds + CalculatePostInterruptGracePeriodSeconds(timeoutSeconds);
 
     // Synchronisation primitive to prevent simultaneous cancellation attempts
     private readonly SemaphoreSlim _cancellationSemaphore = new(1, 1);
@@ -182,14 +180,9 @@ internal class ProcessWrapper : Process
 #endif
         }
     }
-
     
     private void OnStarted(object? sender, EventArgs e)
     {
-        // ReSharper disable once InvertIf
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
-            || OperatingSystem.IsFreeBSD())
-        {
             // Fast-exiting processes (e.g. `which`, `echo`) may have already exited between base.Start()
             // returning and this handler running. Skip the suspend/resume cycle in that case to avoid races on process handles.
             if (HasExited) return;
@@ -243,16 +236,14 @@ internal class ProcessWrapper : Process
             }
             finally
             {
-                // Always resume the process — even if SetResourcePolicy or a raced
-                // child exit throws — so it cannot stay suspended.
+                // Always resume the process — even if SetResourcePolicy or a raced child exit throws — so it cannot stay suspended.
                 try
                 {
                     ResumeProcess();
                 }
                 catch (InvalidOperationException)
                 {
-                    // The process may have already exited during SetResourcePolicy.
-                    // Swallow the exception — the process is gone, nothing to resume.
+                    // The process may have already exited during SetResourcePolicy. Swallow the exception — the process is gone, nothing to resume.
                 }
                 catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
                 {
@@ -290,7 +281,6 @@ internal class ProcessWrapper : Process
             if (resumeFailure is not null)
                 throw resumeFailure;
 #endif
-        }
     }
 
     /// <summary>
@@ -360,8 +350,8 @@ internal class ProcessWrapper : Process
             }
             catch (ObjectDisposedException)
             {
-                // Process handle already released (disposed externally); the wait paths treat
-                // that as exited, so the best available timestamp is now.
+                // Process handle already released (disposed externally); the wait paths treat that as exited,
+                // so the best available timestamp is now.
                 ExitTime = DateTime.UtcNow;
             }
             catch (InvalidOperationException)
@@ -488,10 +478,6 @@ internal class ProcessWrapper : Process
     /// This method uses platform-specific mechanisms to suspend a process and is supported
     /// on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
     /// </remarks>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
     internal void SuspendProcess()
     {
         if (HasExited)
@@ -510,10 +496,6 @@ internal class ProcessWrapper : Process
     /// This method uses platform-specific mechanisms to resume a suspended process
     /// and is supported on Windows, macOS, Linux, and FreeBSD. It is not supported on iOS, tvOS, or browser platforms.
     /// </remarks>
-    [SupportedOSPlatform("windows")]
-    [SupportedOSPlatform("macos")]
-    [SupportedOSPlatform("linux")]
-    [SupportedOSPlatform("freebsd")]
     internal void ResumeProcess()
     {
         if (HasExited)

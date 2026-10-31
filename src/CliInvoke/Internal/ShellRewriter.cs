@@ -334,11 +334,9 @@ internal static class ShellRewriter
     [Pure]
     internal static ProcessConfiguration Rewrite(
         ProcessConfiguration source,
-        string shellTargetPath,
-        string runnerArgs,
+        string shellTargetPath, string runnerArgs,
         ShellKind kind,
-        bool windowCreation,
-        bool useShellExecution)
+        bool windowCreation, bool useShellExecution)
     {
         // When ArgumentList is non-empty it takes precedence over Arguments (matching
         // ProcessConfiguration's delivery contract); each verbatim entry is escaped
@@ -359,8 +357,7 @@ internal static class ShellRewriter
 
                 IReadOnlyList<string> runnerArgList =
                     !string.IsNullOrWhiteSpace(runnerArgs)
-                        ? ArgumentTokenizer.Tokenize(runnerArgs)
-                        : Array.Empty<string>();
+                        ? ArgumentTokenizer.Tokenize(runnerArgs) : [];
 
                 List<string> argumentList = new(runnerArgList.Count + 1);
                 argumentList.AddRange(runnerArgList);
@@ -383,7 +380,7 @@ internal static class ShellRewriter
                 string safePath = QuotePathForCmd(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0
-                    ? string.Join(" ", source.ArgumentList.Select(QuotePathForCmd))
+                    ? string.Join(' ', source.ArgumentList.Select(QuotePathForCmd))
                     : EscapeForCmd(source.Arguments);
                 string innerCommand = string.IsNullOrWhiteSpace(safeArgs)
                     ? safePath
@@ -410,7 +407,7 @@ internal static class ShellRewriter
                 string safePath = QuotePathForPosixShell(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0
-                    ? string.Join(" ", source.ArgumentList.Select(QuotePathForPosixShell))
+                    ? string.Join(' ', source.ArgumentList.Select(QuotePathForPosixShell))
                     : EscapeForPosixShell(source.Arguments);
                 string script = string.IsNullOrWhiteSpace(safeArgs)
                     ? safePath
@@ -418,8 +415,7 @@ internal static class ShellRewriter
 
                 IReadOnlyList<string> runnerArgList =
                     !string.IsNullOrWhiteSpace(runnerArgs)
-                        ? ArgumentTokenizer.Tokenize(runnerArgs)
-                        : Array.Empty<string>();
+                        ? ArgumentTokenizer.Tokenize(runnerArgs) : [];
 
                 List<string> argumentList = new(runnerArgList.Count + 1);
                 argumentList.AddRange(runnerArgList);

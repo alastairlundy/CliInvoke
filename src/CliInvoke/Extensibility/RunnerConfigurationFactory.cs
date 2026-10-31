@@ -34,15 +34,11 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
 
         /*
             Three runner categories, three delivery shapes:
-              - PowerShell (-Command): ShellRewriter composes target + args into one
-                shell-escaped script, delivered as a single ArgumentList entry.
-              - cmd (/c): cmd's quote-stripping doesn't match .NET's ArgumentList
-                escaping, so this delivers the legacy Arguments string (cmd escaper).
-              - Non-shell (sudo, runas): Discrete tokens are handled without escaping,
-                the runner executes the target as-is. Dash-prefixed targets get a "--"
-                terminator first so option-parsing runners (POSIX/Windows sudo) don't
-                bind them as options; the terminator is conditional on a "-" prefix
-                because positional program slots (runas) must not receive one.
+              - PowerShell (-Command): ShellRewriter composes target + args into one shell-escaped script, delivered as a single ArgumentList entry.
+              - cmd (/c): cmd's quote-stripping doesn't match .NET's ArgumentList escaping, so this delivers the legacy Arguments string (cmd escaper).
+              - Non-shell (sudo, runas): Discrete tokens are handled without escaping, the runner executes the target as-is. 
+              Dash-prefixed targets get a "--" terminator first so option-parsing runners (POSIX/Windows sudo) don't
+                bind them as options; the terminator is conditional on a "-" prefix because positional program slots (runas) must not receive one.
         */
         bool runnerIsPowerShell =
             !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
@@ -92,7 +88,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                 argumentList.AddRange(ArgumentTokenizer.Tokenize(runnerProcessConfig.Arguments));
 
             // End the option zone before a dash-prefixed target (POSIX/Windows sudo).
-            if (processConfigToBeRun.TargetFilePath.StartsWith('-'))
+            if (processConfigToBeRun.TargetFilePath.StartsWith('-', StringComparison.OrdinalIgnoreCase))
                 argumentList.Add("--");
 
             argumentList.Add(processConfigToBeRun.TargetFilePath);
