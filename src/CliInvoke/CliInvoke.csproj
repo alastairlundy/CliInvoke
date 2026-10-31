@@ -17,6 +17,7 @@
 - Multi-targets `net10.0` and `net11.0`; on `net11.0` the platform control adapters use the new .NET 11 `Process` APIs (`Process.Signal`, `TryWaitForExitStatus`, `TryGetProcessById`). Windows and macOS children start suspended and resume only after the configured `ProcessResourcePolicy` is applied.
 
 #### Changed
+- Validation rule predicates are nullability-honest: `ProcessResultValidator`'s predicate-based constructor and `AddValidationRules` now accept `Func<TProcessResult?, bool>[]`, matching the documented null-input contract for validation rules. Erased CLR signatures are unchanged.
 - `CliInvoke` adopts `Squash` (2.1.0) build-time trimming. The IL linker now strips unreachable non-public code from the shipped assemblies at Release build time; the public API surface is untouched. Measured as of this release: CliInvoke.dll for net10.0 TFM shrinks ~37% (218 KB → 138 KB) and the package as a whole shrinks ~15% (311 KB → 264 KB) - the removed code is almost entirely unreferenced Polyfill-emitted types.
 - `Polyfill` bundling moved here from `CliInvoke.Core` (which is now dependency-free)
 - `CliRun.FireAndForget(ProcessConfiguration)` fails fast on redirected configurations (`ArgumentException` before start) - the handle is disposed immediately after launch, so redirected pipes would never be drained.

@@ -24,6 +24,9 @@ public sealed class ValidationRule<TProcessResult>
     /// </summary>
     /// <param name="predicate">
     ///     The predicate that evaluates to <c>true</c> when the rule passes and <c>false</c> when it fails.
+    ///     May be invoked with a <c>null</c> result when a <see cref="BufferedProcessResult" />-typed rule is
+    ///     adapted for non-buffered process results; predicate implementations must handle a <c>null</c>
+    ///     result explicitly.
     /// </param>
     /// <param name="name">An optional human-readable name for the rule, used in failure reporting.</param>
     /// <param name="failureMessage">
@@ -36,7 +39,7 @@ public sealed class ValidationRule<TProcessResult>
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="predicate" /> is <c>null</c>.</exception>
     public ValidationRule(
-        Func<TProcessResult, bool> predicate,
+        Func<TProcessResult?, bool> predicate,
         string? name = null,
         string? failureMessage = null,
         Func<TProcessResult, string>? failureMessageFactory = null)
@@ -56,8 +59,9 @@ public sealed class ValidationRule<TProcessResult>
 
     /// <summary>
     ///     Gets the predicate that evaluates the process result.
+    ///     May be invoked with a <c>null</c> result; see the constructor for details.
     /// </summary>
-    public Func<TProcessResult, bool> Predicate { get; }
+    public Func<TProcessResult?, bool> Predicate { get; }
 
     /// <summary>
     ///     Gets the constant failure message, if any.

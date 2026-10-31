@@ -27,7 +27,7 @@ public class ProcessResultValidator<TProcessResult> : IProcessResultValidator<TP
     /// </summary>
     /// <param name="rules">The predicate rules to evaluate against the process result.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="rules" /> is <c>null</c>.</exception>
-    public ProcessResultValidator(Func<TProcessResult, bool>[] rules)
+    public ProcessResultValidator(Func<TProcessResult?, bool>[] rules)
     {
         ArgumentNullException.ThrowIfNull(rules);
 
