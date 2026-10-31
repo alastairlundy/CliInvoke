@@ -14,8 +14,7 @@ using CliInvoke.Processes.Internal;
 namespace CliInvoke.Tests.Processes;
 
 /// <summary>
-///     Verifies the net11.0 suspended-start scoping in <see cref="ProcessWrapper.Start"/>:
-///     <c>ProcessStartInfo.StartSuspended</c> is enabled on Windows and macOS only. The
+///     Verifies the net11.0 suspended-start scoping is enabled on Windows and macOS only. The
 ///     runtime rejects the property everywhere else with
 ///     <see cref="PlatformNotSupportedException"/> (Linux/FreeBSD have no create-suspended
 ///     OS primitive), so a non-Windows/non-macOS runner must observe it left

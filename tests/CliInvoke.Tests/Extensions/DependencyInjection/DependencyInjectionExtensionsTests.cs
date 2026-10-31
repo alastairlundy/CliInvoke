@@ -68,7 +68,7 @@ public class DependencyInjectionExtensionsTests
 
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
         {
-            services.AddCliInvoke(configure: null!);
+            services.AddCliInvoke(null!);
             return Task.CompletedTask;
         });
     }
@@ -225,7 +225,7 @@ public class DependencyInjectionExtensionsTests
     {
         IServiceCollection services = new ServiceCollection();
         services.AddValidationRules<ProcessResult>(
-            [result => result.ExitCode == 0]);
+            [result => result?.ExitCode == 0]);
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();
@@ -241,9 +241,9 @@ public class DependencyInjectionExtensionsTests
     {
         IServiceCollection services = new ServiceCollection();
         services.AddValidationRules<ProcessResult>(
-            [result => result.ExitCode == 0]);
+            [result => result?.ExitCode == 0]);
         services.AddValidationRules<ProcessResult>(
-            [result => result.ExitCode != 0]);
+            [result => result?.ExitCode != 0]);
         IServiceProvider provider = services.BuildServiceProvider();
 
         using IServiceScope scope = provider.CreateScope();
@@ -257,7 +257,7 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCustomResultValidators_RegistersValidator()
     {
         ProcessResultValidator<ProcessResult> customValidator = new ProcessResultValidator<ProcessResult>(
-            [result => result.ExitCode == 0]);
+            [result => result?.ExitCode == 0]);
 
         IServiceCollection services = new ServiceCollection();
         services.AddCustomResultValidators<ProcessResult, ProcessResultValidator<ProcessResult>>(
@@ -276,9 +276,9 @@ public class DependencyInjectionExtensionsTests
     public async Task AddCustomResultValidators_DoubleCall_LastRegistrationWins()
     {
         ProcessResultValidator<ProcessResult> first = new ProcessResultValidator<ProcessResult>(
-            [result => result.ExitCode == 0]);
+            [result => result?.ExitCode == 0]);
         ProcessResultValidator<ProcessResult> second = new ProcessResultValidator<ProcessResult>(
-            [result => result.ExitCode != 0]);
+            [result => result?.ExitCode != 0]);
 
         IServiceCollection services = new ServiceCollection();
         services.AddCustomResultValidators<ProcessResult, ProcessResultValidator<ProcessResult>>(first);

@@ -170,9 +170,7 @@ public class ProcessResultCanceledSignalTests
                     process.Kill();
                 }
             }
-
-            process.Dispose();
-
+            
             if (File.Exists(markerPath))
                 File.Delete(markerPath);
         }
@@ -219,8 +217,6 @@ public class ProcessResultCanceledSignalTests
                     process.Kill();
                 }
             }
-
-            process.Dispose();
         }
     }
 

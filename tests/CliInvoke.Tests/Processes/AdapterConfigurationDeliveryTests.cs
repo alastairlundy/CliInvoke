@@ -83,7 +83,7 @@ public class AdapterConfigurationDeliveryTests
             {
                 EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
                 {
-                    [variableName] = null!
+                    [variableName] = null!,
                 },
             };
 
@@ -94,7 +94,7 @@ public class AdapterConfigurationDeliveryTests
         }
         finally
         {
-            Environment.SetEnvironmentVariable(variableName, null);
+            Environment.SetEnvironmentVariable(variableName, value: null);
         }
     }
 
@@ -116,7 +116,7 @@ public class AdapterConfigurationDeliveryTests
             {
                 EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
                 {
-                    [variableName] = null!
+                    [key: variableName] = null!
                 },
             };
 
@@ -128,7 +128,7 @@ public class AdapterConfigurationDeliveryTests
         }
         finally
         {
-            Environment.SetEnvironmentVariable(variableName, null);
+            Environment.SetEnvironmentVariable(variableName, value: null);
         }
     }
 

@@ -195,6 +195,15 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The exit behaviour is not a valid ProcessExitBehaviour value..
+        /// </summary>
+        internal static string Exceptions_ProcessExitBehaviour_InvalidExitBehaviour {
+            get {
+                return ResourceManager.GetString("Exceptions.ProcessExitBehaviour.InvalidExitBehaviour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The executed process was not successful and returned an exit code of {x}..
         /// </summary>
         internal static string Exceptions_ProcessNotSuccessful_Generic {

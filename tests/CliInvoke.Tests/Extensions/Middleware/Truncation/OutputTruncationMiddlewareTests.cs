@@ -44,7 +44,7 @@ public class OutputTruncationMiddlewareTests
         }).ConfigureAwait(true);
 
         await Assert.That(downstream).IsNotNull();
-        await Assert.That(downstream!.ExitConfiguration.MaxBufferedOutputBytes).IsEqualTo(1_048_576);
+        await Assert.That(downstream.ExitConfiguration.MaxBufferedOutputBytes).IsEqualTo(1_048_576);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class OutputTruncationMiddlewareTests
         }).ConfigureAwait(true);
 
         await Assert.That(downstream).IsNotNull();
-        await Assert.That(downstream!.ExitConfiguration.MaxBufferedOutputBytes).IsEqualTo(2048);
+        await Assert.That(downstream.ExitConfiguration.MaxBufferedOutputBytes).IsEqualTo(2048);
     }
 
     [Test]
