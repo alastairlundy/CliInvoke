@@ -68,4 +68,7 @@
     <data name="Exceptions.Arguments.AddEnumerable.NoValidArgumentsToAdd" xml:space="preserve">
         <value>No valid arguments to add.</value>
     </data>
+    <data name="Exceptions.ArgumentsSpec.ArgumentValidationLogic.Failed" xml:space="preserve">
+        <value>Argument '{0}' not permitted based on validation logic.</value>
+    </data>
 </root>

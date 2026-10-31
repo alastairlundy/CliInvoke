@@ -19,7 +19,7 @@ namespace CliInvoke.Core.Internal;
 ///     underlying C-runtime / POSIX shell argument parser. It deliberately does NOT
 ///     neutralise shell metacharacters (<c>&amp;</c>, <c>|</c>, <c>&lt;</c>, <c>&gt;</c>,
 ///     <c>%</c>, <c>^</c>); that is the shell layer's concern and is handled by the
-///     cmd/PowerShell specializations. As a result the character set this escaper
+///     cmd/PowerShell specialisations. As a result the character set this escaper
 ///     transforms is a strict subset of the shell-layer escaping set (e.g.
 ///     <c>ShellRewriter.EscapeForCmd</c>).
 ///     <para>
@@ -45,89 +45,63 @@ internal static class ArgumentEscaper
     /// <returns>The escaped inner content.</returns>
     public static string EscapeInner(string? argument)
     {
-        if (argument is null)
+        if (string.IsNullOrEmpty(argument))
             return string.Empty;
+        
+        return OperatingSystem.IsWindows() ? EscapeInnerWindows(argument) : EscapeInnerUnix(argument);
+    }
 
-        if (argument.Length == 0)
-            return string.Empty;
+    private static string EscapeInnerUnix(string argument)
+    {
+        // POSIX: the surrounding double quotes are the caller's job. .NET's Unix parser applies the same backslash
+        // rule as the Windows C-runtime, so the inner escaping is currently identical to the Windows branch. The
+        // two branches are kept separate so any future per-platform divergence lands in the right place.
+        return EscapeInnerQuoted(argument);
+    }
 
-        if (OperatingSystem.IsWindows())
-        {
-            // Escaping rules for the Windows C-runtime parser: documented in the class remarks.
-            StringBuilder builder = new(argument.Length + 8);
+    private static string EscapeInnerWindows(string argument)
+    {
+        // Escaping rules for the Windows C-runtime parser: documented in the class remarks.
+        return EscapeInnerQuoted(argument);
+    }
 
-            int backslashCount = 0;
-
-            foreach (char c in argument)
-            {
-                if (c == '\\')
-                {
-                    backslashCount++;
-                }
-                else if (c == '"')
-                {
-                    // Double the preceding backslashes, then emit a doubled quote.
-                    builder.Append('\\', backslashCount * 2);
-                    builder.Append('"').Append('"');
-                    backslashCount = 0;
-                }
-                else if (c is '\n' or '\r')
-                {
-                    // Dropped, so they cannot terminate the command line. The pending backslash
-                    // run is NOT flushed: a dropped newline is not content, so the run still
-                    // applies to whatever follows.
-                }
-                else
-                {
-                    builder.Append('\\', backslashCount);
-                    builder.Append(c);
-                    backslashCount = 0;
-                }
-            }
-
-            // Double any trailing backslashes for the closing quote.
-            builder.Append('\\', backslashCount * 2);
-
-            return builder.ToString();
-        }
-
-        // POSIX: the surrounding double quotes are the caller's job. .NET's Unix parser applies
-        // the same backslash rule as the Windows C-runtime, so the inner escaping below is
-        // identical to the Windows branch.
-        StringBuilder posixBuilder = new(argument.Length + 8);
-
-        int posixBackslashCount = 0;
+    // Common implementation for the double-quoted context both branches target. Assumes the caller
+    // supplies the surrounding quotes.
+    private static string EscapeInnerQuoted(string argument)
+    {
+        StringBuilder builder = new(argument.Length + 8);
+        int backslashCount = 0;
 
         foreach (char c in argument)
         {
             if (c == '\\')
             {
-                posixBackslashCount++;
+                backslashCount++;
             }
             else if (c == '"')
             {
                 // Double the preceding backslashes, then emit a doubled quote.
-                posixBuilder.Append('\\', posixBackslashCount * 2);
-                posixBuilder.Append('"').Append('"');
-                posixBackslashCount = 0;
+                builder.Append('\\', backslashCount * 2);
+                builder.Append('"').Append('"');
+                backslashCount = 0;
             }
             else if (c is '\n' or '\r')
             {
-                // Dropped; the pending backslash run carries across the drop, as in the
-                // Windows branch above.
+                // Dropped, so they cannot terminate the command line. The pending backslash
+                // run is NOT flushed: a dropped newline is not content, so the run still applies to whatever follows.
             }
             else
             {
-                posixBuilder.Append('\\', posixBackslashCount);
-                posixBuilder.Append(c);
-                posixBackslashCount = 0;
+                builder.Append('\\', backslashCount);
+                builder.Append(c);
+                backslashCount = 0;
             }
         }
 
         // Double any trailing backslashes for the closing quote.
-        posixBuilder.Append('\\', posixBackslashCount * 2);
+        builder.Append('\\', backslashCount * 2);
 
-        return posixBuilder.ToString();
+        return builder.ToString();
     }
 
     /// <summary>
@@ -141,7 +115,7 @@ internal static class ArgumentEscaper
     /// </returns>
     public static bool NeedsQuoting(string? argument)
     {
-        if (argument is null || argument.Length == 0)
+        if (string.IsNullOrEmpty(argument))
             return false;
 
         if (OperatingSystem.IsWindows())

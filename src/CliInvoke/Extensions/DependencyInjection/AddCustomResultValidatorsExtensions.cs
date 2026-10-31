@@ -10,6 +10,7 @@
 using CliInvoke.Core.Validation;
 using CliInvoke.Validation;
 
+// ReSharper disable once CheckNamespace
 namespace CliInvoke.Extensions;
 
 /// <summary>

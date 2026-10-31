@@ -11,7 +11,6 @@ using System.Linq;
 
 using Microsoft.Extensions.Caching.Memory;
 
-// ReSharper disable once CheckNamespace
 namespace CliInvoke.Extensions.Caching;
 
 /// <summary>

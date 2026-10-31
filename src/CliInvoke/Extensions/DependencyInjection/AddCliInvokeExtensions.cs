@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 using LoggingMiddleware = CliInvoke.Extensions.Middleware.Logging.LoggingMiddleware;
 
+// ReSharper disable once CheckNamespace
 namespace CliInvoke.Extensions;
 
 /// <summary>

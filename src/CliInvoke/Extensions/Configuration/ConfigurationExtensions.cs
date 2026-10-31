@@ -111,13 +111,11 @@ public static class ConfigurationExtensions
                 .SetProcessResourcePolicy(ProcessResourcePolicy.Default)
                 .SetStandardInputPipe(StreamWriter.Null)
                 .RedirectStandardInput(processStartInfo.RedirectStandardInput)
-                .SetEncoding(
-                    processStartInfo.StandardInputEncoding,
+                .SetEncoding(processStartInfo.StandardInputEncoding,
                     processStartInfo.StandardOutputEncoding, processStartInfo.StandardErrorEncoding);
 
-            // A non-empty ArgumentList is canonical (mirrors BaseProcessControlAdapter, which
-            // clears Arguments and emits the list via ProcessStartInfo.ArgumentList); the raw
-            // Arguments string is only used when the caller never populated the list API.
+            // A non-empty ArgumentList is canonical (mirrors BaseProcessControlAdapter, which clears Arguments and emits the
+            // list via ProcessStartInfo.ArgumentList); the raw Arguments string is only used when the caller never populated the list API.
             if (processStartInfo.ArgumentList.Count > 0)
                 processConfigurationBuilder.SetArgumentList(processStartInfo.ArgumentList);
             else
@@ -129,11 +127,10 @@ public static class ConfigurationExtensions
             if (requiresAdministrator)
                 processConfigurationBuilder.RequireAdministratorPrivileges();
 
-            // User credentials are a Windows-only concept (see the ConfigureUserCredential
-            // remarks): reading Domain, Password, and LoadUserProfile throws
-            // PlatformNotSupportedException on Unix, so the mapping is guarded at runtime
-            // rather than relying on a CA1416 suppression. Values are read into locals so
-            // the platform analyzer tracks the guard (it does not flow into lambda bodies).
+            // User credentials are a Windows-only concept (see the ConfigureUserCredential remarks): reading Domain,
+            // Password, and LoadUserProfile throws PlatformNotSupportedException on Unix, so the mapping is guarded at runtime
+            // rather than relying on a CA1416 suppression. Values are read into locals so the platform analyser tracks the guard
+            // (it does not flow into lambda bodies).
             if (OperatingSystem.IsWindows())
             {
                 string domain = processStartInfo.Domain;

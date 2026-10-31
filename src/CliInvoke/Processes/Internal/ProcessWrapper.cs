@@ -13,6 +13,7 @@ using System.Text;
 
 using CliInvoke.Processes.Internal.Cancellation;
 using CliInvoke.Processes.Internal.ControlAdapters;
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 
 namespace CliInvoke.Processes.Internal;
 
@@ -417,8 +418,8 @@ internal class ProcessWrapper : Process
     public new bool Start()
     {
 #if NET11_0
-        // net11.0 leg, Windows/macOS ONLY: StartSuspended is annotated for those two platforms and the runtime
-        // throws PlatformNotSupportedException elsewhere — Linux/FreeBSD have no create-suspended OS primitive — so the property is never
+        // net11.0 leg, Windows/macOS ONLY: StartSuspended is annotated for those two platforms and the runtime throws
+        // PlatformNotSupportedException elsewhere — Linux/FreeBSD have no create-suspended OS primitive — so the property is never
         // even assigned on those platforms. Shell-executed starts are excluded because StartSuspended cannot be combined
         // with UseShellExecute (the runtime throws); those keep the legacy suspend → apply → resume cycle in OnStarted, as do
         // Linux/FreeBSD on every start.
@@ -436,20 +437,16 @@ internal class ProcessWrapper : Process
         catch(Win32Exception exception)
         {
             HasStarted = false;
-
             throw MapWin32ExceptionToStartFailureException(exception, StartInfo.FileName);
         }
 
         if (!HasStarted)
-        {
             throw new InvalidOperationException($"Process with Target File Name of '{StartInfo.FileName}' could not be started.");
-        }
 
         // Cache StandardOutput/StandardError StreamReaders and the child's stdin writer while the process is still guaranteed alive.
-        // These properties internally call EnsureState, which in .NET 10 throws InvalidOperationException("process has
-        // exited") on fast-exiting processes (e.g. `which dotnet`) that exit before the next line of code runs. Touching them
-        // here means downstream code that reads from the cached readers — or closes the cached stdin writer — works even if
-        // the process has already exited.
+        // These properties internally call EnsureState, which in .NET 10 throws InvalidOperationException("process has exited") on
+        // fast-exiting processes (e.g. `which dotnet`) that exit before the next line of code runs. Touching them here means downstream
+        // code that reads from the cached readers — or closes the cached stdin writer — works even if the process has already exited.
         try
         {
             _ = StandardOutput;
@@ -458,8 +455,7 @@ internal class ProcessWrapper : Process
         }
         catch (InvalidOperationException)
         {
-            // Process exited before we could cache the stream readers.
-            // Downstream code must tolerate an exited process (see HasExited guards).
+            // Process exited before we could cache the stream readers. Downstream code must tolerate an exited process (see HasExited guards).
         }
 
         // Capture Id (safe after Start) and ProcessName (throws if exited). base.Id does not throw on exit; base.ProcessName does.
@@ -477,7 +473,6 @@ internal class ProcessWrapper : Process
         }
 
         StartTime = DateTime.UtcNow;
-        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         Started?.Invoke(this, EventArgs.Empty);
 
         return HasStarted;
@@ -548,7 +543,7 @@ internal class ProcessWrapper : Process
     ///     on every exit path of the piping (successful copy, cancellation, or source-stream error).
     /// </summary>
     /// <remarks>
-    ///     The close targets only the child's pipe write end; the caller-owned source stream is
+    ///     The close targets only the child's pipe write end. The caller-owned source stream is
     ///     never closed or disposed by this method. All exceptions propagate to the caller.
     /// </remarks>
     /// <param name="source">The stream from which to read the standard input data.</param>
@@ -686,8 +681,7 @@ internal class ProcessWrapper : Process
     ///     cleanly (no U+FFFD replacement characters).
     /// </remarks>
     private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
-        StreamReader reader, bool redirected, long? maxBytes,
-        CancellationToken cancellationToken)
+        StreamReader reader, bool redirected, long? maxBytes, CancellationToken cancellationToken)
     {
         if (!redirected || reader == StreamReader.Null)
             return (string.Empty, false);
@@ -695,14 +689,15 @@ internal class ProcessWrapper : Process
         Encoding encoding = reader.CurrentEncoding;
         Stream stream = reader.BaseStream;
 
-        // null or negative = no cap
+        // null or negative = no truncation cap
         if (maxBytes is null or < 0)
         {
             using MemoryStream memoryStream = new();
             await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
+            //TODO: Look into whether this can be done without a .ToArray penalty
             return (encoding.GetString(memoryStream.ToArray()), false);
         }
-
+        
         // 0 = valid zero-byte cap: empty text, truncated flag set
         if (maxBytes == 0)
         {
@@ -719,7 +714,7 @@ internal class ProcessWrapper : Process
         long totalBytes = 0;
         bool truncated = false;
 
-        using MemoryStream outputStream = new MemoryStream();
+        using MemoryStream outputStream = new();
 
         int bytesRead;
         while ((bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
@@ -915,15 +910,13 @@ internal class ProcessWrapper : Process
     ///     <paramref name="isGraceful"/> selects between pure-cancellation and graceful-timeout behaviour.
     /// </summary>
     private async Task WaitForExitCoreAsync(
-        ProcessExitConfiguration processExitConfiguration,
-        CancellationToken cancellationToken,
+        ProcessExitConfiguration processExitConfiguration, CancellationToken cancellationToken,
         bool isGraceful, bool fallbackToForceful = true)
     {
         bool semaphoreAcquired;
         try
         {
-            semaphoreAcquired = await _cancellationSemaphore
-                .WaitAsync(0, cancellationToken).ConfigureAwait(false);
+            semaphoreAcquired = await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -942,8 +935,7 @@ internal class ProcessWrapper : Process
         }
 
         // Captured before the wait so exception handling measures how far the cancellation resolved from the expected exit time.
-        DateTime expectedExitTime =
-            CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
+        DateTime expectedExitTime = CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
 
         try
         {
@@ -1012,11 +1004,10 @@ internal class ProcessWrapper : Process
             if (!HasExited && !isGraceful)
                 ForcefulExit();
 
-            // ForcefulExit (Kill) returns before the OS has reaped the child, so a
-            // caller reading ExitCode immediately after this method returns could
-            // otherwise observe "process must exit before requested information can
-            // be determined". Poll for actual termination (bounded) before returning;
-            // re-issue the forceful kill if the first attempt did not take.
+            // ForcefulExit (Kill) returns before the OS has reaped the child, so a caller reading ExitCode
+            // immediately after this method returns could otherwise observe "process must exit before requested
+            // information can be determined". Poll for actual termination (bounded) before returning; re-issue the
+            // forceful kill if the first attempt did not take.
             bool exited;
             try { exited = HasExited; }
             catch (ObjectDisposedException) { exited = true; }
@@ -1040,14 +1031,12 @@ internal class ProcessWrapper : Process
                 }
             }
 
-            // Belt-and-braces for returns that skipped the exit watches (e.g. a swallowed
-            // exception): once the process is known exited, publish ExitTime.
+            // Belt-and-braces for returns that skipped the exit watches (e.g. a swallowed exception): once the process is known exited, publish ExitTime.
             EnsureExitTime();
 
             _cancellationSemaphore.Release();
         }
     }
-    
     
     /// <summary>
     /// </summary>

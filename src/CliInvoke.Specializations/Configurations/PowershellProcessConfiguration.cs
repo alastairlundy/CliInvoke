@@ -54,7 +54,9 @@ public class PowershellProcessConfiguration : ProcessConfiguration
         string arguments,
         bool redirectStandardInput, bool outputRedirection = true,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
+#pragma warning disable MA0016
         Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
+#pragma warning restore MA0016
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null, ProcessResourcePolicy? processResourcePolicy = null,
