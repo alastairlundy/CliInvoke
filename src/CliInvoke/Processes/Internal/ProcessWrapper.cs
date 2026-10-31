@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -645,11 +646,18 @@ internal class ProcessWrapper : Process
         Task<(string Text, bool Truncated)> standardErrorTask =
             ReadStreamCappedAsync(StandardError, StartInfo.RedirectStandardError, maxStandardErrorBytes, cancellationToken);
 
+        // The pair of capture tasks completes together; awaiting WhenAll once keeps the
+        // fault-propagation shape while avoiding three awaits of the same tasks.
         await Task.WhenAll(standardOutputTask, standardErrorTask).ConfigureAwait(false);
 
-        return ((await standardOutputTask.ConfigureAwait(false)).Text,
-            (await standardErrorTask.ConfigureAwait(false)).Text,
-            (await standardOutputTask.ConfigureAwait(false)).Truncated || (await standardErrorTask.ConfigureAwait(false)).Truncated);
+        // Both tasks are guaranteed completed here (WhenAll only completes that way);
+        // reading .Result on a completed task never blocks or degrades fault behavior.
+        (string Text, bool Truncated) standardOutput = standardOutputTask.Result;
+        (string Text, bool Truncated) standardError = standardErrorTask.Result;
+
+        return (standardOutput.Text,
+            standardError.Text,
+            standardOutput.Truncated || standardError.Truncated);
     }
 
     /// <summary>
@@ -665,6 +673,11 @@ internal class ProcessWrapper : Process
     private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
         StreamReader reader, bool redirected, long? maxBytes, CancellationToken cancellationToken)
     {
+        // Transfer-size buffers come from the shared pool so repeated invocations of the
+        // buffered capture path do not alloc per call (process spawns are frequent in
+        // batched/parallel usage, and GC pressure grows with concurrent captures).
+        const int TransferBufferSize = 8192;
+
         if (!redirected || reader == StreamReader.Null)
             return (string.Empty, false);
 
@@ -676,65 +689,93 @@ internal class ProcessWrapper : Process
         {
             using MemoryStream memoryStream = new();
             await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
-            //TODO: Look into whether this can be done without a .ToArray penalty
-            return (encoding.GetString(memoryStream.ToArray()), false);
+
+            // Decode directly from the MemoryStream's underlying buffer instead of
+            // ToArray(): GetString over the same byte range preserves the previous
+            // semantics byte-for-byte while skipping a full-size duplicate copy of
+            // the captured output (the string allocation itself is unavoidable).
+            int finalLength = (int)memoryStream.Length;
+            return (encoding.GetString(memoryStream.GetBuffer().AsSpan(0, finalLength)), false);
         }
-        
+
         // 0 = valid zero-byte cap: empty text, truncated flag set
         if (maxBytes == 0)
         {
             // Drain any existing data so the pipe is fully consumed.
-            byte[] drainBuffer = new byte[8192];
-            while (await stream.ReadAsync(drainBuffer, cancellationToken).ConfigureAwait(false) > 0)
+            byte[] drainBuffer = ArrayPool<byte>.Shared.Rent(TransferBufferSize);
+            try
             {
-                // Remainder is discarded.
+                while (await stream.ReadAsync(drainBuffer, cancellationToken).ConfigureAwait(false) > 0)
+                {
+                    // Remainder is discarded.
+                }
             }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(drainBuffer);
+            }
+
             return (string.Empty, true);
         }
 
-        byte[] buffer = new byte[8192];
-        long totalBytes = 0;
-        bool truncated = false;
-
-        using MemoryStream outputStream = new();
-
-        int bytesRead;
-        while ((bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(TransferBufferSize);
+        try
         {
-            long room = maxBytes.Value - totalBytes;
+            long totalBytes = 0;
+            bool truncated = false;
 
-            if (room <= 0)
+            using MemoryStream outputStream = new();
+
+            int bytesRead;
+            while ((bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
             {
-                truncated = true;
-                break;
+                long room = maxBytes.Value - totalBytes;
+
+                if (room <= 0)
+                {
+                    truncated = true;
+                    break;
+                }
+
+                int bytesToCopy = (int)Math.Min(bytesRead, room);
+                await outputStream.WriteAsync(buffer.AsMemory(0, bytesToCopy), cancellationToken).ConfigureAwait(false);
+                totalBytes += bytesToCopy;
+
+                if (bytesToCopy < bytesRead)
+                {
+                    truncated = true;
+                    break;
+                }
             }
 
-            int bytesToCopy = (int)Math.Min(bytesRead, room);
-            await outputStream.WriteAsync(buffer.AsMemory(0, bytesToCopy), cancellationToken).ConfigureAwait(false);
-            totalBytes += bytesToCopy;
-
-            if (bytesToCopy < bytesRead)
+            // Drain any remainder so the pipe is fully consumed even when truncated.
+            while (truncated && (_ = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
             {
-                truncated = true;
-                break;
+                // Remainder is discarded.
             }
-        }
 
-        // Drain any remainder so the pipe is fully consumed even when truncated.
-        while (truncated && (_ = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+            // Decode the accumulated bytes with one decoder pass: GetBuffer() exposes the
+            // MemoryStream's storage (removing the ToArray() full-copy) and string.Create
+            // writes the characters straight into the final string (removing the char[]
+            // intermediate and its second copy). GetCharCount/GetChars without flush
+            // reproduce the previous incremental-decoding semantics exactly.
+            Decoder decoder = encoding.GetDecoder();
+            byte[] outputBytes = outputStream.GetBuffer();
+            int outputLength = (int)outputStream.Length;
+            int charCount = decoder.GetCharCount(outputBytes.AsSpan(0, outputLength), flush: false);
+
+            string text = string.Create(charCount, (decoder, outputBytes, outputLength),
+                static (chars, state) =>
+                {
+                    state.decoder.GetChars(state.outputBytes.AsSpan(0, state.outputLength), chars, flush: false);
+                });
+
+            return (text, truncated);
+        }
+        finally
         {
-            // Remainder is discarded.
+            ArrayPool<byte>.Shared.Return(buffer);
         }
-
-        // Use incremental decoding so split trailing multibyte sequences are
-        // held back and dropped cleanly instead of producing U+FFFD.
-        Decoder decoder = encoding.GetDecoder();
-        byte[] outputBytes = outputStream.ToArray();
-        int charCount = decoder.GetCharCount(outputBytes, 0, outputBytes.Length);
-        char[] chars = new char[charCount];
-        decoder.GetChars(outputBytes, 0, outputBytes.Length, chars, 0);
-
-        return (new string(chars), truncated);
     }
 
     #endregion
