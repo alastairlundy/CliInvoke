@@ -12,27 +12,28 @@ using System.Text;
 namespace CliInvoke.Core.Internal;
 
 /// <summary>
-///     A platform-aware argument escaper for general command-line argument building.
+///     A platform-aware argument escaper for command-line argument building.
 /// </summary>
 /// <remarks>
-///     This escaper only performs the minimal, platform-appropriate quoting for the
-///     underlying C-runtime / POSIX shell argument parser. It deliberately does NOT
-///     neutralise shell metacharacters (<c>&amp;</c>, <c>|</c>, <c>&lt;</c>, <c>&gt;</c>,
-///     <c>%</c>, <c>^</c>); that is the shell layer's concern and is handled by the
-///     cmd/PowerShell specialisations. As a result the character set this escaper
-///     transforms is a strict subset of the shell-layer escaping set (e.g.
-///     <c>ShellRewriter.EscapeForCmd</c>).
 ///     <para>
-///         On Windows the C-runtime argument parser treats a doubled quote
-///         (<c>""</c>) inside a quoted token as a literal quote and gives backslashes
-///         special meaning only immediately before a quote. So inner quotes are
-///         doubled, runs of backslashes are doubled before an embedded quote and
-///         before the closing quote, and bare newlines are dropped (they would
-///         otherwise terminate the line). .NET's Unix argument parser applies the same
-///         rule for the double-quoted context the caller supplies, so the POSIX branch
-///         uses identical escaping (doubled backslashes before an embedded quote and
-///         before the closing quote, embedded quotes written as <c>""</c>) and drops
-///         bare newlines.
+///         This escaper performs the minimal escaping for the double-quoted context the caller
+///         supplies: embedded quotes are written as <c>""</c>, runs of backslashes immediately
+///         before an embedded or closing quote are doubled, and bare newlines are dropped so they
+///         cannot terminate the command line. Supplying the surrounding double quotes is always
+///         the caller's job.
+///     </para>
+///     <para>
+///         The same rules apply on both platforms: the Windows C-runtime parser gives backslashes
+///         special meaning only before a quote, and .NET's Unix parser behaves identically in the
+///         double-quoted context. The OS-specific entry points are nonetheless kept separate so
+///         any future per-platform divergence has a place to land.
+///     </para>
+///     <para>
+///         It deliberately does NOT neutralise shell metacharacters (<c>&amp;</c>, <c>|</c>,
+///         <c>&lt;</c>, <c>&gt;</c>, <c>%</c>, <c>^</c>); that is the shell layer's concern and is
+///         handled by the cmd/PowerShell specialisations. The character set this escaper
+///         transforms is therefore a strict subset of the shell-layer escaping set (e.g.
+///         <c>ShellRewriter.EscapeForCmd</c>).
 ///     </para>
 /// </remarks>
 internal static class ArgumentEscaper
@@ -42,7 +43,10 @@ internal static class ArgumentEscaper
     ///     without adding any outer wrapping.
     /// </summary>
     /// <param name="argument">The raw argument value to escape.</param>
-    /// <returns>The escaped inner content.</returns>
+    /// <returns>
+    ///     The escaped inner content, or <see cref="string.Empty"/> for
+    ///     <see langword="null"/> or empty input.
+    /// </returns>
     public static string EscapeInner(string? argument)
     {
         if (string.IsNullOrEmpty(argument))
@@ -110,8 +114,10 @@ internal static class ArgumentEscaper
     /// </summary>
     /// <param name="argument">The argument value to inspect.</param>
     /// <returns>
-    ///     <see langword="true"/> if the argument contains characters that require
-    ///     double-quote wrapping on the current OS; otherwise, <see langword="false"/>.
+    ///     <see langword="true"/> if the argument contains whitespace, a double quote,
+    ///     a backslash, or a shell metacharacter (<c>&amp;</c>, <c>|</c>, <c>&lt;</c>,
+    ///     <c>&gt;</c>, <c>^</c>, <c>%</c>); otherwise, <see langword="false"/>.
+    ///     <see langword="null"/> or empty input returns <see langword="false"/>.
     /// </returns>
     public static bool NeedsQuoting(string? argument)
     {
