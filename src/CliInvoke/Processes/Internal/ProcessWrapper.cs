@@ -1210,7 +1210,7 @@ internal class ProcessWrapper : Process
                     default:
                         throw new ArgumentOutOfRangeException(nameof(exitConfiguration),
                             exitConfiguration.RequestedCancellationExitBehaviour,
-                            "The exit behaviour is not a valid ProcessExitBehaviour value.");
+                            Resources.Exceptions_ProcessExitBehaviour_InvalidExitBehaviour);
                 }
 
                 break;

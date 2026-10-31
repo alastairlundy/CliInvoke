@@ -65,7 +65,7 @@ public class RetryStdinReplayTests
     {
         string path = Path.Combine(Path.GetTempPath(),
             $"cliinvoke-retry-stdin-replay-{Guid.NewGuid():N}.tmp");
-        File.WriteAllBytes(path, Encoding.UTF8.GetBytes("file stdin payload"));
+        await File.WriteAllBytesAsync(path, [.. "file stdin payload"u8]).ConfigureAwait(true);
 
         try
         {
@@ -74,7 +74,7 @@ public class RetryStdinReplayTests
             RetryMiddleware middleware = new RetryMiddleware(new AlwaysRetry(), CreateOptions(2));
             InvocationContext context = CreateContext(CreateConfiguration(stdin));
 
-            List<long> positionsAtAttemptStart = new List<long>();
+            List<long> positionsAtAttemptStart = [];
             int attempts = 0;
             Func<InvocationContext, Task> next = c =>
             {
@@ -92,7 +92,7 @@ public class RetryStdinReplayTests
             await Assert.That(positionsAtAttemptStart[0]).IsEqualTo(0L);
             await Assert.That(positionsAtAttemptStart[1]).IsEqualTo(0L);
             await Assert.That(context.Result).IsNotNull();
-            await Assert.That(context.Result!.ExitCode).IsEqualTo(1);
+            await Assert.That(context.Result.ExitCode).IsEqualTo(1);
         }
         finally
         {
@@ -128,7 +128,7 @@ public class RetryStdinReplayTests
 
         // The first attempt runs; the throw lands exactly where attempt 2 would start.
         await Assert.That(thrown).IsNotNull();
-        await Assert.That(thrown!.Message).IsEqualTo(NonSeekableRetryMessage);
+        await Assert.That(thrown.Message).IsEqualTo(NonSeekableRetryMessage);
         await Assert.That(attempts).IsEqualTo(1);
     }
 
@@ -220,7 +220,7 @@ public class RetryStdinReplayTests
         };
 
     private static ProcessResult MakeResult()
-        => new("dummy", 1, 1, DateTime.UtcNow, DateTime.UtcNow, false, null);
+        => new("dummy", 1, 1, DateTime.UtcNow, DateTime.UtcNow, canceled: false, signal: null);
 
     // Drains the source to end-of-stream, modelling the copy PipeStandardInputAsync performs
     // during an attempt (a no-op past end-of-stream, so the read loop always terminates).

@@ -152,8 +152,9 @@ public class ProcessRuntimeBugfixTests
 
             await Assert.That(propagated).IsNotNull();
 
+            bool hasExited = process.HasExited;
             await ProcessTestHelper.WaitForConditionAsync(
-                () => process.HasExited,
+                () => hasExited,
                 TimeSpan.FromSeconds(5),
                 failureMessage: "Process was not terminated by the cancellation machinery within 5s.").ConfigureAwait(true);
 
