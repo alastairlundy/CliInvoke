@@ -49,6 +49,11 @@ public static class PostExitValidation
     /// </summary>
     /// <param name="exitCodes">The set of permitted exit codes.</param>
     /// <returns>A validator enforcing one of the allowed exit codes.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when <paramref name="exitCodes" /> is <see langword="null"/> (checked before any
+    ///     rule is built; the underlying <see cref="CommonValidationRules&lt;ProcessResult&gt;"/>
+    ///     factory performs the same eager null validation).
+    /// </exception>
     public static IProcessResultValidator<ProcessResult> ExitCodeIsOneOf(params int[] exitCodes)
     {
         ArgumentNullException.ThrowIfNull(exitCodes);
