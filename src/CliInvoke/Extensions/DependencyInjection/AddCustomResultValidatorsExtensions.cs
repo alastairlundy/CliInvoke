@@ -42,7 +42,8 @@ public static class AddCustomResultValidatorsExtensions
         ///     class.
         /// </typeparam>
         /// <param name="validationRules">
-        ///     An array of functions that take a TProcessResult as input and return a boolean indicating
+        ///     An array of functions that take a nullable TProcessResult as input and return a boolean
+        ///     indicating
         ///     whether
         ///     the validation passes or fails for that specific rule. Each function represents a single
         ///     validation rule.
@@ -62,7 +63,7 @@ public static class AddCustomResultValidatorsExtensions
         ///     thrown.
         /// </exception>
         public IServiceCollection AddValidationRules<TProcessResult>(
-            Func<TProcessResult, bool>[] validationRules,
+            Func<TProcessResult?, bool>[] validationRules,
             ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
             where TProcessResult : ProcessResult
         {

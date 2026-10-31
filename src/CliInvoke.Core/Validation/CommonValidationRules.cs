@@ -32,57 +32,59 @@ public static class CommonValidationRules<TProcessResult>
 
     /// <summary>
     ///     A predefined validation rule that ensures the process result's exit code is zero.
+    ///     A <c>null</c> result fails the rule.
     /// </summary>
     /// <returns>
     ///     A function that evaluates to true if the exit code of the process result equals zero;
     ///     otherwise, false.
     /// </returns>
-    public static Func<TProcessResult, bool> RequiresExitCodeZero
+    public static Func<TProcessResult?, bool> RequiresExitCodeZero
         => RequiresExitCode(0);
 
     /// <summary>
     ///     A validation rule that always returns true, effectively bypassing any validation logic.
+    ///     A <c>null</c> result passes the rule.
     /// </summary>
     /// <returns>
-    ///     A function that takes an instance of <typeparamref name="TProcessResult" /> as input and always
+    ///     A function that takes a nullable instance of <typeparamref name="TProcessResult" /> as input and always
     ///     evaluates to true.
     /// </returns>
-    public static Func<TProcessResult, bool> NoValidation()
+    public static Func<TProcessResult?, bool> NoValidation()
     {
         return _ => true;
     }
 
     /// <summary>
     ///     A validation rule that checks whether the process result's exit code matches the specified
-    ///     value.
+    ///     value. A <c>null</c> result fails the rule.
     /// </summary>
     /// <param name="exitCode">
     ///     The expected exit code that the process result must match for the validation to succeed.
     /// </param>
     /// <returns>
-    ///     A function that takes an instance of <typeparamref name="TProcessResult" /> as input and
+    ///     A function that takes a nullable instance of <typeparamref name="TProcessResult" /> as input and
     ///     evaluates to true if the exit code matches; otherwise, false.
     /// </returns>
-    public static Func<TProcessResult, bool> RequiresExitCode(int exitCode)
+    public static Func<TProcessResult?, bool> RequiresExitCode(int exitCode)
     {
-        return result => result.ExitCode == exitCode;
+        return result => result is { } nonNull && nonNull.ExitCode == exitCode;
     }
 
     /// <summary>
     ///     A validation rule that checks whether the process result's exit code is one of the specified
-    ///     allowed exit codes.
+    ///     allowed exit codes. A <c>null</c> result fails the rule.
     /// </summary>
     /// <param name="exitCodes">
     ///     The collection of allowed exit codes that the process result can match for the validation to
     ///     succeed.
     /// </param>
     /// <returns>
-    ///     A function that takes an instance of <typeparamref name="TProcessResult" /> as input and
+    ///     A function that takes a nullable instance of <typeparamref name="TProcessResult" /> as input and
     ///     evaluates to true if the exit code matches any in the provided collection; otherwise, false.
     /// </returns>
-    public static Func<TProcessResult, bool> RequiresAllowedExitCode(params int[] exitCodes)
+    public static Func<TProcessResult?, bool> RequiresAllowedExitCode(params int[] exitCodes)
     {
-        return result => exitCodes.Any(code => result.ExitCode == code);
+        return result => result is { } nonNull && exitCodes.Any(code => nonNull.ExitCode == code);
     }
 
     /// <summary>
@@ -95,10 +97,10 @@ public static class CommonValidationRules<TProcessResult>
     ///     <see cref="BufferedProcessResult.StandardOutput" />.
     /// </param>
     /// <returns>
-    ///     A function that takes an instance of <see cref="BufferedProcessResult" /> as input and evaluates to
+    ///     A function that takes a nullable <see cref="BufferedProcessResult" /> as input and evaluates to
     ///     true if the standard output matches the pattern; otherwise, false.
     /// </returns>
-    public static Func<BufferedProcessResult, bool> RequiresStandardOutputMatches(string regex)
+    public static Func<BufferedProcessResult?, bool> RequiresStandardOutputMatches(string regex)
     {
         ArgumentException.ThrowIfNullOrEmpty(regex);
 
@@ -115,10 +117,10 @@ public static class CommonValidationRules<TProcessResult>
     ///     <see cref="BufferedProcessResult" />; results that do not expose standard error text pass the rule.
     /// </summary>
     /// <returns>
-    ///     A function that takes an instance of <see cref="BufferedProcessResult" /> as input and evaluates to
+    ///     A function that takes a nullable <see cref="BufferedProcessResult" /> as input and evaluates to
     ///     true if the standard error is empty; otherwise, false.
     /// </returns>
-    public static Func<BufferedProcessResult, bool> RequiresStandardErrorIsEmpty() 
+    public static Func<BufferedProcessResult?, bool> RequiresStandardErrorIsEmpty() 
         => result => result is not { } buffered
                      || string.IsNullOrWhiteSpace(buffered.StandardError);
 
@@ -157,7 +159,6 @@ public static class CommonValidationRules<TProcessResult>
     /// <returns>A <see cref="ValidationRule{TProcessResult}" /> enforcing empty standard error.</returns>
     public static ValidationRule<BufferedProcessResult> StandardErrorIsEmptyRule()
         => new(
-            RequiresStandardErrorIsEmpty(),
-            nameof(RequiresStandardErrorIsEmpty),
+            RequiresStandardErrorIsEmpty(), nameof(RequiresStandardErrorIsEmpty),
             "Standard error was not empty.");
 }

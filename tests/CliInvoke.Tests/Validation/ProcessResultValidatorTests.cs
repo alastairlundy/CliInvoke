@@ -22,7 +22,7 @@ public class ProcessResultValidatorTests
     public async Task Constructor_FromPredicates_NullRules_Throws()
     {
         await Assert.That(() => new ProcessResultValidator<ProcessResult>(
-                (Func<ProcessResult, bool>[])null!))
+                (Func<ProcessResult?, bool>[])null!))
             .Throws<ArgumentNullException>();
     }
 
@@ -67,7 +67,7 @@ public class ProcessResultValidatorTests
     {
         // Arrange
         ProcessResultValidator<ProcessResult> validator = new(
-            new ValidationRule<ProcessResult>[] { new(r => r.ExitCode == 0, "exit zero") });
+            new ValidationRule<ProcessResult>[] { new(r => r is { } valid && valid.ExitCode == 0, "exit zero") });
 
         // Act / Assert
         await Assert.That(validator.Validate(MakeResult(0))).IsTrue();
@@ -79,7 +79,7 @@ public class ProcessResultValidatorTests
     {
         // Arrange
         ProcessResultValidator<ProcessResult> validator =
-            new(Array.Empty<Func<ProcessResult, bool>>());
+            new(Array.Empty<Func<ProcessResult?, bool>>());
 
         // Act / Assert
         await Assert.That(validator.Validate(MakeResult(123))).IsTrue();
@@ -90,9 +90,9 @@ public class ProcessResultValidatorTests
     {
         // Arrange
         ValidationRule<ProcessResult> exitRule =
-            new(r => r.ExitCode == 0, "exit zero");
+            new(r => r is { } valid && valid.ExitCode == 0, "exit zero");
         ValidationRule<ProcessResult> pidRule =
-            new(r => r.ProcessId > 0, "positive pid");
+            new(r => r is { } valid && valid.ProcessId > 0, "positive pid");
         ProcessResultValidator<ProcessResult> validator =
             new([exitRule, pidRule]);
 
@@ -109,7 +109,7 @@ public class ProcessResultValidatorTests
     {
         // Arrange
         ProcessResultValidator<ProcessResult> validator = new(
-            new ValidationRule<ProcessResult>[] { new(r => r.ExitCode == 0, "exit zero") });
+            new ValidationRule<ProcessResult>[] { new(r => r is { } valid && valid.ExitCode == 0, "exit zero") });
 
         // Act
         ValidationFailure<ProcessResult>[] failures = validator.GetValidationFailures(MakeResult(0));
@@ -123,7 +123,7 @@ public class ProcessResultValidatorTests
     {
         // Arrange
         ValidationRule<ProcessResult> rule =
-            new(r => r.ExitCode == 0, "exit zero");
+            new(r => r is { } valid && valid.ExitCode == 0, "exit zero");
         ProcessResultValidator<ProcessResult> validator =
             new([rule]);
 
