@@ -26,7 +26,7 @@
 - Multi-targets `net10.0` and `net11.0`.
 
 #### Changed
-- Validation rule predicates are nullability-honest: `ValidationRule` and `CommonValidationRules<T>` factory delegates are now `Func<TProcessResult?, bool>`. The null-input contract previously hidden from the compiler (post-exit validation feeds `null` to buffered-text rules for unbuffered results) is now compiler-enforced, with per-rule null semantics documented. Erased CLR signatures are unchanged.
+- Validation rule predicates are nullability-honest: `ValidationRule` and `CommonValidationRules&lt;T&gt;` factory delegates are now `Func&lt;TProcessResult?, bool&gt;`. The null-input contract previously hidden from the compiler (post-exit validation feeds `null` to buffered-text rules for unbuffered results) is now compiler-enforced, with per-rule null semantics documented. Erased CLR signatures are unchanged.
 - `ProcessResult` / `BufferedProcessResult` equality now compares `ExecutedFilePath` with the platform path comparison (`OrdinalIgnoreCase` on Windows, `Ordinal` elsewhere), so results differing only by path casing compare equal on Windows.
 - `ProcessConfiguration.Equals` computes faster and order-independent environment-variable comparisons; string comparisons in the equality paths are explicitly ordinal.
 
