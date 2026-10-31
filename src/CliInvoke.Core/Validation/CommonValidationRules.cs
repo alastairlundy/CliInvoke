@@ -118,11 +118,9 @@ public static class CommonValidationRules<TProcessResult>
     ///     A function that takes an instance of <see cref="BufferedProcessResult" /> as input and evaluates to
     ///     true if the standard error is empty; otherwise, false.
     /// </returns>
-    public static Func<BufferedProcessResult, bool> RequiresStandardErrorIsEmpty()
-    {
-        return result => result is not { } buffered
-                         || string.IsNullOrWhiteSpace(buffered.StandardError);
-    }
+    public static Func<BufferedProcessResult, bool> RequiresStandardErrorIsEmpty() 
+        => result => result is not { } buffered
+                     || string.IsNullOrWhiteSpace(buffered.StandardError);
 
     /// <summary>
     ///     A self-describing validation rule that ensures the process exited with a zero exit code.

@@ -84,7 +84,7 @@ public sealed class ArgumentsSpec
 
         if (!IsValidArgument(value))
             throw new ArgumentException(
-                $"Argument '{value}' not permitted based on validation logic.", nameof(value));
+                string.Format(Resources.Exceptions_ArgumentsSpec_ArgumentValidationLogic_Failed, value), nameof(value));
 
         string processedValue = escape ? EscapeCharacters(value) : value;
 
@@ -113,9 +113,9 @@ public sealed class ArgumentsSpec
 
         if (!IsValidArgument(value, _formatProvider))
             throw new ArgumentException(
-                $"Argument '{value.ToString()}' not permitted based on validation logic.", nameof(value));
+                string.Format(Resources.Exceptions_ArgumentsSpec_ArgumentValidationLogic_Failed, value.ToString()), nameof(value));
 
-        string valueActual = value.ToString(null, _formatProvider);
+        string valueActual = value.ToString(format: null, _formatProvider);
 
         if (valueActual is null || string.IsNullOrWhiteSpace(valueActual))
             throw new ArgumentNullException(nameof(value));

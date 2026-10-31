@@ -134,7 +134,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
 
             spec.SetProcessorAffinity(
                 source.ResourcePolicy.ProcessorAffinity ??
-                (nint)ProcessResourcePolicy.Default.ProcessorAffinity);
+                ProcessResourcePolicy.DefaultProcessorAffinity);
         });
 
         ConfigureUserCredential(spec =>
@@ -547,5 +547,4 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
         _userCredentialSpec.Dispose();
     }
 }
-
 #pragma warning restore CA1416

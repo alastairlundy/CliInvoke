@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+// ReSharper disable once CheckNamespace
 namespace CliInvoke.Extensions;
 
 /// <summary>
