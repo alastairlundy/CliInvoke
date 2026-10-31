@@ -133,11 +133,9 @@ public class FilePathResolver : IFilePathResolver
         }
 
         bool fileHasExtension = Path.GetExtension(filePathToResolve) != string.Empty;
-
         string fileName = Path.GetFileName(filePathToResolve);
 
-        bool lookForExtension = !fileHasExtension && (OperatingSystem.IsWindows() ||
-                                                      OperatingSystem.IsMacOS() ||
+        bool lookForExtension = !fileHasExtension && (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ||
                                                       OperatingSystem.IsMacCatalyst());
 
         foreach (string pathEntry in pathContents)
@@ -199,30 +197,24 @@ public class FilePathResolver : IFilePathResolver
         
         try
         {
-            directoryPath = Path.GetDirectoryName(filePathToResolve) ??
-                            filePathToResolve.Remove(index, fileName.Length);
+            directoryPath = Path.GetDirectoryName(filePathToResolve) ?? filePathToResolve.Remove(index, fileName.Length);
 
             if (directoryPath.Length == 0)
+                //TODO: Provide exception details for this exception.
                 throw new Exception();
         }
         catch (Exception)
         {
-            // Fallback when directory inference fails: use current working directory.
-            // This catch handles any exception during directory path inference
-            // (e.g., ArgumentOutOfRangeException when filename not found in path,
-            // or when Path.GetDirectoryName returns null and string operations fail).
-            // Per glossary Try* catch discipline: broad catch acceptable here as
-            // LocateFileFromDirectory is not Try*-governed but serves as a fallback
-            // for the main resolution flow.
+            // Fallback when directory inference fails: use current working directory. This catch handles any exception during
+            // directory path inference (e.g., ArgumentOutOfRangeException when filename not found in path, or when Path.GetDirectoryName
+            // returns null and string operations fail). Broad catch acceptable here as LocateFileFromDirectory is not Try*-governed
+            // but serves as a fallback for the main resolution flow.
             directoryPath = Environment.CurrentDirectory;
         }
         
         DirectoryInfo directory = new(directoryPath);
 
-        // Limit the enumeration to the immediate directory (no recursion). The previous
-        // RecurseSubdirectories:true walked the entire subtree from the inferred base directory,
-        // which is a denial-of-service / over-broad-match surface when the base directory is large
-        // or attacker-influenced. A single-level lookup is sufficient for the directory-recursion
+        // Limit the enumeration to the immediate directory (no recursion). A single-level lookup is sufficient for the directory-recursion
         // fallback and avoids enumerating unrelated files.
         FileInfo? file = directory.EnumerateFiles("*", new EnumerationOptions
             {
@@ -241,7 +233,7 @@ public class FilePathResolver : IFilePathResolver
                     // ReSharper disable once InvertIf
                     if (extensionIndex != -1)
                     {
-                        StringBuilder sb = new StringBuilder(f.FullName);
+                        StringBuilder sb = new(f.FullName);
 
                         for (int i = 0; i < extension.Length; i++)
                         {
@@ -259,17 +251,15 @@ public class FilePathResolver : IFilePathResolver
 
         if (file is null)
             throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace(
-                    "{file}",
-                    filePathToResolve));
+                Resources.Exceptions_FileNotFound.Replace("{file}",
+                    filePathToResolve, StringComparison.OrdinalIgnoreCase));
 
         FileInfo refreshed = new FileInfo(file.FullName);
 
         if (!refreshed.Exists)
             throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace(
-                    "{file}",
-                    filePathToResolve));
+                Resources.Exceptions_FileNotFound.Replace("{file}",
+                    filePathToResolve, StringComparison.OrdinalIgnoreCase));
 
         return refreshed;
     }
@@ -286,7 +276,7 @@ public class FilePathResolver : IFilePathResolver
     /// </remarks>
     protected virtual string[] GetPathFileExtensions()
     {
-        string[] extensions = PathEnvironmentVariable.EnumerateFileExtensions().ToArray();
+        string[] extensions = [.. PathEnvironmentVariable.EnumerateFileExtensions()];
 
         for (int i = 0; i < extensions.Length; i++)
         {

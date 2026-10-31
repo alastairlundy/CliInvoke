@@ -379,8 +379,7 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
     [UnsupportedOSPlatform("tvos")]
     public async Task<BufferedProcessResult> CaptureBufferedResultAsync(
         CancellationToken cancellationToken,
-        long? maxStandardOutputBytes = null,
-        long? maxStandardErrorBytes = null)
+        long? maxStandardOutputBytes = null, long? maxStandardErrorBytes = null)
     {
         ProcessWrapper wrapper;
         lock (_lifecycleLock)
@@ -445,14 +444,12 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             // yield no partial strings.
             (string StandardOutput, string StandardError, bool WasTruncated) capturedOutput =
                 outputStrings.Status == TaskStatus.RanToCompletion
-                    ? outputStrings.Result
-                    : (string.Empty, string.Empty, false);
+                    ? await outputStrings.ConfigureAwait(false) : (string.Empty, string.Empty, false);
 
-            BufferedProcessResult result = new BufferedProcessResult(wrapper.StartInfo.FileName,
+            BufferedProcessResult result = new(wrapper.StartInfo.FileName,
                 wrapper.ExitCode,
                 wrapper.Id, capturedOutput.StandardOutput, capturedOutput.StandardError,
-                wrapper.StartTime,
-                wrapper.ExitTime,
+                wrapper.StartTime, wrapper.ExitTime,
                 canceled: wrapper.Canceled,
                 signal: wrapper.Signal,
                 wasTruncated: capturedOutput.WasTruncated);
