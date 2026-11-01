@@ -50,6 +50,9 @@ internal static class PathEnvironmentVariable
     /// </returns>
     public static IEnumerable<string>? EnumerateDirectories()
     {
+        // Computed once for the whole enumeration instead of per PATH entry.
+        string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
         return Environment.GetEnvironmentVariable("PATH")
             ?.Split(PathContentsSeparatorChar, StringSplitOptions.RemoveEmptyEntries)
             .Where(p => !string.IsNullOrWhiteSpace(p))
@@ -61,12 +64,10 @@ internal static class PathEnvironmentVariable
 
                 if (x.StartsWith('~', StringComparison.OrdinalIgnoreCase))
                 {
-                    x = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{x[1..]}";
+                    x = $"{userProfile}{x[1..]}";
                 }
 
                 const string homeToken = "$HOME";
-                string userProfile = Environment.GetFolderPath(
-                    Environment.SpecialFolder.UserProfile);
 
                 int homeTokenIndex = x.IndexOf(
                     homeToken,
