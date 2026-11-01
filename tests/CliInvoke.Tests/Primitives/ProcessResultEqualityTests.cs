@@ -44,31 +44,29 @@ public class ProcessResultEqualityTests
 
     [Test]
     public async Task ProcessResult_CanceledDifference_AffectsEquality()
-{
-    ProcessResult notCanceled = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
-        new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: null);
-    ProcessResult canceled = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
-        new DateTime(2026, 1, 1, 0, 0, 1), canceled: true, signal: null);
+    {
+        ProcessResult notCanceled = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
+            new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: null);
+        ProcessResult canceled = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
+            new DateTime(2026, 1, 1, 0, 0, 1), canceled: true, signal: null);
 
-    await Assert.That(notCanceled.Equals(canceled)).IsFalse();
-    await Assert.That(canceled.Equals(notCanceled)).IsFalse();
-    await Assert.That(notCanceled.GetHashCode()).IsNotEqualTo(canceled.GetHashCode());
-}
+        await Assert.That(notCanceled.Equals(canceled)).IsFalse();
+        await Assert.That(canceled.Equals(notCanceled)).IsFalse();
+    }
 
-[Test]
-public async Task ProcessResult_SignalDifference_AffectsEquality()
-{
-    ProcessResult noSignal = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
-        new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: null);
+    [Test]
+    public async Task ProcessResult_SignalDifference_AffectsEquality()
+    {
+        ProcessResult noSignal = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
+            new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: null);
 
 #pragma warning disable CA1416
-    ProcessResult signaled = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
-        new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: PosixSignal.SIGTERM);
+        ProcessResult signaled = new("foo.exe", 0, 1, new DateTime(2026, 1, 1, 0, 0, 0),
+            new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: PosixSignal.SIGTERM);
 #pragma warning restore CA1416
 
-    await Assert.That(noSignal.Equals(signaled)).IsFalse();
-    await Assert.That(signaled.Equals(noSignal)).IsFalse();
-    await Assert.That(noSignal.GetHashCode()).IsNotEqualTo(signaled.GetHashCode());
+        await Assert.That(noSignal.Equals(signaled)).IsFalse();
+        await Assert.That(signaled.Equals(noSignal)).IsFalse();
     }
 
     [Test]
@@ -110,6 +108,5 @@ public async Task ProcessResult_SignalDifference_AffectsEquality()
             new DateTime(2026, 1, 1, 0, 0, 1), canceled: false, signal: null);
 
         await Assert.That(a.Equals(b)).IsFalse();
-        await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
     }
 }

@@ -38,8 +38,16 @@ public static class CommonValidationRules<TProcessResult>
     ///     A function that evaluates to true if the exit code of the process result equals zero;
     ///     otherwise, false.
     /// </returns>
+    /// <remarks>
+    ///     The delegate is memoized in a static field so each access to this property returns
+    ///     the same instance instead of allocating a fresh closure per read.
+    /// </remarks>
     public static Func<TProcessResult?, bool> RequiresExitCodeZero
-        => RequiresExitCode(0);
+        => s_exitCodeZero;
+
+    // Memoized so the RequiresExitCodeZero property does not allocate a closure and a rule
+    // delegate on every property access.
+    private static readonly Func<TProcessResult?, bool> s_exitCodeZero = RequiresExitCode(0);
 
     /// <summary>
     ///     A validation rule that always returns true, effectively bypassing any validation logic.
@@ -82,9 +90,32 @@ public static class CommonValidationRules<TProcessResult>
     ///     A function that takes a nullable instance of <typeparamref name="TProcessResult" /> as input and
     ///     evaluates to true if the exit code matches any in the provided collection; otherwise, false.
     /// </returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown eagerly at rule creation when <paramref name="exitCodes" /> is <see langword="null"/>,
+    ///     rather than surfacing a <see cref="NullReferenceException"/> from inside the returned
+    ///     predicate on the first result evaluation.
+    /// </exception>
     public static Func<TProcessResult?, bool> RequiresAllowedExitCode(params int[] exitCodes)
     {
-        return result => result is { } nonNull && exitCodes.Any(code => nonNull.ExitCode == code);
+        ArgumentNullException.ThrowIfNull(exitCodes);
+
+        // A direct loop instead of exitCodes.Any(...): removes the LINQ enumerator and
+        // delegate allocations on every result evaluation. The exitCodes capture itself
+        // is required by the Func<TProcessResult?, bool> contract, so one closure per
+        // call remains.
+        return result =>
+        {
+            if (result is not { } nonNull)
+                return false;
+
+            foreach (int code in exitCodes)
+            {
+                if (nonNull.ExitCode == code)
+                    return true;
+            }
+
+            return false;
+        };
     }
 
     /// <summary>

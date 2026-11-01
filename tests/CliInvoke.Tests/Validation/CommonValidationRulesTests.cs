@@ -45,6 +45,20 @@ public class CommonValidationRulesTests
     }
 
     [Test]
+    public async Task RequiresAllowedExitCode_NullArray_ThrowsEagerly()
+    {
+        await Assert.That(() => CommonValidationRules<ProcessResult>.RequiresAllowedExitCode(null!))
+            .Throws<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task RequiresAllowedExitCode_EmptyArray_NeverMatches()
+    {
+        Func<ProcessResult, bool> rule = CommonValidationRules<ProcessResult>.RequiresAllowedExitCode([]);
+        await Assert.That(rule(MakeResult(0))).IsFalse();
+    }
+
+    [Test]
     public async Task NoValidation_AlwaysTrue()
     {
         await Assert.That(CommonValidationRules<ProcessResult>.NoValidation()(MakeResult(99))).IsTrue();

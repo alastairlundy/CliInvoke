@@ -72,7 +72,7 @@ public class ProcessConfigurationPropertyTests
         Prop.ForAll<string, string>((a, b) =>
             {
                 if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b) ||
-                    string.Equals(a, b, StringComparison.Ordinal))
+                    string.Equals(a, b, PlatformPathComparison()))
                     return true;
 
                 ProcessConfiguration config1 = new() { TargetFilePath = a };
@@ -82,6 +82,21 @@ public class ProcessConfigurationPropertyTests
             })
             .QuickCheckThrowOnFailure();
     }
+
+    /// <summary>
+    ///     The comparison <see cref="ProcessConfiguration"/> uses for its path members
+    ///     (see <c>ProcessConfiguration.PathsEqual</c>): case-insensitive on Windows,
+    ///     ordinal elsewhere. Two targets equal under this comparison are equal by
+    ///     design (matching <see cref="object.GetHashCode"/> so the Equals/hash-code
+    ///     contract holds), so the
+    ///     <see cref="Equality_DifferentTargets_ReturnsNotEqual"/> property must
+    ///     exclude them — on Windows a case-only pair like "x" vs "X" must not count
+    ///     as a different target.
+    /// </summary>
+    private static StringComparison PlatformPathComparison()
+        => OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
 
     [Test]
     public async Task EnvironmentVariables_EqualAcrossInsertionOrder()
