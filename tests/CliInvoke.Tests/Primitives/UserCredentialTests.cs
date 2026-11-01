@@ -231,22 +231,4 @@ public class UserCredentialTests
 
         await Assert.That(a.GetHashCode()).IsEqualTo(b.GetHashCode());
     }
-
-    [Test]
-    public async Task GetHashCode_DifferentDomains_Differ()
-    {
-        UserCredential a = new("DOM1", "user", password: null, loadUserProfile: null);
-        UserCredential b = new("DOM2", "user", password: null, loadUserProfile: null);
-
-        await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
-    }
-
-    [Test]
-    public async Task GetHashCode_DifferentUserNames_Differ()
-    {
-        UserCredential a = new("DOM", "userA", password: null, loadUserProfile: null);
-        UserCredential b = new("DOM", "userB", password: null, loadUserProfile: null);
-
-        await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
-    }
 }

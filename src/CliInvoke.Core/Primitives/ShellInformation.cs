@@ -1,4 +1,4 @@
-﻿/*
+/*
     CliInvoke.Core
     Copyright (C) 2024-2026  Alastair Lundy
 
@@ -53,14 +53,55 @@ public class ShellInformation : IEquatable<ShellInformation>
     ///     <see cref="ShellInformation" />.
     /// </param>
     /// <returns>true if the two <see cref="ShellInformation" /> are equal; otherwise, false.</returns>
+    /// <remarks>
+    ///     Shell file paths are compared with the platform path comparison:
+    ///     <see cref="StringComparison.OrdinalIgnoreCase" /> on Windows and
+    ///     <see cref="StringComparison.Ordinal" /> elsewhere, matching
+    ///     <see cref="ProcessConfiguration" /> and <see cref="ProcessResult" />.
+    /// </remarks>
     public bool Equals(ShellInformation? other)
     {
         if (other is null) return false;
 
         return string.Equals(Name, other.Name, StringComparison.Ordinal) &&
                Version == other.Version &&
-               TargetFilePath.FullName.Equals(other.TargetFilePath.FullName,
-                                             StringComparison.OrdinalIgnoreCase);
+               PathsEqual(TargetFilePath.FullName, other.TargetFilePath.FullName);
+    }
+
+    /// <summary>
+    ///     Compares two file paths using <see cref="StringComparison.OrdinalIgnoreCase"/> on
+    ///     Windows and <see cref="StringComparison.Ordinal"/> elsewhere (case-sensitive
+    ///     file systems), matching <see cref="ProcessConfiguration"/> and its
+    ///     <c>PathsEqual</c> behavior, so shell paths equal under the platform
+    ///     path comparison produce equal <see cref="ShellInformation"/> values.
+    /// </summary>
+    /// <param name="left">The first file path to compare.</param>
+    /// <param name="right">The second file path to compare.</param>
+    /// <returns>true if the two paths are equal under the platform path comparison; otherwise, false.</returns>
+    private static bool PathsEqual(string left, string right)
+    {
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.Equals(left, right, comparison);
+    }
+
+    /// <summary>
+    ///     Computes a hash code for a file path using the same platform-aware comparison as
+    ///     <see cref="PathsEqual"/>, so that equal paths (per platform comparison) produce
+    ///     equal hash codes and the <see cref="Equals(ShellInformation?)"/> /
+    ///     <see cref="GetHashCode"/> contract is preserved.
+    /// </summary>
+    /// <param name="path">The file path to hash.</param>
+    /// <returns>A hash code consistent with <see cref="PathsEqual"/>.</returns>
+    private static int PathHashCode(string path)
+    {
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.GetHashCode(path, comparison);
     }
 
     /// <inheritdoc />
@@ -78,8 +119,7 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(Name, Version,
-            TargetFilePath.FullName.GetHashCode(StringComparison.OrdinalIgnoreCase));
+        return HashCode.Combine(Name, Version, PathHashCode(TargetFilePath.FullName));
     }
 
     /// <summary>

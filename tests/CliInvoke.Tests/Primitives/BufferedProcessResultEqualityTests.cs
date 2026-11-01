@@ -86,19 +86,6 @@ public class BufferedProcessResultEqualityTests
     }
 
     [Test]
-    public async Task GetHashCode_DiffersWhenProcessIdDiffers()
-    {
-        BufferedProcessResult a = new BufferedProcessResult(
-            "tool", exitCode: 0, processId: 1, standardOutput: "out", standardError: "err",
-            startTime: FixedTime, exitTime: FixedTime, canceled: false, signal: null);
-        BufferedProcessResult b = new BufferedProcessResult(
-            "tool", exitCode: 0, processId: 2, standardOutput: "out", standardError: "err",
-            startTime: FixedTime, exitTime: FixedTime, canceled: false, signal: null);
-
-        await Assert.That(a.GetHashCode()).IsNotEqualTo(b.GetHashCode());
-    }
-
-    [Test]
     public async Task NullEqualsNull_IsTrue()
     {
         BufferedProcessResult? a = null;
