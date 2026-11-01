@@ -64,7 +64,7 @@ internal static class PathEnvironmentVariable
 
                 if (x.StartsWith('~', StringComparison.OrdinalIgnoreCase))
                 {
-                    x = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{x[1..]}";
+                    x = $"{userProfile}{x[1..]}";
                 }
 
                 const string homeToken = "$HOME";
