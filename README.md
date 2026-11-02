@@ -36,7 +36,7 @@ CliInvoke runs external processes from C# without the `System.Diagnostics.Proces
 * Mockable design: reference `CliInvoke.Core` abstractions in your libraries and mock `IProcessInvoker` in unit tests.
 * A middleware pipeline for logging, retries, output truncation, and post-exit validation; PowerShell and CMD specializations via `UsePowerShell` and `UseCmd` <sup>1</sup>
 * Dependency Injection extensions register `IProcessInvoker`, `IExternalProcessFactory`, and middleware from a single `AddCliInvoke()` call.
-* AOT compatible, trimmable, few dependencies, and [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support. Supports .NET 10 and .NET 11.
+* Supports AOT compilation and trimming, few dependencies, and [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) support. Supports .NET 10 and .NET 11.
 
 <sup>1</sup> Specializations library distributed separately.
 
