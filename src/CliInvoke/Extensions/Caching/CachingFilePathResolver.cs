@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core.Internal;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CliInvoke.Extensions.Caching;
@@ -21,8 +22,10 @@ namespace CliInvoke.Extensions.Caching;
 ///         Lives in <c>CliInvoke.Extensions</c>; <c>CliInvoke.Core</c> remains free of caching concerns.
 ///     </para>
 ///     <para>
-///         Cache keys are normalised per OS casing rules: case-insensitive on Windows,
-///         as-is elsewhere. Two lookups that differ only by case share one cache entry on Windows.
+///         Cache keys are normalised per OS casing rules: uppercased on Windows, as-is
+///         elsewhere. Two lookups that differ only by case share one cache entry on Windows.
+///         The normalization is defined once in
+///         <see cref="CliInvoke.Core.Internal.TargetFilePathNormalization"/>.
 ///     </para>
 ///     <para>
 ///         A benign concurrent-compute race exists: two threads resolving the same target
@@ -62,7 +65,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(filePathToResolve);
 
-        string key = NormalizeKey(filePathToResolve);
+        string key = TargetFilePathNormalization.NormalizeCase(filePathToResolve);
 
         if (TryGetVerified(key, out FileInfo? cached) && cached is not null)
             return cached;
@@ -89,7 +92,7 @@ public sealed class CachingFilePathResolver : IFilePathResolver
 
         try
         {
-            string key = NormalizeKey(filePathToResolve);
+            string key = TargetFilePathNormalization.NormalizeCase(filePathToResolve);
 
             if (TryGetVerified(key, out FileInfo? cached) && cached is not null)
             {
@@ -150,12 +153,5 @@ public sealed class CachingFilePathResolver : IFilePathResolver
             entryOptions.RegisterPostEvictionCallback(_options.PostEvictionCallback);
 
         _cache.Set(key, absolutePath, entryOptions);
-    }
-
-    private static string NormalizeKey(string key)
-    {
-        return OperatingSystem.IsWindows()
-            ? key.ToUpperInvariant()
-            : key;
     }
 }
