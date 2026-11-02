@@ -341,36 +341,24 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <summary>
     ///     Compares two file paths using <see cref="StringComparison.OrdinalIgnoreCase"/> on
     ///     Windows (where file-system paths are case-insensitive) and
-    ///     <see cref="StringComparison.Ordinal"/> elsewhere.
+    ///     <see cref="StringComparison.Ordinal"/> elsewhere; see
+    ///     <see cref="Internal.TargetFilePathNormalization.PathsEqual"/>.
     /// </summary>
     /// <param name="left">The first path to compare.</param>
     /// <param name="right">The second path to compare.</param>
     /// <returns><c>true</c> when both paths are equal under the platform comparison.</returns>
     private static bool PathsEqual(string left, string right)
-    {
-        StringComparison comparison = OperatingSystem.IsWindows()
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal;
-
-        return string.Equals(left, right, comparison);
-    }
+        => Internal.TargetFilePathNormalization.PathsEqual(left, right);
 
     /// <summary>
-    ///     Computes a hash code for a file path using the same platform-aware comparison as
+    ///     Computes a hash code for a file path under the same platform-aware comparison as
     ///     <see cref="PathsEqual"/>, so that equal paths (per platform comparison) produce
-    ///     equal hash codes and the <see cref="Equals(ProcessConfiguration?)"/> /
-    ///     <see cref="GetHashCode"/> contract is preserved.
+    ///     equal hash codes; see <see cref="Internal.TargetFilePathNormalization.PathHashCode"/>.
     /// </summary>
     /// <param name="path">The file path to hash.</param>
     /// <returns>A hash code consistent with <see cref="PathsEqual"/>.</returns>
     private static int PathHashCode(string path)
-    {
-        StringComparison comparison = OperatingSystem.IsWindows()
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal;
-
-        return string.GetHashCode(path, comparison);
-    }
+        => Internal.TargetFilePathNormalization.PathHashCode(path);
 
     /// <summary>
     ///     Compares two environment-variable dictionaries using ordinal string comparison for

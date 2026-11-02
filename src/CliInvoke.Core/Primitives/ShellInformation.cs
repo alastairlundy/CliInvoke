@@ -71,38 +71,27 @@ public class ShellInformation : IEquatable<ShellInformation>
     /// <summary>
     ///     Compares two file paths using <see cref="StringComparison.OrdinalIgnoreCase"/> on
     ///     Windows and <see cref="StringComparison.Ordinal"/> elsewhere (case-sensitive
-    ///     file systems), matching <see cref="ProcessConfiguration"/> and its
-    ///     <c>PathsEqual</c> behavior, so shell paths equal under the platform
-    ///     path comparison produce equal <see cref="ShellInformation"/> values.
+    ///     file systems), matching <see cref="ProcessConfiguration"/>, so shell paths equal
+    ///     under the platform path comparison produce equal <see cref="ShellInformation"/>
+    ///     values; see <see cref="Internal.TargetFilePathNormalization.PathsEqual"/>.
     /// </summary>
     /// <param name="left">The first file path to compare.</param>
     /// <param name="right">The second file path to compare.</param>
     /// <returns>true if the two paths are equal under the platform path comparison; otherwise, false.</returns>
     private static bool PathsEqual(string left, string right)
-    {
-        StringComparison comparison = OperatingSystem.IsWindows()
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal;
-
-        return string.Equals(left, right, comparison);
-    }
+        => Internal.TargetFilePathNormalization.PathsEqual(left, right);
 
     /// <summary>
-    ///     Computes a hash code for a file path using the same platform-aware comparison as
+    ///     Computes a hash code for a file path under the same platform-aware comparison as
     ///     <see cref="PathsEqual"/>, so that equal paths (per platform comparison) produce
     ///     equal hash codes and the <see cref="Equals(ShellInformation?)"/> /
-    ///     <see cref="GetHashCode"/> contract is preserved.
+    ///     <see cref="GetHashCode"/> contract is preserved; see
+    ///     <see cref="Internal.TargetFilePathNormalization.PathHashCode"/>.
     /// </summary>
     /// <param name="path">The file path to hash.</param>
     /// <returns>A hash code consistent with <see cref="PathsEqual"/>.</returns>
     private static int PathHashCode(string path)
-    {
-        StringComparison comparison = OperatingSystem.IsWindows()
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal;
-
-        return string.GetHashCode(path, comparison);
-    }
+        => Internal.TargetFilePathNormalization.PathHashCode(path);
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
