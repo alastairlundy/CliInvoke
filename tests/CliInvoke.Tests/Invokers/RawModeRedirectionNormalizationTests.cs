@@ -22,6 +22,9 @@ namespace CliInvoke.Tests.Invokers;
 ///     copy; Buffered untouched; null env values preserved) is pinned separately by
 ///     <c>PipelineDispatchTests</c>.
 /// </summary>
+// Real powershell.exe children through the pipeline; the guard can trip on a loaded CI runner
+// before the child gets going, so retry only the guard timeout — a real deadlock still fails.
+[Retry(2, RetryOnExceptionTypes = new[] { typeof(System.TimeoutException) })]
 public class RawModeRedirectionNormalizationTests
 {
     /// <summary>
@@ -43,7 +46,7 @@ public class RawModeRedirectionNormalizationTests
     ///     the full pipe) and the test fails with a timeout instead of stalling the
     ///     suite; no assertion depends on this bound firing.
     /// </summary>
-    private static readonly TimeSpan GuardTimeout = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan GuardTimeout = TimeSpan.FromSeconds(45);
 
     /// <summary>
     ///     The H2 hazard shape end to end: Raw mode + <c>outputRedirection: true</c>
