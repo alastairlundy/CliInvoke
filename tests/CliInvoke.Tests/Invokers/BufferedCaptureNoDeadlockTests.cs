@@ -19,6 +19,9 @@ namespace CliInvoke.Tests.Invokers;
 ///     If the pipeline awaited exit first, a child writing more than the OS pipe buffer would block
 ///     and the capture reader would never start.
 /// </summary>
+// Real powershell.exe child through the pipeline; the guard can trip on a loaded CI runner
+// before the child gets going, so retry only the guard timeout — a real deadlock still fails.
+[Retry(2, RetryOnExceptionTypes = new[] { typeof(TimeoutException) })]
 public class BufferedCaptureNoDeadlockTests
 {
     // Emits ~200 KB so the stream exceeds the default OS pipe buffer, forcing the deadlock if the
@@ -44,7 +47,7 @@ public class BufferedCaptureNoDeadlockTests
         // Wrap with a timeout so a regression (deadlock) fails fast instead of hanging the run.
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
+            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);

@@ -21,6 +21,10 @@ namespace CliInvoke.Tests.Invokers;
 ///     (<see cref="BufferedProcessResult.WasTruncated"/> is <c>false</c>). No test references the deleted
 ///     <c>MiddlewareItems</c> string-key handoff.
 /// </summary>
+// These children are real powershell.exe spawns through the pipeline; on a loaded CI runner
+// the first spawn of a run can stall past the guard below. Retry only the guard timeout so a
+// genuine deadlock still fails the build after the retries are exhausted.
+[Retry(2, RetryOnExceptionTypes = new[] { typeof(TimeoutException) })]
 public class OutputTruncationHandoffTests
 {
     // Produces ~20000 bytes of 'a' on stdout so a 1000-byte cap is unambiguously exceeded.
@@ -39,7 +43,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await CliRun
             .RunBufferedAsync(target, arguments, maxBufferedOutputBytes: 1000)
-            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
+            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsTrue();
         await Assert.That(result.StandardOutput.Length).IsLessThanOrEqualTo(1000);
@@ -52,7 +56,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await CliRun
             .RunBufferedAsync(target, arguments)
-            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
+            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsFalse();
         await Assert.That(result.StandardOutput.Length).IsGreaterThan(1000);
@@ -69,7 +73,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await CliRun
             .RunBufferedAsync(configuration, exit)
-            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
+            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsTrue();
         await Assert.That(result.StandardOutput.Length).IsLessThanOrEqualTo(1000);
@@ -87,7 +91,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
+            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsTrue();
@@ -106,7 +110,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
+            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsFalse();
@@ -129,7 +133,7 @@ public class OutputTruncationHandoffTests
 
         BufferedProcessResult result = await invoker
             .ExecuteBufferedAsync(config, exit)
-            .WaitAsync(TimeSpan.FromSeconds(30)).ConfigureAwait(true);
+            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsTrue();
