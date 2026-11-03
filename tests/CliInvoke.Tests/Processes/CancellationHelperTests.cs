@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using CliInvoke.Core.Exceptions;
 using CliInvoke.Processes.Internal.Cancellation;
 
 namespace CliInvoke.Tests.Processes;
@@ -35,7 +36,7 @@ public class CancellationHelperTests
                 DateTime.UtcNow.AddSeconds(-10), CancellationReason.Timeout,
                 Config(ProcessExceptionBehaviour.AllowExceptionsIfUnexpected),
                 new OperationCanceledException()))
-            .Throws<OperationCanceledException>();
+            .Throws<CliInvokeTimeoutException>();
     }
 
     [Test]
@@ -78,7 +79,7 @@ public class CancellationHelperTests
                 DateTime.UtcNow, CancellationReason.Timeout,
                 Config(ProcessExceptionBehaviour.AllowExceptions),
                 new OperationCanceledException()))
-            .Throws<OperationCanceledException>();
+            .Throws<CliInvokeTimeoutException>();
     }
 
     [Test]

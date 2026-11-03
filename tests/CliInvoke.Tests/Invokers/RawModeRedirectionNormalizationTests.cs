@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Tests.Helpers;
 using TUnit.Core.Exceptions;
 
 namespace CliInvoke.Tests.Invokers;
@@ -62,9 +63,15 @@ public class RawModeRedirectionNormalizationTests
         ProcessConfiguration configuration = new(targetFilePath, arguments,
             outputRedirection: true);
 
-        ProcessResult result = await CliRun.RunAsync(configuration,
-                ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(GuardTimeout).ConfigureAwait(true);
+        Task<ProcessResult> runTask = CliRun.RunAsync(configuration,
+                ProcessExitConfiguration.CreateGraceful());
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(GuardTimeout)).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after {GuardTimeout.TotalSeconds}s. Child state:\n{diag}");
+        }
+        ProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.Canceled).IsFalse();
@@ -83,9 +90,15 @@ public class RawModeRedirectionNormalizationTests
         ProcessConfiguration configuration = new(targetFilePath, arguments,
             outputRedirection: true);
 
-        ProcessResult result = await CliRun.RunAsync(configuration,
-                ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(GuardTimeout).ConfigureAwait(true);
+        Task<ProcessResult> runTask = CliRun.RunAsync(configuration,
+                ProcessExitConfiguration.CreateGraceful());
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(GuardTimeout)).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after {GuardTimeout.TotalSeconds}s. Child state:\n{diag}");
+        }
+        ProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.Canceled).IsFalse();

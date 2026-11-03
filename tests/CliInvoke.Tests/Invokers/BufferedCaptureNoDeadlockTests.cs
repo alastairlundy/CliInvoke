@@ -9,6 +9,7 @@
 
 using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware.Truncation;
+using CliInvoke.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Tests.Invokers;
@@ -45,9 +46,15 @@ public class BufferedCaptureNoDeadlockTests
         ProcessConfiguration config = new ProcessConfiguration(target, arguments);
 
         // Wrap with a timeout so a regression (deadlock) fails fast instead of hanging the run.
-        BufferedProcessResult result = await invoker
-            .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
+        Task<BufferedProcessResult> runTask = invoker
+            .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+        }
+        BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.ExitCode).IsEqualTo(0);
