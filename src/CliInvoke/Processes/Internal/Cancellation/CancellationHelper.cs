@@ -7,6 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
+using CliInvoke.Core;
+using CliInvoke.Core.Exceptions;
+
 namespace CliInvoke.Processes.Internal.Cancellation;
 
 internal static class CancellationHelper
@@ -56,6 +59,10 @@ internal static class CancellationHelper
     /// <param name="cancellationReason">The determined reason for the cancellation.</param>
     /// <param name="exitConfiguration">The exit configuration controlling exception behaviour.</param>
     /// <param name="exception">The exception to evaluate.</param>
+    /// <param name="childState">
+    ///     Optional snapshot of the child process state captured when the cancellation occurred,
+    ///     attached to the thrown timeout/cancellation exception for diagnostics.
+    /// </param>
     /// <remarks>
     ///     When <see cref="ProcessExitConfiguration.ExceptionBehaviour" /> is
     ///     <see cref="ProcessExceptionBehaviour.AllowExceptionsIfUnexpected" /> and the reason is a
@@ -69,7 +76,7 @@ internal static class CancellationHelper
     /// <exception cref="Exception">Rethrown when the exception behaviour configuration permits it.</exception>
     internal static void HandleCancellationExceptions(DateTime expectedExitTime,
         CancellationReason cancellationReason, ProcessExitConfiguration exitConfiguration,
-        Exception exception)
+        Exception exception, ProcessDiagnostic? childState = null)
     {
         // The caller-configured cancellation knob overrides the default
         // ExceptionBehaviour heuristics: when CancellationThrowsException is set, any
@@ -77,8 +84,14 @@ internal static class CancellationHelper
         // the caller, regardless of whether the cancellation was user-requested or
         // timer-driven (see troubleshooting docs). Genuine (non-cancellation) failures
         // remain governed by ExceptionBehaviour below.
-        if (exitConfiguration.CancellationThrowsException && exception is OperationCanceledException)
-            throw exception;
+        if (exitConfiguration.CancellationThrowsException && exception is OperationCanceledException oceThrow)
+        {
+            int pid = childState?.ProcessId ?? 0;
+            TimeSpan elapsed = childState?.Elapsed ?? TimeSpan.Zero;
+            if (cancellationReason == CancellationReason.Timeout)
+                throw new CliInvokeTimeoutException(oceThrow.Message, oceThrow, pid, childState, elapsed);
+            throw new CliInvokeCanceledException(oceThrow.Message, oceThrow, pid, childState, elapsed);
+        }
 
         DateTime actualExitTime = DateTime.UtcNow;
         TimeSpan difference = TimeSpan.FromTicks(Math.Abs(expectedExitTime.Ticks - actualExitTime.Ticks));
@@ -89,7 +102,15 @@ internal static class CancellationHelper
             {
                 if (exitConfiguration.ExceptionBehaviour is ProcessExceptionBehaviour
                         .AllowExceptions)
+                {
+                    if (exception is OperationCanceledException oceReq)
+                    {
+                        int pid = childState?.ProcessId ?? 0;
+                        TimeSpan elapsed = childState?.Elapsed ?? TimeSpan.Zero;
+                        throw new CliInvokeCanceledException(oceReq.Message, oceReq, pid, childState, elapsed);
+                    }
                     throw exception;
+                }
 
                 break;
             }
@@ -97,7 +118,17 @@ internal static class CancellationHelper
             {
                 if (exitConfiguration.ExceptionBehaviour
                     == ProcessExceptionBehaviour.AllowExceptions)
+                {
+                    if (exception is OperationCanceledException oceAllow)
+                    {
+                        int pid = childState?.ProcessId ?? 0;
+                        TimeSpan elapsed = childState?.Elapsed ?? TimeSpan.Zero;
+                        if (cancellationReason == CancellationReason.Timeout)
+                            throw new CliInvokeTimeoutException(oceAllow.Message, oceAllow, pid, childState, elapsed);
+                        throw new CliInvokeCanceledException(oceAllow.Message, oceAllow, pid, childState, elapsed);
+                    }
                     throw exception;
+                }
 
                 // AllowExceptionsIfUnexpected swallows only cancellation exceptions raised
                 // on time (the expected kill timer or caller token firing at the threshold).
@@ -107,7 +138,17 @@ internal static class CancellationHelper
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected
                     && (exception is not OperationCanceledException
                         || difference > TimeSpan.FromSeconds(1)))
+                {
+                    if (exception is OperationCanceledException oceUnexpected)
+                    {
+                        int pid = childState?.ProcessId ?? 0;
+                        TimeSpan elapsed = childState?.Elapsed ?? TimeSpan.Zero;
+                        if (cancellationReason == CancellationReason.Timeout)
+                            throw new CliInvokeTimeoutException(oceUnexpected.Message, oceUnexpected, pid, childState, elapsed);
+                        throw new CliInvokeCanceledException(oceUnexpected.Message, oceUnexpected, pid, childState, elapsed);
+                    }
                     throw exception;
+                }
 
                 break;
             }

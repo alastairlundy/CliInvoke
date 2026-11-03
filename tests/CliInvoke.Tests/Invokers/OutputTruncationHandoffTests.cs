@@ -9,6 +9,7 @@
 
 using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware.Truncation;
+using CliInvoke.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Tests.Invokers;
@@ -41,9 +42,15 @@ public class OutputTruncationHandoffTests
     {
         (string target, string arguments) = GetLargeOutputCommand();
 
-        BufferedProcessResult result = await CliRun
-            .RunBufferedAsync(target, arguments, maxBufferedOutputBytes: 1000)
-            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
+        Task<BufferedProcessResult> runTask = CliRun
+            .RunBufferedAsync(target, arguments, maxBufferedOutputBytes: 1000);
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+        }
+        BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsTrue();
         await Assert.That(result.StandardOutput.Length).IsLessThanOrEqualTo(1000);
@@ -54,9 +61,15 @@ public class OutputTruncationHandoffTests
     {
         (string target, string arguments) = GetLargeOutputCommand();
 
-        BufferedProcessResult result = await CliRun
-            .RunBufferedAsync(target, arguments)
-            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
+        Task<BufferedProcessResult> runTask = CliRun
+            .RunBufferedAsync(target, arguments);
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+        }
+        BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsFalse();
         await Assert.That(result.StandardOutput.Length).IsGreaterThan(1000);
@@ -71,9 +84,15 @@ public class OutputTruncationHandoffTests
         ProcessExitConfiguration exit = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), 1000);
 
-        BufferedProcessResult result = await CliRun
-            .RunBufferedAsync(configuration, exit)
-            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
+        Task<BufferedProcessResult> runTask = CliRun
+            .RunBufferedAsync(configuration, exit);
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+        }
+        BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result.WasTruncated).IsTrue();
         await Assert.That(result.StandardOutput.Length).IsLessThanOrEqualTo(1000);
@@ -89,9 +108,15 @@ public class OutputTruncationHandoffTests
         (string target, string arguments) = GetLargeOutputCommand();
         ProcessConfiguration config = new ProcessConfiguration(target, arguments);
 
-        BufferedProcessResult result = await invoker
-            .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
+        Task<BufferedProcessResult> runTask = invoker
+            .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+        }
+        BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsTrue();
@@ -108,9 +133,15 @@ public class OutputTruncationHandoffTests
         (string target, string arguments) = GetLargeOutputCommand();
         ProcessConfiguration config = new ProcessConfiguration(target, arguments);
 
-        BufferedProcessResult result = await invoker
-            .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful())
-            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
+        Task<BufferedProcessResult> runTask = invoker
+            .ExecuteBufferedAsync(config, ProcessExitConfiguration.CreateGraceful());
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+        }
+        BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsFalse();
@@ -131,9 +162,15 @@ public class OutputTruncationHandoffTests
         ProcessExitConfiguration exit = ProcessExitConfiguration.WithMaxBufferedOutputBytes(
             ProcessExitConfiguration.CreateGraceful(), 1000);
 
-        BufferedProcessResult result = await invoker
-            .ExecuteBufferedAsync(config, exit)
-            .WaitAsync(TimeSpan.FromSeconds(45)).ConfigureAwait(true);
+        Task<BufferedProcessResult> runTask = invoker
+            .ExecuteBufferedAsync(config, exit);
+        Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
+        if (completedTask != runTask)
+        {
+            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+        }
+        BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.WasTruncated).IsTrue();
