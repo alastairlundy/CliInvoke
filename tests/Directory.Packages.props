@@ -9,6 +9,6 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.14" />
     <PackageVersion Include="TUnit" Version="1.78.0" />
     <PackageVersion Include="FsCheck" Version="3.5.0" />
-    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.315" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.320" />
   </ItemGroup>
 </Project>
