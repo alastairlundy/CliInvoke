@@ -34,15 +34,15 @@ Key Abstractions:
 
 ## Comparison vs Alternatives
 
-| Feature / Criterion                                                        |  CliInvoke  |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   | [ProcessX](https://github.com/Cysharp/ProcessX) |
-|----------------------------------------------------------------------------|:-----------:|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------:|
-| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                         |                        ❌                        |
-| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                         |                        ❌                        |
-| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                        ✅*                                                        |                       ❌*                        |
-| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                         |                        ✅                        |
-| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                     ✅ (MIT)                     |
+| Feature / Criterion                                                        |  CliInvoke   |                                  [CliWrap](https://github.com/Tyrrrz/CliWrap/)                                   | [ProcessX](https://github.com/Cysharp/ProcessX) |
+|----------------------------------------------------------------------------|:------------:|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------:|
+| Dedicated builder, model, and invoker types (clear separation of concerns) |      ✅      |                                                        ❌                                                        |                       ❌                        |
+| Dependency Injection registration extensions                               |      ✅      |                                                        ❌                                                        |                       ❌                        |
+| Installable via NuGet                                                      |      ✅      |                                                        ✅                                                        |                       ✅                        |
+| Official cross‑platform support (advertised: Windows/macOS/Linux/BSD)      |      ✅      |                                                       ✅*                                                        |                       ❌*                       |
+| Buffered and non‑buffered execution modes                                  |      ✅      |                                                        ✅                                                        |                       ✅                        |
+| Small surface area and minimal dependencies                                |      ✅      |                                                        ✅                                                        |                       ✅                        |
+| Licensing / repository additional terms                                    | ✅ (MPL‑2.0) | ⚠️ (MIT; test project references a source‑available library; repo contains an informal "Terms of Use" statement) |                    ✅ (MIT)                     |
 
 ## Installing CliInvoke.Core
 CliInvoke.Core packages can be installed via the .NET SDK CLI, Nuget via your IDE or code editor's package interface, or via the Nuget website.
