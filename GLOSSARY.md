@@ -38,6 +38,13 @@ A runner process that executes its target by forwarding arguments verbatim to it
 
 The act of producing a new configuration from an existing one, preserving all member values except a stated delta. Derived configurations share resource-owning members by reference; disposal remains the caller's responsibility.
 
+### Arguments string vs ArgumentList
+
+`Arguments` is a preformatted command-line string: it is delivered as written, and the values
+inside it are not kept separate — a space splits them at the shell. `ArgumentList` keeps each
+value separate: one entry, one argument. When `ArgumentList` is non-empty it takes precedence
+over `Arguments`. The splitting behaviour of the string form is specified behaviour, not a
+defect. The full decision record is `docs/adr/0005-arguments-preformatted-string.md`.
 
 ## Versioning Terms
 
