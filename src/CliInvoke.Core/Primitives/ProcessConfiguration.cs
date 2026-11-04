@@ -145,32 +145,30 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     } = Directory.GetCurrentDirectory();
 
     /// <summary>
-    ///     The arguments to be provided to the executable to be run.
+    ///     The command-line arguments as a preformatted string, delivered exactly as
+    ///     written. The values inside it are not kept separate: a delimiter the
+    ///     consuming shell recognises (a space, on the POSIX path) splits the text.
+    ///     See <c>docs/adr/0005-arguments-preformatted-string.md</c> and the README for
+    ///     the full contract.
     /// </summary>
     /// <remarks>
-    ///     When <see cref="ArgumentList"/> is non-empty, the control adapter ignores this
-    ///     property and emits <see cref="ArgumentList"/> via
-    ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead. This
-    ///     prevents the double-parse command-injection vector where a re-tokenised
-    ///     <c>Arguments</c> string is re-interpreted by a wrapped shell.
+    ///     When <see cref="ArgumentList"/> is non-empty it takes precedence and this
+    ///     property is ignored.
     /// </remarks>
     public string Arguments { get; init; } = string.Empty;
 
     /// <summary>
-    ///     An optional verbatim argument list. When non-empty, the control adapter emits these via
-    ///     <see cref="System.Diagnostics.ProcessStartInfo.ArgumentList"/> instead of the single
-    ///     <see cref="Arguments"/> string, so the operating-system command-line parser passes each
-    ///     entry to the child process unmodified. <b>If both <see cref="Arguments"/> and
-    ///     <see cref="ArgumentList"/> are set, <see cref="ArgumentList"/> takes precedence and
-    ///     <see cref="Arguments"/> is ignored.</b> This is the safe path for shell wrappers
-    ///     (PowerShell/cmd), whose own parser would otherwise re-interpret a single re-tokenized
-    ///     <see cref="Arguments"/> string, a command-injection vector.
+    ///     An optional argument list that keeps each value separate: one entry holds one
+    ///     value, and each entry is delivered to the target as exactly one argument.
+    ///     See <c>docs/adr/0005-arguments-preformatted-string.md</c> and the README for
+    ///     the full contract.
     /// </summary>
     /// <remarks>
-    ///     Any supplied list is captured as a snapshot; later mutations made to the caller's
-    ///     original collection are not reflected in the configuration. A null list, or a
-    ///     null entry within the list, is rejected with an <see cref="ArgumentNullException"/>.
-    ///     Empty-string entries are preserved.
+    ///     When non-empty, this property takes precedence over <see cref="Arguments"/>
+    ///     and <see cref="Arguments"/> is then ignored. Any supplied list is captured as
+    ///     a snapshot; later mutations to the caller's original collection are not
+    ///     reflected. A null list or a null entry is rejected with an
+    ///     <see cref="ArgumentNullException"/>; empty-string entries are preserved.
     /// </remarks>
     public IReadOnlyList<string> ArgumentList
     {
