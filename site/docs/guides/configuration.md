@@ -94,6 +94,37 @@ ProcessConfiguration config = new ProcessConfiguration("dotnet")
 };
 ```
 
+#### Choosing between `Arguments` and `ArgumentList`
+
+`ProcessConfiguration` accepts command-line arguments in two ways:
+
+- **`Arguments`** is a preformatted command-line string. CliInvoke passes it to the process
+  (or to a shell composition) exactly as written. It does not keep the values inside it
+  separate: any delimiter the consuming shell recognises — a space, on the POSIX path — splits
+  the text into separate arguments. Quoting and escaping inside this string are the caller's
+  responsibility.
+- **`ArgumentList`** holds one value per entry — for example a single file name. Each entry is
+  delivered to the target as exactly one argument, quoted or escaped per shell by the library.
+  This is the form to use when a value must arrive unchanged, whatever characters it contains.
+
+When `ArgumentList` is non-empty it takes precedence over `Arguments`.
+
+Example — a caller wants `safe.txt --overwrite` to arrive as **one** file name. Passing it as
+a single `ArgumentList` entry does that. Passing the same text in `Arguments` does not; the
+shell splits it at the space:
+
+```text
+Argument count: 2
+argv[1] = <safe.txt>
+argv[2] = <--overwrite>
+```
+
+(The expected result for a single-argument call is `Argument count: 1`,
+`argv[1] = <safe.txt --overwrite>`.)
+
+Migration one-liner: a single value currently placed in `Arguments` belongs in `ArgumentList`
+as one entry.
+
 The model is immutable after construction: every property is
 `{ get; init; }`, so `TargetFilePath`, `Arguments`,
 `OutputRedirection`, and the rest can be set only during construction
