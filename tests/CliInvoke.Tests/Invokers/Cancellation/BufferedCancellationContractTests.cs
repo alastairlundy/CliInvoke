@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+using CliInvoke.Core.Exceptions;
 using CliInvoke.Processes;
 
 // MA0032 ("use an overload with a CancellationToken argument") suggests passing a token to
@@ -125,6 +126,63 @@ public class BufferedCancellationContractTests
             }
 
             await Assert.That(propagated).IsNotNull();
+        }
+        finally
+        {
+            if (!process.HasExited)
+            {
+                await process.Kill().ConfigureAwait(true);
+            }
+
+            process.Dispose();
+
+            if (File.Exists(markerPath))
+                File.Delete(markerPath);
+        }
+    }
+
+    /// <summary>
+    ///     Buffered mode with <c>CancellationThrowsException = true</c> and a forceful timer
+    ///     timeout: the kill timer's cancellation must propagate an
+    ///     <see cref="OperationCanceledException"/> to the caller — surfaced as the concrete
+    ///     <see cref="CliInvokeTimeoutException"/> — so existing OCE handlers around the
+    ///     buffered APIs keep catching timer-driven timeouts, not just caller cancellations.
+    /// </summary>
+    [Test]
+    public async Task Buffered_TimerTimeout_WithCancellationThrowsException_PropagatesOperationCanceled()
+    {
+        string markerPath = Path.Combine(Path.GetTempPath(),
+            $"cliinvoke-buffered-timeout-throws-{Guid.NewGuid():N}.marker");
+
+        ProcessConfiguration configuration = new(
+            ProcessTestHelper.GetSignalTrappingHelperPath(),
+            $"\"{markerPath}\" 30", outputRedirection: true);
+
+        ProcessExitConfiguration exitConfiguration = new(
+            ProcessTimeoutPolicy.FromTimeSpan(TimeSpan.FromSeconds(2), ProcessExitBehaviour.ForcefulExit),
+            cancellationThrowsException: true);
+
+        ExternalProcess process = new(new FilePathResolver(), configuration, exitConfiguration);
+
+        try
+        {
+            process.Start();
+
+            Task<BufferedProcessResult> captureTask =
+                process.CaptureBufferedResultAsync(CancellationToken.None);
+
+            OperationCanceledException? propagated = null;
+            try
+            {
+                await captureTask.WaitAsync(TimeSpan.FromSeconds(20)).ConfigureAwait(true);
+            }
+            catch (OperationCanceledException exception)
+            {
+                propagated = exception;
+            }
+
+            await Assert.That(propagated).IsNotNull();
+            await Assert.That(propagated).IsTypeOf<CliInvokeTimeoutException>();
         }
         finally
         {

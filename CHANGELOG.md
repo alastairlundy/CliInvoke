@@ -14,6 +14,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 - On the `net11.0` leg, Windows and macOS children start suspended (`ProcessStartInfo.StartSuspended`) so a configured `ProcessResourcePolicy` is applied before the child first runs; Linux and FreeBSD keep the previous behaviour (the runtime rejects suspended start there). If resuming a creation-suspended child fails for a reason other than the child already having exited, the child is forceful-exited and the failure propagates from `Start`/`StartAsync` instead of leaving it suspended forever.
 - Guarded-execution guide (`site/docs/guides/guarded-execution.md`): failure-mode-organised reference mapping hangs, runaway output, ignored exit codes, and secret leaks onto CliInvoke's timeout, cancellation, and exit-configuration guards, for automation and agent harnesses.
 - OpenTelemetry middleware recipe (`site/docs/guides/opentelemetry-middleware.md`): a ~30-line `IProcessMiddleware` sample emitting one `ActivitySource` span per invocation (exit code, duration, canceled, mode), with registration and OTLP listener snippets. Spans deliberately carry no output content or raw arguments.
+- **Timeout and cancellation exceptions carry child-process diagnostics.** When an invocation times out or is cancelled and the exit configuration lets the exception propagate, CliInvoke now throws `CliInvokeTimeoutException` or `CliInvokeCanceledException` instead of the bare `OperationCanceledException` it surfaced before, exposing `ProcessId`, `Elapsed`, and a `ProcessDiagnostic` snapshot taken at the throw site (exit state and exit code, thread states, and the `net11.0` `StartSuspended` flag) so callers and CI logs can distinguish a cold-start stall, a suspended-start race, and a genuine deadlock. Both types derive from `OperationCanceledException` — the framework exception they replace, because a timeout is implemented as cancellation of the wait — so existing `catch (OperationCanceledException)` handlers keep working for timer-driven timeouts with `CancellationThrowsException` enabled as well as for caller-requested cancellations; catch the concrete `CliInvokeTimeoutException` to tell a timeout apart from a cancellation. `CliInvokeTimeoutException` deliberately does **not** derive from `TimeoutException`: C# single inheritance cannot make one exception type match both `catch (OperationCanceledException)` and `catch (TimeoutException)`, and the cancellation contract is the one the troubleshooting guide, the `CaptureBufferedResultAsync` docs, and every released version already honour.
 
 ### Changed
 
@@ -324,7 +325,7 @@ Themes:
 - Fixed the `ProcessInvoker` constructor signature in the middleware docs.
 - Fixed stale v1 API references across documentation and READMEs.
 - Rewrote agent skill descriptions for consistency.
-- Removed `Dxxx` decision-ledger citations from documentation and tests, and from `GLOSSARY.md`.
+- Removed decision-ledger citations from documentation and tests, and from `GLOSSARY.md`.
 - Added the 3.0.0 breaking-changes changelog and migration guide.
 - Fixed a code sample in Section 6 of the migration guide.
 - Added a migration guide for the `ExternalProcess` no-mutation contract.

@@ -799,6 +799,92 @@ internal class ProcessWrapper : Process
         }
     }
     
+    /// <summary>
+    ///     Captures a point-in-time snapshot of this process's state for diagnostic purposes.
+    ///     Safe to call even if the process has exited or been disposed; returns best-effort
+    ///     values (zeros / <c>false</c>) when state cannot be read.
+    /// </summary>
+    /// <returns>A <see cref="ProcessDiagnostic"/> describing the current state.</returns>
+    internal ProcessDiagnostic CaptureDiagnostic()
+    {
+        bool hasExited = false;
+        int? exitCode = null;
+        try
+        {
+            hasExited = HasExited;
+        }
+        catch
+        {
+            hasExited = false;
+        }
+
+        if (hasExited)
+        {
+            try
+            {
+                exitCode = ExitCode;
+            }
+            catch
+            {
+                exitCode = null;
+            }
+        }
+
+        bool isSuspended = false;
+        if (!hasExited && Id > 0)
+        {
+            try
+            {
+                using System.Diagnostics.Process found = System.Diagnostics.Process.GetProcessById(Id);
+                var threads = found.Threads;
+                if (threads.Count > 0)
+                {
+                    bool allSuspended = true;
+                    foreach (System.Diagnostics.ProcessThread thread in threads)
+                    {
+                        if (thread.ThreadState != System.Diagnostics.ThreadState.Wait
+                            || thread.WaitReason != System.Diagnostics.ThreadWaitReason.Suspended)
+                        {
+                            allSuspended = false;
+                            break;
+                        }
+                    }
+                    isSuspended = allSuspended;
+                }
+            }
+            catch
+            {
+                isSuspended = false;
+            }
+        }
+
+        bool awaitingInitialResume;
+#if NET11_0
+        awaitingInitialResume = _awaitingInitialResume;
+#else
+        awaitingInitialResume = false;
+#endif
+
+        TimeSpan elapsed;
+        try
+        {
+            elapsed = DateTime.UtcNow - StartTime;
+        }
+        catch
+        {
+            elapsed = TimeSpan.Zero;
+        }
+
+        return new ProcessDiagnostic(
+            ProcessId: Id,
+            HasExited: hasExited,
+            ExitCode: exitCode,
+            IsSuspended: isSuspended,
+            AwaitingInitialResume: awaitingInitialResume,
+            Elapsed: elapsed,
+            CapturedAtUtc: DateTime.UtcNow);
+    }
+
     #region Cancellation Methods
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
@@ -941,13 +1027,14 @@ internal class ProcessWrapper : Process
         {
             semaphoreAcquired = await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException oce)
         {
             // The token was already cancelled on entry, so no cancellation machinery was ever armed for this wait
             // and nothing will terminate the child. Without this forceful exit, a pre-cancelled invocation would
             // orphan the started child: the caller receives the exception and holds no handle to it.
+            ProcessDiagnostic diagnostic = CaptureDiagnostic();
             ForcefulExit();
-            throw;
+            throw new CliInvokeCanceledException(oce.Message, oce, oce.CancellationToken, diagnostic.ProcessId, diagnostic, diagnostic.Elapsed);
         }
 
         if (!semaphoreAcquired)
@@ -1017,10 +1104,11 @@ internal class ProcessWrapper : Process
         }
         catch (Exception exception) when (!isGraceful)
         {
+            ProcessDiagnostic diagnostic1 = CaptureDiagnostic();
             CancellationHelper.HandleCancellationExceptions(
                 expectedExitTime,
                 CancellationReason.RequestedCancellation, processExitConfiguration,
-                exception);
+                exception, diagnostic1);
         }
         finally
         {
@@ -1095,12 +1183,13 @@ internal class ProcessWrapper : Process
                 semaphoreAcquired = await _cancellationSemaphore
                     .WaitAsync(0, cancellationToken).ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException oce)
             {
                 // Same pre-cancelled-token gap as WaitForExitCoreAsync: the throw escapes below this point's kill machinery,
                 // so terminate the started child here instead of orphaning it when the exception propagates.
+                ProcessDiagnostic diagnostic = CaptureDiagnostic();
                 ForcefulExit();
-                throw;
+                throw new CliInvokeCanceledException(oce.Message, oce, oce.CancellationToken, diagnostic.ProcessId, diagnostic, diagnostic.Elapsed);
             }
 
             if (!semaphoreAcquired)
@@ -1123,8 +1212,9 @@ internal class ProcessWrapper : Process
                 // for why the assignment must not sit after HandleCancellationExceptions.
                 _cancellationReason = cancellationReason;
 
+                ProcessDiagnostic diagnostic2 = CaptureDiagnostic();
                 CancellationHelper.HandleCancellationExceptions(expectedExitTime,
-                    cancellationReason, exitConfiguration, exception);
+                    cancellationReason, exitConfiguration, exception, diagnostic2);
             }
             finally
             {
@@ -1194,11 +1284,16 @@ internal class ProcessWrapper : Process
             // the cancellation machinery performed the termination.
             _cancellationReason = cancellationReason;
 
+            // Capture the child state BEFORE HandleCancellationMode runs: its forceful-exit
+            // branches kill the child, and the propagated exception must record the state at
+            // cancellation time (e.g. still suspended) rather than a post-kill snapshot.
+            ProcessDiagnostic diagnostic3 = CaptureDiagnostic();
+
             cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason).ConfigureAwait(false);
 
             CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                 cancellationReason,
-                exitConfiguration, exception);
+                exitConfiguration, exception, diagnostic3);
         }
         finally
         {
