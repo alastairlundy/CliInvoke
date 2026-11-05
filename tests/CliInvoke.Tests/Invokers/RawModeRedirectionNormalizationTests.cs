@@ -68,7 +68,7 @@ public class RawModeRedirectionNormalizationTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(GuardTimeout)).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = CaptureChildState(chatty: true);
             throw new System.TimeoutException($"Timed out after {GuardTimeout.TotalSeconds}s. Child state:\n{diag}");
         }
         ProcessResult result = await runTask.ConfigureAwait(true);
@@ -95,7 +95,7 @@ public class RawModeRedirectionNormalizationTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(GuardTimeout)).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = CaptureChildState(chatty: false);
             throw new System.TimeoutException($"Timed out after {GuardTimeout.TotalSeconds}s. Child state:\n{diag}");
         }
         ProcessResult result = await runTask.ConfigureAwait(true);
@@ -139,6 +139,26 @@ public class RawModeRedirectionNormalizationTests
 
         string sh = ResolveRequired("sh", "A POSIX shell (sh) is not available on PATH.");
         return (sh, "-c \"exit 0\"");
+    }
+
+    /// <summary>
+    ///     Captures diagnostics for the child processes this test class actually spawns
+    ///     on the current OS: <c>powershell</c>/<c>pwsh</c> on Windows, and <c>sh</c> on
+    ///     POSIX — plus <c>dd</c> for the chatty case, whose payload writer runs as a
+    ///     child of <c>sh</c>. A Windows-only capture would report nothing about the
+    ///     process that is actually stuck on non-Windows CI legs.
+    /// </summary>
+    /// <param name="chatty">Whether the guarded test spawns the chatty <c>sh</c>/<c>dd</c> pipeline.</param>
+    /// <returns>A diagnostic snapshot of the relevant child processes.</returns>
+    private static string CaptureChildState(bool chatty)
+    {
+        if (OperatingSystem.IsWindows())
+            return ChildProcessStateDiagnostics.CapturePowerShell();
+
+        string shState = ChildProcessStateDiagnostics.Capture("sh");
+        return chatty
+            ? shState + ChildProcessStateDiagnostics.Capture("dd")
+            : shState;
     }
 
     /// <summary>
