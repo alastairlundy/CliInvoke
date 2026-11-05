@@ -37,6 +37,20 @@ public class OutputTruncationHandoffTests
         return ("/bin/bash", "-c \"printf 'a%.0s' {1..20000}\"");
     }
 
+    /// <summary>
+    ///     Captures diagnostics for the child this class starts on the current OS:
+    ///     <c>powershell</c>/<c>pwsh</c> on Windows, and the <c>bash</c> child that
+    ///     <see cref="GetLargeOutputCommand"/> spawns on POSIX, so a guard timeout
+    ///     reports the state of the process that is actually stuck.
+    /// </summary>
+    /// <returns>A diagnostic snapshot of the relevant child processes.</returns>
+    private static string CaptureChildState()
+    {
+        return OperatingSystem.IsWindows()
+            ? ChildProcessStateDiagnostics.CapturePowerShell()
+            : ChildProcessStateDiagnostics.Capture("bash");
+    }
+
     [Test]
     public async Task RunBufferedAsync_WithMaxBufferedOutputBytes_TruncatesAndSetsWasTruncated()
     {
@@ -47,7 +61,7 @@ public class OutputTruncationHandoffTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = CaptureChildState();
             throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
@@ -66,7 +80,7 @@ public class OutputTruncationHandoffTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = CaptureChildState();
             throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
@@ -89,7 +103,7 @@ public class OutputTruncationHandoffTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = CaptureChildState();
             throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
@@ -113,7 +127,7 @@ public class OutputTruncationHandoffTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = CaptureChildState();
             throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
@@ -138,7 +152,7 @@ public class OutputTruncationHandoffTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = CaptureChildState();
             throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
@@ -167,7 +181,7 @@ public class OutputTruncationHandoffTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = CaptureChildState();
             throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
