@@ -1284,9 +1284,13 @@ internal class ProcessWrapper : Process
             // the cancellation machinery performed the termination.
             _cancellationReason = cancellationReason;
 
+            // Capture the child state BEFORE HandleCancellationMode runs: its forceful-exit
+            // branches kill the child, and the propagated exception must record the state at
+            // cancellation time (e.g. still suspended) rather than a post-kill snapshot.
+            ProcessDiagnostic diagnostic3 = CaptureDiagnostic();
+
             cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason).ConfigureAwait(false);
 
-            ProcessDiagnostic diagnostic3 = CaptureDiagnostic();
             CancellationHelper.HandleCancellationExceptions(expectedExitTime,
                 cancellationReason,
                 exitConfiguration, exception, diagnostic3);
