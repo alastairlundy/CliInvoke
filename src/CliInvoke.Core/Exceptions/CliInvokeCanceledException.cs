@@ -39,18 +39,24 @@ public sealed class CliInvokeCanceledException : OperationCanceledException
     }
 
     /// <summary>
-    ///     Initialises a new instance with a message, an inner exception, and child-state diagnostics.
+    ///     Initialises a new instance with a message, an inner exception, a cancellation token,
+    ///     and child-state diagnostics.
     /// </summary>
     /// <param name="message">A description of the cancellation.</param>
     /// <param name="innerException">The exception that caused this cancellation.</param>
+    /// <param name="cancellationToken">
+    ///     The cancellation token associated with the cancellation; preserved by the base
+    ///     <see cref="OperationCanceledException"/> so callers can match the exception against
+    ///     the token they observe.
+    /// </param>
     /// <param name="processId">The OS-assigned identifier of the child process.</param>
     /// <param name="childState">
     ///     A point-in-time snapshot of the child process's state when the cancellation fired.
     /// </param>
     /// <param name="elapsed">How long the process had been running when the cancellation fired.</param>
-    public CliInvokeCanceledException(string message, Exception? innerException, int processId,
-        ProcessDiagnostic? childState, TimeSpan elapsed)
-        : base(message, innerException)
+    public CliInvokeCanceledException(string message, Exception? innerException, CancellationToken cancellationToken,
+        int processId, ProcessDiagnostic? childState, TimeSpan elapsed)
+        : base(message, innerException, cancellationToken)
     {
         ProcessId = processId;
         ChildState = childState;

@@ -1034,7 +1034,7 @@ internal class ProcessWrapper : Process
             // orphan the started child: the caller receives the exception and holds no handle to it.
             ProcessDiagnostic diagnostic = CaptureDiagnostic();
             ForcefulExit();
-            throw new CliInvokeCanceledException(oce.Message, oce, diagnostic.ProcessId, diagnostic, diagnostic.Elapsed);
+            throw new CliInvokeCanceledException(oce.Message, oce, oce.CancellationToken, diagnostic.ProcessId, diagnostic, diagnostic.Elapsed);
         }
 
         if (!semaphoreAcquired)
@@ -1189,7 +1189,7 @@ internal class ProcessWrapper : Process
                 // so terminate the started child here instead of orphaning it when the exception propagates.
                 ProcessDiagnostic diagnostic = CaptureDiagnostic();
                 ForcefulExit();
-                throw new CliInvokeCanceledException(oce.Message, oce, diagnostic.ProcessId, diagnostic, diagnostic.Elapsed);
+                throw new CliInvokeCanceledException(oce.Message, oce, oce.CancellationToken, diagnostic.ProcessId, diagnostic, diagnostic.Elapsed);
             }
 
             if (!semaphoreAcquired)
