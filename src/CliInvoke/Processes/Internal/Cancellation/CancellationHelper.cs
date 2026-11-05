@@ -89,7 +89,7 @@ internal static class CancellationHelper
             int pid = childState?.ProcessId ?? 0;
             TimeSpan elapsed = childState?.Elapsed ?? TimeSpan.Zero;
             if (cancellationReason == CancellationReason.Timeout)
-                throw new CliInvokeTimeoutException(oceThrow.Message, oceThrow, pid, childState, elapsed);
+                throw new CliInvokeTimeoutException(oceThrow.Message, oceThrow, oceThrow.CancellationToken, pid, childState, elapsed);
             throw new CliInvokeCanceledException(oceThrow.Message, oceThrow, oceThrow.CancellationToken, pid, childState, elapsed);
         }
 
@@ -124,7 +124,7 @@ internal static class CancellationHelper
                         int pid = childState?.ProcessId ?? 0;
                         TimeSpan elapsed = childState?.Elapsed ?? TimeSpan.Zero;
                         if (cancellationReason == CancellationReason.Timeout)
-                            throw new CliInvokeTimeoutException(oceAllow.Message, oceAllow, pid, childState, elapsed);
+                            throw new CliInvokeTimeoutException(oceAllow.Message, oceAllow, oceAllow.CancellationToken, pid, childState, elapsed);
                         throw new CliInvokeCanceledException(oceAllow.Message, oceAllow, oceAllow.CancellationToken, pid, childState, elapsed);
                     }
                     throw exception;
@@ -144,7 +144,7 @@ internal static class CancellationHelper
                         int pid = childState?.ProcessId ?? 0;
                         TimeSpan elapsed = childState?.Elapsed ?? TimeSpan.Zero;
                         if (cancellationReason == CancellationReason.Timeout)
-                            throw new CliInvokeTimeoutException(oceUnexpected.Message, oceUnexpected, pid, childState, elapsed);
+                            throw new CliInvokeTimeoutException(oceUnexpected.Message, oceUnexpected, oceUnexpected.CancellationToken, pid, childState, elapsed);
                         throw new CliInvokeCanceledException(oceUnexpected.Message, oceUnexpected, oceUnexpected.CancellationToken, pid, childState, elapsed);
                     }
                     throw exception;
