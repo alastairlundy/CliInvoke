@@ -71,6 +71,20 @@ public static class ChildProcessStateDiagnostics
                 bool allSuspended = true;
                 bool anySuspended = false;
 
+                // Computed before thread inspection so the failure path below can still report it.
+                string elapsedText;
+                try
+                {
+                    TimeSpan elapsed = DateTime.UtcNow - process.StartTime.ToUniversalTime();
+                    elapsedText = $"{elapsed.TotalSeconds:F1}s";
+                }
+                catch
+                {
+                    // StartTime can throw (exited or access-restricted process); an
+                    // explicit unknown beats a fake elapsed=0.0s in CI logs.
+                    elapsedText = "unknown";
+                }
+
                 try
                 {
                     foreach (ProcessThread thread in process.Threads)
@@ -90,18 +104,8 @@ public static class ChildProcessStateDiagnostics
                 }
                 catch (Exception ex)
                 {
-                    sb.AppendLine($"  PID {pid} ({process.ProcessName}): thread inspection failed: {ex.Message}");
+                    sb.AppendLine($"  PID {pid} ({process.ProcessName}): thread inspection failed: {ex.Message}, elapsed={elapsedText}");
                     continue;
-                }
-
-                TimeSpan elapsed;
-                try
-                {
-                    elapsed = DateTime.UtcNow - process.StartTime.ToUniversalTime();
-                }
-                catch
-                {
-                    elapsed = TimeSpan.Zero;
                 }
 
                 string state = threadCount == 0
@@ -112,7 +116,7 @@ public static class ChildProcessStateDiagnostics
                             ? $"PARTIAL ({suspendedCount}/{threadCount} suspended)"
                             : "running";
 
-                sb.AppendLine($"  PID {pid} ({process.ProcessName}): threads={threadCount}, suspended={suspendedCount}, state={state}, elapsed={elapsed.TotalSeconds:F1}s");
+                sb.AppendLine($"  PID {pid} ({process.ProcessName}): threads={threadCount}, suspended={suspendedCount}, state={state}, elapsed={elapsedText}");
             }
             catch (Exception ex)
             {
