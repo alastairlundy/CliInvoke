@@ -67,4 +67,4 @@ trust and accountability. Check the option that applies.
 If this PR was Co-Authored by AI, please also fill in the following:
 
 - **AI agent used:** <!-- e.g. GitHub Copilot CLI, Cursor, Claude Code, Aider, ... -->
-- **AI model used:** <!-- e.g. GPT-4o, Claude 3.5 Sonnet, o1, ... -->
+- **AI model used:** <!-- e.g. GPT-6 Sol, Claude Opus 5.5, GLM-5.3 Flash, ... -->
