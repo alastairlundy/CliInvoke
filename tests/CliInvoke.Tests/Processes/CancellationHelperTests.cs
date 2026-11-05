@@ -93,4 +93,27 @@ public class CancellationHelperTests
                 new IOException("teardown read failure")))
             .ThrowsNothing();
     }
+
+    [Test]
+    public async Task HandleCancellationExceptions_RequestedCancellationOce_AllowExceptions_PreservesCancellationToken()
+    {
+        // The wrapped CliInvokeCanceledException must carry the original exception's
+        // token so callers can still match the cancellation against their own token.
+        using CancellationTokenSource cts = new();
+        CliInvokeCanceledException? caught = null;
+        try
+        {
+            CancellationHelper.HandleCancellationExceptions(
+                DateTime.UtcNow, CancellationReason.RequestedCancellation,
+                Config(ProcessExceptionBehaviour.AllowExceptions),
+                new OperationCanceledException(cts.Token));
+        }
+        catch (CliInvokeCanceledException ex)
+        {
+            caught = ex;
+        }
+
+        await Assert.That(caught).IsNotNull();
+        await Assert.That(caught!.CancellationToken).IsEqualTo(cts.Token);
+    }
 }
