@@ -51,7 +51,7 @@ public class BufferedCaptureNoDeadlockTests
         Task completedTask = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(45))).ConfigureAwait(true);
         if (completedTask != runTask)
         {
-            string diag = ChildProcessStateDiagnostics.CapturePowerShell();
+            string diag = ChildProcessStateDiagnostics.Capture(OperatingSystem.IsWindows() ? "powershell" : "bash");
             throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);

@@ -815,7 +815,7 @@ internal class ProcessWrapper : Process
         }
         catch
         {
-            hasExited = true;
+            hasExited = false;
         }
 
         if (hasExited)
