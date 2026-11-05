@@ -325,7 +325,7 @@ Themes:
 - Fixed the `ProcessInvoker` constructor signature in the middleware docs.
 - Fixed stale v1 API references across documentation and READMEs.
 - Rewrote agent skill descriptions for consistency.
-- Removed `Dxxx` decision-ledger citations from documentation and tests, and from `GLOSSARY.md`.
+- Removed decision-ledger citations from documentation and tests, and from `GLOSSARY.md`.
 - Added the 3.0.0 breaking-changes changelog and migration guide.
 - Fixed a code sample in Section 6 of the migration guide.
 - Added a migration guide for the `ExternalProcess` no-mutation contract.
