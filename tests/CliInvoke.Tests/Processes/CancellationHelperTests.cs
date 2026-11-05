@@ -116,4 +116,34 @@ public class CancellationHelperTests
         await Assert.That(caught).IsNotNull();
         await Assert.That(caught!.CancellationToken).IsEqualTo(cts.Token);
     }
+
+    [Test]
+    public async Task HandleCancellationExceptions_TimeoutOce_CancellationThrowsException_CatchableAsOperationCanceled()
+    {
+        // Contract (troubleshooting guide): with CancellationThrowsException enabled, a
+        // timer-driven timeout must surface as an OperationCanceledException so existing
+        // catch (OperationCanceledException) handlers around CaptureBufferedResultAsync
+        // and the buffered run APIs keep working; the concrete type still distinguishes
+        // it from a caller-requested cancellation, and the original token survives.
+        using CancellationTokenSource cts = new();
+        ProcessExitConfiguration configuration = new(ProcessTimeoutPolicy.Default,
+            ProcessExitBehaviour.GracefulExit,
+            ProcessExceptionBehaviour.AllowExceptionsIfUnexpected, cancellationThrowsException: true);
+
+        OperationCanceledException? caught = null;
+        try
+        {
+            CancellationHelper.HandleCancellationExceptions(
+                DateTime.UtcNow, CancellationReason.Timeout, configuration,
+                new OperationCanceledException(cts.Token));
+        }
+        catch (OperationCanceledException ex)
+        {
+            caught = ex;
+        }
+
+        await Assert.That(caught).IsNotNull();
+        await Assert.That(caught).IsTypeOf<CliInvokeTimeoutException>();
+        await Assert.That(caught!.CancellationToken).IsEqualTo(cts.Token);
+    }
 }
