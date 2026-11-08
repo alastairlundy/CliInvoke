@@ -1,6 +1,6 @@
 ---
 name: cliinvoke-publish-and-package
-description: Use when testing or performing release operations for CliInvoke.
+description: Use when performing release operations for CliInvoke.
 ---
 
 # CliInvoke Publish and Package
