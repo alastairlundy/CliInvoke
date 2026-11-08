@@ -1,6 +1,6 @@
 ---
 name: cliinvoke-pattern-validator
-description: Validates that code changes adhere to the three primary CliInvoke invocation patterns (CliRun, IProcessInvoker, and IExternalProcess) to prevent architectural pattern bleed and maintain separation of concerns. Use when updating or adding any code that touches upon process invocation.
+description: Use when updating or adding any code that touches upon process invocation or a process invocation pattern (CliRun, IProcessInvoker, and IExternalProcess).
 ---
 
 # CliInvoke Pattern Validator
