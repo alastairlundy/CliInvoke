@@ -67,13 +67,21 @@ internal static class CancellationHelper
     ///     The threshold is truncated to whole milliseconds — the same conversion the runtime's
     ///     timer queue applies to its due times — and callers capture this deadline before arming
     ///     their timer, so on the shared monotonic clock the armed timer can never fire before it.
+    ///     The add saturates at <see cref="long.MaxValue" /> rather than overflowing for a
+    ///     threshold near <see cref="TimeSpan.MaxValue" />; negative thresholds fall through
+    ///     unchanged, and every current caller either rejects them or skips enforcement.
     /// </remarks>
     /// <param name="timeoutThreshold">The timeout threshold to apply.</param>
     /// <returns>
     ///     The expected exit deadline, on the <see cref="Environment.TickCount64" /> basis.
     /// </returns>
     internal static long CalculateExpectedExitTick(TimeSpan timeoutThreshold)
-        => Environment.TickCount64 + (long)timeoutThreshold.TotalMilliseconds;
+    {
+        long thresholdMs = (long)timeoutThreshold.TotalMilliseconds;
+        long now = Environment.TickCount64;
+
+        return thresholdMs > long.MaxValue - now ? long.MaxValue : now + thresholdMs;
+    }
 
 
     /// <summary>
