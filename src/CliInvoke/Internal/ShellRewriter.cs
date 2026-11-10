@@ -136,22 +136,31 @@ internal static class ShellRewriter
 
     /// <summary>
     ///     Escapes a value so it is treated as literal data on the
-    ///     <c>cmd.exe /c</c> command line when the wrapped child target is
-    ///     a plain executable. The escape set covers command chaining
-    ///     (<c>&amp;</c>, <c>|</c>), redirection (<c>&lt;</c>, <c>&gt;</c>),
-    ///     environment-variable expansion (<c>%VAR%</c>), and quoting breaks.
+    ///     <c>cmd.exe /c</c> command line, and remains literal data when the
+    ///     composed command is re-parsed by the child: a nested
+    ///     <c>cmd.exe /c</c> child, or a batch file whose arguments undergo
+    ///     <c>%*</c>-style expansion when the batch executes. The escape set
+    ///     covers command chaining (<c>&amp;</c>, <c>|</c>), redirection
+    ///     (<c>&lt;</c>, <c>&gt;</c>), environment-variable expansion
+    ///     (<c>%VAR%</c>), delayed expansion, the caret escape character
+    ///     itself, and quoting breaks.
     /// </summary>
     /// <remarks>
-    ///     The guarantee is scoped to plain-executable child targets:
-    ///     <c>cmd.exe</c> children and batch files are outside this scope,
-    ///     as is delayed expansion (<c>!</c>), which this escaper does not
-    ///     address. Do not treat the escaped result as sufficient for
-    ///     those targets.
+    ///     Each metacharacter is written as three carets followed by the
+    ///     character. A composed command passes through one
+    ///     <c>cmd /c</c> quote-strip and caret-removal pass before the child
+    ///     sees it, and the child's own parse consumes one further caret
+    ///     level, so a triple survives both passes and still resolves to the
+    ///     literal character. Re-parse chains nested deeper than that
+    ///     (further <c>cmd.exe</c> invocations of the re-parsed text) are
+    ///     outside the guarantee. Delayed expansion only re-scans the text
+    ///     when the caller supplies <c>/V:on</c>; without it the escaped
+    ///     exclamation mark resolves to the literal character.
     /// </remarks>
     /// <param name="value">The raw argument value to escape.</param>
     /// <returns>The escaped value for embedding in a cmd command whose
-    /// wrapped child is a plain executable; see remarks for the scope of
-    /// that guarantee.</returns>
+    /// wrapped child re-parses the composed text at most once more; see
+    /// remarks for the scope of that guarantee.</returns>
     internal static string EscapeForCmd(string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -163,14 +172,17 @@ internal static class ShellRewriter
         {
             switch (c)
             {
-                // cmd.exe escape character is the caret.
+                // cmd.exe escape character is the caret. Three carets allow the
+                // escape to survive both the /c quote-strip caret-removal pass
+                // and one child re-parse; see the remarks above.
                 case '^':
                 case '&':
                 case '|':
                 case '<':
                 case '>':
                 case '%':
-                    builder.Append('^').Append(c);
+                case '!':
+                    builder.Append("^^^").Append(c);
                     break;
                 case '"':
                     // A literal quote inside a quoted cmd token is written as "".

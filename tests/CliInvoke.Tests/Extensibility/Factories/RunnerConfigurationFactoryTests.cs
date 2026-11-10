@@ -288,6 +288,25 @@ public class RunnerConfigurationFactoryTests
         await Assert.That(File.Exists(marker)).IsTrue();
     }
 
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task Calibration_CmdRawSingleString_BatchChildReparse_FiresMarker()
+    {
+        // Shelf check for the batch-child calibration: the composed delivery
+        // layout with UNescaped argument text must still let a second command
+        // through the batch file's re-parse, so the behaviour assertions below
+        // exercise a reachable defect class.
+        SkipTestIfNotWindows();
+
+        string batchFixture = CreateBatchFixture();
+        string marker = MarkerPath("CAL_CMD_BATR");
+        RunRawSingleString("cmd.exe",
+            $"/c \"\"{batchFixture}\" x & echo pwned>\"{marker}\"\"",
+            "CAL_CMD_BATR");
+
+        await Assert.That(File.Exists(marker)).IsTrue();
+    }
+
     // ------------------------------------------------------------------------
     //  Behaviour assertions: factory + pwsh runner, real pwsh, marker must NOT fire
     // ------------------------------------------------------------------------
@@ -438,6 +457,50 @@ public class RunnerConfigurationFactoryTests
         await Assert.That(markerFired).IsFalse();
     }
 
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task CmdRunner_BareAmpersand_CmdChildTarget_DoesNotFireMarker()
+    {
+        // The runner's /c parse is not the only re-parse: a wrapped cmd.exe
+        // child applies its own /c quote-strip and metacharacter pass to the
+        // composed text it receives. The escape depth must remain neutral
+        // through both passes.
+        SkipTestIfNotWindows();
+
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+
+        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
+            factory, runner, "cmd.exe",
+            "/c echo BENIGNPOINTDEPTH & echo pwned>\"" + MarkerPath("B_CMD_EXECH") + "\"",
+            "B_CMD_EXECH").ConfigureAwait(true);
+
+        await Assert.That(markerFired).IsFalse();
+    }
+
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task CmdRunner_BareAmpersand_BatchChildTarget_DoesNotFireMarker()
+    {
+        // A batch child expands %* into its echo line, and cmd re-parses that
+        // expansion — one further caret level after the runner's own strip.
+        // The escape depth must keep the composed argument text neutral
+        // through that re-parse as well.
+        SkipTestIfNotWindows();
+
+        string batchFixture = CreateBatchFixture();
+
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+
+        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
+            factory, runner, batchFixture,
+            "x & echo pwned>\"" + MarkerPath("B_CMD_BATR") + "\"",
+            "B_CMD_BATR").ConfigureAwait(true);
+
+        await Assert.That(markerFired).IsFalse();
+    }
+
     // ------------------------------------------------------------------------
     //  Benign functionality probes — the wrapper must actually run legitimate commands
     // ------------------------------------------------------------------------
@@ -485,6 +548,83 @@ public class RunnerConfigurationFactoryTests
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput).IsNotNull();
         await Assert.That(result.StandardOutput).IsNotEmpty();
+    }
+
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task CmdRunner_WrapsBatchChild_ArgumentsDeliveredIntact()
+    {
+        // Benign targets must stay runnable with their exact arguments: the
+        // composed text delivers 'a b c' verbatim through the batch's %* echo.
+        SkipTestIfNotWindows();
+
+        string batchFixture = CreateBatchFixture();
+
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(batchFixture, "a b c");
+
+        ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
+
+        IProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory());
+        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
+            wrapped, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
+
+        await Assert.That(result.ExitCode).IsEqualTo(0);
+        await Assert.That(result.StandardOutput!.Trim()).Contains("a b c");
+    }
+
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task CmdRunner_BatchChild_MetacharacterText_DeliveredAsLiteralData()
+    {
+        // Argument text that happens to contain cmd metacharacters must reach
+        // the batch child as literal data: the echo line prints it verbatim,
+        // and no second command is produced at the batch re-parse.
+        SkipTestIfNotWindows();
+
+        string batchFixture = CreateBatchFixture();
+
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(batchFixture, "a & batchargument");
+
+        ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
+
+        // The composed form must keep the metacharacter escaped; a bare ampersand
+        // run would be a second command at some parse layer.
+        await Assert.That(wrapped.Arguments).DoesNotContain(" & ");
+
+        IProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory());
+        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
+            wrapped, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
+
+        await Assert.That(result.ExitCode).IsEqualTo(0);
+        await Assert.That(result.StandardOutput).Contains("a & batchargument");
+    }
+
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task CmdRunner_CmdChild_MetacharacterArguments_ChainStaysNeutralAndChildRuns()
+    {
+        // A wrapped cmd.exe child must both run its benign echo with the
+        // argument text delivered verbatim and keep the composed chain neutral.
+        SkipTestIfNotWindows();
+
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig("cmd.exe", "/c echo GOTRESULTS a & batchargument");
+
+        ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
+
+        await Assert.That(wrapped.Arguments).DoesNotContain(" & ");
+
+        IProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory());
+        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
+            wrapped, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
+
+        await Assert.That(result.ExitCode).IsEqualTo(0);
+        await Assert.That(result.StandardOutput).Contains("a & batchargument");
     }
 
     [Test]
@@ -565,6 +705,19 @@ public class RunnerConfigurationFactoryTests
         await Assert.That(wrapped.ArgumentList[0]).IsEqualTo("--");
         await Assert.That(wrapped.ArgumentList[1]).IsEqualTo("-preserve-env=LD_PRELOAD");
         await Assert.That(wrapped.ArgumentList[2]).IsEqualTo("/bin/sh");
+    }
+
+    /// <summary>
+    ///     Creates a benign batch fixture that echoes its received arguments via
+    ///     <c>%*</c>. The expansion re-parses composed argument text at execution
+    ///     time, which is where a composed command's metacharacter escaping meets
+    ///     one further parse layer beyond the runner's own.
+    /// </summary>
+    private static string CreateBatchFixture()
+    {
+        string batchPath = Path.Combine(MarkerDir, $"benign_args_echo_{Guid.NewGuid():N}.bat");
+        File.WriteAllText(batchPath, "@echo off\r\necho BATCHOK %*\r\n");
+        return batchPath;
     }
 
     private static void SkipTestIfNotWindows()

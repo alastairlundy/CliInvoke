@@ -25,7 +25,7 @@ public class ShellRewriterMetacharacterPropertyTests
         ['`', '$', ';', '|', '&', '(', ')', '{', '}', '<', '>', '"', '\''];
 
     private static readonly char[] CmdMetacharacters =
-        ['^', '&', '|', '<', '>', '%'];
+        ['^', '&', '|', '<', '>', '%', '!'];
 
     private static readonly char[] PosixShellMetacharacters =
         ['\\', '$', '`', '"', '\'', '!', '&', '|', ';', '(', ')',
@@ -143,7 +143,9 @@ public class ShellRewriterMetacharacterPropertyTests
         {
             if (Array.IndexOf(CmdMetacharacters, c) >= 0)
             {
-                builder.Append('^').Append(c);
+                // Three carets so the escape survives the /c quote-strip
+                // caret-removal pass plus one child re-parse.
+                builder.Append("^^^").Append(c);
             }
             else if (c == '"')
             {
