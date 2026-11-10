@@ -138,12 +138,22 @@ internal static class ShellRewriter
 
     /// <summary>
     ///     Escapes a value so it is treated as literal data on the
-    ///     <c>cmd.exe /c</c> command line. Prevents command chaining
+    ///     <c>cmd.exe /c</c> command line when the wrapped child target is
+    ///     a plain executable. The escape set covers command chaining
     ///     (<c>&amp;</c>, <c>|</c>), redirection (<c>&lt;</c>, <c>&gt;</c>),
     ///     environment-variable expansion (<c>%VAR%</c>), and quoting breaks.
     /// </summary>
+    /// <remarks>
+    ///     The guarantee is scoped to plain-executable child targets:
+    ///     <c>cmd.exe</c> children and batch files are outside this scope,
+    ///     as is delayed expansion (<c>!</c>), which this escaper does not
+    ///     address. Do not treat the escaped result as sufficient for
+    ///     those targets.
+    /// </remarks>
     /// <param name="value">The raw argument value to escape.</param>
-    /// <returns>The escaped value, safe to embed in a cmd command.</returns>
+    /// <returns>The escaped value for embedding in a cmd command whose
+    /// wrapped child is a plain executable; see remarks for the scope of
+    /// that guarantee.</returns>
     internal static string EscapeForCmd(string? value)
     {
         if (string.IsNullOrEmpty(value))
