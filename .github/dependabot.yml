@@ -1,5 +1,5 @@
 # Dependabot configuration.
-# All groups update weekly (Mondays) with a 14-day version cooldown so
+# All groups update weekly (Mondays) with a 3-day version cooldown so
 # fast-moving packages (TUnit, Polyfill, GitHub Actions) don't open a PR
 # per release. See:
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
@@ -15,7 +15,7 @@ updates:
       interval: weekly
       day: monday
     cooldown:
-      default-days: 14
+      default-days: 3
 
   - package-ecosystem: github-actions
     directory: /
@@ -23,4 +23,4 @@ updates:
       interval: weekly
       day: monday
     cooldown:
-      default-days: 14
+      default-days: 3
