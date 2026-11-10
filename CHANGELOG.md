@@ -414,6 +414,23 @@ Themes:
 - `ShellDetector` no longer strips version separators before `GracefulParse`, fixing version parsing for shells that report versions like `5.9` (previously parsed as `59.0`).
 - `ArgumentsBuilder.AddEnumerable(string)` restores join-then-escape behavior: raw values are joined first, then escaped once at the final `Add` call, matching the `IFormattable` overload. The joined value is also validated against the argument validation logic before appending.
 
+## [2.11.7] - 2026-11-10
+
+### Changed
+
+- Updated DotExtensions from 10.6.2 to 10.6.3.
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.14 to 10.0.15 (pinned to < 11.0.0).
+- Updated Microsoft.Extensions.Hosting and Microsoft.Extensions.DependencyInjection to 10.0.15 (tests and benchmarks).
+- CliInvoke 2.11.x has limited support and reaches end-of-life on December 1st 2026; migrate to v3.1.x or newer to remain supported.
+
+## [2.11.6] - 2026-11-03
+
+### Changed
+
+- Updated DotExtensions from 10.6.1 to 10.6.2.
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.13 to 10.0.14.
+- Updated Microsoft.Extensions.Hosting and Microsoft.Extensions.DependencyInjection to 10.0.14 (tests and benchmarks).
+
 ## [2.11.4] - 2026-09-28
 ### Fixed
 - **Stdin redirection override** – `StartAsync` was forcing `RedirectStandardInput = true` even when the configuration didn't ask for it; it now honours the `RedirectStandardInput` flag.
