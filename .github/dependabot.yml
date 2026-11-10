@@ -24,6 +24,24 @@ updates:
     cooldown:
       default-days: 14
 
+  - package-ecosystem: "nuget" # benchmarks/ package manifests (Directory.Packages.props)
+    directories:
+        - "benchmarks/"
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 14
+
+  - package-ecosystem: "nuget" # examples/ package manifests (Directory.Packages.props)
+    directories:
+        - "examples/"
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 14
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
