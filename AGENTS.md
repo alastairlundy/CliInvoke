@@ -15,7 +15,7 @@ CliInvoke — a .NET/C# library for launching and interacting with command-line 
 - `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. (`tests/CliInvoke.Extensions.Tests/` was removed; extension tests now live in `tests/CliInvoke.Tests/`.)
 - **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs `tests/CliInvoke.Tests/` **and** `tests/CliInvoke.Specializations.Tests/` on the ubuntu-latest, windows-latest, and macos-latest matrix legs.
 - **Benchmarks**: `benchmarks/`.
-- **SDK**: `global.json` pins the .NET 11 SDK (`11.0.100-rc.2`, `rollForward: latestFeature`; CI installs `11.0.100-rc.3` explicitly). The .NET 10 runtime is also needed to run the `net10.0` test leg. Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
+- **SDK**: `global.json` pins the .NET 11 GA SDK (`11.0.100`, `rollForward: latestFeature`). The .NET 10 runtime is also needed to run the `net10.0` test leg. Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
 
 ## Build & Test (replicate CI order)
 From repo root (see `.github/workflows/test.yml`):
