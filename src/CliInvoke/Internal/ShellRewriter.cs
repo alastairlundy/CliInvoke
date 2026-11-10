@@ -27,10 +27,15 @@ internal static class ShellRewriter
 {
     /// <summary>
     ///     Escapes a value so it is treated as literal data inside a PowerShell
-    ///     <c>-Command</c> string. Prevents command chaining (<c>;</c>, <c>|</c>,
-    ///     <c>&amp;</c>), subexpression / variable expansion (<c>$(...)</c>, <c>$var</c>),
-    ///     grouping, redirection, and quoting escapes.
+    ///     <c>-Command</c> string.
     /// </summary>
+    /// <remarks>
+    ///     Backtick-escapes command chaining (<c>;</c>, <c>|</c>, <c>&amp;</c>),
+    ///     grouping and redirection (<c>(</c>, <c>)</c>, <c>{</c>, <c>}</c>,
+    ///     <c>&lt;</c>, <c>&gt;</c>), subexpression and variable expansion
+    ///     (<c>$(...)</c>, <c>$var</c>), quotes, and the escape character itself.
+    ///     Newlines are encoded as <c>`n</c>; bare carriage returns are dropped.
+    /// </remarks>
     /// <param name="value">The raw argument value to escape.</param>
     /// <returns>The escaped value, safe to embed in a PowerShell command.</returns>
     internal static string EscapeForPowerShell(string? value)
@@ -77,11 +82,17 @@ internal static class ShellRewriter
 
     /// <summary>
     ///     Escapes a value so it is treated as literal data inside a POSIX shell
-    ///     <c>-c</c> string. Prevents variable expansion (<c>$var</c>),
-    ///     command substitution (<c>`...`</c>), globbing (<c>*</c>, <c>?</c>,
-    ///     <c>[...]</c>), redirection (<c>&lt;</c>, <c>&gt;</c>),
-    ///     command chaining (<c>;</c>, <c>&amp;</c>, <c>|</c>), and quoting breaks.
+    ///     <c>-c</c> string.
     /// </summary>
+    /// <remarks>
+    ///     Backslash-escapes the POSIX metacharacters: substitution and quoting
+    ///     (<c>\</c>, <c>$</c>, <c>`</c>, <c>"</c>, <c>'</c>), chaining and
+    ///     redirection (<c>;</c>, <c>&amp;</c>, <c>|</c>, <c>&lt;</c>, <c>&gt;</c>),
+    ///     grouping and globbing (<c>(</c>, <c>)</c>, <c>{</c>, <c>}</c>, <c>*</c>,
+    ///     <c>?</c>, <c>[</c>, <c>]</c>), and expansions active in some shells
+    ///     (<c>!</c>, <c>~</c>, <c>#</c>). Newlines and bare carriage returns are
+    ///     dropped.
+    /// </remarks>
     /// <param name="value">The raw argument value to escape.</param>
     /// <returns>The escaped value, safe to embed in a POSIX shell command.</returns>
     internal static string EscapeForPosixShell(string? value)
@@ -137,30 +148,25 @@ internal static class ShellRewriter
     /// <summary>
     ///     Escapes a value so it is treated as literal data on the
     ///     <c>cmd.exe /c</c> command line, and remains literal data when the
-    ///     composed command is re-parsed by the child: a nested
-    ///     <c>cmd.exe /c</c> child, or a batch file whose arguments undergo
-    ///     <c>%*</c>-style expansion when the batch executes. The escape set
-    ///     covers command chaining (<c>&amp;</c>, <c>|</c>), redirection
-    ///     (<c>&lt;</c>, <c>&gt;</c>), environment-variable expansion
-    ///     (<c>%VAR%</c>), delayed expansion, the caret escape character
-    ///     itself, and quoting breaks.
+    ///     composed command is re-parsed by the child once more (a nested
+    ///     <c>cmd.exe</c> child, or a batch file's <c>%*</c>-style expansion).
     /// </summary>
     /// <remarks>
-    ///     Each metacharacter is written as three carets followed by the
-    ///     character. A composed command passes through one
-    ///     <c>cmd /c</c> quote-strip and caret-removal pass before the child
-    ///     sees it, and the child's own parse consumes one further caret
-    ///     level, so a triple survives both passes and still resolves to the
-    ///     literal character. Re-parse chains nested deeper than that
-    ///     (further <c>cmd.exe</c> invocations of the re-parsed text) are
-    ///     outside the guarantee. Delayed expansion only re-scans the text
-    ///     when the caller supplies <c>/V:on</c>; without it the escaped
-    ///     exclamation mark resolves to the literal character.
+    ///     Each metacharacter (<c>&amp;</c>, <c>|</c>, <c>&lt;</c>, <c>&gt;</c>,
+    ///     <c>%</c>, <c>!</c>, <c>^</c>) is written as three carets followed by
+    ///     the character; embedded quotes are doubled (<c>""</c>) and bare
+    ///     newlines are dropped. Two caret levels are consumed before the literal
+    ///     character reaches the child: one by the <c>cmd /c</c> quote-strip and
+    ///     caret-removal pass, one by the child's own parse, so a triple resolves
+    ///     to the literal character. Re-parse chains nested deeper than that are
+    ///     outside the guarantee. Delayed expansion only re-scans the text when
+    ///     the caller supplies <c>/V:on</c>; without it the escaped exclamation
+    ///     mark resolves to the literal character.
     /// </remarks>
     /// <param name="value">The raw argument value to escape.</param>
-    /// <returns>The escaped value for embedding in a cmd command whose
-    /// wrapped child re-parses the composed text at most once more; see
-    /// remarks for the scope of that guarantee.</returns>
+    /// <returns>The escaped value for embedding in a cmd command whose wrapped
+    /// child re-parses the composed text at most once more; see remarks for the
+    /// scope of that guarantee.</returns>
     internal static string EscapeForCmd(string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -203,14 +209,16 @@ internal static class ShellRewriter
 
     /// <summary>
     ///     Composes a target file path for embedding in a PowerShell <c>-Command</c>
-    ///     script, as a double-quoted PowerShell string. Unlike
-    ///     <see cref="EscapeForPowerShell"/> (which targets unquoted command context),
-    ///     only the characters that are significant <em>inside</em> a double-quoted
-    ///     PowerShell string are backtick-escaped: the backtick, the double quote,
-    ///     and <c>$</c> (variable/subexpression expansion). All other characters,
-    ///     including <c>;</c>, <c>|</c>, <c>&amp;</c>, and parentheses, are literal
-    ///     inside a quoted string and are passed through unmodified.
+    ///     script, as a double-quoted PowerShell string.
     /// </summary>
+    /// <remarks>
+    ///     Unlike <see cref="EscapeForPowerShell"/> (which targets unquoted command
+    ///     context), only the characters that are significant <em>inside</em> a
+    ///     double-quoted PowerShell string are backtick-escaped: the backtick, the
+    ///     double quote, and <c>$</c> (variable/subexpression expansion). All other
+    ///     characters, including <c>;</c>, <c>|</c>, <c>&amp;</c>, and parentheses,
+    ///     are literal inside a quoted string and are passed through unmodified.
+    /// </remarks>
     /// <param name="path">The raw target file path.</param>
     /// <returns>The path wrapped in double quotes, safe inside a PowerShell script.</returns>
     internal static string QuotePathForPowerShell(string path)
@@ -259,28 +267,28 @@ internal static class ShellRewriter
 
     /// <summary>
     ///     Composes a target file path for a <c>cmd.exe /c</c> command line, as a
-    ///     double-quoted token. cmd's quote handling is unusual: when its
-    ///     preserved-quote conditions are not met (they cannot be met once special
-    ///     characters are present), <c>cmd /c</c> strips the first and last quote
-    ///     characters of the command line and re-parses the remainder unquoted, so
-    ///     the content must be safe both inside and outside quotes. The path is
-    ///     therefore caret-escaped using outside-quote semantics:
-    ///     <list type="bullet">
-    ///         <item>Command separators and redirection (<c>&amp;</c>, <c>|</c>,
-    ///         <c>&lt;</c>, <c>&gt;</c>), grouping parentheses, and the caret itself
-    ///         are caret-escaped.</item>
-    ///         <item><c>%</c>: environment-variable expansion is caret-escaped so a
-    ///         lone percent survives the unquoted re-parse; note a percent pair
-    ///         matching an existing variable name (e.g. <c>%TEMP%</c>) may still be
-    ///         expanded by cmd's first parse phase, which runs before caret
-    ///         processing and cannot be suppressed by quoting.</item>
-    ///         <item><c>!</c>: delayed expansion (<c>cmd /V:on</c>) is caret-escaped
-    ///         the same way; when delayed expansion is off (the default) the escape
-    ///         resolves to the literal exclamation mark.</item>
-    ///     </list>
-    ///     Embedded double quotes are doubled (<c>""</c>), the cmd convention for a
-    ///     literal quote inside a quoted token.
+    ///     double-quoted token.
     /// </summary>
+    /// <remarks>
+    ///     cmd's quote handling is unusual: when its preserved-quote conditions are
+    ///     not met (they cannot be met once special characters are present),
+    ///     <c>cmd /c</c> strips the first and last quote characters of the command
+    ///     line and re-parses the remainder unquoted, so the content must be safe
+    ///     both inside and outside quotes. The path is therefore caret-escaped
+    ///     using outside-quote semantics:
+    ///     <list type="bullet">
+    ///         <item>command separators and redirection (<c>&amp;</c>, <c>|</c>,
+    ///         <c>&lt;</c>, <c>&gt;</c>), grouping parentheses, the caret itself,
+    ///         <c>%</c>, and <c>!</c> (delayed expansion, <c>cmd /V:on</c>) are
+    ///         caret-escaped; when delayed expansion is off (the default) the
+    ///         escape resolves to the literal exclamation mark;</item>
+    ///         <item>a <c>%VAR%</c> pair matching an existing variable name may
+    ///         still be expanded by cmd's first parse phase, which runs before
+    ///         caret processing and cannot be suppressed by quoting;</item>
+    ///         <item>embedded double quotes are doubled (<c>""</c>), the cmd
+    ///         convention for a literal quote inside a quoted token.</item>
+    ///     </list>
+    /// </remarks>
     /// <param name="path">The raw target file path.</param>
     /// <returns>The path as a quoted cmd token, safe on a <c>cmd /c</c> command line.</returns>
     internal static string QuotePathForCmd(string path)
@@ -338,12 +346,12 @@ internal static class ShellRewriter
     ///     when the target has already been resolved).
     /// </param>
     /// <param name="runnerArgs">
-    ///     Optional runner-level arguments, including shell switches owned by the caller
-    ///     (e.g. <c>-NoProfile -NonInteractive -Command</c>, <c>/c</c>, or <c>-c</c>).
-    ///     For the <see cref="ShellKind.PowerShell"/> and <see cref="ShellKind.Posix"/>
-    ///     kinds these are tokenized and added as discrete argument-list entries before
-    ///     the script entry; for the <see cref="ShellKind.Cmd"/> kind the raw string is
-    ///     prepended to the composed command.
+    ///     Optional runner-level arguments, including caller-owned shell switches
+    ///     (e.g. <c>-Command</c>, <c>/c</c>, <c>-c</c>). For the
+    ///     <see cref="ShellKind.PowerShell"/> and <see cref="ShellKind.Posix"/>
+    ///     kinds these are tokenized into discrete argument-list entries placed
+    ///     before the script entry; for the <see cref="ShellKind.Cmd"/> kind the
+    ///     raw string is prepended to the composed command.
     /// </param>
     /// <param name="kind">The target shell for escaping and composition.</param>
     /// <param name="windowCreation">Whether to enable window creation for the spawned process.</param>
