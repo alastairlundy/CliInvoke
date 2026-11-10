@@ -16,7 +16,8 @@
         <Copyright>Copyright (c) Alastair Lundy 2024-2026</Copyright>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated Microsoft.Extensions.DependencyInjection.Abstractions version from 10.0.14 to 10.0.15 - It is pinned to &lt; 11.0.0 for compatibility reasons
+        <PackageReleaseNotes>**Note**: CliInvoke 2.11.x has limited support and will reach EOL on December 1st 2026. Migrate to v3.1.x or newer to remain supported past this date.
+* Updated Microsoft.Extensions.DependencyInjection.Abstractions version from 10.0.14 to 10.0.15 - It is pinned to &lt; 11.0.0 for compatibility reasons
 * Updated to use CliInvoke.Core 2.11.7 and CliInvoke 2.11.7</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>

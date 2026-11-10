@@ -30,7 +30,8 @@
              errors. With PolyUseEmbeddedAttribute each project generates its own private copy. -->
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         <Version>2.11.7</Version>
-        <PackageReleaseNotes>Version aligned with CliInvoke main package</PackageReleaseNotes>
+        <PackageReleaseNotes>**Note**: CliInvoke 2.11.x has limited support and will reach EOL on December 1st 2026. Migrate to v3.1.x or newer to remain supported past this date.
+Version aligned with CliInvoke main package</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>2.11.7.0</AssemblyVersion>
         <FileVersion>2.11.7.0</FileVersion>

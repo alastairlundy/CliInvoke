@@ -21,7 +21,8 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.11.7</PackageReleaseNotes>
+        <PackageReleaseNotes>**Note**: CliInvoke 2.11.x has limited support and will reach EOL on December 1st 2026. Migrate to v3.1.x or newer to remain supported past this date.
+* Updated to use CliInvoke.Core 2.11.7</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
