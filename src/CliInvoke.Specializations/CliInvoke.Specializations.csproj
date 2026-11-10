@@ -15,20 +15,20 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.11.6</PackageVersion>
+        <PackageVersion>2.11.7</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>* Updated CliInvoke.Core to 2.11.6 </PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated to use CliInvoke.Core 2.11.7</PackageReleaseNotes>
         <Description>CliInvoke Specializations is a library for providing pre-configured Specializations of CliInvoke's ProcessConfiguration.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>
         <PackageId>CliInvoke.Specializations</PackageId>
         <Product>CliInvoke.Specializations</Product>
-        <AssemblyVersion>2.11.6.0</AssemblyVersion>
-        <FileVersion>2.11.6.0</FileVersion>
+        <AssemblyVersion>2.11.7.0</AssemblyVersion>
+        <FileVersion>2.11.7.0</FileVersion>
     </PropertyGroup>
     
     <ItemGroup>

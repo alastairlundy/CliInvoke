@@ -15,11 +15,12 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Updated DotExtensions from version 10.6.1 to 10.6.2</PackageReleaseNotes>
+        <PackageReleaseNotes>**Note**: CliInvoke 2.11.x has limited support and will reach EOL on December 1st 2026. Migrate to v3.1.x or newer to remain supported past this date.
+* Updated DotExtensions from version 10.6.2 to 10.6.3</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>2.11.6</PackageVersion>
+        <PackageVersion>2.11.7</PackageVersion>
         <AssemblyVersion>2.11.6.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
