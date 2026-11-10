@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
+## [3.1.1] - unreleased
+
+### Fixed
+
+- Timer-driven timeouts are classified on the same monotonic clock the kill timer fires against, so a timer kill can no longer be misreported as a non-cancellation. `CancellationHelper` derived the expected exit deadline from `DateTime.UtcNow` while `CancelAfter`/`Task.Delay` fire against `Environment.TickCount64`; a kill timer that fired marginally ahead of the wall clock (dotnet/runtime#100455, closed as by-design) classified the on-time timeout as `NotKnown`, and `BufferedProcessResult.Canceled`/`ProcessResult.Canceled` then reported `false` for a process the cancellation machinery terminated. Deadlines and observations now use `Environment.TickCount64` throughout the wait paths (backport of the same fix landing in 3.2.0).
+
 ## [3.1.0] - 2026-10-19
 
 ### Added

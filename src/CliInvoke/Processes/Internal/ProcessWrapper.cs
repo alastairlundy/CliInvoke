@@ -826,8 +826,8 @@ internal class ProcessWrapper : Process
 
         // Captured before the wait so exception handling measures how far the
         // cancellation resolved from the expected exit time.
-        DateTime expectedExitTime =
-            CancellationHelper.CalculateExpectedExitTime(processExitConfiguration);
+        long expectedExitTick =
+            CancellationHelper.CalculateExpectedExitTick(processExitConfiguration);
 
         try
         {
@@ -897,7 +897,7 @@ internal class ProcessWrapper : Process
         catch (Exception exception) when (!isGraceful)
         {
             CancellationHelper.HandleCancellationExceptions(
-                expectedExitTime,
+                expectedExitTick,
                 CancellationReason.RequestedCancellation, processExitConfiguration,
                 exception);
         }
@@ -929,8 +929,8 @@ internal class ProcessWrapper : Process
         ArgumentOutOfRangeException.ThrowIfLessThan(
             exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero);
 
-        DateTime expectedExitTime =
-            DateTime.UtcNow.Add(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
+        long expectedExitTick = CancellationHelper.CalculateExpectedExitTick(
+            exitConfiguration.TimeoutPolicy.TimeoutThreshold);
 
         CancellationTokenSource cts =
             CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -961,13 +961,13 @@ internal class ProcessWrapper : Process
             catch (Exception exception)
             {
                 CancellationReason cancellationReason =
-                    CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+                    CancellationHelper.GetCancellationReason(expectedExitTick, cancellationToken);
 
                 // Persist the reason BEFORE the propagation decision; see CancelWithInterrupt
                 // for why the assignment must not sit after HandleCancellationExceptions.
                 _cancellationReason = cancellationReason;
 
-                CancellationHelper.HandleCancellationExceptions(expectedExitTime,
+                CancellationHelper.HandleCancellationExceptions(expectedExitTick,
                     cancellationReason, exitConfiguration, exception);
             }
             finally
@@ -1014,7 +1014,7 @@ internal class ProcessWrapper : Process
 
         // Captured before the wait so exception handling measures how far the
         // cancellation resolved from the expected exit time.
-        DateTime expectedExitTime = DateTime.UtcNow.Add(timeoutThreshold);
+        long expectedExitTick = CancellationHelper.CalculateExpectedExitTick(timeoutThreshold);
 
         try
         {
@@ -1035,7 +1035,7 @@ internal class ProcessWrapper : Process
         {
             // Compute the cancellation reason at the catch point where the token is known-cancelled.
             CancellationReason cancellationReason =
-                CancellationHelper.GetCancellationReason(expectedExitTime, cancellationToken);
+                CancellationHelper.GetCancellationReason(expectedExitTick, cancellationToken);
 
             // Persist the reason BEFORE the propagation decision: on approved-throw
             // configurations HandleCancellationExceptions below throws, and an assignment
@@ -1045,7 +1045,7 @@ internal class ProcessWrapper : Process
 
             cancellationSuccess = await HandleCancellationMode(exitConfiguration, cancellationReason).ConfigureAwait(false);
 
-            CancellationHelper.HandleCancellationExceptions(expectedExitTime,
+            CancellationHelper.HandleCancellationExceptions(expectedExitTick,
                 cancellationReason,
                 exitConfiguration, exception);
         }
