@@ -124,4 +124,140 @@ public class RunnerProcessFactoryTests
         Assert.Equal(expected, result.ArgumentsList);
         Assert.DoesNotContain("--", result.ArgumentsList);
     }
+
+    [Fact]
+    public void CreateRunnerConfiguration_CmdRunner_BenignArguments_AreAccepted()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\Windows\System32\robocopy.exe", @"C:\src C:\dst /mir");
+
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
+
+        Assert.Contains("/c", result.ArgumentsList);
+        Assert.Contains(@"C:\Windows\System32\robocopy.exe", result.ArgumentsList);
+        Assert.Contains("/mir", result.ArgumentsList);
+    }
+
+    [Fact]
+    public void CreateRunnerConfiguration_CmdRunner_RunnersArgsWithSeparator_Throws()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c echo hi & echo more");
+        ProcessConfiguration target = BuildConfig("app.exe", "safe");
+
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            () => factory.CreateRunnerConfiguration(target, runner));
+
+        Assert.Equal("Arguments", exception.ParamName);
+        Assert.Contains("&", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("&")]
+    [InlineData("x&echo more")]
+    [InlineData(">")]
+    [InlineData("|")]
+    [InlineData("^")]
+    [InlineData("%TMP%")]
+    [InlineData("\"y\"\"&z\"")]
+    [InlineData("!delayed!")]
+    public void CreateRunnerConfiguration_CmdRunner_ArgsTokenWithMetacharacter_Throws(string arguments)
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig("app.exe", arguments);
+
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            () => factory.CreateRunnerConfiguration(target, runner));
+
+        Assert.Equal("Arguments", exception.ParamName);
+    }
+
+    [Fact]
+    public void CreateRunnerConfiguration_CmdRunner_TargetPathWithSeparator_Throws()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        // When the runner is cmd.exe it parses the whole composed tail itself, so the
+        // target path token is validated alongside the argument tokens.
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\tools\a & b.exe", "safe");
+
+        Assert.Throws<ArgumentException>(
+            () => factory.CreateRunnerConfiguration(target, runner));
+    }
+
+    [Theory]
+    [InlineData("run.exe")]
+    [InlineData("pwsh.exe")]
+    public void CreateRunnerConfiguration_BatchTargetUnderNonCmdRunner_ArgsWithMetacharacter_Throws(
+        string runnerTarget)
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        // A batch file re-parses its arguments with cmd.exe's rules even when the
+        // runner is not cmd.exe, so the wrapped arguments are validated.
+        ProcessConfiguration runner = BuildConfig(runnerTarget, "-flag");
+        ProcessConfiguration target = BuildConfig(@"C:\scripts\task.bat", "x&echo more");
+
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            () => factory.CreateRunnerConfiguration(target, runner));
+
+        Assert.Equal("Arguments", exception.ParamName);
+        Assert.Contains("&", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("cmd.exe")]
+    [InlineData("task.bat")]
+    [InlineData("task.cmd")]
+    public void CreateRunnerConfiguration_CmdOrBatchTargetUnderNonCmdRunner_ArgsWithMetacharacter_Throws(
+        string targetFileName)
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        ProcessConfiguration runner = BuildConfig("run.exe", "-flag");
+        ProcessConfiguration target = BuildConfig($@"C:\tools\{targetFileName}", "safe & echo more");
+
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            () => factory.CreateRunnerConfiguration(target, runner));
+
+        Assert.Equal("Arguments", exception.ParamName);
+        Assert.Contains("&", exception.Message);
+    }
+
+    [Fact]
+    public void CreateRunnerConfiguration_NonCmdRunner_NonCmdTarget_ArgsWithMetacharacter_AreAccepted()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        // Compositions cmd.exe never parses are untouched: a discrete token is
+        // delivered literally to the target process.
+        ProcessConfiguration runner = BuildConfig("sudo", "-u root");
+        ProcessConfiguration target = BuildConfig("app.exe", "value&name");
+
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
+
+        Assert.Contains("value&name", result.ArgumentsList);
+    }
+
+    [Fact]
+    public void CreateRunnerConfiguration_PowerShellRunner_ArgsWithCallOperator_AreAccepted()
+    {
+        IRunnerProcessFactory factory = new RunnerProcessFactory();
+
+        // PowerShell's call operator is a legitimate argument for a PowerShell runner;
+        // validation must not block compositions cmd.exe never parses.
+        ProcessConfiguration runner = BuildConfig("pwsh.exe", "-NoProfile -Command &");
+        ProcessConfiguration target = BuildConfig("app.exe", "value&name");
+
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
+
+        Assert.Contains("&", result.ArgumentsList);
+        Assert.Contains("value&name", result.ArgumentsList);
+    }
 }

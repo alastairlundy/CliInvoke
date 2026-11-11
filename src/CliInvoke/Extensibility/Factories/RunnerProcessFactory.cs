@@ -62,8 +62,34 @@ public class RunnerProcessFactory : IRunnerProcessFactory
         // command, and a terminator would become part of the -Command script text.
         commandTokens.Add(processConfigToBeRun.TargetFilePath);
 
+        IReadOnlyList<string> wrappedArgTokens = [];
+
         if (!string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments))
-            commandTokens.AddRange(ArgumentTokenizer.Tokenize(processConfigToBeRun.Arguments));
+        {
+            wrappedArgTokens = ArgumentTokenizer.Tokenize(processConfigToBeRun.Arguments);
+            commandTokens.AddRange(wrappedArgTokens);
+        }
+
+        // cmd.exe parses the whole tail of its /c command line with its own rules, and
+        // batch files re-parse their arguments the same way: separators, redirection,
+        // escape and expansion characters keep their cmd.exe meaning even when they
+        // arrive inside a discrete argument token, so launch-time quoting cannot keep
+        // them literal. The tokens that cmd.exe will parse are validated here; values
+        // containing those characters are rejected rather than escaped, and callers who
+        // own their quoting can compose a raw command line through CmdProcessConfiguration.
+        if (CmdCompositionArgumentValidator.IsCmdRunner(runnerProcessConfig.TargetFilePath))
+        {
+            CmdCompositionArgumentValidator.Validate(
+                commandTokens, nameof(runnerProcessConfig.Arguments));
+        }
+        else if (CmdCompositionArgumentValidator.IsCmdOrBatchTarget(
+                     processConfigToBeRun.TargetFilePath))
+        {
+            // Only the wrapped arguments are re-parsed by cmd.exe/batch rules here;
+            // the runner parses its own arguments before the target is reached.
+            CmdCompositionArgumentValidator.Validate(
+                wrappedArgTokens, nameof(processConfigToBeRun.Arguments));
+        }
 
         IProcessConfigurationBuilder commandBuilder = new ProcessConfigurationBuilder(
                 runnerProcessConfig.TargetFilePath

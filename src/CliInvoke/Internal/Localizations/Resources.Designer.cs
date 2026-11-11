@@ -122,5 +122,11 @@ namespace CliInvoke.Internal.Localizations {
                 return ResourceManager.GetString("Exceptions.TargetFile.NotExecutable", resourceCulture);
             }
         }
+
+        internal static string Exceptions_Arguments_CmdMetacharacter {
+            get {
+                return ResourceManager.GetString("Exceptions.Arguments.CmdMetacharacter", resourceCulture);
+            }
+        }
     }
 }
