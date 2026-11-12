@@ -16,9 +16,10 @@ namespace CliInvoke.Internal;
 /// <remarks>
 ///     When cmd.exe (or a batch file) receives a command line, it scans the text for its
 ///     own control characters before any argument splitting happens. Characters with
-///     meaning at that layer — separators, redirection, the escape character, and
-///     expansion syntax — are re-interpreted by cmd.exe even when they arrive inside a
-///     discrete argument token, so quoting at the launch layer cannot keep them literal.
+///     meaning at that layer are re-interpreted by cmd.exe even when they arrive
+///     inside a discrete argument token, so quoting at the launch layer cannot
+///     keep them literal. Those characters are separators, redirection, the
+///     escape character, and expansion syntax.
 ///     Values containing them are therefore rejected rather than escaped, and callers
 ///     who own their quoting can compose a raw command line through
 ///     <c>CmdProcessConfiguration</c> instead.
