@@ -141,14 +141,18 @@ internal static class ShellRewriter
     ///     <c>cmd.exe /c</c> command line when the wrapped child target is
     ///     a plain executable. The escape set covers command chaining
     ///     (<c>&amp;</c>, <c>|</c>), redirection (<c>&lt;</c>, <c>&gt;</c>),
-    ///     environment-variable expansion (<c>%VAR%</c>), and quoting breaks.
+    ///     environment-variable expansion (<c>%VAR%</c>), delayed-expansion
+    ///     markers (<c>!</c>), and quoting breaks.
     /// </summary>
     /// <remarks>
     ///     The guarantee is scoped to plain-executable child targets:
-    ///     <c>cmd.exe</c> children and batch files are outside this scope,
-    ///     as is delayed expansion (<c>!</c>), which this escaper does not
-    ///     address. Do not treat the escaped result as sufficient for
-    ///     those targets.
+    ///     <c>cmd.exe</c> children and batch files are outside this scope.
+    ///     <c>!</c> is caret-escaped with the same single caret
+    ///     <see cref="QuotePathForCmd"/> uses: with delayed expansion off (the
+    ///     default) the escape resolves to a literal exclamation mark, and see
+    ///     <see cref="QuotePathForCmd"/> for the percent-expansion note that
+    ///     applies to caret escaping on a cmd command line. Do not treat the
+    ///     escaped result as sufficient for the out-of-scope targets.
     /// </remarks>
     /// <param name="value">The raw argument value to escape.</param>
     /// <returns>The escaped value for embedding in a cmd command whose
@@ -172,6 +176,7 @@ internal static class ShellRewriter
                 case '<':
                 case '>':
                 case '%':
+                case '!':
                     builder.Append('^').Append(c);
                     break;
                 case '"':
@@ -268,6 +273,11 @@ internal static class ShellRewriter
     ///         the same way; when delayed expansion is off (the default) the escape
     ///         resolves to the literal exclamation mark.</item>
     ///     </list>
+    ///     The result is therefore a hybrid: the quoted token is the containment half —
+    ///     the path stays inside one quoted region as the composed command is parsed
+    ///     into the child — while the caret escapes are the expansion half, since
+    ///     phase-1 percent expansion runs before caret processing and cannot be
+    ///     suppressed by quoting (a lone escaped percent survives; see above).
     ///     Embedded double quotes are doubled (<c>""</c>), the cmd convention for a
     ///     literal quote inside a quoted token.
     /// </summary>
@@ -392,6 +402,12 @@ internal static class ShellRewriter
 
             case ShellKind.Cmd:
             {
+                // The inner command is wrapped in one outer quoted region so that the
+                // leading /c parse (default /c quote handling and /S /C alike) strips
+                // only the wrapper's own quotes and hands the child a command whose
+                // target token is quoted. The argument region deliberately stays in the
+                // escaper's unquoted form: adding a second quoted region is re-stripped
+                // by a nested cmd.exe /c or a batch re-parse and mangles the launch.
                 string safePath = QuotePathForCmd(
                     source.TargetFilePath);
                 string safeArgs = source.ArgumentList.Count > 0

@@ -93,6 +93,16 @@ builder.Services.AddCliInvokeSpecializations(); // registers the platform middle
   of the `ShellRewriter` composition core. Callers should rely on the middleware or the
   `ShellRewriter` directly for shell-escaped command composition.
 
+  For cmd.exe compositions the delivery is a single escaped command string (cmd's
+  `/c` parser does not match .NET's argument-list quoting), and arguments are escaped
+  by shell kind inside `ShellRewriter`. When a `RunnerConfigurationFactory`
+  composition runs under a `cmd.exe` runner or wraps a `cmd.exe`/`.bat`/`.cmd` target,
+  argument tokens containing command separator or expansion characters
+  (`& | < > ^ % " !`) are rejected with an `ArgumentException` rather than escaped,
+  because cmd.exe re-reads its own command line at each parse layer. Callers who own
+  their quoting can compose a preformatted command line through `CmdProcessConfiguration`
+  instead — that path is delivered to cmd.exe verbatim and is not validated.
+
 ### Deprecated subclasses
 
 `PowershellProcessConfiguration` and `CmdProcessConfiguration` are deprecated as of

@@ -24,7 +24,7 @@ public class ShellRewriterFuzzTests
         ['`', '$', ';', '|', '&', '(', ')', '{', '}', '<', '>', '"', '\''];
 
     private static readonly char[] CmdMetacharacters =
-        ['^', '&', '|', '<', '>', '%'];
+        ['^', '&', '|', '<', '>', '%', '!'];
 
     private static readonly char[] PosixShellMetacharacters =
         ['\\', '$', '`', '"', '\'', '!', '&', '|', ';', '(', ')',
@@ -206,6 +206,15 @@ public class ShellRewriterFuzzTests
                 return escaped == value;
             })
             .QuickCheckThrowOnFailure();
+    }
+
+    [Test]
+    public async Task EscapeForCmd_ExclamationMark_IsCaretEscapedLikeQuotePathForCmd()
+    {
+        // Symmetry with QuotePathForCmd: the exclamation mark is caret-escaped with a
+        // single caret so it round-trips to a literal character for a plain-executable
+        // child under default (delayed expansion off) settings.
+        await Assert.That(ShellRewriter.EscapeForCmd("a!b")).IsEqualTo("a^!b");
     }
 
     [Test]
