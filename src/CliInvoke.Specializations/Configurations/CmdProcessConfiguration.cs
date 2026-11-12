@@ -33,7 +33,12 @@ public class CmdProcessConfiguration : ProcessConfiguration
     /// <summary>
     ///     Initialises a new instance of the <see cref="CmdProcessConfiguration"/> class.
     /// </summary>
-    /// <param name="arguments">The arguments to be passed to the command.</param>
+    /// <param name="arguments">
+    ///     The raw command line passed to cmd.exe after <c>/c</c>. This is the
+    ///     by-contract escape hatch for preformatted command lines: the caller owns
+    ///     their quoting and composition, and the value is delivered to cmd.exe
+    ///     verbatim rather than escaped or validated by the composition layer.
+    /// </param>
     /// <param name="outputRedirection">Whether to redirect standard output and error streams.</param>
     /// <param name="workingDirectoryPath">The working directory for the command.</param>
     /// <param name="requiresAdministrator">

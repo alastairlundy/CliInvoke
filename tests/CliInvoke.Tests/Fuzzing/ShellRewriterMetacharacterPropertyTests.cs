@@ -25,7 +25,7 @@ public class ShellRewriterMetacharacterPropertyTests
         ['`', '$', ';', '|', '&', '(', ')', '{', '}', '<', '>', '"', '\''];
 
     private static readonly char[] CmdMetacharacters =
-        ['^', '&', '|', '<', '>', '%'];
+        ['^', '&', '|', '<', '>', '%', '!'];
 
     private static readonly char[] PosixShellMetacharacters =
         ['\\', '$', '`', '"', '\'', '!', '&', '|', ';', '(', ')',
