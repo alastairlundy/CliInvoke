@@ -14,12 +14,9 @@ namespace CliInvoke.Specializations.Tests.Configurations;
 /// </summary>
 public class CmdProcessConfigurationTests
 {
-    [Test]
+    [Test, WindowsOnly]
     public async Task ToProcessStartInfo_RawCmdArgumentsWithSeparator_ArePreserved()
     {
-        if (!OperatingSystem.IsWindows())
-            return;
-
         // CmdProcessConfiguration composes the raw /c line itself; reaching the
         // assertions below without an exception is what shows the raw path is
         // untouched by the tokenised-argument rules.
@@ -36,12 +33,9 @@ public class CmdProcessConfigurationTests
         await Assert.That(processStartInfo.FileName).IsEqualTo(configuration.TargetFilePath);
     }
 
-    [Test]
+    [Test, WindowsOnly]
     public async Task ToProcessStartInfo_RawCmdBenignArguments_ArePreserved()
     {
-        if (!OperatingSystem.IsWindows())
-            return;
-
         CmdProcessConfiguration configuration = new("echo hello",
             redirectStandardInput: false,
             redirectStandardOutput: true,
