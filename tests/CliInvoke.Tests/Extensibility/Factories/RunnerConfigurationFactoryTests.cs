@@ -386,58 +386,59 @@ public class RunnerConfigurationFactoryTests
     }
 
     // ------------------------------------------------------------------------
-    //  Behaviour assertions: factory + cmd runner, real cmd, marker must NOT fire
+    //  Factory + cmd runner: metacharacter-bearing wrapped arguments are rejected
+    //  at composition time (full matrix in
+    //  RunnerConfigurationFactoryArgumentValidationTests), so no process starts and
+    //  no marker can be produced. The calibration controls above still prove the
+    //  raw single-string path fires for these input shapes.
     // ------------------------------------------------------------------------
 
     [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_QuoteAndAmpersand_DoesNotFireMarker()
+    public async Task CmdRunner_QuoteAndAmpersand_ArgumentsAreRejected()
     {
-        SkipTestIfNotWindows();
-
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\nonexistent\app.exe",
+            "a\" & echo pwned>\"" + MarkerPath("B_CMD_QA") + "\"");
 
-        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
-            factory, runner, @"C:\nonexistent\app.exe",
-            "a\" & echo pwned>\"" + MarkerPath("B_CMD_QA") + "\"",
-            "B_CMD_QA");
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
 
-        await Assert.That(markerFired).IsFalse();
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_BareAmpersand_DoesNotFireMarker()
+    public async Task CmdRunner_BareAmpersand_ArgumentsAreRejected()
     {
-        SkipTestIfNotWindows();
-
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\nonexistent\app.exe",
+            "x & echo pwned>\"" + MarkerPath("B_CMD_BARE") + "\"");
 
-        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
-            factory, runner, @"C:\nonexistent\app.exe",
-            "x & echo pwned>\"" + MarkerPath("B_CMD_BARE") + "\"",
-            "B_CMD_BARE");
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
 
-        await Assert.That(markerFired).IsFalse();
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_DoubledQuoteAndAmpersand_DoesNotFireMarker()
+    public async Task CmdRunner_DoubledQuoteAndAmpersand_ArgumentsAreRejected()
     {
-        SkipTestIfNotWindows();
-
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\nonexistent\app.exe",
+            "a\"\" & echo pwned>\"" + MarkerPath("B_CMD_QQ") + "\"");
 
-        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
-            factory, runner, @"C:\nonexistent\app.exe",
-            "a\"\" & echo pwned>\"" + MarkerPath("B_CMD_QQ") + "\"",
-            "B_CMD_QQ");
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
 
-        await Assert.That(markerFired).IsFalse();
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
     }
 
     // ------------------------------------------------------------------------
