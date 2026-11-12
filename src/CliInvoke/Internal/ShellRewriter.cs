@@ -143,11 +143,11 @@ internal static class ShellRewriter
     ///     markers (<c>!</c>), and quoting breaks.
     /// </summary>
     /// <remarks>
-    ///     The guarantee is scoped to plain-executable child targets:
+    ///     The guarantee is scoped to plain-executable child targets.
     ///     <c>cmd.exe</c> children and batch files are outside this scope.
-    ///     <c>!</c> is caret-escaped with the same single caret
-    ///     <see cref="QuotePathForCmd"/> uses: with delayed expansion off (the
-    ///     default) the escape resolves to a literal exclamation mark, and see
+    ///     This method caret-escapes <c>!</c> with the same single caret
+    ///     <see cref="QuotePathForCmd"/> uses. With delayed expansion off (the
+    ///     default) the escape resolves to a literal exclamation mark. See
     ///     <see cref="QuotePathForCmd"/> for the percent-expansion note that
     ///     applies to caret escaping on a cmd command line. Do not treat the
     ///     escaped result as sufficient for the out-of-scope targets.
@@ -271,11 +271,11 @@ internal static class ShellRewriter
     ///         the same way; when delayed expansion is off (the default) the escape
     ///         resolves to the literal exclamation mark.</item>
     ///     </list>
-    ///     The result is therefore a hybrid: the quoted token is the containment half —
-    ///     the path stays inside one quoted region as the composed command is parsed
-    ///     into the child — while the caret escapes are the expansion half, since
-    ///     phase-1 percent expansion runs before caret processing and cannot be
-    ///     suppressed by quoting (a lone escaped percent survives; see above).
+    ///     The result is therefore a hybrid. The quoted token is the containment half,
+    ///     keeping the path inside one quoted region as the composed command is parsed
+    ///     into the child, while the caret escapes are the expansion half. Phase-1
+    ///     percent expansion runs before caret processing and cannot be suppressed by
+    ///     quoting (a lone escaped percent survives; see above).
     ///     Embedded double quotes are doubled (<c>""</c>), the cmd convention for a
     ///     literal quote inside a quoted token.
     /// </summary>

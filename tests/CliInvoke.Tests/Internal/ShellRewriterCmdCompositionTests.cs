@@ -18,11 +18,11 @@ namespace CliInvoke.Tests.Internal;
 
 /// <summary>
 ///     Behaviour tests for the cmd composition <see cref="ShellRewriter"/> produces for
-///     the shell middleware path: a plain-executable child receives the composed
-///     command with the control characters kept as literal data (verified end-to-end
-///     against real cmd.exe with a raw single-string calibration alongside), while
-///     cmd.exe and batch children are covered by the factory-level rejection tests in
-///     <c>RunnerConfigurationFactoryArgumentValidationTests</c> — compositions those
+///     the shell middleware path. A plain-executable child receives the composed
+///     command with the control characters kept as literal data, verified end-to-end
+///     against real cmd.exe with a raw single-string calibration alongside. Cmd.exe
+///     and batch children are covered by the factory-level rejection tests in
+///     <c>RunnerConfigurationFactoryArgumentValidationTests</c>. Compositions those
 ///     children would re-parse are refused before any process starts.
 /// </summary>
 public class ShellRewriterCmdCompositionTests
@@ -42,9 +42,9 @@ public class ShellRewriterCmdCompositionTests
 
     /// <summary>
     ///     Runs cmd.exe with <paramref name="arguments"/> as a single verbatim
-    ///     <see cref="System.Diagnostics.ProcessStartInfo.Arguments"/> string. Used only
-    ///     as a CALIBRATION control — proves the input shape fires when delivered raw,
-    ///     so the composition assertion below has meaning.
+    ///     <see cref="System.Diagnostics.ProcessStartInfo.Arguments"/> string. This is
+    ///     only a CALIBRATION control. It proves the input shape fires when delivered
+    ///     raw, so the composition assertion below has meaning.
     /// </summary>
     private static void RunRawSingleString(string arguments)
     {

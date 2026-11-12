@@ -10,15 +10,15 @@
 namespace CliInvoke.Internal;
 
 /// <summary>
-///     Validates argument tokens that cmd.exe will parse itself, rather than leaving to
-///     the operating system's argument-splitting rules.
+///     Validates argument tokens that cmd.exe will parse itself, rather than leaving
+///     them to the operating system's argument-splitting rules.
 /// </summary>
 /// <remarks>
 ///     When cmd.exe (or a batch file) receives a command line, it scans the text for its
 ///     own control characters before any argument splitting happens. Characters with
-///     meaning at that layer — separators, redirection, the escape character, and
-///     expansion syntax — are re-interpreted by cmd.exe even when they arrive inside a
-///     discrete argument token, so quoting at the launch layer cannot keep them literal.
+///     meaning at that layer include separators, redirection, the escape character, and
+///     expansion syntax. They keep that meaning even when they arrive inside a discrete
+///     argument token, so quoting at the launch layer cannot keep them literal.
 ///     Values containing them are therefore rejected rather than escaped, and callers
 ///     who own their quoting can compose a raw command line through
 ///     <c>CmdProcessConfiguration</c> instead.

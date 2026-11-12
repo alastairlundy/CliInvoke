@@ -184,11 +184,11 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
     }
 
     /// <summary>
-    ///     The wrapped command's arguments in the shape the cmd composition embeds them:
-    ///     the verbatim <see cref="ProcessConfiguration.ArgumentList"/> entries when
-    ///     present, otherwise the legacy <see cref="ProcessConfiguration.Arguments"/>
-    ///     string as one span, since that string flows into the composed command line
-    ///     untokenised.
+    ///     The wrapped command's arguments in the shape the cmd composition embeds
+    ///     them. The verbatim <see cref="ProcessConfiguration.ArgumentList"/> entries
+    ///     are used when present. Otherwise the legacy
+    ///     <see cref="ProcessConfiguration.Arguments"/> string is used as one span,
+    ///     since that string flows into the composed command line untokenised.
     /// </summary>
     /// <param name="configuration">The wrapped command configuration.</param>
     /// <returns>The argument values the cmd composition will embed.</returns>
@@ -205,9 +205,9 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
 
     /// <summary>
     ///     The wrapped command's arguments in the shape the non-shell composition
-    ///     delivers them: the verbatim <see cref="ProcessConfiguration.ArgumentList"/>
-    ///     entries when present, otherwise the legacy
-    ///     <see cref="ProcessConfiguration.Arguments"/> string split into discrete
+    ///     delivers them. The verbatim <see cref="ProcessConfiguration.ArgumentList"/>
+    ///     entries are used when present. Otherwise the legacy
+    ///     <see cref="ProcessConfiguration.Arguments"/> string is split into discrete
     ///     tokens.
     /// </summary>
     /// <param name="configuration">The wrapped command configuration.</param>

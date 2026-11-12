@@ -14,12 +14,12 @@ namespace CliInvoke.Tests.Extensibility.Factories;
 
 /// <summary>
 ///     Regression tests for the argument validation applied to compositions cmd.exe
-///     parses itself: when the runner is cmd.exe, the runner arguments, the target
-///     path and the wrapped arguments are checked; when only the wrapped target is
+///     parses itself. When the runner is cmd.exe, the runner arguments, the target
+///     path, and the wrapped arguments are checked. When only the wrapped target is
 ///     cmd.exe or a .bat/.cmd file, the wrapped argument tokens are checked. Values
-///     containing a character cmd.exe interprets itself are rejected with a
-///     fail-closed <see cref="ArgumentException"/> naming the token and character —
-///     never stripped or escaped — while compositions cmd.exe never parses pass the
+///     containing a character cmd.exe interprets itself are rejected rather than
+///     stripped or escaped, with a fail-closed <see cref="ArgumentException"/> that
+///     names the token and character. Compositions cmd.exe never parses pass the
 ///     same values through unchanged.
 /// </summary>
 public class RunnerConfigurationFactoryArgumentValidationTests
