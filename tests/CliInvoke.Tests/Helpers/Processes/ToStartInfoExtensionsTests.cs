@@ -93,6 +93,39 @@ public class ToStartInfoExtensionsTests
     }
 
     [Fact]
+    public void ToProcessStartInfo_ShellExecution_TokenWithSeparator_Throws()
+    {
+        // Shell delivery changes how values reach the target, not the token rules
+        // that apply to a cmd.exe target: the tokens are checked either way.
+        ProcessConfiguration configuration =
+            new("cmd.exe", "x&echo more", useShellExecution: true);
+
+        Assert.True(configuration.UseShellExecution);
+
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            () => configuration.ToProcessStartInfo(false, false));
+
+        Assert.Equal("ArgumentsList", exception.ParamName);
+        Assert.Contains("x&echo", exception.Message);
+        Assert.Contains("&", exception.Message);
+    }
+
+    [Fact]
+    public void ToProcessStartInfo_ShellExecution_BenignTokens_KeepRawArgumentString()
+    {
+        // With shell execution the target receives the raw Arguments string, so the
+        // ArgumentList delivery path must stay out of the picture.
+        ProcessConfiguration configuration =
+            new("cmd.exe", "/c echo hi", useShellExecution: true);
+
+        ProcessStartInfo processStartInfo = configuration.ToProcessStartInfo(false, false);
+
+        Assert.True(processStartInfo.UseShellExecute);
+        Assert.Equal("/c echo hi", processStartInfo.Arguments);
+        Assert.Empty(processStartInfo.ArgumentList);
+    }
+
+    [Fact]
     public void ToProcessStartInfo_RawArgumentsStringPath_IsNotValidated()
     {
         // The raw Arguments string is a by-contract preformatted command line (also
