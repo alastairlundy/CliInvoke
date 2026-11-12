@@ -10,27 +10,28 @@
 namespace CliInvoke.Internal;
 
 /// <summary>
-///     Validates argument tokens that cmd.exe will parse itself, rather than leaving to
-///     the operating system's argument-splitting rules.
+///     Validates argument tokens that cmd.exe will parse itself, rather than the
+///     operating system's argument-splitting rules.
 /// </summary>
 /// <remarks>
-///     When cmd.exe (or a batch file) receives a command line, it scans the text for its
-///     own control characters before any argument splitting happens. Characters with
-///     meaning at that layer — separators, redirection, the escape character, and
-///     expansion syntax — are re-interpreted by cmd.exe even when they arrive inside a
-///     discrete argument token, so quoting at the launch layer cannot keep them literal.
-///     Values containing them are therefore rejected rather than escaped, and callers
-///     who own their quoting can compose a raw command line through
+///     cmd.exe scans a command line for its own control characters before any
+///     argument splitting happens. Separators, redirection, the escape
+///     character, and expansion syntax keep their meaning even inside a
+///     discrete argument token, so quoting at the launch layer cannot keep
+///     them literal.
+///     Values containing them are therefore rejected rather than escaped, and
+///     callers who own their quoting can compose a raw command line through
 ///     <c>CmdProcessConfiguration</c> instead.
 /// </remarks>
 internal static class CmdCompositionArgumentValidator
 {
     /// <summary>
     ///     The characters cmd.exe interprets itself when parsing a command line:
-    ///     <c>&amp;</c> and <c>|</c> separate commands, <c>&lt;</c> and <c>&gt;</c> redirect,
-    ///     <c>^</c> escapes the next character at each parse layer, <c>%</c> expands
-    ///     environment variables, <c>"</c> toggles cmd.exe's own quote handling, and
-    ///     <c>!</c> expands delayed-expansion variables when enabled.
+    ///     <c>&amp;</c> and <c>|</c> separate commands, <c>&lt;</c> and <c>&gt;</c>
+    ///     redirect, <c>^</c> escapes the next character at each parse layer,
+    ///     <c>%</c> expands environment variables, <c>"</c> toggles cmd.exe's
+    ///     quote handling, and <c>!</c> expands delayed-expansion variables
+    ///     when enabled.
     /// </summary>
     private static readonly char[] Metacharacters = ['&', '|', '<', '>', '^', '%', '"', '!'];
 
@@ -48,8 +49,8 @@ internal static class CmdCompositionArgumentValidator
     }
 
     /// <summary>
-    ///     Determines whether the given target file path refers to cmd.exe or a batch file,
-    ///     both of which parse their arguments with cmd.exe's own rules.
+    ///     Determines whether the given target file path refers to cmd.exe or a
+    ///     .bat/.cmd batch file.
     /// </summary>
     /// <param name="targetFilePath">The target file path to check.</param>
     /// <returns>True when the path names cmd.exe or a .bat/.cmd file; otherwise false.</returns>
@@ -65,8 +66,8 @@ internal static class CmdCompositionArgumentValidator
     }
 
     /// <summary>
-    ///     Throws an <see cref="ArgumentException" /> if any of the given tokens contains
-    ///     a character that cmd.exe interprets itself when parsing a command line.
+    ///     Throws an <see cref="ArgumentException" /> if any token contains a
+    ///     character that cmd.exe parses itself.
     /// </summary>
     /// <param name="tokens">The argument tokens to validate.</param>
     /// <param name="paramName">The name of the caller's argument the tokens came from.</param>

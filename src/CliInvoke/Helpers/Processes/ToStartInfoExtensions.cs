@@ -12,18 +12,20 @@ namespace CliInvoke.Helpers.Processes;
 internal static class ToStartInfoExtensions
 {
     /// <summary>
-    /// 
+    ///     Extensions that convert a <see cref="ProcessConfiguration" /> to the
+    ///     <see cref="ProcessStartInfo" /> used to launch its process.
     /// </summary>
-    /// <param name="processConfiguration"></param>
+    /// <param name="processConfiguration">The configuration to convert.</param>
     extension(ProcessConfiguration processConfiguration)
     {
         /// <summary>
-        ///
+        ///     Applies the configuration to a new <see cref="ProcessStartInfo" />.
         /// </summary>
-        /// <param name="redirectStandardOutput"></param>
-        /// <param name="redirectStandardError"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="redirectStandardOutput">Whether to redirect the standard output stream.</param>
+        /// <param name="redirectStandardError">Whether to redirect the standard error stream.</param>
+        /// <returns>A <see cref="ProcessStartInfo" /> with the configuration applied.</returns>
+        /// <exception cref="ArgumentException">Thrown if the target file path is empty, or if
+        /// an argument token contains a character that cmd.exe parses itself.</exception>
         internal ProcessStartInfo ToProcessStartInfo(
             bool redirectStandardOutput,
             bool redirectStandardError
@@ -47,13 +49,24 @@ internal static class ToStartInfoExtensions
                 RedirectStandardError = redirectStandardError,
             };
 
-            // When the configuration exposes pre-tokenized arguments and the process is
-            // launched directly (no shell), pass each value through ArgumentList. The OS
-            // quotes every token (escaping embedded quotes as "") so a value can never be
-            // re-parsed into additional command-line tokens.
+            // With pre-tokenized arguments and no shell, pass each value through
+            // ArgumentList. The OS quotes every token (embedded quotes become ""),
+            // so a value can never be re-parsed into more command-line tokens.
             if (!processConfiguration.UseShellExecution
                 && processConfiguration.ArgumentsList.Count > 0)
             {
+                // cmd.exe and batch files parse the command line with their own rules, so
+                // metacharacters keep their meaning inside tokens no matter how they are
+                // quoted. Tokens are re-checked here to apply the same rules outside the
+                // runner factory. Values are rejected, not escaped.
+                if (CmdCompositionArgumentValidator.IsCmdOrBatchTarget(
+                        processConfiguration.TargetFilePath))
+                {
+                    CmdCompositionArgumentValidator.Validate(
+                        processConfiguration.ArgumentsList,
+                        nameof(processConfiguration.ArgumentsList));
+                }
+
                 processStartInfo.Arguments = string.Empty;
                 foreach (string argument in processConfiguration.ArgumentsList)
                     processStartInfo.ArgumentList.Add(argument);

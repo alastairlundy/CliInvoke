@@ -70,13 +70,10 @@ public class RunnerProcessFactory : IRunnerProcessFactory
             commandTokens.AddRange(wrappedArgTokens);
         }
 
-        // cmd.exe parses the whole tail of its /c command line with its own rules, and
-        // batch files re-parse their arguments the same way: separators, redirection,
-        // escape and expansion characters keep their cmd.exe meaning even when they
-        // arrive inside a discrete argument token, so launch-time quoting cannot keep
-        // them literal. The tokens that cmd.exe will parse are validated here; values
-        // containing those characters are rejected rather than escaped, and callers who
-        // own their quoting can compose a raw command line through CmdProcessConfiguration.
+        // cmd.exe and batch files parse the command line with their own rules, so
+        // metacharacters keep their meaning inside tokens no matter how they are
+        // quoted. The tokens cmd.exe will parse are validated here; values are
+        // rejected, not escaped.
         if (CmdCompositionArgumentValidator.IsCmdRunner(runnerProcessConfig.TargetFilePath))
         {
             CmdCompositionArgumentValidator.Validate(
