@@ -77,6 +77,9 @@
     <data name="Exceptions.DirectoryNotFound.WorkingDirectory" xml:space="preserve">
         <value>Working directory '{0}' does not exist.</value>
     </data>
+    <data name="Exceptions.Arguments.CmdMetacharacter" xml:space="preserve">
+        <value>The argument token "{x}" contains "{y}", which is not accepted in arguments for cmd.exe runners or cmd/batch targets. cmd.exe interprets these characters itself when parsing a command line. For preformatted command lines whose quoting you own, use CmdProcessConfiguration.</value>
+    </data>
     <data name="Exceptions.Arguments.EmptyArgsSequence" xml:space="preserve">
         <value>Arguments sequence cannot be empty.</value>
     </data>
