@@ -101,8 +101,11 @@ public class ShellInjectionSecurityTests
 
         await Assert.That(rewritten.Arguments).IsEqualTo(string.Empty);
         await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(4);
+        // Each argument-list entry is quoted as its own token in the composed script
+        // (per-entry QuotePathForPowerShell), so a semicolon stays inside the entry's
+        // quoted region rather than being re-tokenised.
         await Assert.That(rewritten.ArgumentList[3])
-            .IsEqualTo("& \"prog.exe\" first second`;evil.exe");
+            .IsEqualTo("& \"prog.exe\" \"first\" \"second;evil.exe\"");
     }
 
     [Test]
@@ -149,8 +152,11 @@ public class ShellInjectionSecurityTests
         ProcessConfiguration rewritten = next.Captured!.Configuration;
 
         await Assert.That(rewritten.ArgumentList.Count).IsEqualTo(0);
+        // Each argument-list entry is quoted as its own token in the composed command
+        // (per-entry QuotePathForCmd), so the caret-escaped ampersand stays inside its
+        // entry's quoted region.
         await Assert.That(rewritten.Arguments)
-            .IsEqualTo("/c \"prog.exe\" first second^&evil.exe");
+            .IsEqualTo("/c \"\"prog.exe\" \"first\" \"second^&evil.exe\"\"");
     }
 
     private static string? ResolvePwshPath()
