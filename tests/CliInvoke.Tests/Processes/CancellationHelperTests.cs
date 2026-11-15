@@ -43,7 +43,7 @@ public class CancellationHelperTests
     public async Task HandleCancellationExceptions_TimeoutNonOceWithinWindow_Throws()
     {
         // L7b: a genuine failure near the timeout must never be eaten by the
-        // wall-clock window — only cancellation exceptions are time-discriminated.
+        // wall-clock window; only cancellation exceptions are time-discriminated.
         await Assert.That(() => CancellationHelper.HandleCancellationExceptions(
                 Environment.TickCount64, CancellationReason.Timeout,
                 Config(ProcessExceptionBehaviour.AllowExceptionsIfUnexpected),
@@ -180,6 +180,19 @@ public class CancellationHelperTests
     }
 
     [Test]
+    public async Task GetCancellationReason_DeadlineWithinDeliveryGrace_ReturnsTimeout()
+    {
+        // The OS may deliver a kill timer marginally before the deadline it was armed
+        // against (dotnet/runtime#100455, closed as by-design), so classification allows
+        // TimerDeliveryGraceMilliseconds of early delivery and still reports Timeout.
+        CancellationReason reason = CancellationHelper.GetCancellationReason(
+            Environment.TickCount64 + (CancellationHelper.TimerDeliveryGraceMilliseconds / 2),
+            CancellationToken.None);
+
+        await Assert.That(reason).IsEqualTo(CancellationReason.Timeout);
+    }
+
+    [Test]
     public async Task GetCancellationReason_AfterArmedTimerFires_ReturnsTimeout()
     {
         // Regression (Ubuntu CI): the kill timer can fire marginally before a
@@ -205,9 +218,29 @@ public class CancellationHelperTests
 
         await Assert.That(caught).IsNotNull();
 
+        // GetCancellationReason reads the clock after this read, so a NotKnown result
+        // guarantees the shortfall computed below exceeds the production grace. The OS
+        // may deliver the timer that far ahead of its due time (dotnet/runtime#100455,
+        // closed as by-design); accept that only within this tolerance. A larger
+        // shortfall means classification and the deadline disagree about the clock.
+        // That disagreement is the regression this test exists for, and it must fail.
+        long observedTick = Environment.TickCount64;
         CancellationReason reason = CancellationHelper.GetCancellationReason(
             expectedExitTick, CancellationToken.None);
 
-        await Assert.That(reason).IsEqualTo(CancellationReason.Timeout);
+        if (reason == CancellationReason.NotKnown)
+        {
+            long shortfall = expectedExitTick - observedTick;
+            await Assert.That(shortfall).IsLessThanOrEqualTo(EarlyDeliveryToleranceMilliseconds);
+        }
+        else
+        {
+            await Assert.That(reason).IsEqualTo(CancellationReason.Timeout);
+        }
     }
+
+    // Production grace (10 ms) plus 15 ms for OS early delivery beyond it. A shortfall
+    // this large after an armed timer fires indicates a clock-domain bug, not timer
+    // delivery.
+    private const long EarlyDeliveryToleranceMilliseconds = 25;
 }

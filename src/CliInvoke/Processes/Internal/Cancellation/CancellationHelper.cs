@@ -15,6 +15,22 @@ namespace CliInvoke.Processes.Internal.Cancellation;
 internal static class CancellationHelper
 {
     /// <summary>
+    ///     Slack, in milliseconds, subtracted from the deadline when classifying a cancellation.
+    ///     An observation up to this far before the expected exit tick still classifies as
+    ///     <see cref="CancellationReason.Timeout" />.
+    /// </summary>
+    /// <remarks>
+    ///     The OS may deliver a <c>CancelAfter</c> timer marginally before the
+    ///     <see cref="Environment.TickCount64" /> deadline it was armed against
+    ///     (dotnet/runtime#100455, closed as by-design). The window covers the early delivery
+    ///     reported in that issue with margin. It stays far below the 1 second window
+    ///     <see cref="HandleCancellationExceptions" /> applies, so a genuine failure that
+    ///     precedes a timeout by more than this still classifies as
+    ///     <see cref="CancellationReason.NotKnown" />.
+    /// </remarks>
+    internal const long TimerDeliveryGraceMilliseconds = 10;
+
+    /// <summary>
     ///     Determines the reason for the cancellation of a process.
     /// </summary>
     /// <param name="expectedExitTick">
@@ -27,12 +43,15 @@ internal static class CancellationHelper
     /// </param>
     /// <returns>The reason for the cancellation.</returns>
     /// <remarks>
-    ///     Both the deadline and the observation are read from <see cref="Environment.TickCount64" /> —
+    ///     Both the deadline and the observation are read from <see cref="Environment.TickCount64" />,
     ///     the same monotonic clock the runtime's timer queue fires <c>CancelAfter</c> and
-    ///     <c>Task.Delay</c> against — so a kill timer that fires marginally ahead of the wall clock
+    ///     <c>Task.Delay</c> against, so a kill timer that fires marginally ahead of the wall clock
     ///     can never be misclassified as <see cref="CancellationReason.NotKnown" />. Classifying on
     ///     <c>DateTime.UtcNow</c> instead mixed clock domains and did exactly that
-    ///     (dotnet/runtime#100455), which surfaced an on-time timeout as a cancellation.
+    ///     (dotnet/runtime#100455), which surfaced an on-time timeout as a cancellation. The
+    ///     comparison also allows for <see cref="TimerDeliveryGraceMilliseconds" /> of early timer
+    ///     delivery, because the OS may deliver the kill timer shortly before the deadline it was
+    ///     armed against (the same issue, closed as by-design).
     /// </remarks>
     internal static CancellationReason GetCancellationReason(long expectedExitTick,
         CancellationToken cancellationToken)
@@ -43,7 +62,7 @@ internal static class CancellationHelper
 
         if (isCancellationRequested) return CancellationReason.RequestedCancellation;
 
-        return cancellationTick >= expectedExitTick
+        return cancellationTick >= expectedExitTick - TimerDeliveryGraceMilliseconds
             ? CancellationReason.Timeout
             : CancellationReason.NotKnown;
     }
@@ -64,9 +83,12 @@ internal static class CancellationHelper
     ///     <paramref name="timeoutThreshold" />.
     /// </summary>
     /// <remarks>
-    ///     The threshold is truncated to whole milliseconds — the same conversion the runtime's
-    ///     timer queue applies to its due times — and callers capture this deadline before arming
-    ///     their timer, so on the shared monotonic clock the armed timer can never fire before it.
+    ///     The threshold is truncated to whole milliseconds, the same conversion the runtime's
+    ///     timer queue applies to its due times. Callers capture this deadline before arming
+    ///     their timer, so the armed timer's nominal due time can never precede it. The OS may
+    ///     still deliver the timer marginally early (dotnet/runtime#100455, closed as by-design),
+    ///     which is why <see cref="GetCancellationReason" /> allows
+    ///     <see cref="TimerDeliveryGraceMilliseconds" /> of slack against this deadline.
     /// </remarks>
     /// <param name="timeoutThreshold">The timeout threshold to apply.</param>
     /// <returns>
@@ -97,8 +119,8 @@ internal static class CancellationHelper
     ///     When <see cref="ProcessExitConfiguration.ExceptionBehaviour" /> is
     ///     <see cref="ProcessExceptionBehaviour.AllowExceptionsIfUnexpected" /> and the reason is a
     ///     timeout or an unknown reason, only an <see cref="OperationCanceledException" /> raised
-    ///     within 1 second of <paramref name="expectedExitTick" /> — an on-time timeout raised by
-    ///     CliInvoke's own cancellation machinery — is swallowed. A cancellation exception outside
+    ///     within 1 second of <paramref name="expectedExitTick" />, an on-time timeout raised by
+    ///     CliInvoke's own cancellation machinery, is swallowed. A cancellation exception outside
     ///     that window propagates, and so does every non-cancellation exception (I/O errors, access
     ///     violations, etc.) regardless of timing: the wall-clock window discriminates on-time
     ///     timeouts, never genuine failures.
@@ -162,7 +184,7 @@ internal static class CancellationHelper
 
                 // AllowExceptionsIfUnexpected swallows only cancellation exceptions raised
                 // on time (the expected kill timer or caller token firing at the threshold).
-                // Non-cancellation exceptions are genuine failures and always propagate —
+                // Non-cancellation exceptions are genuine failures and always propagate;
                 // never let a wall-clock coincidence silently eat them (L7b).
                 if (exitConfiguration.ExceptionBehaviour
                         == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected
