@@ -9,7 +9,6 @@ adheres to [Semantic Versioning](https://semver.org/).
 ## [3.2.0] - unreleased
 
 ### Added
-
 - All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks. `tests/CliInvoke.Tests` runs both legs; the Specializations tests stay on `net10.0`. Building from source now requires the .NET 11 SDK (`global.json` pins `11.0.100-rc.2`, CI installs `11.0.100-rc.3`); the `net10.0` test leg still needs a .NET 10 runtime.
 - On the `net11.0` leg, Windows and macOS children start suspended (`ProcessStartInfo.StartSuspended`) so a configured `ProcessResourcePolicy` is applied before the child first runs; Linux and FreeBSD keep the previous behaviour (the runtime rejects suspended start there). If resuming a creation-suspended child fails for a reason other than the child already having exited, the child is forceful-exited and the failure propagates from `Start`/`StartAsync` instead of leaving it suspended forever.
 - Guarded-execution guide (`site/docs/guides/guarded-execution.md`): failure-mode-organised reference mapping hangs, runaway output, ignored exit codes, and secret leaks onto CliInvoke's timeout, cancellation, and exit-configuration guards, for automation and agent harnesses.
@@ -17,7 +16,6 @@ adheres to [Semantic Versioning](https://semver.org/).
 - **Timeout and cancellation exceptions carry child-process diagnostics.** When an invocation times out or is cancelled and the exit configuration lets the exception propagate, CliInvoke now throws `CliInvokeTimeoutException` or `CliInvokeCanceledException` instead of the bare `OperationCanceledException` it surfaced before, exposing `ProcessId`, `Elapsed`, and a `ProcessDiagnostic` snapshot taken at the throw site (exit state and exit code, thread states, and the `net11.0` `StartSuspended` flag) so callers and CI logs can distinguish a cold-start stall, a suspended-start race, and a genuine deadlock. Both types derive from `OperationCanceledException` — the framework exception they replace, because a timeout is implemented as cancellation of the wait — so existing `catch (OperationCanceledException)` handlers keep working for timer-driven timeouts with `CancellationThrowsException` enabled as well as for caller-requested cancellations; catch the concrete `CliInvokeTimeoutException` to tell a timeout apart from a cancellation. `CliInvokeTimeoutException` deliberately does **not** derive from `TimeoutException`: C# single inheritance cannot make one exception type match both `catch (OperationCanceledException)` and `catch (TimeoutException)`, and the cancellation contract is the one the troubleshooting guide, the `CaptureBufferedResultAsync` docs, and every released version already honour.
 
 ### Changed
-
 - **`ShellInformation` equality now uses the platform path comparison for its shell path.** Matching `ProcessResult` and `ProcessConfiguration`: `OrdinalIgnoreCase` on Windows, `Ordinal` elsewhere, with matching hash codes. On Unix-like systems, shell paths differing only by case were previously considered equal despite being distinct files on case-sensitive filesystems; they now compare unequal. Windows behavior is unchanged, and `ShellInformation.Equals`' XML docs state the comparison.
 - **Buffered output capture is allocation-lighter.** The `ExecuteBufferedAsync` capture path no longer makes an intermediate `ToArray()` full-copy before decoding: the uncapped path decodes straight from the acquired buffer, and the truncation-capped path builds its final string with a single non-flush decoder pass and `string.Create` instead of `ToArray()` plus a `char[]` intermediate (the earlier capped path copied the output three times; it now copies once, into the returned string itself). The 8 KB stream-transfer buffers are rented from `ArrayPool<byte>` instead of being heap-allocated per invocation (previously ~16 KB of `byte[]` per capture at steady state). Measured with BenchmarkDotNet's `MemoryDiagnoser` (.NET 10, in-memory capture loop isolated from process spawn): allocation per invocation drops from 14.6 KB to 5.1 KB (-65%) on a 1 KB truncated capture, from 7.7 KB to 6.6 KB (-14%) on a 1 KB uncapped capture, and from 886 KB to 501 KB (-43%) on a 256 KB capture truncated at half the payload, with capture time ~1.4-1.8x faster on the same scenarios. Decode semantics are unchanged - output is byte-for-byte identical (same flush-less decoder state handling, including the clean dropping of multibyte sequences straddling a truncation boundary), verified across cap values at and around the 8 KB buffer boundary and randomized truncation points. Gains scale with invocation rate and output size; a single small invocation is dominated by process-spawn cost.
 - **`CommonValidationRules<T>.RequiresAllowedExitCode` rejects a null `exitCodes` array eagerly.** A `null` array previously threw `NullReferenceException` from inside the returned predicate on the first result evaluation; it now throws `ArgumentNullException` at rule creation, matching the already-guarded `ExitCodeIsOneOf(params)` middleware-wrapped path. **This is the only behavior-visible change from this train's performance pass: consumers that caught `NullReferenceException` from these rule predicates when a result was checked must now catch `ArgumentNullException` at rule creation instead.** Rule evaluation also allocates less - a plain `foreach` over the captured codes replaces the `Any(...)` LINQ enumerator and delegate, `RequiresExitCodeZero` is memoized in a static field so each property read shares one delegate instead of allocating a fresh closure, and a one-closure-per-rule allocation remains (required by the `Func<TProcessResult?, bool>` contract).
@@ -40,7 +38,6 @@ adheres to [Semantic Versioning](https://semver.org/).
 - **Locking uses `System.Threading.Lock`.** `ExternalProcess` and `ProcessWrapper` guard their lifecycle state with `System.Threading.Lock` instead of `object` locks. Mutual-exclusion semantics are unchanged; uncontended acquisition is faster. No public API change.
 
 ### Fixed
-
 - Raw-mode invocations no longer deadlock on chatty children when the configuration enables `OutputRedirection`. `ProcessInvocationPipeline` now forces redirection off for `InvocationMode.Raw` before the process starts (a faithful member-wise copy — the caller's configuration is untouched), so the child inherits the parent's handles instead of writing to a pipe nobody drains. This is the same protective normalization the shell middleware already applied, now applied pipeline-wide. Observable: in Raw mode children see console handles instead of pipes; nothing readable is lost because no public Raw surface exposes output. Use `RunBufferedAsync`/`ExecuteBufferedAsync` to capture output. Direct `IExternalProcess` users still bypass the pipeline — see the new hazard remarks on `WaitForExitOrTimeoutAsync`.
 - Buffered cancellation is deterministic under `CancellationThrowsException=false`. A drain-side `OperationCanceledException` in `CaptureBufferedResultAsync` no longer escapes: it is absorbed under the same guard as the stdin clause, returning a normal `BufferedProcessResult` with `Canceled=true` and empty captured output. When the knob is `true`, nothing from the cancellation machinery is absorbed and the `OperationCanceledException` propagates deterministically whether it surfaces from the wait or the drain.
 - Wait paths wait for actual process exit after a forceful kill. `ForcefulExit` returns before the OS has reaped the child, so reading `ExitCode` immediately after a kill-timed-out wait could throw "process must exit before requested information can be determined". The wait paths now poll (bounded at 5 seconds, re-issuing the kill if needed) before returning.
@@ -50,7 +47,6 @@ adheres to [Semantic Versioning](https://semver.org/).
 - Timer-driven timeouts are classified on the same monotonic clock the kill timer fires against, so they can no longer surface as `CliInvokeCanceledException` instead of `CliInvokeTimeoutException`. `CancellationHelper` derived the expected exit deadline from `DateTime.UtcNow` while `CancelAfter`/`Task.Delay` fire against `Environment.TickCount64`; a kill timer that fired marginally ahead of the wall clock (dotnet/runtime#100455, closed as by-design) classified the on-time timeout as `NotKnown`, which — with `CancellationThrowsException` enabled — wrapped it as the cancellation type rather than the timeout type (the Ubuntu CI failure of `Buffered_TimerTimeout_WithCancellationThrowsException_PropagatesOperationCanceled`). Deadlines and observations now use `Environment.TickCount64` throughout the wait paths; under the default `AllowExceptionsIfUnexpected` swallow path the same race also reported `BufferedProcessResult.Canceled=false` for a timer kill, which now reports `true`.
 
 ### Docs
-
 - XML documentation now states the eager `ArgumentNullException` contract for `CommonValidationRules<T>.RequiresAllowedExitCode` and the post-exit validation `ExitCodeIsOneOf(params)` wrapper (`PostExitValidation.cs`), matching the null-array behavior change above.
 - Troubleshooting guide: new "Child Output Encoding (Mojibake)" section covering the UTF-8 output-decoding default, with detection steps and code samples for overriding encodings on legacy Windows OEM/ANSI children. Documentation only; no behavior change.
 - SECURITY.md support table reworked: 3.1 gets features, bug fixes, and security fixes; 3.0 and 2.11 are security-fixes-only until December 1st 2026; 2.10 and older are end-of-life (ended October 14th 2026).
@@ -61,13 +57,11 @@ adheres to [Semantic Versioning](https://semver.org/).
 ## [3.1.0] - 2026-10-19
 
 ### Added
-
 - Windows command-line length pre-start check. When the assembled command line exceeds the Windows `CreateProcess` limit (~32,767 characters), an `ArgumentException` is thrown before start against the resolved absolute executable path, instead of the cryptic Win32 error 206. Skipped when `UseShellExecute` is enabled.
 - Result ergonomics: `ProcessResult.ToString()` in bracketed diagnostic form (`[ExitCode=N, Path=..., Runtime=...]`); `BufferedProcessResult.ToString()` with output-length indicators and `Truncated=true` when truncated; `BufferedProcessResult.Deconstruct(out int exitCode, out string stdout, out string stderr)`; `IsExitCodeZero()` and `EnsureExitCodeZero()` extensions on `ProcessResult`; and lazy `EnumerateOutputLines()` / `EnumerateErrorLines()` extensions on `BufferedProcessResult`.
 - Result-ergonomics guide (`site/docs/guides/results.md`) and stdin piping guide (`site/docs/guides/stdin-piping.md`).
 
 ### Changed
-
 - Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.12 to 10.0.13.
 - Updated internal Polyfill version from 11.4.0 to 11.4.5.
 - **`ShellArgumentEscaper` is now `internal`.** Compose shell commands through the public middleware (`UseCmd()` / `UsePowerShell()`), not internal composition types.
@@ -78,11 +72,9 @@ adheres to [Semantic Versioning](https://semver.org/).
 - ADR-0001 now justifies the derivation-hook usage under the existing CliInvoke → CliInvoke.Specializations IVT grant; no new grant. The two packages ship in lockstep this train because Specializations reads the internal hook.
 
 ### Deprecated
-
 - `PowershellProcessConfiguration` and `CmdProcessConfiguration`, marked `[Obsolete]`; both are removed in 4.0. Use plain `ProcessConfiguration` with `UsePowerShell()` / `UseCmd()` middleware.
 
 ### Fixed
-
 - Stdin is delivered correctly end to end: the pipeline pipes `ProcessConfiguration.StandardInput` in both Raw and Buffered modes (previously the child received nothing), and the one-call bypass path closes the child's stdin write end on every exit path so stdin-reading children get end-of-file and no longer hang. `ProcessWrapper` caches the writer at start (stdin property access throws after exit on .NET 10 for fast-exiting children) and closes it in a `finally` after each copy. `StartAsync`/`CaptureBufferedResultAsync` absorb broken-pipe faults caused by the library's own kill, while genuine source-stream read errors propagate. `IExternalProcess.StartAsync(configuration, ct)` now honors `RedirectStandardInput` like the instance overloads; a configured writer with redirection disabled is a no-op in every path.
 - **`StartAsync(CancellationToken)` returns at launch again.** It had regressed into waiting for exit, which also kept Raw-mode timeouts from ever firing mid-run. Callers relying on the accidental wait must now call `WaitForExitOrTimeoutAsync` or `CaptureBufferedResultAsync` explicitly. `Start()` and `CliRun.FireAndForget` remain no-pipe by design; see the stdin piping guide.
 - Environment variables, user credentials, and the administrator verb reach the process that actually starts. `BaseProcessControlAdapter.ApplyConfiguration` overwrote `process.StartInfo` after the adapter had written those three onto the original instance, silently discarding them in every invocation pattern. A buffered run test asserts the environment variable arrives.
@@ -131,7 +123,6 @@ adheres to [Semantic Versioning](https://semver.org/).
 ## [3.0.2] - 2026-09-27
 
 ### Fixed
-
 - Environment variables, user credentials, and the administrator verb are now applied to the process that actually starts (previously silently discarded in every invocation pattern).
 - Fixed macOS and FreeBSD suspend/resume signals: macOS children were stopped and never resumed, and FreeBSD suspend/resume were inverted.
 - The default `ProcessResourcePolicy` affinity mask now selects every logical processor instead of pinning multi-core machines to half the cores.
@@ -153,13 +144,11 @@ adheres to [Semantic Versioning](https://semver.org/).
 ## [3.0.1] - 2026-09-24
 
 ### Changed
-
 - Backported shell command composition and escaping from v3.1 into an internal `ShellRewriter`, with property-based tests covering PowerShell, `cmd.exe`, and POSIX shell metacharacters.
 - Updated the root, Core, and Specializations READMEs to use v3 construction and middleware patterns, remove stale API references, and link to the published documentation.
 - Updated example projects to use the stable `CliInvoke` 3.0.0 and `CliInvoke.Core` 3.0.0 packages instead of `3.0.0-beta.3`.
 
 ### Fixed
-
 - `UsePowerShell()` and `UseCmd()` now use the backported `ShellRewriter` output for the final invocation. Non-empty `ProcessConfiguration.ArgumentList` values are preserved and take precedence over `Arguments`; PowerShell uses discrete arguments, while `cmd.exe` uses its parser-compatible escaped command string.
 - Corrected target-path quoting for PowerShell and `cmd.exe` so embedded quotes, expansions, and shell metacharacters remain literal.
 - `UseCmd()` now preserves the source configuration's `UseShellExecution` setting.
@@ -171,14 +160,10 @@ adheres to [Semantic Versioning](https://semver.org/).
 CliInvoke 3.0.0 is the first stable release of the v3 line.
 
 Themes:
-
 - `CliRun` is now a stateless, batteries-included defaults facade.
-- The public surface of `ExternalProcess`, `ProcessInvoker`, and
-  `ProcessConfigurationBuilder` is tightened and sealed where appropriate.
+- The public surface of `ExternalProcess`, `ProcessInvoker`, and `ProcessConfigurationBuilder` is tightened and sealed where appropriate.
 - `ProcessResult` equality is made symmetric across the result hierarchy.
-- Platform-specific process control adapters, output-truncation middleware,
-  retry middleware, caching file-path resolver, and exit validation primitives
-  are now first-class.
+- Platform-specific process control adapters, output-truncation middleware, retry middleware, caching file-path resolver, and exit validation primitives are now first-class.
 
 > **Migration target for removed APIs:** callers of the removed `CliRun.Use*`
 > methods, the removed `ProcessInvoker`/`ExternalProcess` constructors, and the
@@ -187,7 +172,6 @@ Themes:
 > [Migrating to 3.0.0](site/docs/migration-guides/3.0.0.md).
 
 ### Added
-
 - Output truncation middleware with configurable size limits and custom handlers.
 - `CachingFilePathResolver` and DI registration extensions for file-path caching.
 - Retry middleware (`UseRetryPolicy`) with configurable policies, linear backoff, and delay clamping.
@@ -202,7 +186,6 @@ Themes:
 - `ProcessExitConfiguration` for exit-code and signal validation.
 - Localization resources in `CliInvoke` (`Resources.resx` / `Resources.Designer.cs`).
 - `maxBufferedOutputBytes` on `CliRun` string-args buffered path for capping buffered output size.
-
 - `DefaultShellMiddleware` that auto-detects the user's default shell and wraps commands in it.
 - `UseDefaultShell()` convenience extension method on `IProcessMiddlewareBuilder`.
 - `ShellArgumentEscaper.EscapeForPosixShell` for POSIX shell (bash/zsh/fish) escaping.
@@ -211,75 +194,27 @@ Themes:
 ### Changed
 
 - **`InvocationContext.Result` / `.Middleware` ownership documented (no API change).**
-  These properties are now documented as owned by specific middleware: the only
-  legitimate mutators are the `MiddlewareChain` walker, the terminal delegate
-  that bridges the chain to the pipeline, and any propagating middleware that
-  short-circuits the chain. Caller code must not read or write them outside
-  those mutators. This is a documentation-only change; the setters are retained.
-- **`ExitConfiguration` is now read-only.** `IExternalProcess.ExitConfiguration`
-  and `ExternalProcess.ExitConfiguration` are read-only `{ get; }` properties
-  supplied at construction time. The `ExitConfiguration` setter and any
-  `WithExitConfiguration(...)` method do not exist. Construct `ExternalProcess`
-  with the exit configuration via its constructor.
-- **`ProcessInvoker` reduced to two constructors.** The partial overloads
-  `(IExternalProcessFactory, MiddlewareItems?)` and
-  `(IExternalProcessFactory, IEnumerable<IProcessMiddleware>)` were removed.
-  The surviving constructors are `(IExternalProcessFactory)` and
-  `(IExternalProcessFactory, IEnumerable<IProcessMiddleware>, MiddlewareItems?)`.
-- **`ExternalProcess` is sealed.** The class is now `sealed`; no
-  public or protected extension points remain.
-- **`ProcessConfigurationBuilder` is sealed.** The concrete builder is now
-  `sealed`. Fluent chaining via the `IProcessConfigurationBuilder` interface is
-  unaffected.
-- **`ProcessResult` equality is symmetric.** `ProcessResult.Equals(object?)`
-  now uses exact runtime-type matching so that `a.Equals(b) == b.Equals(a)` holds
-  across the `ProcessResult` hierarchy. `BufferedProcessResult` and
-  `PipedProcessResult` were audited to satisfy the same symmetry contract.
-  `ProcessResult` is intentionally **not** sealed in this release (sealing is
-  deferred).
-- **`null == null` now returns `true` for result, configuration, and
-  exception-info types.** `ProcessResult`, `BufferedProcessResult`,
-  `ProcessConfiguration`, and `ProcessExceptionInfo<TProcessResult>` equality
-  operators now implement standard null-safe semantics: `null == null` is `true`,
-  `null == x` is `false`, and the operators never throw. Previously `null == null`
-  could throw or return `false` depending on the type.
-- **`BufferedProcessResult` equality now includes `ProcessId`.** The
-  `Equals` and `GetHashCode` overrides consider `ProcessId`, matching the base
-  `ProcessResult` contract. Two results from the same command but different PIDs
-  now compare unequal. This is a stricter but correct contract.
-- **`UserCredential.GetHashCode` excludes `Password`.** The hash is computed
-  from `Domain`, `UserName`, and `LoadUserProfile` only. `Password` still
-  participates in `Equals` content comparison but never in the hash. Distinct
-  passwords with the same user/domain may collide. This is contract-legal and
-  documented. No `SecureString` unwrapping occurs in hash paths.
-- **Truncation `0`-cap is now a valid zero-byte cap.** Passing `0` as the
-  `maxStandardOutputBytes` or `maxStandardErrorBytes` cap now produces empty text
-  with the `WasTruncated` flag set. Previously `0` was treated as "no cap"
-  (same as `null`/negative). The three spellings are: `null` = no cap,
-  negative = no cap, `0` = zero-byte cap.
-- **Narrowed catch blocks surface previously swallowed failures.** Bare
-  `catch (Exception)` blocks across `ShellDetector`, `ProcessWrapper`, and
-  `ExternalProcess` have been narrowed to catch only their documented expected
-  exceptions. Unexpected exceptions (including `OperationCanceledException` in
-  the PowerShell-to-cmd fallback path) now propagate to the caller.
-- **Unix admin/credential requests now throw `PlatformNotSupportedException`.**
-  `UnixProcessControlAdapter.RequireRunningAsAdmin` and
-  `UnixProcessControlAdapter.SetUserCredential` (with a non-null credential) now
-  throw `PlatformNotSupportedException` instead of silently no-oping. This makes
-  the cross-platform contract honest. Callers on Unix who relied on the silent
-  no-op must handle or guard the exception. Windows behaviour is unchanged.
+  These properties are now documented as owned by specific middleware: the only legitimate mutators are the `MiddlewareChain` walker, the terminal delegate that bridges the chain to the pipeline, and any propagating middleware that short-circuits the chain. Caller code must not read or write them outside those mutators. This is a documentation-only change; the setters are retained.
+- **`ExitConfiguration` is now read-only.** `IExternalProcess.ExitConfiguration` and `ExternalProcess.ExitConfiguration` are read-only `{ get; }` properties supplied at construction time. The `ExitConfiguration` setter and any `WithExitConfiguration(...)` method do not exist. Construct `ExternalProcess` with the exit configuration via its constructor.
+- **`ProcessInvoker` reduced to two constructors.** The partial overloads `(IExternalProcessFactory, MiddlewareItems?)` and `(IExternalProcessFactory, IEnumerable<IProcessMiddleware>)` were removed. The surviving constructors are `(IExternalProcessFactory)` and `(IExternalProcessFactory, IEnumerable<IProcessMiddleware>, MiddlewareItems?)`.
+- **`ExternalProcess` is sealed.** The class is now `sealed`; no public or protected extension points remain.
+- **`ProcessConfigurationBuilder` is sealed.** The concrete builder is now `sealed`. Fluent chaining via the `IProcessConfigurationBuilder` interface is unaffected.
+- **`ProcessResult` equality is symmetric.** `ProcessResult.Equals(object?)` now uses exact runtime-type matching so that `a.Equals(b) == b.Equals(a)` holds across the `ProcessResult` hierarchy. `BufferedProcessResult` and `PipedProcessResult` were audited to satisfy the same symmetry contract. `ProcessResult` is intentionally **not** sealed in this release (sealing is deferred).
+- **`null == null` now returns `true` for result, configuration, and exception-info types.** `ProcessResult`, `BufferedProcessResult`, `ProcessConfiguration`, and `ProcessExceptionInfo<TProcessResult>` equality operators now implement standard null-safe semantics: `null == null` is `true`, `null == x` is `false`, and the operators never throw. Previously `null == null` could throw or return `false` depending on the type.
+- **`BufferedProcessResult` equality now includes `ProcessId`.** The `Equals` and `GetHashCode` overrides consider `ProcessId`, matching the base `ProcessResult` contract. Two results from the same command but different PIDs now compare unequal. This is a stricter but correct contract.
+- **`UserCredential.GetHashCode` excludes `Password`.** The hash is computed from `Domain`, `UserName`, and `LoadUserProfile` only. `Password` still participates in `Equals` content comparison but never in the hash. Distinct passwords with the same user/domain may collide. This is contract-legal and documented. No `SecureString` unwrapping occurs in hash paths.
+- **Truncation `0`-cap is now a valid zero-byte cap.** Passing `0` as the `maxStandardOutputBytes` or `maxStandardErrorBytes` cap now produces empty text with the `WasTruncated` flag set. Previously `0` was treated as "no cap" (same as `null`/negative). The three spellings are: `null` = no cap, negative = no cap, `0` = zero-byte cap.
+- **Narrowed catch blocks surface previously swallowed failures.** Bare `catch (Exception)` blocks across `ShellDetector`, `ProcessWrapper`, and `ExternalProcess` have been narrowed to catch only their documented expected exceptions. Unexpected exceptions (including `OperationCanceledException` in the PowerShell-to-cmd fallback path) now propagate to the caller.
+- **Unix admin/credential requests now throw `PlatformNotSupportedException`.** `UnixProcessControlAdapter.RequireRunningAsAdmin` and `UnixProcessControlAdapter.SetUserCredential` (with a non-null credential) now throw `PlatformNotSupportedException` instead of silently no-oping. This makes the cross-platform contract honest. Callers on Unix who relied on the silent no-op must handle or guard the exception. Windows behaviour is unchanged.
 - **`Configuration` is init-only on `IExternalProcess` and `ExternalProcess`.**
-- **`TargetFilePath` is init-only** and the `ProcessWrapper` constructor adjusted
-  accordingly.
-- **`IFilePathResolver` dropped** from `PowershellProcessConfiguration` constructor,
-  `PowershellProcessInvoker`, and `PowerShellMiddleware`.
+- **`TargetFilePath` is init-only** and the `ProcessWrapper` constructor adjusted accordingly.
+- **`IFilePathResolver` dropped** from `PowershellProcessConfiguration` constructor, `PowershellProcessInvoker`, and `PowerShellMiddleware`.
 - **`ProcessConfigurationFactory` collapsed** to two static spec-callback overloads.
 - `CliInvoke.Extensions` folded into the main `CliInvoke` package.
 - Dead `InternalsVisibleTo` grants across `Core` and `Specializations` stripped out.
 - Solution layout cleaned: `Middleware` folder removed, `Extensions.Tests` wired.
 - Process launch and logging paths made more robust.
 - `AddEnumerable` now fails fast on null entries.
-
 - **`ProcessConfiguration.TargetFilePath` is now `required`.** Object initialisers must set this property.
 - **`ProcessConfiguration.ArgumentList` rejects null and takes precedence over `Arguments`.** A null list throws `ArgumentNullException`; when both `Arguments` and `ArgumentList` are set, `ArgumentList` wins.
 - **`ProcessConfiguration` uses C# 14 `field` keyword** for backing fields, removing manual backing-field declarations.
@@ -337,19 +272,8 @@ Themes:
 - Bumped `github/codeql-action/upload-sarif` from 4.37.7 to 4.37.8 in the Scorecard workflow.
 
 ### Removed
-
-- **`CliRun` static mutable state removed.** `CliRun.UseExternalProcessFactory`
-  and `CliRun.UseFilePathResolver` no longer exist. `CliRun` retains only its
-  `Run*`/`FireAndForget` methods, and each call now allocates a fresh
-  `ProcessInvocationPipeline` (with a fresh `ExternalProcessFactory` and default
-  `FilePathResolver`) per call. There is no process-wide configurable state to
-  leak between calls. Callers needing a custom factory or resolver must use
-  `IProcessInvoker` (or DI) instead of `CliRun`. No `[Obsolete]` shim or bridge
-  method was added (direct cutover).
-- **`ExternalProcess` keeps only constructor C.** Constructors
-  `(IFilePathResolver, string)` and `(ProcessConfiguration, ProcessExitConfiguration?)`
-  were removed. `ExternalProcess` is now constructed with
-  `(IFilePathResolver, ProcessConfiguration, ProcessExitConfiguration?)`.
+- **`CliRun` static mutable state removed.** `CliRun.UseExternalProcessFactory` and `CliRun.UseFilePathResolver` no longer exist. `CliRun` retains only its `Run*`/`FireAndForget` methods, and each call now allocates a fresh `ProcessInvocationPipeline` (with a fresh `ExternalProcessFactory` and default `FilePathResolver`) per call. There is no process-wide configurable state to leak between calls. Callers needing a custom factory or resolver must use `IProcessInvoker` (or DI) instead of `CliRun`. No `[Obsolete]` shim or bridge method was added (direct cutover).
+- **`ExternalProcess` keeps only constructor C.** Constructors `(IFilePathResolver, string)` and `(ProcessConfiguration, ProcessExitConfiguration?)` were removed. `ExternalProcess` is now constructed with `(IFilePathResolver, ProcessConfiguration, ProcessExitConfiguration?)`.
 - **`BuilderProcessConfiguration` bridge subclass deleted.**
 - **`PipedProcessResult` and the `Piped` invocation path removed.**
 - **`CmdProcessInvoker` and `PowershellProcessInvoker` wrappers deleted.**
@@ -358,27 +282,16 @@ Themes:
 - **`IDisposable` dropped from `ProcessConfiguration`.**
 
 ### Fixed
-
 - Fixed `ProcessResult` equality asymmetry and audited the result subclasses (`BufferedProcessResult`).
 - Fixed an issue with the `BufferedProcessResult.Equals` method.
 - Fixed `ExternalProcess` to resolve the file path at `Start`/`StartAsync` without mutating the provided `Configuration`.
 - Fixed `ExternalProcess.StartAsync(config, ct)` to dispose the old wrapper and reattach event handlers.
 - Fixed code smells: null safety, an inverted condition, null equality, a dead override, and dictionary equality.
 - Sorted environment variables by key in `GetHashCode` for ordering independence.
-- `ShellInformation.GetHashCode` now hashes the target file path
-  case-insensitively, matching its `Equals` comparison. Instances whose paths
-  differ only in letter casing are equal and no longer land in different hash
-  buckets when used as dictionary or set keys.
+- `ShellInformation.GetHashCode` now hashes the target file path case-insensitively, matching its `Equals` comparison. Instances whose paths differ only in letter casing are equal and no longer land in different hash buckets when used as dictionary or set keys.
 - Fixed the expected path in the `Resolve_CrossPlatform_PathEnv_Executable` test.
 - `Canceled` no longer reports `false` after graceful timeout cancellation.
-- Fixed the `AllowExceptionsIfUnexpected` cancellation window to measure actual
-  exit skew: the expected exit time is now captured when the wait begins instead
-  of being re-derived inside the exception handlers. Timeout cancellations that
-  resolve on time are swallowed, and genuine failures that resolve more than
-  1 second from the expected exit time are re-thrown. Previously the difference
-  was computed against a re-derived expected exit time, so it matched the
-  configured timeout threshold and exceptions were re-thrown for any timeout
-  longer than 1 second.
+- Fixed the `AllowExceptionsIfUnexpected` cancellation window to measure actual exit skew: the expected exit time is now captured when the wait begins instead of being re-derived inside the exception handlers. Timeout cancellations that resolve on time are swallowed, and genuine failures that resolve more than 1 second from the expected exit time are re-thrown. Previously the difference was computed against a re-derived expected exit time, so it matched the configured timeout threshold and exceptions were re-thrown for any timeout longer than 1 second.
 - Deadlock resolved: buffered/piped capture now starts without awaiting process exit.
 - `LocateFileFromDirectory` rechecks resolved `FileInfo` existence before returning.
 - POSIX argument escaping fixed: `EscapeInner` double-backslashes before quotes and emits POSIX backslashes literally for correct round-tripping.
@@ -401,23 +314,9 @@ Themes:
 - Fixed null-unsafe equality operators on primitives.
 - Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`.
 
-## [2.11.5] - 2026-10-14
-
-### Changed
-
-- Updated Microsoft.Extensions.DependencyInjection.Abstractions to 10.0.13.
-- Updated internal Polyfill version to 11.4.5.
-
-### Fixed
-
-- `RunnerProcessFactory` now inserts a `--` terminator before dash-prefixed targets for non-shell runners (e.g. `sudo`), so option-parsing runners treat the target as the command to run rather than as an option. PowerShell runners are unaffected.
-- `ShellDetector` no longer strips version separators before `GracefulParse`, fixing version parsing for shells that report versions like `5.9` (previously parsed as `59.0`).
-- `ArgumentsBuilder.AddEnumerable(string)` restores join-then-escape behavior: raw values are joined first, then escaped once at the final `Add` call, matching the `IFormattable` overload. The joined value is also validated against the argument validation logic before appending.
-
 ## [2.11.7] - 2026-11-10
 
 ### Changed
-
 - Updated DotExtensions from 10.6.2 to 10.6.3.
 - Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.14 to 10.0.15 (pinned to < 11.0.0).
 - Updated Microsoft.Extensions.Hosting and Microsoft.Extensions.DependencyInjection to 10.0.15 (tests and benchmarks).
@@ -426,12 +325,24 @@ Themes:
 ## [2.11.6] - 2026-11-03
 
 ### Changed
-
 - Updated DotExtensions from 10.6.1 to 10.6.2.
 - Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.13 to 10.0.14.
 - Updated Microsoft.Extensions.Hosting and Microsoft.Extensions.DependencyInjection to 10.0.14 (tests and benchmarks).
 
+## [2.11.5] - 2026-10-14
+This release addresses the argument-injection security advisory [GHSA-h4rx-7jm8-fr3g](https://github.com/alastairlundy/CliInvoke/security/advisories/GHSA-h4rx-7jm8-fr3g)
+
+### Changed
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions to 10.0.13.
+- Updated internal Polyfill version to 11.4.5.
+
+### Fixed
+- `RunnerProcessFactory` now inserts a `--` terminator before dash-prefixed targets for non-shell runners (e.g. `sudo`), so option-parsing runners treat the target as the command to run rather than as an option. PowerShell runners are unaffected.
+- `ShellDetector` no longer strips version separators before `GracefulParse`, fixing version parsing for shells that report versions like `5.9` (previously parsed as `59.0`).
+- `ArgumentsBuilder.AddEnumerable(string)` restores join-then-escape behavior: raw values are joined first, then escaped once at the final `Add` call, matching the `IFormattable` overload. The joined value is also validated against the argument validation logic before appending.
+
 ## [2.11.4] - 2026-09-28
+
 ### Fixed
 - **Stdin redirection override** – `StartAsync` was forcing `RedirectStandardInput = true` even when the configuration didn't ask for it; it now honours the `RedirectStandardInput` flag.
 - **Negative `RuntimeDuration`** – `ExternalProcess` was reading a not-yet-set `ExitTime` when the `Exited` event raced the `HasExited` poll, producing bogus negative durations; it now reads the OS exit time directly with a `UtcNow` fallback.
@@ -455,7 +366,6 @@ Themes:
 ## [2.11.2] - 2026-09-13
 
 ### Deprecated
-
 - Deprecated `IProcessConfigurationFactory` methods for removal in v3
 - Deprecated `ProcessPipeHandler.Shared` for removal in v3
 - Deprecated `ProcessConfigurationFactory` methods for removal in v3
@@ -464,18 +374,15 @@ Themes:
 - Deprecated several extension methods for removal in v3
 
 ### Fixed
-
 - Fixed a race condition in EOF pipe reads. Running the same process concurrently could throw `OperationCanceledException`.
 
 ### Changed
-
 - Updated internal Polyfill from 11.2.0 to 11.3.0
 - Updated to use CliInvoke.Core 2.11.2 and CliInvoke 2.11.2
 
 ## [2.11.1] - 2026-09-10
 
 ### Fixed
-
 - Fixed an equality comparison bug in the `ProcessConfiguration` `Equals` method
 - Fixed equality operators so that they handle null comparisons correctly
 - Fixed `ShellDetector` shell version parsing for non bash based shells
@@ -487,20 +394,17 @@ Themes:
 - Cleaned up `PowershellProcessConfiguration` executable lookup
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.10.6 and CliInvoke 2.10.6
 - Updated `Microsoft.Extensions.DependencyInjection.Abstractions` from 10.0.11 to 10.0.12
 
 ## [2.11.0] - 2026-09-02
 
 ### Changed
-
 - Improved `FilePathResolver` path resolution performance
 - Improved `ShellDetector` detection performance
 - Updated to use CliInvoke.Core 2.11.0 and CliInvoke 2.11.0
 
 ### Deprecated
-
 - Deprecated `PipedProcessResult` ahead of removal in v3
 - Deprecated some extensions for removal in v3
 - Deprecated `PowershellProcessInvoker` and `CmdProcessInvoker` ahead of removal in v3
@@ -508,12 +412,10 @@ Themes:
 ## [2.10.8] - 2026-10-14
 
 ### Changed
-
 - Updated Microsoft.Extensions.DependencyInjection.Abstractions to 10.0.13.
 - Updated internal Polyfill version to 11.4.5.
 
 ### Fixed
-
 - `RunnerProcessFactory` now inserts a `--` terminator before dash-prefixed targets for non-shell runners (e.g. `sudo`), so option-parsing runners treat the target as the command to run rather than as an option. PowerShell runners are unaffected.
 - `ShellDetector` no longer strips version separators before `GracefulParse`, fixing version parsing for shells that report versions like `5.9` (previously parsed as `59.0`).
 - `ArgumentsBuilder.AddEnumerable(string)` restores join-then-escape behavior: raw values are joined first, then escaped once at the final `Add` call, matching the `IFormattable` overload. The joined value is also validated against the argument validation logic before appending.
@@ -521,22 +423,18 @@ Themes:
 ## [2.10.7] - 2026-09-13
 
 ### Deprecated
-
 - Backported `PipedProcessResult` deprecation warnings from the 2.11.x line
 
 ### Fixed
-
 - Fixed the same EOF pipe read race condition as 2.11.2
 - Fixed a deprecation warning in extensions
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.10.7, CliInvoke 2.10.7, and CliInvoke.Specializations 2.10.7
 
 ## [2.10.6] - 2026-09-10
 
 ### Fixed
-
 - Fixed an equality comparison bug in the `ProcessConfiguration` `Equals` method
 - Fixed equality operators so that they handle null comparisons correctly
 - Fixed `ShellDetector` shell version parsing for non bash based shells
@@ -548,24 +446,20 @@ Themes:
 - Cleaned up `PowershellProcessConfiguration` executable lookup
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.10.6 and CliInvoke 2.10.6
 - Updated `Microsoft.Extensions.DependencyInjection.Abstractions` from 10.0.11 to 10.0.12
 
 ## [2.10.5] - 2026-08-30
 
 ### Fixed
-
 - Fixed shell metacharacter escaping in RunnerProcessFactory. Added tests covering the new escaping behavior.
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.10.5 and CliInvoke 2.10.5
 
 ## [2.10.4] - 2026-08-26
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.10.4 and CliInvoke 2.10.4
 - Improved security when running processes created using `RunnerProcessFactory`
 - Improved security when running processes via Specialization powered configurations and invokers.
@@ -573,24 +467,20 @@ Themes:
 ## [2.10.3] - 2026-08-19
 
 ### Fixed
-
 - Fixed `ProcessConfiguration.Equals` to correctly compare `RequiresAdministrator` and `WindowCreation` properties instead of comparing `ResourcePolicy` twice, and added both properties to `GetHashCode` for consistency
 - Fixed `RunnerProcessFactory.CreateRunnerConfiguration` to chain `RequireAdministratorPrivileges()` on the existing builder instead of replacing it with a fresh one, preserving all accumulated configuration when admin privileges are required
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.10.3 and CliInvoke 2.10.3
 
 ## [2.10.2] - 2026-08-15
 
 ### Fixed
-
 - Corrected the upper bound validation for processor affinity.
 - Centralized the processor affinity upper bound and made the related tests processor-count-aware.
 - Replaced `nint`/`IntPtr.MaxValue` with a netstandard2.0-compatible computation in the processor affinity policy.
 
 ### Changed
-
 - Updated Polyfill version from 11.0.1 to 11.2.0
 - Updated DotExtensions from 10.5.0 to 10.5.1
 - Updated to use CliInvoke.Core 2.10.2 and CliInvoke 2.10.2
@@ -598,22 +488,18 @@ Themes:
 ## [2.10.1] - 2026-08-05
 
 ### Fixed
-
 - Fixed potential race conditions in `ProcessWrapper`'s `Start` method for fast exiting processes.
 - Fixed an issue where `WaitForExitAsync` waiting for End Of File would block indefinitely on piped outputs
 
 ### Changed
-
 - Updated to use CliInvoke 2.10.1
 
 ## [2.10.0] - 2026-07-31
 
 ### Added
-
 - Added a constructor overload that accepts `IEnumerable<string>` in `ProcessConfiguration`.
 
 ### Changed
-
 - Reduced code duplication in `ProcessConfiguration` constructors.
 - Improved formatting in `ProcessConfiguration`.
 - Updated DotExtensions from 10.4.0 to 10.5.0.
@@ -621,50 +507,41 @@ Themes:
 ## [2.9.4] - 2026-08-30
 
 ### Security
-
 - Security re-backport of 2.10.5 ArgumentList fix (CWE-78, CWE-88). The 2.9.3 escaping-based backport was proven still vulnerable: a double quote in caller arguments could break OS-level quoting and let the wrapped shell reassemble a second command.
 
 ### Changed
-
 - RunnerProcessFactory composes the wrapped command as a list of separate argument tokens, and ToStartInfoExtensions delivers them through `ProcessStartInfo.ArgumentList` on .NET 8+ so the OS quotes each value independently and no caller value can alter how the wrapped command is split.
 - Add `PolyUseEmbeddedAttribute=true` in CliInvoke.Specializations so each project's polyfill copy stays private (prevents CS0433/CS0121).
 - Guard `[OverloadResolutionPriority(2)]` on the obsolete `FromStartInfo` with `#if NET9_0_OR_GREATER` in CliInvoke.Extensions.
 
 ### Fixed
-
 - Port three admin-flag preservation regression tests from 2.10.5.
 
 ## [2.9.3] - 2026-08-30
 
 ### Fixed
-
 - Fixed shell metacharacter escaping in RunnerProcessFactory. Added tests covering the new escaping behavior.
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.9.3 and CliInvoke 2.9.3
 
 ## [2.9.2] - 2026-08-19
 
 ### Fixed
-
 - Fixed `ProcessConfiguration.Equals` to correctly compare `RequiresAdministrator` and `WindowCreation` properties instead of comparing `ResourcePolicy` twice, and added both properties to `GetHashCode` for consistency
 - Fixed `RunnerProcessFactory.CreateRunnerConfiguration` to chain `RequireAdministratorPrivileges()` on the existing builder instead of replacing it with a fresh one, preserving all accumulated configuration when admin privileges are required
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.9.2 and CliInvoke 2.9.2
 
 ## [2.9.1] - 2026-08-15
 
 ### Fixed
-
 - Corrected the upper bound validation for processor affinity.
 - Centralized the processor affinity upper bound and made the related tests processor-count-aware.
 - Replaced `nint`/`IntPtr.MaxValue` with a netstandard2.0-compatible computation in the processor affinity policy.
 
 ### Changed
-
 - Updated Polyfill version from 11.0.1 to 11.0.2
 - Updated DotExtensions from 10.4.0 to 10.5.1
 - Updated to use CliInvoke.Core 2.9.1 and CliInvoke 2.9.1
@@ -672,7 +549,6 @@ Themes:
 ## [2.9.0] - 2026-07-19
 
 ### Changed
-
 - Updated Polyfill from 10.11.2 to 11.0.1
 - Updated DotExtensions from 10.3.3 to 10.4.0
 - Scaled the graceful-cancellation wait with the configured timeout, replacing the fixed 30-second `GracefulTimeoutWaitSeconds` constant with `CalculateGracefulTimeoutWaitSeconds(timeout)` (returns `min(10 + floor(timeout * 0.05), 20)`). A 10s timeout now waits 10s (was 30s); a 200s timeout is capped at 20s. The `GracefulCancel_InterruptSignals_Success` test bound is now derived from the same formula (wait + 5s, capped at 60s) so it stays in sync if the formula changes again.
@@ -680,43 +556,36 @@ Themes:
 - Fixed British English spelling in XML doc comment for AddCustomResultValidatorsExtensions ("customize" → "customise")
 
 ### Deprecated
-
 - Deprecated FilePathResolver.Shared static property (marked [Obsolete] ahead of removal in v3)
 
 ## [2.8.5] - 2026-08-30
 
 ### Changed
-
 - Replace `ArgumentCompositionHelper`-based command composition with direct `ArgumentTokenizer` usage so the wrapped command is built from discrete tokens and `ProcessStartInfo` delivers them through `ArgumentList`.
 - Rename `ArgumentParser` to `ArgumentTokenizer` (matches 2.10.x naming).
 - `RunnerProcessFactory` now tokenises runner args, the target path, and the caller's arguments separately, letting the OS quote each value independently when it composes the final command line.
 - `ProcessConfiguration`'s first constructor initialises `ArgumentsList`; `Equals` covers `RequiresAdministrator` and `WindowCreation`.
 
 ### Removed
-
 - Remove `ArgumentCompositionHelper` and its pre-quoting helpers.
 
 ## [2.8.4] - 2026-08-30
 
 ### Fixed
-
 - Fixed shell metacharacter escaping in RunnerProcessFactory.
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.8.4 and CliInvoke 2.8.4
 
 ## [2.8.3] - 2026-06-30
 
 ### Fixed
-
 - Fixed `ProcessTimeoutPolicy.Default` so it uses the parameterless constructor (3 minutes) rather than being hardcoded to 30 minutes, aligning the static `Default` value with the documented default-constructor behavior.
 - Fixed `ProcessResourcePolicy` constructor throwing an exception if ProcessorAffinity was set to 1 or less (minimum supported value is 1 (0x0001))
 - Fixed an issue where the `ProcessResourcePolicy` constructor would not throw an Exception if ProcessorAffinity was set to a number greater than the 2x the `Environment.ProcessorCount` property
 - Changed `UserCredential.LoadUserProfile` to default to `null` instead of `false`, so that the builder-produced `UserCredential` matches the configuration's actual default
 
 ### Changed
-
 - Updated `.gitignore` to exclude `/waza-results` and `skills-lock.json`.
 - Bumped `Polyfill` from `10.8.1` to `10.11.2`.
 - Updated to use CliInvoke.Core 2.8.3 and CliInvoke 2.8.3
@@ -724,7 +593,6 @@ Themes:
 ## [2.8.2] - 2026-06-12
 
 ### Changed
-
 - Updated `.gitignore` to include agent skills and Lunet build artifacts.
 - Updated `Polyfill` from 10.7.0 to 10.8.1.
 - Updated `DotExtensions` from 10.3.2 to 10.3.3.
@@ -733,7 +601,6 @@ Themes:
 ## [2.8.1] - 2026-05-31
 
 ### Fixed
-
 - Fixed an issue where timeout threshold wasn't reduced to 3 minutes
 - Fixed a Dependency Injection ambiguous constructor issue in `ProcessInvoker`
 - Fixed an issue with `ExternalProcess` where `WaitForBufferedExitOrTimeout` would cause an exception to be thrown
@@ -741,18 +608,15 @@ Themes:
 - Fixed a Dependency Injection ambiguous constructor issue in `ProcessInvoker`
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.8.1 and CliInvoke 2.8.1
 
 ## [2.8.0] - 2026-05-31
 
 ### Added
-
 - Added `WaitForPipedExitOrTimeoutAsync` to `IExternalProcess`
 - Added `WaitForPipedExitOrTimeoutAsync` to `ExternalProcess`
 
 ### Changed
-
 - Reduced timeout threshold to 3 minutes
 - Refactored `ProcessInvoker` class to internally use `IExternalProcessFactory` and `IExternalProcess` to reduce code duplication
 - Updated to use CliInvoke.Core 2.8.0 and CliInvoke 2.8.0
@@ -760,7 +624,6 @@ Themes:
 ## [2.7.1] - 2026-05-31
 
 ### Changed
-
 - Update internal Polyfill version from 10.5.1 to 10.7.0
 - Reduced private helper method code usage in `ProcessInvoker`
 - Updated to use CliInvoke.Core 2.7.1 and CliInvoke 2.7.1
@@ -768,13 +631,11 @@ Themes:
 ## [2.7.0] - 2026-05-16
 
 ### Added
-
 - Added a simpler overload to `ProcessConfiguration`
 - Added a simpler overload to `ProcessExitConfiguration`.
 - Ported `CliRun` facade to `CliInvoke` 2.7. CliRun is a new beginner-friendly entry point providing static RunAsync / Run*Async methods for simple process invocation without boilerplate (zero DI setup required, but allows optional DI injection of some services)
 
 ### Changed
-
 - Backported README improvements and PATTERNS.md from v3.
 - Updated test dependencies.
 - Updated `.gitignore`.
@@ -788,11 +649,9 @@ Themes:
 ## [2.6.0] - 2026-04-26
 
 ### Added
-
 - Added a new ProcessConfiguration constructor. This is intended to replace the original constructor
 
 ### Changed
-
 - Reduced compiler warnings and disabled obsolete warnings
 - Updated DotExtensions to version 10.3.0
 - Switched to using DotExtensions' PATH Environment variable resolving code from DotPrimitives and removed dependency on DotPrimitives
@@ -802,19 +661,16 @@ Themes:
 - Added a test for `PowershellProcessInvoker`
 
 ### Deprecated
-
 - Deprecated `IProcessConfigurationFactory`. This will be removed in CliInvoke v3
 - Deprecated the original ProcessConfiguration constructor. This will be removed in CliInvoke v3
 - Deprecated `ProcessConfigurationFactory`. This is replaced by a static Factory class in CliInvoke v3
 
 ### Fixed
-
 - Fixed an issue with `PowershellProcessInvoker` that would cause it to throw an ArgumentException upon instantiation. This will be backported to 2.5.x
 
 ## [2.5.4] - 2026-04-26
 
 ### Changed
-
 - Updated internal Polyfill version from 10.1.1 to 10.3.0
 - Updated DotExtensions version from 10.2.0 to 10.2.3
 - Updated Microsoft.Extensions.DependencyInjection.Abstractions version from 10.0.5 to 10.0.7
@@ -823,7 +679,6 @@ Themes:
 ## [2.5.3] - 2026-04-12
 
 ### Changed
-
 - Updated internal Polyfill version from 9.23.0 to 10.1.1
 - Removed deprecation of `IFilePathResolver` interface. The `ResolveFilePath` method signature in the interface is deprecated and will be replaced with a new method signature in CliInvoke v3
 - Updated DotPrimitives version from 4.3.3 to 4.4.0
@@ -835,13 +690,11 @@ Themes:
 ## [2.5.2] - 2026-04-02
 
 ### Changed
-
 - Updated internal Polyfill version from 9.22.0 to 9.23.0
 - Updated DotExtensions version from 10.0.0 to 10.1.1
 - Updated to use CliInvoke.Core 2.5.2 and CliInvoke 2.5.2
 
 ### Deprecated
-
 - Deprecated `IProcessPipeHandler` for removal in CliInvoke v3
 - Deprecated `RunnerProcessInvokerBase` for removal in CliInvoke v3
 - Deprecated `DefaultRunnerProcessInvoker` for removal in CliInvoke v3
@@ -849,7 +702,6 @@ Themes:
 - Deprecated `AddDerivedRunnerProcessInvoker` and  `AddDefaultRunnerProcessInvoker` methods for removal in CliInvoke v3
 
 ### Fixed
-
 - Fixed a potential issue where Graceful cancellation on Windows would not free an allocated console leading to leaking memory
 - Fixed possible cancellation related race conditions
 - Fixed an issue where the wrong exception type was attempted to be caught in cancellation methods
@@ -857,7 +709,6 @@ Themes:
 ## [2.5.1] - 2026-03-21
 
 ### Changed
-
 - Updated AOT Compatibility property in `CliInvoke.Core.csproj` to only be set to true on .NET 8+
 - Reduced warnings regarding supported and unsupported OSes in `IProcessResourcePolicyBuilder`
 - Updated AOT Compatibility property in `CliInvoke.csproj` to only be set to true on .NET 8+
@@ -867,43 +718,36 @@ Themes:
 - Updated AOT Compatibility property in `CliInvoke.Specializations.csproj` to only be set to true on .NET 8+
 
 ### Fixed
-
 - Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AOT compatible despite CliInvoke advertising itself as Trimming safe and AOT compatible. It is now fixed to be Trimming safe and AOT compatible on .NET 8+. This fix is also backported to CliInvoke 2.4 via version 2.4.4
 
 ## [2.5.0] - 2026-03-18
 
 ### Added
-
 - Added `IExternalProcessFactory`, an interface for easily creating `IExternalProcess` instances.
 - Added `ExternalProcessFactory`, the implementation of `IExternalProcessFactory` for easily creating `IExternalProcess` instances.
 - Added support for `IExternalProcessFactory` and `ExternalProcessFactory`
 
 ### Changed
-
 - Updated DotExtensions version from 9.7.4 to 10.0.0
 - Updated DotPrimitives version from 4.3.2 to 4.3.3
 - Updated to use CliInvoke.Core 2.5.0 and CliInvoke 2.5.0
 
 ### Deprecated
-
 - Deprecated `IProcessConfigurationBuilder`'s `SetStandardOutputPipe` and `SetStandardErrorPipe` methods for removal in CliInvoke.Core v3
 - Deprecated `ProcessConfigurationBuilder`'s `SetStandardOutputPipe` and `SetStandardErrorPipe` methods for removal in CliInvoke v3
 - Deprecated `ProcessConfiguration`'s `FromStartInfo` static extension method as deprecated for removal in CliInvoke v3. This is being replaced with a replacement method called `FromProcessStartInfo`
 
 ### Fixed
-
 - Fixed an issue where ProcessPipeHandler didn't make use of the CancellationToken passed to its methods (Backported to 2.4.3)
 
 ## [2.4.5] - 2026-04-02
 
 ### Changed
-
 - Updated internal Polyfill version from 9.22.0 to 9.23.0
 - Updated DotExtensions version from 9.7.4 to 9.7.5
 - Updated to use CliInvoke.Core 2.4.5 and CliInvoke 2.4.5
 
 ### Fixed
-
 - Fixed a potential issue where Graceful cancellation on Windows would not free an allocated console leading to leaking memory
 - Fixed possible cancellation related race conditions
 - Fixed an issue where the wrong exception type was attempted to be caught in cancellation methods
@@ -911,7 +755,6 @@ Themes:
 ## [2.4.4] - 2026-03-21
 
 ### Changed
-
 - Updated AOT Compatibility property in `CliInvoke.Core.csproj` to only be set to true on .NET 8+
 - Updated AOT Compatibility property in `CliInvoke.csproj` to only be set to true on .NET 8+
 - Updated to use CliInvoke.Core 2.4.4 and CliInvoke 2.4.4
@@ -919,31 +762,26 @@ Themes:
 - Updated AOT Compatibility property in `CliInvoke.Specializations.csproj` to only be set to true on .NET 8+
 
 ### Fixed
-
 - Fixed a potential issue where CliInvoke Graceful cancellation on Unix and Windows may not have been Trimming safe or AOT compatible despite CliInvoke advertising itself as Trimming safe and AOT compatible. It is now fixed to be Trimming safe and AOT compatible on .NET 8+
 
 ## [2.4.3] - 2026-03-18
 
 ### Changed
-
 - Updated internal Polyfill version from 9.20.0 to 9.22.0
 - Updated to use CliInvoke.Core 2.4.3 and CliInvoke 2.4.3
 - Added FreeBSD as a supported OS attribute for `PowershellProcessInvoker`
 
 ### Fixed
-
 - Fixed an issue where `ProcessPipeHandler` didn't make use of the CancellationToken passed to its methods
 - Removed nuisance OS Support warnings for `ProcessPipeHandler`
 
 ## [2.4.2] - 2026-03-14
 
 ### Changed
-
 - Updated internal Polyfill version from 9.18.0 to 9.20.0
 - Updated to use CliInvoke.Core 2.4.2 and CliInvoke 2.4.2
 
 ### Fixed
-
 - Fixed an issue where `RunnerProcessFactory` failed to adequately apply runner configuration arguments and runner process arguments to a runner process.
 - Fixed an issue where `ProcessInvoker`'s `ExecuteAsync` method would attempt Standard Input Redirection without checking first if it was requested
 - Fixed an issue with `CmdProcessConfiguration` that would cause an Argument exception to be thrown if instantiated due to an empty or whitespace string parameter value in the constructor
@@ -952,7 +790,6 @@ Themes:
 ## [2.4.1] - 2026-03-12
 
 ### Changed
-
 - Switched to using Central Package Management
 - Updated internal Polyfill version from 9.12.0 to 9.18.0
 - Updated DotExtensions version from 9.7.0 to 9.7.3
@@ -962,7 +799,6 @@ Themes:
 ## [2.4.0] - 2026-02-24
 
 ### Added
-
 - Added `IShellDetector` interface for detecting default system Shell
 - Added `IExternalProcess` (the interface for `ExternalProcess`). This is not an injectable service and exists to facilitate a possible future `ExternalProcess` Factory pattern, and/or allow alternate implementations.
 - Added `ShellDetector` implementation of `IShellDetector` for detecting default system Shell
@@ -970,13 +806,11 @@ Themes:
 - Added registration of `IShellDetector` and `ShellDetector` in `AddCliInvoke` method
 
 ### Changed
-
 - Updated to use CliInvoke.Core 2.4.0
 
 ## [2.3.4] - 2026-02-24
 
 ### Changed
-
 - Updated internal Polyfill version from 9.9.0 to 9.10.0
 - Updated DotExtensions version from 9.6.2 to 9.7.0
 - Updated to use CliInvoke.Core 2.3.4 and CliInvoke 2.3.4
@@ -984,7 +818,6 @@ Themes:
 ## [2.3.3] - 2026-02-15
 
 ### Changed
-
 - Updated internal Polyfill version from 9.8.1 to 9.9.0
 - Updated DotPrimitives version from 4.3.1 to 4.3.2
 - Updated DotExtensions version from 9.6.1 to 9.6.2
@@ -993,27 +826,23 @@ Themes:
 ## [2.3.2] - 2026-02-14
 
 ### Changed
-
 - Updated DotExtensions version from 9.5.1 to 9.6.1
 - Backported readme improvements
 - Updated to use Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.2 to 10.0.3
 - Updated to use CliInvoke.Core 2.3.2 and CliInvoke 2.3.2
 
 ### Fixed
-
 - Fixed xml doc comment grammar issues
 
 ## [2.3.1] - 2026-02-04
 
 ### Changed
-
 - Refactor `WaitForExitNoTimeoutAsync` to use `WaitForExitOrGracefulTimeoutAsync` with fallback to forceful.
 - Extract `GracefulInterruptCancellation` method in `GracefulCancellation`.
 
 ## [2.3.0] - 2026-01-23
 
 ### Added
-
 - Added CancellationToken support to `IProcessPipeHandler`
 - Added `IProcessResultValidator<TProcessResult>` This is the replacement for `ProcessResultValidation`.
 - Added `CommonValidationRules` static class for common Validation Rules
@@ -1025,7 +854,6 @@ Themes:
 - Added `AddCustomResultValidators<TProcessResult, TProcessResultValidator>(TProcessResultValidator validator, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)` DI registration method
 
 ### Changed
-
 - Replaced manual `ArgumentOutOfRangeException` instantiation and throwing with cleaner Throw method calls
 - Updated `ProcessExceptionInfo` class
 - Updated `ProcessConfigurationFactory` to use default `ArgumentsBuilder` validation
@@ -1035,7 +863,6 @@ Themes:
 - Updated to use CliInvoke.Core 2.3.0 and CliInvoke 2.3.0
 
 ### Deprecated
-
 - Deprecated `ProcessConfiguration`'s `StandardOutput` and `StandardError` properties. These will be removed in CliInvoke.Core v3
 - Deprecated `ProcessResultValidation` enum. This will be replaced with a new Result Validation system in CliInvoke.Core v3
 - Deprecated `ResultValidation` property in `ProcessExitConfiguration`. This will be replaced in CliInvoke.Core v3
@@ -1043,13 +870,11 @@ Themes:
 - Deprecated `IFilePathResolver` interface. This will be removed in version 3. CliInvoke uses File Path Resolving as an implementation detail and CliInvoke main package will migrate to use an alternative file path resolving interface
 
 ### Fixed
-
 - Fixed xml doc comment issues
 
 ## [2.2.1] - 2026-01-21
 
 ### Changed
-
 - Updated internal Polyfill version from 9.6.0 to 9.7.4
 - Updated DotPrimitives version from 4.1.0 to 4.2.0
 - Updated DotExtensions version from 9.3.1 to 9.4.1
@@ -1057,14 +882,12 @@ Themes:
 - Updated to use CliInvoke.Core 2.2.1 and CliInvoke 2.2.1
 
 ### Fixed
-
 - Fixed an issue where an empty StandardOutput in `BufferedProcessResult` constructor would throw an ArgumentException
 - Fixed an issue with `ProcessInvoker` exit code validation logic if exit code validation fails
 
 ## [2.2.0] - 2025-12-29
 
 ### Added
-
 - Add `ProcessExceptionInfo` type for detailed process failure information.
 - Add initial `Configuration.FromStartInfo` extension method.
 - Add File Path Resolve unit tests.
@@ -1072,7 +895,6 @@ Themes:
 - Add initial reworked string escape code.
 
 ### Changed
-
 - Rework `FilePathResolver` to use DotExtensions and DotPrimitives.
 - Rework Powershell Unix detection to resolve file path and remove reliance on `which`.
 - Improve file path resolver performance.
@@ -1085,7 +907,6 @@ Themes:
 - Remove unnecessary new instantiation.
 
 ### Fixed
-
 - Fix Cancellation Token ignored in Timeout methods.
 - Fix potential issue with Process wrongly reporting starting.
 - Fix standard input issue.
@@ -1097,18 +918,15 @@ Themes:
 - Fix issues with old package id and namespaces.
 
 ### Removed
-
 - Remove remote process running detection and process disposal detection.
 - Remove no longer needed localized phrase.
 
 ## [2.1.5] - 2026-01-02
 
 ### Changed
-
 - Update to use CliInvoke main package 2.1.5
 
 ### Fixed
-
 - Fixed an issue where Cancellation Token is ignored in some circumstances
 - Fixed an issue where `ProcessWrapper` could attempt to apply a Resource Policy to a Process even if the Process hasn't started successfully
 - Fixed an issue where `ProcessInvoker`'s `ExecutePipedAsync` method would attempt to redirect Standard Input before the process has started
@@ -1116,55 +934,46 @@ Themes:
 ## [2.1.4] - 2025-12-26
 
 ### Changed
-
 - Update internal Polyfill version from 9.3.4 to 9.5.0
 - Update to CliInvoke 2.1.4
 - Replaced outdated package Ids and namespaces in readmes and some file headers.
 
 ### Fixed
-
 - Fixed an issue with Standard Input incorrectly being applied to `ProcessWrapper` (CliInvoke's internal Process wrapper class) in `ProcessInvoker`
 
 ## [2.1.3] - 2025-12-18
 
 ### Changed
-
 - Update to use CliInvoke main package 2.1.3
 
 ### Fixed
-
 - Fixed a bug where FilePathResolver's implementation of Path Environment Variable Resolving would lead to incorrect file path evaluation due to an incorrect if statement evaluation.
 
 ## [2.1.2] - 2025-12-11
 
 ### Changed
-
 - Updated to Polyfill version 9.3.4 from 9.1.0
 - Updated to Microsoft.Extensions.DependencyInjection.Abstractions version 10.0.1 from 10.0.0
 
 ## [2.1.1] - 2025-11-18
 
 ### Changed
-
 - Added Trimming test project
 - Added AOT test project
 - Update to internal Polyfill version 9.1.0 from 9.0.3
 
 ### Fixed
-
 - Fixed an issue that caused Trimming warning IL2091 when used in a Trimmed Application
 - Fixed nullability inconsistency issues
 
 ## [2.1.0] - 2025-11-14
 
 ### Added
-
 - Added .NET 10  TFM and switched to C# language version 14
 - Added Trimming Support and AOT support
 - Added `UseCustomFilePathResolver<TResolver>` extension member method to register custom File Path Resolver implementations. This uses C# 14's extension members system and thus requires C# 14
 
 ### Changed
-
 - Renamed namespaces to start with `CliInvoke` instead of `AlastairLundy.CliInvoke`
 - Updated `IUserCredentialBuilder` to not accept null strings
 - Updated internal Polyfill version from 8.9.1 to 9.0.3
@@ -1178,7 +987,6 @@ Themes:
 ## [2.0.1] - 2025-11-18
 
 ### Changed
-
 - Update internal Polyfill version from 8.9.1 to 9.1.0
 - Updated DotExtensions from 8.6.3 to 9.0.0
 - Update Core and Main to 2.0.1
@@ -1187,7 +995,6 @@ Themes:
 ## [2.0.0] - 2025-10-28
 
 ### Added
-
 - Added `IProcessConfigurationFactory`
 - Added abstract class `RunnerProcessInvokerBase` that inherits from `IProcessInvoker`
 - Added `IRunnerProcessFactory`. An interface for creating Processes that run other processes.
@@ -1200,7 +1007,6 @@ Themes:
 - Added convenience extension methods that make CliInvoke more ergonomic to use.
 
 ### Changed
-
 - Updated `ProcessResult` to implement `IEquatable<ProcessResult>`
 - Updated `PipedProcessResult` to implement `IDisposable` and dispose of the Stream parameters when Dispose or DisposeAsync is called
 - Changed default value for `ProcessResourcePolicy`'s `PriorityBoostEnabled` value from true to false
@@ -1222,7 +1028,6 @@ Themes:
 - Restructured `IProcessInvoker` interface with methods for `ExecuteAsync`, `ExecuteBufferedAsync`, and `ExecutePipedAsync`
 
 ### Removed
-
 - Removed `CliCommandConfiguration`. This has been replaced by `ProcessConfiguration`
 - Removed `ICliCommandConfigurationBuilder` and `CliCommandConfigurationBuilder`. These have been replaced by `IProcessConfigurationBuilder` and `ProcessConfigurationBuilder` respectively
 - Removed `ICliCommandInvoker` and `CliCommandInvoker` This has been replaced with `IProcessInvoker`
@@ -1234,4 +1039,3 @@ Themes:
 - Removed `IProcessFactory`
 - Removed `IProcessTimeoutPolicyBuilder` and `ProcessTimeoutPolicyBuilder`. These builders added hardly any benefit for the complexity they added
 - Removed `ProcessFactory`
-
