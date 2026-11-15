@@ -7,6 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Linq;
 using CliInvoke.Core.Extensibility;
 using CliInvoke.Extensibility;
 
@@ -135,6 +136,29 @@ public class RunnerConfigurationFactoryArgumentValidationTests
 
         await Assert.That(exception.ParamName).IsEqualTo("TargetFilePath");
         await Assert.That(exception.Message).Contains("&");
+    }
+
+    [Test]
+    [Arguments(@"C:\mytools\mycmd.exe")]
+    [Arguments(@"C:\cmd tools\runner.exe")]
+    public async Task RunnerPathContainingCmdWithoutCmdFileName_IsNotTreatedAsCmdRunner(
+        string runnerTarget)
+    {
+        IRunnerConfigurationFactory factory = CreateFactory();
+
+        // A runner whose path contains "cmd" but whose file name is neither cmd nor
+        // cmd.exe keeps tokenized delivery; its argument values are not validated as
+        // cmd.exe input, because cmd.exe will not parse the runner's own arguments.
+        ProcessConfiguration runner = BuildConfig(runnerTarget, "/c echo BASE & echo X");
+        ProcessConfiguration target = BuildConfig(@"C:\Windows\System32\robocopy.exe", @"C:\src C:\dst /mir");
+
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(target, runner);
+
+        // The non-shell branch delivers discrete tokens; the separator character stays
+        // ordinary argument data for the runner.
+        await Assert.That(result.ArgumentList.Contains("&")).IsTrue();
+        await Assert.That(result.ArgumentList.Count).IsGreaterThan(0);
+        await Assert.That(result.Arguments).IsEqualTo(string.Empty);
     }
 
     [Test]
