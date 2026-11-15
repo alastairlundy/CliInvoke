@@ -169,7 +169,10 @@ CliInvoke's `ProcessInvoker` supports an optional **middleware** system that let
 
 Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`. `UsePowerShell`/`UseCmd` additionally require registering the Specializations middleware types via `AddCliInvokeSpecializations()` from the `CliInvoke.Specializations` package — see that package's README.
 
-For the full guide — constructor details, the `IProcessMiddleware` contract, DI configuration, result ownership, and the result-swap rule — see the **[Middleware Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/middleware/)**.
+For the full guide - constructor details, the `IProcessMiddleware` contract, DI configuration, result ownership, and the result-swap rule - see the **[Middleware Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/middleware/)**.
+
+> [!NOTE]
+> Runners are identified by file name. Invoke shell runners by their canonical names (`cmd.exe`, `pwsh`/`powershell`); a renamed shell binary is treated as an ordinary target and receives tokenized delivery, and shell-specific composition and its validation do not apply.
 
 ## Resource Disposal
 

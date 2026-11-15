@@ -125,6 +125,10 @@ Two behaviours of the shell middleware are easy to get wrong when configuring th
 
 * **`OutputRedirection` is overwritten on every invocation.** `PowerShellMiddleware`, `CmdMiddleware`, and `DefaultShellMiddleware` all overwrite the source configuration's `OutputRedirection` flag before the next stage runs: it is forced off when the invocation mode is `InvocationMode.Raw`, and forced on otherwise. The overwrite is protective, not cosmetic. `Raw` mode waits for process exit without draining redirected streams, so a redirected pipe that nobody reads would fill up and block the child process; buffered invocations need the redirect on so output can be captured. The `OutputRedirection` value you set on a `ProcessConfiguration` does not survive shell wrapping.
 
+### Runner identification
+
+Runners are identified by file name. Invoke shell runners by their canonical names (`cmd.exe`, `pwsh`/`powershell`); a renamed shell binary — a copy of `cmd.exe` under another name, for example — is treated as an ordinary target and receives tokenized delivery. Shell-specific composition and the validation applied to it do not apply to a runner the library cannot identify as a shell.
+
 ## Wrapping only some invocations in a shell
 
 Shell middleware such as `UsePowerShell()` rewrites every invocation that reaches it. Often you want most commands to run directly and only a few to go through a shell. There are two ways to do this, and they fit different situations. The examples below use PowerShell, but the same techniques apply to `UseCmd()` and `UseDefaultShell()` as well.
