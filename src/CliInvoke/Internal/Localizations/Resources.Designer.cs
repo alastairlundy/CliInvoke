@@ -96,6 +96,15 @@ namespace CliInvoke.Internal.Localizations {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument token &quot;{x}&quot; contains &quot;{y}&quot;, which is not accepted in arguments for cmd.exe runners or cmd/batch targets. cmd.exe interprets these characters itself when parsing a command line. For preformatted command lines whose quoting you own, use CmdProcessConfiguration..
+        /// </summary>
+        internal static string Exceptions_Arguments_CmdMetacharacter {
+            get {
+                return ResourceManager.GetString("Exceptions.Arguments.CmdMetacharacter", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Arguments sequence cannot be empty..
         /// </summary>
         internal static string Exceptions_Arguments_EmptyArgsSequence {

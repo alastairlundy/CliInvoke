@@ -32,6 +32,47 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         ArgumentNullException.ThrowIfNull(processConfigToBeRun);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
 
+        // cmd.exe parses the whole tail of its /c command line with its own rules, and
+        // batch files re-parse their arguments the same way: separators, redirection,
+        // escape and expansion characters keep their cmd.exe meaning even when they
+        // arrive inside a discrete argument token, so launch-time quoting cannot keep
+        // them literal. The tokens that cmd.exe will parse are validated here; values
+        // containing those characters are rejected rather than escaped, and callers who
+        // own their quoting can compose a raw command line through
+        // CmdProcessConfiguration.
+        if (CmdCompositionArgumentValidator.IsCmdRunner(runnerProcessConfig.TargetFilePath))
+        {
+            // cmd.exe parses its whole /c tail: the runner arguments, the target path
+            // and the wrapped arguments are all validated. The runner and legacy
+            // argument strings flow into the composed command line as whole spans, so
+            // they are validated as whole spans — tokenising first would drop quote
+            // characters that still reach cmd.exe's parse.
+            if (!string.IsNullOrWhiteSpace(runnerProcessConfig.Arguments))
+            {
+                CmdCompositionArgumentValidator.Validate(
+                    [runnerProcessConfig.Arguments],
+                    nameof(runnerProcessConfig.Arguments));
+            }
+
+            CmdCompositionArgumentValidator.Validate(
+                [processConfigToBeRun.TargetFilePath],
+                nameof(processConfigToBeRun.TargetFilePath));
+
+            CmdCompositionArgumentValidator.Validate(
+                RawWrappedArguments(processConfigToBeRun),
+                nameof(processConfigToBeRun.Arguments));
+        }
+        else if (CmdCompositionArgumentValidator.IsCmdOrBatchTarget(
+                     processConfigToBeRun.TargetFilePath))
+        {
+            // Only the wrapped arguments are re-parsed by cmd.exe/batch rules here;
+            // the runner parses its own arguments before the target is reached. This
+            // composition delivers tokenised, so the tokens are validated.
+            CmdCompositionArgumentValidator.Validate(
+                TokenisedWrappedArguments(processConfigToBeRun),
+                nameof(processConfigToBeRun.Arguments));
+        }
+
         /*
             Three runner categories, three delivery shapes:
               - PowerShell (-Command): ShellRewriter composes target + args into one shell-escaped script, delivered as a single ArgumentList entry.
@@ -136,5 +177,45 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         ProcessConfiguration result = commandBuilder.Build();
 
         return result;
+    }
+
+    /// <summary>
+    ///     The wrapped command's arguments in the shape the cmd composition embeds
+    ///     them. The verbatim <see cref="ProcessConfiguration.ArgumentList"/> entries
+    ///     are used when present. Otherwise the legacy
+    ///     <see cref="ProcessConfiguration.Arguments"/> string is used as one span,
+    ///     since that string flows into the composed command line untokenised.
+    /// </summary>
+    /// <param name="configuration">The wrapped command configuration.</param>
+    /// <returns>The argument values the cmd composition will embed.</returns>
+    private static IEnumerable<string> RawWrappedArguments(ProcessConfiguration configuration)
+    {
+        if (configuration.ArgumentList.Count > 0)
+            return configuration.ArgumentList;
+
+        if (string.IsNullOrWhiteSpace(configuration.Arguments))
+            return [];
+
+        return [configuration.Arguments];
+    }
+
+    /// <summary>
+    ///     The wrapped command's arguments in the shape the non-shell composition
+    ///     delivers them. The verbatim <see cref="ProcessConfiguration.ArgumentList"/>
+    ///     entries are used when present. Otherwise the legacy
+    ///     <see cref="ProcessConfiguration.Arguments"/> string is split into discrete
+    ///     tokens.
+    /// </summary>
+    /// <param name="configuration">The wrapped command configuration.</param>
+    /// <returns>The argument tokens the non-shell composition will deliver.</returns>
+    private static IEnumerable<string> TokenisedWrappedArguments(ProcessConfiguration configuration)
+    {
+        if (configuration.ArgumentList.Count > 0)
+            return configuration.ArgumentList;
+
+        if (string.IsNullOrWhiteSpace(configuration.Arguments))
+            return [];
+
+        return ArgumentTokenizer.Tokenize(configuration.Arguments);
     }
 }

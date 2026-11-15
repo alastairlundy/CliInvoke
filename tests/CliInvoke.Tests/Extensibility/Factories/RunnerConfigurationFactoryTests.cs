@@ -403,102 +403,135 @@ public class RunnerConfigurationFactoryTests
     }
 
     // ------------------------------------------------------------------------
-    //  Behaviour assertions: factory + cmd runner, real cmd, marker must NOT fire
+    //  Factory + cmd runner: metacharacter-bearing wrapped arguments are rejected
+    //  at composition time (full matrix in
+    //  RunnerConfigurationFactoryArgumentValidationTests), so no process starts and
+    //  no marker can be produced. The calibration controls above still prove the
+    //  raw single-string path fires for these input shapes.
     // ------------------------------------------------------------------------
 
     [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_QuoteAndAmpersand_DoesNotFireMarker()
+    public async Task CmdRunner_QuoteAndAmpersand_ArgumentsAreRejected()
     {
-        SkipTestIfNotWindows();
-
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\nonexistent\app.exe",
+            "a\" & echo pwned>\"" + MarkerPath("B_CMD_QA") + "\"");
 
-        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
-            factory, runner, @"C:\nonexistent\app.exe",
-            "a\" & echo pwned>\"" + MarkerPath("B_CMD_QA") + "\"",
-            "B_CMD_QA").ConfigureAwait(true);
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
 
-        await Assert.That(markerFired).IsFalse();
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_BareAmpersand_DoesNotFireMarker()
+    public async Task CmdRunner_BareAmpersand_ArgumentsAreRejected()
     {
-        SkipTestIfNotWindows();
-
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\nonexistent\app.exe",
+            "x & echo pwned>\"" + MarkerPath("B_CMD_BARE") + "\"");
 
-        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
-            factory, runner, @"C:\nonexistent\app.exe",
-            "x & echo pwned>\"" + MarkerPath("B_CMD_BARE") + "\"",
-            "B_CMD_BARE").ConfigureAwait(true);
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
 
-        await Assert.That(markerFired).IsFalse();
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_DoubledQuoteAndAmpersand_DoesNotFireMarker()
+    public async Task CmdRunner_DoubledQuoteAndAmpersand_ArgumentsAreRejected()
     {
-        SkipTestIfNotWindows();
-
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\nonexistent\app.exe",
+            "a\"\" & echo pwned>\"" + MarkerPath("B_CMD_QQ") + "\"");
 
-        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
-            factory, runner, @"C:\nonexistent\app.exe",
-            "a\"\" & echo pwned>\"" + MarkerPath("B_CMD_QQ") + "\"",
-            "B_CMD_QQ").ConfigureAwait(true);
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
 
-        await Assert.That(markerFired).IsFalse();
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_BareAmpersand_CmdChildTarget_DoesNotFireMarker()
+    public async Task CmdRunner_BareAmpersand_CmdChildTarget_ArgumentsAreRejected()
     {
         // The runner's /c parse is not the only re-parse: a wrapped cmd.exe
         // child applies its own /c quote-strip and metacharacter pass to the
-        // composed text it receives. The escape depth must remain neutral
-        // through both passes.
-        SkipTestIfNotWindows();
-
+        // composed text it receives. The composition is refused before any
+        // process starts, so no marker can be produced.
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig("cmd.exe",
+            "/c echo BENIGNPOINTDEPTH & echo pwned>\"" + MarkerPath("B_CMD_EXECH") + "\"");
 
-        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
-            factory, runner, "cmd.exe",
-            "/c echo BENIGNPOINTDEPTH & echo pwned>\"" + MarkerPath("B_CMD_EXECH") + "\"",
-            "B_CMD_EXECH").ConfigureAwait(true);
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
 
-        await Assert.That(markerFired).IsFalse();
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_BareAmpersand_BatchChildTarget_DoesNotFireMarker()
+    public async Task CmdRunner_BareAmpersand_BatchChildTarget_ArgumentsAreRejected()
     {
         // A batch child expands %* into its echo line, and cmd re-parses that
-        // expansion — one further caret level after the runner's own strip.
-        // The escape depth must keep the composed argument text neutral
-        // through that re-parse as well.
-        SkipTestIfNotWindows();
-
-        string batchFixture = CreateBatchFixture();
-
+        // expansion — one further caret level after the runner's own strip. The
+        // composition is refused before any process starts, so no marker can be
+        // produced.
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\scripts\task.bat",
+            "x & echo pwned>\"" + MarkerPath("B_CMD_BATR") + "\"");
 
-        bool markerFired = await RunViaFactoryAndCheckMarkerAsync(
-            factory, runner, batchFixture,
-            "x & echo pwned>\"" + MarkerPath("B_CMD_BATR") + "\"",
-            "B_CMD_BATR").ConfigureAwait(true);
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
 
-        await Assert.That(markerFired).IsFalse();
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
+    }
+
+    [Test]
+    public async Task CmdRunner_BatchChild_MetacharacterText_ArgumentsAreRejected()
+    {
+        // Argument text that happens to contain cmd metacharacters previously
+        // reached the batch child as literal data; it is now refused at
+        // composition time, so no composed delivery starts a process.
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig(@"C:\scripts\task.bat", "a & batchargument");
+
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
+
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
+    }
+
+    [Test]
+    public async Task CmdRunner_CmdChild_MetacharacterArguments_ArgumentsAreRejected()
+    {
+        // A wrapped cmd.exe child would apply its own /c parse to the composed
+        // text; the composition is refused before any process starts instead.
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
+        ProcessConfiguration target = BuildConfig("cmd.exe",
+            "/c echo GOTRESULTS a & batchargument");
+
+        ArgumentException exception = await Assert
+            .That(() => factory.CreateRunnerConfiguration(target, runner))
+            .Throws<ArgumentException>();
+
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("&");
     }
 
     // ------------------------------------------------------------------------
@@ -572,59 +605,6 @@ public class RunnerConfigurationFactoryTests
 
         await Assert.That(result.ExitCode).IsEqualTo(0);
         await Assert.That(result.StandardOutput!.Trim()).Contains("a b c");
-    }
-
-    [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_BatchChild_MetacharacterText_DeliveredAsLiteralData()
-    {
-        // Argument text that happens to contain cmd metacharacters must reach
-        // the batch child as literal data: the echo line prints it verbatim,
-        // and no second command is produced at the batch re-parse.
-        SkipTestIfNotWindows();
-
-        string batchFixture = CreateBatchFixture();
-
-        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
-        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
-        ProcessConfiguration target = BuildConfig(batchFixture, "a & batchargument");
-
-        ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
-
-        // The composed form must keep the metacharacter escaped; a bare ampersand
-        // run would be a second command at some parse layer.
-        await Assert.That(wrapped.Arguments).DoesNotContain(" & ");
-
-        IProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory());
-        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
-            wrapped, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
-
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-        await Assert.That(result.StandardOutput).Contains("a & batchargument");
-    }
-
-    [Test]
-    [SupportedOSPlatform("windows")]
-    public async Task CmdRunner_CmdChild_MetacharacterArguments_ChainStaysNeutralAndChildRuns()
-    {
-        // A wrapped cmd.exe child must both run its benign echo with the
-        // argument text delivered verbatim and keep the composed chain neutral.
-        SkipTestIfNotWindows();
-
-        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
-        ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
-        ProcessConfiguration target = BuildConfig("cmd.exe", "/c echo GOTRESULTS a & batchargument");
-
-        ProcessConfiguration wrapped = factory.CreateRunnerConfiguration(target, runner);
-
-        await Assert.That(wrapped.Arguments).DoesNotContain(" & ");
-
-        IProcessInvoker invoker = new ProcessInvoker(new ExternalProcessFactory());
-        BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
-            wrapped, ProcessExitConfiguration.CreateGraceful()).ConfigureAwait(true);
-
-        await Assert.That(result.ExitCode).IsEqualTo(0);
-        await Assert.That(result.StandardOutput).Contains("a & batchargument");
     }
 
     [Test]
