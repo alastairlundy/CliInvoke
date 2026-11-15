@@ -90,10 +90,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
             && (runnerProcessConfig.TargetFilePath.Contains("pwsh", StringComparison.OrdinalIgnoreCase)
                 || runnerProcessConfig.TargetFilePath.Contains("powershell", StringComparison.OrdinalIgnoreCase));
 
-        bool runnerIsCmd =
-            !runnerIsPowerShell
-            && !string.IsNullOrEmpty(runnerProcessConfig.TargetFilePath)
-            && runnerProcessConfig.TargetFilePath.Contains("cmd", StringComparison.OrdinalIgnoreCase);
+        bool runnerIsCmd = !runnerIsPowerShell && CmdCompositionArgumentValidator.IsCmdRunner(runnerProcessConfig.TargetFilePath);
 
         ProcessConfigurationBuilder commandBuilder = new(runnerProcessConfig.TargetFilePath);
 
