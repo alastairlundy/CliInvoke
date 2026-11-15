@@ -33,6 +33,12 @@ namespace CliInvoke.Specializations.Middleware;
 ///         a raw-mode pipe deadlock. Raw mode waits for process exit without draining redirected
 ///         output, so a redirected pipe nobody reads would fill up and block the child process.
 ///     </para>
+///     <para>
+///         Runners are identified by file name. Invoke shell runners by their canonical names
+///         (<c>cmd.exe</c>, <c>pwsh</c>/<c>powershell</c>). A renamed shell binary is treated as an
+///         ordinary target and receives tokenized delivery; shell-specific composition and its
+///         validation do not apply.
+///     </para>
 /// </remarks>
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]

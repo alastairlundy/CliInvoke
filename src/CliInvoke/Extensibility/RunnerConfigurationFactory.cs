@@ -24,6 +24,14 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
     /// <param name="processConfigToBeRun">The command to be run by the Command Runner command.</param>
     /// <param name="runnerProcessConfig"></param>
     /// <returns></returns>
+    /// <remarks>
+    ///     <para>
+    ///         Runners are identified by file name. Invoke shell runners by their canonical
+    ///         names (<c>cmd.exe</c>, <c>pwsh</c>/<c>powershell</c>). A renamed shell binary is
+    ///         treated as an ordinary target and receives tokenized delivery; shell-specific
+    ///         composition and its validation do not apply.
+    ///     </para>
+    /// </remarks>
     [Pure]
     public ProcessConfiguration CreateRunnerConfiguration(
         ProcessConfiguration processConfigToBeRun,

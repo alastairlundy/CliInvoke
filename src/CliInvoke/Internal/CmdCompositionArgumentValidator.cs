@@ -39,6 +39,14 @@ internal static class CmdCompositionArgumentValidator
     /// </summary>
     /// <param name="targetFilePath">The target file path to check.</param>
     /// <returns>True when the path names cmd.exe; otherwise false.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Runners are identified by file name. Invoke shell runners by their canonical
+    ///         names (<c>cmd.exe</c>, <c>pwsh</c>/<c>powershell</c>). A renamed shell binary is
+    ///         treated as an ordinary target and receives tokenized delivery; shell-specific
+    ///         composition and its validation do not apply.
+    ///     </para>
+    /// </remarks>
     internal static bool IsCmdRunner(string targetFilePath)
     {
         string fileName = Path.GetFileName(targetFilePath.Trim());
