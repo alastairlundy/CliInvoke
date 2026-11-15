@@ -60,7 +60,7 @@ Exactly **four** `IDisposable` types: `IExternalProcess`, `UserCredential`, `Use
 
 ## Testing notes
 - TUnit + FsCheck (property tests) + Bogus.
-- Tests spawn real executables (`dotnet`, `powershell.exe`, `pwsh`); PowerShell middleware tests skip when `pwsh` is not on PATH (e.g., Windows CI). OS-dependent behavior — replicate CI on ubuntu-latest when in doubt.
+- Tests spawn real executables (`dotnet`, `powershell.exe`, `pwsh`); PowerShell middleware tests skip (`SkipTestIfNull`) only when `pwsh` is genuinely absent from PATH. GitHub-hosted Windows runner images ship PowerShell 7, so those tests run on the windows-latest leg rather than skipping. Local pitfall: a Store-installed PowerShell resolves on PATH to an app-execution alias in `%LOCALAPPDATA%\Microsoft\WindowsApps`. The alias is not an empty file; the real executable can live in an ACL-restricted package folder, and the alias is a reparse point that reports a 0-byte size to normal file-size queries. It launches in some contexts, but Windows can refuse it from the test host's context (`Access is denied`, os error 5), so pwsh tests can fail instead of skip on such machines. OS-dependent behavior - replicate CI on ubuntu-latest when in doubt.
 - CI runs on ubuntu-latest, windows-latest, and macos-latest: cmd-runner behavioural tests (marker-file injection tests in `tests/CliInvoke.Tests/Extensibility/Factories/` and `tests/CliInvoke.Specializations.Tests/`) are Windows-only by design and skip on the other legs; the windows-latest leg runs them.
 
 ## PRs & contributing
