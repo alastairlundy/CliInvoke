@@ -54,6 +54,15 @@ adheres to [Semantic Versioning](https://semver.org/).
 - CONTRIBUTING.md now spells out the required coding standard (`src/.editorconfig`), the `ConfigureAwait` policy and its analyzer/CI enforcement, the test-everywhere expectation (Windows, macOS, Linux), and the contribution-licensing terms.
 - THIRD_PARTY_NOTICES.txt: corrected the DotExtensions attribution path after `PathEnvironmentVariable` moved from `CliInvoke.Core` to `CliInvoke` (`CliInvoke.Core.Internal.IO` -> `CliInvoke.Internal.IO`).
 
+## [3.1.1] - 2026-11-16
+
+### Changed
+* Updated Microsoft.Extensions.DependencyInjection.Abstractions version from 10.0.13 to 10.0.15
+* Updated Microsoft.Extensions.Logging.Abstractions version from 10.0.13 to 10.0.15
+* Fixed an issue where a `ProcessResult`'s Cancellation Reason incorrectly classified timeouts
+* Improved cancellation helper robustness
+* Addressed some warnings
+
 ## [3.1.0] - 2026-10-19
 
 ### Added
@@ -96,6 +105,12 @@ adheres to [Semantic Versioning](https://semver.org/).
 - `WithMaxBufferedOutputBytes(config, null)` clears the source cap so an explicit `null` really means unbounded output; omitting the argument still inherits it.
 - XML docs corrected: invoker invoke paths throw `ProcessValidationException`, not `ProcessNotSuccessfulException`; `WaitForExitOrTimeoutAsync` does not return a "buffered" result; disposal docs say four IDisposable types, not three.
 - Stub-based stdin contract tests pin the close and fault rules without spawning real processes, and escaper fuzz tests cover the `ShellRewriter` composition paths for all three shell kinds.
+
+## [3.0.5] - 2026-11-16
+
+### Changed
+- Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.13 to 10.0.15 (pinned to < 11.0.0).
+- Updated Microsoft.Extensions.Hosting and Microsoft.Extensions.DependencyInjection to 10.0.15 (tests and benchmarks).
 
 ## [3.0.4] - 2026-10-19
 
@@ -320,7 +335,6 @@ Themes:
 - Updated DotExtensions from 10.6.2 to 10.6.3.
 - Updated Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.14 to 10.0.15 (pinned to < 11.0.0).
 - Updated Microsoft.Extensions.Hosting and Microsoft.Extensions.DependencyInjection to 10.0.15 (tests and benchmarks).
-- CliInvoke 2.11.x has limited support and reaches end-of-life on December 1st 2026; migrate to v3.1.x or newer to remain supported.
 
 ## [2.11.6] - 2026-11-03
 
