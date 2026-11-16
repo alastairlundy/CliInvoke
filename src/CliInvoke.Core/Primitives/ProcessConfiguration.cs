@@ -385,7 +385,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     /// <returns>The hash code for the current ProcessConfiguration.</returns>
     public override int GetHashCode()
     {
-        HashCode hashCode = new HashCode();
+        HashCode hashCode = new();
 
         hashCode.Add(PathHashCode(TargetFilePath));
         hashCode.Add(Arguments);
