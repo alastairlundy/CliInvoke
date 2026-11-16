@@ -22,11 +22,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.0.4</PackageVersion>
-        <PackageReleaseNotes>* Fixed an xml doc comment issue</PackageReleaseNotes>
+        <PackageVersion>3.0.5</PackageVersion>
+        <PackageReleaseNotes>Aligned version with CliInvoke</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>3.0.4.0</AssemblyVersion>
-        <FileVersion>3.0.4.0</FileVersion>
+        <AssemblyVersion>3.0.5.0</AssemblyVersion>
+        <FileVersion>3.0.5.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>

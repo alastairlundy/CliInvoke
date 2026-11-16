@@ -14,12 +14,13 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>* Fixed an issue where a fast running process on macOS would throw `Win32Exception` if it exited whilst a `ProcessResourcePolicy` was being applied to it</PackageReleaseNotes>
+        <PackageReleaseNotes>* Updated Microsoft.Extensions.DependencyInjection.Abstractions version from 10.0.13 to 10.0.15
+* Updated Microsoft.Extensions.Logging.Abstractions version from 10.0.13 to 10.0.15</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.0.4</PackageVersion>
-        <AssemblyVersion>3.0.4.0</AssemblyVersion>
+        <PackageVersion>3.0.5</PackageVersion>
+        <AssemblyVersion>3.0.5.0</AssemblyVersion>
         <PackageTags>shell, pipe, command-line, executable, wrapper, standard-input, standard-output, standard-error, input, output, error, arguments, invoke, process, processconfiguration,execution.</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PackageIcon>icon.png</PackageIcon>
@@ -27,7 +28,7 @@
         <PackageId>CliInvoke</PackageId>
         <Product>CliInvoke</Product>
         <PolyEnsure>true</PolyEnsure>
-        <FileVersion>3.0.4.0</FileVersion>
+        <FileVersion>3.0.5.0</FileVersion>
 <!--
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
 -->
