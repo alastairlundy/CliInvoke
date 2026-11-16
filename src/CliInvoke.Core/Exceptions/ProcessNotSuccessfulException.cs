@@ -25,8 +25,8 @@ where TProcessResult : ProcessResult
         : base(
             Resources.Exceptions_ProcessNotSuccessful_Specific.Replace(
                     "{x}",
-                    processInfo.Result.ExecutedFilePath)
-                .Replace("{y}", processInfo.Result.ExitCode.ToString())
+                    processInfo.Result.ExecutedFilePath, StringComparison.OrdinalIgnoreCase)
+                .Replace("{y}", processInfo.Result.ExitCode.ToString(System.Globalization.CultureInfo.CurrentCulture), StringComparison.OrdinalIgnoreCase)
         )
     {
         ExecutedProcessInfo = processInfo;

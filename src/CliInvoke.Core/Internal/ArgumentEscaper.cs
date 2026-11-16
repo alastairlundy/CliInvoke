@@ -45,10 +45,7 @@ internal static class ArgumentEscaper
     /// <returns>The escaped inner content.</returns>
     public static string EscapeInner(string? argument)
     {
-        if (argument is null)
-            return string.Empty;
-
-        if (argument.Length == 0)
+        if (string.IsNullOrEmpty(argument))
             return string.Empty;
 
         if (OperatingSystem.IsWindows())
@@ -155,7 +152,7 @@ internal static class ArgumentEscaper
     /// </returns>
     public static bool NeedsQuoting(string? argument)
     {
-        if (argument is null || argument.Length == 0)
+        if (string.IsNullOrEmpty(argument))
             return false;
 
         if (OperatingSystem.IsWindows())
