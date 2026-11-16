@@ -30,14 +30,20 @@ honestly claim cmd parse semantics for it, and the file name is the identifier i
    `cmd.exe`, case-insensitive. The predicate lives in one place
    (`CmdCompositionArgumentValidator.IsCmdRunner`), and both the composition routing and the
    factory-level validation hook call it. They cannot drift apart again.
-2. **Target-side checks keep exact/extension matching** (`IsCmdOrBatchTarget`, and the 2.x
+2. **The `UseCmd` middleware validates through the same entry point.** Its composition wraps
+   caller text the same way the factory's cmd branch does, so it calls the shared
+   `ValidateCompositionSource` (target path plus wrapped arguments in the shape the composition
+   consumes) rather than relying on the escaper alone. The factory's cmd branch delegates its
+   target-path and wrapped-argument checks to the same method. Validation and composition cannot
+   be ordered differently in the two places that compose for cmd.
+3. **Target-side checks keep exact/extension matching** (`IsCmdOrBatchTarget`, and the 2.x
    launch-time guard). At those points the parser identity is known — the wrapped or launched
    process — so the check is precise. Substring path matching there would reject arguments for
    benign non-cmd targets whose paths pass through a directory containing `cmd`.
-3. On the 2.x train there is no cmd-specific routing branch (delivery is uniformly tokenized);
+4. On the 2.x train there is no cmd-specific routing branch (delivery is uniformly tokenized);
    its hook is semantic and uses the same exact-match predicate. The rejection character set and
    behavior are identical on every train; only the routing context differs.
-4. The matching rule and its limit are stated in the XML documentation of `IsCmdRunner`, the
+5. The matching rule and its limit are stated in the XML documentation of `IsCmdRunner`, the
    runner factory, and `CmdMiddleware`.
 
 ## Consequences
@@ -67,6 +73,10 @@ honestly claim cmd parse semantics for it, and the file name is the identifier i
   (`RunnerConfigurationFactoryArgumentValidationTests`), and a runner whose path contains `cmd`
   but whose file name is neither `cmd` nor `cmd.exe` routes to the tokenized branch and is not
   runner-validated (`RunnerPathContainingCmdWithoutCmdFileName_IsNotTreatedAsCmdRunner`).
+- The `UseCmd` middleware path has the same rejection coverage
+  (`ShellInjectionSecurityTests`: metacharacters in the target path and in the wrapped arguments
+  are refused with the naming exception; a benign argument list still composes with per-entry
+  quoting), so the two composition sites are held to one behavior by tests, not by convention.
 - The runner-identification contract is published in the XML documentation of the factory, the
   middleware, and the predicate, in the README, and in `site/docs`, so the discouragement of
   renamed shell runners is discoverable rather than a silent behavior cliff.

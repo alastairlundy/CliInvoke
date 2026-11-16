@@ -129,6 +129,10 @@ Two behaviours of the shell middleware are easy to get wrong when configuring th
 
 Runners are identified by file name. Invoke shell runners by their canonical names (`cmd.exe`, `pwsh`/`powershell`); a renamed shell binary — a copy of `cmd.exe` under another name, for example — is treated as an ordinary target and receives tokenized delivery. Shell-specific composition and the validation applied to it do not apply to a runner the library cannot identify as a shell.
 
+### cmd composition validation
+
+`UseCmd` composes the wrapped command into a single `/c` line that cmd.exe parses with its own rules, so the wrapped values are checked before anything is composed. If the wrapped configuration's target path or arguments contain a character cmd.exe interprets itself (`&`, `|`, `<`, `>`, `^`, `%`, `"`, `!`), the invocation fails with an `ArgumentException` naming the offending value and character. The same check applies to cmd runners in the runner factory. Callers who need those characters as literal data can compose a raw command line through `CmdProcessConfiguration`, where quoting is the caller's responsibility.
+
 ## Wrapping only some invocations in a shell
 
 Shell middleware such as `UsePowerShell()` rewrites every invocation that reaches it. Often you want most commands to run directly and only a few to go through a shell. There are two ways to do this, and they fit different situations. The examples below use PowerShell, but the same techniques apply to `UseCmd()` and `UseDefaultShell()` as well.
