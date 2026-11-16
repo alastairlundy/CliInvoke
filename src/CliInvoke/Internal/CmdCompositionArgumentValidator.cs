@@ -73,6 +73,41 @@ internal static class CmdCompositionArgumentValidator
     }
 
     /// <summary>
+    ///     Validates the parts of a source configuration that a cmd.exe composition
+    ///     delivers as text: the target file path, and the wrapped arguments in the
+    ///     shape the composition consumes.
+    /// </summary>
+    /// <param name="source">The configuration being composed into a cmd.exe command line.</param>
+    /// <exception cref="ArgumentException">The target path or a wrapped argument contains a character cmd.exe parses itself.</exception>
+    internal static void ValidateCompositionSource(ProcessConfiguration source)
+    {
+        Validate(
+            [source.TargetFilePath],
+            nameof(ProcessConfiguration.TargetFilePath));
+
+        Validate(RawWrappedArguments(source), nameof(ProcessConfiguration.Arguments));
+    }
+
+    /// <summary>
+    ///     The wrapped command's arguments in the shape the cmd composition consumes:
+    ///     the verbatim <see cref="ProcessConfiguration.ArgumentList"/> entries when
+    ///     present, otherwise the legacy <see cref="ProcessConfiguration.Arguments"/>
+    ///     string as one whole span.
+    /// </summary>
+    /// <param name="configuration">The wrapped command configuration.</param>
+    /// <returns>The argument spans the composition will deliver as cmd.exe input.</returns>
+    private static IEnumerable<string> RawWrappedArguments(ProcessConfiguration configuration)
+    {
+        if (configuration.ArgumentList.Count > 0)
+            return configuration.ArgumentList;
+
+        if (string.IsNullOrWhiteSpace(configuration.Arguments))
+            return [];
+
+        return [configuration.Arguments];
+    }
+
+    /// <summary>
     ///     Throws an <see cref="ArgumentException" /> if any of the given tokens contains
     ///     a character that cmd.exe interprets itself when parsing a command line.
     /// </summary>
