@@ -62,13 +62,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                     nameof(runnerProcessConfig.Arguments));
             }
 
-            CmdCompositionArgumentValidator.Validate(
-                [processConfigToBeRun.TargetFilePath],
-                nameof(processConfigToBeRun.TargetFilePath));
-
-            CmdCompositionArgumentValidator.Validate(
-                RawWrappedArguments(processConfigToBeRun),
-                nameof(processConfigToBeRun.Arguments));
+            CmdCompositionArgumentValidator.ValidateCompositionSource(processConfigToBeRun);
         }
         else if (CmdCompositionArgumentValidator.IsCmdOrBatchTarget(
                      processConfigToBeRun.TargetFilePath))
@@ -182,26 +176,6 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         ProcessConfiguration result = commandBuilder.Build();
 
         return result;
-    }
-
-    /// <summary>
-    ///     The wrapped command's arguments in the shape the cmd composition embeds
-    ///     them. The verbatim <see cref="ProcessConfiguration.ArgumentList"/> entries
-    ///     are used when present. Otherwise the legacy
-    ///     <see cref="ProcessConfiguration.Arguments"/> string is used as one span,
-    ///     since that string flows into the composed command line untokenised.
-    /// </summary>
-    /// <param name="configuration">The wrapped command configuration.</param>
-    /// <returns>The argument values the cmd composition will embed.</returns>
-    private static IEnumerable<string> RawWrappedArguments(ProcessConfiguration configuration)
-    {
-        if (configuration.ArgumentList.Count > 0)
-            return configuration.ArgumentList;
-
-        if (string.IsNullOrWhiteSpace(configuration.Arguments))
-            return [];
-
-        return [configuration.Arguments];
     }
 
     /// <summary>

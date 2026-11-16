@@ -73,6 +73,14 @@ internal sealed class CmdMiddleware : IProcessMiddleware
             src,
             b => b.SetOutputRedirection(context.Mode != InvocationMode.Raw));
 
+        // cmd.exe parses the whole /c tail this middleware composes: the target path
+        // and the wrapped arguments reach cmd.exe's parse as text, so they are validated
+        // here the same way the runner factory validates its cmd branch. Values
+        // containing characters cmd.exe interprets itself are rejected rather than
+        // escaped, and callers who own their quoting can compose a raw command line
+        // through CmdProcessConfiguration.
+        CmdCompositionArgumentValidator.ValidateCompositionSource(source);
+
         ProcessConfiguration rewritten = ShellRewriter.Rewrite(
             source,
             shellTargetPath: "cmd.exe",

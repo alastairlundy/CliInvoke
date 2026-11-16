@@ -15,9 +15,11 @@ using TUnit.Core.Exceptions;
 namespace CliInvoke.Specializations.Tests.Middleware;
 
 /// <summary>
-///     Regression tests for shell command composition. The middleware must use the
-///     shell-aware <c>ShellRewriter</c> output, preserve caller-supplied argument lists,
-///     and prevent shell metacharacters from becoming additional commands.
+///     Regression tests for shell command composition. The PowerShell middleware must
+///     use the shell-aware <c>ShellRewriter</c> output and preserve caller-supplied
+///     argument lists; the cmd middleware additionally rejects wrapped values
+///     containing characters cmd.exe parses itself, the same as the runner factory's
+///     cmd branch.
 /// </summary>
 public class ShellInjectionSecurityTests
 {
@@ -113,30 +115,56 @@ public class ShellInjectionSecurityTests
 
     [Test]
     [SupportedOSPlatform("windows")]
-    public async Task Cmd_Wrapper_PreventsCommandInjectionFromTargetAndArguments()
+    public async Task Cmd_Wrapper_RejectsMetacharactersInTargetPath()
     {
         if (!OperatingSystem.IsWindows())
             throw new SkipTestException(
                 "cmd is Windows-only; CmdMiddleware rejects non-Windows by design.");
 
-        ProcessConfiguration original = MakeConfig("prog\" & evil.exe & \"", "a & b | c");
+        // cmd.exe parses the whole /c tail the middleware composes, so a target path
+        // containing characters cmd.exe interprets itself is rejected before anything
+        // is composed or launched, the same as the runner factory's cmd branch.
+        ProcessConfiguration original = MakeConfig("prog\" & evil.exe & \"", "a b c");
 
         CapturingNext next = new();
         CmdMiddleware middleware = new();
 
-        await middleware.InvokeAsync(
-            new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
-                InvocationMode.Buffered),
-            next.Invoke).ConfigureAwait(true);
+        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await middleware.InvokeAsync(
+                new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
+                    InvocationMode.Buffered),
+                next.Invoke).ConfigureAwait(true));
 
-        ProcessConfiguration rewritten = next.Captured?.Configuration;
+        await Assert.That(exception.ParamName).IsEqualTo("TargetFilePath");
+        await Assert.That(exception.Message).Contains("prog\" & evil.exe & \"");
+        await Assert.That(next.Captured).IsNull();
+    }
 
-        // cmd.exe applies its own quote-stripping rules, so it receives a single
-        // escaped Arguments string rather than a ProcessStartInfo.ArgumentList.
-        await Assert.That(rewritten?.ArgumentList.Count).IsEqualTo(0);
-        await Assert.That(rewritten?.Arguments).StartsWith("/c \"");
-        await Assert.That(rewritten?.Arguments).Contains("^&", StringComparison.Ordinal);
-        await Assert.That(rewritten?.Arguments).Contains("^|", StringComparison.Ordinal);
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public async Task Cmd_Wrapper_RejectsCommandSeparatorInArguments()
+    {
+        if (!OperatingSystem.IsWindows())
+            throw new SkipTestException(
+                "cmd is Windows-only; CmdMiddleware rejects non-Windows by design.");
+
+        // The legacy Arguments string flows into the composed /c tail as one whole
+        // span, so a separator character anywhere in it is rejected as well.
+        ProcessConfiguration original = MakeConfig("prog.exe", "a & b | c");
+
+        CapturingNext next = new();
+        CmdMiddleware middleware = new();
+
+        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await middleware.InvokeAsync(
+                new InvocationContext(original, ProcessExitConfiguration.CreateGraceful(),
+                    InvocationMode.Buffered),
+                next.Invoke).ConfigureAwait(true));
+
+        await Assert.That(exception.ParamName).IsEqualTo("Arguments");
+        await Assert.That(exception.Message).Contains("a & b | c");
+        await Assert.That(exception.Message).Contains("&");
+        await Assert.That(next.Captured).IsNull();
     }
 
     [Test]
@@ -151,7 +179,7 @@ public class ShellInjectionSecurityTests
         // two arguments instead of delivering it as the single argument the caller asked for.
         ProcessConfiguration original = new("prog.exe", "ignored")
         {
-            ArgumentList = ["first", "second&evil.exe", "third arg"]
+            ArgumentList = ["first", "second app", "third arg"]
         };
 
         CapturingNext next = new();
@@ -168,9 +196,9 @@ public class ShellInjectionSecurityTests
 
         // The outer quoting pair is mandatory: cmd.exe strips one leading and one trailing
         // quote before reparsing the remainder. Quoting each entry inside it is what keeps
-        // argument boundaries intact. An unquoted 'second^&evil.exe' does not merely lose the
-        // argument, it terminates the command and runs 'evil.exe' as a second one.
+        // argument boundaries intact, so 'second app' stays one argument for the child
+        // instead of collapsing into two.
         await Assert.That(rewritten?.Arguments)
-            .IsEqualTo("/c \"\"prog.exe\" \"first\" \"second^&evil.exe\" \"third arg\"\"");
+            .IsEqualTo("/c \"\"prog.exe\" \"first\" \"second app\" \"third arg\"\"");
     }
 }
