@@ -39,6 +39,13 @@ namespace CliInvoke.Specializations.Middleware;
 ///         ordinary target and receives tokenized delivery; shell-specific composition and its
 ///         validation do not apply.
 ///     </para>
+///     <para>
+///         The wrapped values delivered to cmd.exe are validated before composition: a target
+///         path or argument containing a character cmd.exe interprets itself throws
+///         <see cref="ArgumentException"/>, naming the value and the character, the same as the
+///         runner factory's cmd branch. Callers who own their quoting can compose a raw command
+///         line through <c>CmdProcessConfiguration</c>.
+///     </para>
 /// </remarks>
 [SupportedOSPlatform("windows")]
 [UnsupportedOSPlatform("macos")]
