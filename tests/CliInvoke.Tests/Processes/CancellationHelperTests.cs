@@ -239,8 +239,53 @@ public class CancellationHelperTests
         }
     }
 
-    // Production grace (10 ms) plus 15 ms for OS early delivery beyond it. A shortfall
+    [Test]
+    public async Task GetCancellationReasonFromTokens_CallerTokenCancelled_ReturnsRequestedCancellation()
+    {
+        // The caller's token takes precedence over the kill timer's, matching the
+        // pre-existing ordering in GetCancellationReason.
+        using CancellationTokenSource callerCts = new();
+        await callerCts.CancelAsync().ConfigureAwait(true);
+
+        using CancellationTokenSource linkedCts =
+            CancellationTokenSource.CreateLinkedTokenSource(callerCts.Token);
+        linkedCts.CancelAfter(TimeSpan.FromMilliseconds(1));
+
+        CancellationReason reason = CancellationHelper.GetCancellationReasonFromTokens(
+            callerCts.Token, linkedCts.Token);
+
+        await Assert.That(reason).IsEqualTo(CancellationReason.RequestedCancellation);
+    }
+
+    [Test]
+    public async Task GetCancellationReasonFromTokens_OnlyKillTimerCancelled_ReturnsTimeout()
+    {
+        // The production contract the recurring Windows CI flake broke: "linked token
+        // cancelled, caller token not" is a timer-driven timeout regardless of when the
+        // OS delivered the timer, so the classifier must not read the clock at all.
+        using CancellationTokenSource linkedCts =
+            CancellationTokenSource.CreateLinkedTokenSource(CancellationToken.None);
+        await linkedCts.CancelAsync().ConfigureAwait(true);
+
+        CancellationReason reason = CancellationHelper.GetCancellationReasonFromTokens(
+            CancellationToken.None, linkedCts.Token);
+
+        await Assert.That(reason).IsEqualTo(CancellationReason.Timeout);
+    }
+
+    [Test]
+    public async Task GetCancellationReasonFromTokens_NeitherTokenCancelled_ReturnsNotKnown()
+    {
+        // Genuine (non-cancellation) failures reach the same catch block with no token
+        // cancelled; they must not classify as RequestedCancellation or Timeout.
+        CancellationReason reason = CancellationHelper.GetCancellationReasonFromTokens(
+            CancellationToken.None, CancellationToken.None);
+
+        await Assert.That(reason).IsEqualTo(CancellationReason.NotKnown);
+    }
+
+    // Production grace (25 ms) plus 15 ms for OS early delivery beyond it. A shortfall
     // this large after an armed timer fires indicates a clock-domain bug, not timer
     // delivery.
-    private const long EarlyDeliveryToleranceMilliseconds = 25;
+    private const long EarlyDeliveryToleranceMilliseconds = 40;
 }

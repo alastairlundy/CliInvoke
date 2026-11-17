@@ -1205,8 +1205,15 @@ internal class ProcessWrapper : Process
             }
             catch (Exception exception)
             {
+                // Classify by token ownership, not clock timing: the linked source is
+                // cancelled only by this wait's kill timer (or the caller's token, which
+                // the classifier rules out first), so "timer cancelled, caller not" is a
+                // timeout no matter how far ahead of the deadline the OS delivered it.
+                // Clock-based classification here required a delivery-grace window that
+                // Windows CI timers exceeded, misclassifying on-time timeouts as
+                // CancellationReason.NotKnown (see GetCancellationReasonFromTokens).
                 CancellationReason cancellationReason =
-                    CancellationHelper.GetCancellationReason(expectedExitTick, cancellationToken);
+                    CancellationHelper.GetCancellationReasonFromTokens(cancellationToken, actualCancellationToken);
 
                 // Persist the reason BEFORE the propagation decision; see CancelWithInterrupt
                 // for why the assignment must not sit after HandleCancellationExceptions.

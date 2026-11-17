@@ -23,12 +23,16 @@ internal static class CancellationHelper
     ///     The OS may deliver a <c>CancelAfter</c> timer marginally before the
     ///     <see cref="Environment.TickCount64" /> deadline it was armed against
     ///     (dotnet/runtime#100455, closed as by-design). The window covers the early delivery
-    ///     reported in that issue with margin. It stays far below the 1 second window
+    ///     reported in that issue plus a full Windows timer tick (~15.6 ms) of extra skew
+    ///     observed on Windows CI runners (commit 6f633f32's regression test documents a
+    ///     25 ms envelope), where delivery beyond the original 10 ms grace still flaked an
+    ///     on-time timeout into <see cref="CancellationReason.NotKnown"/>. It stays far below
+    ///     the 1 second window
     ///     <see cref="HandleCancellationExceptions" /> applies, so a genuine failure that
     ///     precedes a timeout by more than this still classifies as
     ///     <see cref="CancellationReason.NotKnown" />.
     /// </remarks>
-    internal const long TimerDeliveryGraceMilliseconds = 10;
+    internal const long TimerDeliveryGraceMilliseconds = 25;
 
     /// <summary>
     ///     Determines the reason for the cancellation of a process.
@@ -51,7 +55,10 @@ internal static class CancellationHelper
     ///     (dotnet/runtime#100455), which surfaced an on-time timeout as a cancellation. The
     ///     comparison also allows for <see cref="TimerDeliveryGraceMilliseconds" /> of early timer
     ///     delivery, because the OS may deliver the kill timer shortly before the deadline it was
-    ///     armed against (the same issue, closed as by-design).
+    ///     armed against (the same issue, closed as by-design). The forceful timer wait
+    ///     classifies by token ownership instead of clock timing — see
+    ///     <see cref="GetCancellationReasonFromTokens" /> — because delivery skew beyond
+    ///     the grace window kept misclassifying on-time timeouts on Windows CI.
     /// </remarks>
     internal static CancellationReason GetCancellationReason(long expectedExitTick,
         CancellationToken cancellationToken)
@@ -63,6 +70,55 @@ internal static class CancellationHelper
         if (isCancellationRequested) return CancellationReason.RequestedCancellation;
 
         return cancellationTick >= expectedExitTick - TimerDeliveryGraceMilliseconds
+            ? CancellationReason.Timeout
+            : CancellationReason.NotKnown;
+    }
+
+    /// <summary>
+    ///     Classifies the reason a forceful-timer wait's cancellation exception was raised,
+    ///     from token ownership rather than clock timing.
+    /// </summary>
+    /// <param name="callerToken">
+    ///     The caller's cancellation token passed to the wait.
+    /// </param>
+    /// <param name="timerToken">
+    ///     The token of the linked <see cref="CancellationTokenSource"/> whose
+    ///     <c>CancelAfter</c> arms the wait's kill timer. It can only be cancelled by that
+    ///     timer, or by the caller's token cancelling first — which the
+    ///     <paramref name="callerToken"/> check rules out — so "timer cancelled, caller not"
+    ///     identifies a timer-driven timeout unambiguously.
+    /// </param>
+    /// <returns>
+    ///     <see cref="CancellationReason.RequestedCancellation"/> when the caller's token is
+    ///     cancelled, <see cref="CancellationReason.Timeout"/> when only the kill timer's
+    ///     token is, and <see cref="CancellationReason.NotKnown"/> when neither is (genuine
+    ///     non-cancellation failures reach the same catch block).
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="GetCancellationReason"/>, this classification never reads
+    ///         the clock, so timer delivery skew cannot flip an on-time timeout into
+    ///         <see cref="CancellationReason.NotKnown"/>: the recurring Windows CI flake had
+    ///         an on-time kill delivered more than
+    ///         <see cref="TimerDeliveryGraceMilliseconds"/> early, which clock-based
+    ///         classification surfaced as <c>CliInvokeCanceledException</c> instead of
+    ///         <c>CliInvokeTimeoutException</c> under
+    ///         <c>CancellationThrowsException</c>.
+    ///     </para>
+    ///     <para>
+    ///         The flag reads are safe at the catch point: the caught cancellation exception
+    ///         can only have been raised after the owning token's cancellation flag was set,
+    ///         so the flag cannot still be unset when the token that raised the exception is
+    ///         inspected.
+    ///     </para>
+    /// </remarks>
+    internal static CancellationReason GetCancellationReasonFromTokens(
+        CancellationToken callerToken, CancellationToken timerToken)
+    {
+        if (callerToken.IsCancellationRequested)
+            return CancellationReason.RequestedCancellation;
+
+        return timerToken.IsCancellationRequested
             ? CancellationReason.Timeout
             : CancellationReason.NotKnown;
     }
