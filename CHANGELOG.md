@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
+## [3.2.0-beta.1] - unreleased
+
+### Changed
+
+- Tightened argument validation for cmd runner compositions.
+- Hardened metacharacter escapes in the cmd composition path.
+- Runner identification now matches shell runners by exact file name.
+
 ## [3.2.0] - unreleased
 
 ### Added

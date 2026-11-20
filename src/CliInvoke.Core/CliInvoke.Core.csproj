@@ -21,21 +21,11 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.2.0-alpha.1</PackageVersion>
-        <PackageReleaseNotes>#### Added
-- Multi-targets `net10.0` and `net11.0`.
-
-#### Changed
-- Validation rule predicates are nullability-honest: `ValidationRule` and `CommonValidationRules&lt;T&gt;` factory delegates are now `Func&lt;TProcessResult?, bool&gt;`. The null-input contract previously hidden from the compiler (post-exit validation feeds `null` to buffered-text rules for unbuffered results) is now compiler-enforced, with per-rule null semantics documented. Erased CLR signatures are unchanged.
-- `ProcessResult` / `BufferedProcessResult` equality now compares `ExecutedFilePath` with the platform path comparison (`OrdinalIgnoreCase` on Windows, `Ordinal` elsewhere), so results differing only by path casing compare equal on Windows.
-- `ProcessConfiguration.Equals` computes faster and order-independent environment-variable comparisons; string comparisons in the equality paths are explicitly ordinal.
-
-#### Fixed
-- `ProcessExitConfigurationCreationExtensions.Default` now matches the constructor default (allows unexpected-exit exceptions) instead of aliasing `CreateGraceful()`.
-- Null environment-variable values are honored as BCL variable removal instead of being silently dropped; empty-string values remain a valid way to clear a variable.
-
-#### Removed
-- The `Polyfill` dependency - Core now has **zero runtime package dependencies**.</PackageReleaseNotes>
+        <PackageVersion>3.2.0-beta.1</PackageVersion>
+        <PackageReleaseNotes>#### Changed
+- Tightened argument validation for cmd runner compositions.
+- Hardened metacharacter escapes in the cmd composition path.
+- Runner identification now matches shell runners by exact file name.</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>3.2.0.0</AssemblyVersion>
         <FileVersion>3.2.0.0</FileVersion>
