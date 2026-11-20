@@ -23,7 +23,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: |
+            10.0.x
+            11.0.x
 
       - name: Create local nupkg output dir
         run: mkdir -p ./nupkgs
@@ -47,9 +49,18 @@ jobs:
         with:
           user: ${{ secrets.NUGET_USER }}
 
-      # Push all nupkgs (no sleeps needed)
-      - name: Push all nupkgs to NuGet.org
+      # Stage all nupkgs for review before publication. Run from a directory
+      # outside the repo so global.json does not select an SDK that lacks the
+      # stage command.
+      - name: Stage all nupkgs for NuGet.org review
+        shell: bash
         run: |
-          for f in ./nupkgs/*.nupkg; do
-            dotnet nuget push "$f" --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          REPO_DIR="$PWD"
+          cd "$(mktemp -d)"
+          shopt -s nullglob
+          for f in "$REPO_DIR"/nupkgs/*.nupkg; do
+            dotnet package stage push "$f" \
+              --source https://api.nuget.org/v3/index.json \
+              --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
+              --group cliinvoke-2026-11
           done
