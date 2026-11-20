@@ -22,11 +22,14 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
-        <PackageVersion>3.0.5</PackageVersion>
-        <PackageReleaseNotes>Aligned version with CliInvoke</PackageReleaseNotes>
+        <PackageVersion>3.0.6</PackageVersion>
+        <PackageReleaseNotes>* Tightened argument validation for cmd runner compositions
+* Hardened metacharacter escapes in the cmd composition path
+* Runner identification now matches shell runners by exact file name
+* Documented the cmd composition and runner identification contracts</PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
-        <AssemblyVersion>3.0.5.0</AssemblyVersion>
-        <FileVersion>3.0.5.0</FileVersion>
+        <AssemblyVersion>3.0.6.0</AssemblyVersion>
+        <FileVersion>3.0.6.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>
