@@ -47,7 +47,8 @@ Versions that are currently supported with Bug Fixes and/or Security Fixes are d
 
 | Version series | Support Status | End of Security Fixes |
 |-|-|-|
-| 3.1 | Features, Bug Fixes, and Security Fixes | None Scheduled |
+| 3.2 | Features, Bug Fixes, and Security Fixes | None Scheduled |
+| 3.1 | Bug Fixes, and Security Fixes | None Scheduled |
 | 3.0 | Security Fixes only | December 1st 2026 |
 | 2.11 | Security Fixes only | December 1st 2026 |
 | 2.10 and older | End Of Life | Ended October 14th 2026 |
