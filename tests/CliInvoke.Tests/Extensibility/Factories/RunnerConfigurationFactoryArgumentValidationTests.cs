@@ -149,8 +149,8 @@ public class RunnerConfigurationFactoryArgumentValidationTests
     }
 
     [Test]
-    [Arguments(@"C:\mytools\mycmd.exe")]
-    [Arguments(@"C:\cmd tools\runner.exe")]
+    [Arguments(@"C:/mytools/mycmd.exe")]
+    [Arguments(@"C:/cmd tools/runner.exe")]
     public async Task RunnerPathContainingCmdWithoutCmdFileName_IsNotTreatedAsCmdRunner(
         string runnerTarget)
     {
@@ -182,7 +182,7 @@ public class RunnerConfigurationFactoryArgumentValidationTests
         // A batch file re-parses its arguments with cmd.exe's rules even when the
         // runner is not cmd.exe, so the wrapped argument tokens are validated.
         ProcessConfiguration runner = BuildConfig(runnerTarget, "-flag");
-        ProcessConfiguration target = BuildConfig(@"C:\scripts\task.bat", "x&echo more");
+        ProcessConfiguration target = BuildConfig(@"C:/scripts/task.bat", "x&echo more");
 
         ArgumentException exception = await Assert
             .That(() => factory.CreateRunnerConfiguration(target, runner))
@@ -203,7 +203,9 @@ public class RunnerConfigurationFactoryArgumentValidationTests
         IRunnerConfigurationFactory factory = CreateFactory();
 
         ProcessConfiguration runner = BuildConfig("run.exe", "-flag");
-        ProcessConfiguration target = BuildConfig($@"C:\tools\{targetFileName}", "safe & echo more");
+        // Platform-neutral separators: the validation matches targets by file
+        // name and extension on every platform.
+        ProcessConfiguration target = BuildConfig($@"C:/tools/{targetFileName}", "safe & echo more");
 
         ArgumentException exception = await Assert
             .That(() => factory.CreateRunnerConfiguration(target, runner))
