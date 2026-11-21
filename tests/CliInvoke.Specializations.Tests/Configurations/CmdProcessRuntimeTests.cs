@@ -59,10 +59,14 @@ public class CmdProcessRuntimeTests
     }
 
     [Test, WindowsOnly]
-    public async Task CreateRunnerConfiguration_TokenWithCmdControlCharacter_ThrowsBeforeLaunch()
+    [Arguments("/c echo alpha & echo beta", "&")]
+    [Arguments("/c echo alpha < echo beta", "<")]
+    public async Task CreateRunnerConfiguration_TokenWithCmdControlCharacter_ThrowsBeforeLaunch(
+        string arguments,
+        string expectedCharacter)
     {
         ProcessConfiguration runner = new("cmd.exe", "/c");
-        ProcessConfiguration target = new("cmd.exe", "/c echo alpha & echo beta");
+        ProcessConfiguration target = new("cmd.exe", arguments);
 
         RunnerProcessFactory factory = new();
 
@@ -81,13 +85,18 @@ public class CmdProcessRuntimeTests
         // ever started from the rejected configuration.
         await Assert.That(caught).IsNotNull();
         await Assert.That(caught!.ParamName).IsEqualTo(nameof(runner.Arguments));
-        await Assert.That(caught.Message).Contains("&");
+        await Assert.That(caught.Message).Contains(expectedCharacter);
+        await Assert.That(caught.Message).Contains($"contains \"{expectedCharacter}\"");
     }
 
     [Test, WindowsOnly]
-    public async Task ToProcessStartInfo_TokenWithCmdControlCharacter_ThrowsBeforeLaunch()
+    [Arguments("/c echo alpha & echo beta", "&")]
+    [Arguments("/c echo alpha < echo beta", "<")]
+    public async Task ToProcessStartInfo_TokenWithCmdControlCharacter_ThrowsBeforeLaunch(
+        string arguments,
+        string expectedCharacter)
     {
-        ProcessConfiguration configuration = new("cmd.exe", "/c echo alpha & echo beta");
+        ProcessConfiguration configuration = new("cmd.exe", arguments);
 
         ArgumentException? caught = null;
 
@@ -103,7 +112,8 @@ public class CmdProcessRuntimeTests
         // Conversion fails before any process could be started from the result.
         await Assert.That(caught).IsNotNull();
         await Assert.That(caught!.ParamName).IsEqualTo(nameof(ProcessConfiguration.ArgumentsList));
-        await Assert.That(caught.Message).Contains("&");
+        await Assert.That(caught.Message).Contains(expectedCharacter);
+        await Assert.That(caught.Message).Contains($"contains \"{expectedCharacter}\"");
     }
 
     /// <summary>

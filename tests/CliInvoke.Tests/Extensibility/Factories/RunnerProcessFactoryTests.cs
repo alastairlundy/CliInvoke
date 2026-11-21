@@ -153,18 +153,23 @@ public class RunnerProcessFactoryTests
 
         Assert.Equal("Arguments", exception.ParamName);
         Assert.Contains("&", exception.Message);
+        Assert.Contains("contains \"&\"", exception.Message);
     }
 
     [Theory]
-    [InlineData("&")]
-    [InlineData("x&echo more")]
-    [InlineData(">")]
-    [InlineData("|")]
-    [InlineData("^")]
-    [InlineData("%TMP%")]
-    [InlineData("\"y\"\"&z\"")]
-    [InlineData("!delayed!")]
-    public void CreateRunnerConfiguration_CmdRunner_ArgsTokenWithMetacharacter_Throws(string arguments)
+    [InlineData("&", "&")]
+    [InlineData("x&echo more", "&")]
+    [InlineData("<", "<")]
+    [InlineData("x<echo more", "<")]
+    [InlineData(">", ">")]
+    [InlineData("|", "|")]
+    [InlineData("^", "^")]
+    [InlineData("%TMP%", "%")]
+    [InlineData("\"y\"\"&z\"", "\"")]
+    [InlineData("!delayed!", "!")]
+    public void CreateRunnerConfiguration_CmdRunner_ArgsTokenWithMetacharacter_Throws(
+        string arguments,
+        string expectedCharacter)
     {
         IRunnerProcessFactory factory = new RunnerProcessFactory();
 
@@ -175,6 +180,9 @@ public class RunnerProcessFactoryTests
             () => factory.CreateRunnerConfiguration(target, runner));
 
         Assert.Equal("Arguments", exception.ParamName);
+        // The message names the offending token first and, right after
+        // "contains", the exact character found in that token.
+        Assert.Contains($"contains \"{expectedCharacter}\"", exception.Message);
     }
 
     [Fact]
@@ -187,8 +195,11 @@ public class RunnerProcessFactoryTests
         ProcessConfiguration runner = BuildConfig("cmd.exe", "/c");
         ProcessConfiguration target = BuildConfig(@"C:\tools\a & b.exe", "safe");
 
-        Assert.Throws<ArgumentException>(
+        ArgumentException exception = Assert.Throws<ArgumentException>(
             () => factory.CreateRunnerConfiguration(target, runner));
+
+        Assert.Equal("Arguments", exception.ParamName);
+        Assert.Contains("contains \"&\"", exception.Message);
     }
 
     [Theory]
@@ -208,7 +219,9 @@ public class RunnerProcessFactoryTests
             () => factory.CreateRunnerConfiguration(target, runner));
 
         Assert.Equal("Arguments", exception.ParamName);
+        Assert.Contains("x&echo", exception.Message);
         Assert.Contains("&", exception.Message);
+        Assert.Contains("contains \"&\"", exception.Message);
     }
 
     [Theory]
@@ -228,6 +241,7 @@ public class RunnerProcessFactoryTests
 
         Assert.Equal("Arguments", exception.ParamName);
         Assert.Contains("&", exception.Message);
+        Assert.Contains("contains \"&\"", exception.Message);
     }
 
     [Fact]
