@@ -62,7 +62,7 @@ public class ToStartInfoExtensionsTests
     public void ToProcessStartInfo_NonCmdTarget_TokenWithSeparator_IsAccepted()
     {
         // A discrete token is delivered literally to a target cmd.exe never parses.
-        ProcessConfiguration configuration = BuildConfig(@"C:\tools\app.exe", "value&name");
+        ProcessConfiguration configuration = BuildConfig(@"C:/tools/app.exe", "value&name");
 
         ProcessStartInfo processStartInfo = configuration.ToProcessStartInfo(false, false);
 
@@ -70,8 +70,8 @@ public class ToStartInfoExtensionsTests
     }
 
     [Theory]
-    [InlineData(@"C:\scripts\task.bat")]
-    [InlineData(@"C:\scripts\task.cmd")]
+    [InlineData(@"C:/scripts/task.bat")]
+    [InlineData(@"C:/scripts/task.cmd")]
     public void ToProcessStartInfo_BatchTarget_TokenWithSeparator_Throws(string targetFilePath)
     {
         // A batch file re-parses its arguments with cmd.exe's rules even when it is
