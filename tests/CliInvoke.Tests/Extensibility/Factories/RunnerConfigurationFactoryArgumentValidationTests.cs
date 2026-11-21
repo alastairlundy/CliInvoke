@@ -51,15 +51,18 @@ public class RunnerConfigurationFactoryArgumentValidationTests
     }
 
     [Test]
-    [Arguments("&")]
-    [Arguments("x&echo more")]
-    [Arguments(">")]
-    [Arguments("|")]
-    [Arguments("^")]
-    [Arguments("%TMP%")]
-    [Arguments("\"quoted\"")]
-    [Arguments("!delayed!")]
-    public async Task CmdRunner_RunnerArgumentsWithControlCharacter_Throws(string arguments)
+    [Arguments("&", "&")]
+    [Arguments("x&echo more", "&")]
+    [Arguments("<", "<")]
+    [Arguments("x<echo more", "<")]
+    [Arguments(">", ">")]
+    [Arguments("|", "|")]
+    [Arguments("^", "^")]
+    [Arguments("%TMP%", "%")]
+    [Arguments("\"quoted\"", "\"")]
+    [Arguments("!delayed!", "!")]
+    public async Task CmdRunner_RunnerArgumentsWithControlCharacter_Throws(
+        string arguments, string expectedCharacter)
     {
         IRunnerConfigurationFactory factory = CreateFactory();
 
@@ -72,18 +75,22 @@ public class RunnerConfigurationFactoryArgumentValidationTests
 
         await Assert.That(exception.ParamName).IsEqualTo("Arguments");
         await Assert.That(exception.Message).Contains(arguments);
+        await Assert.That(exception.Message).Contains($"contains \"{expectedCharacter}\"");
     }
 
     [Test]
-    [Arguments("&")]
-    [Arguments("x&echo more")]
-    [Arguments(">")]
-    [Arguments("|")]
-    [Arguments("^")]
-    [Arguments("%TMP%")]
-    [Arguments("\"quoted\"")]
-    [Arguments("!delayed!")]
-    public async Task CmdRunner_WrappedArgumentsWithControlCharacter_Throws(string arguments)
+    [Arguments("&", "&")]
+    [Arguments("x&echo more", "&")]
+    [Arguments("<", "<")]
+    [Arguments("x<echo more", "<")]
+    [Arguments(">", ">")]
+    [Arguments("|", "|")]
+    [Arguments("^", "^")]
+    [Arguments("%TMP%", "%")]
+    [Arguments("\"quoted\"", "\"")]
+    [Arguments("!delayed!", "!")]
+    public async Task CmdRunner_WrappedArgumentsWithControlCharacter_Throws(
+        string arguments, string expectedCharacter)
     {
         IRunnerConfigurationFactory factory = CreateFactory();
 
@@ -96,6 +103,7 @@ public class RunnerConfigurationFactoryArgumentValidationTests
 
         await Assert.That(exception.ParamName).IsEqualTo("Arguments");
         await Assert.That(exception.Message).Contains(arguments);
+        await Assert.That(exception.Message).Contains($"contains \"{expectedCharacter}\"");
     }
 
     [Test]
@@ -118,6 +126,7 @@ public class RunnerConfigurationFactoryArgumentValidationTests
         await Assert.That(exception.ParamName).IsEqualTo("Arguments");
         await Assert.That(exception.Message).Contains("x&echo more");
         await Assert.That(exception.Message).Contains("&");
+        await Assert.That(exception.Message).Contains("contains \"&\"");
     }
 
     [Test]
@@ -136,6 +145,7 @@ public class RunnerConfigurationFactoryArgumentValidationTests
 
         await Assert.That(exception.ParamName).IsEqualTo("TargetFilePath");
         await Assert.That(exception.Message).Contains("&");
+        await Assert.That(exception.Message).Contains("contains \"&\"");
     }
 
     [Test]
@@ -180,6 +190,7 @@ public class RunnerConfigurationFactoryArgumentValidationTests
 
         await Assert.That(exception.ParamName).IsEqualTo("Arguments");
         await Assert.That(exception.Message).Contains("&");
+        await Assert.That(exception.Message).Contains("contains \"&\"");
     }
 
     [Test]
@@ -200,6 +211,7 @@ public class RunnerConfigurationFactoryArgumentValidationTests
 
         await Assert.That(exception.ParamName).IsEqualTo("Arguments");
         await Assert.That(exception.Message).Contains("&");
+        await Assert.That(exception.Message).Contains("contains \"&\"");
     }
 
     [Test]
