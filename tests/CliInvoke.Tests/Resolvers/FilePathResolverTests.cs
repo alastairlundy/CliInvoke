@@ -43,7 +43,14 @@ public class FilePathResolverTests
         }
         else
         {
-            expected = "/usr/bin/dotnet";
+            using ProcessConfiguration configuration = new ("which", "dotnet");
+
+            IProcessInvoker processInvoker = new ProcessInvoker(FilePathResolver.Shared, ProcessPipeHandler.Shared);
+
+            BufferedProcessResult task = await processInvoker.ExecuteBufferedAsync(configuration,
+                cancellationToken: TestContext.Current.CancellationToken);
+
+            expected = task.StandardOutput.Split(Environment.NewLine).First();
         }
        
         Assert.Equal(expected, actual);
