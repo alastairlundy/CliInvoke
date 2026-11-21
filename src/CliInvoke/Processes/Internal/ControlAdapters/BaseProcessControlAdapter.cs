@@ -9,6 +9,7 @@
 
 using System.Runtime.InteropServices;
 
+using CliInvoke.Internal;
 using CliInvoke.Processes.Internal.Cancellation;
 
 namespace CliInvoke.Processes.Internal.ControlAdapters;
@@ -33,6 +34,17 @@ internal abstract class BaseProcessControlAdapter
     internal virtual void ApplyConfiguration(ProcessWrapper process, ProcessConfiguration processConfiguration)
     {
         ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath);
+
+        // Tokenized argument lists are checked before a child is started when the target
+        // parses its own command line. The raw preformatted Arguments string is left to
+        // the caller, who owns its quoting and composition.
+        if (processConfiguration.ArgumentList.Count > 0
+            && CmdCompositionArgumentValidator.IsCmdOrBatchTarget(processConfiguration.TargetFilePath))
+        {
+            CmdCompositionArgumentValidator.Validate(
+                processConfiguration.ArgumentList,
+                nameof(ProcessConfiguration.ArgumentList));
+        }
 
         ProcessStartInfo processStartInfo = new()
         {
