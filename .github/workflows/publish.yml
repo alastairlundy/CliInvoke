@@ -100,5 +100,5 @@ jobs:
             dotnet package stage push "$f" \
               --source https://api.nuget.org/v3/index.json \
               --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
-              --group cliinvoke-2026-11
+              --group cliinvoke-staging
           done
