@@ -6,15 +6,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
-## [3.2.0-beta.1] - unreleased
-
-### Changed
-
-- Tightened argument validation for cmd runner compositions.
-- Hardened metacharacter escapes in the cmd composition path.
-- Runner identification now matches shell runners by exact file name.
-
-## [3.2.0] - unreleased
+## [3.2.0] - Unreleased
 
 ### Added
 - All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks. `tests/CliInvoke.Tests` runs both legs; the Specializations tests stay on `net10.0`. Building from source now requires the .NET 11 SDK (`global.json` pins `11.0.100-rc.2`, CI installs `11.0.100-rc.3`); the `net10.0` test leg still needs a .NET 10 runtime.
@@ -61,6 +53,11 @@ adheres to [Semantic Versioning](https://semver.org/).
 - Public XML documentation pass across `src/`: empty `<summary>`/`<param>`/`<returns>` stubs on `IProcessConfigurationBuilder`, `InvocationMode`, `ProcessTimeoutPolicy`, `ProcessExceptionInfo`, and others filled with real descriptions; duplicate and restating comments collapsed to a single copy; grammar and legibility fixes in `CliRun` overloads, `MiddlewareContext`, and `DefaultShellMiddleware`.
 - CONTRIBUTING.md now spells out the required coding standard (`src/.editorconfig`), the `ConfigureAwait` policy and its analyzer/CI enforcement, the test-everywhere expectation (Windows, macOS, Linux), and the contribution-licensing terms.
 - THIRD_PARTY_NOTICES.txt: corrected the DotExtensions attribution path after `PathEnvironmentVariable` moved from `CliInvoke.Core` to `CliInvoke` (`CliInvoke.Core.Internal.IO` -> `CliInvoke.Internal.IO`).
+
+## [3.1.2] - Unreleased
+- Tightened argument validation for cmd runner compositions.
+- Hardened metacharacter escapes in the cmd composition path.
+- Runner identification now matches shell runners by exact file name.
 
 ## [3.1.1] - 2026-11-16
 
@@ -113,6 +110,11 @@ adheres to [Semantic Versioning](https://semver.org/).
 - `WithMaxBufferedOutputBytes(config, null)` clears the source cap so an explicit `null` really means unbounded output; omitting the argument still inherits it.
 - XML docs corrected: invoker invoke paths throw `ProcessValidationException`, not `ProcessNotSuccessfulException`; `WaitForExitOrTimeoutAsync` does not return a "buffered" result; disposal docs say four IDisposable types, not three.
 - Stub-based stdin contract tests pin the close and fault rules without spawning real processes, and escaper fuzz tests cover the `ShellRewriter` composition paths for all three shell kinds.
+
+## [3.0.6] - Unreleased
+- Tightened argument validation for cmd runner compositions.
+- Hardened metacharacter escapes in the cmd composition path.
+- Runner identification now matches shell runners by exact file name.
 
 ## [3.0.5] - 2026-11-16
 
@@ -336,6 +338,11 @@ Themes:
 - Fixed stale `PowerShellMiddlewareOptions` references in docs, tests, and middleware guide (renamed to `ShellMiddlewareOptions`).
 - Fixed null-unsafe equality operators on primitives.
 - Fixed a duplicate in `GetHashCode` in `ProcessExitConfiguration`.
+
+## [2.11.8] - Unreleased
+- Tightened argument validation for cmd runner compositions.
+- Hardened metacharacter escapes in the cmd composition path.
+- Runner identification now matches shell runners by exact file name.
 
 ## [2.11.7] - 2026-11-10
 
