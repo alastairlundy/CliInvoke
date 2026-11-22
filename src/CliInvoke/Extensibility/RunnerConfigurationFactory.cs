@@ -21,7 +21,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
     /// <summary>
     ///     Create the command to be run from the Command runner configuration and an input command.
     /// </summary>
-    /// <param name="processConfigToBeRun">The command to be run by the Command Runner command.</param>
+    /// <param name="processConfigTarget">The command to be run by the Command Runner command.</param>
     /// <param name="runnerProcessConfig">The configuration of the runner that will execute the target command.</param>
     /// <returns>The configuration the runner should be invoked with.</returns>
     /// <remarks>
@@ -34,14 +34,13 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
     /// </remarks>
     [Pure]
     public ProcessConfiguration CreateRunnerConfiguration(
-        ProcessConfiguration processConfigToBeRun,
-        ProcessConfiguration runnerProcessConfig)
+        ProcessConfiguration processConfigTarget, ProcessConfiguration runnerProcessConfig)
     {
-        ArgumentNullException.ThrowIfNull(processConfigToBeRun);
+        ArgumentNullException.ThrowIfNull(processConfigTarget);
         ArgumentNullException.ThrowIfNull(runnerProcessConfig);
 
         // cmd.exe parses the whole tail of its /c command line with its own rules, and
-        // batch files re-parse their arguments the same way: separators, redirection,
+        // batch files reparse their arguments the same way: separators, redirection,
         // escape and expansion characters keep their cmd.exe meaning even when they
         // arrive inside a discrete argument token, so launch-time quoting cannot keep
         // them literal. The tokens that cmd.exe will parse are validated here; values
@@ -62,17 +61,17 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                     nameof(runnerProcessConfig.Arguments));
             }
 
-            CmdCompositionArgumentValidator.ValidateCompositionSource(processConfigToBeRun);
+            CmdCompositionArgumentValidator.ValidateCompositionSource(processConfigTarget);
         }
         else if (CmdCompositionArgumentValidator.IsCmdOrBatchTarget(
-                     processConfigToBeRun.TargetFilePath))
+                     processConfigTarget.TargetFilePath))
         {
             // Only the wrapped arguments are re-parsed by cmd.exe/batch rules here;
             // the runner parses its own arguments before the target is reached. This
             // composition delivers tokenised, so the tokens are validated.
             CmdCompositionArgumentValidator.Validate(
-                TokenisedWrappedArguments(processConfigToBeRun),
-                nameof(processConfigToBeRun.Arguments));
+                TokenisedWrappedArguments(processConfigTarget),
+                nameof(processConfigTarget.Arguments));
         }
 
         /*
@@ -96,12 +95,12 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         {
             // ShellRewriter composes the script; delivery is a single ArgumentList entry.
             ProcessConfiguration rewritten = ShellRewriter.Rewrite(
-                processConfigToBeRun,
+                processConfigTarget,
                 runnerProcessConfig.TargetFilePath,
                 runnerProcessConfig.Arguments,
                 ShellKind.PowerShell,
-                windowCreation: processConfigToBeRun.WindowCreation,
-                useShellExecution: processConfigToBeRun.UseShellExecution);
+                windowCreation: processConfigTarget.WindowCreation,
+                useShellExecution: processConfigTarget.UseShellExecution);
 
             commandBuilder.SetArgumentList(rewritten.ArgumentList);
             commandBuilder.SetArguments(string.Empty);
@@ -110,12 +109,12 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         {
             // ShellRewriter composes the command; delivery is the legacy Arguments string.
             ProcessConfiguration rewritten = ShellRewriter.Rewrite(
-                processConfigToBeRun,
+                processConfigTarget,
                 runnerProcessConfig.TargetFilePath,
                 runnerProcessConfig.Arguments,
                 ShellKind.Cmd,
-                windowCreation: processConfigToBeRun.WindowCreation,
-                useShellExecution: processConfigToBeRun.UseShellExecution);
+                windowCreation: processConfigTarget.WindowCreation,
+                useShellExecution: processConfigTarget.UseShellExecution);
 
             commandBuilder.SetArguments(rewritten.Arguments);
         }
@@ -128,12 +127,12 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
                 argumentList.AddRange(ArgumentTokenizer.Tokenize(runnerProcessConfig.Arguments));
 
             // End the option zone before a dash-prefixed target (POSIX/Windows sudo).
-            if (processConfigToBeRun.TargetFilePath.StartsWith('-', StringComparison.OrdinalIgnoreCase))
+            if (processConfigTarget.TargetFilePath.StartsWith('-', StringComparison.OrdinalIgnoreCase))
                 argumentList.Add("--");
 
-            argumentList.Add(processConfigToBeRun.TargetFilePath);
-            if (!string.IsNullOrWhiteSpace(processConfigToBeRun.Arguments))
-                argumentList.AddRange(ArgumentTokenizer.Tokenize(processConfigToBeRun.Arguments));
+            argumentList.Add(processConfigTarget.TargetFilePath);
+            if (!string.IsNullOrWhiteSpace(processConfigTarget.Arguments))
+                argumentList.AddRange(ArgumentTokenizer.Tokenize(processConfigTarget.Arguments));
 
             commandBuilder.SetArgumentList(argumentList);
             commandBuilder.SetArguments(string.Empty);
@@ -142,33 +141,33 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
         commandBuilder
             .ConfigureEnvironmentVariables(envSpec =>
             {
-                envSpec.SetReadOnlyDictionary(processConfigToBeRun.EnvironmentVariables);
+                envSpec.SetReadOnlyDictionary(processConfigTarget.EnvironmentVariables);
             })
             .ConfigureProcessResourcePolicy(resourceSpec =>
             {
-                resourceSpec.SetPriorityClass(processConfigToBeRun.ResourcePolicy.PriorityClass);
+                resourceSpec.SetPriorityClass(processConfigTarget.ResourcePolicy.PriorityClass);
 
                 if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ||
                     OperatingSystem.IsFreeBSD())
                 {
-                    resourceSpec.SetMinWorkingSet(processConfigToBeRun.ResourcePolicy.MinWorkingSet);
-                    resourceSpec.SetMaxWorkingSet(processConfigToBeRun.ResourcePolicy.MaxWorkingSet);
+                    resourceSpec.SetMinWorkingSet(processConfigTarget.ResourcePolicy.MinWorkingSet);
+                    resourceSpec.SetMaxWorkingSet(processConfigTarget.ResourcePolicy.MaxWorkingSet);
                 }
 
                 if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
                 {
-                    resourceSpec.SetProcessorAffinity(processConfigToBeRun.ResourcePolicy.ProcessorAffinity ??
+                    resourceSpec.SetProcessorAffinity(processConfigTarget.ResourcePolicy.ProcessorAffinity ??
                                                       ProcessResourcePolicy.DefaultProcessorAffinity);
                 }
 
-                resourceSpec.ConfigurePriorityBoost(processConfigToBeRun.ResourcePolicy
+                resourceSpec.ConfigurePriorityBoost(processConfigTarget.ResourcePolicy
                     .EnablePriorityBoost);
             })
-            .SetEncoding(processConfigToBeRun.StandardInputEncoding, processConfigToBeRun.StandardOutputEncoding, processConfigToBeRun.StandardErrorEncoding)
-            .SetStandardInputPipe(processConfigToBeRun.StandardInput ?? StreamWriter.Null)
-            .SetOutputRedirection(processConfigToBeRun.OutputRedirection)
-            .UseShellExecution(processConfigToBeRun.UseShellExecution)
-            .EnableWindowCreation(processConfigToBeRun.WindowCreation);
+            .SetEncoding(processConfigTarget.StandardInputEncoding, processConfigTarget.StandardOutputEncoding, processConfigTarget.StandardErrorEncoding)
+            .SetStandardInputPipe(processConfigTarget.StandardInput ?? StreamWriter.Null)
+            .SetOutputRedirection(processConfigTarget.OutputRedirection)
+            .UseShellExecution(processConfigTarget.UseShellExecution)
+            .EnableWindowCreation(processConfigTarget.WindowCreation);
 
         if (runnerProcessConfig.RequiresAdministrator)
             commandBuilder.RequireAdministratorPrivileges();
@@ -181,7 +180,7 @@ public class RunnerConfigurationFactory : IRunnerConfigurationFactory
     /// <summary>
     ///     The wrapped command's arguments in the shape the non-shell composition
     ///     delivers them. The verbatim <see cref="ProcessConfiguration.ArgumentList"/>
-    ///     entries are used when present. Otherwise the legacy
+    ///     entries are used when present. Otherwise, the legacy
     ///     <see cref="ProcessConfiguration.Arguments"/> string is split into discrete
     ///     tokens.
     /// </summary>

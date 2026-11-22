@@ -9,7 +9,6 @@
 
 using System.Runtime.InteropServices;
 
-using CliInvoke.Internal;
 using CliInvoke.Processes.Internal.Cancellation;
 
 namespace CliInvoke.Processes.Internal.ControlAdapters;
@@ -45,9 +44,8 @@ internal abstract class BaseProcessControlAdapter
         ArgumentException.ThrowIfNullOrEmpty(processConfiguration.TargetFilePath,
             nameof(processConfiguration));
 
-        // Tokenized argument lists are checked before a child is started when the target
-        // parses its own command line. The raw preformatted Arguments string is left to
-        // the caller, who owns its quoting and composition.
+        // Tokenized argument lists are checked before a child is started when the target parses its own command line.
+        // The raw preformatted Arguments string is left to the caller, who owns its quoting and composition.
         if (processConfiguration.ArgumentList.Count > 0
             && CmdCompositionArgumentValidator.IsCmdOrBatchTarget(processConfiguration.TargetFilePath))
         {
@@ -60,8 +58,7 @@ internal abstract class BaseProcessControlAdapter
         {
             FileName = processConfiguration.TargetFilePath,
             Arguments = string.IsNullOrEmpty(processConfiguration.Arguments)
-                ? string.Empty
-                : processConfiguration.Arguments,
+                ? string.Empty : processConfiguration.Arguments,
             WorkingDirectory = processConfiguration.WorkingDirectoryPath,
             UseShellExecute = processConfiguration.UseShellExecution,
             CreateNoWindow = !processConfiguration.WindowCreation,
@@ -72,11 +69,9 @@ internal abstract class BaseProcessControlAdapter
             RedirectStandardError = processConfiguration.OutputRedirection,
         };
 
-        // When a verbatim argument list is supplied (shell wrappers), emit it via
-        // ArgumentList so the OS command-line parser passes each entry to the child
-        // unmodified. This prevents the double-parse command-injection vector where a
-        // single re-tokenized Arguments string is re-interpreted by the wrapped shell.
-        // The read-only ArgumentList is the canonical source.
+        // When a verbatim argument list is supplied (shell wrappers), emit it via ArgumentList so the OS command-line parser
+        // passes each entry to the child unmodified. This prevents the double-parse command-injection vector where a
+        // single re-tokenised Arguments string is re-interpreted by the wrapped shell. The read-only ArgumentList is the canonical source.
         IReadOnlyList<string> effectiveArgumentList = processConfiguration.ArgumentList;
 
         if (effectiveArgumentList.Count > 0)
@@ -96,10 +91,9 @@ internal abstract class BaseProcessControlAdapter
         if (processStartInfo.RedirectStandardError)
             processStartInfo.StandardErrorEncoding = processConfiguration.StandardErrorEncoding;
 
-        // Assign the assembled ProcessStartInfo BEFORE applying platform-specific mutations
-        // below. RequireRunningAsAdmin, SetUserCredential, and SetEnvironmentVariables mutate
-        // process.StartInfo in place, so they must run after this assignment to land on the
-        // instance that will actually be used to start the process. Mutating before the
+        // Assign the assembled ProcessStartInfo BEFORE applying platform-specific mutations below. RequireRunningAsAdmin,
+        // SetUserCredential, and SetEnvironmentVariables mutate process.StartInfo in place, so they must run after this
+        // assignment to land on the instance that will actually be used to start the process. Mutating before the
         // assignment silently drops environment variables, credentials, and the admin verb.
         process.StartInfo = processStartInfo;
 
@@ -113,7 +107,7 @@ internal abstract class BaseProcessControlAdapter
         if (processConfiguration.EnvironmentVariables.Count > 0)
             SetEnvironmentVariables(process, processConfiguration.EnvironmentVariables);
     }
-    
+
     /// <summary>
     ///     Validates the assembled command-line length against the Windows
     ///     <c>CreateProcess</c> limit of approximately 32,767 characters.
@@ -126,14 +120,14 @@ internal abstract class BaseProcessControlAdapter
     ///     <para>
     ///     The calculation mirrors the command line the .NET runtime actually serializes for
     ///     <c>CreateProcess</c> when <see cref="ProcessStartInfo.UseShellExecute"/> is
-    ///     <c>false</c>: the instance name is wrapped in quotes unless it is already fully
+    ///     <see langword="false"/> : the instance name is wrapped in quotes unless it is already fully
     ///     quoted (<see cref="ProcessStartInfo.FileName"/> + 2 chars, after trimming), each
     ///     <see cref="ProcessStartInfo.ArgumentList"/> entry is measured using the runtime's
     ///     argument quoting rules (quotes, escaped quotes, and doubled
     ///     backslash runs) separated by single spaces, and a verbatim
     ///     <see cref="ProcessStartInfo.Arguments"/> string is measured after one leading
     ///     separator. Skipped when <see cref="ProcessStartInfo.UseShellExecute"/> is
-    ///     <c>true</c>, where the <c>CreateProcess</c> limit does not apply the same way.
+    ///     <see langword="true"/>, where the <c>CreateProcess</c> limit does not apply the same way.
     ///     </para>
     /// </remarks>
     /// <exception cref="ArgumentException">

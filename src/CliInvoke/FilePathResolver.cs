@@ -205,8 +205,8 @@ public class FilePathResolver : IFilePathResolver
         }
         catch (Exception)
         {
-            // Fallback when directory inference fails: use current working directory. This catch handles any exception during
-            // directory path inference (e.g., ArgumentOutOfRangeException when filename not found in path, or when Path.GetDirectoryName
+            // Fallback when directory inference fails: use current working directory. This catch handles any exception during directory
+            // path inference (e.g., ArgumentOutOfRangeException when filename not found in path, or when Path.GetDirectoryName
             // returns null and string operations fail). Broad catch acceptable here as LocateFileFromDirectory is not Try*-governed
             // but serves as a fallback for the main resolution flow.
             directoryPath = Environment.CurrentDirectory;
@@ -230,7 +230,6 @@ public class FilePathResolver : IFilePathResolver
 
                     int extensionIndex = f.FullName.LastIndexOf(extension, StringComparison.Ordinal);
 
-                    // ReSharper disable once InvertIf
                     if (extensionIndex != -1)
                     {
                         StringBuilder sb = new(f.FullName);
@@ -249,19 +248,11 @@ public class FilePathResolver : IFilePathResolver
             .FirstOrDefault(f => OperatingSystem.IsWindows() ? f.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)
                 : f.Name.Equals(fileName, StringComparison.Ordinal));
 
-        if (file is null)
+        if (file is null || !new FileInfo(file.FullName).Exists ) 
             throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace("{file}",
-                    filePathToResolve, StringComparison.OrdinalIgnoreCase));
-
-        FileInfo refreshed = new FileInfo(file.FullName);
-
-        if (!refreshed.Exists)
-            throw new FileNotFoundException(
-                Resources.Exceptions_FileNotFound.Replace("{file}",
-                    filePathToResolve, StringComparison.OrdinalIgnoreCase));
-
-        return refreshed;
+                Resources.Exceptions_FileNotFound.Replace("{file}", filePathToResolve, StringComparison.OrdinalIgnoreCase));
+        
+        return new FileInfo(file.FullName);
     }
 
     /// <summary>

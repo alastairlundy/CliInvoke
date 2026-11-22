@@ -673,9 +673,8 @@ internal class ProcessWrapper : Process
     private static async Task<(string Text, bool Truncated)> ReadStreamCappedAsync(
         StreamReader reader, bool redirected, long? maxBytes, CancellationToken cancellationToken)
     {
-        // Transfer-size buffers come from the shared pool so repeated invocations of the
-        // buffered capture path do not alloc per call (process spawns are frequent in
-        // batched/parallel usage, and GC pressure grows with concurrent captures).
+        // Transfer-size buffers come from the shared pool so repeated invocations of the buffered capture path do not alloc per call
+        // (process spawns are frequent in batched/parallel usage, and GC pressure grows with concurrent captures).
         const int TransferBufferSize = 8192;
 
         if (!redirected || reader == StreamReader.Null)
@@ -690,10 +689,8 @@ internal class ProcessWrapper : Process
             using MemoryStream memoryStream = new();
             await stream.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
 
-            // Decode directly from the MemoryStream's underlying buffer instead of
-            // ToArray(): GetString over the same byte range preserves the previous
-            // semantics byte-for-byte while skipping a full-size duplicate copy of
-            // the captured output (the string allocation itself is unavoidable).
+            // Decode directly from the MemoryStream's underlying buffer instead of ToArray(): GetString over the same byte range preserves the previous
+            // semantics byte-for-byte while skipping a full-size duplicate copy of the captured output (the string allocation itself is unavoidable).
             int finalLength = (int)memoryStream.Length;
             return (encoding.GetString(memoryStream.GetBuffer().AsSpan(0, finalLength)), false);
         }
@@ -754,11 +751,9 @@ internal class ProcessWrapper : Process
                 // Remainder is discarded.
             }
 
-            // Decode the accumulated bytes with one decoder pass: GetBuffer() exposes the
-            // MemoryStream's storage (removing the ToArray() full-copy) and string.Create
-            // writes the characters straight into the final string (removing the char[]
-            // intermediate and its second copy). GetCharCount/GetChars without flush
-            // reproduce the previous incremental-decoding semantics exactly.
+            // Decode the accumulated bytes with one decoder pass: GetBuffer() exposes the MemoryStream's storage (removing the ToArray() full-copy)
+            // and string.Create writes the characters straight into the final string (removing the char[] intermediate and its second copy).
+            // GetCharCount/GetChars without flush reproduce the previous incremental-decoding semantics exactly.
             Decoder decoder = encoding.GetDecoder();
             byte[] outputBytes = outputStream.GetBuffer();
             int outputLength = (int)outputStream.Length;
@@ -807,7 +802,7 @@ internal class ProcessWrapper : Process
     /// <returns>A <see cref="ProcessDiagnostic"/> describing the current state.</returns>
     internal ProcessDiagnostic CaptureDiagnostic()
     {
-        bool hasExited = false;
+        bool hasExited;
         int? exitCode = null;
         try
         {
@@ -835,15 +830,14 @@ internal class ProcessWrapper : Process
         {
             try
             {
-                using System.Diagnostics.Process found = System.Diagnostics.Process.GetProcessById(Id);
-                var threads = found.Threads;
+                using Process found = GetProcessById(Id);
+                ProcessThreadCollection threads = found.Threads;
                 if (threads.Count > 0)
                 {
                     bool allSuspended = true;
-                    foreach (System.Diagnostics.ProcessThread thread in threads)
+                    foreach (ProcessThread thread in threads)
                     {
-                        if (thread.ThreadState != System.Diagnostics.ThreadState.Wait
-                            || thread.WaitReason != System.Diagnostics.ThreadWaitReason.Suspended)
+                        if (thread.ThreadState != System.Diagnostics.ThreadState.Wait || thread.WaitReason != ThreadWaitReason.Suspended)
                         {
                             allSuspended = false;
                             break;
@@ -858,11 +852,10 @@ internal class ProcessWrapper : Process
             }
         }
 
-        bool awaitingInitialResume;
 #if NET11_0
-        awaitingInitialResume = _awaitingInitialResume;
+       bool awaitingInitialResume = _awaitingInitialResume;
 #else
-        awaitingInitialResume = false;
+        const bool awaitingInitialResume = false;
 #endif
 
         TimeSpan elapsed;
@@ -1051,11 +1044,9 @@ internal class ProcessWrapper : Process
         {
             if (isGraceful)
             {
-                // Capture the cancellation task so its completion (and the resulting
-                // _cancellationReason assignment) can be awaited explicitly below.
+                // Capture the cancellation task so its completion (and the resulting _cancellationReason assignment) can be awaited explicitly below.
                 Task<bool> cancelWithInterruptTask = CancelWithInterrupt(
-                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold,
-                    processExitConfiguration, cancellationToken);
+                    processExitConfiguration.TimeoutPolicy.TimeoutThreshold, processExitConfiguration, cancellationToken);
 
                 Task firstExitWatch = WaitForExitSafeAsync(cancellationToken);
                 await Task.WhenAny([firstExitWatch, cancelWithInterruptTask]).ConfigureAwait(false);
@@ -1067,9 +1058,8 @@ internal class ProcessWrapper : Process
                 Task secondExitWatch = WaitForExitSafeAsync(cancellationToken);
                 await Task.WhenAny([interruptGraceDelay, secondExitWatch]).ConfigureAwait(false);
 
-                // Task.WhenAny never surfaces candidate faults; observe them without propagating.
-                // Policy-approved propagation is the interrupt task's job (below), so the default
-                // CancellationThrowsException=false configuration still does not throw OCE.
+                // Task.WhenAny never surfaces candidate faults; observe them without propagating. Policy-approved propagation
+                // is the interrupt task's job (below), so the default CancellationThrowsException=false configuration still does not throw OCE.
                 ObserveFault(firstExitWatch);
                 ObserveFault(interruptGraceDelay);
                 ObserveFault(secondExitWatch);
@@ -1155,15 +1145,12 @@ internal class ProcessWrapper : Process
     [UnsupportedOSPlatform("ios")]
     [UnsupportedOSPlatform("tvos")]
     internal async Task WaitForExitOrForcefulTimeoutAsync(
-        ProcessExitConfiguration exitConfiguration,
-        CancellationToken cancellationToken)
+        ProcessExitConfiguration exitConfiguration, CancellationToken cancellationToken)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(
-            exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero,
+        ArgumentOutOfRangeException.ThrowIfLessThan(exitConfiguration.TimeoutPolicy.TimeoutThreshold, TimeSpan.Zero,
             nameof(exitConfiguration));
 
-        long expectedExitTick = CancellationHelper.CalculateExpectedExitTick(
-            exitConfiguration.TimeoutPolicy.TimeoutThreshold);
+        long expectedExitTick = CancellationHelper.CalculateExpectedExitTick(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
 
         CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
@@ -1171,8 +1158,7 @@ internal class ProcessWrapper : Process
         {
             // A disabled timeout policy never arms the timer, so the wait below is bounded only by the caller's token
             // and the process's own exit, the same behaviour ProcessTimeoutPolicy.None already exhibited for a zero threshold.
-            if (exitConfiguration.TimeoutPolicy.Enabled
-                && exitConfiguration.TimeoutPolicy.TimeoutThreshold > TimeSpan.Zero)
+            if (exitConfiguration.TimeoutPolicy.Enabled && exitConfiguration.TimeoutPolicy.TimeoutThreshold > TimeSpan.Zero)
                 cts.CancelAfter(exitConfiguration.TimeoutPolicy.TimeoutThreshold);
 
             CancellationToken actualCancellationToken = cts.Token;
@@ -1180,8 +1166,7 @@ internal class ProcessWrapper : Process
             bool semaphoreAcquired;
             try
             {
-                semaphoreAcquired = await _cancellationSemaphore
-                    .WaitAsync(0, cancellationToken).ConfigureAwait(false);
+                semaphoreAcquired = await _cancellationSemaphore.WaitAsync(0, cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException oce)
             {
@@ -1205,23 +1190,18 @@ internal class ProcessWrapper : Process
             }
             catch (Exception exception)
             {
-                // Classify by token ownership, not clock timing: the linked source is
-                // cancelled only by this wait's kill timer (or the caller's token, which
-                // the classifier rules out first), so "timer cancelled, caller not" is a
-                // timeout no matter how far ahead of the deadline the OS delivered it.
-                // Clock-based classification here required a delivery-grace window that
-                // Windows CI timers exceeded, misclassifying on-time timeouts as
+                // Classify by token ownership, not clock timing: the linked source is cancelled only by this wait's kill timer (or the caller's token, which
+                // the classifier rules out first), so "timer cancelled, caller not" is a timeout no matter how far ahead of the deadline the OS delivered it.
+                // Clock-based classification here required a delivery-grace window that Windows CI timers exceeded, misclassifying on-time timeouts as
                 // CancellationReason.NotKnown (see GetCancellationReasonFromTokens).
                 CancellationReason cancellationReason =
                     CancellationHelper.GetCancellationReasonFromTokens(cancellationToken, actualCancellationToken);
 
-                // Persist the reason BEFORE the propagation decision; see CancelWithInterrupt
-                // for why the assignment must not sit after HandleCancellationExceptions.
+                // Persist the reason BEFORE the propagation decision; see CancelWithInterrupt for why the assignment must not sit after HandleCancellationExceptions.
                 _cancellationReason = cancellationReason;
 
                 ProcessDiagnostic diagnostic2 = CaptureDiagnostic();
-                CancellationHelper.HandleCancellationExceptions(expectedExitTick,
-                    cancellationReason, exitConfiguration, exception, diagnostic2);
+                CancellationHelper.HandleCancellationExceptions(expectedExitTick, cancellationReason, exitConfiguration, exception, diagnostic2);
             }
             finally
             {
@@ -1234,8 +1214,7 @@ internal class ProcessWrapper : Process
                     // Best-effort kill; swallow any exception to avoid masking the original.
                 }
 
-                // The wait can end via the timeout/cancel exception path rather than a
-                // confirmed exit; publish ExitTime once the kill has landed.
+                // The wait can end via the timeout/cancel exception path rather than a confirmed exit; publish ExitTime once the kill has landed.
                 EnsureExitTime();
 
                 _cancellationSemaphore.Release();
@@ -1243,8 +1222,7 @@ internal class ProcessWrapper : Process
         }
         finally
         {
-            // Disposed on every exit path, including a throw from the semaphore wait with an
-            // already-cancelled token, so the linked token registration never leaks.
+            // Disposed on every exit path, including a throw from the semaphore wait with an already-cancelled token, so the linked token registration never leaks.
             cts.Dispose();
         }
     }

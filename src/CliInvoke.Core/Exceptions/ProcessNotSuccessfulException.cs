@@ -15,7 +15,7 @@ namespace CliInvoke.Core.Exceptions;
 ///     An exception thrown if a Process is run unsuccessfully.
 /// </summary>
 public sealed class ProcessNotSuccessfulException<TProcessResult> : Exception
-where TProcessResult : ProcessResult
+    where TProcessResult : ProcessResult
 {
     /// <summary>
     ///     Thrown when an executed Process exited with a non-zero exit code.
@@ -26,7 +26,7 @@ where TProcessResult : ProcessResult
             Resources.Exceptions_ProcessNotSuccessful_Specific.Replace(
                     "{x}",
                     processInfo.Result.ExecutedFilePath)
-                .Replace("{y}", processInfo.Result.ExitCode.ToString())
+                .Replace("{y}", processInfo.Result.ExitCode.ToString(System.Globalization.CultureInfo.CurrentCulture))
         )
     {
         ExecutedProcessInfo = processInfo;

@@ -93,7 +93,6 @@ public static class ConfigurationExtensions
             IEnumerable<KeyValuePair<string, string>> kvp = processStartInfo.Environment
                 .Where(kv => kv.Value is not null)
                 // Suppression is okay here because we check for null before Select.
-
                 // ReSharper disable once NullableWarningSuppressionIsUsed
                 .Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value!));
 
@@ -127,10 +126,9 @@ public static class ConfigurationExtensions
             if (requiresAdministrator)
                 processConfigurationBuilder.RequireAdministratorPrivileges();
 
-            // User credentials are a Windows-only concept (see the ConfigureUserCredential remarks): reading Domain,
-            // Password, and LoadUserProfile throws PlatformNotSupportedException on Unix, so the mapping is guarded at runtime
-            // rather than relying on a CA1416 suppression. Values are read into locals so the platform analyser tracks the guard
-            // (it does not flow into lambda bodies).
+            // User credentials are a Windows-only concept (see the ConfigureUserCredential remarks): reading Domain, Password,
+            // and LoadUserProfile throws PlatformNotSupportedException on Unix, so the mapping is guarded at runtime rather than
+            // relying on a CA1416 suppression. Values are read into locals so the platform analyser tracks the guard.
             if (OperatingSystem.IsWindows())
             {
                 string domain = processStartInfo.Domain;

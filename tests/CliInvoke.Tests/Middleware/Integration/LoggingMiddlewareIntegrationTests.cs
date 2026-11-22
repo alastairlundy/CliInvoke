@@ -8,8 +8,6 @@
 */
 
 using System.Linq;
-using System.Threading;
-
 using CliInvoke.Core.Middleware;
 using CliInvoke.Extensions.Middleware.Logging;
 using CliInvoke.Factories;

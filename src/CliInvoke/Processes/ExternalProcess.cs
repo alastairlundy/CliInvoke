@@ -393,11 +393,8 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
 
         // Feed stdin alongside the drain-and-wait so the copy runs at the child's
         // pace instead of blocking ahead of it.
-        Task standardInputCopy = Configuration.StandardInput is not null
-                                 && wrapper.StartInfo.RedirectStandardInput
-            ? wrapper.PipeStandardInputAsync(Configuration.StandardInput.BaseStream,
-                cancellationToken)
-            : Task.CompletedTask;
+        Task standardInputCopy = Configuration.StandardInput is not null && wrapper.StartInfo.RedirectStandardInput
+            ? wrapper.PipeStandardInputAsync(Configuration.StandardInput.BaseStream, cancellationToken) : Task.CompletedTask;
 
         Task waitTask = wrapper.WaitForExitOrTimeoutAsync(ExitConfiguration, cancellationToken);
 
@@ -405,37 +402,24 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         {
             try
             {
-                await Task.WhenAll(waitTask, outputStrings, standardInputCopy)
-                    .ConfigureAwait(false);
+                await Task.WhenAll(waitTask, outputStrings, standardInputCopy).ConfigureAwait(false);
             }
-            catch (Exception) when (standardInputCopy.IsFaulted
-                                    && !waitTask.IsFaulted
-                                    && !outputStrings.IsFaulted
+            catch (Exception) when (standardInputCopy.IsFaulted && !waitTask.IsFaulted && !outputStrings.IsFaulted
                                     && wrapper.Canceled)
             {
-                // A stdin copy fault that is an artefact of this instance's own
-                // timeout/cancellation kill (a broken pipe after ForcefulExit) is
-                // absorbed in this join; a genuine source-stream read error leaves
-                // the kill machinery un-run and still propagates, as do any wait
+                // A stdin copy fault that is an artefact of this instance's own timeout/cancellation kill (a broken pipe after ForcefulExit) is
+                // absorbed in this join; a genuine source-stream read error leaves the kill machinery un-run and still propagates, as do any wait
                 // or drain faults.
             }
             catch (Exception ex) when (ex is OperationCanceledException
-                                       && !ExitConfiguration.CancellationThrowsException
-                                       && cancellationToken.IsCancellationRequested
-                                       && !waitTask.IsFaulted
-                                       && !standardInputCopy.IsFaulted
-                                       && wrapper.Canceled)
+                                       && !ExitConfiguration.CancellationThrowsException && cancellationToken.IsCancellationRequested
+                                       && !waitTask.IsFaulted && !standardInputCopy.IsFaulted && wrapper.Canceled)
             {
-                // A stream-read OperationCanceledException raised by this instance's
-                // own cancellation machinery (the drains observe the caller's token)
-                // is absorbed so the documented CancellationThrowsException=false
-                // contract holds: the caller receives a normal BufferedProcessResult
-                // with Cancelled set and empty captured output instead of an escaping
-                // exception. When CancellationThrowsException is true nothing from
-                // the cancellation machinery is absorbed — the OCE propagates whether
-                // it surfaces from the wait or from the drain. (The two faults race,
-                // so the knob is checked here rather than relying on which task
-                // faults first.) Genuine (non-OCE) read failures and wait faults
+                // A stream-read OperationCanceledException raised by this instance's own cancellation machinery (the drains observe the caller's token)
+                // is absorbed so the documented CancellationThrowsException=false contract holds: the caller receives a normal BufferedProcessResult
+                // with Cancelled set and empty captured output instead of an escaping exception. When CancellationThrowsException is true nothing from
+                // the cancellation machinery is absorbed — the OCE propagates whether it surfaces from the wait or from the drain. (The two faults race,
+                // so the knob is checked here rather than relying on which task faults first.) Genuine (non-OCE) read failures and wait faults
                 // always propagate.
             }
 
@@ -458,9 +442,8 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
         }
         catch (Exception)
         {
-            // Only a propagating path reaches this handler (a genuine stream failure or a
-            // wait fault); the absorbed cancellation paths above return results instead.
-            // The kill machinery never ran there, so terminate a still-running child
+            // Only a propagating path reaches this handler (a genuine stream failure or a wait fault); the absorbed cancellation
+            // paths above return results instead. The kill machinery never ran there, so terminate a still-running child
             // rather than orphaning it when the exception escapes.
             TerminateAbandonedChild();
             throw;
@@ -470,7 +453,6 @@ public sealed class ExternalProcess : ISuspendableExternalProcess, IExternalProc
             outputStrings.Dispose();
         }
     }
-
     
     /// <summary>
     /// Suspends the external process that is currently running.

@@ -28,13 +28,6 @@ namespace CliInvoke.Tests.Fuzzing;
 public class ProcessConfigurationDerivationPropertyTests
 {
     /// <summary>
-    ///     The number of init-only properties on
-    ///     <see cref="ProcessConfiguration"/> that this test asserts.
-    ///     Must be updated when the member set changes.
-    /// </summary>
-    private const int ExpectedPropertyCount = 16;
-
-    /// <summary>
     ///     For any generated <see cref="ProcessConfiguration"/>, derivation with
     ///     an empty delta must reproduce every init-only property exactly.
     ///     Resource-owning members (<see cref="ProcessConfiguration.StandardInput"/>)
@@ -128,23 +121,18 @@ public class ProcessConfigurationDerivationPropertyTests
                     // 9. OutputRedirection
                     && derived.OutputRedirection == source.OutputRedirection
                     // 10. EnvironmentVariables (content equality)
-                    && derived.EnvironmentVariables.Count
-                    == source.EnvironmentVariables.Count
-                    && derived.EnvironmentVariables.SequenceEqual(
-                        source.EnvironmentVariables)
+                    && derived.EnvironmentVariables.Count == source.EnvironmentVariables.Count
+                    && derived.EnvironmentVariables.SequenceEqual(source.EnvironmentVariables)
                     // 11. ResourcePolicy
                     && derived.ResourcePolicy.Equals(source.ResourcePolicy)
                     // 12. Credential
                     && derived.Credential.Equals(source.Credential)
                     // 13. StandardInputEncoding
-                    && derived.StandardInputEncoding.Equals(
-                        source.StandardInputEncoding)
+                    && derived.StandardInputEncoding.Equals(source.StandardInputEncoding)
                     // 14. StandardOutputEncoding
-                    && derived.StandardOutputEncoding.Equals(
-                        source.StandardOutputEncoding)
+                    && derived.StandardOutputEncoding.Equals(source.StandardOutputEncoding)
                     // 15. StandardErrorEncoding
-                    && derived.StandardErrorEncoding.Equals(
-                        source.StandardErrorEncoding);
+                    && derived.StandardErrorEncoding.Equals(source.StandardErrorEncoding);
 
                 // 16. StandardInput — resource-owning member, matched by reference.
                 bool standardInputRef =

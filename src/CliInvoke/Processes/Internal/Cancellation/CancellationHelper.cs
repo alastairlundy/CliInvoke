@@ -7,9 +7,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
    */
 
-using CliInvoke.Core;
-using CliInvoke.Core.Exceptions;
-
 namespace CliInvoke.Processes.Internal.Cancellation;
 
 internal static class CancellationHelper
@@ -27,7 +24,7 @@ internal static class CancellationHelper
     ///     observed on Windows CI runners (commit 6f633f32's regression test documents a
     ///     25 ms envelope), where delivery beyond the original 10 ms grace still flaked an
     ///     on-time timeout into <see cref="CancellationReason.NotKnown"/>. It stays far below
-    ///     the 1 second window
+    ///     the 1-second window
     ///     <see cref="HandleCancellationExceptions" /> applies, so a genuine failure that
     ///     precedes a timeout by more than this still classifies as
     ///     <see cref="CancellationReason.NotKnown" />.
@@ -186,11 +183,9 @@ internal static class CancellationHelper
         CancellationReason cancellationReason, ProcessExitConfiguration exitConfiguration,
         Exception exception, ProcessDiagnostic? childState = null)
     {
-        // The caller-configured cancellation knob overrides the default
-        // ExceptionBehaviour heuristics: when CancellationThrowsException is set, any
-        // OperationCanceledException raised by the cancellation machinery propagates to
-        // the caller, regardless of whether the cancellation was user-requested or
-        // timer-driven (see troubleshooting docs). Genuine (non-cancellation) failures
+        // The caller-configured cancellation knob overrides the default ExceptionBehaviour heuristics: when CancellationThrowsException is
+        // set, any OperationCanceledException raised by the cancellation machinery propagates to the caller, regardless of whether the
+        // cancellation was user-requested or timer-driven (see troubleshooting docs). Genuine (non-cancellation) failures
         // remain governed by ExceptionBehaviour below.
         if (exitConfiguration.CancellationThrowsException && exception is OperationCanceledException oceThrow)
         {
@@ -224,8 +219,7 @@ internal static class CancellationHelper
             }
             case CancellationReason.Timeout or CancellationReason.NotKnown:
             {
-                if (exitConfiguration.ExceptionBehaviour
-                    == ProcessExceptionBehaviour.AllowExceptions)
+                if (exitConfiguration.ExceptionBehaviour == ProcessExceptionBehaviour.AllowExceptions)
                 {
                     if (exception is OperationCanceledException oceAllow)
                     {
@@ -238,14 +232,11 @@ internal static class CancellationHelper
                     throw exception;
                 }
 
-                // AllowExceptionsIfUnexpected swallows only cancellation exceptions raised
-                // on time (the expected kill timer or caller token firing at the threshold).
-                // Non-cancellation exceptions are genuine failures and always propagate;
-                // never let a wall-clock coincidence silently eat them (L7b).
-                if (exitConfiguration.ExceptionBehaviour
-                        == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected
-                    && (exception is not OperationCanceledException
-                        || difference > TimeSpan.FromSeconds(1)))
+                // AllowExceptionsIfUnexpected swallows only cancellation exceptions raised on time (the expected kill timer or caller
+                // token firing at the threshold). Non-cancellation exceptions are genuine failures and always propagate;
+                // never let a wall-clock coincidence silently eat them.
+                if (exitConfiguration.ExceptionBehaviour == ProcessExceptionBehaviour.AllowExceptionsIfUnexpected
+                    && (exception is not OperationCanceledException || difference > TimeSpan.FromSeconds(1)))
                 {
                     if (exception is OperationCanceledException oceUnexpected)
                     {

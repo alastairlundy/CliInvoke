@@ -9,7 +9,6 @@
 
 using CliInvoke.Extensions;
 using CliInvoke.Extensions.Middleware.Truncation;
-using CliInvoke.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliInvoke.Tests.Invokers;
@@ -62,7 +61,7 @@ public class OutputTruncationHandoffTests
         if (completedTask != runTask)
         {
             string diag = CaptureChildState();
-            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+            throw new TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
@@ -81,7 +80,7 @@ public class OutputTruncationHandoffTests
         if (completedTask != runTask)
         {
             string diag = CaptureChildState();
-            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+            throw new TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
@@ -104,7 +103,7 @@ public class OutputTruncationHandoffTests
         if (completedTask != runTask)
         {
             string diag = CaptureChildState();
-            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+            throw new TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
@@ -128,7 +127,7 @@ public class OutputTruncationHandoffTests
         if (completedTask != runTask)
         {
             string diag = CaptureChildState();
-            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+            throw new TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
@@ -153,7 +152,7 @@ public class OutputTruncationHandoffTests
         if (completedTask != runTask)
         {
             string diag = CaptureChildState();
-            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+            throw new TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
@@ -182,7 +181,7 @@ public class OutputTruncationHandoffTests
         if (completedTask != runTask)
         {
             string diag = CaptureChildState();
-            throw new System.TimeoutException($"Timed out after 45s. Child state:\n{diag}");
+            throw new TimeoutException($"Timed out after 45s. Child state:\n{diag}");
         }
         BufferedProcessResult result = await runTask.ConfigureAwait(true);
 
