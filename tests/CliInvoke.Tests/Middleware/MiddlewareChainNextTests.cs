@@ -107,8 +107,8 @@ public class MiddlewareChainNextTests
         await Assert.That(second.ObservedBefore).IsEqualTo(second.ObservedAfter);
 
         // One run-scoped token on the shared context.
-        await Assert.That(first.ObservedBefore!.CancellationToken).IsEqualTo(cts.Token);
-        await Assert.That(second.ObservedBefore!.CancellationToken).IsEqualTo(cts.Token);
+        await Assert.That(first.ObservedBefore?.CancellationToken).IsEqualTo(cts.Token);
+        await Assert.That(second.ObservedBefore?.CancellationToken).IsEqualTo(cts.Token);
     }
 
     /// <summary>

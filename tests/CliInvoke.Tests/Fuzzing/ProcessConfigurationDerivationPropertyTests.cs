@@ -21,9 +21,7 @@ namespace CliInvoke.Tests.Fuzzing;
 /// </summary>
 /// <remarks>
 ///     The member set is explicitly enumerated to track the init-only
-///     property set. When v4 adds PipeSource or other init-only
-///     properties, extend <see cref="ExpectedPropertyCount"/> and add the
-///     corresponding assertion in <see cref="DeriveEmptyDelta_PreservesAllProperties"/>.
+///     property set.
 /// </remarks>
 public class ProcessConfigurationDerivationPropertyTests
 {

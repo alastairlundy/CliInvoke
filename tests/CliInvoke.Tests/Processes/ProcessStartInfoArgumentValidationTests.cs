@@ -39,8 +39,8 @@ public class ProcessStartInfoArgumentValidationTests
             .Throws<ArgumentException>();
 
         await Assert.That(exception).IsNotNull();
-        await Assert.That(exception!.ParamName).IsEqualTo("ArgumentList");
-        await Assert.That(exception!.Message).Contains($"contains \"{character}\"");
+        await Assert.That(exception.ParamName).IsEqualTo("ArgumentList");
+        await Assert.That(exception.Message).Contains($"contains \"{character}\"");
     }
 
     [Test]

@@ -69,7 +69,7 @@ public class ShellMiddlewareWrappingTests
         services.AddSingleton<IExternalProcessFactory>(factory);
 
         if (shellDetector is not null)
-            services.AddSingleton<IShellDetector>(shellDetector);
+            services.AddSingleton(shellDetector);
 
         IServiceProvider provider = services.BuildServiceProvider();
 
