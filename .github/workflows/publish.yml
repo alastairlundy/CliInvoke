@@ -53,5 +53,5 @@ jobs:
       - name: Stage all nupkgs for NuGet.org review
         run: |
           for f in ./nupkgs/*.nupkg; do
-            dotnet package stage push "$f" --source https://api.nuget.org/v3/index.json --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --group cliinvoke-2026-11
+            dotnet package stage push "$f" --source https://api.nuget.org/v3/index.json --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --group cliinvoke-staging
           done
