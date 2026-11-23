@@ -4,13 +4,8 @@ using CliInvoke.Processes.Internal.ControlAdapters;
 namespace CliInvoke.Tests.Processes;
 
 /// <summary>
-///     Regression tests for the fast-exiting-child resource-policy race:
-///     <see cref="BaseProcessControlAdapter.SetResourcePolicy"/> runs immediately after
-///     <see cref="ProcessWrapper.Start"/> returns, and children that exit within
-///     milliseconds made the affinity and priority-boost setters fail with
-///     <c>Win32Exception</c> (<c>ERROR_ACCESS_DENIED</c>) on Windows while termination was
-///     still in progress, escaping the <c>OnStarted</c> handler and failing the
-///     caller's spawn (observed in a consumer's parallel test suite).
+///     Regression tests for the fast-exiting-child resource-policy race in
+///     <see cref="BaseProcessControlAdapter.SetResourcePolicy"/>.
 /// </summary>
 public class SetResourcePolicyExitRaceTests
 {
@@ -40,9 +35,7 @@ public class SetResourcePolicyExitRaceTests
         process.WaitForExit();
         await Assert.That(process.HasExited).IsTrue();
 
-        // The default policy is the exact combination that raced the exit transition
-        // before the fix: full affinity mask, Normal priority, boost disabled. Policy on
-        // a terminated child is meaningless, so the call must be a no-op, not a throw.
+        // Policy on a terminated child must be a no-op.
         await Assert.That(() => adapter.SetResourcePolicy(process, ProcessResourcePolicy.Default))
             .ThrowsNothing();
     }

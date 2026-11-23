@@ -26,39 +26,12 @@ internal abstract class BaseProcessControlAdapter
     internal abstract void SetUserCredential(Process process, UserCredential credential);
 
     /// <summary>
-    ///     How long, in milliseconds, to wait for a child's exit signal when deciding whether a
-    ///     failed resource-policy setter is a benign exit race or a genuine permission failure.
+    ///     Applies one resource-policy setter, swallowing only the benign exit-race exception
+    ///     (Windows ERROR_ACCESS_DENIED 5, Unix ESRCH 3) when the child reports exited.
+    ///     Failures on a live child surface.
     /// </summary>
-    /// <remarks>
-    ///     Measured pre-signal termination windows on Windows are about a millisecond; this
-    ///     budget gives several times that margin while keeping the failure-path cost trivial
-    ///     against a full spawn.
-    /// </remarks>
-    private const int ExitRaceSettleMilliseconds = 5;
-
-    /// <summary>
-    ///     Applies a single resource-policy setter to the child, swallowing the exception the
-    ///     operating system raises when the child terminated between the caller's exited-check
-    ///     and the setter call (a benign exit race: resource policy on a terminated child is
-    ///     meaningless, matching the exit-race handling in the
-    ///     <see cref="ResumeProcess(Process)"/> and <see cref="SuspendProcess(Process)"/>
-    ///     implementations). Failures on a child that is verifiably still alive keep surfacing.
-    /// </summary>
-    /// <param name="process">The wrapper around the child process the policy applies to.</param>
+    /// <param name="process">The child the policy applies to.</param>
     /// <param name="apply">The setter to invoke.</param>
-    /// <remarks>
-    ///     On Windows, <see cref="Process.ProcessorAffinity"/>, <see cref="Process.PriorityBoostEnabled"/>,
-    ///     and the working-set setters fail with <c>ERROR_ACCESS_DENIED</c> (5) while termination
-    ///     is in progress. The BCL's own exited-check inside those setters waits on the process
-    ///     handle with a zero timeout, so during the pre-signal termination window the runtime
-    ///     considers the child alive, calls the underlying Win32 API, and gets
-    ///     <c>ACCESS_DENIED</c>, which surfaces as <see cref="Win32Exception"/>.
-    ///     <para>
-    ///     On Unix-like systems the same window maps to errno <c>ESRCH</c> (3), which
-    ///     <see cref="ProcessWrapper.OnStarted"/> also treats as benign. Other native error
-    ///     codes never match, so unrelated access failures keep surfacing.
-    ///     </para>
-    /// </remarks>
     internal static void ApplyPolicySetting(ProcessWrapper process, Action apply)
     {
         try
@@ -71,46 +44,36 @@ internal abstract class BaseProcessControlAdapter
     }
 
     /// <summary>
-    ///     Determines whether a <see cref="Win32Exception"/> from a resource-policy setter means
-    ///     the child exited mid-application: Windows reports <c>ERROR_ACCESS_DENIED</c> (5) for
-    ///     a terminating child whose handle is not yet signaled, while Unix-like systems map
-    ///     errno <c>ESRCH</c> (3) to the same condition. The Windows check deliberately never
-    ///     matches Unix error numbers (3 is <c>ERROR_PATH_NOT_FOUND</c> there), and the Unix
-    ///     check deliberately never matches errno 5 (<c>EIO</c>).
+    ///     Matches the benign error code and the child's exit status. A live child never
+    ///     matches, so genuine access failures surface.
     /// </summary>
     private static bool IsBenignResourcePolicyExitRace(
         ProcessWrapper process, Win32Exception exception)
     {
         int benignErrorCode = OperatingSystem.IsWindows()
-            ?
-            // ERROR_ACCESS_DENIED: rejected while termination is in progress.
-            5
-            :
-            // ESRCH: the child is gone.
-            3;
+            ? 5  // ERROR_ACCESS_DENIED
+            : 3; // ESRCH
 
-        return exception.NativeErrorCode == benignErrorCode && SettledExited(process);
+        return exception.NativeErrorCode == benignErrorCode && TerminationHasBegun(process);
     }
 
     /// <summary>
-    ///     Determines whether the child's exit has settled by waiting briefly for the exit
-    ///     signal, closing the gap between a failed setter and the process handle becoming
-    ///     signaled. A live child that is genuinely denied (for example a protected process)
-    ///     stays unsignaled, so the wait elapses and the original exception surfaces.
+    ///     Reads the child's exit status instead of waiting on the handle, so the verdict is
+    ///     deterministic. A disposed handle counts as gone. STILL_ACTIVE (259) as a real exit
+    ///     code is misclassified as live, so the exception surfaces (fail-loud).
     /// </summary>
-    private static bool SettledExited(ProcessWrapper process)
+    private static bool TerminationHasBegun(ProcessWrapper process)
     {
         try
         {
-            return process.WaitForExit(ExitRaceSettleMilliseconds);
+            return process.HasExited;
         }
         catch (Exception)
         {
-            // Disposed or invalid process handle: the process is gone.
+            // Disposed or invalid handle: gone.
             return true;
         }
     }
-
 
     /// <summary>
     ///     Resolves the POSIX signal that terminated a process from its exit code, using the

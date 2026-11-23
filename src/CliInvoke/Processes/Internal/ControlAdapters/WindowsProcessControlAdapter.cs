@@ -125,6 +125,25 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         }
     }
 
+    /// <summary>
+    ///     Reads the child's exit status exception-safely: a disposed or invalid process
+    ///     handle means the child is gone, so any failure of the check itself reports
+    ///     <c>true</c> instead of throwing. Never throws, which also makes it safe to call
+    ///     from an exception filter (a filter that throws is treated as <c>false</c>).
+    /// </summary>
+    private static bool ChildHasExited(ProcessWrapper process)
+    {
+        try
+        {
+            return process.HasExited;
+        }
+        catch (Exception)
+        {
+            // Disposed or invalid process handle: the process is gone.
+            return true;
+        }
+    }
+
     internal override void SetResourcePolicy(ProcessWrapper process, ProcessResourcePolicy?  resourcePolicy)
     {
         resourcePolicy ??= ProcessResourcePolicy.Default;
@@ -141,29 +160,49 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         if (process.HasExited)
             return;
 
-        if (OperatingSystem.IsWindows())
-            if (resourcePolicy.ProcessorAffinity is not null)
-                ApplyPolicySetting(process,
-                    () => process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity);
-
-        if (OperatingSystem.IsMacOS()
-            || OperatingSystem.IsMacCatalyst()
-            || OperatingSystem.IsFreeBSD()
-            || OperatingSystem.IsWindows()
-           )
+        // Short-circuit the remaining setters once the child reports exited: resource policy
+        // on a terminated child is meaningless, and the BCL setters throw against a signaled
+        // handle — this must keep SetResourcePolicy self-contained instead of relying on
+        // OnStarted's catch.
+        void ApplySettingIfRunning(Action apply)
         {
-            if (resourcePolicy.MinWorkingSet is not null)
-                ApplyPolicySetting(process,
-                    () => process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet);
-
-            if (resourcePolicy.MaxWorkingSet is not null)
-                ApplyPolicySetting(process,
-                    () => process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet);
+            if (!ChildHasExited(process))
+                ApplyPolicySetting(process, apply);
         }
 
-        ApplyPolicySetting(process, () => process.PriorityClass = resourcePolicy.PriorityClass);
-        ApplyPolicySetting(process,
-            () => process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost);
+        try
+        {
+            if (OperatingSystem.IsWindows())
+                if (resourcePolicy.ProcessorAffinity is not null)
+                    ApplySettingIfRunning(
+                        () => process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity);
+
+            if (OperatingSystem.IsMacOS()
+                || OperatingSystem.IsMacCatalyst()
+                || OperatingSystem.IsFreeBSD()
+                || OperatingSystem.IsWindows()
+               )
+            {
+                if (resourcePolicy.MinWorkingSet is not null)
+                    ApplySettingIfRunning(
+                        () => process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet);
+
+                if (resourcePolicy.MaxWorkingSet is not null)
+                    ApplySettingIfRunning(
+                        () => process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet);
+            }
+
+            ApplySettingIfRunning(() => process.PriorityClass = resourcePolicy.PriorityClass);
+            ApplySettingIfRunning(
+                () => process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost);
+        }
+        catch (InvalidOperationException) when (ChildHasExited(process))
+        {
+            // Belt-and-braces: the child can exit after the last guard above but before a
+            // setter's own exited-check. The filter re-reads exit status (never throws), so
+            // a genuine InvalidOperationException on a live child fails the filter and
+            // keeps surfacing.
+        }
     }
 
     [SupportedOSPlatform("windows")]
