@@ -115,9 +115,17 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
                 Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
             );
 
+        // Fast-exiting children can terminate between OnStarted's exited-check and this call.
+        // Applying a resource policy to a terminated child is meaningless, so skip it instead
+        // of letting the setters throw — matching the ResumeProcess/SuspendProcess exit-race
+        // handling. Failures on a verifiably live child keep surfacing (see ApplyPolicySetting).
+        if (process.HasExited)
+            return;
+
         if (OperatingSystem.IsLinux())
             if (resourcePolicy.ProcessorAffinity is not null)
-                process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity;
+                ApplyPolicySetting(process,
+                    () => process.ProcessorAffinity = (IntPtr)resourcePolicy.ProcessorAffinity);
 
         if (OperatingSystem.IsMacOS()
             || OperatingSystem.IsMacCatalyst()
@@ -125,14 +133,17 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
            )
         {
             if (resourcePolicy.MinWorkingSet is not null)
-                process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet;
+                ApplyPolicySetting(process,
+                    () => process.MinWorkingSet = (nint)resourcePolicy.MinWorkingSet);
 
             if (resourcePolicy.MaxWorkingSet is not null)
-                process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet;
+                ApplyPolicySetting(process,
+                    () => process.MaxWorkingSet = (nint)resourcePolicy.MaxWorkingSet);
         }
 
-        process.PriorityClass = resourcePolicy.PriorityClass;
-        process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost;
+        ApplyPolicySetting(process, () => process.PriorityClass = resourcePolicy.PriorityClass);
+        ApplyPolicySetting(process,
+            () => process.PriorityBoostEnabled = resourcePolicy.EnablePriorityBoost);
     }
 
     [SupportedOSPlatform("linux")]
