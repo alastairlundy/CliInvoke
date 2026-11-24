@@ -48,13 +48,13 @@ flowchart TD
 
 **Quick rules of thumb:**
 
-- **Just need to run a command and get output?** → `CliRun`
-- **Building a testable application with DI?** → `IProcessInvoker`
-- **Need to pipe input, monitor a long-running process, or control start/stop?** → `IExternalProcess`
+- **Just need to run a command and get output?** Use `CliRun`
+- **Building a testable application with DI?** Use `IProcessInvoker`
+- **Need to pipe input, monitor a long-running process, or control start/stop?** Use `IExternalProcess`
 
 ---
 
-## `CliRun` — Quickstart & scripting
+## `CliRun` – Quickstart & scripting
 
 ### When to choose it
 
@@ -84,20 +84,20 @@ Console.WriteLine(result.StandardOutput);
 
 `CliRun` is a static façade. It builds a `ProcessConfiguration` and a
 `ProcessExitConfiguration` internally, applies sensible defaults, and runs
-them through a fresh process pipeline allocated per call — no DI container,
+them through a fresh process pipeline allocated per call: no DI container,
 no invoker resolution, no shared static state (see
 [ADR-0003](https://github.com/alastairlundy/CliInvoke/blob/main/docs/adr/0003-cli-run-defaults-facade.md)).
 You get results with a single line of code.
 
 ### What you give up
 
-- **Testability** — the static entry point can't be replaced with a mock.
-- **Flexibility** — you can't customise resource policies, interrupt
+- **Testability**. The static entry point can't be replaced with a mock.
+- **Flexibility**. You can't customise resource policies, interrupt
   strategies, or start-logic per call.
 
 ---
 
-## `IProcessInvoker` — DI-centric applications
+## `IProcessInvoker` – DI-centric applications
 
 ### When to choose it
 
@@ -143,31 +143,31 @@ wires together configuration, exit behaviour, cancellation, and piping.
 
 ### What you give up
 
-- **Lifecycle control** — you can't interact with the process between
+- **Lifecycle control**. You can't interact with the process between
   start and exit. The invoker handles the full start → capture → dispose
   cycle internally.
-- **Boilerplate** — you need a DI container and service registration.
+- **Boilerplate**. You need a DI container and service registration.
 
 ---
 
-## `IExternalProcess` — Power-user lifecycle control
+## `IExternalProcess` – Power-user lifecycle control
 
 ### When to choose it
 
-- You need to interact with the process while it's running — pipe input,
+- You need to interact with the process while it's running: pipe input,
   read partial output, send signals, or monitor progress.
 - You want granular control over the start/stop sequence.
 - You're building a library that wraps process interaction.
 - You need an API similar to `System.Diagnostics.Process` but with a
-  richer, safer surface.
+  richer, safer API.
 
 ### When NOT to choose it
 
-- You just need to run a command and get the result — `CliRun` or
+- You just need to run a command and get the result. `CliRun` or
   `IProcessInvoker` are simpler.
 - You want minimal boilerplate.
 
-### Example — without DI
+### Example: without DI
 
 ```csharp
 using CliInvoke;
@@ -190,7 +190,7 @@ BufferedProcessResult result = await process.CaptureBufferedResultAsync(
 Console.WriteLine(result.StandardOutput);
 ```
 
-### Example — with DI
+### Example: with DI
 
 ```csharp
 services.AddCliInvoke();
@@ -213,9 +213,9 @@ configured instances, optionally with a custom `IFilePathResolver`.
 
 ### What you give up
 
-- **Simplicity** — each scenario demands manual disposal, cancellation
+- **Simplicity**. Each scenario demands manual disposal, cancellation
   tokens, and lifecycle management.
-- **Convention** — you're responsible for the full start → interact →
+- **Convention**. You're responsible for the full start → interact →
   capture → dispose sequence.
 
 ---
@@ -223,7 +223,7 @@ configured instances, optionally with a custom `IFilePathResolver`.
 ## Migrating between patterns
 
 As your application grows, you may need to move from a simpler pattern
-to a more capable one. The patterns are designed to be composable — you
+to a more capable one. The patterns are designed to be composable. You
 can upgrade without rewriting your configuration.
 
 ### `CliRun` → `IProcessInvoker`
@@ -310,13 +310,13 @@ don't need DI or advanced configuration.
 and per-invocation configuration matter.
 
 **Choose `IExternalProcess`** when you need process-level APIs similar to
-`System.Diagnostics.Process` — interacting with the process while it runs,
+`System.Diagnostics.Process`, interacting with the process while it runs,
 controlling start/stop sequences, or building process-aware libraries.
 
 ## Further reading
 
-- [`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md) — full API reference for each pattern.
-- [Architecture](architecture.md) — internal data-flow and implementation mapping.
-- [Configuration](configuration.md) — configuration model reference and builders.
-- [Resource Disposal](resource-disposal.md) — ownership and disposal rules.
-- [Migrating to 3.0.0](../migration-guides/3.0.0.md) — breaking changes and upgrade guide.
+- [`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md), full API reference for each pattern.
+- [Architecture](architecture.md), internal data-flow and implementation mapping.
+- [Configuration](configuration.md), configuration model reference and builders.
+- [Resource Disposal](resource-disposal.md), ownership and disposal rules.
+- [Migrating to 3.0.0](../migration-guides/3.0.0.md), breaking changes and upgrade guide.

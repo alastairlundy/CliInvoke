@@ -8,7 +8,7 @@ layout: simple
 This guide explains how CliInvoke works internally. It walks through the
 data-flow that every invocation follows, shows how the three invocation
 patterns (`CliRun`, `IProcessInvoker`, `IExternalProcess`) enter and exit
-that data-flow, and describes the **Process Invocation Pipeline** — the
+that data-flow, and describes the **Process Invocation Pipeline**, the
 layered pattern CliInvoke uses to keep cross-cutting concerns (path
 resolution, runner wrapping, result validation) out of the core execution
 path.
@@ -38,7 +38,7 @@ canonical definitions in
 A **Builder** is a fluent, mutable object used to assemble a configuration
 model (advanced path). Each builder is a short-lived staging area whose
 only job is to produce exactly one model via `Build()`. The produced model
-is independent of the builder — they do not share lifetime. In v3,
+is independent of the builder, and they do not share lifetime. In v3,
 init construction is the default; the builder is reserved for argument
 escaping, `UserCredentialSpec`, and resource-policy callback flows.
 Examples: `ProcessConfigurationBuilder`, `ArgumentsSpec`,
@@ -59,8 +59,8 @@ configuration; it reads the model, runs the process, and disposes the
 OS resources it allocated.
 
 A **Result** is the immutable object returned by the invoker after the
-process exits. Two concrete result types exist —
-`ProcessResult` and `BufferedProcessResult` —
+process exits. Two concrete result types exist,
+`ProcessResult` and `BufferedProcessResult`,
 corresponding to the two execution modes (Basic, Buffered).
 Results are the canonical return value of the pipeline.
 
@@ -111,7 +111,7 @@ flowchart LR
     E -->|returned| C
 ```
 
-### Stage 1 — Construction
+### Stage 1: Construction
 
 In v3, **init construction is the default**. The caller creates the
 configuration either directly via init properties (the default) or via
@@ -123,7 +123,7 @@ a builder (advanced). Both paths produce an immutable `ProcessConfiguration`.
 ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version");
 ```
 
-**Builder construction** (advanced — for escaping, credentials, policy):
+**Builder construction** (advanced, for escaping, credentials, policy):
 
 ```csharp
 using CliInvoke.Builders;
@@ -137,40 +137,40 @@ ProcessConfiguration config = builder.Build();
 
 Key types in this stage:
 
-- `ProcessConfiguration` — directly constructible via init setters with
+- `ProcessConfiguration` is directly constructible via init setters with
   required `TargetFilePath`.
-- `ProcessConfigurationBuilder` — assembles `ProcessConfiguration`
+- `ProcessConfigurationBuilder` assembles `ProcessConfiguration`
   (advanced: escaping, `UserCredentialSpec`, resource-policy callbacks).
-- `ArgumentsSpec` — assembles the argument list.
-- `EnvironmentVariablesSpec` — assembles the environment-variable
+- `ArgumentsSpec` assembles the argument list.
+- `EnvironmentVariablesSpec` assembles the environment-variable
   dictionary.
-- `ProcessResourcePolicySpec` — assembles `ProcessResourcePolicy`.
-- `UserCredentialSpec` — assembles `UserCredential`.
+- `ProcessResourcePolicySpec` assembles `ProcessResourcePolicy`.
+- `UserCredentialSpec` assembles `UserCredential`.
 
 **Invariant:** the builder is single-use-per-stage. Calling `Build()`
 produces a model; calling `Build()` again produces a *new* model
 (mutations between calls do not retroactively change models already
-produced). The builder is **not** required — every model also exposes
-a public constructor — but it is the advanced path for configurations
+produced). The builder is **not** required. Every model also exposes
+a public constructor, but the builder is the advanced path for configurations
 that need argument escaping, credential staging, or resource-policy
 callback flows.
 
-### Stage 2 — Configuration Model
+### Stage 2: Configuration Model
 
 Construction (Stage 1) returns an immutable, value-equal
 `ProcessConfiguration`. The model is the single thing that travels from
-the caller's code into the library's execution layer. It is read by the
-invoker and by every cross-cutting concern in the pipeline; nothing in
+the caller's code into the library's execution layer. The invoker and every cross-cutting concern in the pipeline read it;
+nothing in
 the library is allowed to mutate it after construction.
 
 Key types in this stage:
 
-- `ProcessConfiguration` — the top-level model that the invoker
+- `ProcessConfiguration`: the top-level model that the invoker
   consumes. Owns the executable path, arguments, working directory,
   environment, resource policy, timeout policy, and optional credential.
-- `ProcessExitConfiguration` — how the process should be terminated if
+- `ProcessExitConfiguration`: how the process should be terminated if
   it does not exit on its own.
-- `UserCredential` — optional credentials for processes that require
+- `UserCredential`: optional credentials for processes that require
   them.
 
 **Invariants:**
@@ -185,7 +185,7 @@ Key types in this stage:
   `ProcessConfigurationBuilder`). Any `Credential` or `StandardInput`
   you supplied inside the model remain yours to dispose.
 
-### Stage 3 — Invoker
+### Stage 3: Invoker
 
 The invoker is the abstraction that turns a `ProcessConfiguration` into
 a running process. The default implementation, `ProcessInvoker`, takes
@@ -194,22 +194,22 @@ token; creates an `IExternalProcess` via the configured
 `IExternalProcessFactory`; runs it; and returns a typed result. Two
 methods exist on the interface, one per execution mode:
 
-- `ExecuteAsync` — returns `ProcessResult` (exit code only).
-- `ExecuteBufferedAsync` — returns `BufferedProcessResult` (exit code
+- `ExecuteAsync` returns `ProcessResult` (exit code only).
+- `ExecuteBufferedAsync` returns `BufferedProcessResult` (exit code
   plus captured `StandardOutput` / `StandardError` as strings).
 
 **Invariants:**
 
 - The invoker does not retain a reference to the configuration after
   the invocation returns.
-- The invoker disposes the `IExternalProcess` it created — but it does
+- The invoker disposes the `IExternalProcess` it created, but it does
   **not** dispose the configuration or the result. The caller owns
   those.
 - The invoker reads the configuration, the exit configuration, and the
   cancellation token; it does not read or write process state between
   `Start` and exit (that is what `IExternalProcess` is for).
 
-### Stage 4 — Result
+### Stage 4: Result
 
 The invoker returns a result. The result is the canonical return value
 of an invocation. It is immutable.
@@ -244,10 +244,10 @@ flowchart LR
     end
 ```
 
-### `CliRun` — drives every stage for the caller
+### `CliRun`: drives every stage for the caller
 
 `CliRun` is a static façade. The caller hands it the executable, the
-arguments, and any optional knobs; `CliRun` runs Stages 1–3 internally
+arguments, and any optional knobs; `CliRun` runs Stages 1-3 internally
 using sensible defaults and returns the result.
 
 ```csharp
@@ -258,9 +258,9 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(
 
 Internally, `CliRun` constructs a `ProcessConfiguration` and a
 `ProcessExitConfiguration` from the method arguments (Stage 1 → Stage 2),
-then allocates a fresh process pipeline — and, underneath it, a fresh
-`ExternalProcessFactory` with a default `FilePathResolver` — per call
-(Stage 3; there is no shared, configurable static state) and returns the
+then allocates a fresh process pipeline, and underneath it a fresh
+`ExternalProcessFactory` with a default `FilePathResolver`, per call
+(Stage 3; there is no shared, configurable static state), and returns the
 result (Stage 4). It does not resolve or delegate to a registered
 `IProcessInvoker` (see
 [ADR-0003](https://github.com/alastairlundy/CliInvoke/blob/main/docs/adr/0003-cli-run-defaults-facade.md)).
@@ -270,7 +270,7 @@ the trade-off documented in
 [Choosing your Invocation Pattern](choosing-invocation-pattern.md#cirun--quickstart-scripting):
 zero boilerplate, zero testability, zero customisation.
 
-### `IProcessInvoker` — caller provides Stages 1–2; library runs 3–4
+### `IProcessInvoker`: caller provides Stages 1-2; library runs 3-4
 
 `IProcessInvoker` is the abstraction for DI-centric applications. The
 caller assembles the `ProcessConfiguration` themselves (Stage 1 →
@@ -288,25 +288,25 @@ BufferedProcessResult result = await invoker.ExecuteBufferedAsync(
     config, ProcessExitConfiguration.CreateGraceful());
 ```
 
-The caller now has control over the model — they can construct it
+The caller now has control over the model: they can construct it
 explicitly, share it across invocations, and inject a mock invoker for
 unit tests. They have given up `CliRun`'s one-liner simplicity, in
 exchange for testability and per-call configuration.
 
-### `IExternalProcess` — caller provides Stages 1–2; library and caller share 3; library returns 4
+### `IExternalProcess`: caller provides Stages 1-2; library and caller share 3; library returns 4
 
 `IExternalProcess` is the power-user API. The caller still assembles
-the configuration (Stages 1–2) but the "Invoker" stage is split into
+the configuration (Stages 1-2) but the "Invoker" stage is split into
 multiple sub-stages that the caller drives:
 
-1. `factory.CreateExternalProcess(config)` — Stage 3a: the library
+1. `factory.CreateExternalProcess(config)`. Stage 3a: the library
    creates the `IExternalProcess`.
-2. `process.StartAsync()` — Stage 3b: the library starts the OS
+2. `process.StartAsync()`. Stage 3b: the library starts the OS
    process.
-3. **The caller interacts with the process** — Stage 3c: write to
+3. **The caller interacts with the process**. Stage 3c: write to
    `StandardInput`, read from `StandardOutput`, send signals, check
    status. This is the gap that no other pattern exposes.
-4. `process.CaptureBufferedResultAsync()` — Stage 3d: the library captures the
+4. `process.CaptureBufferedResultAsync()`. Stage 3d: the library captures the
    result and returns it.
 
 ```csharp
@@ -326,7 +326,7 @@ BufferedProcessResult result = await process.CaptureBufferedResultAsync(
 ```
 
 This is the only pattern that lets the caller do work between
-`Start` and `Capture`. The trade-off is significant: the caller owns
+`Start` and `Capture`. The trade-off is significant. The caller owns
 the full `using` chain, the cancellation tokens, and the disposal
 contract for both the configuration and the `IExternalProcess`.
 
@@ -387,28 +387,28 @@ CliInvoke ships three first-class cross-cutting concerns. Each is
 backed by a public interface so that callers can replace or extend
 the default implementation.
 
-#### 1. Path resolution — `IFilePathResolver`
+#### 1. Path resolution: `IFilePathResolver`
 
-`IFilePathResolver` answers the question *“where on disk is this
-executable?”*. The default implementation, `FilePathResolver`,
+`IFilePathResolver` answers the question *"where on disk is this
+executable?"*. The default implementation, `FilePathResolver`,
 consults `PATH` first, then falls back to a single-level, non-recursive
-search of the inferred base directory. The
-resolver is consulted by `ExternalProcessFactory` when the
+search of the inferred base directory.
+`ExternalProcessFactory` consults the resolver when the
 `ProcessConfiguration` references a bare executable name rather than
 an absolute path.
 
 Customising the resolver is the supported way to add new lookup
-strategies — for example, looking up executable paths in a vendored
+strategies, such as looking up executable paths in a vendored
 toolchain directory. See
-[`GLOSSARY.md` § 1 — Resolution order rationale](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md#1-resolution-order-rationale)
+[`GLOSSARY.md` § 1: Resolution order rationale](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md#1-resolution-order-rationale)
 for the performance contract that custom resolvers must respect.
 
-#### 2. Runner wrapping — `IRunnerConfigurationFactory` and shell middleware
+#### 2. Runner wrapping: `IRunnerConfigurationFactory` and shell middleware
 
-`IRunnerConfigurationFactory` answers the question *“if the process
+`IRunnerConfigurationFactory` answers the question *"if the process
 needs to be run through another process (e.g. PowerShell, CMD, or a
 custom runner such as sudo), how do we build a new configuration that
-does that?”*. The default implementation, `RunnerConfigurationFactory`,
+does that?"*. The default implementation, `RunnerConfigurationFactory`,
 ships in the `CliInvoke` package and is registered by default by
 `AddCliInvoke`; custom implementations can be registered in DI for any
 other runner.
@@ -416,11 +416,11 @@ other runner.
 The invoker does **not** consult the runner factory on its own. There
 are two supported rewrite paths:
 
-- **Shell middleware** — `UsePowerShell()` / `UseCmd()` from the
+- **Shell middleware**. `UsePowerShell()` / `UseCmd()` from the
   `CliInvoke.Specializations` package rewrite the configuration via the
   internal `ShellRewriter` before the pipeline runs, escaping and
   composing the inner command for the target shell.
-- **Direct use** — callers invoke `IRunnerConfigurationFactory` (or
+- **Direct use**. Callers invoke `IRunnerConfigurationFactory` (or
   their own implementation) to produce a rewritten
   `ProcessConfiguration` and pass that rewritten configuration to the
   invoker.
@@ -429,26 +429,26 @@ When the runner is not a shell, a target path that starts with `-`
 gets a `--` option terminator inserted before it in the runner's
 argument list.
 
-#### 3. Result validation — `IProcessResultValidator` and exit-configuration rules
+#### 3. Result validation: `IProcessResultValidator` and exit-configuration rules
 
 Result validation has one execution path and one caller-facing helper
-surface.
+API.
 
-The **execution path** is `ProcessExitConfiguration.ValidationRules` —
+The **execution path** is `ProcessExitConfiguration.ValidationRules`,
 an array of self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
 rules that the pipeline evaluates once, after the process exits and the
 result is produced. Each failing rule contributes its name and failure
 message; any failure causes the pipeline to throw
 `ProcessValidationException` with the joined per-rule messages. The
-`UsePostExitValidation` middleware works through this same path: it
+`UsePostExitValidation` middleware works through this same path. It
 folds an `IProcessResultValidator`'s rules into the invocation's exit
 configuration before execution, so validator rules and inline rules are
 evaluated together.
 
-The **helper surface** is `IProcessResultValidator<TProcessResult>` —
-it answers the question *“is this result acceptable, or should we
-raise a failure?”* — and its default implementation
-(`ProcessResultValidator<TProcessResult>`), which evaluates a set of
+The **helper API** is `IProcessResultValidator<TProcessResult>`.
+It answers the question *"is this result acceptable, or should we
+raise a failure?"* Its default implementation
+(`ProcessResultValidator<TProcessResult>`) evaluates a set of
 self-describing <xref:CliInvoke.Core.Validation.ValidationRule`1>
 rules. `Validate` returns a `bool` (all rules pass), while
 `GetValidationFailures` returns the per-rule
@@ -458,13 +458,13 @@ consults a validator; validator rules reach the pipeline only via
 `UsePostExitValidation`. Callers can also apply a validator directly to
 a result with `ThrowIfUnsuccessful`, which raises
 `ProcessNotSuccessfulException<TProcessResult>` when `Validate`
-returns false — that exception is produced only by these result
+returns false. That exception is produced only by these result
 helper extensions; the invocation path itself never throws it (the
 pipeline throws `ProcessValidationException`, per the execution path
 above).
 
 Custom validators are the supported way to add domain-specific
-post-execution checks — for example, asserting that captured output
+post-execution checks, such as asserting that captured output
 matches a regex, or that a specific environment variable was
 forwarded.
 
@@ -505,8 +505,8 @@ sequenceDiagram
 
 The pipeline keeps the core execution path (`Start` → `Run` →
 `Capture` → `Dispose`) free of cross-cutting logic. A new
-cross-cutting concern — for example, distributed-tracing context
-propagation, or per-call metric emission — can be added by writing
+cross-cutting concern, for example distributed-tracing context
+propagation or per-call metric emission, can be added by writing
 a new interceptor without modifying the invoker or the
 `IExternalProcess` interface. Callers who need to disable a
 default concern can do so by registering an alternative
@@ -526,8 +526,8 @@ API reference is the canonical place to look up method signatures.
 | Runner wrapping | `IRunnerConfigurationFactory` | `RunnerConfigurationFactory` (CliInvoke package; registered by default by `AddCliInvoke`) | register a custom `IRunnerConfigurationFactory` in DI (replacing the default registration) |
 | Result validation | `IProcessResultValidator<TProcessResult>` | `ProcessResultValidator<TProcessResult>` | `AddCustomResultValidators(...)` |
 
-The **core execution** layer — `IExternalProcess`, `ProcessInvoker`,
-`ExternalProcessFactory` — is not intended to be replaced for
+The **core execution** layer, `IExternalProcess`, `ProcessInvoker`,
+and `ExternalProcessFactory`, is not intended to be replaced for
 ordinary use. If you find yourself wanting to override the core
 executor, treat that as a signal that you may need a new pattern
 rather than a pipeline extension; open an issue describing the
@@ -535,24 +535,24 @@ scenario.
 
 ## Further reading
 
-- [Choosing your Invocation Pattern](choosing-invocation-pattern.md) —
+- [Choosing your Invocation Pattern](choosing-invocation-pattern.md),
   the decision tree for picking between `CliRun`, `IProcessInvoker`,
   and `IExternalProcess`.
-- [Configuration](configuration.md) — the full reference for
+- [Configuration](configuration.md), the full reference for
   `ProcessConfiguration`, the builder lifecycle, and the
   default-value appendix.
-- [Resource Disposal](resource-disposal.md) — the disposal contract
+- [Resource Disposal](resource-disposal.md), the disposal contract
   for the four Resource-Owning Types: the `IExternalProcess`,
   `UserCredential`, `UserCredentialSpec`, and
   `ProcessConfigurationBuilder`, plus the caller-owned `Credential`
   and `StandardInput` inside `ProcessConfiguration`.
-- [Troubleshooting](troubleshooting.md) — symptom-based diagnosis for
+- [Troubleshooting](troubleshooting.md), symptom-based diagnosis for
   leaks, hangs, exit-code mismatches, and file-not-found errors.
-- [`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md) — full API-level detail for
+- [`DESIGN_PATTERNS.md`](https://github.com/alastairlundy/CliInvoke/blob/main/DESIGN_PATTERNS.md), full API-level detail for
   the three invocation patterns.
-- [Migrating to 3.0.0](../migration-guides/3.0.0.md) — breaking changes
+- [Migrating to 3.0.0](../migration-guides/3.0.0.md), breaking changes
   and upgrade guide.
-- [`GLOSSARY.md`](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md) — the canonical glossary,
+- [`GLOSSARY.md`](https://github.com/alastairlundy/CliInvoke/blob/main/GLOSSARY.md), the canonical glossary,
   including the definitions of the Process Invocation Pipeline and
   the Process Invocation Context.
 

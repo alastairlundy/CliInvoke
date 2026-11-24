@@ -8,7 +8,7 @@
 
 ### Factory (Recommended)
 
-Use `IExternalProcessFactory.CreateExternalProcess(ProcessConfiguration)` — this is the intended entry point for both DI and non-DI scenarios:
+Use `IExternalProcessFactory.CreateExternalProcess(ProcessConfiguration)`. This is the intended entry point for both DI and non-DI scenarios:
 
 ```csharp
 using CliInvoke;
@@ -25,7 +25,7 @@ BufferedProcessResult result = await process.CaptureBufferedResultAsync(Cancella
 
 ### Direct Instantiation
 
-Use `ExternalProcess(IFilePathResolver, ProcessConfiguration, ProcessExitConfiguration?)` when you need a custom `IFilePathResolver`. `ExternalProcess` is `sealed` — subclassing is not supported:
+Use `ExternalProcess(IFilePathResolver, ProcessConfiguration, ProcessExitConfiguration?)` when you need a custom `IFilePathResolver`. `ExternalProcess` is `sealed`. Subclassing is not supported:
 
 ```csharp
 using CliInvoke;
@@ -85,14 +85,14 @@ These are all kernel-level resources that the garbage collector cannot reclaim. 
 
 - The caller that receives the `IExternalProcess` owns it and must dispose it after `WaitForExitOrTimeoutAsync` / `CaptureBufferedResultAsync` completes.
 - The invoker does not retain a reference to the process after returning.
-- Middleware returns the process result **un-disposed** — you remain responsible for disposal.
+- Middleware returns the process result **un-disposed**. You remain responsible for disposal.
 
 ## Caller-Owned Resources Inside ProcessConfiguration
 
 `ProcessConfiguration` itself is **not** disposable. Two of its properties are your responsibility:
 
-- **`StandardInput`** — a `StreamWriter` you supplied (or the default `StreamWriter.Null`). If you provide a real stream, dispose it after the final invocation.
-- **`Credential`** — a `UserCredential` you supplied (or the default `UserCredential.Null`). If you provide a real `UserCredential`, dispose it.
+- **`StandardInput`**, a `StreamWriter` you supplied (or the default `StreamWriter.Null`). If you provide a real stream, dispose it after the final invocation.
+- **`Credential`**, a `UserCredential` you supplied (or the default `UserCredential.Null`). If you provide a real `UserCredential`, dispose it.
 
 Hold these in their own `using` declarations so their lifetime is independent of the configuration:
 

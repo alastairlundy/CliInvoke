@@ -18,7 +18,7 @@ Any version of the .NET 10 SDK can be used, but using the latest version is pref
 CliInvoke aims to follow Semantic versioning with ```[Major].[Minor].[Build]``` for most circumstances and an optional ``.[Revision]`` when only a configuration change is made, or a new build of a preview release is made.
 
 #### Pre-releases
-Pre-release versions should have a suffix of -alpha, -beta, -rc, or -preview followed by a ``.`` and what pre-release version number they are. The number should be incremented by 1 after each release unless it only contains a configuration change, or another packaging, or build change. An example pre-release version may look like 1.1.0-alpha.2 , this version string would indicate it is the 2nd alpha pre-release version of 1.1.0 .
+Pre-release versions should have a suffix of -alpha, -beta, -rc, or -preview followed by a ``.`` and what pre-release version number they are. The number should be incremented by 1 after each release unless it only contains a configuration change, or another packaging, or build change. An example pre-release version may look like 1.1.0-alpha.2. This version string would indicate it is the 2nd alpha pre-release version of 1.1.0.
 
 #### Stable Releases
 Stable versions should follow semantic versioning and should only increment the Revision number if a release only contains configuration or build packaging changes, with no change in functionality, features, or even bug or security fixes.
@@ -27,7 +27,7 @@ Releases that only implement bug fixes should see the Build version incremented.
 
 Releases that add new non-breaking changes should increment the Minor version. Minor breaking changes may be permitted in Minor version releases where doing so is necessary to maintain compatibility with an existing supported platform, or an existing piece of code that requires a breaking change to continue to function as intended.
 
-Releases that add major breaking changes or significantly affect the API should increment the Major version. Major version releases should not be released with excessive frequency and should be released when there is a genuine need for the API to change significantly for the improvement of the project.
+Releases that add major breaking changes or significantly affect the API should increment the Major version. Major version releases should not be released with excessive frequency and should be released when there is a genuine need for the API to change for the improvement of the project.
 
 ### Building for Testing
 You can build for testing by building the desired project within your IDE or VS Code, or manually by entering the following command: ``dotnet build -c Debug``.
@@ -36,12 +36,12 @@ If you encounter any bugs or issues, try running the ``CliInvoke.Tests`` project
 
 #### Middleware feature
 
-CliInvoke now ships an optional middleware system for ``ProcessInvoker``. The chain wraps the existing ``ProcessInvocationPipeline`` (the terminal) so built-in concerns — logging, post-exit validation, and platform selection (`PowerShell`/`cmd.exe`) — can be applied to every invocation through the public ``UseLogging``, ``UsePostExitValidation``, ``UsePowerShell``, and ``UseCmd`` extension methods.
+CliInvoke now ships an optional middleware system for ``ProcessInvoker``. The chain wraps the existing ``ProcessInvocationPipeline`` (the terminal) so built-in concerns, logging, post-exit validation, and platform selection (`PowerShell`/`cmd.exe`), can be applied to every invocation through the public ``UseLogging``, ``UsePostExitValidation``, ``UsePowerShell``, and ``UseCmd`` extension methods.
 
 Coverage for the middleware feature lives in:
-* ``tests/CliInvoke.Tests/Middleware/`` — unit tests for the chain semantics and items bag.
-* ``tests/CliInvoke.Tests/Middleware/Integration/`` — real-process integration tests for ``LoggingMiddleware`` and ``PostExitValidationMiddleware``.
-* ``tests/CliInvoke.Specializations.Tests/Middleware/`` — a real-process integration test for ``PowerShellMiddleware`` (skipped automatically when ``pwsh`` is not on ``PATH``, e.g. on Windows CI).
+* ``tests/CliInvoke.Tests/Middleware/``. Unit tests for the chain semantics and items bag.
+* ``tests/CliInvoke.Tests/Middleware/Integration/``. Real-process integration tests for ``LoggingMiddleware`` and ``PostExitValidationMiddleware``.
+* ``tests/CliInvoke.Specializations.Tests/Middleware/``. A real-process integration test for ``PowerShellMiddleware`` (skipped automatically when ``pwsh`` is not on ``PATH``, e.g. on Windows CI).
 
 Run the middleware integration tests with:
 
@@ -61,7 +61,7 @@ You should ensure the project builds under debug settings before producing a rel
 #### Producing Release Builds
 To manually build a project for release, enter ``dotnet build -c Release /p:ContinuousIntegrationBuild=true`` for a release with [SourceLink](https://github.com/dotnet/sourcelink) enabled or just ``dotnet build -c Release`` for a build without SourceLink.
 
-Builds should generally always include Source Link and symbol packages if intended for wider distribution.
+Builds should always include Source Link and symbol packages if intended for wider distribution.
 
 ## Licensing
 CliInvoke is licensed under the MPL 2.0 license. If you modify any of the package's files then the modified files must remain licensed under the MPL 2.0 .

@@ -42,7 +42,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 - **`ProcessConfiguration` derivation goes through one internal hook.** The six hand-copied derivation sites (three Specializations shell middleware, three `ShellRewriter` branches) now call `ProcessConfigurationDerivation.Derive`, which seeds a builder from the source config, applies a delta, and builds. A newly added member can no longer be missed by one copy site. No public API change.
 - **`RetryConditions.ExitCodeZero()` renamed to `NonZeroExitCode()`.** The old name described the opposite of the behavior; the classifier retries on non-zero exit codes. Behavior unchanged; update call sites of the pre-release name.
 - The `WithValidationRules` and `WithMaxBufferedOutputBytes` extension methods share one private copy routine instead of duplicated property-copy blocks.
-- ADR-0001 now justifies the derivation-hook usage under the existing CliInvoke → CliInvoke.Specializations IVT grant; no new grant. The two packages ship in lockstep this train because Specializations reads the internal hook.
+- ADR-0001 now justifies the derivation-hook usage under the existing CliInvoke to CliInvoke.Specializations IVT grant; no new grant. The two packages ship in lockstep this train because Specializations reads the internal hook.
 
 ### Deprecated
 
@@ -68,7 +68,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 - Rooted paths in `FilePathResolver.ResolveFilePath` are validated for existence and throw `FileNotFoundException` like relative paths, matching the `IFilePathResolver` contract.
 - Static `BufferedProcessResult.Equals(null, ...)` no longer throws a `NullReferenceException`; it is null-safe like the `ProcessResult` equivalent.
 - `GetFirstOutputLine()` splits on `Environment.NewLine` only, matching the other line APIs.
-- `WithMaxBufferedOutputBytes(config, null)` clears the source cap so an explicit `null` really means unbounded output; omitting the argument still inherits it.
+- `WithMaxBufferedOutputBytes(config, null)` clears the source cap so an explicit `null` means unbounded output; omitting the argument still inherits it.
 - XML docs corrected: invoker invoke paths throw `ProcessValidationException`, not `ProcessNotSuccessfulException`; `WaitForExitOrTimeoutAsync` does not return a "buffered" result; disposal docs say four IDisposable types, not three.
 - Stub-based stdin contract tests pin the close and fault rules without spawning real processes, and escaper fuzz tests cover the `ShellRewriter` composition paths for all three shell kinds.
 
@@ -128,7 +128,7 @@ CliInvoke 3.0.0 is the first stable release of the v3 line.
 Themes:
 
 - `CliRun` is now a stateless, batteries-included defaults facade.
-- The public surface of `ExternalProcess`, `ProcessInvoker`, and
+- The public API of `ExternalProcess`, `ProcessInvoker`, and
   `ProcessConfigurationBuilder` is tightened and sealed where appropriate.
 - `ProcessResult` equality is made symmetric across the result hierarchy.
 - Platform-specific process control adapters, output-truncation middleware,
@@ -232,7 +232,7 @@ Themes:
 - `CliInvoke.Extensions` folded into the main `CliInvoke` package.
 - Dead `InternalsVisibleTo` grants across `Core` and `Specializations` stripped out.
 - Solution layout cleaned: `Middleware` folder removed, `Extensions.Tests` wired.
-- Process launch and logging paths made more robust.
+- Process launch and logging paths made more reliable.
 - `AddEnumerable` now fails fast on null entries.
 
 - **`ProcessConfiguration.TargetFilePath` is now `required`.** Object initialisers must set this property.
@@ -902,7 +902,7 @@ Themes:
 ### Added
 
 - Added `IShellDetector` interface for detecting default system Shell
-- Added `IExternalProcess` (the interface for `ExternalProcess`). This is not an injectable service and exists to facilitate a possible future `ExternalProcess` Factory pattern, and/or allow alternate implementations.
+- Added `IExternalProcess` (the interface for `ExternalProcess`). This is not an injectable service and exists to enable a possible future `ExternalProcess` Factory pattern, and/or allow alternate implementations.
 - Added `ShellDetector` implementation of `IShellDetector` for detecting default system Shell
 - Added `ExternalProcess`. An alternative to the Process Invocation design pattern. This version makes use of CliInvoke v2's file path resolver and process pipe handling as well as internal CliInvoke helper code.
 - Added registration of `IShellDetector` and `ShellDetector` in `AddCliInvoke` method

@@ -2,24 +2,24 @@
 name: implement-resource-lifecycle
 description: Guidance on auditing and managing the lifecycle of disposable types in CliInvoke to prevent resource leaks and secure sensitive data. USE FOR auditing and managing disposable types (ProcessConfiguration, IExternalProcess, etc.) to prevent resource leaks. DO NOT USE FOR general C# memory management.
 compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, or CliInvoke.Specialization)
-targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
+targets: CliInvoke 3.0 (spec API, see skills/README.md for version note)
 ---
 # Implement Resource Lifecycle
 
 ## When to Use
-- When auditing code for proper disposal of CliInvoke's mandatory disposable types: `IExternalProcess`, `UserCredential`, and the credential-build type for your version — `UserCredentialBuilder` on 2.x or `UserCredentialSpec` on 3.0+. (`ProcessConfiguration` is **not** disposable — it is a plain immutable value object; the caller still owns disposal of any `StandardInput` stream and `UserCredential` placed inside it.)
+- When auditing code for proper disposal of CliInvoke's mandatory disposable types: `IExternalProcess`, `UserCredential`, and the credential-build type for your version, `UserCredentialBuilder` on 2.x or `UserCredentialSpec` on 3.0+. (`ProcessConfiguration` is **not** disposable. It is a plain immutable value object; the caller still owns disposal of any `StandardInput` stream and `UserCredential` placed inside it.)
 - When deciding between `using` and `await using` in async methods.
 - When investigating a suspected handle leak, memory pressure, or `SecureString` retention issue.
 - When the user asks about `SecureString` cleanup or process/stream lifetime in CliInvoke.
 
 ## When not to use
 - When the question is about general C#/.NET memory management, GC tuning, or `IDisposable` mechanics outside CliInvoke's specific types.
-- When building or executing a configuration — load `generate-process-configuration` or `select-execution-pattern` instead.
-- When migrating from v2 to v3 — load `v2-to-v3-migration` for any disposal-related API changes.
+- When building or executing a configuration, load `generate-process-configuration` or `select-execution-pattern` instead.
+- When migrating from v2 to v3, load `v2-to-v3-migration` for any disposal-related API changes.
 
 ## Middleware and Disposal
 
-If you configure `ProcessInvoker` with middleware (`UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd`), **the disposal contract is unchanged**. Middleware returns the process result **un-disposed** to the caller — identical to a non-middleware invoker. You remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration`; `ProcessConfiguration` itself is **not** disposable. The same checklist below applies whether or not middleware is in the chain.
+If you configure `ProcessInvoker` with middleware (`UseLogging`, `UsePostExitValidation`, `UsePowerShell`, `UseCmd`), **the disposal contract is unchanged**. Middleware returns the process result **un-disposed** to the caller, identical to a non-middleware invoker. You remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration`; `ProcessConfiguration` itself is **not** disposable. The same checklist below applies whether or not middleware is in the chain.
 
 ## Mandatory Disposable Types
 
@@ -40,7 +40,7 @@ leaks, memory pressure, or sensitive data remaining in memory.
 ### 2. `UserCredential`
 - **Reason**: Contains a `SecureString` for passwords; needs to be cleared from memory.
 - **Pattern**: `using` or explicit `.Dispose()`.
-- **Note**: If assigned to a `ProcessConfiguration`, the configuration does **not** dispose the credential — you must dispose the `UserCredential` yourself.
+- **Note**: If assigned to a `ProcessConfiguration`, the configuration does **not** dispose the credential. You must dispose the `UserCredential` yourself.
 - **Example**: See [UserCredential.md](./references/UserCredential.md)
 
 ### 3. `UserCredentialSpec` (CliInvoke 3.0)
@@ -59,7 +59,7 @@ leaks, memory pressure, or sensitive data remaining in memory.
   // spec disposed here; SecureString cleared from memory
   ```
 
-### 4. `UserCredentialBuilder` (CliInvoke 2.x — legacy API)
+### 4. `UserCredentialBuilder` (CliInvoke 2.x, legacy API)
 - **Reason**: Holds a `SecureString` during the construction of credentials.
 - **Pattern**: Always wrap the builder in a `using` block.
 - **Timing**: Dispose immediately after calling `.Build()`.
@@ -70,8 +70,8 @@ leaks, memory pressure, or sensitive data remaining in memory.
 
 - [ ] Every instance of the disposable types above (`IExternalProcess`, `UserCredential`, `UserCredentialSpec`, `UserCredentialBuilder`) is wrapped in a `using` or `await using` block. `ProcessConfiguration` is not disposable.
 - [ ] `IExternalProcess` uses `await using` in async methods.
-- [ ] The credential-build type is disposed of after `.Build()` is called — `UserCredentialSpec` on 3.0, `UserCredentialBuilder` on 2.x.
-- [ ] Any `StandardInput` stream or `UserCredential` supplied to a `ProcessConfiguration` is disposed by the caller after the process has completed and results are processed — `ProcessConfiguration` itself is not disposable.
+- [ ] The credential-build type is disposed of after `.Build()` is called. `UserCredentialSpec` on 3.0, `UserCredentialBuilder` on 2.x.
+- [ ] Any `StandardInput` stream or `UserCredential` supplied to a `ProcessConfiguration` is disposed by the caller after the process has completed and results are processed. `ProcessConfiguration` itself is not disposable.
 
 For detailed usage examples, see the following references:
 * [IExternalProcess example](./references/IExternalProcess.md)

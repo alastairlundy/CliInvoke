@@ -84,6 +84,6 @@ services.AddCliInvoke(builder => builder.UseMiddleware<LoggingMiddleware>());
 
 ## Cross-references
 
-- [Configuration guide](../../../../site/docs/guides/configuration.md) — consumer reference
-- [Migration guide — ProcessInvoker constructors](../../../../site/docs/migration-guides/3.0.0.md#4-processinvoker-has-two-constructors)
+- [Configuration guide](../../../../site/docs/guides/configuration.md), consumer reference
+- [Migration guide, ProcessInvoker constructors](../../../../site/docs/migration-guides/3.0.0.md#4-processinvoker-has-two-constructors)
 - [Architecture guide](../../../../site/docs/guides/architecture.md)

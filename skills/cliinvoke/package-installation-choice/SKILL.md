@@ -12,17 +12,17 @@ description: Guides the selection and installation of the correct CliInvoke NuGe
 - When auditing an existing project's package references against the recommended installation matrix.
 
 ## When not to use
-- When fixing NuGet restore errors, version conflicts, or feed/source issues — this skill does not address package resolution problems.
-- When the question is about how to *use* a package after installation — load a skill specific to the API surface (e.g., `generate-process-configuration`, `select-execution-pattern`).
-- When migrating v2-style code to v3 — load `v2-to-v3-migration` instead.
+- When fixing NuGet restore errors, version conflicts, or feed/source issues. This skill does not address package resolution problems.
+- When the question is about how to *use* a package after installation, load a skill specific to the API (e.g., `generate-process-configuration`, `select-execution-pattern`).
+- When migrating v2-style code to v3, load `v2-to-v3-migration` instead.
 
 ## Installation Matrix
 
 | Project type / Need | Packages to install | Notes |
 | :--- | :--- | :--- |
-| **Library author** (abstractions only) | `CliInvoke.Core` | Only the Core (abstractions) package — consumers can choose implementations. |
+| **Library author** (abstractions only) | `CliInvoke.Core` | Only the Core (abstractions) package. Consumers can choose implementations. |
 | **Library or app** (needs concrete builders/implementations) | `CliInvoke.Core`, `CliInvoke` | Implementation package plus Core for models/abstractions. |
-| **Desktop or Console application** (common case — use DI & convenience helpers) | `CliInvoke.Core`, `CliInvoke` | `CliInvoke` includes the `AddCliInvoke` DI registration and convenience extensions for easy setup. |
+| **Desktop or Console application** (common case, use DI & convenience helpers) | `CliInvoke.Core`, `CliInvoke` | `CliInvoke` includes the `AddCliInvoke` DI registration and convenience extensions for easy setup. |
 | **Platform-specific/shell specializations** (optional) | `CliInvoke.Specializations` | Adds Cmd/PowerShell and other specializations; install in addition to the packages above as needed. Its middleware types are registered with `AddCliInvokeSpecializations()`. |
 
 ## Key Installation Paths
@@ -37,7 +37,7 @@ If you are creating a library that defines process interactions but doesn't want
 If you are building a final application (Console, Desktop, etc.):
 - **Recommended**: Full Application Setup (`CliInvoke.Core` and `CliInvoke`)
 - **Required**: `CliInvoke.Core` and `CliInvoke`
-- **Optional**: `CliInvoke.Specializations` (if you specifically need Windows CMD or PowerShell support, **including** the `UsePowerShell` / `UseCmd` middleware — registered via that package's `AddCliInvokeSpecializations()`).
+- **Optional**: `CliInvoke.Specializations` (if you specifically need Windows CMD or PowerShell support, **including** the `UsePowerShell` / `UseCmd` middleware, registered via that package's `AddCliInvokeSpecializations()`).
 
 ## Installation Commands
 
@@ -57,6 +57,6 @@ Depending on the choice above, use the following `dotnet add package` commands:
 - **Adding Specializations** (includes platform middleware):
   `dotnet add package CliInvoke.Specializations`
 
-> **Middleware note:** `CliInvoke` (via `AddCliInvoke`) provides the `UseLogging` and `UsePostExitValidation` middleware; `CliInvoke.Specializations` provides the `UsePowerShell` and `UseCmd` platform middleware, registered via `AddCliInvokeSpecializations()` alongside `AddCliInvoke` (same `ServiceLifetime`). Both require the `ProcessInvoker` (from `CliInvoke`) — they are not available through `CliRun`.
+> **Middleware note:** `CliInvoke` (via `AddCliInvoke`) provides the `UseLogging` and `UsePostExitValidation` middleware; `CliInvoke.Specializations` provides the `UsePowerShell` and `UseCmd` platform middleware, registered via `AddCliInvokeSpecializations()` alongside `AddCliInvoke` (same `ServiceLifetime`). Both require the `ProcessInvoker` (from `CliInvoke`). They are not available through `CliRun`.
 
 This is a pure knowledge skill and does not invoke external tools.

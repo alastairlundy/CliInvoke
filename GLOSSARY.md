@@ -20,7 +20,7 @@ A parameter of the invocation contract that the caller states for the invocation
 
 ### Shell Wrapping
 
-The act of running a command inside a shell interpreter (PowerShell, CMD, or a POSIX shell). A shell-wrapping flow resolves the shell, escapes the command's target and arguments so they are treated as literal data rather than shell syntax, composes the inner command, and rewrites the process configuration so the shell executes the original command. Shell wrapping is a middleware concern, not an Invocation Capability: the caller could omit it without changing what the invocation means.
+The act of running a command inside a shell interpreter (PowerShell, CMD, or a POSIX shell). A shell-wrapping flow resolves the shell, escapes the command's target and arguments so they are treated as literal data rather than shell syntax, composes the inner command, and rewrites the process configuration. The shell executes the original command. Shell wrapping is a middleware concern, not an Invocation Capability: the caller could omit it without changing what the invocation means.
 
 ### Runner process
 
@@ -38,12 +38,11 @@ A runner process that executes its target by forwarding arguments verbatim to it
 
 The act of producing a new configuration from an existing one, preserving all member values except a stated delta. Derived configurations share resource-owning members by reference; disposal remains the caller's responsibility.
 
-
 ## Versioning Terms
 
 ### v2-style code
 
-Code that a v3 migration must change: (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles — reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default. Deliberate advanced-builder usage (argument escaping, `UserCredentialSpec`/resource-policy callback flows) is not v2-style.
+Code that a v3 migration must change: (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles, reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default. Deliberate advanced-builder usage (argument escaping, `UserCredentialSpec`/resource-policy callback flows) is not v2-style.
 
 ## Architectural Patterns
 
@@ -61,7 +60,7 @@ For detailed definitions, target audiences, and usage examples of the architectu
 
 ### 3. Lowercasing contract for `GetPathFileExtensions`
 
-Custom resolvers overriding `GetPathFileExtensions` must return lowercased extensions. The base's default implementation lowercases in a single pass; the strategy loop uses the values as-is with no per-iteration `.ToLower()`. Returning raw (un-lowercased) extensions causes a silent runtime bug — symptom is "no match found" for a case that should match.
+Custom resolvers overriding `GetPathFileExtensions` must return lowercased extensions. The base's default implementation lowercases in a single pass; the strategy loop uses the values as-is with no per-iteration `.ToLower()`. Returning raw (un-lowercased) extensions causes a silent runtime bug. The symptom is "no match found" for a case that should match.
 
 ### 4. Catch discipline for `Try*` methods
 
@@ -69,7 +68,7 @@ Custom resolvers overriding `GetPathFileExtensions` must return lowercased exten
 
 ### 5. `IFilePathResolver` lifetime convention in `AddCliInvoke`
 
-`AddCliInvoke` registers `IFilePathResolver` with the same lifetime as the global `lifetime` parameter (default `Scoped`). The resolver is not special-cased — a stateless service does not automatically become `Singleton`. Users who want a different lifetime opt in via `UseCustomFilePathResolver<TResolver>(ServiceLifetime)`.
+`AddCliInvoke` registers `IFilePathResolver` with the same lifetime as the global `lifetime` parameter (default `Scoped`). The resolver is not special-cased. A stateless service does not automatically become `Singleton`. Users who want a different lifetime opt in via `UseCustomFilePathResolver<TResolver>(ServiceLifetime)`.
 
 The same lifetime-matching rule applies to the `AddCliInvokeSpecializations` add-on (CliInvoke.Specializations package): it must be called with the same `ServiceLifetime` as `AddCliInvoke`, because its middleware lifetimes are matched to the invoker lifetime to avoid captive scoped-in-singleton dependencies.
 
@@ -91,7 +90,7 @@ An assembly-scoped grant (via `<InternalsVisibleTo>` in a `.csproj` or `Internal
 
 ### Cross-package coupling point
 
-A dependency surface where one CliInvoke package consumes another package's internal types through an IVT grant, so a change to the internal can break the consuming package.
+A dependency where one CliInvoke package consumes another package's internal types through an IVT grant, so a change to the internal can break the consuming package.
 
 ### Polyfill leakage
 

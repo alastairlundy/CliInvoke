@@ -9,7 +9,7 @@ deciders: CliInvoke maintainers
 
 ## Context
 
-`CliRun` was previously a static facade backed by process-wide mutable state configured through `CliRun.UseExternalProcessFactory` / `CliRun.UseFilePathResolver`. Those `Use*` methods and their backing static fields/helpers were removed: every `Run*`/`FireAndForget` call now allocates a fresh `ProcessInvocationPipeline` (and a fresh `ExternalProcessFactory` with a default `FilePathResolver`) per call. There is therefore no shared lock or lazy-initialisation asymmetry to preserve — the historical `lock(_syncRoot)` double-check on the resolver no longer exists. Callers needing a custom factory or resolver must use `IProcessInvoker` (or DI) instead of `CliRun`.
+`CliRun` was previously a static facade backed by process-wide mutable state configured through `CliRun.UseExternalProcessFactory` / `CliRun.UseFilePathResolver`. Those `Use*` methods and their backing static fields/helpers were removed: every `Run*`/`FireAndForget` call now allocates a fresh `ProcessInvocationPipeline` (and a fresh `ExternalProcessFactory` with a default `FilePathResolver`) per call. There is therefore no shared lock or lazy-initialisation asymmetry to preserve. The historical `lock(_syncRoot)` double-check on the resolver no longer exists. Callers needing a custom factory or resolver must use `IProcessInvoker` (or DI) instead of `CliRun`.
 
 ## Decision
 
@@ -18,7 +18,7 @@ Remove all static state from `CliRun`. The public API now operates entirely on p
 - `CliRun.RunAsync()`, `CliRun.FireAndForget()`, and all other entrypoints create a fresh `ProcessInvocationPipeline` per invocation.
 - A fresh `ExternalProcessFactory` with a default `FilePathResolver` is allocated per call.
 - No shared locks, no lazy-initialisation, no process-wide mutable state.
-- `UseExternalProcessFactory` and `UseFilePathResolver` methods (and their static backing) were removed from the public surface.
+- `UseExternalProcessFactory` and `UseFilePathResolver` methods (and their static backing) were removed from the public API.
 - Callers requiring custom factories or resolvers must register `IProcessInvoker` via DI or use `IProcessInvoker` directly.
 
 ## Rationale
@@ -36,6 +36,6 @@ Remove all static state from `CliRun`. The public API now operates entirely on p
 
 ## Related
 
-- `docs/adr/0002-why-not-cliwrap.md` — design rationale for the three invocation patterns
-- `CONTRIBUTING.md` — IVT minimization and contribution guidelines
-- `DESIGN_PATTERNS.md` — pattern decision tree for choosing an invocation pattern
+- `docs/adr/0002-why-not-cliwrap.md`. Design rationale for the three invocation patterns
+- `CONTRIBUTING.md`. IVT minimization and contribution guidelines
+- `DESIGN_PATTERNS.md`. Pattern decision tree for choosing an invocation pattern

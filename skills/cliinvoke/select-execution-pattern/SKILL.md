@@ -9,13 +9,13 @@ description: Guidance on choosing between CliRun, IProcessInvoker, and IExternal
 - When starting a new CliInvoke integration and choosing between `CliRun`, `IProcessInvoker`, and `IExternalProcess`.
 - When refactoring existing code that uses the wrong pattern (e.g., `CliRun` in a DI-heavy service, or `IProcessInvoker` for an interactive shell).
 - When evaluating trade-offs around testability, DI support, boilerplate, and lifecycle control.
-- When the user needs cross-cutting concerns (logging, post-exit validation, platform wrapping) applied to every invocation — see the **Middleware-augmented `IProcessInvoker`** branch below.
+- When the user needs cross-cutting concerns (logging, post-exit validation, platform wrapping) applied to every invocation, see the **Middleware-augmented `IProcessInvoker`** branch below.
 - When the user's requirements mention scripting/prototyping, enterprise DI, or interactive process control.
 
 ## When not to use
-- When implementing the actual process logic — this skill only guides the choice of pattern. Once chosen, load a skill specific to the pattern (e.g., `generate-process-configuration` for building configurations, or the execution reference docs).
+- When implementing the actual process logic. This skill only guides the choice of pattern. Once chosen, load a skill specific to the pattern (e.g., `generate-process-configuration` for building configurations, or the execution reference docs).
 - When the choice is already made and the question is about a specific API call or builder method.
-- When the user wants to migrate v2-style code to v3 — load `v2-to-v3-migration` instead.
+- When the user wants to migrate v2-style code to v3, load `v2-to-v3-migration` instead.
 
 ## Decision Logic
 
@@ -58,12 +58,12 @@ When deciding which pattern to use, evaluate the requirements against the follow
 - You want a composable chain: `LoggingMiddleware`, `PostExitValidationMiddleware`, `PowerShellMiddleware`/`CmdMiddleware`.
 
 **Key Characteristic:**
-- Built with the `ProcessInvoker` constructor that accepts `IEnumerable<IProcessMiddleware>` (or a `MiddlewareItems? sharedItems` seed bag), or — more idiomatically — via the fluent `Use*` extension methods. Each `Use*` method returns a **new** `ProcessInvoker`, so they compose:
+- Built with the `ProcessInvoker` constructor that accepts `IEnumerable<IProcessMiddleware>` (or a `MiddlewareItems? sharedItems` seed bag), or, more idiomatically, via the fluent `Use*` extension methods. Each `Use*` method returns a **new** `ProcessInvoker`, so they compose:
   - `UseLogging()` (`CliInvoke.Extensions.Middleware`)
   - `UsePostExitValidation(PostExitValidation.ExitCodeIsZero())` (`CliInvoke.Extensions.Middleware.Validation`)
   - `UsePowerShell()` / `UseCmd()` (`CliInvoke.Specializations.Middleware`)
-- The terminal **Process Invocation Pipeline** (Configuration → Invoke → OS Process → Result) remains the leaf that actually starts and waits on the process; middleware wraps it in registration order. **Call sites are unchanged**: `ExecuteAsync` and `ExecuteBufferedAsync` work exactly as without middleware.
-- Middleware is an invoker-level concern only. `CliRun` does **not** support middleware — if you need middleware, choose `IProcessInvoker`/`ProcessInvoker` instead. At the `IExternalProcess` layer there is no middleware either; middleware operates above the invoker.
+- The terminal **Process Invocation Pipeline** (Configuration → Invoke → OS Process → Result) remains the leaf that actually starts and waits on the process; middleware wraps it in registration order. **Call sites are unchanged**. `ExecuteAsync` and `ExecuteBufferedAsync` work exactly as without middleware.
+- Middleware is an invoker-level concern only. `CliRun` does **not** support middleware. If you need middleware, choose `IProcessInvoker`/`ProcessInvoker` instead. At the `IExternalProcess` layer there is no middleware either; middleware operates above the invoker.
 
 **Key Characteristic:**
 - Adds a thin, declarative cross-cutting layer on top of the `IProcessInvoker` pattern; combines well with DI (register the configured `ProcessInvoker`).
@@ -87,10 +87,10 @@ For detailed implementation examples on creating external processes, see the fol
 
 | Pitfall | Solution |
 | :--- | :--- |
-| Using `CliRun` in a service that already utilizes DI | Switch to `IProcessInvoker` to reuse existing DI registrations and improve testability. |
+| Using `CliRun` in a service that already uses DI | Switch to `IProcessInvoker` to reuse existing DI registrations and improve testability. |
 | Using `IProcessInvoker` for interactive shells | Switch to `IExternalProcess` to allow real-time interaction with the process. |
 | Needing logging, result validation, or PowerShell/`cmd` wrapping on every call | Use the fluent `Use*` extension methods on `ProcessInvoker` (e.g., `.UseLogging().UsePostExitValidation(PostExitValidation.ExitCodeIsZero())`) instead of hand-writing the cross-cutting logic in each call site. |
 | Reaching for middleware but starting from `CliRun` | `CliRun` has no middleware support; construct a `ProcessInvoker` (optionally with `IEnumerable<IProcessMiddleware>` or `MiddlewareItems`) and use the `Use*` methods instead. |
-| Assuming middleware disposes the result for you | Middleware returns the `ProcessResult` **un-disposed** — you remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration` you created. `ProcessConfiguration` itself is not disposable. |
+| Assuming middleware disposes the result for you | Middleware returns the `ProcessResult` **un-disposed**. You remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration` you created. `ProcessConfiguration` itself is not disposable. |
 
 This is a pure knowledge skill and does not invoke external tools.

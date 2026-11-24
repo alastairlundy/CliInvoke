@@ -16,7 +16,7 @@ update your code.
 > spec classes are reserved for advanced scenarios (argument escaping,
 > `UserCredentialSpec`, resource-policy callback flows). If you are
 > writing new code, use `ProcessConfiguration` init construction
-> directly — see the [Configuration guide](configuration.md) for the
+> directly. See the [Configuration guide](configuration.md) for the
 > recommended construction story.
 
 ## What changed
@@ -34,8 +34,8 @@ have been removed:
 The new spec classes live in `CliInvoke.Core.Configuration` and are
 configured through the `IProcessConfigurationBuilder.ConfigureXxx`
 lambda methods introduced alongside them. They still expose a fluent
-`Set*` / `Build()` surface, so the coding pattern is nearly identical
-— the only change is the type name and namespace.
+`Set*` / `Build()` API, so the coding pattern is nearly identical.
+The only change is the type name and namespace.
 
 ## Arguments → `ArgumentsSpec`
 
@@ -70,8 +70,8 @@ builder.ConfigureArguments(args =>
 
 The lambda parameter changes from `IArgumentsBuilder` to
 `ArgumentsSpec`. The `Add`, `AddEnumerable`, and `Build()` methods
-remain the same. `EscapeCharacters` is no longer a public method —
-escaping is handled internally based on the `escape` flag passed to
+remain the same. `EscapeCharacters` is no longer a public method.
+Escaping is handled internally based on the `escape` flag passed to
 `Add`.
 
 ## Environment Variables → `EnvironmentVariablesSpec`
@@ -197,8 +197,8 @@ Key differences:
 
 - `UserCredentialSpec` implements `IDisposable` and owns the
   `SecureString` lifetime. When used via the `ConfigureUserCredential`
-  lambda on `IProcessConfigurationBuilder`, disposal is handled
-  automatically by the builder's `Dispose` chain.
+  lambda on `IProcessConfigurationBuilder`, the builder's `Dispose` chain
+  handles disposal automatically.
 - `Build()` returns a `UserCredential` instance.
 
 ## Summary of API changes
@@ -208,11 +208,11 @@ Key differences:
 | Arguments | `IArgumentsBuilder` | `ArgumentsSpec` | `EscapeCharacters` removed (internal) |
 | Environment variables | `IEnvironmentVariablesBuilder` | `EnvironmentVariablesSpec` | `Set()` → `SetPair()` |
 | Process resource policy | `IProcessResourcePolicyBuilder` | `ProcessResourcePolicySpec` | `SetMinWorkingSet(nint?)`/`SetMaxWorkingSet(nint?)` independent setters; `ConfigureResourcePolicy` → `ConfigureProcessResourcePolicy` |
-| User credential | `IUserCredentialBuilder` | `UserCredentialSpec` | None — method names preserved |
+| User credential | `IUserCredentialBuilder` | `UserCredentialSpec` | None. Method names preserved |
 
 ## Further reading
 
-- [Configuration](configuration.md) — full configuration model
+- [Configuration](configuration.md), full configuration model
   reference and builder documentation.
-- [CHANGELOG](../../../CHANGELOG.md) — entry for the v3.0.0
+- [CHANGELOG](../../../CHANGELOG.md), entry for the v3.0.0
   config-seam hard break.

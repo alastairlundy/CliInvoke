@@ -79,13 +79,13 @@ ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version")
 };
 ```
 
-## Builder — advanced only
+## Builder, advanced only
 
 The builder is not the default. Use it only when you need:
 
-- **Argument escaping** — `ConfigureArguments(Action<ArgumentsSpec>)`
-- **UserCredentialSpec** — `ConfigureUserCredential(Action<UserCredentialSpec>)`
-- **Resource-policy callbacks** — `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)`
+- **Argument escaping**, `ConfigureArguments(Action<ArgumentsSpec>)`
+- **UserCredentialSpec**, `ConfigureUserCredential(Action<UserCredentialSpec>)`
+- **Resource-policy callbacks**, `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)`
 
 ```csharp
 // Advanced: builder for escaping/credentials/policy
@@ -124,5 +124,5 @@ ProcessConfiguration config = builder.Build();
 
 ## Cross-references
 
-- [Configuration guide](../../../../site/docs/guides/configuration.md) — full configuration reference
-- [Migration guide — Shared Construction](../../../../site/docs/migration-guides/3.0.0.md#shared-construction-v3-default)
+- [Configuration guide](../../../../site/docs/guides/configuration.md), full configuration reference
+- [Migration guide, Shared Construction](../../../../site/docs/migration-guides/3.0.0.md#shared-construction-v3-default)

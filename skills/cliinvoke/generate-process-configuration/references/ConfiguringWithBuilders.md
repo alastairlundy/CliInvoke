@@ -1,14 +1,14 @@
 # Configuring with Spec Interfaces
 
-This reference shows how to use `ProcessConfigurationBuilder` and the `*Spec` configuration seams for advanced scenarios. For the default path, see `SettingValues.md` — direct init construction is the recommended approach for most use cases.
+This reference shows how to use `ProcessConfigurationBuilder` and the `*Spec` configuration seams for advanced scenarios. For the default path, see `SettingValues.md`. Direct init construction is the recommended approach for most use cases.
 
 ## When to Use the Builder
 
 `ProcessConfigurationBuilder` is an **advanced** tool. Use it only when you need one of these features that init construction cannot provide:
 
-- **Argument escaping** — `ConfigureArguments(Action<ArgumentsSpec>)` lets you add arguments with per-argument escaping control.
-- **User credential configuration** — `ConfigureUserCredential(Action<UserCredentialSpec>)` stages a `SecureString` password through the `UserCredentialSpec` seam (Windows only).
-- **Resource policy configuration** — `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` configures processor affinity, priority class, and other OS resource settings via a callback.
+- **Argument escaping**. `ConfigureArguments(Action<ArgumentsSpec>)` lets you add arguments with per-argument escaping control.
+- **User credential configuration**. `ConfigureUserCredential(Action<UserCredentialSpec>)` stages a `SecureString` password through the `UserCredentialSpec` seam (Windows only).
+- **Resource policy configuration**. `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` configures processor affinity, priority class, and other OS resource settings via a callback.
 
 For all other cases, prefer direct init construction of `ProcessConfiguration`. The builder is sealed and cannot be subclassed.
 
@@ -44,7 +44,7 @@ var config = builder.Build();
 > };
 > ```
 >
-> The `ArgumentList` property is an init-only snapshot — any list you supply is captured at construction time and later mutations to the original collection are not reflected. The v2 `ArgumentsList` property was merged into this init-only `ArgumentList` in v3.
+> The `ArgumentList` property is an init-only snapshot. Any list you supply is captured at construction time and later mutations to the original collection are not reflected. The v2 `ArgumentsList` property was merged into this init-only `ArgumentList` in v3.
 
 ### Configuring User Credentials
 
@@ -64,7 +64,7 @@ builder.ConfigureUserCredential(cred =>
 var config = builder.Build();
 ```
 
-The `UserCredentialSpec` implements `IDisposable` — when used through the builder, the builder owns and disposes it. If you create a `UserCredentialSpec` directly, you must dispose it yourself. The `UserCredential` produced by `Build()` has an independent lifetime and must also be disposed separately.
+The `UserCredentialSpec` implements `IDisposable`. When used through the builder, the builder owns and disposes it. If you create a `UserCredentialSpec` directly, you must dispose it yourself. The `UserCredential` produced by `Build()` has an independent lifetime and must also be disposed separately.
 
 ### Configuring Resource Policy
 
@@ -119,7 +119,7 @@ var config = builder.Build();
 
 ## Builder Lifecycle
 
-`ProcessConfigurationBuilder` implements `IDisposable`. It owns the internal `UserCredentialSpec` and `StandardInput` `StreamWriter` it creates. Always dispose the builder when you are done with it — or better, use it in a `using` declaration:
+`ProcessConfigurationBuilder` implements `IDisposable`. It owns the internal `UserCredentialSpec` and `StandardInput` `StreamWriter` it creates. Always dispose the builder when you are done with it, or better, use it in a `using` declaration:
 
 ```csharp
 using CliInvoke.Builders;

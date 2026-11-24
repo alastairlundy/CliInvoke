@@ -75,14 +75,14 @@ else
 
 The `IProcessInvoker` interface provides two methods for executing processes:
 
-1. `ExecuteAsync` - Returns a `ProcessResult` with exit code only
-2. `ExecuteBufferedAsync` - Returns a `BufferedProcessResult` with exit code, standard output, and standard error
+1. `ExecuteAsync` returns a `ProcessResult` with exit code only
+2. `ExecuteBufferedAsync` returns a `BufferedProcessResult` with exit code, standard output, and standard error
 
 All methods follow the same parameter pattern:
 
-- `ProcessConfiguration` - Required configuration for the process
-- `ProcessExitConfiguration?` - Optional configuration for process exit behavior (timeout, etc.)
-- `CancellationToken` - Optional cancellation token
+- `ProcessConfiguration`, required configuration for the process
+- `ProcessExitConfiguration?`, optional configuration for process exit behavior (timeout, etc.)
+- `CancellationToken`, optional cancellation token
 
 ### Note on DI Usage
 
@@ -99,7 +99,7 @@ Using dependency injection to obtain `IProcessInvoker` provides several benefits
 
 #### Via DI (Recommended)
 
-Register middleware through `AddCliInvoke` — the callback receives an `IProcessMiddlewareBuilder`:
+Register middleware through `AddCliInvoke`. The callback receives an `IProcessMiddlewareBuilder`:
 
 ```csharp
 using CliInvoke.Extensions;                      // AddCliInvoke
@@ -154,6 +154,6 @@ ProcessInvoker invoker = new ProcessInvoker(factory, middlewares, items);
 
 ### Middleware Coverage
 
-`IProcessInvoker` / `ProcessInvoker` is the **primary middleware entrypoint**. Every invocation through these types flows through the registered middleware chain. This applies whether the invoker was resolved from DI or constructed manually. Middleware does not apply to `CliRun` or `IExternalProcess` — see the middleware asymmetry documentation in the execution-pattern selection skill for details.
+`IProcessInvoker` / `ProcessInvoker` is the **primary middleware entrypoint**. Every invocation through these types flows through the registered middleware chain. This applies whether the invoker was resolved from DI or constructed manually. Middleware does not apply to `CliRun` or `IExternalProcess`. See the middleware asymmetry documentation in the execution-pattern selection skill for details.
 
 **Disposal through the chain:** middleware returns the process result **un-disposed** (exactly as without middleware). You remain responsible for disposing the `IExternalProcess` you receive and any `StandardInput`/`UserCredential` you supplied to the `ProcessConfiguration` you created. `ProcessConfiguration` itself is not disposable. See the `implement-resource-lifecycle` skill for the full ownership checklist.

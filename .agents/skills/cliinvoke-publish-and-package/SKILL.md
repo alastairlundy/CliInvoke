@@ -40,7 +40,7 @@ dotnet restore src/CliInvoke.Specializations -s ./nupkgs -s https://api.nuget.or
 ```
 In PowerShell, create the directory with `New-Item -ItemType Directory -Force ./nupkgs` instead of `mkdir -p`.
 
-One caveat worth knowing before you trust this result: the two dependents reach Core through a `ProjectReference`, and the project graph resolves that reference as a project. Adding a package source does not redirect it, so the packed nupkg may not be what actually gets compiled against.
+One caveat worth knowing before you trust this result is that the two dependents reach Core through a `ProjectReference`, and the project graph resolves that reference as a project. Adding a package source does not redirect it, so the packed nupkg may not be what actually gets compiled against.
 
 ### Step 2: Production Publishing Sequence
 Follow the sequence in `.github/workflows/publish.yml`. Each project is a plain `dotnet pack`, run in dependency order:

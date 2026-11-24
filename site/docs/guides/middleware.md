@@ -24,7 +24,7 @@ public ProcessInvoker(
     MiddlewareItems? sharedItems);
 ```
 
-The full constructor accepts an optional `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with services your own middleware reads at runtime. Built-in middleware does not pull its dependencies from this bag: `LoggingMiddleware`, for example, receives its `ILogger` through constructor injection from the DI container (`UseLogging()` is the only public entry point — the middleware class itself is internal):
+The full constructor accepts an optional `MiddlewareItems? sharedItems` parameter to seed the per-chain item bag with services your own middleware reads at runtime. Built-in middleware does not pull its dependencies from this bag: `LoggingMiddleware`, for example, receives its `ILogger` through constructor injection from the DI container (`UseLogging()` is the only public entry point, and the middleware class itself is internal):
 
 ```csharp
 using CliInvoke.Core.Middleware; // MiddlewareItems
@@ -34,7 +34,7 @@ items.Set("MyService", myService);
 var invoker = new ProcessInvoker(factory, Array.Empty<IProcessMiddleware>(), items);
 ```
 
-Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the factory-only constructor when you don't need middleware. Use the full constructor (factory, an `IEnumerable<IProcessMiddleware>` sequence, and an optional `sharedItems`) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way: `ExecuteAsync` and `ExecuteBufferedAsync` are unchanged.
+Middleware is configured through the `IProcessMiddlewareBuilder` (see [Configuring middleware through DI](#configuring-middleware-through-di) below). Use the factory-only constructor when you don't need middleware. Use the full constructor (factory, an `IEnumerable<IProcessMiddleware>` sequence, and an optional `sharedItems`) when you want logging, validation, or platform wrapping applied to every invocation. Call sites are identical either way. `ExecuteAsync` and `ExecuteBufferedAsync` are unchanged.
 
 ## The `IProcessMiddleware` contract
 
@@ -51,7 +51,7 @@ public interface IProcessMiddleware
 
 The `next` delegate takes only the `InvocationContext`; the `CancellationToken` is available as `context.CancellationToken` (not a separate parameter). Calling `next(context)` continues the chain (or the terminal pipeline); omitting the call short-circuits.
 
-Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag) — for example, your own middleware can store a value under a key of its choosing for downstream middleware to read. Built-in middleware does not resolve its logger from this bag: `LoggingMiddleware` constructor-injects an `ILogger` from the DI container, falling back to a no-op `NullLogger` when none is registered.
+Middleware read and share data through `InvocationContext.Middleware.Items` (a typed `MiddlewareItems` bag). For example, your own middleware can store a value under a key of its choosing for downstream middleware to read. Built-in middleware does not resolve its logger from this bag: `LoggingMiddleware` constructor-injects an `ILogger` from the DI container, falling back to a no-op `NullLogger` when none is registered.
 
 ## Built-in middleware
 
@@ -74,9 +74,9 @@ builder.Services.AddCliInvoke(builder =>
 builder.Services.AddCliInvokeSpecializations(); // registers the platform middleware types
 ```
 
-* `UseLogging` — logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). A built-in heuristic redacts the values following the sensitive flags (`--password`, `--token`, `--api-key`); captured stdout/stderr lines are redacted too. The middleware class is `internal` and `UseLogging()` takes no parameters, so there is no public way to supply a custom redactor — the built-in heuristic is always used. Its `ILogger` is constructor-injected from the DI container at pipeline build time; when no logger is registered, a no-op `NullLogger` is used.
-* `UsePostExitValidation(validator)` — runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
-* `UsePowerShell` / `UseCmd` — rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowerShellMiddleware` and `ProcessConfiguration`. `PowerShellMiddleware` and `DefaultShellMiddleware` read those two flags from a `ShellMiddlewareOptions` instance resolved directly out of the DI container (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties). Register the instance itself:
+* `UseLogging` logs process entry and exit at `Information`, and each captured stdout/stderr line at `Debug` (when using `BufferedProcessResult`). A built-in heuristic redacts the values following the sensitive flags (`--password`, `--token`, `--api-key`); captured stdout/stderr lines are redacted too. The middleware class is `internal` and `UseLogging()` takes no parameters, so there is no public way to supply a custom redactor. The built-in heuristic is always used. Its `ILogger` is constructor-injected from the DI container at pipeline build time; when no logger is registered, a no-op `NullLogger` is used.
+* `UsePostExitValidation(validator)` runs a validator built from CliInvoke's `CommonValidationRules` against the `ProcessResult` and throws `ProcessValidationException` (with a per-rule failure message) when it fails. Helpers: `PostExitValidation.ExitCodeIsZero()`, `ExitCodeIs(code)`, `ExitCodeIsOneOf(codes...)`, `StdoutMatches(regex)`, `StderrIsEmpty()`.
+* `UsePowerShell` / `UseCmd` rewrite the configuration so the original command executes inside `pwsh` (or `pwsh.exe` on Windows) using `-NoProfile -NonInteractive -Command`, or inside `cmd.exe` using `/c`. `UsePowerShell()` is a parameterless extension on `IProcessMiddlewareBuilder` (as is `UseCmd()`); the parameterless form defaults `WindowCreation` and `UseShellExecution` to `false`, matching the unified defaults used by `PowerShellMiddleware` and `ProcessConfiguration`. `PowerShellMiddleware` and `DefaultShellMiddleware` read those two flags from a `ShellMiddlewareOptions` instance resolved directly out of the DI container (namespace `CliInvoke.Specializations.Middleware`, with `bool WindowCreation` and `bool UseShellExecution` properties). Register the instance itself:
 
   ```csharp
   using CliInvoke.Specializations.Middleware; // ShellMiddlewareOptions
@@ -88,10 +88,10 @@ builder.Services.AddCliInvokeSpecializations(); // registers the platform middle
   });
   ```
 
-  The middleware resolves the `ShellMiddlewareOptions` instance, not an `IConfigureOptions<ShellMiddlewareOptions>`, so `services.Configure<ShellMiddlewareOptions>(...)` silently does nothing — it registers configuration objects that nothing consumes. Register your instance before `AddCliInvokeSpecializations()`: its `TryAdd` registration then leaves your instance in place. When no instance is registered, `ShellMiddlewareOptions.Default` (both flags `false`) is used. `UseCmd()` does not read `ShellMiddlewareOptions` at all — see [Shell middleware settings and output redirection](#shell-middleware-settings-and-output-redirection) below.
+  The middleware resolves the `ShellMiddlewareOptions` instance, not an `IConfigureOptions<ShellMiddlewareOptions>`, so `services.Configure<ShellMiddlewareOptions>(...)` silently does nothing. It registers configuration objects that nothing consumes. Register your instance before `AddCliInvokeSpecializations()`. Its `TryAdd` registration then leaves your instance in place. When no instance is registered, `ShellMiddlewareOptions.Default` (both flags `false`) is used. `UseCmd()` does not read `ShellMiddlewareOptions` at all. See [Shell middleware settings and output redirection](#shell-middleware-settings-and-output-redirection) below.
 
   Shell wrapping is delivered via the shell middleware on plain `ProcessConfiguration`.
-  The `ShellArgumentEscaper` type is no longer public — escaping is an internal concern
+  The `ShellArgumentEscaper` type is no longer public. Escaping is an internal concern
   of the `ShellRewriter` composition core. Callers should rely on the middleware or the
   `ShellRewriter` directly for shell-escaped command composition.
 
@@ -121,9 +121,9 @@ var config = new ProcessConfiguration("Get-Process");
 // Register UsePowerShell() in the middleware pipeline
 ```
 
-* `UseDefaultShell` — detects the user's default shell (pwsh, Windows PowerShell, or cmd) via `IShellDetector` and wraps the command in it automatically. Use this instead of `UsePowerShell`/`UseCmd` when you want cross-platform shell detection without committing to a specific shell. Requires `IShellDetector` (registered by `AddCliInvoke`).
+* `UseDefaultShell` detects the user's default shell (pwsh, Windows PowerShell, or cmd) via `IShellDetector` and wraps the command in it automatically. Use this instead of `UsePowerShell`/`UseCmd` when you want cross-platform shell detection without committing to a specific shell. Requires `IShellDetector` (registered by `AddCliInvoke`).
 
-  `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; the platform-restricted behaviour is enforced by `CmdMiddleware`.
+  `UseCmd` is Windows-only and throws `PlatformNotSupportedException` on other platforms; `CmdMiddleware` enforces the platform-restricted behaviour.
 
   The `PowerShellMiddleware`/`CmdMiddleware`/`DefaultShellMiddleware` types behind `UsePowerShell()`/`UseCmd()`/`UseDefaultShell()` are registered in the DI container by `AddCliInvokeSpecializations()` (shipped in the `CliInvoke.Specializations` package). Call it alongside `AddCliInvoke` with the same `ServiceLifetime`; without it, resolving the invoker throws `InvalidOperationException` because the middleware types are not registered.
 
@@ -133,7 +133,7 @@ Two behaviours of the shell middleware are easy to get wrong when configuring th
 
 * **`UseCmd` reads its flags from the configuration, not from `ShellMiddlewareOptions`.** `CmdMiddleware` takes `WindowCreation` and `UseShellExecution` from the source `ProcessConfiguration` of each invocation; it never reads a `ShellMiddlewareOptions` instance. Registering `ShellMiddlewareOptions` therefore affects `UsePowerShell()` and `UseDefaultShell()` only. To give a cmd-wrapped invocation a window or shell-execution semantics, set `WindowCreation` / `UseShellExecution` on the `ProcessConfiguration` itself.
 
-* **`OutputRedirection` is overwritten on every invocation.** `PowerShellMiddleware`, `CmdMiddleware`, and `DefaultShellMiddleware` all overwrite the source configuration's `OutputRedirection` flag before the next stage runs: it is forced off when the invocation mode is `InvocationMode.Raw`, and forced on otherwise. The overwrite is protective, not cosmetic. `Raw` mode waits for process exit without draining redirected streams, so a redirected pipe that nobody reads would fill up and block the child process; buffered invocations need the redirect on so output can be captured. The `OutputRedirection` value you set on a `ProcessConfiguration` does not survive shell wrapping.
+* **`OutputRedirection` is overwritten on every invocation.** `PowerShellMiddleware`, `CmdMiddleware`, and `DefaultShellMiddleware` all overwrite the source configuration's `OutputRedirection` flag before the next stage runs. It is forced off when the invocation mode is `InvocationMode.Raw`, and forced on otherwise. The overwrite is protective, not cosmetic. `Raw` mode waits for process exit without draining redirected streams, so a redirected pipe that nobody reads would fill up and block the child process; buffered invocations need the redirect on so output can be captured. The `OutputRedirection` value you set on a `ProcessConfiguration` does not survive shell wrapping.
 
 ## Wrapping only some invocations in a shell
 
@@ -215,7 +215,7 @@ If you would rather have *both* invokers keyed, register the plain one yourself 
 
 ### Which one to use
 
-Use `UseWhen` when the rule is a property of the command being run and you can express it as a predicate over the configuration. Use two invoker registrations when the choice is a decision the calling code makes, or when different parts of your app have different shell policies and you want the compiler, not a predicate, to enforce the split. The two compose: a keyed shell invoker can itself use `UseWhen` internally if only a subset of its invocations should wrap.
+Use `UseWhen` when the rule is a property of the command being run and you can express it as a predicate over the configuration. Use two invoker registrations when the choice is a decision the calling code makes, or when different parts of your app have different shell policies and you want the compiler, not a predicate, to enforce the split. The two compose. A keyed shell invoker can itself use `UseWhen` internally if only a subset of its invocations should wrap.
 
 ## Configuring middleware through DI
 
@@ -243,8 +243,8 @@ The overload works for all three supported lifetimes (`Singleton`, `Scoped`, `Tr
 
 ## Result-ownership and disposal through the chain
 
-Middleware does **not** dispose the process result — the result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing any `UserCredential` or `StreamWriter` you placed inside the `ProcessConfiguration`. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
+Middleware does **not** dispose the process result. The result is returned to you un-disposed, exactly as with a non-middleware invoker. You remain responsible for disposing any `UserCredential` or `StreamWriter` you placed inside the `ProcessConfiguration`. See **[Resource Disposal](resource-disposal.md)** for the full ownership rules and checklist.
 
 ## The result-swap rule
 
-By default, middleware does **not** mutate the `ProcessResult` object. Logging and post-exit validation pass the result through unchanged. Platform-selection middleware (`UsePowerShell` / `UseCmd`) substitutes the result of the wrapped `pwsh` / `cmd.exe` invocation — the caller still sees a normal `ProcessResult`, but the data comes from the wrapped shell, not from the original command. Transforming or replacing the result is a deliberate, niche operation: a middleware that does so should write the new result onto `InvocationContext.Result` so the caller receives it.
+By default, middleware does **not** mutate the `ProcessResult` object. Logging and post-exit validation pass the result through unchanged. Platform-selection middleware (`UsePowerShell` / `UseCmd`) substitutes the result of the wrapped `pwsh` / `cmd.exe` invocation. The caller still sees a normal `ProcessResult`, but the data comes from the wrapped shell, not from the original command. Transforming or replacing the result is a deliberate, niche operation. A middleware that does so should write the new result onto `InvocationContext.Result` so the caller receives it.

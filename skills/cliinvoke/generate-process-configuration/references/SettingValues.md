@@ -1,6 +1,6 @@
 # Setting Values Directly
 
-This reference shows the default and recommended way to configure a process: direct init construction of `ProcessConfiguration`. The builder path (`ProcessConfigurationBuilder`) is reserved for advanced scenarios — see `ConfiguringWithBuilders.md`.
+This reference shows the default and recommended way to configure a process: direct init construction of `ProcessConfiguration`. The builder path (`ProcessConfigurationBuilder`) is reserved for advanced scenarios. See `ConfiguringWithBuilders.md`.
 
 ## Init Construction (Default)
 
@@ -8,7 +8,7 @@ In v3, `ProcessConfiguration` is directly constructible via an object initialize
 
 ### Convenience Constructor
 
-The simplest path — pass the target file path and optional arguments:
+The simplest path. Pass the target file path and optional arguments:
 
 ```csharp
 using CliInvoke.Core;
@@ -33,7 +33,7 @@ ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version", ou
 
 ### Object Initializer
 
-For full control, use the object initializer. `TargetFilePath` is required and must be set — the init setter throws `ArgumentException` on null or empty:
+For full control, use the object initializer. `TargetFilePath` is required and must be set. The init setter throws `ArgumentException` on null or empty:
 
 ```csharp
 using CliInvoke.Core;
@@ -62,7 +62,7 @@ ProcessConfiguration config = new ProcessConfiguration
 
 ### ArgumentList (v3 init-only property)
 
-The v2 `ArgumentsList` property was merged into the init-only `ArgumentList` in v3. Use it for pre-tokenised argument lists — each entry is passed to the child process unmodified via `ProcessStartInfo.ArgumentList`:
+The v2 `ArgumentsList` property was merged into the init-only `ArgumentList` in v3. Use it for pre-tokenised argument lists. Each entry is passed to the child process unmodified via `ProcessStartInfo.ArgumentList`:
 
 ```csharp
 using CliInvoke.Core;
@@ -73,7 +73,7 @@ ProcessConfiguration config = new ProcessConfiguration("dotnet")
 };
 ```
 
-> `ArgumentList` is a snapshot: any list you supply is copied at construction time. Later mutations to the original collection are not reflected in the configuration.
+> `ArgumentList` is a snapshot. Any list you supply is copied at construction time. Later mutations to the original collection are not reflected in the configuration.
 
 ### Environment Variables
 
@@ -137,8 +137,8 @@ ProcessConfiguration config = new ProcessConfiguration("cmd", "/c echo Hello")
 
 The `ProcessConfigurationBuilder` is reserved for scenarios where init construction cannot express what you need:
 
-- **Argument escaping** — per-argument escaping control via `ConfigureArguments`
-- **User credential staging** — `SecureString` password setup via `ConfigureUserCredential` (Windows only)
-- **Resource policy callbacks** — processor affinity and priority class via `ConfigureProcessResourcePolicy`
+- **Argument escaping**, per-argument escaping control via `ConfigureArguments`
+- **User credential staging**, `SecureString` password setup via `ConfigureUserCredential` (Windows only)
+- **Resource policy callbacks**, processor affinity and priority class via `ConfigureProcessResourcePolicy`
 
 For everything else, init construction is the v3 default. See `ConfiguringWithBuilders.md` for the advanced builder path.

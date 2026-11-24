@@ -5,7 +5,7 @@ patterns to v3 replacements. It mirrors the [`IExternalProcess` Users walkthroug
 
 ## ExternalProcess is sealed
 
-`ExternalProcess` is now `sealed` — it can no longer be subclassed.
+`ExternalProcess` is now `sealed`. It can no longer be subclassed.
 If you subclassed the builder, switch to composing an
 `IProcessConfigurationBuilder` instead.
 
@@ -53,13 +53,13 @@ and no setter.
 
 The `IExternalProcess` lifecycle in v3:
 
-1. **Construct** — `new ExternalProcess(resolver, configuration, exitConfig)`
-2. **Start** — `await process.StartAsync(CancellationToken.None)`
-3. **Observe** — subscribe to `Started`/`Exited` events, or poll
+1. **Construct**. `new ExternalProcess(resolver, configuration, exitConfig)`
+2. **Start**. `await process.StartAsync(CancellationToken.None)`
+3. **Observe**. Subscribe to `Started`/`Exited` events, or poll
    `HasStarted`/`HasExited`
-4. **Capture** — `await process.WaitForExitOrTimeoutAsync(token)` or
+4. **Capture**. `await process.WaitForExitOrTimeoutAsync(token)` or
    `await process.CaptureBufferedResultAsync(token)`
-5. **Dispose** — `process.Dispose()` (or `using`)
+5. **Dispose**. `process.Dispose()` (or `using`)
 
 ## PipedProcessResult removed
 
@@ -79,14 +79,14 @@ The `ExecutePipedAsync`, `RunPipedAsync`, and
 | `ExternalProcess(resolver, "path")` | `ExternalProcess(resolver, configuration, exitConfig)` |
 | `ExternalProcess(config, exitConfig)` | `ExternalProcess(resolver, configuration, exitConfig)` |
 | `process.ExitConfiguration = ...` (setter) | Pass at construction |
-| Subclassing `ExternalProcess` | Sealed — use composition |
+| Subclassing `ExternalProcess` | Sealed. Use composition |
 | `PipedProcessResult` | `IExternalProcess` for streaming |
 | `ExecutePipedAsync` / `RunPipedAsync` | `IExternalProcess` lifecycle methods |
 
 ## Cross-references
 
-- [Configuration guide](../../../../site/docs/guides/configuration.md) — consumer reference
-- [Resource Disposal guide](../../../../site/docs/guides/resource-disposal.md) — ownership rules
-- [Migration guide — ExternalProcess](../../../../site/docs/migration-guides/3.0.0.md#5-externalprocess-keeps-only-constructor-c)
-- [Migration guide — ExitConfiguration](../../../../site/docs/migration-guides/3.0.0.md#3-exitconfiguration-is-read-only)
-- [Migration guide — PipedProcessResult](../../../../site/docs/migration-guides/3.0.0.md#7-processresult-equality-is-symmetric)
+- [Configuration guide](../../../../site/docs/guides/configuration.md), consumer reference
+- [Resource Disposal guide](../../../../site/docs/guides/resource-disposal.md), ownership rules
+- [Migration guide, ExternalProcess](../../../../site/docs/migration-guides/3.0.0.md#5-externalprocess-keeps-only-constructor-c)
+- [Migration guide, ExitConfiguration](../../../../site/docs/migration-guides/3.0.0.md#3-exitconfiguration-is-read-only)
+- [Migration guide, PipedProcessResult](../../../../site/docs/migration-guides/3.0.0.md#7-processresult-equality-is-symmetric)

@@ -5,7 +5,7 @@ layout: simple
 
 Migration guidance and migration resources.
 
-- [Migrating to 3.0.0](migration-guides/3.0.0.md) — v2 to v3 breaking changes
+- [Migrating to 3.0.0](migration-guides/3.0.0.md). v2 to v3 breaking changes
 
 ### Legacy (for users still on v1)
 

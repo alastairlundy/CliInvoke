@@ -4,8 +4,8 @@ title: "Getting Started"
 
 # Getting Started
 
-> **New to CliInvoke? Start with `CliRun`.** It is the recommended default entry point — zero boilerplate,
-> no dependency injection required. Use `IProcessInvoker` when you need DI or middleware, and
+> **New to CliInvoke? Start with `CliRun`.** It is the recommended default entry point, with zero boilerplate
+> and no dependency injection required. Use `IProcessInvoker` when you need DI or middleware, and
 > `IExternalProcess` when you need process-level control. See [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md) for a
 > [Which pattern should I use?](DESIGN_PATTERNS.md#which-invocation-pattern-should-i-use) decision tree.
 
@@ -70,7 +70,7 @@ You can also configure the middleware pipeline when registering:
 services.AddCliInvoke(builder => builder.UseMiddleware<LoggingMiddleware>());
 ```
 
-> If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations) package's `UsePowerShell()`/`UseCmd()` middleware, also call `AddCliInvokeSpecializations()` (namespace `CliInvoke.Specializations` — add `using CliInvoke.Specializations;`) with the same `ServiceLifetime` so those middleware types resolve from the container.
+> If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations) package's `UsePowerShell()`/`UseCmd()` middleware, also call `AddCliInvokeSpecializations()` (namespace `CliInvoke.Specializations`, add `using CliInvoke.Specializations;`) with the same `ServiceLifetime` so those middleware types resolve from the container.
 
 #### Manual Setup
 This example manually registers ``IProcessInvoker`` and the other core CliInvoke services as Singletons.

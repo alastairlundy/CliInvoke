@@ -19,7 +19,7 @@ services.AddCliInvoke();
 var provider = services.BuildServiceProvider();
 ```
 
-The quickest way to run a command is `CliRun` — the recommended default entry point:
+The quickest way to run a command is `CliRun`, the recommended default entry point:
 
 ```csharp
 using CliInvoke;

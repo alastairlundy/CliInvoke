@@ -7,7 +7,7 @@ layout: simple
 
 Welcome to the CliInvoke Guides section. This collection of conceptual guides
 explains how the library works, how to configure it well, and how to keep it
-running safely in production. Each guide is self-contained — you can read them
+running safely in production. Each guide is self-contained. You can read them
 in order, or jump straight to the one that matches your need.
 
 ## Who these guides are for
@@ -15,8 +15,8 @@ in order, or jump straight to the one that matches your need.
 These guides are for .NET developers who have already
 [installed CliInvoke](../getting-started.md) and want to understand how to
 use it well. If you are brand new to the library, start with the
-[Quickstart](../getting-started-quickstart.md) instead — it gets you to a
-running command in under five minutes — and come back here once you have a
+[Quickstart](../getting-started-quickstart.md) instead, as it gets you to a
+running command in under five minutes, and come back here once you have a
 working invocation.
 
 The guides assume you can read C#, are familiar with `async`/`await`, and
@@ -29,21 +29,21 @@ Read the guides in this order on your first pass. Each one builds on the
 concepts introduced in the previous guide, so the sequence is designed to
 minimise backtracking.
 
-1. **[Choosing your Invocation Pattern](choosing-invocation-pattern.md)** —
-   pick the right pattern (`CliRun`, `IProcessInvoker`, or
+1. **[Choosing your Invocation Pattern](choosing-invocation-pattern.md)**.
+   Pick the right pattern (`CliRun`, `IProcessInvoker`, or
    `IExternalProcess`) for your scenario before you write any code.
-2. **[Configuration](configuration.md)** — once you have a pattern, learn
+2. **[Configuration](configuration.md)**. Once you have a pattern, learn
    what `ProcessConfiguration` owns, how init construction works (the
    default), when to use the builder (advanced), and what the
    defaults are.
-3. **[Resource Disposal](resource-disposal.md)** — every unmanaged handle
+3. **[Resource Disposal](resource-disposal.md)**. Every unmanaged handle
    and `SecureString` buffer in the library is owned by exactly one of the
    four Resource-Owning Types; this guide documents the disposal contract
    for each.
-4. **[Architecture](architecture.md)** — once you have written a few
+4. **[Architecture](architecture.md)**. Once you have written a few
    invocations, read this to understand the four-stage data-flow, the
    Process Invocation Pipeline, and where cross-cutting concerns plug in.
-5. **[Troubleshooting](troubleshooting.md)** — keep this as a reference for
+5. **[Troubleshooting](troubleshooting.md)**. Keep this as a reference for
    when something goes wrong; it is symptom-organised, not narrative.
 
 After the first pass, you will probably treat this section as a reference
@@ -57,15 +57,15 @@ and when to read it.
 ### [Choosing your Invocation Pattern](choosing-invocation-pattern.md)
 
 Decision tree and trade-off guide for picking between `CliRun`,
-`IProcessInvoker`, and `IExternalProcess`. **Read this first** — it
-establishes which API surface the rest of the guides apply to and explains
+`IProcessInvoker`, and `IExternalProcess`. **Read this first.** It
+establishes which public API the rest of the guides apply to and explains
 when (and how) to migrate from one pattern to another as your needs grow.
 
 ### [Architecture](architecture.md)
 
 Explains the four-stage data-flow (Construction → Configuration Model → Invoker
 → Result), shows how the three invocation patterns map onto that flow, and
-documents the **Process Invocation Pipeline** — the layered pattern that
+documents the **Process Invocation Pipeline**, the layered pattern that
 keeps cross-cutting concerns (path resolution, runner wrapping, result
 validation) out of the core execution path. Read this once you are
 comfortable invoking processes and want to understand what is happening
@@ -83,7 +83,7 @@ does, what its default is, and which builder method to use.
 ### [Resource Disposal](resource-disposal.md)
 
 Documents every public type in the library that implements `IDisposable`
-(and, where applicable, `IAsyncDisposable`) — there are exactly four — the
+(and, where applicable, `IAsyncDisposable`), exactly four of them, the
 unmanaged resources they own, and the disposal patterns callers must
 follow. Read this before shipping code that creates processes in a loop,
 exposes processes to a long-running service, or handles `SecureString`

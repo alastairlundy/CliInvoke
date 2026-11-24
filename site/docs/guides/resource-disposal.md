@@ -8,15 +8,15 @@ layout: simple
 This is the canonical reference for resource management in CliInvoke. It
 documents the library's four resource-owning types, the unmanaged
 resources they own, and the exact disposal patterns callers must
-follow. No type in CliInvoke implements `IAsyncDisposable` — the
+follow. No type in CliInvoke implements `IAsyncDisposable`. The
 library is `IDisposable`-only.
 
 The goal of this page is to prevent two failure modes:
 
-1. **Resource leaks** — files, pipes, kernel handles, and
+1. **Resource leaks**: files, pipes, kernel handles, and
    `SecureString` buffers left in memory after an invocation has
    finished.
-2. **Handle exhaustion** — the platform error state reached when a
+2. **Handle exhaustion**: the platform error state reached when a
    process accumulates open handles faster than it releases them.
 
 If you only read one section, read
@@ -52,7 +52,7 @@ documentation describes that contract.
 
 These four are the types that own unmanaged handles or sensitive
 memory. For `ProcessConfigurationBuilder`, you remain responsible for
-disposing any `Credential` and `StandardInput` you supply to it — the
+disposing any `Credential` and `StandardInput` you supply to it. The
 builder does not dispose caller-provided credential/stdin resources
 (its `Dispose()` only releases the `UserCredentialSpec` it created).
 A type not listed in the table above may still implement
@@ -60,7 +60,7 @@ A type not listed in the table above may still implement
 buffers; check its own documentation before assuming no disposal is
 needed.
 
-### `ProcessConfiguration` — caller-owned resources
+### `ProcessConfiguration` – caller-owned resources
 
 Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 
@@ -73,10 +73,10 @@ implement `IDisposable`, and the invocation pipeline never adopts
 ownership of the disposable objects it references. Two of its
 properties are therefore your responsibility:
 
-- **`StandardInput`** — a `StreamWriter` you supplied (or the default
+- **`StandardInput`**: a `StreamWriter` you supplied (or the default
   `StreamWriter.Null`). If you provide a real stream, you must dispose
   it once every invocation that referenced it has completed.
-- **`Credential`** — a `UserCredential` you supplied (or the default
+- **`Credential`**: a `UserCredential` you supplied (or the default
   `UserCredential.Null`). If you provide a real `UserCredential`, you
   must dispose it.
 
@@ -133,13 +133,13 @@ and the GC cannot reclaim them.
 `Process.Dispose()`, which kills the wait handle, disposes the
 redirected streams, and releases the kernel handle.
 
-**Ownership rule**: Returned from
+**Ownership rule**: It comes from
 `IExternalProcessFactory.CreateExternalProcess(ProcessConfiguration)`. The caller owns
 the returned `IExternalProcess` and must dispose it after
 `WaitForExitOrTimeoutAsync` / `CaptureBufferedResultAsync` completes.
 An `IExternalProcess` created inside the invoker's pipeline follows a
-different rule: the pipeline creates it, runs it, and disposes it in a
-`finally` before returning the result — it is never handed to the
+different rule. The pipeline creates it, runs it, and disposes it in a
+`finally` before returning the result. It is never handed to the
 caller.
 
 ### 2. `UserCredential`
@@ -166,10 +166,10 @@ public void Dispose()
 }
 ```
 
-**Ownership rule**: Two cases.
+**Ownership rule**: There are two cases.
 
 1. The credential is assigned to a `ProcessConfiguration.Credential`.
-   The `ProcessConfiguration` does **not** dispose it — the credential
+   The `ProcessConfiguration` does **not** dispose it. The credential
    remains a standalone disposable that **you** must dispose. Do not
    rely on the configuration to clean it up.
 2. The credential is used standalone (e.g., returned from a factory).
@@ -201,7 +201,7 @@ public void Dispose()
 copies the password into a new `UserCredential`; the original
 `SecureString` held by the builder is still owned by the builder and
 must be disposed when the builder is no longer needed. Disposing the
-builder does **not** dispose the produced `UserCredential` — the two
+builder does **not** dispose the produced `UserCredential`. The two
 lifetimes are independent.
 
 ### 4. `ProcessConfigurationBuilder`
@@ -230,13 +230,13 @@ public void Dispose()
 **Ownership rule**: The caller owns the builder; disposing it disposes
 the builder-owned `UserCredentialSpec`. Disposing the builder does
 **not** dispose the produced `ProcessConfiguration`, any `UserCredential`
-inside it, or any `StandardInput` stream the caller supplied — those
+inside it, or any `StandardInput` stream the caller supplied. Those
 follow the [caller-owned rules](#processconfiguration--caller-owned-resources).
 
 ## Handle Exhaustion: Why Explicit Disposal Is Required
 
 Managed memory in .NET is reclaimed by the garbage collector. The
-resources in this library are not managed memory — they are kernel
+resources in this library are not managed memory. They are kernel
 handles, pipe handles, and `SecureString` buffers. The GC is allowed
 to collect any object at any time, but it has no way to release a
 kernel handle; only the type that allocated it can do that, and only
@@ -249,7 +249,7 @@ allocates a pair of anonymous pipe handles. On Windows these are
 backed by entries in the kernel's handle table, which is
 per-process and finite. The default per-process handle limit on
 Windows is `2^24` (about 16.7 million). On Linux the limits are
-similar in spirit: each open file descriptor consumes a slot in the
+similar in spirit. Each open file descriptor consumes a slot in the
 process's file descriptor table, with a typical soft limit of 1024
 per process and 4096 for the entire system for unprivileged users.
 
@@ -261,7 +261,7 @@ the next `Process.Start` throws `IOException("Too many open files")`
 on Linux or `Win32Exception("Not enough quota")` on Windows.
 
 `SecureString` is a different resource but the failure mode is
-similar: the buffer is pinned in unmanaged memory and is not movable
+similar. The buffer is pinned in unmanaged memory and is not movable
 by the GC. A long-lived process that leaks many `UserCredential`
 objects retains every password buffer in pinned memory for the rest
 of its lifetime.
@@ -270,13 +270,13 @@ of its lifetime.
 
 The GC is allowed to delay collection arbitrarily. The `Dispose`
 pattern exists precisely because the GC **cannot** call `Dispose`
-itself — that would require non-deterministic ordering between
+itself. That would require non-deterministic ordering between
 finalization and the consumer's last use of the resource. CliInvoke
-follows the standard `IDisposable` contract: the type implements
+follows the standard `IDisposable` contract. The type implements
 `Dispose()`, and the caller is contractually obligated to call it.
 
 The library does not implement finalizers (`~Type()`) on its
-disposable types. This is intentional: a finalizer would add
+disposable types. This is intentional. A finalizer would add
 non-deterministic latency to handle release and would not help the
 caller, which still needs to release the resource in a timely
 manner. The `Dispose` contract is the supported way to release
@@ -284,7 +284,7 @@ resources in CliInvoke.
 
 ## Disposal Patterns
 
-### Pattern A — synchronous `using`
+### Pattern A: synchronous `using`
 
 Use for `UserCredential` and `UserCredentialSpec`.
 
@@ -300,10 +300,10 @@ ProcessConfiguration config = new ProcessConfiguration("cmd", "/c echo hello")
 // ProcessConfiguration never disposes it.
 ```
 
-### Pattern B — scope-bound `using` declaration
+### Pattern B: scope-bound `using` declaration
 
 Use for a factory-created `IExternalProcess`. It implements
-`IDisposable` only — there is no `IAsyncDisposable` in CliInvoke — so a
+`IDisposable` only. There is no `IAsyncDisposable` in CliInvoke, so a
 plain `using` declaration is the contract. Output is captured into the
 result object; `IExternalProcess` does not expose live `StandardOutput`
 / `StandardError` streams to read from.
@@ -323,7 +323,7 @@ BufferedProcessResult result = await process.CaptureBufferedResultAsync(ct);
 // process is disposed when leaving scope
 ```
 
-### Pattern C — explicit `Dispose` in a `try/finally`
+### Pattern C: explicit `Dispose` in a `try/finally`
 
 Use when the disposable crosses a scope that is not a `using`
 declaration, or when working in a `try/catch` block where the
@@ -343,7 +343,7 @@ finally
 }
 ```
 
-### Pattern D — spec + built credential
+### Pattern D: spec + built credential
 
 `UserCredentialSpec` and the `UserCredential` it produces have
 **independent lifetimes**. Both must be disposed.
@@ -382,15 +382,15 @@ These rules are normative for every consumer of the library.
    parent. Calling `Dispose`
    on them directly is a double-dispose.
 4. **Dispose `IExternalProcess` with a plain `using` or `try/finally`.**
-   It implements `IDisposable` only — no type in CliInvoke implements
-   `IAsyncDisposable` — and disposing it releases the redirected
+   It implements `IDisposable` only. No type in CliInvoke implements
+   `IAsyncDisposable`, and disposing it releases the redirected
    streams and process handles it owns.
 5. **Disposal is the caller's responsibility for what the caller
    receives.** The invoker does not retain references to the
    configuration or the result after returning; the caller that
-   received them owns them. The `IExternalProcess` the pipeline
-   created is disposed by the pipeline itself (in a `finally`) before
-   the result is returned — only processes you create yourself need
+   received them owns them. The pipeline disposes the `IExternalProcess`
+   it created (in a `finally`) before
+   returning the result. Only processes you create yourself need
    your `Dispose()`.
 6. **Reuse is allowed** for `ProcessConfiguration`. Dispose any
    `StandardInput` stream or `UserCredential` you supplied only after
@@ -403,9 +403,9 @@ following:
 
 - [ ] Every `IExternalProcess` you create via `IExternalProcessFactory`
   is wrapped in `using` or `try/finally`. `StartAsync` returns `Task`
-  (not a process), and an `IExternalProcess` created by the invoker's
-  pipeline is created *and* disposed by that pipeline
-  (`ProcessInvocationPipeline` releases it in a `finally`) — the
+  (not a process), and the invoker's pipeline creates *and* disposes
+  an `IExternalProcess`
+  (`ProcessInvocationPipeline` releases it in a `finally`). The
   invoker never returns it, so there is nothing for you to dispose.
 - [ ] Every standalone `UserCredential` is wrapped in `using`.
 - [ ] Every standalone `UserCredentialSpec` you create and own is wrapped in `using`, and the
@@ -415,14 +415,14 @@ following:
 - [ ] Any `StreamWriter` you pass as `ProcessConfiguration.StandardInput`
   is disposed by your own `using` (the configuration will not dispose it).
 - [ ] No `SecureString` or caller-supplied `StandardInput` stream is
-  disposed directly — only by the object that owns it.
+  disposed directly. Only the object that owns it does so.
 - [ ] `IDisposable` is not implemented on any custom wrapper that
   owns an `IExternalProcess` without also disposing the owned
   resource in its own `Dispose`.
 
 ## Cross-References
 
-- README — Resource Disposal summary
+- README: Resource Disposal summary
 - Issue tracker reference: #348
 - Source files:
   - `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`

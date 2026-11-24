@@ -4,7 +4,7 @@ title: "Removed Interfaces and Classes"
 
 # Removed Interfaces and Classes
 
-CliInvoke v2 removes a number of interfaces and classes from v1. Below is a non-exhaustive list of the main removed interfaces and classes.
+CliInvoke v2 removes many interfaces and classes from v1. Below is a non-exhaustive list of the main removed interfaces and classes.
 
 ## IProcessRunnerUtility and ProcessRunnerUtility
 **Rationale**:
@@ -15,7 +15,7 @@ CliInvoke v2 removes a number of interfaces and classes from v1. Below is a non-
 
 ## IPipedProcessRunner and PipedProcessRunner
 **Rationale**:
-* Although well intentioned, the interface and classes were badly designed, and are no longer needed as a middleman between Process Invokers and Process ProcessRunnerUtility. It contributed to a more fragmented and confused API surface and thus removal was necessary to clean up the CliInvoke v2 API Surface.
+* Although well intentioned, the interface and classes were badly designed, and are no longer needed as a middleman between Process Invokers and Process ProcessRunnerUtility. It contributed to a more fragmented and confused public API and thus removal was necessary to clean up the CliInvoke v2 API.
 
 **Replacement**: 
 * ``IProcessInvoker`` and ``ProcessInvoker`` for running ``ProcessConfiguration`` objects.

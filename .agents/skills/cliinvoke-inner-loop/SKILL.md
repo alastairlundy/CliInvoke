@@ -52,7 +52,7 @@ dotnet test
 
 Run this from `tests/CliInvoke.Tests/`. That is the only test project CI executes. There is no test project anywhere under `src/`, so `dotnet test src/CliInvoke/` fails with `No test projects were found.`
 
-The suite spawns real executables (`dotnet`, `powershell.exe`, `pwsh`), so it takes considerably longer than the build. Tests that need PowerShell Core call `SkipTestIfNull` when `pwsh` is off `PATH`, which is the situation on GitHub-hosted Windows runners but not on most dev machines. A skip is not a failure, so compare the passed count against your own baseline rather than expecting a fixed total.
+The suite spawns real executables (`dotnet`, `powershell.exe`, `pwsh`), so it takes considerably longer than the build. Tests that need PowerShell Core call `SkipTestIfNull` when `pwsh` is off `PATH`, which is the situation on GitHub-hosted Windows runners but not on most dev machines. A skip is not a failure. Compare the passed count against your own baseline rather than expecting a fixed total.
 
 ### Step 4: Release Build
 
