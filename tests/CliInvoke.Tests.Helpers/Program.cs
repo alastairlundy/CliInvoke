@@ -52,12 +52,9 @@ if (!string.IsNullOrEmpty(parentDir) && !Directory.Exists(parentDir))
         $"Marker file parent directory does not exist: {parentDir}");
 }
 
-Action writeMarker = () =>
-    File.WriteAllText(markerPath, DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture));
-
 Console.CancelKeyPress += (_, e) =>
 {
-    writeMarker();
+    WriteMarker();
     e.Cancel = false;
 };
 
@@ -67,7 +64,7 @@ if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.Is
 {
     PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
     {
-        writeMarker();
+        WriteMarker();
         context.Cancel = false;
     });
 }
@@ -75,3 +72,5 @@ if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.Is
 await System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(sleepSeconds)).ConfigureAwait(true);
 
 return 0;
+
+void WriteMarker() => File.WriteAllText(markerPath, DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture));
