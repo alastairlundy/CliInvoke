@@ -14,7 +14,7 @@ command line is assembled by something that is not a human, such as an agent
 that builds shell commands from generated text.
 
 This guide uses the `CliRun` facade because it is the recommended entry point.
-Everything here also applies through `IProcessInvoker`, which additionally
+Everything here also applies through `IProcessInvoker`, which also
 gives you the middleware pipeline. See
 [Choosing your Invocation Pattern](choosing-invocation-pattern.md) if you have
 not picked a pattern yet.
@@ -90,8 +90,8 @@ reaching the threshold returns a normal result with `Canceled = true` and the
 kill exit code. Nothing throws. Check `result.Canceled` and treat it as a
 failed tool invocation.
 
-**Platform caveat.** The graceful interrupt is best-effort on Windows:
-delivering it requires attaching to the child's console, which typically fails
+**Platform caveat.** The graceful interrupt is best-effort on Windows.
+Delivering it requires attaching to the child's console, which typically fails
 when your own process is a console application. Expect force-termination on
 Windows. On Unix the interrupt sends SIGTERM and is genuinely graceful. Either
 way the child exits within the grace period or is killed.
@@ -121,16 +121,16 @@ ProcessExitConfiguration exitConfig = new(
     cancellationThrowsException: true);
 ```
 
-Note the scope of that knob: when it is on, any cancellation-driven exception
+Note the scope of that knob. When it is on, any cancellation-driven exception
 propagates, including the timeout's, because the timeout is implemented as
 cancellation. Harness authors usually want the result form so they can record
 the kill and keep going. Interactive tools usually want the exception form.
 
 ## 3. Capture output without deadlocks or runaway memory
 
-Buffered mode is the safe path: the pipeline drains both streams concurrently
-while waiting for exit, which is exactly the shape the classic
-`ReadToEnd`-before-`WaitForExit` deadlock punishes. The cap keeps a child that
+Buffered mode is the safe path. The pipeline drains both streams concurrently
+while waiting for exit, which is the exact shape that triggers the classic
+`ReadToEnd`-before-`WaitForExit` deadlock. The cap keeps a child that
 emits gigabytes of output from taking your process with it, applied
 independently to standard output and standard error:
 
@@ -146,7 +146,7 @@ In DI pipelines, `UseOutputTruncation()` provides the equivalent at the
 middleware layer. See the [Middleware guide](middleware.md).
 
 **Raw-mode caveat.** Until the 3.2.0 raw-mode normalization ships, avoid raw
-mode with `OutputRedirection = true`: raw mode waits for exit without draining
+mode with `OutputRedirection = true`. Raw mode waits for exit without draining
 redirected pipes, which deadlocks with chatty children. Buffered mode, or raw
 mode with redirection off, are the safe combinations.
 
@@ -181,7 +181,7 @@ await CliRun.RunAsync(config, strict, ct);
 For rules beyond "the exit code was not what we expected", register
 `UsePostExitValidation` with your own `IProcessResultValidator<ProcessResult>`.
 Agents should treat unexpected exits as tool failures, because an unchecked
-nonzero exit code is how automation convinces itself that deployment worked.
+nonzero exit code lets automation record the deployment as successful.
 
 ## 5. Retry flaky tools safely
 
@@ -217,7 +217,7 @@ shell-wrapped invocations are covered too. Supply your own
 `Func<string?, string>` redactor if you use a central secret taxonomy such as
 `Microsoft.Extensions.Compliance.Redaction`.
 
-One layer earlier: do not put secrets on the command line at all. On Linux,
+One layer earlier, do not put secrets on the command line at all. On Linux,
 `/proc/<pid>/cmdline` is world-readable while a process environment is
 readable only by its owner, so a token passed as an argument is visible to
 every local user for the lifetime of the child. Pass secrets through

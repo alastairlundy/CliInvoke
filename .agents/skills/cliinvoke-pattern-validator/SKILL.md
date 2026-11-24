@@ -46,7 +46,7 @@ Verify that a high-level pattern is not reimplementing a lower-level pattern's l
 - [ ] No static dependencies were added to `IProcessInvoker` implementations.
 - [ ] `CliRun` remains a zero-boilerplate entry point, and holds no state between calls.
 - [ ] Construction matches the v3 default, with `ProcessConfigurationBuilder` reserved for its documented use cases.
-- [ ] The change does not introduce **v2-style code** (see `GLOSSARY.md`). Code is v2-style if (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles — reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default. **Carve-out**: deliberate advanced-builder usage (argument escaping, `UserCredentialSpec`/resource-policy callback flows) is legitimate and must not be flagged.
+- [ ] The change does not introduce **v2-style code** (see `GLOSSARY.md`). Code is v2-style if (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles, reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default. **Carve-out**: deliberate advanced-builder usage (argument escaping, `UserCredentialSpec`/resource-policy callback flows) is legitimate and must not be flagged.
 
 ## Common Pitfalls
 

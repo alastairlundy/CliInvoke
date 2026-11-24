@@ -16,7 +16,7 @@ composition passes the escaped string to the shell as written, so a space inside
 text. A value such as `safe.txt --overwrite` therefore reaches the target as two arguments.
 
 Reviewers and agents have repeatedly read this splitting as a defect and proposed "fixing" it
-by escaping spaces — without a record stating whether the behaviour is specified.
+by escaping spaces, without a record stating whether the behaviour is specified.
 
 ## Decision
 
@@ -63,10 +63,10 @@ by escaping spaces — without a record stating whether the behaviour is specifi
 
 ## Alternatives considered
 
-- **Escape spaces in `EscapeForPosixShell`** — rejected: silently changes multi-value legacy
+- **Escape spaces in `EscapeForPosixShell`.** Rejected: silently changes multi-value legacy
   callers into single-value callers, leaves every other delimiter unaddressed, and converts a
   documented contract into an undocumented one.
-- **Make `Arguments` preserve boundaries (auto-quote)** — rejected: changes composition for all
+- **Make `Arguments` preserve boundaries (auto-quote).** Rejected: changes composition for all
   existing string callers at once; a breaking behaviour change in a patch line.
-- **Deprecate `Arguments`** — rejected for now: the preformatted-line form is a legitimate use
+- **Deprecate `Arguments`.** Rejected for now: the preformatted-line form is a legitimate use
   and removing it is a major-version question, not a contract question.

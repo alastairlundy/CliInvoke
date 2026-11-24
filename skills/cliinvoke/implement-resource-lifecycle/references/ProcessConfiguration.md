@@ -4,7 +4,7 @@
 
 ## Construction
 
-`ProcessConfiguration` is directly constructible via an object initializer with init-only properties. There is no factory — `ProcessConfigurationFactory` was removed in v3.
+`ProcessConfiguration` is directly constructible via an object initializer with init-only properties. There is no factory. `ProcessConfigurationFactory` was removed in v3.
 
 ### Convenience Constructor
 
@@ -25,7 +25,7 @@ ProcessConfiguration config = new ProcessConfiguration("dotnet", "--version", ou
 
 ### Object Initializer
 
-`TargetFilePath` is required and must be set via the init setter — it throws `ArgumentException` on null or empty:
+`TargetFilePath` is required and must be set via the init setter. It throws `ArgumentException` on null or empty:
 
 ```csharp
 using CliInvoke.Core;
@@ -58,8 +58,8 @@ All properties are init-only. Once constructed, the configuration cannot be muta
 
 `ProcessConfiguration` does **not** implement `IDisposable`. The invocation pipeline never adopts ownership of the disposable objects it references. Two of its properties are therefore **your** responsibility:
 
-- **`StandardInput`** — a `StreamWriter` you supplied (or the default `StreamWriter.Null`). If you provide a real stream, you must dispose it after the final invocation that referenced it has completed.
-- **`Credential`** — a `UserCredential` you supplied (or the default `UserCredential.Null`). If you provide a real `UserCredential`, you must dispose it.
+- **`StandardInput`**, a `StreamWriter` you supplied (or the default `StreamWriter.Null`). If you provide a real stream, you must dispose it after the final invocation that referenced it has completed.
+- **`Credential`**, a `UserCredential` you supplied (or the default `UserCredential.Null`). If you provide a real `UserCredential`, you must dispose it.
 
 CliInvoke will not close your `StandardInput` stream or wipe your `SecureString` for you. Hold these resources in their own `using` declarations:
 
@@ -81,7 +81,7 @@ BufferedProcessResult result = await CliRun.RunBufferedAsync(config);
 
 ## Ownership Rules
 
-1. `ProcessConfiguration` is a value object — no disposal required.
+1. `ProcessConfiguration` is a value object. No disposal required.
 2. The caller that supplies `StandardInput` or `UserCredential` owns those objects and must dispose them.
-3. Reusing a single configuration across multiple invocations is allowed — dispose `StandardInput` and `UserCredential` only after the final invocation.
+3. Reusing a single configuration across multiple invocations is allowed. Dispose `StandardInput` and `UserCredential` only after the final invocation.
 4. The `UserCredentialSpec` staged through `ProcessConfigurationBuilder.ConfigureUserCredential` is owned and disposed by the builder; do not dispose it yourself. The `UserCredential` it produces has an independent lifetime and must be disposed separately.

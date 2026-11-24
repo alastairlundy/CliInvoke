@@ -63,10 +63,10 @@ IProcessInvoker invoker = new ProcessInvoker(myFactory);
 |---------|-------------|
 | `CliRun.UseExternalProcessFactory(factory)` | Use `IProcessInvoker` via DI or construct `ProcessInvoker` directly |
 | `CliRun.UseFilePathResolver(resolver)` | Use `IProcessInvoker` via DI or construct `ProcessInvoker` directly |
-| All static backing state | Per-call allocation — no process-wide state |
+| All static backing state | Per-call allocation, no process-wide state |
 
 ## Cross-references
 
-- [ADR 0003 — CliRun defaults facade](../../../../docs/adr/0003-cli-run-defaults-facade.md)
-- [Migration guide — CliRun](../../../../site/docs/migration-guides/3.0.0.md#1-clirun-is-now-stateless)
+- [ADR 0003, CliRun defaults facade](../../../../docs/adr/0003-cli-run-defaults-facade.md)
+- [Migration guide, CliRun](../../../../site/docs/migration-guides/3.0.0.md#1-clirun-is-now-stateless)
 - [Choosing your Invocation Pattern](../../../../site/docs/guides/choosing-invocation-pattern.md)

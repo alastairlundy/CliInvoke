@@ -58,11 +58,11 @@ else
 
 Detail the three main method groups (each with two overloads):
 
-1. **RunAsync** - Returns a `ProcessResult` with exit code only
+1. **RunAsync** returns a `ProcessResult` with exit code only
    - `RunAsync(string targetFilePath, string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null, CancellationToken cancellationToken = default)`
    - `RunAsync(ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)`
 
-2. **RunBufferedAsync** - Returns a `BufferedProcessResult` with exit code, standard output, and standard error
+2. **RunBufferedAsync** returns a `BufferedProcessResult` with exit code, standard output, and standard error
    - `RunBufferedAsync(string targetFilePath, string arguments = "", string? workingDirectory = null, TimeSpan? timeoutTimeSpan = null, CancellationToken cancellationToken = default)`
    - `RunBufferedAsync(ProcessConfiguration configuration, ProcessExitConfiguration? exitConfiguration = null, CancellationToken cancellationToken = default)`
 
@@ -70,9 +70,9 @@ Detail the three main method groups (each with two overloads):
 
 Using the static `CliRun` class involves the following trade-offs:
 
-- **Advantages**: Zero boilerplate – no DI container or factories required; most arguments are optional with sensible defaults for common use cases.
-- **Disadvantages**: Limited flexibility – cannot change resource policies, interrupt strategies, or start-logic customisations; harder to replace the underlying invoker for unit testing or alternative back-ends. **No middleware support** — `CliRun` cannot run cross-cutting concerns (logging, post-exit validation, PowerShell/`cmd` wrapping). If you need middleware, use `IProcessInvoker`/`ProcessInvoker` with the fluent `Use*` extension methods instead.
+- **Advantages**: Zero boilerplate, no DI container or factories required; most arguments are optional with sensible defaults for common use cases.
+- **Disadvantages**: Limited flexibility, cannot change resource policies, interrupt strategies, or start-logic customisations; harder to replace the underlying invoker for unit testing or alternative back-ends. **No middleware support**. `CliRun` cannot run cross-cutting concerns (logging, post-exit validation, PowerShell/`cmd` wrapping). If you need middleware, use `IProcessInvoker`/`ProcessInvoker` with the fluent `Use*` extension methods instead.
 
 ## Middleware Coverage
 
-`CliRun` does **not** flow through the middleware pipeline. Every `Run*`/`FireAndForget` call allocates a fresh `ProcessInvocationPipeline` internally — there is no persistent `ProcessInvoker` to attach middleware to. If you need cross-cutting concerns (logging, result validation, platform wrapping), use `IProcessInvoker`/`ProcessInvoker` instead.
+`CliRun` does **not** flow through the middleware pipeline. Every `Run*`/`FireAndForget` call allocates a fresh `ProcessInvocationPipeline` internally. There is no persistent `ProcessInvoker` to attach middleware to. If you need cross-cutting concerns (logging, result validation, platform wrapping), use `IProcessInvoker`/`ProcessInvoker` instead.

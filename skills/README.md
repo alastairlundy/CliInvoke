@@ -1,6 +1,6 @@
 # CliInvoke AI Agent Skills
 
-> **API version note:** These skills describe the **CliInvoke 3.0 configuration API** — the `*Spec` configuration seams (e.g. `ArgumentsSpec`, `EnvironmentVariablesSpec`, `ProcessResourcePolicySpec`, `UserCredentialSpec`) and the `ConfigureXxx(Action<XxxSpec>)` builder methods. The 3.0 API is available in pre-release packages (`3.0.0-beta.2`). On the older 2.x release the equivalent surface is the builder types (`IArgumentsBuilder`, `UserCredentialBuilder`, etc.). Agents should match their guidance to the installed package version.
+> **API version note:** These skills describe the **CliInvoke 3.0 configuration API**, the `*Spec` configuration seams (e.g. `ArgumentsSpec`, `EnvironmentVariablesSpec`, `ProcessResourcePolicySpec`, `UserCredentialSpec`) and the `ConfigureXxx(Action<XxxSpec>)` builder methods. The 3.0 API is available in pre-release packages (`3.0.0-beta.2`). On the older 2.x release the equivalent API is the builder types (`IArgumentsBuilder`, `UserCredentialBuilder`, etc.). Agents should match their guidance to the installed package version.
 
 This directory contains skills that guide AI agents in correctly using the CliInvoke library.
 
@@ -8,9 +8,9 @@ This directory contains skills that guide AI agents in correctly using the CliIn
 
 Skills are organized into directories by the general area they cover:
 
-- `cliinvoke/` — invocation patterns, configuration, and lifecycle.
-- `cliinvoke-migration/` — v2 to v3 migration guidance.
-- `evals/` — YAML files for testing skill effectiveness. Used for skill development and testing only.
+- `cliinvoke/` covers invocation patterns, configuration, and lifecycle.
+- `cliinvoke-migration/` covers v2 to v3 migration guidance.
+- `evals/` contains YAML files for testing skill effectiveness. Used for skill development and testing only.
 
 Each skill is contained in its own directory and consists of a `SKILL.md` file documenting the specialized knowledge and workflows.
 

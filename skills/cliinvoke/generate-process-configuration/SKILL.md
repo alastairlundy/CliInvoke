@@ -1,8 +1,8 @@
 ---
 name: generate-process-configuration
-description: Guidance on correctly utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, with proper build and redirection setup. USE FOR guidelines on utilizing IProcessConfigurationBuilder to create ProcessConfiguration objects, including build and redirection setup. DO NOT USE FOR executing the resulting configuration.
+description: Guidance on correctly using IProcessConfigurationBuilder to create ProcessConfiguration objects, with proper build and redirection setup. USE FOR guidelines on using IProcessConfigurationBuilder to create ProcessConfiguration objects, including build and redirection setup. DO NOT USE FOR executing the resulting configuration.
 compatibility: Requires one or more CliInvoke NuGet packages (such as CliInvoke.Core, CliInvoke, or CliInvoke.Specialization)
-targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
+targets: CliInvoke 3.0 (spec API, see skills/README.md for version note)
 ---
 # Generate Process Configuration
 
@@ -13,14 +13,14 @@ targets: CliInvoke 3.0 (spec API — see skills/README.md for version note)
 - When auditing existing builder code for missing `.Build()` calls or missing redirection setup.
 
 ## When not to use
-- When executing the resulting configuration — this skill covers *building* the configuration, not running it. For execution, load `select-execution-pattern` to choose an invoker.
-- When managing disposal of `ProcessConfiguration` — load `implement-resource-lifecycle` instead.
-- When migrating from v2-style code to v3 — load `v2-to-v3-migration`.
+- When executing the resulting configuration. This skill covers *building* the configuration, not running it. For execution, load `select-execution-pattern` to choose an invoker.
+- When managing disposal of `ProcessConfiguration`, load `implement-resource-lifecycle` instead.
+- When migrating from v2-style code to v3, load `v2-to-v3-migration`.
 
 ## Mental Model: Stage 1 of the Process Invocation Pipeline
 
 In CliInvoke v3, process invocation is modelled as a four-stage pipeline: **Configuration → Invoke → OS Process → Result**.
-`ProcessConfiguration` is **Stage 1** — pure, value-bearing data describing *what* to run and *how* to start it. The invoker (Stage 2) reads it and never mutates it, with the single exception of platform middleware (`UsePowerShell` / `UseCmd`), which substitutes the command that runs inside the wrapped shell. Build the configuration correctly here and the rest of the pipeline is deterministic.
+`ProcessConfiguration` is **Stage 1**, pure, value-bearing data describing *what* to run and *how* to start it. The invoker (Stage 2) reads it and never mutates it, with the single exception of platform middleware (`UsePowerShell` / `UseCmd`), which substitutes the command that runs inside the wrapped shell. Build the configuration correctly here and the rest of the pipeline is deterministic.
 
 ## Core Workflow
 

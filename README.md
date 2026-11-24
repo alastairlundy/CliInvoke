@@ -54,15 +54,15 @@ CliInvoke is available on [the NuGet Gallery](https://nuget.org) but can also be
 
 The package(s) to install depends on your use case:
 
-* For use in a .NET library – Install the abstractions package, your developer users can install the Implementation and
+* For use in a .NET library – Install the abstractions package. Your developer users can install the Implementation and
   Dependency Injection packages.
 * For use in a .NET app – Install the implementation package. It includes DI registration and convenience helpers built in.
 
 | Project type / Need                                                          | Packages to install (dotnet add package ...)                                      | Notes                                                                        |
 |------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                  | Only the Core (abstractions) package — consumers can choose implementations. |
+| Library author (provide abstractions only)                                   | `CliInvoke.Core`                                                                  | Only the Core (abstractions) package. Consumers can choose implementations. |
 | Library or app that needs concrete builders / implementations                | `CliInvoke.Core`, `CliInvoke`                                                     | Implementation package plus Core for models/abstractions.                    |
-| Desktop or Console application (common case — use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`                                                     | Includes DI registration and convenience helpers; some Middleware implementations are built into the main package.         |
+| Desktop or Console application (common case, use DI & convenience helpers)  | `CliInvoke.Core`, `CliInvoke`                                                     | Includes DI registration and convenience helpers; some Middleware implementations are built into the main package.         |
 | Any project that needs platform‑specific or shell specializations (optional) | `CliInvoke.Specializations` (install in addition to the packages above as needed) | Adds Cmd/PowerShell and other specializations; include only when required.   |
 
 ### Links to packages
@@ -73,7 +73,7 @@ The package(s) to install depends on your use case:
 
 ## Supported Platforms
 
-CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android (untested). Note: the PowerShell middleware does not support Android — shell specializations via `UsePowerShell` are unavailable there.
+CliInvoke supports Windows, macOS, Linux, FreeBSD, and Android (untested). Note: the PowerShell middleware does not support Android. Shell specializations via `UsePowerShell` are unavailable there.
 
 CliInvoke targets .NET 10 and .NET 11 only, by design. .NET 8 and .NET 9 leave Microsoft support in November 2026, and supporting netstandard2.0 in v2 added real maintenance cost. The 2.x release line, which supports older runtimes, is itself unsupported after December 1, 2026.
 
@@ -86,11 +86,11 @@ platform Specializations as composition paths). See [DESIGN_PATTERNS.md](DESIGN_
 documentation on each pattern, including a [Which pattern should I use?](DESIGN_PATTERNS.md#which-invocation-pattern-should-i-use)
 decision tree and a [Configuration Patterns](DESIGN_PATTERNS.md#configuration-patterns) guide.
 
-* **`CliRun`** — Recommended default. Beginner-friendly entrypoint for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. Start here if you are new to CliInvoke.
-* **`IProcessInvoker`** — DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
-* **`IExternalProcess` & `IExternalProcessFactory`** — Process-like API with DI support. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
+* **`CliRun`**, recommended default. Beginner-friendly entrypoint for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. Start here if you are new to CliInvoke.
+* **`IProcessInvoker`**, DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
+* **`IExternalProcess` & `IExternalProcessFactory`**, process-like API with DI support. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
 
-> **New to CliInvoke? Start with `CliRun`** — it is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control.
+> **New to CliInvoke? Start with `CliRun`**. It is the recommended default entry point. Reach for `IProcessInvoker` when you need DI or middleware, and `IExternalProcess` when you need process-level control.
 
 ## Examples
 
@@ -125,7 +125,7 @@ For detailed documentation on all available patterns and when to use them, see [
 
 ### Advanced Configuration
 
-For fine-grained control over process execution — custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration — see the **[Configuration Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/configuration)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
+For fine-grained control over process execution, such as custom timeouts, cancellation strategies, buffered vs. non-buffered output, and builder-based configuration, see the **[Configuration Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/configuration)** and the **[Choosing your Invocation Pattern](site/docs/guides/choosing-invocation-pattern.md)** guide in the documentation portal.
 
 > Most configurations are built with direct init construction (see [Configuration Patterns](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern)). The builder path is for argument escaping, user credentials, and resource policy features.
 
@@ -138,16 +138,16 @@ For fine-grained control over process execution — custom timeouts, cancellatio
 
 - **`Arguments`** is a preformatted command-line string. CliInvoke passes it to the process
   (or to a shell composition) exactly as written. It does not keep the values inside it
-  separate: any delimiter the consuming shell recognises — a space, on the POSIX path — splits
+  separate: any delimiter the consuming shell recognises, a space on the POSIX path, splits
   the text into separate arguments. Quoting and escaping inside this string are the caller's
   responsibility.
-- **`ArgumentList`** holds one value per entry — for example a single file name. Each entry is
+- **`ArgumentList`** holds one value per entry, for example a single file name. Each entry is
   delivered to the target as exactly one argument, quoted or escaped per shell by the library.
   This is the form to use when a value must arrive unchanged, whatever characters it contains.
 
 When `ArgumentList` is non-empty it takes precedence over `Arguments`.
 
-Example — a caller wants `safe.txt --overwrite` to arrive as **one** file name. Passing it as
+Example. A caller wants `safe.txt --overwrite` to arrive as **one** file name. Passing it as
 a single `ArgumentList` entry does that. Passing the same text in `Arguments` does not; the
 shell splits it at the space:
 
@@ -165,11 +165,11 @@ as one entry.
 
 ## Middleware
 
-CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns — logging, validation, platform selection, retries — around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`) remain identical.
+CliInvoke's `ProcessInvoker` supports an optional **middleware** system that lets you plug cross-cutting concerns, such as logging, validation, platform selection, and retries, around the process pipeline without changing how you call it. Middleware wraps the terminal pipeline in the order you register, and call sites (`ExecuteAsync`, `ExecuteBufferedAsync`) remain identical.
 
-Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`. `UsePowerShell`/`UseCmd` additionally require registering the Specializations middleware types via `AddCliInvokeSpecializations()` from the `CliInvoke.Specializations` package — see that package's README.
+Built-in middleware includes `UseLogging`, `UsePostExitValidation`, `UsePowerShell`, and `UseCmd`. Middleware can be configured by hand or through DI via the `IProcessMiddlewareBuilder` callback in `AddCliInvoke`. `UsePowerShell`/`UseCmd` also require registering the Specializations middleware types via `AddCliInvokeSpecializations()` from the `CliInvoke.Specializations` package. See that package's README.
 
-For the full guide - constructor details, the `IProcessMiddleware` contract, DI configuration, result ownership, and the result-swap rule - see the **[Middleware Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/middleware/)**.
+For the full guide, constructor details, the `IProcessMiddleware` contract, DI configuration, result ownership, and the result-swap rule, see the **[Middleware Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/middleware/)**.
 
 > [!NOTE]
 > Runners are identified by file name. Invoke shell runners by their canonical names (`cmd.exe`, `pwsh`/`powershell`); a renamed shell binary is treated as an ordinary target and receives tokenized delivery, and shell-specific composition and its validation do not apply.
@@ -184,15 +184,15 @@ For the full guide - constructor details, the `IProcessMiddleware` contract, DI 
 > | 1 | `IExternalProcess`      | Underlying `System.Diagnostics.Process` (pipes, handles, threads) |
 > | 2 | `UserCredential`        | `SecureString` password buffer                                    |
 > | 3 | `UserCredentialSpec`  | `SecureString` password buffer staged for `Build()`               |
-> | 4 | `ProcessConfigurationBuilder` | The `UserCredentialSpec` it created — `Dispose()` disposes only that spec (and its staged `SecureString`), never caller-supplied `Credential`/`StandardInput` |
+> | 4 | `ProcessConfigurationBuilder` | The `UserCredentialSpec` it created. `Dispose()` disposes only that spec (and its staged `SecureString`), never caller-supplied `Credential`/`StandardInput` |
 >
 > Always wrap these four types in `using` or `await using` statements.
 >
-> For `ProcessConfigurationBuilder`, the user remains responsible for disposing any `Credential` and `StandardInput` they supply to it — the builder does not dispose caller-provided credential/stdin resources.
+> For `ProcessConfigurationBuilder`, the user remains responsible for disposing any `Credential` and `StandardInput` they supply to it. The builder does not dispose caller-provided credential/stdin resources.
 >
-> `ProcessConfiguration` is a plain immutable value object and does **not** implement `IDisposable`. The `StandardInput` (`StreamWriter`) and `UserCredential` you place inside it remain **your** responsibility to dispose — CliInvoke never disposes them on your behalf.
+> `ProcessConfiguration` is a plain immutable value object and does **not** implement `IDisposable`. The `StandardInput` (`StreamWriter`) and `UserCredential` you place inside it remain **your** responsibility to dispose. CliInvoke never disposes them on your behalf.
 
-For the full disposal reference — ownership rules, disposal patterns, and a checklist — see the **[Resource Disposal Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/resource-disposal/)**.
+For the full disposal reference, ownership rules, disposal patterns, and a checklist, see the **[Resource Disposal Guide](https://alastairlundy.github.io/CliInvoke/docs/guides/resource-disposal/)**.
 
 > [!NOTE]
 > Middleware does not change these rules. A middleware chain returns the process result **un-disposed** to the caller, so the disposal contract described above applies exactly as it does without middleware. See **[Middleware](#middleware)** for the result-ownership note.
@@ -203,9 +203,9 @@ Full documentation is available in the [CliInvoke Developer Site](https://alasta
 
 | Who you are                                                        | Start here                                                                                                                                                                                               |
 |--------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Beginner** — "I just need to run a command"                      | [Quickstart](https://alastairlundy.github.io/CliInvoke/docs/getting-started-quickstart) → [Choosing your Invocation Pattern](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern)                                                              |
-| **Professional Developer** — "I'm building a testable app with DI" | [Getting Started](https://alastairlundy.github.io/CliInvoke/docs/getting-started/) → [Configuration](https://alastairlundy.github.io/CliInvoke/docs/guides/configuration)                                                                                                     |
-| **Power User** — "I need full lifecycle control"                   | [Choosing your Invocation Pattern → IExternalProcess](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern#iexternalprocess--power-user-lifecycle-control) → [Architecture](https://alastairlundy.github.io/CliInvoke/docs/guides/architecture) |
+| **Beginner**, "I just need to run a command"                      | [Quickstart](https://alastairlundy.github.io/CliInvoke/docs/getting-started-quickstart) → [Choosing your Invocation Pattern](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern)                                                              |
+| **Professional Developer**, "I'm building a testable app with DI" | [Getting Started](https://alastairlundy.github.io/CliInvoke/docs/getting-started/) → [Configuration](https://alastairlundy.github.io/CliInvoke/docs/guides/configuration)                                                                                                     |
+| **Power User**, "I need full lifecycle control"                   | [Choosing your Invocation Pattern → IExternalProcess](https://alastairlundy.github.io/CliInvoke/docs/guides/choosing-invocation-pattern#iexternalprocess--power-user-lifecycle-control) → [Architecture](https://alastairlundy.github.io/CliInvoke/docs/guides/architecture) |
 
 Other guides: [Troubleshooting](https://alastairlundy.github.io/CliInvoke/docs/guides/troubleshooting), [Migration Guides](https://alastairlundy.github.io/CliInvoke/docs/migration-guides/), [Building from Source](https://alastairlundy.github.io/CliInvoke/docs/building-cliinvoke/)
 

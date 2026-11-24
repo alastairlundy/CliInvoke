@@ -1,7 +1,7 @@
 # CliInvoke Agent Guidelines
 
 ## What this repo is
-CliInvoke — a .NET/C# library for launching and interacting with command-line processes (builders, configuration models, invokers, middleware, DI, and platform specializations).
+CliInvoke is a .NET/C# library for launching and interacting with command-line processes (builders, configuration models, invokers, middleware, DI, and platform specializations).
 
 - TFMs: `net10.0` and `net11.0` (src packages and `CliInvoke.Tests` multi-target; `global.json` pins the .NET 11 SDK, which builds both). Current release line: `3.1.0`.
 - Docs portal lives in `site/` (built with Lunet; published to GitHub Pages on release by `.github/workflows/docs-publish.yml`).
@@ -9,17 +9,17 @@ CliInvoke — a .NET/C# library for launching and interacting with command-line 
 ## Codebase Organization
 - **Solution**: `src/CliInvoke.sln`
 - **Packages** (each carries its own `Version`/`PackageVersion` and `PackageReleaseNotes` in its csproj):
-  - `src/CliInvoke.Core/` — abstractions & models (`ProcessConfiguration`, results, middleware interfaces)
-  - `src/CliInvoke/` — implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers, including the `AddCliInvoke` DI entry point in `Extensions/DependencyInjection/AddCliInvokeExtensions.cs`, namespace `CliInvoke.Extensions`)
-  - `src/CliInvoke.Specializations/` — shell middleware (PowerShell/CMD/default shell); also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Specializations`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
-- `src/CliInvoke.Extensions/` is an **empty leftover directory** — that package no longer exists; its content was folded into the main `CliInvoke` package. (`tests/CliInvoke.Extensions.Tests/` was removed; extension tests now live in `tests/CliInvoke.Tests/`.)
-- **Tests**: `tests/` — TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs `tests/CliInvoke.Tests/` **and** `tests/CliInvoke.Specializations.Tests/` on the ubuntu-latest, windows-latest, and macos-latest matrix legs.
+  - `src/CliInvoke.Core/`, abstractions & models (`ProcessConfiguration`, results, middleware interfaces)
+  - `src/CliInvoke/`, implementation: `CliRun` facade, `ProcessInvoker`/`ProcessInvocationPipeline`, builders, `Extensions/` (middleware + DI helpers, including the `AddCliInvoke` DI entry point in `Extensions/DependencyInjection/AddCliInvokeExtensions.cs`, namespace `CliInvoke.Extensions`)
+  - `src/CliInvoke.Specializations/`, shell middleware (PowerShell/CMD/default shell); also defines the orthogonal add-on registration `AddCliInvokeSpecializations` (`DependencyInjectionExtensions.cs`, namespace `CliInvoke.Specializations`), which registers only its middleware types and is called alongside `AddCliInvoke` (same `ServiceLifetime`)
+- `src/CliInvoke.Extensions/` is an **empty leftover directory**. That package no longer exists; its content was folded into the main `CliInvoke` package. (`tests/CliInvoke.Extensions.Tests/` was removed; extension tests now live in `tests/CliInvoke.Tests/`.)
+- **Tests**: `tests/`, TUnit on Microsoft.Testing.Platform (`UseTestingPlatformRunner=true`; test projects are `Exe`). CI runs `tests/CliInvoke.Tests/` **and** `tests/CliInvoke.Specializations.Tests/` on the ubuntu-latest, windows-latest, and macos-latest matrix legs.
 - **Benchmarks**: `benchmarks/`.
 - **SDK**: `global.json` pins the .NET 11 GA SDK (`11.0.100`, `rollForward: latestFeature`). The .NET 10 runtime is also needed to run the `net10.0` test leg. Check `dotnet --version` vs `global.json` if builds fail with TFM errors.
 
 ## Build & Test (replicate CI order)
 From repo root (see `.github/workflows/test.yml`):
-1. `bash scripts/guard-configureawait.sh src` — **ConfigureAwait guard, hard CI gate run before build.** Every `await` in `src/` must have `.ConfigureAwait(false)`; `await foreach`/`await using` are exempt. Run via Git Bash/WSL on Windows.
+1. `bash scripts/guard-configureawait.sh src`. **ConfigureAwait guard, hard CI gate run before build.** Every `await` in `src/` must have `.ConfigureAwait(false)`; `await foreach`/`await using` are exempt. Run via Git Bash/WSL on Windows.
 2. `dotnet build src/CliInvoke.sln`
 3. From `tests/CliInvoke.Tests/`: `dotnet test`
 4. From `tests/CliInvoke.Specializations.Tests/`: `dotnet test`
@@ -29,39 +29,39 @@ From repo root (see `.github/workflows/test.yml`):
 Other gates/quirks:
 - **XML doc comments are build errors**: `Directory.Build.props` escalates CS1574/1580/1581/1584/1658/1734/1762 to errors. Keep `<summary>`/`<paramref>`/`<see>` valid on public API.
 - **`ImplicitUsings` disabled**; `LangVersion` 14; Nullable enabled. Style: `src/.editorconfig` (no `var` for built-ins, separate using groups, 100-col max).
-- **Central Package Management**: `src/`, `tests/`, `benchmarks/` each have their own `Directory.Packages.props`. New `PackageReference` requires a matching `PackageVersion` there — no `Version=` attributes in csprojs.
-- **AOT & trimming**: src packages are `IsAotCompatible` + `IsTrimmable` — avoid reflection-dependent APIs.
+- **Central Package Management**: `src/`, `tests/`, `benchmarks/` each have their own `Directory.Packages.props`. New `PackageReference` requires a matching `PackageVersion` there, no `Version=` attributes in csprojs.
+- **AOT & trimming**: src packages are `IsAotCompatible` + `IsTrimmable`. Avoid reflection-dependent APIs.
 
 ## Invocation patterns (architecture)
 Three patterns, documented in `DESIGN_PATTERNS.md` (includes a decision tree):
-- **`CliRun`** — static, stateless, batteries-included facade; recommended default (`RunAsync`/`RunBufferedAsync` with string-args overloads). Allocates a fresh pipeline per call; no process-wide configurable state.
-- **`IProcessInvoker`** — DI-centric; the only pattern that flows through the middleware chain.
-- **`IExternalProcess` / `IExternalProcessFactory`** — process-like lifecycle control; does **not** flow through middleware (the bypass pattern).
+- **`CliRun`**, static, stateless, batteries-included facade; recommended default (`RunAsync`/`RunBufferedAsync` with string-args overloads). Allocates a fresh pipeline per call; no process-wide configurable state.
+- **`IProcessInvoker`**, DI-centric; the only pattern that flows through the middleware chain.
+- **`IExternalProcess` / `IExternalProcessFactory`**, process-like lifecycle control; does **not** flow through middleware (the bypass pattern).
 - Built-in middleware: `UseLogging`, `UsePostExitValidation` (main package); `UsePowerShell`, `UseCmd`, `UseDefaultShell` (Specializations). Plus retry/truncation extensions. Middleware returns the process result **un-disposed** to the caller.
 - Middleware state split: **DI** resolves framework services (loggers, validators, lifetimes); **`MiddlewareItems`** is the ad-hoc per-invocation bag shared between middleware (same split as `HttpContext.RequestServices` vs `HttpContext.Items`).
-- Construction default: init construction with `required` `TargetFilePath`. `ProcessConfigurationBuilder` is only for argument escaping, `UserCredentialSpec`, and resource-policy callback flows — reaching for the builder by habit is "v2-style code" (see `GLOSSARY.md`).
+- Construction default: init construction with `required` `TargetFilePath`. `ProcessConfigurationBuilder` is only for argument escaping, `UserCredentialSpec`, and resource-policy callback flows. Reaching for the builder by habit is "v2-style code" (see `GLOSSARY.md`).
 - Load the `cliinvoke-pattern-validator` skill when adding or changing invocation code.
 
 ## Resource disposal
 Exactly **four** `IDisposable` types: `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, `ProcessConfigurationBuilder` (see README "Resource Disposal"). `ProcessConfiguration` is not disposable; `StandardInput`/`UserCredential` placed inside it remain the caller's responsibility.
 
-## Domain conventions (details in GLOSSARY.md — do not "fix" these)
-- `FilePathResolver.ResolveFilePath` (formerly `FilePathResolverBase`): PATH lookup first, then a single-level, non-recursive directory fallback — a performance contract; reordering requires a new ADR.
-- `Get*` returns materialized arrays; `Enumerate*` returns lazy `IEnumerable` — intentional naming asymmetry.
+## Domain conventions (details in GLOSSARY.md, do not "fix" these)
+- `FilePathResolver.ResolveFilePath` (formerly `FilePathResolverBase`): PATH lookup first, then a single-level, non-recursive directory fallback, a performance contract; reordering requires a new ADR.
+- `Get*` returns materialized arrays; `Enumerate*` returns lazy `IEnumerable`, intentional naming asymmetry.
 - Custom `GetPathFileExtensions` overrides must return **lowercased** extensions or matching silently fails.
 - `Try*` methods must never propagate exceptions (catch `Exception` by convention).
 
 ## Packaging & releases
 - Use the `cliinvoke-publish-and-package` skill for releases and cross-project testing (it requires running `cliinvoke-inner-loop` first).
 - Release-style build: `dotnet build src/CliInvoke.sln -c Release /p:ContinuousIntegrationBuild=true` (SourceLink + snupkg expected in CI).
-- Cross-project testing: pack Core to a local feed (`dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs`) and restore dependents with `-s ./nupkgs`. Packs use plain project references — nuspec dependency versions are taken from the referenced projects' `PackageVersion` properties.
-- `publish.yml` is manual (`workflow_dispatch`); package versions come from the csprojs' `PackageVersion` properties — keep them in sync before dispatching.
+- Cross-project testing: pack Core to a local feed (`dotnet pack src/CliInvoke.Core -c Release -o ./nupkgs`) and restore dependents with `-s ./nupkgs`. Packs use plain project references. The nuspec dependency versions are taken from the referenced projects' `PackageVersion` properties.
+- `publish.yml` is manual (`workflow_dispatch`); package versions come from the csprojs' `PackageVersion` properties. Keep them in sync before dispatching.
 - Update the csproj `PackageVersion`/`PackageReleaseNotes` **and** `CHANGELOG.md` for releases.
 
 ## Testing notes
 - TUnit + FsCheck (property tests) + Bogus.
-- Tests spawn real executables (`dotnet`, `powershell.exe`, `pwsh`); PowerShell middleware tests skip (`SkipTestIfNull`) only when `pwsh` is genuinely absent from PATH. GitHub-hosted Windows runner images ship PowerShell 7, so those tests run on the windows-latest leg rather than skipping. Local pitfall: a Store-installed PowerShell resolves on PATH to an app-execution alias in `%LOCALAPPDATA%\Microsoft\WindowsApps`. The alias is not an empty file; the real executable can live in an ACL-restricted package folder, and the alias is a reparse point that reports a 0-byte size to normal file-size queries. It launches in some contexts, but Windows can refuse it from the test host's context (`Access is denied`, os error 5), so pwsh tests can fail instead of skip on such machines. OS-dependent behavior - replicate CI on ubuntu-latest when in doubt.
-- CI runs on ubuntu-latest, windows-latest, and macos-latest: cmd-runner behavioural tests (marker-file injection tests in `tests/CliInvoke.Tests/Extensibility/Factories/` and `tests/CliInvoke.Specializations.Tests/`) are Windows-only by design and skip on the other legs; the windows-latest leg runs them.
+- Tests spawn real executables (`dotnet`, `powershell.exe`, `pwsh`); PowerShell middleware tests skip (`SkipTestIfNull`) only when `pwsh` is genuinely absent from PATH. GitHub-hosted Windows runner images ship PowerShell 7, so those tests run on the windows-latest leg rather than skipping. Local pitfall: a Store-installed PowerShell resolves on PATH to an app-execution alias in `%LOCALAPPDATA%\Microsoft\WindowsApps`. The alias is not an empty file; the real executable can live in an ACL-restricted package folder, and the alias is a reparse point that reports a 0-byte size to normal file-size queries. It launches in some contexts, but Windows can refuse it from the test host's context (`Access is denied`, os error 5). pwsh tests can fail instead of skip on such machines. OS-dependent behavior. Replicate CI on ubuntu-latest when in doubt.
+- CI runs on ubuntu-latest, windows-latest, and macos-latest. Cmd-runner behavioural tests (marker-file injection tests in `tests/CliInvoke.Tests/Extensibility/Factories/` and `tests/CliInvoke.Specializations.Tests/`) are Windows-only by design and skip on the other legs; the windows-latest leg runs them.
 
 ## PRs & contributing
 - Follow `CONTRIBUTING.md`; fill in every section of `.github/pull_request_template.md`.

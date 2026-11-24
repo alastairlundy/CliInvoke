@@ -12,18 +12,18 @@ For an implementing package, check out [CliInvoke](https://www.nuget.org/package
 
 Key abstractions:
 
-* ``IProcessInvoker`` - Runs a ``ProcessConfiguration`` and returns the result.
-* ``IExternalProcessFactory`` - Creates ``IExternalProcess`` instances from a ``ProcessConfiguration`` for lifecycle control.
+* ``IProcessInvoker`` runs a ``ProcessConfiguration`` and returns the result.
+* ``IExternalProcessFactory`` creates ``IExternalProcess`` instances from a ``ProcessConfiguration`` for lifecycle control.
 
 * Output redirection:
     * Output redirection is handled via ``IProcessInvoker.ExecuteBufferedAsync`` (or
       ``IExternalProcess.CaptureBufferedResultAsync``).
 
 * Fluent specs and builders:
-    * ``ArgumentsSpec`` - A spec for argument building and argument escaping.
-    * ``EnvironmentVariablesSpec`` - A spec for setting environment variables.
-    * ``IProcessConfigurationBuilder`` - An interface to fluently configure and build ``ProcessConfiguration`` objects. Prefer direct init construction. Reach for the builder only for argument escaping, user credentials, or resource-policy flows.
-    * ``ProcessResourcePolicySpec`` - A spec for fluently configuring and building ``ProcessResourcePolicy``
+    * ``ArgumentsSpec``, a spec for argument building and argument escaping.
+    * ``EnvironmentVariablesSpec``, a spec for setting environment variables.
+    * ``IProcessConfigurationBuilder``, an interface to fluently configure and build ``ProcessConfiguration`` objects. Prefer direct init construction. Reach for the builder only for argument escaping, user credentials, or resource-policy flows.
+    * ``ProcessResourcePolicySpec``, a spec for fluently configuring and building ``ProcessResourcePolicy``
       objects.
     * ``UserCredentialSpec``
 
@@ -64,9 +64,9 @@ the [list of supported platforms](https://github.com/alastairlundy/CliInvoke/blo
 
 CliInvoke.Core provides abstractions and types used by different design patterns. For comprehensive documentation on design patterns, see [DESIGN_PATTERNS.md](../../DESIGN_PATTERNS.md).
 
-* **`CliRun`** – Beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. (Requires `CliInvoke` package)
-* **`IProcessInvoker`** – DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
-* **`IExternalProcess` & `IExternalProcessFactory`** – Process-like API with greater flexibility. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
+* **`CliRun`**, beginner-friendly/quickstart entrypoint. Use for basic scripting, CI/CD tasks, or simple command execution. Zero boilerplate, optional arguments with sensible defaults. (Requires `CliInvoke` package)
+* **`IProcessInvoker`**, DI-centric pattern for end-to-end process management. Use when building applications that need testability, dependency injection integration, or custom process configuration per invocation.
+* **`IExternalProcess` & `IExternalProcessFactory`**, Process-like API with greater flexibility. Use when you need granular lifecycle control, manual start/stop sequences, or power-user scenarios similar to `System.Diagnostics.Process`.
 
 ## Examples
 
@@ -128,7 +128,7 @@ BufferedProcessResult result = await invoker.ExecuteBufferedAsync(configuration)
 
 Reach for ``IProcessConfigurationBuilder`` only when you need argument escaping, user credentials, or resource-policy callback flows. For everything else, prefer direct init construction as shown above. The builder implementation ships in the main ``CliInvoke`` package.
 
-The four resource-owning types are `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, and `ProcessConfigurationBuilder`. For `ProcessConfigurationBuilder` the user remains responsible for disposing any `Credential` and `StandardInput` they supply to it — the builder does not dispose caller-provided credential/stdin resources.
+The four resource-owning types are `IExternalProcess`, `UserCredential`, `UserCredentialSpec`, and `ProcessConfigurationBuilder`. For `ProcessConfigurationBuilder` the user remains responsible for disposing any `Credential` and `StandardInput` they supply to it. The builder does not dispose caller-provided credential/stdin resources.
 
 #### Non-buffered execution example
 
@@ -246,8 +246,8 @@ catch (OperationCanceledException)
 
 CliInvoke supports two cancellation strategies, controlled via `ProcessExitBehaviour`:
 
-* **Graceful Exit** (default) – Sends SIGTERM/SIGINT signals to allow the process to shut down cleanly and release resources. The process has an opportunity to handle the signal and exit gracefully.
-* **Forceful Exit** – Forcefully terminates the process and all child processes immediately without waiting for graceful shutdown.
+* **Graceful Exit** (default) sends SIGTERM/SIGINT signals to allow the process to shut down cleanly and release resources. The process has an opportunity to handle the signal and exit gracefully.
+* **Forceful Exit** terminates the process and all child processes immediately without waiting for graceful shutdown.
 
 You can configure the cancellation behavior when a timeout occurs or when cancellation is requested:
 
@@ -265,7 +265,7 @@ ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(forcefulTimeo
 
 ##### Cancellation Exception Behavior
 
-By default, cancellations do not throw exceptions—the process simply exits and a result is returned. You can change this behavior with `CancellationThrowsException`:
+By default, cancellations do not throw exceptions. The process simply exits and a result is returned. You can change this behavior with `CancellationThrowsException`:
 
 ```csharp
 using CliInvoke.Core;

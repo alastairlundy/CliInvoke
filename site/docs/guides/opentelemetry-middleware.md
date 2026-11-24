@@ -8,7 +8,7 @@ layout: simple
 When automation shells out, traces answer questions logs struggle with: which
 subprocess consumed the forty seconds, which tool hangs in production, how
 often timeouts fire per tool. CliInvoke does not ship an OpenTelemetry
-package. The middleware contract makes one unnecessary:
+package. The middleware contract makes one unnecessary.
 [IProcessMiddleware](middleware.md) is a first-class pipeline participant, so
 a span per invocation is about thirty lines of your own code. This recipe is
 the starting point.

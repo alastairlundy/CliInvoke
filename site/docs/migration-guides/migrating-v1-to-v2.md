@@ -4,10 +4,10 @@ title: "CliInvoke v1 to v2 Migration Guide."
 
 # CliInvoke v1 to v2 Migration Guide.
 
-CliInvoke v2 contains a number of breaking changes from CliInvoke v1. This document aims to detail alternatives to removed interfaces and classes.
+CliInvoke v2 contains many breaking changes from CliInvoke v1. This document aims to detail alternatives to removed interfaces and classes.
 
 ## v2 Overview
-CliInvoke version 2, hereafter v2, is a redesign of CliInvoke that vastly simplifies the API surface, improves the ergonomic experience of using CliInvoke, and adds support for Process Exit Configuration and additional features.
+CliInvoke version 2, hereafter v2, is a redesign of CliInvoke that simplifies the public API, makes CliInvoke easier to use, and adds support for Process Exit Configuration and additional features.
 
 Explicit support for .NET Standard 2.1 has been removed and is now provided through .NET Standard 2.0 Support
 

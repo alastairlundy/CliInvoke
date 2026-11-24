@@ -32,7 +32,7 @@ CliInvoke models process invocation as a four-stage pipeline:
 | # | Stage | Role | Owns |
 |---|-------|------|------|
 | 1 | **Configuration** | Pure data describing *what* to run and *how* to start it. | `ProcessConfiguration` (+ optional `ProcessExitConfiguration`, `UserCredential`, `ProcessResourcePolicy`) |
-| 2 | **Invoke** | The orchestration layer. Accepts a configuration, builds an `IExternalProcess`, drives start → capture, and disposes. | The invoker implementation and the factory. |
+| 2 | **Invoke** | The orchestration layer. Accepts a configuration, builds an `IExternalProcess`, drives start and capture, and disposes. | The invoker implementation and the factory. |
 | 3 | **OS Process** | The actual child process started by the OS via `System.Diagnostics.Process`. The library does not own the child after `Start()` returns; it observes it. | The OS process handle, the redirected pipes, and the captured exit code / start time / exit time. |
 | 4 | **Result** | Pure data describing *what happened*. | `ProcessResult` / `BufferedProcessResult`. |
 
@@ -43,8 +43,8 @@ Stage 2 hands a value to Stage 4 and to the caller.
 
 ### Execution modes
 
-The Invoke stage has three execution modes. The mode is selected by
-the caller (which method on the invoker / `CliRun` they invoke) and
+The Invoke stage has three execution modes. The caller selects the mode
+(which method on the invoker / `CliRun` they invoke), and the mode
 determines the result type:
 
 | Mode | Caller entry point | Result type | Captures |
@@ -60,7 +60,7 @@ The mode is implicit in which `IExternalProcess` method is called
 This section pins each conceptual stage to a concrete type and file
 in the source tree.
 
-### Stage 1 — Configuration
+### Stage 1: Configuration
 
 | Type | File |
 |------|------|
@@ -71,18 +71,18 @@ in the source tree.
 | Builders (interfaces) | `src/CliInvoke.Core/Builders/` |
 | Builders (concrete implementations) | `src/CliInvoke/Builders/` |
 
-The configuration is value-bearing. The invoker reads it; it is
-never mutated by the orchestration, with the single exception of
+The configuration is value-bearing. The invoker reads it; the orchestration
+never mutates it, with the single exception of
 `TargetFilePath`, which the file path resolver is allowed to rewrite
 from a relative path to an absolute one (see
 `ExternalProcess.StartAsync`).
 
-### Stage 2 — Invoke
+### Stage 2: Invoke
 
 | Type | Role | File |
 |------|------|------|
 | `IProcessInvoker` (interface) | Abstraction consumers depend on. | `src/CliInvoke.Core/IProcessInvoker.cs` |
-| `ProcessInvoker` | Default implementation. Owns an `IExternalProcessFactory` and orchestrates start → capture → dispose. | `src/CliInvoke/ProcessInvoker.cs` |
+| `ProcessInvoker` | Default implementation. Owns an `IExternalProcessFactory` and orchestrates start, capture, and dispose. | `src/CliInvoke/ProcessInvoker.cs` |
 | `IExternalProcessFactory` (interface) | Creates configured `IExternalProcess` instances. | `src/CliInvoke.Core/Factories/IExternalProcessFactory.cs` |
 | `ExternalProcessFactory` | Default factory. Constructs the `ExternalProcess` for a given configuration. | `src/CliInvoke/Factories/ExternalProcessFactory.cs` |
 | `CliRun` | Static façade. Builds a `ProcessConfiguration` from positional parameters and delegates to the same factory. | `src/CliInvoke/Extensions/CliRun.cs` |
@@ -106,7 +106,7 @@ finally
 }
 ```
 
-### Stage 3 — OS Process
+### Stage 3: OS Process
 
 | Type | Role | File |
 |------|------|------|
@@ -129,19 +129,19 @@ finally
 directly. It translates `ProcessExitConfiguration` into a concrete
 exit-handling strategy:
 
-- `ProcessExitBehaviour.WaitForExit` → `WaitForExitAsync`.
-- `ProcessExitBehaviour.GracefulExit` → race a `Task.Delay` against
+- `ProcessExitBehaviour.WaitForExit` maps to `WaitForExitAsync`.
+- `ProcessExitBehaviour.GracefulExit`. Race a `Task.Delay` against
   `WaitForExitAsync`; on timeout, send an interrupt signal via
   `BaseProcessControlAdapter.SendInterruptSignalAsync`; after a
   `CalculatePostInterruptGracePeriodSeconds(timeoutSeconds)` grace period
   (10s + 5% of the timeout, capped at 20s), fall back to `Kill()`.
-- `ProcessExitBehaviour.ForcefulExit` → `Kill()` after the timeout.
+- `ProcessExitBehaviour.ForcefulExit` maps to `Kill()` after the timeout.
 
-The race is serialised by a `SemaphoreSlim`
-(`ProcessWrapper._cancellationSemaphore`) so two concurrent
+A `SemaphoreSlim`
+(`ProcessWrapper._cancellationSemaphore`) serialises the race so two concurrent
 cancellation callers cannot both issue `Kill()`.
 
-### Stage 4 — Result
+### Stage 4: Result
 
 | Type | File |
 |------|------|
@@ -233,17 +233,17 @@ Use the table below to decide which stage a change belongs to.
 | Change | Belongs in |
 |--------|-----------|
 | New property on the process-start knobs (e.g. a new encoding) | Configuration (Stage 1) |
-| New consumer convenience API (e.g. a `RunXxxAsync` overload) | Invoke (Stage 2) — add to `CliRun` and `IProcessInvoker` |
-| New exit strategy (e.g. a new `ProcessExitBehaviour` value) | OS Process (Stage 3) — `ProcessWrapper` + `CancellationHelper` + `ProcessControlAdapter` |
-| New platform-specific process control (suspend / resume / interrupt) | OS Process (Stage 3) — add a new `BaseProcessControlAdapter` |
+| New consumer convenience API (e.g. a `RunXxxAsync` overload) | Invoke (Stage 2). Add to `CliRun` and `IProcessInvoker` |
+| New exit strategy (e.g. a new `ProcessExitBehaviour` value) | OS Process (Stage 3). `ProcessWrapper` + `CancellationHelper` + `ProcessControlAdapter` |
+| New platform-specific process control (suspend / resume / interrupt) | OS Process (Stage 3). Add a new `BaseProcessControlAdapter` |
 | New field on the result | Result (Stage 4) |
 
 ## Cross-References
 
-- [GLOSSARY.md](../GLOSSARY.md) — domain glossary.
-- [DESIGN_PATTERNS.md](../DESIGN_PATTERNS.md) — three invocation patterns and when
+- [GLOSSARY.md](../GLOSSARY.md). Domain glossary.
+- [DESIGN_PATTERNS.md](../DESIGN_PATTERNS.md). Three invocation patterns and when
   to use them.
-- [site/docs/guides/configuration.md](../site/docs/guides/configuration.md) —
-  configuration model reference.
-- [site/docs/guides/resource-disposal.md](../site/docs/guides/resource-disposal.md) —
-  ownership rules for configuration and result types.
+- [site/docs/guides/configuration.md](../site/docs/guides/configuration.md).
+  Configuration model reference.
+- [site/docs/guides/resource-disposal.md](../site/docs/guides/resource-disposal.md).
+  Ownership rules for configuration and result types.

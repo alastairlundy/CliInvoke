@@ -15,15 +15,15 @@ compatibility: Requires one or more CliInvoke NuGet packages (CliInvoke.Core, Cl
 
 ## When not to use
 
-- When writing new v3 code from scratch with no v2 references — the patterns in v3 are self-describing.
-- When the question is about general CliInvoke usage, configuration, or execution — load `select-execution-pattern` instead.
+- When writing new v3 code from scratch with no v2 references. The patterns in v3 are self-describing.
+- When the question is about general CliInvoke usage, configuration, or execution, load `select-execution-pattern` instead.
 - When the project has no v2 dependency and the task is unrelated to migration.
 
 ## v2-style code detection
 
 **v2-style code** is defined in [GLOSSARY.md](../../../GLOSSARY.md) as:
 
-> Code that a v3 migration must change: (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles — reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default.
+> Code that a v3 migration must change: (a) it uses APIs of the prior major version (v2) that v3 removed or changed, or (b) it defaults to v3-advanced construction styles, reaching for `ProcessConfigurationBuilder` by habit where init construction is the v3 default.
 
 ### Detection signals
 
@@ -31,14 +31,14 @@ Scan for these patterns to identify v2-style code:
 
 | Signal | What to look for |
 |--------|------------------|
-| `ProcessConfigurationFactory` | Removed in v3 — construct `ProcessConfiguration` directly |
-| `CliRun.UseExternalProcessFactory(...)` | Removed — use `IProcessInvoker` or DI |
-| `CliRun.UseFilePathResolver(...)` | Removed — use `IProcessInvoker` or DI |
-| `process.ExitConfiguration = ...` | Setter removed — pass at construction |
+| `ProcessConfigurationFactory` | Removed in v3. Construct `ProcessConfiguration` directly |
+| `CliRun.UseExternalProcessFactory(...)` | Removed. Use `IProcessInvoker` or DI |
+| `CliRun.UseFilePathResolver(...)` | Removed. Use `IProcessInvoker` or DI |
+| `process.ExitConfiguration = ...` | Setter removed. Pass at construction |
 | `ArgumentsList` property | Renamed to `ArgumentList` |
-| `PipedProcessResult` / `ExecutePipedAsync` / `RunPipedAsync` | Removed — use `IExternalProcess` for streaming |
-| `ProcessInvoker(factory, MiddlewareItems?)` or `ProcessInvoker(factory, IEnumerable<IProcessMiddleware>)` | Two-arg overloads removed — use three-arg form `ProcessInvoker(factory, middleware, items)` |
-| `ExternalProcess(resolver, targetPath)` or `ExternalProcess(config, exitConfig)` | Two-arg constructors removed — use constructor C `(resolver, configuration, exitConfig)` |
+| `PipedProcessResult` / `ExecutePipedAsync` / `RunPipedAsync` | Removed. Use `IExternalProcess` for streaming |
+| `ProcessInvoker(factory, MiddlewareItems?)` or `ProcessInvoker(factory, IEnumerable<IProcessMiddleware>)` | Two-arg overloads removed. Use three-arg form `ProcessInvoker(factory, middleware, items)` |
+| `ExternalProcess(resolver, targetPath)` or `ExternalProcess(config, exitConfig)` | Two-arg constructors removed. Use constructor C `(resolver, configuration, exitConfig)` |
 | `new ProcessConfigurationBuilder()` as default | Use init construction instead; builder is advanced-only |
 | Subclassing `ExternalProcess` | Sealed in v3 |
 | Subclassing `ProcessConfigurationBuilder` | Sealed in v3 |
@@ -65,10 +65,10 @@ the appropriate reference based on which pattern the v2-style code uses:
 
 ## Migration strategy
 
-1. **Scan** — grep for the detection signals above.
-2. **Classify** — determine which pattern the code uses (`CliRun`, `IProcessInvoker`, or `IExternalProcess`).
-3. **Apply** — load the corresponding reference and apply the Before/After mapping.
-4. **Verify** — check that no v2-era identifiers remain.
+1. **Scan**. Grep for the detection signals above.
+2. **Classify**. Determine which pattern the code uses (`CliRun`, `IProcessInvoker`, or `IExternalProcess`).
+3. **Apply**. Load the corresponding reference and apply the Before/After mapping.
+4. **Verify**. Check that no v2-era identifiers remain.
 
 ## Common pitfalls
 

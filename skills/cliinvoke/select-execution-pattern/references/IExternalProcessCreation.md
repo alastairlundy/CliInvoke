@@ -44,7 +44,7 @@ BufferedProcessResult result = await process.CaptureBufferedResultAsync(Cancella
 
 ## Direct Instantiation
 
-In specific scenarios where you need full control over the `ExternalProcess` constructor (such as providing a custom `IFilePathResolver`), you can instantiate the class directly. `ExternalProcess` is `sealed` — subclassing is not supported.
+In specific scenarios where you need full control over the `ExternalProcess` constructor (such as providing a custom `IFilePathResolver`), you can instantiate the class directly. `ExternalProcess` is `sealed`. Subclassing is not supported.
 
 ### Basic Direct Instantiation
 
@@ -84,6 +84,6 @@ Directly instantiating `ExternalProcess` is generally discouraged in favor of `I
 
 ## Middleware Coverage
 
-The `IExternalProcess` / `ExternalProcess` path is the **bypass pattern**: middleware does **not** apply. There is no middleware API at the `IExternalProcess` layer — the factory and direct-construction paths are unaffected by middleware. If you need cross-cutting concerns (logging, post-exit validation, platform wrapping), configure them on a `ProcessInvoker` via the `Use*` extension methods and let the invoker drive the factory through `IProcessInvoker`.
+The `IExternalProcess` / `ExternalProcess` path is the **bypass pattern**. Middleware does **not** apply. There is no middleware API at the `IExternalProcess` layer. The factory and direct-construction paths are unaffected by middleware. If you need cross-cutting concerns (logging, post-exit validation, platform wrapping), configure them on a `ProcessInvoker` via the `Use*` extension methods and let the invoker drive the factory through `IProcessInvoker`.
 
 Middleware operates above the invoker: `ProcessInvoker` / `IProcessInvoker` → middleware chain → `IExternalProcessFactory` → `IExternalProcess`. The `IExternalProcess` layer is below the middleware chain and never sees it.

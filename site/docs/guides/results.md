@@ -6,8 +6,8 @@ layout: simple
 # Working with Results
 
 When a process exits, CliInvoke returns an immutable result object. Two
-concrete types exist — `ProcessResult` and
-`BufferedProcessResult` — corresponding to the two execution modes
+concrete types exist, `ProcessResult` and
+`BufferedProcessResult`, corresponding to the two execution modes
 (plain and buffered). This page documents the result types, their
 convenience members, and the recommended way to test for success.
 
@@ -29,7 +29,7 @@ on `ProcessResult` is also available on a buffered result.
 CliInvoke provides two distinct ways to test whether a process
 succeeded. They serve different audiences and should not be confused.
 
-### Default heuristic — `IsExitCodeZero` / `EnsureExitCodeZero`
+### Default heuristic: `IsExitCodeZero` / `EnsureExitCodeZero`
 
 Extension methods on every `ProcessResult` (and therefore on
 `BufferedProcessResult` too):
@@ -60,13 +60,13 @@ and optional configuration) for diagnostics.
 
 These methods are the recommended quick-check for scripts, CI steps, and
 non-DI call sites. They are a **default heuristic**, not a success
-policy: they test one boolean condition and know nothing about what the
+policy. They test one boolean condition and know nothing about what the
 caller considers successful.
 
-### Authoritative validation — `ThrowIfUnsuccessful` / `UsePostExitValidation`
+### Authoritative validation: `ThrowIfUnsuccessful` / `UsePostExitValidation`
 
-When success depends on more than the exit code — for example, a
-specific exit code, a stdout regex, or an empty stderr — use the
+When success depends on more than the exit code, such as a
+specific exit code, a stdout regex, or an empty stderr, use the
 caller-stated validation path instead.
 
 **Inline (non-DI):**
@@ -112,12 +112,12 @@ validator rejects the result. Helpers: `PostExitValidation.ExitCodeIsZero()`,
 > **Which should I pick?** Use `IsExitCodeZero` / `EnsureExitCodeZero`
 > for quick, script-style checks where "exit code 0 means success" is
 > correct. Use `ThrowIfUnsuccessful` or `UsePostExitValidation` when
-> the success criterion is a policy the caller states explicitly — for
+> the success criterion is a policy the caller states explicitly, for
 > example, "only exit code 0 and 1 are acceptable" or "stderr must be
 > empty". The convenience methods never replace a caller-stated
 > validator; they coexist.
 
-## `ToString` — compact diagnostic format
+## `ToString`: compact diagnostic format
 
 Both result types override `ToString` to produce a compact, single-line
 diagnostic string. The format is fixed (intentionally suitable for
@@ -147,9 +147,9 @@ middleware), a `Truncated=true` indicator appears:
 ```
 
 The lengths are character counts, not byte counts. The output text
-itself is never included — safe for structured logging pipelines.
+itself is never included, so it is safe for structured logging pipelines.
 
-## `Deconstruct` — pattern matching on `BufferedProcessResult`
+## `Deconstruct`: pattern matching on `BufferedProcessResult`
 
 `BufferedProcessResult` provides a `Deconstruct` that yields the three
 fields most callers care about:
@@ -170,7 +170,7 @@ if (exitCode == 0)
 The deconstructed tuple is `(int exitCode, string stdout, string
 stderr)`.
 
-## Lazy line enumeration — `EnumerateOutputLines` / `EnumerateErrorLines`
+## Lazy line enumeration: `EnumerateOutputLines` / `EnumerateErrorLines`
 
 `BufferedProcessResult` exposes lazy line-enumeration extensions that
 split on `Environment.NewLine` without allocating an intermediate array:
@@ -192,7 +192,7 @@ foreach (string line in result.EnumerateErrorLines())
 
 These produce the same results as `string.Split(Environment.NewLine)`,
 including a trailing empty element when the input ends with a newline.
-They are deliberately **not** `MemoryExtensions.EnumerateLines` — that
+They are deliberately **not** `MemoryExtensions.EnumerateLines`. That
 API treats lone `\n` as a separator, which diverges from the
 `GetOutputLines()` contract. The lazy variants are the right choice when
 you want to stream-process output line-by-line without materialising the
@@ -215,13 +215,13 @@ existing `GetOutputLines()` method on `BufferedProcessResult`:
 
 ## Cross-references
 
-- [Choosing your Invocation Pattern](choosing-invocation-pattern.md) —
+- [Choosing your Invocation Pattern](choosing-invocation-pattern.md),
   which pattern to use and when.
-- [Configuration](configuration.md) — the configuration models that
+- [Configuration](configuration.md), the configuration models that
   produce results.
-- [Middleware](middleware.md) — `UsePostExitValidation` and
+- [Middleware](middleware.md), `UsePostExitValidation` and
   `UseLogging` for result-aware middleware.
-- [Architecture](architecture.md) — the data-flow from configuration
+- [Architecture](architecture.md), the data-flow from configuration
   to result.
 - Source files:
   - `src/CliInvoke.Core/Primitives/Results/ProcessResult.cs`

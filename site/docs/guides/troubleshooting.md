@@ -36,7 +36,7 @@ leak in this library traces back to one of these four.
   `ERROR_HANDLE_DISK_FULL` / `0x80070005` Access Denied (Windows).
 - `ObjectDisposedException` on `StandardOutput`, `StandardError`, or
   `StandardInput`.
-- Heap grows monotonically; `SecureString` content still present in
+- Heap grows monotonically; `SecureString` content is still present in
   process memory after the configuration is logically done.
 - Child processes outlive the parent (zombie processes on Unix).
 
@@ -44,23 +44,23 @@ leak in this library traces back to one of these four.
 
 1. **A factory-created `IExternalProcess` is not disposed.** The only
    `IExternalProcess` you receive is one you create via
-   `IExternalProcessFactory.CreateExternalProcess` — you own that
+   `IExternalProcessFactory.CreateExternalProcess`. You own that
    lifetime. Wrap it in `using` or call `Dispose()` in a `finally`
    block. (`StartAsync` returns `Task`, not a process; an
    `IExternalProcess` created by the invoker's pipeline is created and
    disposed by that pipeline, so the invoker path cannot leak one.)
 2. **Disposing a `StandardInput` stream too early.** The `StreamWriter` you assign to
-   `ProcessConfiguration.StandardInput` is **caller-owned** — `ProcessConfiguration` does not dispose
+   `ProcessConfiguration.StandardInput` is **caller-owned**. `ProcessConfiguration` does not dispose
    it. Do not dispose it while the process is still reading from it; dispose it only after the
    invocation completes. The redirected output streams the process owns are released when the
-   `IExternalProcess` is disposed — the interface exposes no live `StandardOutput` /
+   `IExternalProcess` is disposed. The interface exposes no live `StandardOutput` /
    `StandardError` properties; captured output lives on the result.
 3. **A `UserCredential`, a standalone `UserCredentialSpec`, or a builder-owned `UserCredentialSpec` is not disposed.**
    All three hold a `SecureString`. A standalone `UserCredential` or a `UserCredentialSpec` you create
    and own must be wrapped in `using` (the spec and the `UserCredential` it builds have independent
    lifetimes). A `UserCredentialSpec` configured through `ProcessConfigurationBuilder.ConfigureUserCredential`
    is owned and disposed by the builder, so do not dispose it yourself. A `UserCredential` assigned to
-   `ProcessConfiguration.Credential` is **not** disposed by the configuration — dispose it yourself.
+   `ProcessConfiguration.Credential` is **not** disposed by the configuration. Dispose it yourself.
 4. **Reusing a `ProcessConfiguration` is allowed.** `ProcessConfiguration` is not disposable, so it can
    be safely reused across invocations. Ensure any `StandardInput` stream or `UserCredential` you supplied
    is not disposed until after the final invocation that references it.
@@ -110,7 +110,7 @@ specific platform behavior.
    (Windows).
 2. **Windows-only shells invoked on Unix.** `cmd`, `cmd.exe`, and
    Windows PowerShell's `powershell.exe` are not present on Unix. Use
-   the `CliInvoke.Specializations` shell middleware instead:
+   the `CliInvoke.Specializations` shell middleware instead.
    `UsePowerShell()` wraps the command for `pwsh` (PowerShell Core),
    which runs on Windows, macOS, Mac Catalyst, Linux, and FreeBSD,
    while `UseCmd()` targets `cmd.exe` and is Windows-only. Note that
@@ -126,8 +126,8 @@ specific platform behavior.
 4. **Process-group vs. process-only termination.** On Unix, killing the
    parent PID does not signal its children. Use
    `ProcessExitBehaviour.ForcefulExit` to attempt to terminate child
-   processes together with the parent — it does not guarantee that every
-   descendant is killed. The tree-kill is best-effort: descendants
+   processes together with the parent. It does not guarantee that every
+   descendant is killed. The tree-kill is best-effort. Descendants
    spawned while the tree is being killed may survive. CliInvoke does
    not add a post-kill delay or a second kill pass, matching
    .NET's own `Kill(entireProcessTree: true)` semantics.
@@ -136,7 +136,7 @@ specific platform behavior.
    adapter is `UnixProcessControlAdapter` (not
    `WindowsProcessControlAdapter`), and its `SetUserCredential` throws
    `PlatformNotSupportedException` when any credential field is
-   populated — the value is rejected outright, not silently lost. An
+   populated. The value is rejected outright, not silently lost. An
    all-null credential such as the default `UserCredential.Null` is a
    no-op.
 6. **Path-separator assumptions.** Backslash-separated paths fail on
@@ -144,7 +144,7 @@ specific platform behavior.
    entries rather than concatenating with `\`.
 7. **Windows "graceful" timeout degrades to forceful termination.** With
    `ProcessExitBehaviour.GracefulExit`, the interrupt is best-effort on
-   Windows: delivering the interrupt requires attaching to the child
+   Windows. Delivering the interrupt requires attaching to the child
    process's console (`AttachConsole(child)`), which typically fails when
    the caller itself is running in a console window. When the attach
    fails, no signal is sent (no `CTRL_BREAK_EVENT`/`CTRL_C_EVENT`
@@ -207,8 +207,8 @@ blocking on a task in a way that deadlocks under a captured
    `OperationCanceledException` regardless of whether the user or the
    timer caused it.
 3. **Assuming `IExternalProcess` is async-disposable.** It implements
-   `IDisposable` only — no type in CliInvoke implements
-   `IAsyncDisposable` — so there is no `DisposeAsync` for `await using`
+   `IDisposable` only. No type in CliInvoke implements
+   `IAsyncDisposable`, so there is no `DisposeAsync` for `await using`
    to prefer. Dispose it once, synchronously, with `using` or a
    `finally` after the result is captured (see the Resource Disposal
    guide).
@@ -234,7 +234,7 @@ blocking on a task in a way that deadlocks under a captured
 | `dotnet-counters` | `dotnet-counters monitor -p <pid> --counters System.Threading` | `threadpool-thread-count` pinned at the minimum, `queue-length` rising. |
 | `dotnet-dump` | `dotnet-dump collect -p <pid>` then `clrthreads` | Threads in `(GC)` or `(debugger)` for long periods; deadlock suspected if all worker threads are blocked on the same Monitor. |
 | ETW (Windows only) | `dotnet-trace collect -p <pid> --providers Microsoft-Windows-DotNETRuntime:0x14C14FCC80:Verbose` | Task wait chains showing circular wait. The `Microsoft-Windows-DotNETRuntime` provider is ETW and exists only on Windows; use the EventPipe row above on Linux and macOS. |
-| Code review | `rg -n '\.Result\b\|\.Wait()\b\|\.GetAwaiter\(\)\.GetResult\(\)' src/` (ripgrep is not preinstalled; install it separately, or use your editor's "Find in Files" on the same pattern) | Any of these inside library code (under `src/CliInvoke*`) is a defect — library code must be awaitable end-to-end. |
+| Code review | `rg -n '\.Result\b\|\.Wait()\b\|\.GetAwaiter\(\)\.GetResult\(\)' src/` (ripgrep is not preinstalled; install it separately, or use your editor's "Find in Files" on the same pattern) | Any of these inside library code (under `src/CliInvoke*`) is a defect. Library code must be awaitable end-to-end. |
 
 If the failure involves the process itself, see
 [Resource Management](#resource-management) for disposal-related
@@ -244,7 +244,7 @@ deadlocks.
 
 ## Configuration & Timeouts
 
-These failures are not bugs in caller threading or disposal — they are
+These failures are not bugs in caller threading or disposal. They are
 configurations of `ProcessExitConfiguration`, `ProcessTimeoutPolicy`,
 and `ProcessExitBehaviour` that produce surprising exit behavior.
 
@@ -274,7 +274,7 @@ and `ProcessExitBehaviour` that produce surprising exit behavior.
    executables (e.g. JVM-based tools) trip the timeout before producing
    any output, producing a misleading "process hung" diagnosis.
 
-Note: invokers return one of two result types — `ProcessResult`
+Note: invokers return one of two result types, `ProcessResult`
 and `BufferedProcessResult`. Neither represents an exit *policy*; the
 policy is always on `ProcessExitConfiguration` and is consulted before
 the result is constructed.
@@ -332,8 +332,8 @@ the same bytes read with the wrong character table.
 
 ### Fix
 
-Set the encodings explicitly to the child's actual code page. Both API
-surfaces do the same thing:
+Set the encodings explicitly to the child's actual code page. Both APIs
+do the same thing:
 
 ```csharp
 using System.Text;

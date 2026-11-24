@@ -19,7 +19,7 @@ If you only read one section, read
 This page exists to answer three questions precisely:
 
 1. What does each configuration model represent, and what does it own?
-2. How do the builders relate to the models — and are they required?
+2. How do the builders relate to the models, and are they required?
 3. What is the default value of every property on every configuration
    model?
 
@@ -33,7 +33,7 @@ read-only properties, and implement value equality.
 A **Builder** is a fluent, mutable object used to assemble a
 configuration model. Each builder is a short-lived staging area whose
 only job is to produce exactly one model via `Build()`. The produced
-model is independent of the builder — they do not share lifetime.
+model is independent of the builder, and they do not share lifetime.
 
 An **Invoker** is the abstraction that turns a configuration model
 into a running process. The invoker owns nothing about the
@@ -48,17 +48,17 @@ has a public constructor that accepts its required parameters
 positionally. The builder is reserved for advanced scenarios that the
 simple constructors cannot express.
 
-### `ProcessConfiguration` — direct construction
+### `ProcessConfiguration`: direct construction
 
 `ProcessConfiguration` is the only required model. `TargetFilePath` is
-a `required` init property — the constructor throws `ArgumentException`
+a `required` init property. The constructor throws `ArgumentException`
 if it is null or empty. `WorkingDirectoryPath` defaults to
 `Directory.GetCurrentDirectory()`, so the caller's current directory is
 the configured starting point when the property is not explicitly set.
 When set to a non-empty value, it validates the directory exists at init
 time and throws `DirectoryNotFoundException` if it does not.
 
-**Convenience constructor** — for the common case of target file path
+**Convenience constructor** for the common case of target file path
 plus arguments:
 
 ```csharp
@@ -69,7 +69,7 @@ This sets `TargetFilePath`, `Arguments`, and `OutputRedirection` (which
 defaults to `true`); all other properties take their documented
 defaults.
 
-**Parameterless constructor with an object initializer** — when you
+**Parameterless constructor with an object initializer** when you
 need to set additional init-only properties:
 
 ```csharp
@@ -82,7 +82,7 @@ ProcessConfiguration config = new ProcessConfiguration
 };
 ```
 
-**ArgumentList** — replaces the v2 `ArgumentsList` property. When
+**ArgumentList** replaces the v2 `ArgumentsList` property. When
 non-empty, the control adapter emits entries via
 `ProcessStartInfo.ArgumentList` instead of the single `Arguments`
 string, so the OS command-line parser passes each entry unmodified:
@@ -100,16 +100,16 @@ ProcessConfiguration config = new ProcessConfiguration("dotnet")
 
 - **`Arguments`** is a preformatted command-line string. CliInvoke passes it to the process
   (or to a shell composition) exactly as written. It does not keep the values inside it
-  separate: any delimiter the consuming shell recognises — a space, on the POSIX path — splits
+  separate. Any delimiter the consuming shell recognises, such as a space on the POSIX path, splits
   the text into separate arguments. Quoting and escaping inside this string are the caller's
   responsibility.
-- **`ArgumentList`** holds one value per entry — for example a single file name. Each entry is
+- **`ArgumentList`** holds one value per entry, for example a single file name. Each entry is
   delivered to the target as exactly one argument, quoted or escaped per shell by the library.
   This is the form to use when a value must arrive unchanged, whatever characters it contains.
 
 When `ArgumentList` is non-empty it takes precedence over `Arguments`.
 
-Example — a caller wants `safe.txt --overwrite` to arrive as **one** file name. Passing it as
+Example: a caller wants `safe.txt --overwrite` to arrive as **one** file name. Passing it as
 a single `ArgumentList` entry does that. Passing the same text in `Arguments` does not; the
 shell splits it at the space:
 
@@ -125,15 +125,15 @@ argv[2] = <--overwrite>
 Migration one-liner: a single value currently placed in `Arguments` belongs in `ArgumentList`
 as one entry.
 
-The model is immutable after construction: every property is
+The model is immutable after construction. Every property is
 `{ get; init; }`, so `TargetFilePath`, `Arguments`,
 `OutputRedirection`, and the rest can be set only during construction
 (via the constructor or an object initializer) and cannot be
-reassigned afterwards — see the
+reassigned afterwards. See the
 [Reference Appendix](#reference-appendix) for the default of each
 property.
 
-### `ProcessExitConfiguration` — direct construction
+### `ProcessExitConfiguration`: direct construction
 
 ```csharp
 ProcessExitConfiguration exitConfig = new ProcessExitConfiguration(
@@ -146,7 +146,7 @@ Or use the static factory for the common graceful case:
 ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();
 ```
 
-### `UserCredential` — direct construction
+### `UserCredential`: direct construction
 
 ```csharp
 UserCredential credential = new UserCredential(
@@ -156,10 +156,10 @@ UserCredential credential = new UserCredential(
     loadUserProfile: null);
 ```
 
-`UserCredential` implements `IDisposable` — see the
+`UserCredential` implements `IDisposable`. See the
 [Resource Disposal](./resource-disposal.md) guide for ownership rules.
 
-### `ProcessResourcePolicy` — direct construction
+### `ProcessResourcePolicy`: direct construction
 
 ```csharp
 ProcessResourcePolicy policy = ProcessResourcePolicy.Default;
@@ -172,19 +172,19 @@ ProcessResourcePolicy policy = new ProcessResourcePolicy(
     priorityClass: ProcessPriorityClass.High);
 ```
 
-## Builders — advanced
+## Builders: advanced
 
 The builder is **not required** and is positioned as an advanced
 construction path. Use the builder when you need features that the
 simple constructors cannot express:
 
-- **Argument escaping** — `ConfigureArguments(Action<ArgumentsSpec>)`
+- **Argument escaping**. `ConfigureArguments(Action<ArgumentsSpec>)`
   wraps and validates individual arguments, applying character escaping
   (quotes, backslashes, control characters) before joining.
-- **User credential configuration** —
+- **User credential configuration**. Use
   `ConfigureUserCredential(Action<UserCredentialSpec>)` for Windows-only
   credential injection with `SecureString` password staging.
-- **Resource policy configuration** —
+- **Resource policy configuration**. Use
   `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)`
   for processor affinity and resource settings with cross-validation
   (e.g., `SetMinWorkingSet` throws `ArgumentOutOfRangeException` when
@@ -232,7 +232,7 @@ same model** for the same input. Concretely:
   joining. The model's `Arguments` string is stored verbatim.
 - **Working-set cross-validation in `ProcessResourcePolicySpec`.**
   `SetMinWorkingSet` and `SetMaxWorkingSet` validate against each
-  other: once one of them is set, setting the other to an
+  other. Once one of them is set, setting the other to an
   inconsistent value throws `ArgumentOutOfRangeException`. Neither
   call fabricates a value for the other, and the model allows `Min`
   and `Max` to be set independently.
@@ -292,8 +292,8 @@ services.AddCliInvoke(builder => builder.UseLogging());
 
 > If you use the [CliInvoke.Specializations](https://www.nuget.org/packages/CliInvoke.Specializations)
 > package's `UsePowerShell()`/`UseCmd()` middleware, also call
-> `AddCliInvokeSpecializations()` (namespace `CliInvoke.Specializations`
-> — add `using CliInvoke.Specializations;`) with the same
+> `AddCliInvokeSpecializations()` (namespace `CliInvoke.Specializations`:
+> add `using CliInvoke.Specializations;`) with the same
 > `ServiceLifetime` so those middleware types resolve from the container.
 
 ## The Lifecycle: Construction → Model → Invoker
@@ -308,12 +308,12 @@ Every CliInvoke invocation moves through three stages.
                                          └──────────────────┘
 ```
 
-1. **Construction** — the caller creates the configuration, either
+1. **Construction**. The caller creates the configuration, either
    directly via init properties (the default) or via a builder
    (advanced). Both paths produce an immutable `ProcessConfiguration`.
-2. **Model** — the configuration holds the data the invoker reads.
+2. **Model**. The configuration holds the data the invoker reads.
    The model is independent of the construction path.
-3. **Consumer** — the caller hands the model to one of three
+3. **Consumer**. The caller hands the model to one of three
    consumption paths: `IProcessInvoker.ExecuteAsync`,
    `IExternalProcess.StartAsync` (followed by a separate capture
    call), or the static `CliRun.RunAsync` family. Each consumer
@@ -348,7 +348,7 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 public class ProcessConfiguration : IEquatable<ProcessConfiguration>
 ```
 
-The **only required model**. It describes the executable to run, the
+This is the **only required model**. It describes the executable to run, the
 arguments to pass, and the OS-level knobs that affect how the process
 is spawned (working directory, environment, redirection, credentials,
 resource policy, encodings).
@@ -367,7 +367,7 @@ does not).
 
 **Disposal**: `ProcessConfiguration` does **not** implement `IDisposable`. It is a plain
 immutable value object. The `StandardInput` (`StreamWriter`) and `UserCredential` you supply
-remain **your** responsibility to dispose — see the
+remain **your** responsibility to dispose. See the
 [Resource Disposal](./resource-disposal.md) guide for ownership rules.
 
 ### 2. `ProcessExitConfiguration`
@@ -406,7 +406,7 @@ public class UserCredential : IEquatable<UserCredential>, IDisposable
 Represents the Windows-domain credentials under which the child
 process should run. On non-Windows platforms, a credential with any
 values set throws `PlatformNotSupportedException` when the process is
-started — only an empty (all-null) credential such as
+started. Only an empty (all-null) credential such as
 `UserCredential.Null` is accepted. `Domain`, `Password`, and
 `LoadUserProfile` are marked `[SupportedOSPlatform("windows")]`.
 
@@ -416,8 +416,8 @@ credential". This is the default assigned by
 
 **Disposal**: `UserCredential` owns its `SecureString` password and
 implements `IDisposable`. A `UserCredential` assigned to a
-`ProcessConfiguration.Credential` is **not** disposed by the configuration —
-the caller must dispose it. See the
+`ProcessConfiguration.Credential` is **not** disposed by the configuration.
+The caller must dispose it. See the
 [Resource Disposal](./resource-disposal.md) guide.
 
 ### 4. `ProcessResourcePolicy`
@@ -431,9 +431,9 @@ public class ProcessResourcePolicy : IEquatable<ProcessResourcePolicy>
 Describes OS-level resource constraints applied to the spawned
 process: processor affinity, priority class, priority boost, and
 working-set sizes. The default value (`ProcessResourcePolicy.Default`)
-assigns affinity to every logical processor on the machine — a mask of
+assigns affinity to every logical processor on the machine, a mask of
 `(1 << Environment.ProcessorCount) - 1`, saturating to
-`nint.MaxValue` on machines with 63 or more logical processors —
+`nint.MaxValue` on machines with 63 or more logical processors,
 and leaves everything else at the OS default.
 
 **Platform notes**:
@@ -477,7 +477,7 @@ public interface IProcessInvoker
 
 The invoker is the **only** stage of the lifecycle that performs
 side-effects. It is also the **only** stage that does not retain
-references to the configuration after the call returns — see the
+references to the configuration after the call returns. See the
 [Resource Disposal](./resource-disposal.md) guide.
 
 The invoker does not validate the configuration. The configuration
@@ -485,8 +485,8 @@ models validate themselves in their constructors (e.g.,
 `ProcessConfiguration` rejects a null `TargetFilePath`). The invoker
 trusts the model it was given.
 
-The invoker is also not the place to configure process behaviour —
-that is the job of the configuration model. If you find yourself
+The invoker is also not the place to configure process behaviour.
+That is the job of the configuration model. If you find yourself
 wanting to pass a flag to `ExecuteAsync` that is not on
 `ProcessConfiguration` or `ProcessExitConfiguration`, the right answer
 is to add it to the appropriate model, not to overload the invoker.
@@ -520,7 +520,7 @@ public interface IExternalProcess : IDisposable
 and joins in a single call, `IExternalProcess` exposes the process's
 lifecycle as a sequence of steps you orchestrate yourself:
 
-1. **Start** — call `StartAsync(...)`. This returns once the OS
+1. **Start**. Call `StartAsync(...)`. This returns once the OS
    process has been launched, the redirected pipes are attached, and
    any configured `StandardInput` has been piped to the child. When
    stdin was piped, the child's stdin write end has closed by then, so
@@ -528,16 +528,16 @@ lifecycle as a sequence of steps you orchestrate yourself:
    plain `Task`; it does **not** return the process result and does
    **not** wait for the process to exit. The result is obtained
    separately, by calling one of the capture methods below.
-2. **Observe** — subscribe to `Started` and `Exited` events, or
+2. **Observe**. Subscribe to `Started` and `Exited` events, or
    poll `HasStarted` / `HasExited`.
-3. **Capture** — call `WaitForExitOrTimeoutAsync` for a plain
+3. **Capture**. Call `WaitForExitOrTimeoutAsync` for a plain
     `ProcessResult`, or `CaptureBufferedResultAsync` to read the buffered
     stdout/stderr into memory. `CaptureBufferedResultAsync` also feeds
     the configured `StandardInput` to the child, concurrently with
     capturing output, when redirection is enabled. These methods can be
     called at any point during execution, not only at exit.
-4. **Terminate** — call `Kill()` to stop a runaway process. It does
-    not always force-stop: it honours
+4. **Terminate**. Call `Kill()` to stop a runaway process. It does
+    not always force-stop. It honours
     `ExitConfiguration.RequestedCancellationExitBehaviour`. With
     `WaitForExit` it waits for the process to exit on its own and
     returns without terminating it; with `GracefulExit` (the default)
@@ -564,8 +564,8 @@ deliberately does not pipe.
 `IExternalProcess` is constructed by `IExternalProcessFactory`
 (typically obtained via `AddCliInvoke` dependency injection, namespace
 `CliInvoke.Extensions`) or by the `CliRun` static API below. The caller owns the
-returned `IExternalProcess` and is responsible for disposing it —
-see the [Resource Disposal](./resource-disposal.md) guide.
+returned `IExternalProcess` and is responsible for disposing it.
+See the [Resource Disposal](./resource-disposal.md) guide.
 
 `IProcessInvoker` and `IExternalProcess` are **not** competing APIs.
 `IProcessInvoker` is the right choice when you want a one-shot run;
@@ -608,8 +608,8 @@ and disposes the `IExternalProcess`. The configuration is built for
 you from the positional parameters; the timeout defaults to
 `ProcessTimeoutPolicy.Default.TimeoutThreshold` (2 minutes); and
 the exit configuration defaults to a graceful one. The factory and
-file-path resolver are fixed defaults — `CliRun` keeps no process-wide
-mutable state — so callers that need a custom factory or resolver
+file-path resolver are fixed defaults, and `CliRun` keeps no process-wide
+mutable state. Callers that need a custom factory or resolver
 should construct an `IProcessInvoker` (or resolve one from the DI
 container) instead.
 
@@ -742,13 +742,13 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExitBehaviour.cs`.
 | Value | Numeric | Meaning |
 |-------|---------|---------|
 | `WaitForExit` | `0` | Run until the process exits on its own. |
-| `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, falling back to forceful termination if the process does not exit. **On Windows this is best-effort**: the interrupt requires attaching to the child's console, which typically fails when the caller itself runs in a console window — no signal is delivered and the child is force-terminated. Unix SIGTERM delivery is genuinely graceful. |
+| `GracefulExit` | `1` | *(default)* Cancel via SIGTERM/SIGINT, falling back to forceful termination if the process does not exit. **On Windows this is best-effort**: the interrupt requires attaching to the child's console, which typically fails when the caller itself runs in a console window. No signal is delivered and the child is force-terminated. Unix SIGTERM delivery is genuinely graceful. |
 | `ForcefulExit` | `2` | Forcefully terminate the process and attempt to terminate all child processes. |
 
 > **Note on `ForcefulExit`**: The tree-kill is best-effort, matching
 > .NET's own `Kill(entireProcessTree: true)` semantics. Descendants
 > spawned while the tree is being killed may survive. CliInvoke does
-> not add a post-kill delay or a second kill pass — this mirrors the
+> not add a post-kill delay or a second kill pass. This mirrors the
 > documented behavior of `Process.Kill(entireProcessTree: true)`.
 
 #### `ProcessExceptionBehaviour`
@@ -759,21 +759,21 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessExceptionBehaviour.cs`.
 |-------|---------|---------|
 | `SuppressExceptions` | `0` | Suppress all exceptions thrown during execution. |
 | `AllowExceptions` | `1` | Throw the exception for a cancellation under all circumstances. |
-| `AllowExceptionsIfUnexpected` | `2` | *(default)* Throw only when the cancellation outcome was unexpected — i.e., the cancellation resolved more than 1 second from the expected exit time. |
+| `AllowExceptionsIfUnexpected` | `2` | *(default)* Throw only when the cancellation outcome was unexpected, i.e., the cancellation resolved more than 1 second from the expected exit time. |
 
 ## Cross-References
 
-- [Architecture](./architecture.md) — how the three invocation patterns
+- [Architecture](./architecture.md), how the three invocation patterns
   consume the configuration.
-- [Resource Disposal](./resource-disposal.md) — ownership rules for
+- [Resource Disposal](./resource-disposal.md), ownership rules for
   `ProcessConfiguration` and `UserCredential`.
-- [Troubleshooting](./troubleshooting.md) — common configuration
+- [Troubleshooting](./troubleshooting.md), common configuration
   mistakes.
-- [Choosing your Invocation Pattern](./choosing-invocation-pattern.md) —
+- [Choosing your Invocation Pattern](./choosing-invocation-pattern.md),
   the three-pattern canon with decision tree.
-- [Migrating to 3.0.0](../migration-guides/3.0.0.md) — breaking changes
+- [Migrating to 3.0.0](../migration-guides/3.0.0.md), breaking changes
   and upgrade guide.
-- API Reference — full type documentation.
+- API Reference: full type documentation.
 - Source files:
   - `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`
   - `src/CliInvoke.Core/Primitives/ProcessExitConfiguration.cs`

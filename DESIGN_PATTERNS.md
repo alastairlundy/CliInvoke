@@ -2,17 +2,17 @@
 
 CliInvoke separates its design patterns into two concerns:
 
-- **Invocation patterns** — how a process is executed. CliInvoke offers three: `CliRun`, `IProcessInvoker`, and `IExternalProcess`. Each targets a different audience and trade-off space.
-- **Configuration patterns** — how an invocation is described. Every invocation pattern consumes a `ProcessConfiguration`, which can be built with the simple public constructors or the builder.
+- **Invocation patterns**, how a process is executed. CliInvoke offers three: `CliRun`, `IProcessInvoker`, and `IExternalProcess`. Each targets a different audience and trade-off space.
+- **Configuration patterns**, how an invocation is described. Every invocation pattern consumes a `ProcessConfiguration`, which can be built with the simple public constructors or the builder.
 
 The two concerns are independent: choose an invocation pattern and a configuration approach separately; neither constrains the other.
 
 ## Which invocation pattern should I use?
 
-Start from your situation — this is a short decision tree; follow the first branch that matches:
+Start from your situation. This is a short decision tree; follow the first branch that matches:
 
-- **"I just need to run a command and get the result."** → Use **`CliRun`** — the recommended **default** for beginners, scripts, and CI/CD. Zero boilerplate, no DI required.
-- **"I need dependency injection, testability, or cross-cutting behaviour (logging, retry, validation)."** → Use **`IProcessInvoker`** registered in DI, and add the behaviour through the **middleware pipeline** — that combination is the **DI + Middleware** path.
+- **"I just need to run a command and get the result."** → Use **`CliRun`**, the recommended **default** for beginners, scripts, and CI/CD. Zero boilerplate, no DI required.
+- **"I need dependency injection, testability, or cross-cutting behaviour (logging, retry, validation)."** → Use **`IProcessInvoker`** registered in DI, and add the behaviour through the **middleware pipeline**. That combination is the **DI + Middleware** path.
 - **"I need raw, `System.Diagnostics.Process`-style control over start/stop and lifetime."** → Use **`IExternalProcess`** / `IExternalProcessFactory`.
 - **"I am scripting PowerShell or Cmd specifically."** → Use the **Specializations** (`UsePowerShell`, `UseCmd`) middleware extensions on the `IProcessInvoker` path. Specializations are **add-ons to an invocation pattern, not a fourth pattern**.
 
@@ -49,7 +49,7 @@ Straightforward API for running a process and retrieving its result.
 * Basic scripting, CI/CD tasks, or quick prototyping.
 
 ### Core idea
-`CliRun` exposes `Run*Async` methods that internally create a `ProcessConfiguration`, apply a default `ProcessExitConfiguration`, and execute it through a fresh `ProcessInvocationPipeline` constructed over a fresh `ExternalProcessFactory` on every call — no DI container or configured `IProcessInvoker` is involved.
+`CliRun` exposes `Run*Async` methods that internally create a `ProcessConfiguration`, apply a default `ProcessExitConfiguration`, and execute it through a fresh `ProcessInvocationPipeline` constructed over a fresh `ExternalProcessFactory` on every call. No DI container or configured `IProcessInvoker` is involved.
 
 ### Advantage
 * Zero boilerplate – no DI container, no factories required.
@@ -103,7 +103,7 @@ BufferedProcessResult result = await invoker.ExecuteBufferedAsync(config, Proces
 ### Flexible / Process-User Familiar Pattern – `IExternalProcess` & `IExternalProcessFactory`
 
 ### Purpose
-Mirror the classic `System.Diagnostics.Process` workflow while providing a safe and rich API surface.
+Mirror the classic `System.Diagnostics.Process` workflow while providing a safe and rich API.
 
 ### Target user
 * Power users who want granular control over the start/stop sequence and process lifetime.
@@ -162,28 +162,28 @@ Choose `CliRun` for scripting or basic command execution, `IProcessInvoker` for 
 
 ## Configuration Patterns
 
-Every invocation pattern consumes a `ProcessConfiguration`. The invocation pattern you chose does not constrain how you build it — pick a configuration approach on its own merits.
+Every invocation pattern consumes a `ProcessConfiguration`. The invocation pattern you chose does not constrain how you build it. Pick a configuration approach on its own merits.
 
 ### Which configuration approach should I use?
 
-Start from your situation — follow the first branch that matches:
+Start from your situation. Follow the first branch that matches:
 
-- **"I have a target file path, plain arguments, and nothing exotic."** → Use the **simple public constructors** — the recommended **default**. No builder, no factory, no DI required.
+- **"I have a target file path, plain arguments, and nothing exotic."** → Use the **simple public constructors**, the recommended **default**. No builder, no factory, no DI required.
 - **"I need argument escaping, Windows user credentials, or resource policy settings."** → Use the **builder path** (`ProcessConfigurationBuilder`), which supports features the simple constructors cannot express.
 
 ### Simple constructors (default)
 
 `ProcessConfiguration` exposes three public constructors that cover most scenarios: a parameterless one (for object-initialiser construction), a target-file-path plus string-arguments overload, and a target-file-path plus `IEnumerable<string>` argument-list overload.
 
-**Convenience constructor** — for the common case of target file path plus arguments:
+**Convenience constructor** for the common case of target file path plus arguments:
 
 ```csharp
 ProcessConfiguration config = new("dotnet", "--version");
 ```
 
-This sets `TargetFilePath`, `Arguments`, and `OutputRedirection`; the constructor's `outputRedirection` parameter defaults to `true`, so the convenience constructor enables redirection unless you pass `false`. Note that the `OutputRedirection` init property itself defaults to `false` when you construct via the parameterless constructor and object initializer (as in the next example), so set it explicitly there. All other properties take their documented defaults.
+This sets `TargetFilePath`, `Arguments`, and `OutputRedirection`; the constructor's `outputRedirection` parameter defaults to `true`, so the convenience constructor enables redirection unless you pass `false`. Note that the `OutputRedirection` init property itself defaults to `false` when you construct via the parameterless constructor and object initializer (as in the next example). Set it explicitly there. All other properties take their documented defaults.
 
-**Parameterless constructor with an object initializer** — when you need to set additional init-only properties:
+**Parameterless constructor with an object initializer** when you need to set additional init-only properties:
 
 ```csharp
 ProcessConfiguration config = new()
@@ -200,9 +200,9 @@ ProcessConfiguration config = new()
 
 Use `ProcessConfigurationBuilder` when you need features that the simple constructors cannot express:
 
-- **Argument escaping** — `ConfigureArguments(Action<ArgumentsSpec>)` wraps and validates individual arguments.
-- **User credential configuration** — `ConfigureUserCredential(Action<UserCredentialSpec>)` for Windows-only credential injection with `SecureString` password staging.
-- **Resource policy configuration** — `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` for processor affinity and resource settings.
+- **Argument escaping**, `ConfigureArguments(Action<ArgumentsSpec>)` wraps and validates individual arguments.
+- **User credential configuration**, `ConfigureUserCredential(Action<UserCredentialSpec>)` for Windows-only credential injection with `SecureString` password staging.
+- **Resource policy configuration**, `ConfigureProcessResourcePolicy(Action<ProcessResourcePolicySpec>)` for processor affinity and resource settings.
 
 ```csharp
 using CliInvoke.Builders;
@@ -227,4 +227,4 @@ Use the simple constructors by default, and reach for the builder only when you 
 
 ## See also
 
-- [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md) — the design rationale behind the patterns above.
+- [Why CliInvoke did not copy CliWrap](docs/adr/0002-why-not-cliwrap.md), the design rationale behind the patterns above.

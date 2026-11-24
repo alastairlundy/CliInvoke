@@ -60,7 +60,7 @@ class Program
 ```
 
 #### Manual Setup
-This example manually sets up ``IProcessInvoker``, ``IExternalProcessFactory`` and other dependencies as Singletons.
+This example manually sets up ``IProcessInvoker``, ``IExternalProcessFactory``, and other dependencies as Singletons.
 
 Most developers using CliInvoke in their applications should use the ``AddCliInvoke`` method instead of manually configuring Dependency Injection unless there is good reason to avoid using it. ``AddCliInvoke`` registers all of the services shown below for you.
 

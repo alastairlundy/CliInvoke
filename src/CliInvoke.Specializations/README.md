@@ -17,8 +17,8 @@ CliInvoke.Specializations ships three shell middleware types: `PowerShellMiddlew
 
 The legacy `CmdProcessConfiguration` and `PowershellProcessConfiguration` subclasses are deprecated, marked `[Obsolete]`, and will be removed in 4.0. New code should use `ProcessConfiguration` with the matching middleware instead. The old subclasses are still documented below for existing users:
 
-- [CmdProcessConfiguration](#cmdprocessconfiguration-deprecated) — only for existing users, runs through Windows' `cmd.exe`.
-- [PowershellProcessConfiguration](#powershellprocessconfiguration-deprecated) — only for existing users, runs through cross-platform PowerShell (PowerShell is not installed by CliInvoke and must already be installed).
+- [CmdProcessConfiguration](#cmdprocessconfiguration-deprecated), only for existing users, runs through Windows' `cmd.exe`.
+- [PowershellProcessConfiguration](#powershellprocessconfiguration-deprecated), only for existing users, runs through cross-platform PowerShell (PowerShell is not installed by CliInvoke and must already be installed).
 
 ### Quick start with CliRun
 

@@ -23,7 +23,7 @@ Specializations). This ADR records why we deliberately did **not** mirror CliWra
 CliInvoke keeps the following design choices, which differ from CliWrap:
 
 1. **Immutable configuration objects, not a single fluent chain.** `ProcessConfiguration` is a plain
-   immutable value object — it does not even implement `IDisposable`, so the caller owns disposal of any
+   immutable value object. It does not even implement `IDisposable`, so the caller owns disposal of any
    `StandardInput` or `UserCredential` it supplies. This makes configurations thread-safe, easy to share
    across invocations, and straightforward to assert on in tests, rather than a mutable chain you must
    rebuild on every call.
@@ -48,5 +48,5 @@ CliInvoke keeps the following design choices, which differ from CliWrap:
 
 ## References
 
-- [DESIGN_PATTERNS.md](../../DESIGN_PATTERNS.md) — the pattern decision tree.
-- [Resource Disposal Guide](../../site/docs/guides/resource-disposal.md) — caller-owned disposal rules.
+- [DESIGN_PATTERNS.md](../../DESIGN_PATTERNS.md). The pattern decision tree.
+- [Resource Disposal Guide](../../site/docs/guides/resource-disposal.md). Caller-owned disposal rules.
