@@ -21,59 +21,77 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
     
     internal override void ResumeProcess(Process process)
     {
+        // By-ID lookups refuse a child whose exit code is recorded, so use a Toolhelp thread
+        // snapshot keyed off the held handle instead; that handle stays valid until termination.
         uint actualPid = GetProcessId(process.Handle);
-
-        Process proc;
-        try
+        if (actualPid == 0)
         {
-            proc = Process.GetProcessById((int)actualPid);
-        }
-        catch (ArgumentException)
-        {
-            // Process was not found - probably exited already.
+            // No associated process: nothing to resume.
             return;
         }
 
-        ProcessThreadCollection threads;
+        IntPtr snapshot = CreateToolhelp32Snapshot(Th32csSnapThread, 0);
+        if (snapshot == InvalidSnapshotHandle)
+        {
+            throw new InvalidOperationException(
+                $"CreateToolhelp32Snapshot failed with error {Marshal.GetLastWin32Error()}.");
+        }
+
         try
         {
-            threads = proc.Threads;
-        }
-        catch (InvalidOperationException)
-        {
-            // Process has exited; nothing to resume.
-            return;
-        }
-
-        foreach (ProcessThread pt in threads)
-        {
-            IntPtr threadHandle =
-                OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
-            if (threadHandle == IntPtr.Zero) continue;
-
-            uint result = ResumeThread(threadHandle);
-            if (result == uint.MaxValue)
+            ThreadEntry32 entry = new()
             {
-                int err = Marshal.GetLastWin32Error();
-                CloseHandle(threadHandle);
-                // ERROR_ACCESS_DENIED (5) can occur when resuming protected threads; ignore it.
-                const int ERROR_ACCESS_DENIED = 5;
-                if (err == ERROR_ACCESS_DENIED)
-                    continue;
+                dwSize = (uint)Marshal.SizeOf<ThreadEntry32>()
+            };
 
-                // If the process has exited since we started enumerating threads, treat that as benign and continue.
-                if (proc.HasExited)
-                    continue;
-
+            if (!Thread32First(snapshot, ref entry))
+            {
+                // Enumeration failure; OnStarted decides if it is benign.
                 throw new InvalidOperationException(
-                    $"ResumeThread failed for thread {pt.Id} with error {err}.");
+                    $"Thread32First failed with error {Marshal.GetLastWin32Error()}.");
             }
-            CloseHandle(threadHandle);
+
+            do
+            {
+                if (entry.th32OwnerProcessID != actualPid)
+                    continue;
+
+                ResumeThreadById(entry.th32ThreadID);
+            } while (Thread32Next(snapshot, ref entry));
         }
+        finally
+        {
+            CloseHandle(snapshot);
+        }
+    }
+
+    /// <summary>Releases one suspend count on a snapshot thread, skipping gone/denied ones.</summary>
+    private static void ResumeThreadById(uint threadId)
+    {
+        IntPtr threadHandle = OpenThread(ThreadAccess.THREAD_SUSPEND_RESUME, false, threadId);
+        if (threadHandle == IntPtr.Zero) return;
+
+        uint result = ResumeThread(threadHandle);
+        if (result == uint.MaxValue)
+        {
+            // Read the error before CloseHandle overwrites the last-error slot.
+            int err = Marshal.GetLastWin32Error();
+            CloseHandle(threadHandle);
+            const int ERROR_ACCESS_DENIED = 5;
+            if (err == ERROR_ACCESS_DENIED)
+                return;
+
+            // HasExited is also true in the pre-signal window, so let the caller decide.
+            throw new InvalidOperationException(
+                $"ResumeThread failed for thread {threadId} with error {err}.");
+        }
+
+        CloseHandle(threadHandle);
     }
 
     internal override void SuspendProcess(Process process)
     {
+        // A refused by-ID lookup here means nothing was frozen.
         uint actualPid = GetProcessId(process.Handle);
 
         Process proc;
@@ -125,13 +143,8 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         }
     }
 
-    /// <summary>
-    ///     Reads the child's exit status exception-safely: a disposed or invalid process
-    ///     handle means the child is gone, so any failure of the check itself reports
-    ///     <c>true</c> instead of throwing. Never throws, which also makes it safe to call
-    ///     from an exception filter (a filter that throws is treated as <c>false</c>).
-    /// </summary>
-    private static bool ChildHasExited(ProcessWrapper process)
+    /// <summary>Never-throwing HasExited read; a disposed handle counts as gone.</summary>
+    private static bool ChildHasExited(Process process)
     {
         try
         {
@@ -153,17 +166,11 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
                 Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
             );
 
-        // Fast-exiting children can terminate between OnStarted's exited-check and this call.
-        // Applying a resource policy to a terminated child is meaningless, so skip it instead
-        // of letting the setters throw — matching the ResumeProcess/SuspendProcess exit-race
-        // handling. Failures on a verifiably live child keep surfacing (see ApplyPolicySetting).
+        // A child may exit between OnStarted's check and this call; skip its policy.
         if (process.HasExited)
             return;
 
-        // Short-circuit the remaining setters once the child reports exited: resource policy
-        // on a terminated child is meaningless, and the BCL setters throw against a signaled
-        // handle — this must keep SetResourcePolicy self-contained instead of relying on
-        // OnStarted's catch.
+        // Skip remaining setters once the child reports exited, keeping this method self-contained.
         void ApplySettingIfRunning(Action apply)
         {
             if (!ChildHasExited(process))
@@ -198,10 +205,7 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
         }
         catch (InvalidOperationException) when (ChildHasExited(process))
         {
-            // Belt-and-braces: the child can exit after the last guard above but before a
-            // setter's own exited-check. The filter re-reads exit status (never throws), so
-            // a genuine InvalidOperationException on a live child fails the filter and
-            // keeps surfacing.
+            // Child exited after the last guard but before a setter's own check.
         }
     }
 
@@ -306,7 +310,38 @@ internal partial class WindowsProcessControlAdapter : BaseProcessControlAdapter
     [LibraryImport("kernel32.dll", SetLastError = true)]
     private static partial uint GetProcessId(IntPtr hProcess);
 
-    [Flags]
+    // TH32CS_SNAPTHREAD: list the child's threads without re-opening it by ID.
+    private const uint Th32csSnapThread = 0x00000004;
+
+    private static readonly IntPtr InvalidSnapshotHandle = new(-1); // INVALID_HANDLE_VALUE
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial IntPtr CreateToolhelp32Snapshot(uint dwFlags, uint th32ProcessID);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool Thread32First(IntPtr hSnapshot, ref ThreadEntry32 lpte);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool Thread32Next(IntPtr hSnapshot, ref ThreadEntry32 lpte);
+
+    // All seven native fields declared; the 28-byte layout must match THREADENTRY32.
+    [StructLayout(LayoutKind.Sequential)]
+    private struct ThreadEntry32
+    {
+        public uint dwSize;
+        public uint cntUsage;
+        public uint th32ThreadID;
+        public uint th32OwnerProcessID;
+        public int tpBasePri;
+        public int tpDeltaPri;
+        public uint dwFlags;
+    }
+
+    // Deliberately not marked [Flags]: the values mirror the Win32 THREAD_* access masks,
+    // but this enum is only ever passed to OpenThread as a single right (never combined),
+    // and THREAD_ALL_ACCESS (0x001F03FF) is not a clean combination of the other members.
     private enum ThreadAccess : uint
     {
         THREAD_SUSPEND_RESUME = 0x0002,

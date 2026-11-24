@@ -120,32 +120,27 @@ internal class ProcessWrapper : Process
     
     private void OnStarted(object? sender, EventArgs e)
     {
-        // ReSharper disable once InvertIf
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()
-            || OperatingSystem.IsFreeBSD())
-        {
-            // Fast-exiting processes (e.g. `which`, `echo`) may have already exited
-            // between base.Start() returning and this handler running. Skip the
-            // suspend/resume cycle in that case to avoid races on process handles.
+            // Already exited before this handler runs; no thread has been suspended yet.
             if (HasExited) return;
 
-            // TODO: Replace with ProcessStartInfo.StartSuspended + SafeProcessHandle.Resume()
-            // on Windows and macOS when .NET 11 is added as a target framework.
-            try
             {
-                SuspendProcess();
+                try
+                {
+                    SuspendProcess();
+                }
+                catch (InvalidOperationException)
+                {
+                    // Fall through: a partial freeze must still reach the resume in the finally.
+                }
+                catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
+                {
+                    // ESRCH: no signal delivered, but still fall through for the same reason.
+                }
             }
-            catch (InvalidOperationException)
-            {
-                // Process exited before we could suspend it.
-                return;
-            }
-            catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
-            {
-                // Adapter suspend signals a just-exited child; errno ESRCH means it is
-                // gone. Same race as the exiting-before-suspend case above.
-                return;
-            }
+
+            // Capture live-child resume failures here; throwing from the finally would mask an
+            // in-flight SetResourcePolicy exception (MA0072).
+            Exception? resumeFailure = null;
 
             try
             {
@@ -159,30 +154,45 @@ internal class ProcessWrapper : Process
             }
             catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
             {
-                // PriorityClass and working-set setters translate libc ESRCH into
-                // Win32Exception ("No such process") when the fast-exiting child is
-                // already reaped (observed on macOS arm64 runners). Unrelated access
-                // failures keep surfacing.
+                // Setters raise ESRCH for an already-reaped child; unrelated failures surface.
             }
             finally
             {
-                // Always resume the process — even if SetResourcePolicy or a raced
-                // child exit throws — so it cannot stay suspended.
+                // Resume even when HasExited is true: on Windows it becomes true before the handle
+                // signals, while threads may still be frozen mid-termination.
                 try
                 {
-                    ResumeProcess();
-                }
-                catch (InvalidOperationException)
-                {
-                    // The process may have already exited during SetResourcePolicy.
-                    // Swallow the exception — the process is gone, nothing to resume.
+                    ResumeProcess(skipExitedGuard: true);
                 }
                 catch (Win32Exception exception) when (IsErrnoNoSuchProcess(exception))
                 {
-                    // Same as above: the child exited mid-sequence.
+                    // ESRCH: nothing left to resume.
+                }
+                catch (Exception) when (IsFullyTerminated())
+                {
+                    // Handle signaled: no threads remain, so a failed resume is benign.
+                }
+                catch (Exception exception)
+                {
+                    // Live child or pre-signal window: kill it so it cannot stay suspended.
+                    try
+                    {
+                        ForcefulExit(skipExitedGuard: true);
+                    }
+                    catch (Exception)
+                    {
+                        // Best-effort kill.
+                    }
+
+                    // Surface only genuine live-child failures.
+                    if (!IsProcessGone())
+                        resumeFailure = exception;
                 }
             }
-        }
+
+            // Safe to surface the resume failure now.
+            if (resumeFailure is not null)
+                throw resumeFailure;
     }
 
     /// <summary>
@@ -194,6 +204,40 @@ internal class ProcessWrapper : Process
     private static bool IsErrnoNoSuchProcess(Win32Exception exception) =>
         !OperatingSystem.IsWindows()
         && exception.NativeErrorCode == 3;
+
+    /// <summary>
+    ///     Never-throwing HasExited read; a disposed handle counts as gone. On Windows this is
+    ///     true during the pre-signal window, not only after full termination.
+    /// </summary>
+    private bool IsProcessGone()
+    {
+        try
+        {
+            return HasExited;
+        }
+        catch (Exception)
+        {
+            // Disposed or invalid handle: gone.
+            return true;
+        }
+    }
+
+    /// <summary>
+    ///     True only once the process handle has signaled, i.e. no threads remain. Unlike
+    ///     HasExited this is false during the pre-signal window.
+    /// </summary>
+    private bool IsFullyTerminated()
+    {
+        try
+        {
+            return WaitForExit(0);
+        }
+        catch (Exception)
+        {
+            // Disposed or invalid handle: gone.
+            return true;
+        }
+    }
 
     private void OnExited(object? sender, EventArgs e)
     {
@@ -392,8 +436,11 @@ internal class ProcessWrapper : Process
     /// <summary>
     /// Resumes the execution of the current process. Routes to the platform-specific implementation.
     /// </summary>
+    /// <param name="skipExitedGuard">
+    /// OnStarted's finally only: HasExited can be true while threads are still frozen.
+    /// </param>
     /// <exception cref="InvalidOperationException">
-    /// Thrown when an attempt is made to resume a process that has already exited.
+    /// Thrown when the child has exited and <paramref name="skipExitedGuard"/> is false.
     /// </exception>
     /// <remarks>
     /// This method uses platform-specific mechanisms to resume a suspended process
@@ -403,9 +450,9 @@ internal class ProcessWrapper : Process
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("freebsd")]
-    internal void ResumeProcess()
+    internal void ResumeProcess(bool skipExitedGuard = false)
     {
-        if (HasExited)
+        if (!skipExitedGuard && HasExited)
             throw new InvalidOperationException(Resources.Exceptions_Process_CannotResumeExited);
 
         ProcessControlAdapter.ResumeProcess(this);
@@ -653,9 +700,9 @@ internal class ProcessWrapper : Process
 
     #endregion
 
-    internal void ForcefulExit()
+    internal void ForcefulExit(bool skipExitedGuard = false)
     {
-        if (HasExited)
+        if (!skipExitedGuard && HasExited)
             return;
 
         try
