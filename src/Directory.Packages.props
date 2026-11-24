@@ -9,6 +9,6 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="11.0.0" />
     <PackageVersion Include="Squash" Version="2.2.0" />
-    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.339" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.341" />
   </ItemGroup>
 </Project>
