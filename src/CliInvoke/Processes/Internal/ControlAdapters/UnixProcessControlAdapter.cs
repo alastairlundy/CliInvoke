@@ -35,6 +35,8 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     [UnsupportedOSPlatform("windows")]
     internal override void ResumeProcess(Process process)
     {
+        // No exited guard: SIGCONT must reach a stopped child. A stopped Unix child cannot
+        // report exited, so the Windows pre-signal window has no equivalent here.
 #if NET11_0
         // net11.0 leg: Process.Signal delivers SIGCONT through the runtime's own kill()
         // plumbing, which resolves the platform-correct signal number internally —
@@ -106,12 +108,7 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
     /// </summary>
     internal static int GetContinueSignalNumber() => UsesBsdSignalNumbers() ? 19 : 18;
 
-    /// <summary>
-    ///     Reads the child's exit status exception-safely: a disposed or invalid process
-    ///     handle means the child is gone, so any failure of the check itself reports
-    ///     <c>true</c> instead of throwing. Never throws, which also makes it safe to call
-    ///     from an exception filter (a filter that throws is treated as <c>false</c>).
-    /// </summary>
+    /// <summary>Never-throwing HasExited read; a disposed handle counts as gone.</summary>
     private static bool ChildHasExited(ProcessWrapper process)
     {
         try
@@ -134,17 +131,11 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
                 Resources.Exceptions_ResourcePolicy_CannotSetToNonStartedProcess
             );
 
-        // Fast-exiting children can terminate between OnStarted's exited-check and this call.
-        // Applying a resource policy to a terminated child is meaningless, so skip it instead
-        // of letting the setters throw — matching the ResumeProcess/SuspendProcess exit-race
-        // handling. Failures on a verifiably live child keep surfacing (see ApplyPolicySetting).
+        // A child may exit between OnStarted's check and this call; skip its policy.
         if (process.HasExited)
             return;
 
-        // Short-circuit the remaining setters once the child reports exited: resource policy
-        // on a terminated child is meaningless, and the BCL setters throw against a signaled
-        // handle — this must keep SetResourcePolicy self-contained instead of relying on
-        // OnStarted's catch.
+        // Skip remaining setters once the child reports exited, keeping this method self-contained.
         void ApplySettingIfRunning(Action apply)
         {
             if (!ChildHasExited(process))
@@ -178,10 +169,7 @@ internal partial class UnixProcessControlAdapter : BaseProcessControlAdapter
         }
         catch (InvalidOperationException) when (ChildHasExited(process))
         {
-            // Belt-and-braces: the child can exit after the last guard above but before a
-            // setter's own exited-check. The filter re-reads exit status (never throws), so
-            // a genuine InvalidOperationException on a live child fails the filter and
-            // keeps surfacing.
+            // Child exited after the last guard but before a setter's own check.
         }
     }
 
