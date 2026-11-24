@@ -14,6 +14,11 @@ adheres to [Semantic Versioning](https://semver.org/).
 - Hardened metacharacter escapes in the cmd composition path.
 - Runner identification now matches shell runners by exact file name.
 
+### Fixed
+
+- Resource-policy setters no longer fail the caller's spawn when a fast-exiting child is mid-termination. `BaseProcessControlAdapter.SetResourcePolicy` treats setter failures during the exit transition as benign, short-circuits once the child reports exited (applying policy to a terminated child is a no-op, not a `Win32Exception`), and reads exit state from the child's exit status instead of a 5 ms timed wait. (Backport of the same fix landing in 3.2.0.)
+- `OnStarted` always resumes the child, including when `HasExited` is already true, and resumes threads from the held process handle instead of a by-ID lookup that skips terminating children. A resume failure on a child whose handle has not signaled yet now forceful-exits the child, so no child is left suspended forever holding its PID. (Backport of the same fix landing in 3.2.0.)
+
 ## [3.1.1] - unreleased
 
 ### Fixed
