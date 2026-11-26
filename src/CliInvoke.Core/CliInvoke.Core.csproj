@@ -22,10 +22,11 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>3.1.0</Version>
         <PackageVersion>3.2.0-beta.1</PackageVersion>
-        <PackageReleaseNotes>#### Changed
-- Tightened argument validation for cmd runner compositions.
-- Hardened metacharacter escapes in the cmd composition path.
-- Runner identification now matches shell runners by exact file name.</PackageReleaseNotes>
+        <PackageReleaseNotes>
+        - All three packages, `CliInvoke.Core`, `CliInvoke`, and `CliInvoke.Specializations`, now ship assets for .NET 10 and .NET 11. Source builds require the .NET 10 and .NET 11 SDKs, and `global.json` pins version 11.0.100.
+        - Validation rules and environment-variable comparisons also use less memory. `RequiresExitCodeZero` reuses the same function instead of creating a new one each time. `ProcessConfiguration.Equals` compares environment variables by key instead of comparing sorted lists.
+- `AllowExceptionsIfUnexpected` no longer swallows non-cancellation failures that happen near a timeout.
+        </PackageReleaseNotes>
         <Product>CliInvoke.Core</Product>
         <AssemblyVersion>3.2.0.0</AssemblyVersion>
         <FileVersion>3.2.0.0</FileVersion>

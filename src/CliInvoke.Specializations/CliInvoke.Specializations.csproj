@@ -10,16 +10,13 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.2.0-beta.1</PackageVersion>
+        <PackageVersion>3.2.0</PackageVersion>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/alastairlundy/CliInvoke</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>#### Changed
-- Tightened argument validation for cmd runner compositions.
-- Hardened metacharacter escapes in the cmd composition path.
-- Runner identification now matches shell runners by exact file name.</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated to use CliInvoke 3.2.0</PackageReleaseNotes>
         <Description>Shell middleware for CliInvoke. Run commands through PowerShell, CMD, or the user's default shell with UsePowerShell, UseCmd, and UseDefaultShell. Requires the CliInvoke package.</Description>
         <PackageIcon>icon.png</PackageIcon>
         <IsTrimmable>true</IsTrimmable>

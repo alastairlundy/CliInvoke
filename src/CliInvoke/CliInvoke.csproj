@@ -13,14 +13,40 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReleaseNotes>#### Changed
-- Tightened argument validation for cmd runner compositions.
-- Hardened metacharacter escapes in the cmd composition path.
-- Runner identification now matches shell runners by exact file name.</PackageReleaseNotes>
+        <PackageReleaseNotes>## Changes since 3.1
+CliInvoke 3.2.0 adds .NET 11 support and new exceptions that report child-process details when timeouts or cancellations occur. It also fixes process startup, shutdown, retry, and validation edge cases - Several of these have been backported to 3.1.x via 3.1.3
+
+### Added
+- All three packages, `CliInvoke.Core`, `CliInvoke`, and `CliInvoke.Specializations`, now ship assets for .NET 10 and .NET 11. Source builds require the .NET 10 and .NET 11 SDKs, and `global.json` pins version 11.0.100.
+- The new exceptions `CliInvokeTimeoutException` and `CliInvokeCanceledException` carry `ProcessId`, `Elapsed`, and a `ChildState` snapshot when the exit configuration allows cancellation exceptions to propagate. `ProcessDiagnostic` records the child's exit state, exit code, suspension state, elapsed time, and capture time. Both exception types derive from `OperationCanceledException`, so existing handlers still catch them. The original cancellation token remains available. `CliInvokeTimeoutException` does not derive from `TimeoutException`.
+
+### Performance
+- Buffered output capture now uses less memory. It avoids extra copies before decoding text and reuses transfer buffers. The captured text remains unchanged.
+- Validation rules and environment-variable comparisons also use less memory. `RequiresExitCodeZero` reuses the same function instead of creating a new one each time. `ProcessConfiguration.Equals` compares environment variables by key instead of comparing sorted lists.
+
+### Fixed
+- Raw-mode invocations no longer deadlock when a child writes enough output to fill an unread pipe.
+- Buffered cancellation now behaves consistently when `CancellationThrowsException` is `false`. Cancellation while reading captured output returns a `BufferedProcessResult` with `Canceled` set to `true` and empty output. When the option is `true`, cancellation exceptions propagate.
+- Timer-driven timeouts now use the same clock as the process kill timer. This prevents a timeout from being reported as a caller cancellation or as an uncanceled result.
+- The standard wait path now waits for the operating system to confirm process exit after a forceful process kill.
+- Resource-policy setters tolerate children that exit while CliInvoke applies the policy. Resume handling also uses the held process handle and terminates a child if its initial resume fails.
+- Non-shell child processes on .NET 11 start suspended on Windows and macOS so CliInvoke can apply `ProcessResourcePolicy` before the child runs. Linux and FreeBSD keep their existing start behavior.
+- Retry middleware rewinds seekable standard input before each retry. A non-seekable input stream now throws `InvalidOperationException` when a retry is about to run instead of sending an empty stream.
+- `LoggingMiddleware` logs `ArgumentList` when the argument string is empty. The display value still passes through the configured sanitizer.
+- `ProcessResult.Signal` now converts native Unix signal numbers through the platform mapping on .NET 11.
+- `AllowExceptionsIfUnexpected` no longer swallows non-cancellation failures that happen near a timeout.
+
+### Changed
+
+- `CliInvoke` now references Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Extensions.Logging.Abstractions, and Microsoft.Extensions.Caching.Memory 11.0.0.
+- `CliInvoke` no longer depends on DotExtensions. The path and version helpers now live in the repository.
+- Polyfill moved from `CliInvoke.Core` to `CliInvoke` and now uses version 12.0.0. The `CliInvoke` package also uses Squash for build-time trimming.
+- Argument exceptions in configuration and policy methods now include the offending parameter name.
+</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>3.2.0-beta.1</PackageVersion>
+        <PackageVersion>3.2.0</PackageVersion>
         <AssemblyVersion>3.2.0.0</AssemblyVersion>
         <PackageTags>shell,command-line,cli,automation,execute,executable,wrapper,powershell,cmd,timeout,cancellation,standard-input,standard-output,standard-error,invoke,process,invocation,execution</PackageTags>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>

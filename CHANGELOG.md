@@ -6,10 +6,10 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
-## [3.2.0] - Unreleased
+## [3.2.0] - 2026-11-26
 
 ### Added
-- All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks. `tests/CliInvoke.Tests` runs both legs; the Specializations tests stay on `net10.0`. Building from source now requires the .NET 11 SDK (`global.json` pins `11.0.100-rc.2`, CI installs `11.0.100-rc.3`); the `net10.0` test leg still needs a .NET 10 runtime.
+- All three packages (`CliInvoke.Core`, `CliInvoke`, `CliInvoke.Specializations`) now multi-target `net10.0` and `net11.0`, shipping assets for both frameworks. `tests/CliInvoke.Tests` runs both legs; the Specializations tests stay on `net10.0`. Building from source now requires the .NET 11 SDK (`global.json` pins `11.0.100-rc.2`, CI installs `11.0.100`); the `net10.0` test leg still needs a .NET 10 runtime.
 - On the `net11.0` leg, Windows and macOS children start suspended (`ProcessStartInfo.StartSuspended`) so a configured `ProcessResourcePolicy` is applied before the child first runs; Linux and FreeBSD keep the previous behaviour (the runtime rejects suspended start there). If resuming a creation-suspended child fails for a reason other than the child already having exited, the child is forceful-exited and the failure propagates from `Start`/`StartAsync` instead of leaving it suspended forever.
 - Guarded-execution guide (`site/docs/guides/guarded-execution.md`): failure-mode-organised reference mapping hangs, runaway output, ignored exit codes, and secret leaks onto CliInvoke's timeout, cancellation, and exit-configuration guards, for automation and agent harnesses.
 - OpenTelemetry middleware recipe (`site/docs/guides/opentelemetry-middleware.md`): a ~30-line `IProcessMiddleware` sample emitting one `ActivitySource` span per invocation (exit code, duration, canceled, mode), with registration and OTLP listener snippets. Spans deliberately carry no output content or raw arguments.
@@ -57,7 +57,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 - CONTRIBUTING.md now spells out the required coding standard (`src/.editorconfig`), the `ConfigureAwait` policy and its analyzer/CI enforcement, the test-everywhere expectation (Windows, macOS, Linux), and the contribution-licensing terms.
 - THIRD_PARTY_NOTICES.txt: corrected the DotExtensions attribution path after `PathEnvironmentVariable` moved from `CliInvoke.Core` to `CliInvoke` (`CliInvoke.Core.Internal.IO` -> `CliInvoke.Internal.IO`).
 
-## [3.1.3] - Unreleased
+## [3.1.3] - 2026-11-26
 
 ### Fixed
 - Resource-policy setters no longer fail the launch when the child process exits first. When a child process exits while `BaseProcessControlAdapter.SetResourcePolicy` is still running, the setter treats that failure as harmless and stops trying once the child process reports it has exited, because setting a policy on a process that has already exited does nothing. It reads the exit state from the child process's exit status instead of waiting 5 ms and checking again. (Backport of the same fix landing in 3.2.0.)
