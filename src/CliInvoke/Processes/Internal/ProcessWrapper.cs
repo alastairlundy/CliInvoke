@@ -142,6 +142,35 @@ internal class ProcessWrapper : Process
             // in-flight SetResourcePolicy exception (MA0072).
             Exception? resumeFailure = null;
 
+            // Only the exception types a resume can actually raise enter the exit-race and
+            // forceful-kill handling below: OS-level delivery failures (Win32Exception, from
+            // ResumeThread/kill/SafeHandle.Resume) and Process state failures
+            // (InvalidOperationException, which also covers the derived ObjectDisposedException
+            // from a released handle). Any other exception type is a defect in the resume path,
+            // not a failed resume, and must propagate unchanged instead of triggering a kill.
+            void HandleResumeFailure(Exception exception)
+            {
+                if (IsFullyTerminated())
+                {
+                    // Handle signaled: no threads remain, so a failed resume is benign.
+                    return;
+                }
+
+                // Live child or pre-signal window: kill it so it cannot stay suspended.
+                try
+                {
+                    ForcefulExit(skipExitedGuard: true);
+                }
+                catch (Exception)
+                {
+                    // Best-effort kill.
+                }
+
+                // Surface only genuine live-child failures.
+                if (!IsProcessGone())
+                    resumeFailure = exception;
+            }
+
             try
             {
 #pragma warning disable CA1416
@@ -168,25 +197,13 @@ internal class ProcessWrapper : Process
                 {
                     // ESRCH: nothing left to resume.
                 }
-                catch (Exception) when (IsFullyTerminated())
+                catch (InvalidOperationException exception)
                 {
-                    // Handle signaled: no threads remain, so a failed resume is benign.
+                    HandleResumeFailure(exception);
                 }
-                catch (Exception exception)
+                catch (Win32Exception exception)
                 {
-                    // Live child or pre-signal window: kill it so it cannot stay suspended.
-                    try
-                    {
-                        ForcefulExit(skipExitedGuard: true);
-                    }
-                    catch (Exception)
-                    {
-                        // Best-effort kill.
-                    }
-
-                    // Surface only genuine live-child failures.
-                    if (!IsProcessGone())
-                        resumeFailure = exception;
+                    HandleResumeFailure(exception);
                 }
             }
 
