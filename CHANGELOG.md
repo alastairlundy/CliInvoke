@@ -57,6 +57,13 @@ adheres to [Semantic Versioning](https://semver.org/).
 - CONTRIBUTING.md now spells out the required coding standard (`src/.editorconfig`), the `ConfigureAwait` policy and its analyzer/CI enforcement, the test-everywhere expectation (Windows, macOS, Linux), and the contribution-licensing terms.
 - THIRD_PARTY_NOTICES.txt: corrected the DotExtensions attribution path after `PathEnvironmentVariable` moved from `CliInvoke.Core` to `CliInvoke` (`CliInvoke.Core.Internal.IO` -> `CliInvoke.Internal.IO`).
 
+## [3.1.3] - Unreleased
+
+### Fixed
+- Resource-policy setters no longer fail the caller's spawn when a fast-exiting child is mid-termination. `BaseProcessControlAdapter.SetResourcePolicy` treats setter failures during the exit transition as benign, short-circuits once the child reports exited (applying policy to a terminated child is a no-op, not a `Win32Exception`), and reads exit state from the child's exit status instead of a 5 ms timed wait. (Backport of the same fix landing in 3.2.0.)
+- `OnStarted` always resumes the child, including when `HasExited` is already true, and resumes threads from the held process handle instead of a by-ID lookup that skips terminating children. A resume failure on a child whose handle has not signaled yet now forceful-exits the child, so no child is left suspended forever holding its PID. (Backport of the same fix landing in 3.2.0.)
+- The resume-failure handler in `OnStarted` catches only `InvalidOperationException` and `Win32Exception` instead of `Exception`, so a defect elsewhere in the resume path propagates instead of triggering the forceful kill and rethrow. `ObjectDisposedException` derives from `InvalidOperationException`, so a released handle stays covered.
+
 ## [3.1.2] - 2026-11-23
 - Addressed the cmd.exe command-injection security advisory [GHSA-wx65-9pfv-4xx5](https://github.com/alastairlundy/CliInvoke/security/advisories/GHSA-wx65-9pfv-4xx5).
 - Tightened argument validation for cmd runner compositions.
