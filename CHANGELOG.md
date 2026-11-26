@@ -6,7 +6,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 > For releases prior to 2.0, see [CHANGELOG-archive.md](CHANGELOG-archive.md).
 
-## [3.1.2] - unreleased
+## [3.1.2] - 2026-11-23
 
 ### Changed
 
