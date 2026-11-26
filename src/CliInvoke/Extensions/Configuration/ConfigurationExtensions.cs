@@ -76,10 +76,9 @@ public static class ConfigurationExtensions
         ///     <para>
         ///         Null-valued entries in <see cref="ProcessStartInfo.Environment"/> (which remove
         ///         the variable from the child process when the source is started directly) are
-        ///         not carried over: <see cref="ProcessConfiguration.EnvironmentVariables"/> is a
-        ///         set-only surface that cannot express removal, so the variable stays inherited
-        ///         by the child after conversion. This is another lossy edge of this conversion,
-        ///         like the redirect-flag collapse above.
+        ///         carried over as removals: they map onto the null-value variable-removal
+        ///         semantics of <see cref="ProcessConfiguration.EnvironmentVariables"/>, so the
+        ///         variable stays absent in the child after conversion.
         ///     </para>
         /// </remarks>
         [Pure]
@@ -90,11 +89,10 @@ public static class ConfigurationExtensions
                 && (processStartInfo.Verb.StartsWith("runas", StringComparison.OrdinalIgnoreCase)
                     || processStartInfo.Verb.StartsWith("sudo", StringComparison.OrdinalIgnoreCase));
 
-            IEnumerable<KeyValuePair<string, string>> kvp = processStartInfo.Environment
-                .Where(kv => kv.Value is not null)
-                // Suppression is okay here because we check for null before Select.
-                // ReSharper disable once NullableWarningSuppressionIsUsed
-                .Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value!));
+            // Null-valued entries are preserved: a null value maps onto CliInvoke's
+            // variable-removal semantics instead of being silently dropped.
+            IEnumerable<KeyValuePair<string, string?>> variables =
+                processStartInfo.Environment;
 
             IProcessConfigurationBuilder processConfigurationBuilder =
                 new ProcessConfigurationBuilder(processStartInfo.FileName);
@@ -102,7 +100,7 @@ public static class ConfigurationExtensions
             processConfigurationBuilder = processConfigurationBuilder
                 .ConfigureEnvironmentVariables(envSpec =>
                 {
-                    envSpec.SetEnumerable(kvp);
+                    envSpec.SetEnumerable(variables);
                 })
                 .UseShellExecution(processStartInfo.UseShellExecute)
                 .EnableWindowCreation(!processStartInfo.CreateNoWindow)

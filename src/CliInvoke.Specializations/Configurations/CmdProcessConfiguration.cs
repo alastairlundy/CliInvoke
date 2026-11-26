@@ -40,7 +40,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
     ///     Indicates whether the command requires administrator
     ///     privileges.
     /// </param>
-    /// <param name="environmentVariables">A dictionary of environment variables to be set for the command.</param>
+    /// <param name="environmentVariables">A dictionary of environment variables to be set for the command; a <see langword="null" /> value records the removal of the variable from the child's environment.</param>
     /// <param name="credentials">The user credentials to be used when running the command.</param>
     /// <param name="standardInput">The stream for the standard input.</param>
     /// <param name="standardInputEncoding">The encoding for the standard input stream.</param>
@@ -59,7 +59,7 @@ public class CmdProcessConfiguration : ProcessConfiguration
         bool redirectStandardInput, bool outputRedirection = true,
         string? workingDirectoryPath = null, bool requiresAdministrator = false,
 #pragma warning disable MA0016
-        Dictionary<string, string>? environmentVariables = null, UserCredential? credentials = null,
+        Dictionary<string, string?>? environmentVariables = null, UserCredential? credentials = null,
 #pragma warning restore MA0016
         StreamWriter? standardInput = null,
         Encoding? standardInputEncoding = null, Encoding? standardOutputEncoding = null,

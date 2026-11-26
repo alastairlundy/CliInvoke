@@ -650,7 +650,7 @@ Defined in `src/CliInvoke.Core/Primitives/ProcessConfiguration.cs`.
 | `WorkingDirectoryPath` | `string` | `Directory.GetCurrentDirectory()` | Init-only | 128 |
 | `WindowCreation` | `bool` | `false` | Init-only | 189 |
 | `UseShellExecution` | `bool` | `false` | Init-only | 224 |
-| `EnvironmentVariables` | `IReadOnlyDictionary<string, string>` | `ImmutableSortedDictionary<string, string>.Empty` | Init-only | 204 |
+| `EnvironmentVariables` | `IReadOnlyDictionary<string, string?>` | `ImmutableSortedDictionary<string, string?>.Empty` | Init-only | 216 |
 | `Credential` | `UserCredential` | `UserCredential.Null` | Init-only | 213 |
 | `OutputRedirection` | `bool` | `false` *(the convenience constructor defaults to `true`)* | Init-only | 245 |
 | `RedirectStandardInput` | `bool` | `false` | Init-only | 240 |

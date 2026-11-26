@@ -22,7 +22,7 @@ public class EnvironmentVariablesSpecTests
         EnvironmentVariablesSpec spec = new();
 
         // Assert
-        IReadOnlyDictionary<string, string> built = spec.Build();
+        IReadOnlyDictionary<string, string?> built = spec.Build();
         await Assert.That(built).IsEmpty();
     }
 
@@ -36,13 +36,13 @@ public class EnvironmentVariablesSpecTests
         spec.SetPair("KEY", "value");
 
         // Assert
-        IReadOnlyDictionary<string, string> built = spec.Build();
+        IReadOnlyDictionary<string, string?> built = spec.Build();
         await Assert.That(built).ContainsKey("KEY");
         await Assert.That(built["KEY"]).IsEqualTo("value");
     }
 
     [Test]
-    public async Task SetPair_RejectsNullOrEmptyNameOrNullValue()
+    public async Task SetPair_RejectsNullOrEmptyName()
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
@@ -50,7 +50,21 @@ public class EnvironmentVariablesSpecTests
         // Assert
         await Assert.That(() => spec.SetPair(null!, "v")).Throws<ArgumentException>();
         await Assert.That(() => spec.SetPair("", "v")).Throws<ArgumentException>();
-        await Assert.That(() => spec.SetPair("k", null!)).Throws<ArgumentException>();
+    }
+
+    [Test]
+    public async Task SetPair_NullValue_RecordsRemoval()
+    {
+        // Arrange - a null value is the documented removal signal, not a rejection.
+        EnvironmentVariablesSpec spec = new();
+
+        // Act
+        spec.SetPair("KEY", null);
+
+        // Assert
+        IReadOnlyDictionary<string, string?> built = spec.Build();
+        await Assert.That(built).ContainsKey("KEY");
+        await Assert.That(built["KEY"]).IsNull();
     }
 
     [Test]
@@ -63,7 +77,7 @@ public class EnvironmentVariablesSpecTests
         spec.SetPair("KEY", "");
 
         // Assert
-        IReadOnlyDictionary<string, string> built = spec.Build();
+        IReadOnlyDictionary<string, string?> built = spec.Build();
         await Assert.That(built).ContainsKey("KEY");
         await Assert.That(built["KEY"]).IsEqualTo("");
     }
@@ -100,7 +114,7 @@ public class EnvironmentVariablesSpecTests
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
-        List<KeyValuePair<string, string>> vars =
+        List<KeyValuePair<string, string?>> vars =
         [
             new("A", "1"),
             new("B", "2"),
@@ -110,7 +124,7 @@ public class EnvironmentVariablesSpecTests
         spec.SetEnumerable(vars);
 
         // Assert
-        IReadOnlyDictionary<string, string> built = spec.Build();
+        IReadOnlyDictionary<string, string?> built = spec.Build();
         await Assert.That(built["A"]).IsEqualTo("1");
         await Assert.That(built["B"]).IsEqualTo("2");
     }
@@ -127,11 +141,11 @@ public class EnvironmentVariablesSpecTests
     }
 
     [Test]
-    public async Task SetEnumerable_AllowsEmptyValues_RejectsNullValues()
+    public async Task SetEnumerable_AllowsEmptyAndNullValues()
     {
-        // Arrange - empty values are legitimate; null values are not.
+        // Arrange - empty values set an empty value; null values are the removal signal.
         EnvironmentVariablesSpec spec = new();
-        List<KeyValuePair<string, string>> vars =
+        List<KeyValuePair<string, string?>> vars =
         [
             new("EMPTY", ""),
         ];
@@ -142,13 +156,18 @@ public class EnvironmentVariablesSpecTests
         // Assert
         await Assert.That(spec.Build()["EMPTY"]).IsEqualTo("");
 
-        List<KeyValuePair<string, string>> withNull =
+        List<KeyValuePair<string, string?>> withNull =
         [
-            new("NULL", null!),
+            new("NULL", null),
         ];
 
-        await Assert.That(() => spec.SetEnumerable(withNull))
-            .Throws<ArgumentNullException>();
+        // Act
+        spec.SetEnumerable(withNull);
+
+        // Assert - the null-valued entry is recorded, not rejected or dropped
+        IReadOnlyDictionary<string, string?> built = spec.Build();
+        await Assert.That(built).ContainsKey("NULL");
+        await Assert.That(built["NULL"]).IsNull();
     }
 
     [Test]
@@ -156,7 +175,7 @@ public class EnvironmentVariablesSpecTests
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
-        List<KeyValuePair<string, string>> vars =
+        List<KeyValuePair<string, string?>> vars =
         [
             new("K", "1"),
             new("K", "2"),
@@ -171,7 +190,7 @@ public class EnvironmentVariablesSpecTests
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
-        Dictionary<string, string> vars = new(StringComparer.Ordinal) { ["X"] = "9" };
+        Dictionary<string, string?> vars = new(StringComparer.Ordinal) { ["X"] = "9" };
 
         // Act
         spec.SetDictionary(vars);
@@ -185,8 +204,8 @@ public class EnvironmentVariablesSpecTests
     {
         // Arrange
         EnvironmentVariablesSpec spec = new();
-        IReadOnlyDictionary<string, string> vars = new ReadOnlyDictionary<string, string>(
-            new Dictionary<string, string>(StringComparer.Ordinal) { ["R"] = "7" });
+        IReadOnlyDictionary<string, string?> vars = new ReadOnlyDictionary<string, string?>(
+            new Dictionary<string, string?>(StringComparer.Ordinal) { ["R"] = "7" });
 
         // Act
         spec.SetReadOnlyDictionary(vars);
@@ -216,7 +235,7 @@ public class EnvironmentVariablesSpecTests
         // Arrange
         EnvironmentVariablesSpec spec = new();
         spec.SetPair("K", "v");
-        IReadOnlyDictionary<string, string> first = spec.Build();
+        IReadOnlyDictionary<string, string?> first = spec.Build();
 
         // Act
         spec.Clear();

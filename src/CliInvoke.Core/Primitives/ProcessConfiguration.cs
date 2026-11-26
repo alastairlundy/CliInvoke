@@ -208,16 +208,16 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///         A null value for a variable removes that variable from the child process's
     ///         environment: the value inherited from the current process is not passed on. An
     ///         empty string instead sets an empty value and does not remove the variable. Null
-    ///         values are only honourable through direct initialisation of this property; the
-    ///         <c>EnvironmentVariablesSpec</c> builder API rejects them with an
-    ///         <see cref="ArgumentNullException"/>.
+    ///         values can be supplied through direct initialisation of this property and
+    ///         through the <c>EnvironmentVariablesSpec</c> set methods, which record a null
+    ///         value as the removal signal.
     ///     </para>
     /// </remarks>
-    public IReadOnlyDictionary<string, string> EnvironmentVariables
+    public IReadOnlyDictionary<string, string?> EnvironmentVariables
     {
         get;
         init => field = ImmutableSortedDictionary.CreateRange(StringComparer.Ordinal, value);
-    } = ImmutableSortedDictionary<string, string>.Empty;
+    } = ImmutableSortedDictionary<string, string?>.Empty;
 
     /// <summary>
     ///     The credential to be used when executing the Command.
@@ -376,13 +376,13 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
     ///     comparison; otherwise, <c>false</c>.
     /// </returns>
     private static bool EnvironmentVariablesEqual(
-        IReadOnlyDictionary<string, string> left,
-        IReadOnlyDictionary<string, string> right)
+        IReadOnlyDictionary<string, string?> left,
+        IReadOnlyDictionary<string, string?> right)
     {
         if (left.Count != right.Count)
             return false;
 
-        foreach (KeyValuePair<string, string> pair in left)
+        foreach (KeyValuePair<string, string?> pair in left)
         {
             if (!right.TryGetValue(pair.Key, out string? value)
                 || !string.Equals(pair.Value, value, StringComparison.Ordinal))
@@ -419,7 +419,7 @@ public class ProcessConfiguration : IEquatable<ProcessConfiguration>
         foreach (string arg in ArgumentList)
             hashCode.Add(arg, StringComparer.Ordinal);
         hashCode.Add(PathHashCode(WorkingDirectoryPath));
-        foreach (KeyValuePair<string, string> kvp in EnvironmentVariables)
+        foreach (KeyValuePair<string, string?> kvp in EnvironmentVariables)
         {
             hashCode.Add(kvp.Key, StringComparer.Ordinal);
             hashCode.Add(kvp.Value, StringComparer.Ordinal);

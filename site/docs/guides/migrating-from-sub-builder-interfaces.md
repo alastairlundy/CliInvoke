@@ -117,6 +117,12 @@ The lambda parameter changes from `IEnvironmentVariablesBuilder` to
   remain available.
 - The spec constructor accepts an optional `StringComparer` and
   `throwExceptionIfDuplicateKeyFound` flag.
+- A `null` value passed to any of the set methods records a
+  variable removal: when the child starts, the variable is absent
+  from the child's environment instead of inherited from the parent
+  process. This maps onto the BCL null semantics of
+  `ProcessStartInfo.Environment`. An empty string value sets an
+  empty value and does not remove the variable.
 
 ## Process Resource Policy → `ProcessResourcePolicySpec`
 

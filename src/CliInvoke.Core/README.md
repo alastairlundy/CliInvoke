@@ -21,7 +21,7 @@ Key abstractions:
 
 * Fluent specs and builders:
     * ``ArgumentsSpec``, a spec for argument building and argument escaping.
-    * ``EnvironmentVariablesSpec``, a spec for setting environment variables.
+    * ``EnvironmentVariablesSpec``, a spec for setting environment variables; a ``null`` value records the removal of the variable from the child's environment.
     * ``IProcessConfigurationBuilder``, an interface to fluently configure and build ``ProcessConfiguration`` objects. Prefer direct init construction. Reach for the builder only for argument escaping, user credentials, or resource-policy flows.
     * ``ProcessResourcePolicySpec``, a spec for fluently configuring and building ``ProcessResourcePolicy``
       objects.

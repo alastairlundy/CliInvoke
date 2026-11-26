@@ -31,7 +31,7 @@ public class AdapterConfigurationDeliveryTests
 
         ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(), string.Empty)
         {
-            EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
+            EnvironmentVariables = new Dictionary<string, string?>(StringComparer.Ordinal)
             {
                 [variableName] = variableValue
             },
@@ -55,7 +55,7 @@ public class AdapterConfigurationDeliveryTests
 
         ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
         {
-            EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
+            EnvironmentVariables = new Dictionary<string, string?>(StringComparer.Ordinal)
             {
                 [variableName] = variableValue
             },
@@ -81,9 +81,9 @@ public class AdapterConfigurationDeliveryTests
         {
             ProcessConfiguration configuration = new(ProcessTestHelper.GetTargetFilePath(), string.Empty)
             {
-                EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
+                EnvironmentVariables = new Dictionary<string, string?>(StringComparer.Ordinal)
                 {
-                    [variableName] = null!,
+                    [variableName] = null,
                 },
             };
 
@@ -114,9 +114,9 @@ public class AdapterConfigurationDeliveryTests
         {
             ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
             {
-                EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
+                EnvironmentVariables = new Dictionary<string, string?>(StringComparer.Ordinal)
                 {
-                    [key: variableName] = null!
+                    [key: variableName] = null
                 },
             };
 
@@ -146,7 +146,7 @@ public class AdapterConfigurationDeliveryTests
         {
             ProcessConfiguration configuration = new(helperPath, ["echo-env", variableName])
             {
-                EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
+                EnvironmentVariables = new Dictionary<string, string?>(StringComparer.Ordinal)
                 {
                     [variableName] = string.Empty
                 },

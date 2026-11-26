@@ -55,7 +55,7 @@ public class ProcessConfigurationDerivationPropertyTests
                 else
                     stdIn = new StreamWriter(new MemoryStream());
 
-                Dictionary<string, string> envVars = new(StringComparer.Ordinal);
+                Dictionary<string, string?> envVars = new(StringComparer.Ordinal);
                 int envCount = Math.Abs(rng.Next() % 5);
                 for (int i = 0; i < envCount; i++)
                     envVars[$"KEY_{rng.Next()}"] = $"VALUE_{rng.Next()}";

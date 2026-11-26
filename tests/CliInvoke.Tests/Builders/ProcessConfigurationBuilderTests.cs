@@ -472,7 +472,7 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
-        List<KeyValuePair<string, string>> list =
+        List<KeyValuePair<string, string?>> list =
         [
             new("KEY1", "VALUE1"),
             new("KEY2", "VALUE2"),
@@ -484,7 +484,7 @@ public class ProcessConfigurationBuilderTests
 
         // Assert
         ProcessConfiguration config = builder.Build();
-        foreach (KeyValuePair<string, string> pair in list)
+        foreach (KeyValuePair<string, string?> pair in list)
             await Assert.That(config.EnvironmentVariables[pair.Key]).IsEqualTo(pair.Value);
     }
 
@@ -493,7 +493,7 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
-        Dictionary<string, string> dictionary = new(StringComparer.Ordinal)
+        Dictionary<string, string?> dictionary = new(StringComparer.Ordinal)
         {
             { "D_KEY1", "D_VALUE1" },
             { "D_KEY2", "D_VALUE2" },
@@ -504,7 +504,7 @@ public class ProcessConfigurationBuilderTests
 
         // Assert
         ProcessConfiguration config = builder.Build();
-        foreach (KeyValuePair<string, string> pair in dictionary)
+        foreach (KeyValuePair<string, string?> pair in dictionary)
             await Assert.That(config.EnvironmentVariables[pair.Key]).IsEqualTo(pair.Value);
     }
 
@@ -513,19 +513,19 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
-        Dictionary<string, string> source = new(StringComparer.Ordinal)
+        Dictionary<string, string?> source = new(StringComparer.Ordinal)
         {
             { "RO_KEY1", "RO_VALUE1" },
             { "RO_KEY2", "RO_VALUE2" },
         };
-        ReadOnlyDictionary<string, string> readOnlyDictionary = new(source);
+        ReadOnlyDictionary<string, string?> readOnlyDictionary = new(source);
 
         // Act
         builder.ConfigureEnvironmentVariables(spec => spec.SetReadOnlyDictionary(readOnlyDictionary));
 
         // Assert
         ProcessConfiguration config = builder.Build();
-        foreach (KeyValuePair<string, string> pair in readOnlyDictionary)
+        foreach (KeyValuePair<string, string?> pair in readOnlyDictionary)
             await Assert.That(config.EnvironmentVariables[pair.Key]).IsEqualTo(pair.Value);
     }
 
@@ -534,8 +534,8 @@ public class ProcessConfigurationBuilderTests
     {
         // Arrange
         IProcessConfigurationBuilder builder = new ProcessConfigurationBuilder("test.exe");
-        Dictionary<string, string> dictionary = new(StringComparer.Ordinal) { { "D_KEY", "D_VALUE" } };
-        List<KeyValuePair<string, string>> list = [new("L_KEY", "L_VALUE")];
+        Dictionary<string, string?> dictionary = new(StringComparer.Ordinal) { { "D_KEY", "D_VALUE" } };
+        List<KeyValuePair<string, string?>> list = [new("L_KEY", "L_VALUE")];
 
         // Act
         builder.ConfigureEnvironmentVariables(spec =>

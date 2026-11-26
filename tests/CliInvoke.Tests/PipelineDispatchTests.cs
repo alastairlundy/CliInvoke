@@ -164,9 +164,9 @@ internal class PipelineDispatchTests : IDisposable
     /// <summary>
     ///     L6 regression guard for the H2 normalisation: a null env-var value is the
     ///     documented removal signal and must survive the Raw-mode copy. A builder
-    ///     round-trip would throw <see cref="ArgumentNullException"/> here because
-    ///     <c>EnvironmentVariablesSpec</c> rejects nulls — the normalisation is therefore
-    ///     a faithful member-wise copy.
+    ///     round-trip would re-run spec validation and normalise
+    ///     <see cref="ProcessConfiguration.StandardInput"/> — the normalisation is
+    ///     therefore a faithful member-wise copy.
     /// </summary>
     [Test]
     public async Task InvokeAsync_Raw_RedirectedConfigWithNullEnvValue_PreservesNullValue()
@@ -175,9 +175,9 @@ internal class PipelineDispatchTests : IDisposable
         ProcessConfiguration config =
             new ProcessConfiguration(_targetFilePath)
             {
-                EnvironmentVariables = new Dictionary<string, string>(StringComparer.Ordinal)
+                EnvironmentVariables = new Dictionary<string, string?>(StringComparer.Ordinal)
                 {
-                    [VariableName] = null!,
+                    [VariableName] = null,
                 },
             };
         ProcessExitConfiguration exitConfig = ProcessExitConfiguration.CreateGraceful();

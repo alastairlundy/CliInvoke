@@ -16,9 +16,17 @@ namespace CliInvoke.Core.Configuration;
 ///     A sealed configuration seam for constructing environment variables,
 ///     replacing the former EnvironmentVariablesBuilder / IEnvironmentVariablesBuilder pair.
 /// </summary>
+/// <remarks>
+///     A <see langword="null" /> value is the variable-removal signal: when the child
+///     process starts, the variable is absent from the child's environment instead of
+///     being inherited from the current process. This maps onto the BCL null semantics
+///     of <see cref="System.Diagnostics.ProcessStartInfo.Environment" />, through which
+///     CliInvoke applies the built dictionary. An empty string value is different: it
+///     sets the variable to an empty value in the child process and does not remove it.
+/// </remarks>
 public sealed class EnvironmentVariablesSpec
 {
-    private readonly Dictionary<string, string> _environmentVariables;
+    private readonly Dictionary<string, string?> _environmentVariables;
     private readonly bool _throwExceptionIfDuplicateKeyFound;
 
     /// <summary>
@@ -28,7 +36,7 @@ public sealed class EnvironmentVariablesSpec
     public EnvironmentVariablesSpec()
     {
         _throwExceptionIfDuplicateKeyFound = true;
-        _environmentVariables = new Dictionary<string, string>(StringComparer.Ordinal);
+        _environmentVariables = new Dictionary<string, string?>(StringComparer.Ordinal);
     }
 
     /// <summary>
@@ -45,28 +53,27 @@ public sealed class EnvironmentVariablesSpec
         ArgumentNullException.ThrowIfNull(stringComparer);
 
         _throwExceptionIfDuplicateKeyFound = throwExceptionIfDuplicateKeyFound;
-        _environmentVariables = new Dictionary<string, string>(stringComparer);
+        _environmentVariables = new Dictionary<string, string?>(stringComparer);
     }
 
     /// <summary>
     ///     Sets multiple environment variables.
     /// </summary>
     /// <param name="variables">
-    ///     The environment variables to set. Keys must be non-null and non-empty. Values must
-    ///     not be null. An empty string value is permitted and sets the variable to an empty
-    ///     value in the child process; it does not remove the variable, and this specification
-    ///     cannot remove variables inherited from the parent environment.
+    ///     The environment variables to set. Keys must be non-null and non-empty. A
+    ///     <see langword="null" /> value records the removal of the variable from the child
+    ///     process's environment; an empty string value is permitted and sets the variable
+    ///     to an empty value in the child process.
     /// </param>
     /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
     public EnvironmentVariablesSpec SetEnumerable(
-        IEnumerable<KeyValuePair<string, string>> variables)
+        IEnumerable<KeyValuePair<string, string?>> variables)
     {
         ArgumentNullException.ThrowIfNull(variables);
 
-        foreach (KeyValuePair<string, string> pair in variables)
+        foreach (KeyValuePair<string, string?> pair in variables)
         {
             ArgumentException.ThrowIfNullOrEmpty(pair.Key, nameof(variables));
-            ArgumentNullException.ThrowIfNull(pair.Value, nameof(variables));
 
             if (_throwExceptionIfDuplicateKeyFound)
             {
@@ -89,15 +96,15 @@ public sealed class EnvironmentVariablesSpec
     /// </summary>
     /// <param name="name">The name of the environment variable to set. Must be non-null and non-empty.</param>
     /// <param name="value">
-    ///     The value of the environment variable to set. An empty string is permitted and sets
-    ///     the variable to an empty value in the child process (it does not remove the
-    ///     variable); <see langword="null" /> is rejected.
+    ///     The value of the environment variable to set. An empty string is permitted and
+    ///     sets the variable to an empty value in the child process (it does not remove the
+    ///     variable); <see langword="null" /> is the removal signal: the variable is absent
+    ///     from the child's environment instead of being inherited from the current process.
     /// </param>
     /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
-    public EnvironmentVariablesSpec SetPair(string name, string value)
+    public EnvironmentVariablesSpec SetPair(string name, string? value)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
-        ArgumentNullException.ThrowIfNull(value);
 
         if (_throwExceptionIfDuplicateKeyFound)
         {
@@ -117,9 +124,12 @@ public sealed class EnvironmentVariablesSpec
     /// <summary>
     ///     Sets multiple environment variables from a dictionary.
     /// </summary>
-    /// <param name="variables">The dictionary of environment variables to set.</param>
+    /// <param name="variables">
+    ///     The dictionary of environment variables to set. A <see langword="null" /> value
+    ///     records the removal of the variable from the child process's environment.
+    /// </param>
     /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
-    public EnvironmentVariablesSpec SetDictionary(IDictionary<string, string> variables)
+    public EnvironmentVariablesSpec SetDictionary(IDictionary<string, string?> variables)
     {
         ArgumentNullException.ThrowIfNull(variables);
 
@@ -129,10 +139,13 @@ public sealed class EnvironmentVariablesSpec
     /// <summary>
     ///     Sets multiple environment variables from a read-only dictionary.
     /// </summary>
-    /// <param name="variables">The read-only dictionary of environment variables to set.</param>
+    /// <param name="variables">
+    ///     The read-only dictionary of environment variables to set. A <see langword="null" />
+    ///     value records the removal of the variable from the child process's environment.
+    /// </param>
     /// <returns>The current <see cref="EnvironmentVariablesSpec" /> instance.</returns>
     public EnvironmentVariablesSpec SetReadOnlyDictionary(
-        IReadOnlyDictionary<string, string> variables)
+        IReadOnlyDictionary<string, string?> variables)
     {
         ArgumentNullException.ThrowIfNull(variables);
 
@@ -143,9 +156,9 @@ public sealed class EnvironmentVariablesSpec
     ///     Builds the dictionary of configured environment variables.
     /// </summary>
     /// <returns>A read-only dictionary containing the configured environment variables.</returns>
-    public IReadOnlyDictionary<string, string> Build()
+    public IReadOnlyDictionary<string, string?> Build()
     {
-        return new Dictionary<string, string>(_environmentVariables, _environmentVariables.Comparer);
+        return new Dictionary<string, string?>(_environmentVariables, _environmentVariables.Comparer);
     }
 
     /// <summary>

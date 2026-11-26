@@ -513,7 +513,7 @@ public sealed class ProcessConfigurationBuilder : IProcessConfigurationBuilder, 
 
         string arguments = _argumentsSpec.Build();
         
-        IReadOnlyDictionary<string, string> environmentVariables = _environmentVariablesSpec.Build();
+        IReadOnlyDictionary<string, string?> environmentVariables = _environmentVariablesSpec.Build();
         
         ProcessResourcePolicy resourcePolicy = _processResourcePolicySpec.Build();
         UserCredential credential = _userCredentialSpec.Build();

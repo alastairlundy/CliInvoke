@@ -295,12 +295,12 @@ internal abstract class BaseProcessControlAdapter
     }
 
     private void SetEnvironmentVariables(
-        Process process, IReadOnlyDictionary<string, string> environmentVariables)
+        Process process, IReadOnlyDictionary<string, string?> environmentVariables)
     {
         if (environmentVariables.Count == 0)
             return;
 
-        foreach (KeyValuePair<string, string> variable in environmentVariables)
+        foreach (KeyValuePair<string, string?> variable in environmentVariables)
             // BCL semantics: ProcessStartInfo.Environment treats a null value as removal of
             // the variable - entries whose value is null are omitted when the child's
             // environment block is built, so the variable is absent in the child instead of

@@ -41,7 +41,7 @@ public class RunnerConfigurationFactoryTests
         // Arrange
         IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
 
-        Dictionary<string, string> envVars = new Dictionary<string, string>(StringComparer.Ordinal) { { "MY_VAR", "hello" } };
+        Dictionary<string, string?> envVars = new Dictionary<string, string?>(StringComparer.Ordinal) { { "MY_VAR", "hello" } };
 
         ProcessConfiguration processConfigToBeRun = new ProcessConfigurationBuilder("target.exe")
             .SetArguments("--input value")
@@ -67,6 +67,38 @@ public class RunnerConfigurationFactoryTests
         await Assert.That(result.ArgumentList).Contains("value");
         await Assert.That(result.EnvironmentVariables).IsEquivalentTo(envVars);
         await Assert.That(result.StandardInputEncoding).IsEqualTo(System.Text.Encoding.UTF8);
+    }
+
+    [Test]
+    public async Task CreateRunnerConfiguration_PreservesNullEnvironmentValues()
+    {
+        // Arrange - null values are the documented variable-removal signal and must
+        // survive the runner re-wrap.
+        IRunnerConfigurationFactory factory = new RunnerConfigurationFactory();
+
+        Dictionary<string, string?> envVars = new(StringComparer.Ordinal)
+        {
+            ["MY_VAR"] = "hello",
+            ["REMOVED_VAR"] = null,
+        };
+
+        ProcessConfiguration processConfigToBeRun = new ProcessConfigurationBuilder("target.exe")
+            .ConfigureEnvironmentVariables(envSpec =>
+            {
+                envSpec.SetReadOnlyDictionary(envVars);
+            })
+            .Build();
+
+        ProcessConfiguration runnerProcessConfig = new ProcessConfigurationBuilder("runner.exe")
+            .Build();
+
+        // Act
+        ProcessConfiguration result = factory.CreateRunnerConfiguration(processConfigToBeRun, runnerProcessConfig);
+
+        // Assert
+        await Assert.That(result.EnvironmentVariables["MY_VAR"]).IsEqualTo("hello");
+        await Assert.That(result.EnvironmentVariables).ContainsKey("REMOVED_VAR");
+        await Assert.That(result.EnvironmentVariables["REMOVED_VAR"]).IsNull();
     }
 
     [Test]
