@@ -34,14 +34,13 @@ internal static class ProcessConfigurationDerivation
     ///     raw-mode pipe deadlock (Raw waits for exit without draining redirected output,
     ///     so a redirected pipe nobody reads blocks the child). This deliberately bypasses
     ///     the builder-based <see cref="Derive" /> path: builder seeding re-runs
-    ///     <c>EnvironmentVariablesSpec</c> validation, which rejects the null or empty
-    ///     variable names that direct initialisation of
+    ///     <c>EnvironmentVariablesSpec</c> validation, which rejects empty variable
+    ///     names that direct initialisation of
     ///     <see cref="ProcessConfiguration.EnvironmentVariables" /> would accept, and it
-    ///     normalizes
-    ///     <see cref="ProcessConfiguration.StandardInput" /> — a builder round-trip would
-    ///     therefore narrow which configurations the pipeline accepts. Resource-owning
-    ///     members (e.g. <see cref="ProcessConfiguration.StandardInput" />) are
-    ///     reference-copied, matching <see cref="Derive" />'s own copying semantics.
+    ///     normalizes <see cref="ProcessConfiguration.StandardInput" />. A builder
+    ///     round-trip would therefore narrow which configurations the pipeline accepts.
+    ///     Resource-owning members (e.g. <see cref="ProcessConfiguration.StandardInput" />)
+    ///     are reference-copied, matching <see cref="Derive" />'s own copying semantics.
     /// </remarks>
     /// <param name="source">The source configuration to copy from.</param>
     /// <returns>A copy of <paramref name="source" /> with output redirection disabled.</returns>

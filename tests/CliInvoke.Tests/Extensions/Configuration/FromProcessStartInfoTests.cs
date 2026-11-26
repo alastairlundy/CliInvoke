@@ -18,7 +18,8 @@ namespace CliInvoke.Tests.Extensions.Configuration;
 
 /// <summary>
 ///     Tests for <see cref="ConfigurationExtensions"/>'s <c>FromProcessStartInfo</c> mapping,
-///     covering the redirect-standard-input flag and the argument-list/string precedence rules.
+///     covering environment-variable mapping, the redirect-standard-input flag, and the
+///     argument-list/string precedence rules.
 /// </summary>
 public class FromProcessStartInfoTests
 {
@@ -76,6 +77,19 @@ public class FromProcessStartInfoTests
 
         await Assert.That(config.Arguments).IsEqualTo("--raw value");
         await Assert.That(config.ArgumentList).IsEmpty();
+    }
+
+    [Test]
+    public async Task FromProcessStartInfo_NullEnvironmentValue_PreservesRemoval()
+    {
+        const string variableName = "CLIINVOKE_FROM_PSI_NULL_ENV";
+        ProcessStartInfo startInfo = new("test.exe");
+        startInfo.Environment[variableName] = null;
+
+        ProcessConfiguration config = ProcessConfiguration.FromProcessStartInfo(startInfo);
+
+        await Assert.That(config.EnvironmentVariables).ContainsKey(variableName);
+        await Assert.That(config.EnvironmentVariables[variableName]).IsNull();
     }
 
     /// <summary>

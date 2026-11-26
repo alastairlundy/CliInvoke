@@ -100,7 +100,7 @@ using CliInvoke.Core.Configuration;
 builder.ConfigureEnvironmentVariables(env =>
 {
     env.SetPair("PATH", "/usr/local/bin");
-    env.SetEnumerable(new Dictionary<string, string>
+    env.SetEnumerable(new Dictionary<string, string?>
     {
         ["HOME"] = "/home/user",
         ["LANG"] = "en_US.UTF-8"
